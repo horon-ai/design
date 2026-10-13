@@ -80,16 +80,113 @@ export const letterSpacing = {
 	wider: 0.05,
 } as const
 
+/**
+ * Font families, split by platform. `web` keeps the CSS stacks; `native`
+ * exposes single React Native family names (loaded via expo-font in the app),
+ * because RN cannot resolve a CSS font-stack string.
+ */
 export const fontFamily = {
-	sans: "'Geist Variable', ui-sans-serif, system-ui, sans-serif",
-	mono: "ui-monospace, SFMono-Regular, Menlo, monospace",
+	web: {
+		sans: "'Geist Variable', ui-sans-serif, system-ui, sans-serif",
+		mono: "ui-monospace, SFMono-Regular, Menlo, monospace",
+	},
+	native: {
+		sans: "Geist",
+		mono: "GeistMono",
+	},
 } as const
 
+/**
+ * Elevation, split by platform. `web` is the CSS `box-shadow` string;
+ * `native.ios` carries the four RN shadow props and `native.android` the
+ * `elevation` level (Android renders shadows through elevation only).
+ */
 export const shadow = {
-	sm: { x: 0, y: 1, blur: 2, spread: 0, opacity: 0.05, color: "#000000" },
-	md: { x: 0, y: 4, blur: 6, spread: -1, opacity: 0.1, color: "#000000" },
-	lg: { x: 0, y: 10, blur: 15, spread: -3, opacity: 0.1, color: "#000000" },
+	sm: {
+		web: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+		native: {
+			ios: {
+				shadowOffset: { width: 0, height: 1 },
+				shadowOpacity: 0.05,
+				shadowRadius: 2,
+				shadowColor: "#000000",
+			},
+			android: { elevation: 1 },
+		},
+	},
+	md: {
+		web: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+		native: {
+			ios: {
+				shadowOffset: { width: 0, height: 4 },
+				shadowOpacity: 0.1,
+				shadowRadius: 6,
+				shadowColor: "#000000",
+			},
+			android: { elevation: 4 },
+		},
+	},
+	lg: {
+		web: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+		native: {
+			ios: {
+				shadowOffset: { width: 0, height: 10 },
+				shadowOpacity: 0.1,
+				shadowRadius: 15,
+				shadowColor: "#000000",
+			},
+			android: { elevation: 8 },
+		},
+	},
 } as const
+
+/**
+ * Motion durations in milliseconds, mirroring `core/packages/tokens` DURATION.
+ * Plain numbers so React Native can use them directly.
+ */
+export const duration = {
+	instant: 50,
+	fast: 100,
+	normal: 150,
+	slow: 200,
+	slower: 300,
+} as const
+
+/**
+ * Motion easing in both platform forms. `web` keeps the CSS keyword /
+ * cubic-bezier string; `native` exposes the same curve as a bezier
+ * control-point tuple `[x1, y1, x2, y2]` for React Native's `Easing.bezier`.
+ */
+export const easing = {
+	web: {
+		default: "ease",
+		in: "ease-in",
+		out: "ease-out",
+		"in-out": "ease-in-out",
+		"in-strong": "cubic-bezier(0.895, 0.03, 0.685, 0.22)",
+		"out-strong": "cubic-bezier(0.165, 0.84, 0.44, 1)",
+		"out-cubic": "cubic-bezier(0.215, 0.61, 0.355, 1)",
+		"out-quint": "cubic-bezier(0.16, 1, 0.3, 1)",
+		"in-out-strong": "cubic-bezier(0.77, 0, 0.175, 1)",
+	},
+	native: {
+		default: [0.25, 0.1, 0.25, 1],
+		in: [0.42, 0, 1, 1],
+		out: [0, 0, 0.58, 1],
+		"in-out": [0.42, 0, 0.58, 1],
+		"in-strong": [0.895, 0.03, 0.685, 0.22],
+		"out-strong": [0.165, 0.84, 0.44, 1],
+		"out-cubic": [0.215, 0.61, 0.355, 1],
+		"out-quint": [0.16, 1, 0.3, 1],
+		"in-out-strong": [0.77, 0, 0.175, 1],
+	},
+} as const
+
+/**
+ * Backdrop-blur radius (px) for glass surfaces. A non-color value, so it lives
+ * here rather than in the color token map (which runs through `oklchToHex`).
+ */
+export const glassBlur = 32
 
 export const zIndex = {
 	base: 0,
