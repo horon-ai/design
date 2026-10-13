@@ -143,6 +143,20 @@ export * from "./components/dialog"
 
 `cn()`은 `@horon/web/lib/utils`에서 가져옵니다.
 
+## 배포 (Storybook)
+
+Storybook 정적 사이트는 Cloudflare Pages 프로젝트 `horon-storybook`으로 배포합니다.
+
+- 프로덕션 URL: https://horon-storybook.pages.dev
+- 설정: `apps/storybook/wrangler.toml` (`pages_build_output_dir = "./storybook-static"`)
+
+```bash
+bun run deploy:storybook    # 빌드 후 프로덕션(main)으로 배포
+```
+
+`wrangler` CLI가 설치·로그인되어 있어야 합니다(`wrangler login`). CI에서는 `CLOUDFLARE_API_TOKEN`과
+`CLOUDFLARE_ACCOUNT_ID` 환경변수로 인증합니다.
+
 ## 검증
 
 ```bash
