@@ -160,8 +160,8 @@
   --sidebar-accent-foreground: oklch(0.9642 0 89.876);
   --sidebar-border: oklch(0.3052 0 89.876);
   --sidebar-ring: oklch(0.7225 0.1488 69.638);
-  --glass-fill: oklch(0.2136 0.032 262.44 / 0.55);
-  --glass-fill-strong: oklch(0.2136 0.032 262.44 / 0.75);
+  --glass-fill: oklch(0.2136 0.032 262.44 / 0.7);
+  --glass-fill-strong: oklch(0.2136 0.032 262.44 / 0.8);
   --glass-fill-frost: oklch(0.2136 0.032 262.44 / 0.9);
   --glass-fill-solid: oklch(0.2136 0.032 262.44);
   --glass-border: oklch(1 0 0 / 0.12);
