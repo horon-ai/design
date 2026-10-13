@@ -5,7 +5,7 @@
 		"jsx": "react-jsx",
 		"noEmit": true,
 		"verbatimModuleSyntax": true,
-		"types": ["vite/client"]
+		"types": ["vite/client", "bun"]
 	},
-	"include": [".storybook", "stories"]
+	"include": [".storybook", "stories", "test"]
 }
