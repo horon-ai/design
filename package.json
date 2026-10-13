@@ -1,0 +1,31 @@
+{
+	"name": "horon-design",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"packageManager": "bun@1.4.2",
+	"engines": {
+		"node": ">=20.19.0"
+	},
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"scripts": {
+		"build": "turbo build",
+		"dev": "turbo dev",
+		"lint": "turbo lint",
+		"typecheck": "turbo typecheck",
+		"format": "turbo format",
+		"tokens": "turbo build --filter=@horon/tokens",
+		"storybook": "turbo storybook --filter=@horon/storybook",
+		"build:storybook": "turbo build-storybook --filter=@horon/storybook",
+		"playground": "turbo dev --filter=@horon/playground"
+	},
+	"devDependencies": {
+		"prettier": "^3.9.9",
+		"prettier-plugin-tailwindcss": "^0.8.1",
+		"turbo": "^2.11.7",
+		"typescript": "~6.0.2"
+	}
+}
