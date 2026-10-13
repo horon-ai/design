@@ -310,7 +310,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: visual-engineering - navigation and data display
       Commit: Y | feat(web): add tabs/list/avatar/chip
 
-- [ ] 20. App form controls: Textarea, Switch, Checkbox, Radio
+- [x] 20. App form controls: Textarea, Switch, Checkbox, Radio
       What to do / Must NOT do: build RN versions in `packages/app/src/components/`, using `@horon/tokens/native` values and the existing primitives; do NOT edit `packages/app/src/index.ts` - todo 24 owns the barrel. Do NOT use DOM/CSS.
       Closes: GAP-6
       Parallelization: Wave 3 | Blocked by: 8,9 | Blocks: 24
@@ -320,7 +320,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: deep-low - React Native components on shared tokens
       Commit: Y | feat(app): add Textarea/Switch/Checkbox/Radio
 
-- [ ] 21. App overlays: Dialog, Sheet, Select, Tooltip
+- [x] 21. App overlays: Dialog, Sheet, Select, Tooltip
       What to do / Must NOT do: RN modal/sheet/select/tooltip using `Modal`/`Pressable` primitives + tokens (no entry-point edit; todo 24 owns the barrel). Do NOT use DOM APIs.
       Closes: GAP-6
       Parallelization: Wave 3 | Blocked by: 8,9 | Blocks: 24
@@ -330,7 +330,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: deep-low - RN modal/sheet primitives
       Commit: Y | feat(app): add Dialog/Sheet/Select/Tooltip
 
-- [ ] 22. App feedback: Progress, Skeleton, Toast, Empty
+- [x] 22. App feedback: Progress, Skeleton, Toast, Empty
       What to do / Must NOT do: build RN versions (no entry-point edit; todo 24 owns the barrel). Do NOT add later-tier components.
       Closes: GAP-6
       Parallelization: Wave 3 | Blocked by: 8,9 | Blocks: 24
@@ -340,7 +340,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: deep-low - RN async feedback
       Commit: Y | feat(app): add Progress/Skeleton/Toast/Empty
 
-- [ ] 23. App navigation/data: Tabs, List, Avatar, Chip
+- [x] 23. App navigation/data: Tabs, List, Avatar, Chip
       What to do / Must NOT do: build RN versions (no entry-point edit; todo 24 owns the barrel). Do NOT build table/chart.
       Closes: GAP-6
       Parallelization: Wave 3 | Blocked by: 8,9 | Blocks: 24
@@ -350,7 +350,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: deep-low - RN navigation and data display
       Commit: Y | feat(app): add Tabs/List/Avatar/Chip
 
-- [ ] 24. Export the full v1 set from both entry points and add Storybook coverage
+- [x] 24. Export the full v1 set from both entry points and add Storybook coverage
       What to do / Must NOT do: ensure every new component is exported from `packages/web/src/index.ts` and `packages/app/src/index.ts`, and that each has a story. Do NOT leave an unexported component.
       Closes: GAP-6
       Parallelization: Wave 3 | Blocked by: 16-23 | Blocks: F1
@@ -370,14 +370,44 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: quick - dependency/link fix
       Commit: Y | fix(app): make react-native-web resolvable for the storybook build
 
+- [x] 26. Fix the app-component lint errors (react-hooks/refs on Animated.Value)
+      What to do / Must NOT do: make `bun run lint` exit 0 across the workspace. 15 `react-hooks/refs` errors in packages/app/src/components/{Switch,Progress,Skeleton}.tsx (Animated.Value interpolate/access during render). Prefer restructuring so the rule passes (e.g. react-native's useAnimatedValue, or moving the interpolation out of render); if the rule is a genuine false positive for the RN Animated API, configure it narrowly with a documented rationale - do NOT blanket-disable lint or weaken rules globally.
+      Closes: verification-enabler (no GAP row)
+      Parallelization: Wave 3 | Blocked by: 20-23 | Blocks: F1
+      References: packages/app/src/components/Switch.tsx, packages/app/src/components/Progress.tsx, packages/app/src/components/Skeleton.tsx, packages/app/eslint.config.js
+      Acceptance criteria: `bun run lint` exits 0 (all packages).
+      QA scenarios: happy - bun run lint exit 0; failure - confirm the three components still animate/render (screenshot). Evidence .omo/evidence/design-system-tidy/task-26-lint.md.
+      Recommended task executor category: deep-low - framework-rule friction
+      Commit: Y | fix(app): resolve react-hooks/refs lint errors in animated components
+
+- [x] 27. Fix IS-6: dark glass contrast over light content
+      What to do / Must NOT do: make the glass surface meet WCAG 4.5:1 in the DEFAULT state (not only the degradation ladder). F4 measured the DARK glass (glass-fill dark, ~0.55 alpha) over light content at 3.42:1 - below 4.5:1. Per the research rule, dark glass must be a darker, MORE OPAQUE sheet so its self-owned glass-foreground always has contrast. Adjust the glass tokens (packages/tokens/src/tokens.ts glass-fill/glass-fill-strong for dark, and if needed light) so glass-foreground composited over representative real backdrops (light card, dark card, busy/image) is >= 4.5:1 in BOTH themes; regenerate theme.css. Do NOT weaken the rule by lowering the target; do NOT remove the degradation ladder.
+      Closes: IS-6
+      Parallelization: Wave 3 | Blocked by: 3,7 | Blocks: F4
+      References: packages/tokens/src/tokens.ts (glass tokens), SYNTHESIS F3/F9 (dark glass = darker, more opaque sheet), packages/web/src/styles/globals.css (.glass).
+      Acceptance criteria: a WCAG contrast computation (script) over the representative backdrops shows >= 4.5:1 for glass-foreground in light AND dark; written to .omo/evidence/design-system-tidy/task-3-glass.md.
+      QA scenarios: happy - print the contrast table (all >= 4.5:1); failure - confirm the degradation modes (prefers-reduced-transparency -> frost, no backdrop-filter -> solid) still resolve. Evidence .omo/evidence/design-system-tidy/task-3-glass.md.
+      Recommended task executor category: deep-low - accessibility-critical token tuning
+      Commit: Y | fix(tokens): make dark glass opaque enough for 4.5:1 contrast
+
+- [x] 28. Address F2 code-quality notes (CI branch, minor polish)
+      What to do / Must NOT do: fix the actionable notes from the F2 review. (N1) .github/workflows/ci.yml targets branches [main] but the working branch is dev - make CI run on push to dev (and PRs) too. (N3) packages/app/src/components/Toast.tsx schedules the dismiss timer twice (provider setTimeout at ~:159 and Toast useEffect at ~:44) - make it single-owner. (N4) packages/web/src/components/empty.tsx EmptyDescription declares React.ComponentProps<"p"> but renders <div> - align type and element. (N5) packages/web/src/components/dialog.tsx is missing the "use client" directive that sheet.tsx/select.tsx/radio-group.tsx carry - add it for consistency. (N6) packages/tokens/src/palette.ts alpha() is unused - either export it from the package index or remove it. Do NOT change behavior or weaken tests; N2 (render tests) is a noted limitation, leave it.
+      Closes: verification-enabler (no GAP row)
+      Parallelization: Wave 3 | Blocked by: 14,20-23 | Blocks: F2
+      References: .github/workflows/ci.yml, packages/app/src/components/Toast.tsx, packages/web/src/components/empty.tsx, packages/web/src/components/dialog.tsx, packages/tokens/src/palette.ts.
+      Acceptance criteria: bun run lint && bun run typecheck && bun test && bun run build all exit 0; ci.yml triggers on dev.
+      QA scenarios: happy - the four commands pass; failure - confirm no behavior change (toast still dismisses once). Evidence .omo/evidence/design-system-tidy/task-28-polish.md.
+      Recommended task executor category: quick - small targeted fixes
+      Commit: Y | fix: address F2 review notes (ci branch, toast timer, misc)
+
 ## Final verification wave
 
 > Runs in parallel after ALL todos. ALL must APPROVE. Surface results and wait for the user's explicit okay before declaring complete.
 
-- [ ] F1. Plan compliance audit
-- [ ] F2. Code quality review
-- [ ] F3. Real manual QA
-- [ ] F4. Ideal-state fidelity
+- [x] F1. Plan compliance audit
+- [x] F2. Code quality review
+- [x] F3. Real manual QA
+- [x] F4. Ideal-state fidelity
 
 > Review note (known risk): codex-chatgpt-web 계획 검토는 상한(초회+재검토=2회)에 도달했다. 라운드2 FAIL 4건(엔트리 barrel 단일 소유자화, 폰트 파일 로딩, glass 실배경·강등 대비, 네이티브 렌더 필수화)은 반영했으나 3차 codex 검증은 하지 않았다. plan-reviewer 고정밀 리뷰는 라운드1 [OKAY].
 
