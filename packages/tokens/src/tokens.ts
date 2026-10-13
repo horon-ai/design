@@ -46,6 +46,19 @@ const light = {
   "sidebar-accent-foreground": solid("sand", 12, "light"),
   "sidebar-border": solid("sand", 5, "light"),
   "sidebar-ring": ACCENT.light,
+
+  // Glass = the floating-chrome surface variant. It OWNS its foreground (it
+  // must not inherit the theme `foreground`): light glass is a translucent
+  // white sheet, so its text is the dark ink, not the light-theme foreground.
+  // `glass-fill-frost` / `glass-fill-solid` are the degradation-ladder
+  // fallbacks for `prefers-reduced-transparency: reduce` and
+  // `@supports not (backdrop-filter)`.
+  "glass-fill": "oklch(1 0 0 / 0.55)",
+  "glass-fill-strong": "oklch(1 0 0 / 0.7)",
+  "glass-fill-frost": "oklch(1 0 0 / 0.9)",
+  "glass-fill-solid": "oklch(1 0 0)",
+  "glass-border": "oklch(1 0 0 / 0.8)",
+  "glass-foreground": "oklch(0.2686 0 89.876)",
 } as const
 
 const dark = {
@@ -85,6 +98,15 @@ const dark = {
   "sidebar-accent-foreground": solid("sand", 12, "dark"),
   "sidebar-border": solid("sand", 6, "dark"),
   "sidebar-ring": ACCENT.dark,
+
+  // Dark glass is a dark, MORE opaque sheet (not an inverted white one), so its
+  // owned foreground is the light ink.
+  "glass-fill": "oklch(0.2136 0.032 262.44 / 0.55)",
+  "glass-fill-strong": "oklch(0.2136 0.032 262.44 / 0.75)",
+  "glass-fill-frost": "oklch(0.2136 0.032 262.44 / 0.9)",
+  "glass-fill-solid": "oklch(0.2136 0.032 262.44)",
+  "glass-border": "oklch(1 0 0 / 0.12)",
+  "glass-foreground": "oklch(0.9642 0 89.876)",
 } as const satisfies Record<keyof typeof light, string>
 
 export const colorTokens = { light, dark }
