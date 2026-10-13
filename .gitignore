@@ -34,3 +34,12 @@ storybook-static
 
 # typescript
 *.tsbuildinfo
+
+# .omo runtime (keep .omo/plans and .omo/drafts tracked)
+.omo/evidence/
+.omo/ulw-execute/
+.omo/ulw-research/
+.omo/ulw-loop/
+.omo/team-specs/
+.omo/ev/
+.hyper/
