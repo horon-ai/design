@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useState } from "react"
 import {
 	Animated,
 	type DimensionValue,
@@ -23,7 +23,7 @@ export function Skeleton({
 	style,
 }: SkeletonProps) {
 	const t = useTheme()
-	const opacity = useRef(new Animated.Value(0.5)).current
+	const [opacity] = useState(() => new Animated.Value(0.5))
 
 	useEffect(() => {
 		const loop = Animated.loop(
