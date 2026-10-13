@@ -150,11 +150,15 @@ export function ToastProvider({
 		setItems((prev) => prev.filter((item) => item.id !== id))
 	}, [])
 
+	// Single-owner auto-dismiss: the provider schedules the timer once, at
+	// creation, and strips `duration` from the stored item so the rendered
+	// <Toast> does not schedule a second timer. A standalone <Toast> (rendered
+	// outside a provider) still owns its own timer through its effect.
 	const toast = useCallback(
 		(options: ToastOptions) => {
 			const id = (idRef.current += 1)
-			setItems((prev) => [...prev, { id, ...options }])
-			const autoDismiss = options.duration ?? duration
+			const { duration: autoDismiss = duration, ...rest } = options
+			setItems((prev) => [...prev, { id, ...rest }])
 			if (autoDismiss > 0) {
 				setTimeout(() => dismiss(id), autoDismiss)
 			}

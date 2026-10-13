@@ -1,5 +1,7 @@
 export * from "./tokens"
 export * from "./scales"
+export { PALETTE, step, solid, alpha, INK, ACCENT } from "./palette"
+export type { PaletteName, PaletteRamp, Ramp, Mode } from "./palette"
 export { oklchToHex, oklchToRgbString, oklchToRgba, parseOklch } from "./color"
 export { buildThemeCss, tokenToHex } from "./css"
 export type { Rgba } from "./color"
