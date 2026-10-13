@@ -4,10 +4,15 @@
 디자인 토큰을 한 곳에서 정의하고, 웹은 Tailwind CSS v4, 네이티브는 같은 값의 StyleSheet를
 쓰기 때문에 두 플랫폼의 색·간격·타이포가 어긋나지 않습니다.
 
+토큰 정본은 `@horon/tokens` 하나입니다. 확정 Horon 팔레트(sand 중성 + gold 액센트 + 잉크
+primary), glass 표면, 모션, 그리고 React Native가 그대로 쓰는 폰트·그림자 값이 모두 여기서
+나옵니다.
+
 ## 구조
 
 ```
 apps/
+  native/       @horon/native      Expo 앱 — @horon/app 을 소비해 네이티브 렌더를 증명
   playground/   @horon/playground  웹 데모 앱 (@horon/web 만 사용)
   storybook/    @horon/storybook   두 레이어를 함께 미리보기 (개발 도구)
 packages/
@@ -22,10 +27,10 @@ packages/
 참조하지 않고, 이 경계는 각 패키지·앱의 `eslint.config.js`에 있는
 `no-restricted-imports` 규칙으로 강제됩니다. 어기면 `bun run lint`가 막습니다.
 
-| 위치                        | import 가능                   | 금지                                          |
-| --------------------------- | ----------------------------- | --------------------------------------------- |
-| `packages/app`, 네이티브 앱 | `@horon/app`, `@horon/tokens` | `@horon/web`, `react-native-web`, `react-dom` |
-| `packages/web`, 웹 앱       | `@horon/web`, `@horon/tokens` | `@horon/app`, `react-native`                  |
+| 위치                          | import 가능                   | 금지                                          |
+| ----------------------------- | ----------------------------- | --------------------------------------------- |
+| `packages/app`, `apps/native` | `@horon/app`, `@horon/tokens` | `@horon/web`, `react-native-web`, `react-dom` |
+| `packages/web`, 웹 앱         | `@horon/web`, `@horon/tokens` | `@horon/app`, `react-native`                  |
 
 ```tsx
 // 앱(React Native)
@@ -46,6 +51,13 @@ bun install
 bun run tokens        # 토큰 CSS(theme.css) 생성
 bun run storybook     # Storybook → http://localhost:6006 (두 레이어 미리보기)
 bun run playground    # 웹 데모 앱
+```
+
+네이티브는 별도로 띄웁니다. `apps/native`가 `@horon/app`을 그대로 소비합니다.
+
+```bash
+cd apps/native
+bunx expo start --ios    # iOS 시뮬레이터에서 네이티브 렌더 확인
 ```
 
 ## 컴포넌트 사용
@@ -69,7 +81,7 @@ export function Screen() {
 ```
 
 Metro가 워크스페이스 패키지를 읽도록 `metro.config.js`에 `watchFolders`와
-`nodeModulesPaths`를 모노레포 루트로 잡아 주세요.
+`nodeModulesPaths`를 모노레포 루트로 잡아 주세요. `apps/native`가 그 예입니다.
 
 ### React 웹 앱 — `@horon/web`
 
@@ -88,13 +100,30 @@ import "@horon/web/globals.css" // 엔트리에서 한 번
 `@horon/web`은 단일 진입점(`"."`)과 하위 경로(`@horon/web/components/button`)를 모두
 제공합니다.
 
-## 토큰 수정
+## 토큰
 
-1. 색은 `packages/tokens/src/tokens.ts`, 간격·반경·글자 크기는
+정본은 `packages/tokens` 하나입니다. 색·표면·모션·폰트·그림자가 여기서 나오고, 웹과
+네이티브가 같은 값을 씁니다.
+
+- **팔레트**: `packages/tokens/src/palette.ts`의 raw 램프(sand 12+6, gold, status)를
+  `tokens.ts`에서 시맨틱 이름으로 매핑합니다. 표면·텍스트·경계는 sand, `primary`는 잉크,
+  `accent`/`ring`은 gold입니다.
+- **glass**: `glass-fill`·`glass-border`·`glass-foreground`(자체 foreground)와 강등 래더
+  (frost, solid)를 `tokens.ts`에, blur 반경은 `scales.ts`에 둡니다. 웹의 `.glass` /
+  `.glass-strong` 유틸리티와 `prefers-reduced-transparency`·`no backdrop-filter` 강등이
+  여기서 파생됩니다.
+- **모션**: `scales.ts`의 `duration`(ms 숫자)과 `easing`(웹은 CSS 문자열, 네이티브는
+  `Easing.bezier`가 먹는 4-튜플).
+- **폰트·그림자**: `scales.ts`에서 웹/네이티브로 나뉩니다. 네이티브는 RN 단일 패밀리명
+  (`Geist`)과 플랫폼별 그림자(iOS shadow props / Android elevation)를 씁니다.
+
+수정 순서는 이렇습니다.
+
+1. 색은 `packages/tokens/src/palette.ts`, 간격·반경·글자·모션·폰트·그림자는
    `packages/tokens/src/scales.ts`에서 고칩니다.
 2. `bun run tokens`로 `packages/tokens/theme.css`를 다시 생성합니다.
 3. 웹은 Tailwind 유틸리티(`bg-primary`, `rounded-lg` 등)로, 네이티브는
-   `@horon/tokens/native`가 준 hex 값으로 같은 색을 씁니다.
+   `@horon/tokens/native`가 주는 hex·숫자 값으로 같은 색·간격을 씁니다.
 
 ## shadcn 컴포넌트 추가·커스텀
 
@@ -117,11 +146,16 @@ export * from "./components/dialog"
 ## 검증
 
 ```bash
+bun test                          # 토큰 드리프트 가드 + 팔레트 스냅샷
 bun run typecheck                 # 전 워크스페이스 타입 검사
 bun run lint                      # 경계 규칙 포함 린트
-bun run build:storybook           # Storybook 정적 빌드
 bun run build                     # 토큰 + 웹 앱 빌드
+bun run build:storybook           # Storybook 정적 빌드
 ```
+
+`bun test`가 토큰 드리프트 가드를 돌립니다. `theme.css`를 손으로 고치거나 생성기를 낡게
+두면 재생성 결과와 달라져 테스트가 실패합니다. CI(GitHub Actions)도 같은
+lint·typecheck·test·build를 돌립니다.
 
 ## 알아 둘 점
 
@@ -129,5 +163,6 @@ bun run build                     # 토큰 + 웹 앱 빌드
   웹은 Vite가 각각 변환합니다.
 - `@horon/app`의 React Native 컴포넌트를 웹에서 확인하려면 Storybook을 씁니다. 웹 앱은
   `@horon/web`만 쓰므로 웹 번들에 `react-native-web`이 들어가지 않습니다.
-- 아직 React Native 앱 프로젝트는 이 저장소에 없습니다. `apps/native`(Expo)를 추가해
-  `@horon/app`을 소비하게 하고, 그 앱에도 같은 경계 규칙을 넣으면 됩니다.
+- `apps/native`(Expo)는 `@horon/app`을 그대로 소비해 네이티브 렌더를 증명합니다.
+  `metro.config.js`가 모노레포 루트를 watch하고, Geist 폰트는 `expo-font`로 로드해
+  `fontFamily.native.sans`가 런타임에 해석됩니다.
