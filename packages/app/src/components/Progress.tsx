@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import {
 	Animated,
 	Easing,
@@ -36,7 +36,7 @@ export function Progress({
 }: ProgressProps) {
 	const t = useTheme()
 	const [trackWidth, setTrackWidth] = useState(0)
-	const anim = useRef(new Animated.Value(0)).current
+	const [anim] = useState(() => new Animated.Value(0))
 
 	useEffect(() => {
 		if (!indeterminate) return

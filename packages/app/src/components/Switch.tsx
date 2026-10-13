@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useState } from "react"
 import {
 	Animated,
 	Easing,
@@ -32,7 +32,7 @@ export function Switch({
 	...rest
 }: SwitchProps) {
 	const t = useTheme()
-	const progress = useRef(new Animated.Value(value ? 1 : 0)).current
+	const [progress] = useState(() => new Animated.Value(value ? 1 : 0))
 
 	useEffect(() => {
 		Animated.timing(progress, {
