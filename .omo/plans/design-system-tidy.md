@@ -120,7 +120,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
 
 > Implementation + Test = ONE todo. Never separate.
 
-- [ ] 1. Encode the raw Horon palette into the tokens package
+- [x] 1. Encode the raw Horon palette into the tokens package
      What to do / Must NOT do: create `packages/tokens/src/palette.ts` holding the raw primitive ramps as the single encoded copy: the **sand monochrome** ramp (12 solid + 6 alpha, light+dark) read from `core/packages/tokens/src/palette.ts` (the `gray` hue), a **gold** accent ramp, and **status** ramps (success/warning/danger/info). Encode the ramps as **OKLCH strings** - the existing pipeline (`packages/tokens/src/color.ts` `oklchToHex`) throws on non-OKLCH input, so convert the core hex ramps to OKLCH as you encode them (do NOT copy raw hex). Do NOT edit the core/web repos; read them read-only. Do NOT change existing semantic names yet.
      Closes: GAP-1
      Parallelization: Wave 1 | Blocked by: - | Blocks: 2,7
@@ -130,7 +130,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
      Recommended task executor category: deep-low - reads sibling repos read-only and encodes ramps
      Commit: Y | feat(tokens): add raw Horon palette (sand/gold/status)
 
-- [ ] 2. Rewrite the semantic color layer to the Horon palette
+- [x] 2. Rewrite the semantic color layer to the Horon palette
      What to do / Must NOT do: in `packages/tokens/src/tokens.ts`, remap the semantic tokens to the palette: surface/text/border all from the **sand** ramp; `primary` = **ink** (near-black light / near-white dark) per the recorded decision; `accent`/`ring` = **gold**; status colors muted. Keep the existing semantic token NAMES (background/foreground/card/muted/border/input/ring/primary/...) so nothing downstream breaks. Light + dark.
      Closes: GAP-1
      Parallelization: Wave 1 | Blocked by: 1 | Blocks: 3,4,5,6
@@ -210,7 +210,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
      Recommended task executor category: visual-engineering - Tailwind v4 utilities and glass surface styling
      Commit: Y | feat(web): consume glass/motion tokens in globals.css
 
-- [ ] 10. Fix the story folder naming drift
+- [x] 10. Fix the story folder naming drift
       What to do / Must NOT do: rename `apps/storybook/stories/universal` to `apps/storybook/stories/app` and update story titles `Universal/*` to `App/*`. Do NOT change story content.
       Closes: GAP-8
       Parallelization: Wave 2 | Blocked by: - | Blocks: F2
@@ -220,7 +220,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: quick - folder rename plus title strings
       Commit: Y | chore(storybook): rename universal stories to app
 
-- [ ] 11. Clean stray artifacts and settle `.omo` handling
+- [x] 11. Clean stray artifacts and settle `.omo` handling
       What to do / Must NOT do: remove tracked build outputs (`apps/playground/dist`, `apps/storybook/storybook-static`) if present; add `.omo/evidence/` to `.gitignore` while keeping `.omo/plans` and `.omo/drafts` tracked; confirm `.gitignore` covers dist/storybook-static/.turbo. Do NOT delete the `.omo/ulw-research` trail.
       Closes: GAP-10
       Parallelization: Wave 2 | Blocked by: - | Blocks: F2
