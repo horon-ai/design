@@ -91,6 +91,12 @@ export const shadow = {
 	lg: { x: 0, y: 10, blur: 15, spread: -3, opacity: 0.1, color: "#000000" },
 } as const
 
+/**
+ * Backdrop-blur radius (px) for glass surfaces. A non-color value, so it lives
+ * here rather than in the color token map (which runs through `oklchToHex`).
+ */
+export const glassBlur = 32
+
 export const zIndex = {
 	base: 0,
 	dropdown: 1000,
