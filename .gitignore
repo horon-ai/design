@@ -34,3 +34,6 @@ storybook-static
 
 # typescript
 *.tsbuildinfo
+
+# omo evidence (plans and drafts stay tracked)
+.omo/evidence/
