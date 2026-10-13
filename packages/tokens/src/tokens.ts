@@ -100,9 +100,14 @@ const dark = {
   "sidebar-ring": ACCENT.dark,
 
   // Dark glass is a dark, MORE opaque sheet (not an inverted white one), so its
-  // owned foreground is the light ink.
-  "glass-fill": "oklch(0.2136 0.032 262.44 / 0.55)",
-  "glass-fill-strong": "oklch(0.2136 0.032 262.44 / 0.75)",
+  // owned foreground is the light ink. The default rung must stay >= 4.5:1 even
+  // when it floats over LIGHT content: a dark sheet at low alpha lifts its
+  // composite toward the backdrop, and light ink over a light-lifted composite
+  // loses contrast (0.55 alpha measured 3.66:1 over a light card). The fill
+  // opacity is set high enough to clear AA over a pure-white backdrop while
+  // staying translucent (measured 5.87:1; see scripts/glass-contrast.ts).
+  "glass-fill": "oklch(0.2136 0.032 262.44 / 0.7)",
+  "glass-fill-strong": "oklch(0.2136 0.032 262.44 / 0.8)",
   "glass-fill-frost": "oklch(0.2136 0.032 262.44 / 0.9)",
   "glass-fill-solid": "oklch(0.2136 0.032 262.44)",
   "glass-border": "oklch(1 0 0 / 0.12)",

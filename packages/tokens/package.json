@@ -12,6 +12,7 @@
 	},
 	"scripts": {
 		"build": "bun run scripts/build.ts",
+		"contrast": "bun run scripts/glass-contrast.ts",
 		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
