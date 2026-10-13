@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Button, HStack, Stack, Text } from "@horon/app"
 
 const meta = {
-	title: "Universal/Button",
+	title: "App/Button",
 	component: Button,
 	parameters: { layout: "centered" },
 	argTypes: {
