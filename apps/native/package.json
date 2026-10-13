@@ -1,0 +1,34 @@
+{
+	"name": "@horon/native",
+	"version": "0.0.0",
+	"private": true,
+	"main": "index.js",
+	"scripts": {
+		"start": "expo start",
+		"ios": "expo start --ios",
+		"android": "expo start --android",
+		"typecheck": "tsc --noEmit",
+		"lint": "eslint ."
+	},
+	"dependencies": {
+		"@expo-google-fonts/geist": "^0.4.2",
+		"@horon/app": "workspace:*",
+		"@horon/tokens": "workspace:*",
+		"expo": "~57.0.28",
+		"expo-font": "~57.0.4",
+		"expo-status-bar": "~57.0.1",
+		"react": "19.2.3",
+		"react-native": "0.86.3"
+	},
+	"devDependencies": {
+		"@eslint/js": "^10",
+		"@types/react": "~19.2.0",
+		"babel-preset-expo": "~57.0.15",
+		"eslint": "^10",
+		"eslint-plugin-react-hooks": "^7.1.1",
+		"eslint-plugin-react-refresh": "^0.5.7",
+		"globals": "^17",
+		"typescript": "~6.0.2",
+		"typescript-eslint": "^8"
+	}
+}
