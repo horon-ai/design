@@ -1,0 +1,14 @@
+{
+	"schema_version": 2,
+	"active_work_id": "design-system-tidy",
+	"works": {
+		"design-system-tidy": {
+			"work_id": "design-system-tidy",
+			"active_plan": ".omo/plans/design-system-tidy.md",
+			"plan_name": "design-system-tidy",
+			"session_ids": ["senpi:01a1365b-c74b-74f2-9107-f07b4aae081c"],
+			"status": "active",
+			"worktree_path": "/Users/alpox/dev/horon-ai/design-wt/design-system-tidy-wave1"
+		}
+	}
+}

@@ -1,0 +1,14 @@
+Edit the ONE image attached to this prompt. This is a color-only edit: keep the drawing EXACTLY as it is.
+
+KEEP UNCHANGED (do not redraw, do not restyle, do not move, do not resize, do not change any shape or proportion):
+- the falcon chick's exact head shape, the two crown feather tufts, the face-plate outline, the two eyes and their white highlights, the beak, the raised waving wing and the resting wing, the chest eye mark, the feet, the contact shadow, the pose, the framing, and the camera angle.
+
+CHANGE ONLY THESE COLORS:
+- every navy/dark-blue area (hood, body, wings, eyes) -> warm near-black ink #1C1A17.
+- the dark navy background field -> flat warm cream #FBF7F0.
+- keep the cream face plate and the cream chest mark as they are; keep the beak and feet a warm brand gold #E0921F.
+
+The result must look like the SAME image with only the palette swapped. Output one square PNG and save it to this exact absolute path on disk:
+/Users/alpox/dev/horon-ai/design/assets/horon-mascot-wave.png
+
+After saving, reply with only the absolute path and the pixel dimensions.

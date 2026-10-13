@@ -1,0 +1,7 @@
+Edit the attached image. Keep the design identical (same shapes, pose, framing, lighting). Change ONLY the colors:
+- navy/dark-blue hood, body, and eyes -> #1C1A17
+- dark navy background -> #FBF7F0
+- beak -> #E0921F
+- keep the cream face plate cream.
+Save the result as PNG to: /Users/alpox/dev/horon-ai/design/assets/horon-mascot-face.png
+Reply with the path and pixel size.

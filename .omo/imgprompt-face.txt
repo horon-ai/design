@@ -1,0 +1,7 @@
+A single square brand-mascot icon for Horon, a warm friendly AI product.
+
+Subject: a close-up head-and-shoulders portrait of one round falcon chick, facing the camera straight on, calm and approachable. The head is one heavily rounded square; two short feather tufts rise from the crown. A large soft oval face plate in warm cream fills most of the head, framed by a dark rounded hood. Two large round dark eyes, each carrying one small white highlight; a short soft triangular beak tilted very slightly to the character's left. Shoulders are cropped at the bottom edge.
+
+Render as a soft matte clay 3D character: broad rounded bevels, an even fully matte surface, gentle soft occlusion, no mirror gloss. Palette: warm near-black ink #1C1A17 for the hood, eyes, and shoulders; warm cream #FBF7F0 for the face plate; brand gold #E0921F for the beak. Field: one flat uncluttered warm cream #FBF7F0 surface. Lighting: a single broad soft key light from the upper left, falling off softly toward the right.
+
+Composition: the head centered, filling about 85% of the frame height, with a generous even margin. Square 1:1 canvas at 1254x1254. A clean wordless field holding one isolated subject.

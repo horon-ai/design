@@ -1,0 +1,12 @@
+Generate one image with your image-generation tool, then save the resulting PNG file to this exact absolute path on disk: /Users/alpox/dev/horon-ai/design/assets/horon-mascot-wave.png
+
+Image brief:
+A single square brand-mascot image for Horon, a warm friendly AI product.
+
+Subject: one round falcon chick standing and waving hello, three-quarter front view, friendly and calm. The head is one heavily rounded square with two short feather tufts on the crown; a large soft oval cream face plate framed by a dark rounded hood; two large round dark eyes each carrying one small white highlight; a short soft triangular beak tilted very slightly to the character's left. The body is a short rounded pill about two-thirds the head width. A raised right wing waves up beside the head; the left wing rests down at the side. On the chest, a modern geometric eye mark: a shallow arc above a small dot, over an inverted arc below. Two small feet.
+
+Render as a soft matte clay 3D character: broad rounded bevels, an even fully matte surface, one flat elliptical contact shadow under the feet, no mirror gloss. Palette: warm near-black ink #1C1A17 for the hood, body, wings, and eyes; warm cream #FBF7F0 for the face plate and the chest mark; brand gold #E0921F for the beak and the feet. Field: one flat uncluttered warm cream #FBF7F0 surface. Lighting: a single broad soft key light from the upper left, falling off softly toward the right.
+
+Composition: the character centered, about 62% of the frame height, with a wider top margin than bottom. Square 1:1 canvas at 1254x1254. A clean wordless field holding one isolated subject.
+
+After saving, reply with only the absolute path you wrote and the pixel dimensions.

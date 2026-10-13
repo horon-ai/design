@@ -230,7 +230,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: quick - gitignore and artifact cleanup
       Commit: Y | chore: ignore build outputs and evidence
 
-- [ ] 12. Add an Expo native app that consumes @horon/app
+- [x] 12. Add an Expo native app that consumes @horon/app
       What to do / Must NOT do: scaffold `apps/native` (Expo, TypeScript) with a minimal screen rendering `@horon/app` components (Button, Card, Input, Badge, Spinner) under the app theme; wire the monorepo (metro watchFolders); register and LOAD the Geist font file via `expo-font` (or `@expo-google-fonts/geist`) so `fontFamily.native.sans` resolves at runtime. Do NOT duplicate component logic; import from `@horon/app`. Do NOT add an app that can't typecheck.
       Closes: GAP-7
       Parallelization: Wave 2 | Blocked by: 8 | Blocks: F3
@@ -250,7 +250,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: deep-low - a test that must fail on mutation
       Commit: Y | test(tokens): guard theme.css against drift
 
-- [ ] 14. Add minimal CI
+- [x] 14. Add minimal CI
       What to do / Must NOT do: add `.github/workflows/ci.yml` running install, lint, typecheck, test, and build on push/PR using Bun. Do NOT add deploy steps.
       Closes: GAP-9
       Parallelization: Wave 2 | Blocked by: 13 | Blocks: F1
@@ -260,7 +260,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: quick - a single workflow file
       Commit: Y | ci: add lint/typecheck/test/build workflow
 
-- [ ] 15. Update the README for the new structure and palette
+- [x] 15. Update the README for the new structure and palette
       What to do / Must NOT do: update `README.md` to describe the canonical tokens, the Horon palette, glass/motion, `apps/native`, and the drift guard. Do NOT document features that do not exist.
       Closes: GAP-11
       Parallelization: Wave 2 | Blocked by: - | Blocks: F2
@@ -270,7 +270,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: writing - documentation prose
       Commit: Y | docs: update README for the canonical token system
 
-- [ ] 16. Web form controls: textarea, checkbox, radio-group, switch
+- [x] 16. Web form controls: textarea, checkbox, radio-group, switch
       What to do / Must NOT do: vendor/build these into `packages/web/src/components/` on Base UI + Tailwind v4, styled with the new tokens; add stories under `stories/web`. Do NOT edit `packages/web/src/index.ts` - todo 24 owns the barrel. Do NOT restyle with raw hex.
       Closes: GAP-6
       Parallelization: Wave 3 | Blocked by: 9 | Blocks: 24
@@ -280,7 +280,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: visual-engineering - Base UI components styled with tokens
       Commit: Y | feat(web): add textarea/checkbox/radio-group/switch
 
-- [ ] 17. Web overlays: dialog, sheet, tooltip, select
+- [x] 17. Web overlays: dialog, sheet, tooltip, select
       What to do / Must NOT do: vendor/build these (Base UI dialog/popover/select primitives), glass styling for the floating chrome (dialog/sheet/tooltip/select list), stories (do NOT edit `packages/web/src/index.ts` - todo 24 owns the barrel). Do NOT use glass on content surfaces.
       Closes: GAP-6
       Parallelization: Wave 3 | Blocked by: 9 | Blocks: 24
@@ -290,7 +290,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: visual-engineering - overlay chrome with glass styling
       Commit: Y | feat(web): add dialog/sheet/tooltip/select
 
-- [ ] 18. Web feedback: progress, skeleton, toast, empty
+- [x] 18. Web feedback: progress, skeleton, toast, empty
       What to do / Must NOT do: build these + stories (no entry-point edit; todo 24 owns the barrel). Async feedback is v1 (an agent that looks frozen reads as broken). Do NOT add "soon/later" components.
       Closes: GAP-6
       Parallelization: Wave 3 | Blocked by: 9 | Blocks: 24
@@ -300,7 +300,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: visual-engineering - async feedback components
       Commit: Y | feat(web): add progress/skeleton/toast/empty
 
-- [ ] 19. Web navigation/data: tabs, list, avatar, chip
+- [x] 19. Web navigation/data: tabs, list, avatar, chip
       What to do / Must NOT do: build these + stories (no entry-point edit; todo 24 owns the barrel). Do NOT build table/chart (later).
       Closes: GAP-6
       Parallelization: Wave 3 | Blocked by: 9 | Blocks: 24
