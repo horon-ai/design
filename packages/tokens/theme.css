@@ -47,6 +47,7 @@
   --color-glass-border: var(--glass-border);
   --color-glass-foreground: var(--glass-foreground);
   --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-heading: var(--font-sans);
   --radius-xs: calc(var(--radius) * 0.4);
   --radius-sm: calc(var(--radius) * 0.6);
@@ -56,6 +57,23 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --duration-instant: 50ms;
+  --duration-fast: 100ms;
+  --duration-normal: 150ms;
+  --duration-slow: 200ms;
+  --duration-slower: 300ms;
+  --ease-default: ease;
+  --ease-in: ease-in;
+  --ease-out: ease-out;
+  --ease-in-out: ease-in-out;
+  --ease-in-strong: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+  --ease-out-strong: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-out-quint: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 :root {
@@ -102,6 +120,7 @@
   --glass-border: oklch(1 0 0 / 0.8);
   --glass-foreground: oklch(0.2686 0 89.876);
   --radius: 0.625rem;
+  --glass-blur: 32px;
 }
 
 .dark {
@@ -147,4 +166,25 @@
   --glass-fill-solid: oklch(0.2136 0.032 262.44);
   --glass-border: oklch(1 0 0 / 0.12);
   --glass-foreground: oklch(0.9642 0 89.876);
+}
+
+/* Glass accessibility fallbacks. The floating-chrome surface degrades from the
+ * translucent glass fill to the frost (prefers-reduced-transparency) or solid
+ * (no backdrop-filter) rung of the ladder, and drops the blur with it. */
+@media (prefers-reduced-transparency: reduce) {
+  :root,
+  .dark {
+    --glass-fill: var(--glass-fill-frost);
+    --glass-fill-strong: var(--glass-fill-frost);
+    --glass-blur: 0px;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root,
+  .dark {
+    --glass-fill: var(--glass-fill-solid);
+    --glass-fill-strong: var(--glass-fill-solid);
+    --glass-blur: 0px;
+  }
 }
