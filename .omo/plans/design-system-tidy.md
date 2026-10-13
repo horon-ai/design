@@ -140,7 +140,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
      Recommended task executor category: deep-low - semantic remapping with downstream constraints
      Commit: Y | feat(tokens): map semantics to the Horon sand/gold/ink palette
 
-- [ ] 3. Add glass tokens (chrome variant, self-owned foreground)
+- [x] 3. Add glass tokens (chrome variant, self-owned foreground)
      What to do / Must NOT do: add the glass COLOR tokens `glass-fill`, `glass-fill-strong`, `glass-border`, `glass-foreground` to `tokens.ts` (colors only), light+dark; put the non-color `glass-blur` radius in `scales.ts` (NOT the color map, which runs through `oklchToHex`); add the degradation-ladder values (frost, solid) as color variants. Glass must OWN its foreground (do not inherit theme `foreground`). Do NOT apply glass to content surfaces.
      Closes: GAP-2
      Parallelization: Wave 1 | Blocked by: 2 | Blocks: 4,7,8
@@ -150,7 +150,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
      Recommended task executor category: deep-low - accessibility-critical foreground decision
      Commit: Y | feat(tokens): add glass tokens with self-owned foreground
 
-- [ ] 4. Add motion tokens
+- [x] 4. Add motion tokens
      What to do / Must NOT do: add `duration` and `easing` scales to `packages/tokens/src/scales.ts`, mirroring `core/packages/tokens/src/scales.ts` DURATION/EASING. `duration` = numeric ms. `easing` = BOTH forms: web keeps the CSS strings (`ease`, `cubic-bezier(...)`); native exposes each key as a **bezier control-point tuple `[x1,y1,x2,y2]`** (map `ease`->[0.25,0.1,0.25,1], `ease-in`->[0.42,0,1,1], `ease-out`->[0,0,0.58,1], `ease-in-out`->[0.42,0,0.58,1]; named core beziers keep their points) so RN's `Easing.bezier(...)` consumes it. Do NOT emit a CSS string into the native slot. Do NOT invent new timings beyond the core set.
      Closes: GAP-3
      Parallelization: Wave 1 | Blocked by: 3 | Blocks: 5,7,8
@@ -160,7 +160,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
      Recommended task executor category: quick - mechanical mirror of the core motion scale
      Commit: Y | feat(tokens): add motion tokens
 
-- [ ] 5. Split fontFamily into web + native
+- [x] 5. Split fontFamily into web + native
      What to do / Must NOT do: change `fontFamily` to `{ web: {sans, mono}, native: {sans, mono} }` in `scales.ts`; `web.sans` keeps the CSS stack, `native.sans` becomes a single RN family name (e.g. `Geist`). Update every consumer in the same todo: `packages/app/src/primitives/Text.tsx`, `packages/app/src/theme/index.tsx`, `packages/tokens/src/css.ts`. Do NOT leave a CSS string in the native slot.
      Closes: GAP-4
      Parallelization: Wave 1 | Blocked by: 4 | Blocks: 6,7,8
@@ -170,7 +170,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
      Recommended task executor category: quick - small, well-defined shape change
      Commit: Y | feat(tokens): split fontFamily for web and native
 
-- [ ] 6. Reshape shadow for web + native
+- [x] 6. Reshape shadow for web + native
      What to do / Must NOT do: change `shadow` to `{ web: <css string>, native: { ios: {shadowOffset,shadowOpacity,shadowRadius,shadowColor}, android: {elevation} } }` in `scales.ts` for sm/md/lg. Update every consumer (`packages/tokens/src/css.ts`, `packages/app/src/theme/index.tsx`) in the same todo, and add `bun run typecheck` to the acceptance criteria. Do NOT keep only the CSS shape.
      Closes: GAP-5
      Parallelization: Wave 1 | Blocked by: 5 | Blocks: 7,8
@@ -180,7 +180,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
      Recommended task executor category: deep-low - platform-specific RN mapping
      Commit: Y | feat(tokens): reshape shadow for web and native
 
-- [ ] 7. Extend the CSS generator and regenerate theme.css
+- [x] 7. Extend the CSS generator and regenerate theme.css
      What to do / Must NOT do: update `packages/tokens/src/css.ts` to emit the new `--color-*` (palette/semantic), `--glass-*`, `--font-*`, `--shadow-*`, motion vars, plus the `@media (prefers-reduced-transparency: reduce)` and `@supports not (backdrop-filter)` fallbacks for glass. Run `bun run --filter @horon/tokens build` to regenerate `theme.css`. Do NOT hand-edit `theme.css`.
      Closes: GAP-1,GAP-2,GAP-3,GAP-4,GAP-5
      Parallelization: Wave 1 | Blocked by: 1-6 | Blocks: 8,13,16-24
@@ -190,7 +190,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
      Recommended task executor category: deep-low - generator change plus a11y fallbacks
      Commit: Y | feat(tokens): generate glass/motion/font/shadow CSS
 
-- [ ] 8. Export the new tokens from the native entry point
+- [x] 8. Export the new tokens from the native entry point
      What to do / Must NOT do: update `packages/tokens/src/native.ts` to export a `glass` aggregate object (glass colors as hex + `glass-blur` from scales), `duration` as numbers and `easing` as bezier tuples, `fontFamily.native`, and `shadow.native`, so `@horon/app` can consume them. Do NOT break existing exports.
      Closes: GAP-2,GAP-3,GAP-4,GAP-5
      Parallelization: Wave 1 | Blocked by: 3-6 | Blocks: 12,13
@@ -200,7 +200,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
      Recommended task executor category: deep-low - keeps the native consumer contract intact
      Commit: Y | feat(tokens): export glass/motion/font/shadow for native
 
-- [ ] 9. Wire the web globals to the new tokens and add glass utilities
+- [x] 9. Wire the web globals to the new tokens and add glass utilities
      What to do / Must NOT do: ensure `packages/web/src/styles/globals.css` consumes `@horon/tokens/theme.css` and exposes the glass surface utility/classes (`glass`, `glass-strong`) and motion utilities. Do NOT redefine palette values in the CSS (single source is the generator).
      Closes: GAP-2
      Parallelization: Wave 1 | Blocked by: 7 | Blocks: 16-24
@@ -240,7 +240,7 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       Recommended task executor category: deep-low - Expo scaffold plus monorepo metro wiring
       Commit: Y | feat(native): add Expo app consuming @horon/app
 
-- [ ] 13. Add the token-drift guard test
+- [x] 13. Add the token-drift guard test
       What to do / Must NOT do: add a test that regenerates `theme.css` from source and asserts zero diff (so the generator can never go stale), plus a value-snapshot test for the palette. Add a root `test` script running it. Do NOT weaken or skip.
       Closes: GAP-9
       Parallelization: Wave 2 | Blocked by: 7,8 | Blocks: 14,F1
@@ -359,6 +359,16 @@ Your next move: 실행은 별도 세션의 `/ulw-execute design-system-tidy`로 
       QA scenarios: happy - import every component by name from each entry point; failure - confirm a missing export fails the check. Evidence `.omo/evidence/design-system-tidy/task-24-exports.md`.
       Recommended task executor category: unspecified-low - barrel exports plus story coverage
       Commit: Y | feat: export the v1 component set from both entry points
+
+- [x] 25. Fix the fresh-install storybook build (react-native-web link for @horon/app)
+      What to do / Must NOT do: make build:storybook pass from a FRESH install. Root cause: @horon/app does not depend on react-native-web, so a fresh bun install does not link it into packages/app/node_modules; the storybook vite alias (react-native -> react-native-web) then fails to resolve for files under packages/app and react-docgen parses the real (Flow) react-native, failing the build. Fix by making react-native-web resolvable from @horon/app (add it to @horon/app devDependencies and/or an optional peerDependency). Do NOT weaken the alias or globally skip docgen.
+      Closes: verification-enabler (no GAP row)
+      Parallelization: Wave 2 | Blocked by: 3-6 | Blocks: F2
+      References: packages/app/package.json, apps/storybook/.storybook/main.ts (vite alias), packages/app/src/primitives/Text.tsx.
+      Acceptance criteria: from the wave1 worktree, `rm -rf packages/app/node_modules && bun install && bun run build:storybook` exits 0.
+      QA scenarios: happy - fresh install + build:storybook exit 0; failure - confirm no Flow docgen errors from the real react-native. Evidence .omo/evidence/design-system-tidy/task-25-storybook-build.md.
+      Recommended task executor category: quick - dependency/link fix
+      Commit: Y | fix(app): make react-native-web resolvable for the storybook build
 
 ## Final verification wave
 
