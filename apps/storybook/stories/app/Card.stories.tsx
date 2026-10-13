@@ -13,7 +13,7 @@ import {
 } from "@horon/app"
 
 const meta = {
-	title: "Universal/Card",
+	title: "App/Card",
 	component: Card,
 	parameters: { layout: "centered" },
 } satisfies Meta<typeof Card>

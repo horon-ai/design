@@ -13,7 +13,7 @@ const variants: TextVariant[] = [
 ]
 
 const meta = {
-	title: "Universal/Typography",
+	title: "App/Typography",
 	component: Text,
 	parameters: { layout: "padded" },
 } satisfies Meta<typeof Text>
