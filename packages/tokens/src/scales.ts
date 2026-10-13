@@ -92,6 +92,48 @@ export const shadow = {
 } as const
 
 /**
+ * Motion durations in milliseconds, mirroring `core/packages/tokens` DURATION.
+ * Plain numbers so React Native can use them directly.
+ */
+export const duration = {
+	instant: 50,
+	fast: 100,
+	normal: 150,
+	slow: 200,
+	slower: 300,
+} as const
+
+/**
+ * Motion easing in both platform forms. `web` keeps the CSS keyword /
+ * cubic-bezier string; `native` exposes the same curve as a bezier
+ * control-point tuple `[x1, y1, x2, y2]` for React Native's `Easing.bezier`.
+ */
+export const easing = {
+	web: {
+		default: "ease",
+		in: "ease-in",
+		out: "ease-out",
+		"in-out": "ease-in-out",
+		"in-strong": "cubic-bezier(0.895, 0.03, 0.685, 0.22)",
+		"out-strong": "cubic-bezier(0.165, 0.84, 0.44, 1)",
+		"out-cubic": "cubic-bezier(0.215, 0.61, 0.355, 1)",
+		"out-quint": "cubic-bezier(0.16, 1, 0.3, 1)",
+		"in-out-strong": "cubic-bezier(0.77, 0, 0.175, 1)",
+	},
+	native: {
+		default: [0.25, 0.1, 0.25, 1],
+		in: [0.42, 0, 1, 1],
+		out: [0, 0, 0.58, 1],
+		"in-out": [0.42, 0, 0.58, 1],
+		"in-strong": [0.895, 0.03, 0.685, 0.22],
+		"out-strong": [0.165, 0.84, 0.44, 1],
+		"out-cubic": [0.215, 0.61, 0.355, 1],
+		"out-quint": [0.16, 1, 0.3, 1],
+		"in-out-strong": [0.77, 0, 0.175, 1],
+	},
+} as const
+
+/**
  * Backdrop-blur radius (px) for glass surfaces. A non-color value, so it lives
  * here rather than in the color token map (which runs through `oklchToHex`).
  */
