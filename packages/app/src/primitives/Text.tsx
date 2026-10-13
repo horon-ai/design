@@ -76,7 +76,7 @@ export function Text({
 			fontSize: t.fontSize.sm,
 			lineHeight: t.fontSize.sm * t.lineHeight.normal,
 			fontWeight: t.fontWeight.regular,
-			fontFamily: t.fontFamily.mono,
+			fontFamily: t.fontFamily.native.mono,
 		},
 	}[variant]
 
