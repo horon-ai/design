@@ -96,10 +96,48 @@ export const fontFamily = {
 	},
 } as const
 
+/**
+ * Elevation, split by platform. `web` is the CSS `box-shadow` string;
+ * `native.ios` carries the four RN shadow props and `native.android` the
+ * `elevation` level (Android renders shadows through elevation only).
+ */
 export const shadow = {
-	sm: { x: 0, y: 1, blur: 2, spread: 0, opacity: 0.05, color: "#000000" },
-	md: { x: 0, y: 4, blur: 6, spread: -1, opacity: 0.1, color: "#000000" },
-	lg: { x: 0, y: 10, blur: 15, spread: -3, opacity: 0.1, color: "#000000" },
+	sm: {
+		web: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+		native: {
+			ios: {
+				shadowOffset: { width: 0, height: 1 },
+				shadowOpacity: 0.05,
+				shadowRadius: 2,
+				shadowColor: "#000000",
+			},
+			android: { elevation: 1 },
+		},
+	},
+	md: {
+		web: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+		native: {
+			ios: {
+				shadowOffset: { width: 0, height: 4 },
+				shadowOpacity: 0.1,
+				shadowRadius: 6,
+				shadowColor: "#000000",
+			},
+			android: { elevation: 4 },
+		},
+	},
+	lg: {
+		web: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+		native: {
+			ios: {
+				shadowOffset: { width: 0, height: 10 },
+				shadowOpacity: 0.1,
+				shadowRadius: 15,
+				shadowColor: "#000000",
+			},
+			android: { elevation: 8 },
+		},
+	},
 } as const
 
 /**
