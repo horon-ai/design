@@ -1,0 +1,9 @@
+# Cloudflare Pages config for the Storybook static site.
+# Project: horon-storybook  ->  https://horon-storybook.pages.dev
+# Deploy:  bun run deploy:storybook   (from the repo root)
+# Requires the `wrangler` CLI to be installed and authenticated
+# (`wrangler login`). CI can authenticate with CLOUDFLARE_API_TOKEN +
+# CLOUDFLARE_ACCOUNT_ID instead.
+name = "horon-storybook"
+compatibility_date = "2026-10-14"
+pages_build_output_dir = "./storybook-static"

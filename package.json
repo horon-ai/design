@@ -21,7 +21,8 @@
 		"tokens": "turbo build --filter=@horon/tokens",
 		"storybook": "turbo storybook --filter=@horon/storybook",
 		"build:storybook": "turbo build-storybook --filter=@horon/storybook",
-		"playground": "turbo dev --filter=@horon/playground"
+		"playground": "turbo dev --filter=@horon/playground",
+		"deploy:storybook": "turbo build-storybook --filter=@horon/storybook && wrangler pages deploy apps/storybook/storybook-static --project-name=horon-storybook --branch=main"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.4.3",
