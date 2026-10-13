@@ -80,9 +80,20 @@ export const letterSpacing = {
 	wider: 0.05,
 } as const
 
+/**
+ * Font families, split by platform. `web` keeps the CSS stacks; `native`
+ * exposes single React Native family names (loaded via expo-font in the app),
+ * because RN cannot resolve a CSS font-stack string.
+ */
 export const fontFamily = {
-	sans: "'Geist Variable', ui-sans-serif, system-ui, sans-serif",
-	mono: "ui-monospace, SFMono-Regular, Menlo, monospace",
+	web: {
+		sans: "'Geist Variable', ui-sans-serif, system-ui, sans-serif",
+		mono: "ui-monospace, SFMono-Regular, Menlo, monospace",
+	},
+	native: {
+		sans: "Geist",
+		mono: "GeistMono",
+	},
 } as const
 
 export const shadow = {

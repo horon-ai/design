@@ -26,7 +26,7 @@ export function buildThemeCss(): string {
 
 @theme inline {
 ${themeColors}
-  --font-sans: ${fontFamily.sans};
+  --font-sans: ${fontFamily.web.sans};
   --font-heading: var(--font-sans);
   --radius-xs: calc(var(--radius) * 0.4);
   --radius-sm: calc(var(--radius) * 0.6);
