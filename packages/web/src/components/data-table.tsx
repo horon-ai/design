@@ -134,11 +134,20 @@ function DataTable<TData extends RowData>({
 					)}
 				</TableBody>
 			</Table>
-			<div className="flex items-center justify-between gap-4">
-				<p className="text-[13px] text-muted-foreground">
+			<div
+				data-slot="data-table-pagination"
+				className="flex items-center justify-between gap-4"
+			>
+				<p
+					data-slot="data-table-row-count"
+					className="text-[13px] text-muted-foreground"
+				>
 					{table.getRowCount()} row(s)
 				</p>
-				<div className="flex items-center gap-2">
+				<div
+					data-slot="data-table-pagination-controls"
+					className="flex items-center gap-2"
+				>
 					<Button
 						variant="outline"
 						size="sm"
@@ -147,7 +156,10 @@ function DataTable<TData extends RowData>({
 					>
 						Previous
 					</Button>
-					<span className="text-[13px] text-muted-foreground tabular-nums">
+					<span
+						data-slot="data-table-page-status"
+						className="text-[13px] text-muted-foreground tabular-nums"
+					>
 						Page {pagination.pageIndex + 1} of {pageCount}
 					</span>
 					<Button

@@ -77,7 +77,7 @@ function DrawerContent({
             >
               <XIcon
               />
-              <span className="sr-only">Close</span>
+              <span data-slot="drawer-close-text" className="sr-only">Close</span>
             </DrawerPrimitive.Close>
           )}
         </DrawerPrimitive.Popup>

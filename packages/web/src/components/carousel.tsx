@@ -190,7 +190,7 @@ function CarouselPrevious({
 			{...props}
 		>
 			<ChevronLeftIcon />
-			<span className="sr-only">Previous slide</span>
+			<span data-slot="carousel-previous-text" className="sr-only">Previous slide</span>
 		</Button>
 	)
 }
@@ -220,7 +220,7 @@ function CarouselNext({
 			{...props}
 		>
 			<ChevronRightIcon />
-			<span className="sr-only">Next slide</span>
+			<span data-slot="carousel-next-text" className="sr-only">Next slide</span>
 		</Button>
 	)
 }

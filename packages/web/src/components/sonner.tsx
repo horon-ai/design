@@ -31,6 +31,7 @@ function SonnerToaster({
 
 	return (
 		<SonnerToasterPrimitive
+			data-slot="toaster"
 			theme={theme ?? documentTheme}
 			className={cn("toaster group", className)}
 			style={
