@@ -134,6 +134,10 @@
   --glass-foreground: oklch(0.1448 0 90);
   --radius: 0.875rem;
   --glass-blur: 32px;
+  --glass-liquid-blur: 4px;
+  --glass-liquid-fill: linear-gradient(180deg, oklch(1 0 0 / 0.4) 10%, oklch(1 0 0 / 0.8));
+  --glass-liquid-border: linear-gradient(oklch(1 0 0 / 0.64) 40%, transparent 75% 95%, oklch(1 0 0 / 0.64));
+  --glass-liquid-shadow: 0 12px 12px 2px oklch(0 0 0 / 0.1), 0 2px 4px -1px oklch(0 0 0 / 0.06);
 }
 
 .dark {
@@ -182,6 +186,9 @@
   --glass-border: oklch(1 0 90 / 0.239);
   --glass-tint: oklch(1 0 90 / 0.059);
   --glass-foreground: oklch(0.9851 0 90);
+  --glass-liquid-fill: linear-gradient(180deg, oklch(1 0 0 / 0.08) 10%, oklch(1 0 0 / 0.14));
+  --glass-liquid-border: linear-gradient(oklch(1 0 0 / 0.24) 40%, transparent 75% 95%, oklch(1 0 0 / 0.24));
+  --glass-liquid-shadow: 0 12px 12px 2px oklch(0 0 0 / 0.4), 0 2px 4px -1px oklch(0 0 0 / 0.3);
 }
 
 /* Glass accessibility fallbacks. The floating-chrome surface degrades from the
@@ -193,6 +200,7 @@
     --glass-fill: var(--glass-fill-frost);
     --glass-fill-strong: var(--glass-fill-frost);
     --glass-blur: 0px;
+    --glass-liquid-blur: 0px;
   }
 }
 
@@ -202,5 +210,6 @@
     --glass-fill: var(--glass-fill-solid);
     --glass-fill-strong: var(--glass-fill-solid);
     --glass-blur: 0px;
+    --glass-liquid-blur: 0px;
   }
 }
