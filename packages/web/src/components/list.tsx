@@ -6,7 +6,7 @@ function List({ className, ...props }: React.ComponentProps<"ul">) {
 		<ul
 			data-slot="list"
 			className={cn(
-				"flex w-full flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-card text-card-foreground",
+				"flex w-full flex-col divide-y divide-border overflow-hidden rounded-md border border-border bg-card text-card-foreground",
 				className
 			)}
 			{...props}
