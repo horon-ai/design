@@ -14,6 +14,7 @@ type Layer = {
 	componentsDir: string
 	barrelPath: string
 	storiesDir: string
+	overviewPath: string
 	namespace: Record<string, unknown>
 }
 
@@ -23,6 +24,7 @@ const layers: Layer[] = [
 		componentsDir: `${repoRoot}/packages/web/src/components`,
 		barrelPath: `${repoRoot}/packages/web/src/index.ts`,
 		storiesDir: `${repoRoot}/apps/storybook/stories/web`,
+		overviewPath: `${repoRoot}/apps/storybook/stories/overview/Web.stories.tsx`,
 		namespace: web as unknown as Record<string, unknown>,
 	},
 	{
@@ -30,6 +32,7 @@ const layers: Layer[] = [
 		componentsDir: `${repoRoot}/packages/app/src/components`,
 		barrelPath: `${repoRoot}/packages/app/src/index.ts`,
 		storiesDir: `${repoRoot}/apps/storybook/stories/app`,
+		overviewPath: `${repoRoot}/apps/storybook/stories/overview/App.stories.tsx`,
 		namespace: app as unknown as Record<string, unknown>,
 	},
 ]
@@ -93,6 +96,15 @@ for (const layer of layers) {
 			for (const file of files) {
 				expect(storyFiles).toContain(
 					`${pascalCase(withoutExtension(file))}.stories.tsx`,
+				)
+			}
+		})
+
+		test("every component is listed on the layer overview page", async () => {
+			const overview = await Bun.file(layer.overviewPath).text()
+			for (const file of files) {
+				expect(overview).toContain(
+					`data-component="${pascalCase(withoutExtension(file))}"`,
 				)
 			}
 		})
