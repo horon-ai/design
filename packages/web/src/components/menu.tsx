@@ -15,11 +15,12 @@ function Menu({ className, ...props }: React.ComponentProps<"div">) {
 	)
 }
 
-function MenuItem({ className, ...props }: React.ComponentProps<"div">) {
+function MenuItem({ className, tabIndex = 0, ...props }: React.ComponentProps<"div">) {
 	return (
 		<div
 			data-slot="menu-item"
 			role="menuitem"
+			tabIndex={tabIndex}
 			className={cn(
 				"flex w-full items-center gap-2 rounded-[5px] px-2.5 py-[7px] text-xs text-foreground outline-none select-none hover:bg-foreground/5 focus-visible:bg-foreground/5 data-disabled:pointer-events-none data-disabled:opacity-50",
 				className
