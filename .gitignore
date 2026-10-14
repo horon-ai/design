@@ -43,3 +43,5 @@ storybook-static
 .omo/team-specs/
 .omo/ev/
 .hyper/
+
+.verify/
