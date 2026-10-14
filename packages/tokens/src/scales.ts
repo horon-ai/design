@@ -199,6 +199,31 @@ export const easing = {
  */
 export const glassBlur = 32
 
+/**
+ * Liquid glass - the floating-chrome recipe measured from baalda.com's header
+ * (2026-10-14): a vertical white gradient fill, a low 4px backdrop blur, a
+ * masked 1px gradient border, and a soft two-layer shadow. These are CSS
+ * strings (gradient/shadow), so they live in the scales like `shadow.web`.
+ */
+export const glassLiquidBlur = 4
+
+export const glassLiquidFill = {
+	light: "linear-gradient(180deg, oklch(1 0 0 / 0.4) 10%, oklch(1 0 0 / 0.8))",
+	dark: "linear-gradient(180deg, oklch(1 0 0 / 0.08) 10%, oklch(1 0 0 / 0.14))",
+} as const
+
+export const glassLiquidBorder = {
+	light:
+		"linear-gradient(oklch(1 0 0 / 0.64) 40%, transparent 75% 95%, oklch(1 0 0 / 0.64))",
+	dark: "linear-gradient(oklch(1 0 0 / 0.24) 40%, transparent 75% 95%, oklch(1 0 0 / 0.24))",
+} as const
+
+export const glassLiquidShadow = {
+	light:
+		"0 12px 12px 2px oklch(0 0 0 / 0.1), 0 2px 4px -1px oklch(0 0 0 / 0.06)",
+	dark: "0 12px 12px 2px oklch(0 0 0 / 0.4), 0 2px 4px -1px oklch(0 0 0 / 0.3)",
+} as const
+
 export const zIndex = {
 	base: 0,
 	dropdown: 1000,

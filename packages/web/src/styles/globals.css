@@ -42,6 +42,33 @@
     backdrop-filter: blur(var(--glass-blur));
   }
 
+  /* Liquid glass - the baalda.com header recipe: a vertical white gradient fill,
+   * a low 4px blur, a masked 1px gradient border (the ::before ring), and a soft
+   * two-layer shadow. The border radius is inherited from the element's own
+   * rounded-* class, so the same surface works at any radius (pill header to
+   * rounded card). Values come from theme.css, so it never re-declares a color. */
+  .liquid-glass {
+    position: relative;
+    background: var(--glass-liquid-fill);
+    -webkit-backdrop-filter: blur(var(--glass-liquid-blur));
+    backdrop-filter: blur(var(--glass-liquid-blur));
+    box-shadow: var(--glass-liquid-shadow);
+  }
+
+  .liquid-glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--glass-liquid-border);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
   /* Motion helpers driven by the duration/ease tokens. */
   .motion-surface {
     transition-property: background-color, border-color, color, box-shadow,

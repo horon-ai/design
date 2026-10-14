@@ -4,6 +4,10 @@ import {
 	easing,
 	fontFamily,
 	glassBlur,
+	glassLiquidBlur,
+	glassLiquidBorder,
+	glassLiquidFill,
+	glassLiquidShadow,
 	radius,
 	radiusRem,
 	shadow,
@@ -66,10 +70,17 @@ ${easingVars}
 ${lightVars}
   --radius: ${radiusRem}rem;
   --glass-blur: ${glassBlur}px;
+  --glass-liquid-blur: ${glassLiquidBlur}px;
+  --glass-liquid-fill: ${glassLiquidFill.light};
+  --glass-liquid-border: ${glassLiquidBorder.light};
+  --glass-liquid-shadow: ${glassLiquidShadow.light};
 }
 
 .dark {
 ${darkVars}
+  --glass-liquid-fill: ${glassLiquidFill.dark};
+  --glass-liquid-border: ${glassLiquidBorder.dark};
+  --glass-liquid-shadow: ${glassLiquidShadow.dark};
 }
 
 /* Glass accessibility fallbacks. The floating-chrome surface degrades from the
@@ -81,6 +92,7 @@ ${darkVars}
     --glass-fill: var(--glass-fill-frost);
     --glass-fill-strong: var(--glass-fill-frost);
     --glass-blur: 0px;
+    --glass-liquid-blur: 0px;
   }
 }
 
@@ -90,6 +102,7 @@ ${darkVars}
     --glass-fill: var(--glass-fill-solid);
     --glass-fill-strong: var(--glass-fill-solid);
     --glass-blur: 0px;
+    --glass-liquid-blur: 0px;
   }
 }
 `
