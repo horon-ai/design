@@ -30,6 +30,11 @@ const preview: Preview = {
 		},
 		layout: "padded",
 		a11y: { test: "todo" },
+		options: {
+			storySort: {
+				order: ["Overview", ["App", "Web"], "Foundations", "App", "Web"],
+			},
+		},
 	},
 	decorators: [
 		withThemeByClassName({
