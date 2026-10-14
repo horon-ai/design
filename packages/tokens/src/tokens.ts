@@ -1,117 +1,124 @@
 /**
- * Semantic color tokens, expressed in OKLCH (the CSS-native form).
- * `@horon/tokens/native` converts these to hex for React Native.
+ * Semantic color tokens, expressed in OKLCH.
  *
- * A thin remap over the raw Horon palette in `palette.ts`: sand feeds surfaces/
- * text/borders, ink feeds `primary`, gold feeds `accent`/`ring`, muted status
- * ramps feed success/warning/destructive. Token names are unchanged.
+ * Transcribed from the pen.dev canvas `00 Tokens` board
+ * (`horon-design.pen`, board `ev2sU`). `@horon/tokens/native` converts these to
+ * hex for React Native. Token names follow the shadcn contract.
+ *
+ * Primitives come from `palette.ts`. A few surfaces (card, popover, muted,
+ * secondary, accent, sidebar) are bespoke neutrals that are not on the sand
+ * ramp, so they are written out directly - the canvas defines them that way.
+ * Borders and inputs are the ink at 12% alpha, not a solid sand step.
  */
 
-import { ACCENT, INK, solid } from "./palette"
+import { ACCENT, INK, PALETTE } from "./palette"
 
 const light = {
-  background: solid("sand", 2, "light"),
-  foreground: solid("sand", 12, "light"),
-  card: solid("sand", 1, "light"),
-  "card-foreground": solid("sand", 12, "light"),
-  popover: solid("sand", 1, "light"),
-  "popover-foreground": solid("sand", 12, "light"),
-  primary: INK.light,
-  "primary-foreground": solid("sand", 1, "light"),
-  secondary: solid("sand", 3, "light"),
-  "secondary-foreground": solid("sand", 12, "light"),
-  muted: solid("sand", 3, "light"),
-  "muted-foreground": solid("sand", 10, "light"),
-  accent: solid("gold", 3, "light"),
-  "accent-foreground": solid("sand", 12, "light"),
-  destructive: solid("danger", 10, "light"),
-  "destructive-foreground": solid("sand", 1, "light"),
-  success: solid("success", 10, "light"),
-  "success-foreground": solid("sand", 1, "light"),
-  warning: solid("warning", 9, "light"),
-  "warning-foreground": solid("sand", 12, "light"),
-  border: solid("sand", 5, "light"),
-  input: solid("sand", 5, "light"),
-  ring: ACCENT.light,
-  "chart-1": solid("gold", 9, "light"),
-  "chart-2": solid("gold", 7, "light"),
-  "chart-3": solid("sand", 9, "light"),
-  "chart-4": solid("success", 10, "light"),
-  "chart-5": solid("danger", 10, "light"),
-  sidebar: solid("sand", 1, "light"),
-  "sidebar-foreground": solid("sand", 12, "light"),
-  "sidebar-primary": INK.light,
-  "sidebar-primary-foreground": solid("sand", 1, "light"),
-  "sidebar-accent": solid("gold", 3, "light"),
-  "sidebar-accent-foreground": solid("sand", 12, "light"),
-  "sidebar-border": solid("sand", 5, "light"),
-  "sidebar-ring": ACCENT.light,
+	background: PALETTE.sand[100],
+	foreground: PALETTE.sand[1200],
+	card: "oklch(1 0 90)",
+	"card-foreground": PALETTE.sand[1200],
+	popover: "oklch(1 0 90)",
+	"popover-foreground": PALETTE.sand[1200],
+	primary: INK.light,
+	"primary-foreground": PALETTE.sand[100],
+	secondary: PALETTE.sand[200],
+	"secondary-foreground": PALETTE.sand[1200],
+	muted: PALETTE.sand[200],
+	"muted-foreground": PALETTE.sand[700],
+	accent: PALETTE.sand[200],
+	"accent-foreground": PALETTE.sand[1200],
+	destructive: PALETTE.red[600],
+	"destructive-foreground": "oklch(1 0 90)",
+	success: PALETTE.green[600],
+	"success-foreground": "oklch(1 0 90)",
+	warning: PALETTE.gold[500],
+	"warning-foreground": "oklch(0.1889 0.026 77.499)",
+	info: PALETTE.blue[600],
+	"info-foreground": "oklch(1 0 90)",
+	border: "oklch(0.1448 0 90 / 0.122)",
+	input: "oklch(0.1448 0 90 / 0.122)",
+	ring: ACCENT.light,
+	"chart-1": PALETTE.sand[1200],
+	"chart-2": PALETTE.sand[700],
+	"chart-3": PALETTE.gold[500],
+	"chart-4": PALETTE.green[600],
+	"chart-5": PALETTE.blue[600],
+	sidebar: PALETTE.sand[200],
+	"sidebar-foreground": PALETTE.sand[1200],
+	"sidebar-primary": INK.light,
+	"sidebar-primary-foreground": PALETTE.sand[100],
+	"sidebar-accent": PALETTE.sand[400],
+	"sidebar-accent-foreground": PALETTE.sand[1200],
+	"sidebar-border": "oklch(0.1448 0 90 / 0.122)",
+	"sidebar-ring": ACCENT.light,
 
-  // Glass = the floating-chrome surface variant. It OWNS its foreground (it
-  // must not inherit the theme `foreground`): light glass is a translucent
-  // white sheet, so its text is the dark ink, not the light-theme foreground.
-  // `glass-fill-frost` / `glass-fill-solid` are the degradation-ladder
-  // fallbacks for `prefers-reduced-transparency: reduce` and
-  // `@supports not (backdrop-filter)`.
-  "glass-fill": "oklch(1 0 0 / 0.55)",
-  "glass-fill-strong": "oklch(1 0 0 / 0.7)",
-  "glass-fill-frost": "oklch(1 0 0 / 0.9)",
-  "glass-fill-solid": "oklch(1 0 0)",
-  "glass-border": "oklch(1 0 0 / 0.8)",
-  "glass-foreground": "oklch(0.2686 0 89.876)",
+	// Glass = the floating-chrome surface. It OWNS its foreground (it must not
+	// inherit the theme `foreground`). The fill/strong/border values are the
+	// canvas glass; `glass-fill-frost` / `glass-fill-solid` are the
+	// degradation-ladder rungs for `prefers-reduced-transparency: reduce` and
+	// `@supports not (backdrop-filter)`.
+	"glass-fill": "oklch(1 0 90 / 0.451)",
+	"glass-fill-strong": "oklch(1 0 90 / 0.651)",
+	"glass-fill-frost": "oklch(1 0 90 / 0.9)",
+	"glass-fill-solid": "oklch(1 0 90)",
+	"glass-border": "oklch(1 0 90 / 0.949)",
+	"glass-tint": "oklch(0.1448 0 90 / 0.039)",
+	"glass-foreground": PALETTE.sand[1200],
 } as const
 
 const dark = {
-  background: solid("sand", 1, "dark"),
-  foreground: solid("sand", 12, "dark"),
-  card: solid("sand", 3, "dark"),
-  "card-foreground": solid("sand", 12, "dark"),
-  popover: solid("sand", 3, "dark"),
-  "popover-foreground": solid("sand", 12, "dark"),
-  primary: INK.dark,
-  "primary-foreground": solid("sand", 1, "dark"),
-  secondary: solid("sand", 4, "dark"),
-  "secondary-foreground": solid("sand", 12, "dark"),
-  muted: solid("sand", 4, "dark"),
-  "muted-foreground": solid("sand", 9, "dark"),
-  accent: solid("gold", 4, "dark"),
-  "accent-foreground": solid("sand", 12, "dark"),
-  destructive: solid("danger", 9, "dark"),
-  "destructive-foreground": solid("sand", 12, "dark"),
-  success: solid("success", 9, "dark"),
-  "success-foreground": solid("sand", 1, "dark"),
-  warning: solid("warning", 9, "dark"),
-  "warning-foreground": solid("sand", 1, "dark"),
-  border: solid("sand", 6, "dark"),
-  input: solid("sand", 6, "dark"),
-  ring: ACCENT.dark,
-  "chart-1": solid("gold", 9, "dark"),
-  "chart-2": solid("gold", 7, "dark"),
-  "chart-3": solid("sand", 9, "dark"),
-  "chart-4": solid("success", 9, "dark"),
-  "chart-5": solid("danger", 9, "dark"),
-  sidebar: solid("sand", 3, "dark"),
-  "sidebar-foreground": solid("sand", 12, "dark"),
-  "sidebar-primary": INK.dark,
-  "sidebar-primary-foreground": solid("sand", 1, "dark"),
-  "sidebar-accent": solid("gold", 4, "dark"),
-  "sidebar-accent-foreground": solid("sand", 12, "dark"),
-  "sidebar-border": solid("sand", 6, "dark"),
-  "sidebar-ring": ACCENT.dark,
+	background: PALETTE.sand[1200],
+	foreground: PALETTE.sand[100],
+	card: "oklch(0.1913 0 90)",
+	"card-foreground": PALETTE.sand[100],
+	popover: "oklch(0.2046 0 90)",
+	"popover-foreground": PALETTE.sand[100],
+	primary: INK.dark,
+	"primary-foreground": PALETTE.sand[1200],
+	secondary: "oklch(0.2393 0 90)",
+	"secondary-foreground": PALETTE.sand[100],
+	muted: "oklch(0.2393 0 90)",
+	"muted-foreground": PALETTE.sand[600],
+	accent: "oklch(0.2393 0 90)",
+	"accent-foreground": PALETTE.sand[100],
+	destructive: PALETTE.red[400],
+	"destructive-foreground": "oklch(0.1796 0.0217 34.633)",
+	success: PALETTE.green[400],
+	"success-foreground": "oklch(0.2066 0.0257 153.463)",
+	warning: PALETTE.gold[400],
+	"warning-foreground": "oklch(0.2321 0.026 79.078)",
+	info: PALETTE.blue[400],
+	"info-foreground": "oklch(0.1961 0.0376 260.503)",
+	border: "oklch(0.9851 0 90 / 0.122)",
+	input: "oklch(0.9851 0 90 / 0.122)",
+	ring: ACCENT.dark,
+	"chart-1": PALETTE.sand[100],
+	"chart-2": PALETTE.sand[600],
+	"chart-3": PALETTE.gold[400],
+	"chart-4": PALETTE.green[400],
+	"chart-5": PALETTE.blue[400],
+	sidebar: "oklch(0.1684 0 90)",
+	"sidebar-foreground": PALETTE.sand[100],
+	"sidebar-primary": INK.dark,
+	"sidebar-primary-foreground": PALETTE.sand[1200],
+	"sidebar-accent": "oklch(0.2393 0 90)",
+	"sidebar-accent-foreground": PALETTE.sand[100],
+	"sidebar-border": "oklch(0.9851 0 90 / 0.122)",
+	"sidebar-ring": ACCENT.dark,
 
-  // Dark glass is a dark, MORE opaque sheet (not an inverted white one), so its
-  // owned foreground is the light ink. The default rung must stay >= 4.5:1 even
-  // when it floats over LIGHT content: a dark sheet at low alpha lifts its
-  // composite toward the backdrop, and light ink over a light-lifted composite
-  // loses contrast (0.55 alpha measured 3.66:1 over a light card). The fill
-  // opacity is set high enough to clear AA over a pure-white backdrop while
-  // staying translucent (measured 5.87:1; see scripts/glass-contrast.ts).
-  "glass-fill": "oklch(0.2136 0.032 262.44 / 0.7)",
-  "glass-fill-strong": "oklch(0.2136 0.032 262.44 / 0.8)",
-  "glass-fill-frost": "oklch(0.2136 0.032 262.44 / 0.9)",
-  "glass-fill-solid": "oklch(0.2136 0.032 262.44)",
-  "glass-border": "oklch(1 0 0 / 0.12)",
-  "glass-foreground": "oklch(0.9642 0 89.876)",
+	// Dark glass is a dark, MORE opaque sheet rather than the canvas's 10% white
+	// veil: a translucent veil over LIGHT content lifts its composite toward the
+	// backdrop, and no single self-owned foreground can then hold 4.5:1 over
+	// both light and dark backdrops (see scripts/glass-contrast.ts). The border
+	// and tint are the canvas values.
+	"glass-fill": "oklch(0.2136 0.032 262.44 / 0.7)",
+	"glass-fill-strong": "oklch(0.2136 0.032 262.44 / 0.8)",
+	"glass-fill-frost": "oklch(0.2136 0.032 262.44 / 0.9)",
+	"glass-fill-solid": "oklch(0.2136 0.032 262.44)",
+	"glass-border": "oklch(1 0 90 / 0.239)",
+	"glass-tint": "oklch(1 0 90 / 0.059)",
+	"glass-foreground": PALETTE.sand[100],
 } as const satisfies Record<keyof typeof light, string>
 
 export const colorTokens = { light, dark }

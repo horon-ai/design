@@ -28,20 +28,20 @@ export const space = {
 	24: 96,
 } as const
 
-/** Base radius in rem; shadcn derives its radius-* scale from this. */
-export const radiusRem = 0.625
+/** Base radius in rem (14px) - the canvas `radius` token. */
+export const radiusRem = 0.875
 
-/** Radius scale in pixels (derived from radiusRem, kept in sync by hand). */
+/** Radius scale in pixels, from the canvas `radius-*` tokens. */
 export const radius = {
 	none: 0,
-	xs: 4,
-	sm: 6,
-	md: 8,
-	lg: 10,
-	xl: 14,
-	"2xl": 18,
-	"3xl": 22,
-	"4xl": 26,
+	xs: 6,
+	sm: 8,
+	md: 12,
+	lg: 14,
+	xl: 20,
+	"2xl": 25,
+	"3xl": 31,
+	"4xl": 36,
 	full: 9999,
 } as const
 
@@ -54,6 +54,17 @@ export const fontSize = {
 	"2xl": 24,
 	"3xl": 30,
 	"4xl": 36,
+} as const
+
+/** Semantic type scale from the canvas `Typography` board. */
+export const text = {
+	caption: 12,
+	body: 14,
+	lead: 16,
+	subtitle: 18,
+	heading: 24,
+	display: 36,
+	hero: 48,
 } as const
 
 export const fontWeight = {

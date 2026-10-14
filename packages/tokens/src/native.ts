@@ -14,6 +14,7 @@ import {
 	radiusRem,
 	shadow,
 	space,
+	text,
 	zIndex,
 } from "./scales"
 
@@ -49,6 +50,7 @@ export const glass = {
 		fillFrost: colors.light["glass-fill-frost"],
 		fillSolid: colors.light["glass-fill-solid"],
 		border: colors.light["glass-border"],
+		tint: colors.light["glass-tint"],
 		foreground: colors.light["glass-foreground"],
 	},
 	dark: {
@@ -57,6 +59,7 @@ export const glass = {
 		fillFrost: colors.dark["glass-fill-frost"],
 		fillSolid: colors.dark["glass-fill-solid"],
 		border: colors.dark["glass-border"],
+		tint: colors.dark["glass-tint"],
 		foreground: colors.dark["glass-foreground"],
 	},
 } as const
@@ -78,6 +81,7 @@ export const scales = {
 	letterSpacing,
 	fontFamily,
 	shadow,
+	text,
 	zIndex,
 	breakpoint,
 } as const
@@ -100,5 +104,6 @@ export {
 	radiusRem,
 	shadow,
 	space,
+	text,
 	zIndex,
 }
