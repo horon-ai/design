@@ -108,5 +108,21 @@ for (const layer of layers) {
 				)
 			}
 		})
+
+		test("no component value export name is duplicated across files", async () => {
+			const owners = new Map<string, string[]>()
+			for (const file of files) {
+				const source = await Bun.file(`${layer.componentsDir}/${file}`).text()
+				for (const name of valueExports(source)) {
+					const list = owners.get(name) ?? []
+					list.push(file)
+					owners.set(name, list)
+				}
+			}
+			const duplicates = [...owners.entries()]
+				.filter(([, owners]) => owners.length > 1)
+				.map(([name, owners]) => `${name}: ${owners.join(", ")}`)
+			expect(duplicates).toEqual([])
+		})
 	})
 }
