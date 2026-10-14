@@ -114,7 +114,10 @@ function DropdownMenuCheckboxItem({
 			)}
 			{...props}
 		>
-			<span className="pointer-events-none absolute left-2 flex size-4 items-center justify-center">
+			<span
+				data-slot="dropdown-menu-checkbox-indicator"
+				className="pointer-events-none absolute left-2 flex size-4 items-center justify-center"
+			>
 				<MenuPrimitive.CheckboxItemIndicator>
 					<CheckIcon />
 				</MenuPrimitive.CheckboxItemIndicator>
@@ -151,7 +154,10 @@ function DropdownMenuRadioItem({
 			)}
 			{...props}
 		>
-			<span className="pointer-events-none absolute left-2 flex size-4 items-center justify-center">
+			<span
+				data-slot="dropdown-menu-radio-indicator"
+				className="pointer-events-none absolute left-2 flex size-4 items-center justify-center"
+			>
 				<MenuPrimitive.RadioItemIndicator>
 					<CircleIcon className="size-2 fill-current" />
 				</MenuPrimitive.RadioItemIndicator>

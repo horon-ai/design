@@ -109,7 +109,7 @@ function BreadcrumbEllipsis({
 			{...props}
 		>
 			<MoreHorizontalIcon />
-			<span className="sr-only">More</span>
+			<span data-slot="breadcrumb-ellipsis-text" className="sr-only">More</span>
 		</span>
 	)
 }

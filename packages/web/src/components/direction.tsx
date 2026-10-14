@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import { DirectionProvider as DirectionProviderPrimitive } from "@base-ui/react/direction-provider"
 

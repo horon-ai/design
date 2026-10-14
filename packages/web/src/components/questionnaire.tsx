@@ -29,7 +29,10 @@ function QuestionnaireProgress({
 			)}
 			{...props}
 		>
-			<span className="min-w-[14ch] text-xs font-medium text-muted-foreground tabular-nums">
+			<span
+				data-slot="questionnaire-progress-label"
+				className="min-w-[14ch] text-xs font-medium text-muted-foreground tabular-nums"
+			>
 				{children}
 			</span>
 			{typeof value === "number" ? (

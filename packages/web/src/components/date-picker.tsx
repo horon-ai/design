@@ -62,7 +62,7 @@ function DatePicker({
 				}
 			>
 				<CalendarIcon />
-				{selected ? format(selected, "PPP") : <span>{placeholder}</span>}
+				{selected ? format(selected, "PPP") : <span data-slot="date-picker-placeholder">{placeholder}</span>}
 			</PopoverTrigger>
 			<PopoverContent className="w-auto p-3" align={align}>
 				<Calendar
@@ -138,7 +138,7 @@ function DateRangePicker({
 						format(range.from, "LLL dd, y")
 					)
 				) : (
-					<span>{placeholder}</span>
+					<span data-slot="date-range-picker-placeholder">{placeholder}</span>
 				)}
 			</PopoverTrigger>
 			<PopoverContent className="w-auto p-3" align={align}>

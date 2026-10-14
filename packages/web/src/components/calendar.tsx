@@ -165,7 +165,10 @@ function Calendar({
 						data-week={week.weekNumber}
 						{...weekNumberProps}
 					>
-						<div className="flex size-(--cell-size) items-center justify-center text-center">
+						<div
+							data-slot="calendar-week-number-content"
+							className="flex size-(--cell-size) items-center justify-center text-center"
+						>
 							{children}
 						</div>
 					</td>

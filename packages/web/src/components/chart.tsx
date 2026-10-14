@@ -101,6 +101,7 @@ function ChartTooltip({
 }: React.ComponentProps<typeof RechartsPrimitive.Tooltip>) {
 	return (
 		<RechartsPrimitive.Tooltip
+			data-slot="chart-tooltip"
 			content={content ?? <ChartTooltipContent />}
 			{...props}
 		/>
@@ -149,7 +150,10 @@ function ChartTooltipContent({
 
 		if (labelFormatter) {
 			return (
-				<div className={cn("font-medium", labelClassName)}>
+				<div
+					data-slot="chart-tooltip-label-formatted"
+					className={cn("font-medium", labelClassName)}
+				>
 					{labelFormatter(value, payload)}
 				</div>
 			)
@@ -159,7 +163,14 @@ function ChartTooltipContent({
 			return null
 		}
 
-		return <div className={cn("font-medium", labelClassName)}>{value}</div>
+		return (
+			<div
+				data-slot="chart-tooltip-label-value"
+				className={cn("font-medium", labelClassName)}
+			>
+				{value}
+			</div>
+		)
 	}, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey])
 
 	if (!active || !payload?.length) {
@@ -178,7 +189,7 @@ function ChartTooltipContent({
 			)}
 		>
 			{nestLabel ? null : tooltipLabel}
-			<div className="grid gap-1.5">
+			<div data-slot="chart-tooltip-items" className="grid gap-1.5">
 				{items.map((item, index) => {
 					const key = `${nameKey ?? item.name ?? item.dataKey ?? "value"}`
 					const itemConfig = getPayloadConfigFromPayload(config, item, key)
@@ -187,6 +198,7 @@ function ChartTooltipContent({
 
 					return (
 						<div
+							data-slot="chart-tooltip-item"
 							key={index}
 							className={cn(
 								"flex w-full flex-wrap items-stretch gap-2 [&>svg]:size-2.5 [&>svg]:text-muted-foreground",
@@ -202,6 +214,7 @@ function ChartTooltipContent({
 									) : (
 										!hideIndicator && (
 											<div
+												data-slot="chart-tooltip-indicator"
 												className={cn(
 													"shrink-0 rounded-xs border-(--color-border) bg-(--color-bg)",
 													indicator === "dot" && "size-2.5",
@@ -220,19 +233,26 @@ function ChartTooltipContent({
 										)
 									)}
 									<div
+										data-slot="chart-tooltip-item-content"
 										className={cn(
 											"flex flex-1 justify-between leading-none",
 											nestLabel ? "items-end" : "items-center"
 										)}
 									>
-										<div className="grid gap-1.5">
+										<div data-slot="chart-tooltip-item-label" className="grid gap-1.5">
 											{nestLabel ? tooltipLabel : null}
-											<span className="text-muted-foreground">
+											<span
+												data-slot="chart-tooltip-item-name"
+												className="text-muted-foreground"
+											>
 												{itemConfig?.label ?? item.name}
 											</span>
 										</div>
 										{item.value !== undefined ? (
-											<span className="font-medium text-foreground tabular-nums">
+											<span
+												data-slot="chart-tooltip-item-value"
+												className="font-medium text-foreground tabular-nums"
+											>
 												{item.value.toLocaleString()}
 											</span>
 										) : null}
@@ -254,6 +274,7 @@ function ChartLegend({
 }: RechartsPrimitive.LegendProps & { className?: string }) {
 	return (
 		<RechartsPrimitive.Legend
+			data-slot="chart-legend"
 			content={content ?? <ChartLegendContent className={className} />}
 			{...props}
 		/>
@@ -293,6 +314,7 @@ function ChartLegendContent({
 
 				return (
 					<div
+						data-slot="chart-legend-item"
 						key={index}
 						className="flex items-center gap-1.5 [&>svg]:size-3 [&>svg]:text-muted-foreground"
 					>
@@ -300,6 +322,7 @@ function ChartLegendContent({
 							<itemConfig.icon />
 						) : (
 							<div
+								data-slot="chart-legend-indicator"
 								className="size-2 shrink-0 rounded-xs"
 								style={{ backgroundColor: item.color }}
 							/>
