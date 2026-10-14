@@ -24,7 +24,6 @@ import {
 	List,
 	ListItem,
 	Progress,
-	Radio,
 	RadioGroup,
 	Select,
 	Sheet,
@@ -64,7 +63,7 @@ const sectionStyle: CSSProperties = {
 	gap: 20,
 	paddingTop: 24,
 	marginTop: 16,
-	borderTop: "1px solid #e5e5e5",
+	borderTop: "1px solid var(--border)",
 }
 
 const specimenStyle: CSSProperties = {
@@ -77,7 +76,7 @@ const headingStyle: CSSProperties = { margin: 0 }
 
 const captionStyle: CSSProperties = {
 	margin: 0,
-	color: "#737373",
+	color: "var(--muted-foreground)",
 	fontSize: 13,
 	lineHeight: 1.5,
 }
