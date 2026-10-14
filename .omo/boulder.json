@@ -1,12 +1,24 @@
 {
 	"schema_version": 2,
-	"active_work_id": "design-system-tidy",
+	"active_work_id": "web-component-parity",
 	"works": {
-		"design-system-tidy": {
-			"work_id": "design-system-tidy",
-			"active_plan": ".omo/plans/design-system-tidy.md",
-			"plan_name": "design-system-tidy",
-			"session_ids": ["senpi:01a1365b-c74b-74f2-9107-f07b4aae081c"],
+		"web-component-parity": {
+			"work_id": "web-component-parity",
+			"active_plan": ".omo/plans/web-component-parity.md",
+			"plan_name": "web-component-parity",
+			"session_ids": [
+				"senpi:01a137ed-a6ba-76b6-9960-78a1a7fc5699"
+			],
+			"status": "active",
+			"worktree_path": null
+		},
+		"storybook-overview": {
+			"work_id": "storybook-overview",
+			"active_plan": ".omo/plans/storybook-overview.md",
+			"plan_name": "storybook-overview",
+			"session_ids": [
+				"senpi:01a1387d-01d3-7062-9959-33a996cd88fc"
+			],
 			"status": "completed",
 			"worktree_path": null
 		}
