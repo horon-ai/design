@@ -43,23 +43,25 @@ export const Variants: Story = {
 }
 
 export const Removable: Story = {
-	render: () => {
-		const [chips, setChips] = React.useState(["design", "tokens", "web"])
-		return (
-			<div className="flex flex-wrap items-center gap-2">
-				{chips.map((chip) => (
-					<Chip
-						key={chip}
-						variant="secondary"
-						removeLabel={`Remove ${chip}`}
-						onRemove={() =>
-							setChips((prev) => prev.filter((item) => item !== chip))
-						}
-					>
-						{chip}
-					</Chip>
-				))}
-			</div>
-		)
-	},
+	render: () => <RemovableDemo />,
+}
+
+function RemovableDemo() {
+	const [chips, setChips] = React.useState(["design", "tokens", "web"])
+	return (
+		<div className="flex flex-wrap items-center gap-2">
+			{chips.map((chip) => (
+				<Chip
+					key={chip}
+					variant="secondary"
+					removeLabel={`Remove ${chip}`}
+					onRemove={() =>
+						setChips((prev) => prev.filter((item) => item !== chip))
+					}
+				>
+					{chip}
+				</Chip>
+			))}
+		</div>
+	)
 }
