@@ -147,8 +147,9 @@ export * from "./components/dialog"
 
 Storybook 정적 사이트는 Cloudflare Pages 프로젝트 `horon-storybook`으로 배포합니다.
 
-- 프로덕션 URL: https://horon-storybook.pages.dev
-- **자동 배포**: GitHub 저장소(`horon-ai/design`)가 연결돼 있어 **`dev` 브랜치에 푸시하면 자동으로 빌드·배포**됩니다.
+- 프로덕션 URL: https://storybook.horon.ai (별칭 https://horon-storybook.pages.dev)
+- 브랜치: **`main`이 프로덕션 브랜치**, `dev`가 통합 브랜치입니다. 작업은 `dev`에 쌓고, 배포할 때 `dev`를 `main`으로 병합합니다.
+- **자동 배포**: GitHub 저장소(`horon-ai/design`)가 연결돼 있어 **`main` 브랜치에 푸시하면 자동으로 빌드·배포**됩니다.
   - 빌드: `bun install && bun run build:storybook`
   - 출력: `apps/storybook/storybook-static`
 - 수동 배포(폴백): `bun run deploy:storybook` — `wrangler` CLI가 설치·로그인돼 있어야 합니다(`wrangler login`).
