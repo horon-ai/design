@@ -5,11 +5,21 @@
   "tabWidth": 2,
   "useTabs": false,
   "trailingComma": "all",
-  "printWidth": 100,
-  "plugins": ["prettier-plugin-tailwindcss"],
-  "tailwindStylesheet": "packages/web/src/styles/globals.css",
-  "tailwindFunctions": ["cn", "cva"],
+  "printWidth": 120,
   "overrides": [
-    { "files": "package.json", "options": { "useTabs": true } }
+    {
+      "files": "package.json",
+      "options": {
+        "useTabs": true
+      }
+    }
+  ],
+  "plugins": [
+    "prettier-plugin-tailwindcss"
+  ],
+  "tailwindStylesheet": "packages/web/src/styles/globals.css",
+  "tailwindFunctions": [
+    "cn",
+    "cva"
   ]
 }

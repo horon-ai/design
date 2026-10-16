@@ -39,7 +39,6 @@
     "import/no-named-export": "off",
     "id-length": "off",
     "react/jsx-max-depth": "off",
-    "react/react-in-jsx-scope": "off",
     "capitalized-comments": "off",
     "node/no-sync": "off",
     "func-style": "off",
@@ -81,18 +80,13 @@
     ],
     "unicorn/prefer-number-coercion": "off",
     "unicorn/number-literal-case": "off",
-    "typescript/only-throw-error": "off"
+    "typescript/only-throw-error": "off",
+    "react/react-in-jsx-scope": "off"
   },
-  "ignorePatterns": [
-    "node_modules",
-    "dist",
-    "out",
-    ".omo",
-    "**/*.cjs"
-  ],
+  "ignorePatterns": ["node_modules", "dist", "out", ".omo", "**/*.cjs", ".expo", "**/routeTree.gen.ts"],
   "overrides": [
     {
-      "files": ["**/*.js", "**/*.jsx"],
+      "files": ["**/*.js", "**/*.jsx", "tools/**/*.mjs", "scripts/**/*.mjs"],
       "rules": {
         "typescript/no-unsafe-assignment": "off",
         "typescript/no-unsafe-call": "off",
@@ -112,6 +106,13 @@
         "typescript/no-unnecessary-type-arguments": "off",
         "typescript/no-unnecessary-type-conversion": "off",
         "typescript/require-await": "off"
+      }
+    },
+    {
+      "files": ["tools/**/*.mjs", "scripts/**/*.mjs"],
+      "rules": {
+        "no-await-in-loop": "off",
+        "unicorn/no-await-expression-member": "off"
       }
     }
   ]
