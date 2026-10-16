@@ -35,10 +35,10 @@ import 경계 강제는 지금 설정에 없습니다.
 
 ```tsx
 // 앱(React Native)
-import { Button, Card, CardTitle, CardContent, Text } from "@horon/app"
+import { Button, Card, CardTitle, CardContent, Text } from "@horon/app";
 
 // 웹
-import { Button, Card, CardTitle, CardContent } from "@horon/web"
+import { Button, Card, CardTitle, CardContent } from "@horon/web";
 ```
 
 Storybook(`apps/storybook`)만 예외입니다. 이 앱은 `@horon/app`의 React Native 컴포넌트를
@@ -66,18 +66,20 @@ bunx expo start --ios    # iOS 시뮬레이터에서 네이티브 렌더 확인
 ### React Native 앱 — `@horon/app`
 
 ```tsx
-import { Button, Card, CardTitle, CardContent, Text } from "@horon/app"
+import { Button, Card, CardTitle, CardContent, Text } from "@horon/app";
 
 export function Screen() {
   return (
     <Card>
       <CardTitle>제목</CardTitle>
       <CardContent>
-        <Text variant="bodySm" tone="muted">설명</Text>
+        <Text variant="bodySm" tone="muted">
+          설명
+        </Text>
         <Button>확인</Button>
       </CardContent>
     </Card>
-  )
+  );
 }
 ```
 
@@ -87,15 +89,15 @@ Metro가 워크스페이스 패키지를 읽도록 `metro.config.js`에 `watchFo
 ### React 웹 앱 — `@horon/web`
 
 ```tsx
-import { Button, Card, CardHeader, CardTitle } from "@horon/web"
-import "@horon/web/globals.css" // 엔트리에서 한 번
+import { Button, Card, CardHeader, CardTitle } from "@horon/web";
+import "@horon/web/globals.css"; // 엔트리에서 한 번
 
 <Card>
   <CardHeader>
     <CardTitle>제목</CardTitle>
   </CardHeader>
   <Button variant="outline">취소</Button>
-</Card>
+</Card>;
 ```
 
 `@horon/web`은 단일 진입점(`"."`)과 하위 경로(`@horon/web/components/button`)를 모두
@@ -139,7 +141,7 @@ npx shadcn@latest add dialog sheet -c packages/web
 쓰려면 `packages/web/src/index.ts`에 한 줄 추가하세요.
 
 ```ts
-export * from "./components/dialog"
+export * from "./components/dialog";
 ```
 
 `cn()`은 `@horon/web/lib/utils`에서 가져옵니다.

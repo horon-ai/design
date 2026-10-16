@@ -14,12 +14,7 @@
       }
     }
   ],
-  "plugins": [
-    "prettier-plugin-tailwindcss"
-  ],
+  "plugins": ["prettier-plugin-tailwindcss"],
   "tailwindStylesheet": "packages/web/src/styles/globals.css",
-  "tailwindFunctions": [
-    "cn",
-    "cva"
-  ]
+  "tailwindFunctions": ["cn", "cva"]
 }
