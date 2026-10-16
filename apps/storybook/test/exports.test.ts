@@ -25,7 +25,7 @@ const layers: Layer[] = [
 		barrelPath: `${repoRoot}/packages/web/src/index.ts`,
 		storiesDir: `${repoRoot}/apps/storybook/stories/web`,
 		overviewPath: `${repoRoot}/apps/storybook/stories/overview/Web.stories.tsx`,
-		namespace: web as unknown as Record<string, unknown>,
+		namespace: web,
 	},
 	{
 		label: "@horon/app",
@@ -33,7 +33,7 @@ const layers: Layer[] = [
 		barrelPath: `${repoRoot}/packages/app/src/index.ts`,
 		storiesDir: `${repoRoot}/apps/storybook/stories/app`,
 		overviewPath: `${repoRoot}/apps/storybook/stories/overview/App.stories.tsx`,
-		namespace: app as unknown as Record<string, unknown>,
+		namespace: app,
 	},
 ]
 
