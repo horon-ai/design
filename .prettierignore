@@ -5,3 +5,4 @@ storybook-static/
 coverage/
 bun.lock
 packages/tokens/theme.css
+.omo
