@@ -28,12 +28,12 @@ function oklchToSrgb(input: string) {
 	const hRad = (h * Math.PI) / 180
 	const aLab = c * Math.cos(hRad)
 	const bLab = c * Math.sin(hRad)
-	const l_ = l + 0.3963377774 * aLab + 0.2158037573 * bLab
-	const m_ = l - 0.1055613458 * aLab - 0.0638541728 * bLab
-	const s_ = l - 0.0894841775 * aLab - 1.291485548 * bLab
-	const l3 = l_ ** 3
-	const m3 = m_ ** 3
-	const s3 = s_ ** 3
+	const lLinear = l + 0.3963377774 * aLab + 0.2158037573 * bLab
+	const mLinear = l - 0.1055613458 * aLab - 0.0638541728 * bLab
+	const sLinear = l - 0.0894841775 * aLab - 1.291485548 * bLab
+	const l3 = lLinear ** 3
+	const m3 = mLinear ** 3
+	const s3 = sLinear ** 3
 	const lin = [
 		4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3,
 		-1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3,
@@ -58,12 +58,14 @@ function over(
 	}
 }
 
+/** sRGB channel -> linear-light channel (WCAG 2.1 relative luminance). */
+function channel(v: number) {
+	const s = v / 255
+	return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4)
+}
+
 function luminance(c: { r: number; g: number; b: number }) {
-	const ch = (v: number) => {
-		const s = v / 255
-		return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4)
-	}
-	return 0.2126 * ch(c.r) + 0.7152 * ch(c.g) + 0.0722 * ch(c.b)
+	return 0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b)
 }
 
 function contrast(

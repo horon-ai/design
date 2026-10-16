@@ -6,6 +6,13 @@ import type { ToasterProps } from "sonner"
 
 import { cn } from "cn"
 
+/**
+ * A style block of CSS custom properties. React's `CSSProperties` has no index
+ * signature for `--*` keys, so custom-property blocks get their own type before
+ * they reach a `style` prop.
+ */
+type CssVars = Record<`--${string}`, string | number | undefined>
+
 function useDocumentTheme(): "light" | "dark" {
 	const [theme, setTheme] = React.useState<"light" | "dark">("light")
 
@@ -40,7 +47,7 @@ function SonnerToaster({
 					"--normal-text": "var(--popover-foreground)",
 					"--normal-border": "var(--border)",
 					"--border-radius": "var(--radius-md)",
-				} as React.CSSProperties
+				} as CssVars
 			}
 			toastOptions={{
 				...toastOptions,

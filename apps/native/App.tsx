@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { SafeAreaView, ScrollView, View } from "react-native"
-import { StatusBar } from "expo-status-bar"
+import { StatusBar, type StatusBarProps } from "expo-status-bar"
 import * as Font from "expo-font"
 import {
   Geist_400Regular,
@@ -26,6 +26,12 @@ import {
   VStack,
   useTheme,
 } from "@horon/app"
+
+/**
+ * expo-status-bar takes the status bar style *name* ("dark"), not a CSS object,
+ * so the props are built as an object and spread onto the component.
+ */
+const STATUS_BAR_PROPS = { style: "dark" } satisfies StatusBarProps
 
 /**
  * A minimal screen that renders @horon/app components under the app theme.
@@ -128,7 +134,7 @@ export default function App() {
 
   return (
     <ThemeProvider scheme="light">
-      <StatusBar style="dark" />
+      <StatusBar {...STATUS_BAR_PROPS} />
       {fontsLoaded || fontError ? (
         <Screen />
       ) : (

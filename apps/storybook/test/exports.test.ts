@@ -4,7 +4,7 @@ const repoRoot = `${import.meta.dir}/../../..`
 
 const reactNativeSpecifier: string = "react-native-web"
 const reactNativeWeb = await import(reactNativeSpecifier)
-mock.module("react-native", () => reactNativeWeb)
+await mock.module("react-native", () => reactNativeWeb)
 
 const web = await import("@horon/web")
 const app = await import("@horon/app")
@@ -38,7 +38,7 @@ const layers: Layer[] = [
 ]
 
 const listFiles = (dir: string, pattern: string) =>
-	[...new Bun.Glob(pattern).scanSync(dir)].sort()
+	[...new Bun.Glob(pattern).scanSync(dir)].toSorted()
 
 const withoutExtension = (file: string) => file.replace(/\.tsx$/, "")
 
@@ -82,8 +82,10 @@ for (const layer of layers) {
 		})
 
 		test("every component value export is importable by name from the entry point", async () => {
-			for (const file of files) {
-				const source = await Bun.file(`${layer.componentsDir}/${file}`).text()
+			const sources = await Promise.all(
+				files.map((file) => Bun.file(`${layer.componentsDir}/${file}`).text())
+			)
+			for (const source of sources) {
 				const names = valueExports(source)
 				expect(names.length).toBeGreaterThan(0)
 				for (const name of names) {
@@ -111,17 +113,19 @@ for (const layer of layers) {
 
 		test("no component value export name is duplicated across files", async () => {
 			const owners = new Map<string, string[]>()
-			for (const file of files) {
-				const source = await Bun.file(`${layer.componentsDir}/${file}`).text()
-				for (const name of valueExports(source)) {
+			const sources = await Promise.all(
+				files.map((file) => Bun.file(`${layer.componentsDir}/${file}`).text())
+			)
+			for (const [index, file] of files.entries()) {
+				for (const name of valueExports(sources[index])) {
 					const list = owners.get(name) ?? []
 					list.push(file)
 					owners.set(name, list)
 				}
 			}
 			const duplicates = [...owners.entries()]
-				.filter(([, owners]) => owners.length > 1)
-				.map(([name, owners]) => `${name}: ${owners.join(", ")}`)
+				.filter(([, list]) => list.length > 1)
+				.map(([name, list]) => `${name}: ${list.join(", ")}`)
 			expect(duplicates).toEqual([])
 		})
 	})

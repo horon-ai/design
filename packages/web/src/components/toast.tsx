@@ -7,6 +7,9 @@ import { XIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Load
 
 const toast = ToastPrimitive.createToastManager()
 
+const DEFAULT_ACTION_RENDER = <Button variant="outline" size="sm" />
+const DEFAULT_CLOSE_RENDER = <Button variant="ghost" size="icon-sm" />
+
 function ToastProvider({ ...props }: ToastPrimitive.Provider.Props) {
   return <ToastPrimitive.Provider {...props} />
 }
@@ -93,7 +96,7 @@ function ToastDescription({
 
 function ToastAction({
   className,
-  render = <Button variant="outline" size="sm" />,
+  render = DEFAULT_ACTION_RENDER,
   ...props
 }: ToastPrimitive.Action.Props) {
   return (
@@ -109,7 +112,7 @@ function ToastAction({
 function ToastClose({
   className,
   children,
-  render = <Button variant="ghost" size="icon-sm" />,
+  render = DEFAULT_CLOSE_RENDER,
   ...props
 }: ToastPrimitive.Close.Props) {
   return (

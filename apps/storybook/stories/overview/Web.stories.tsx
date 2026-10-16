@@ -72,9 +72,6 @@ import {
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from "@horon/web"
-import { FileTextIcon, FolderIcon, ImageIcon, InboxIcon } from "lucide-react"
-import {
 	AspectRatio,
 	Attachment,
 	AttachmentContent,
@@ -103,8 +100,6 @@ import {
 	ScrollAreaScrollbar,
 	ScrollAreaThumb,
 	ScrollAreaViewport,
-} from "@horon/web"
-import {
 	Alert,
 	AlertDescription,
 	AlertDialog,
@@ -135,8 +130,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 	SonnerToaster,
-} from "@horon/web"
-import {
 	Carousel,
 	CarouselContent,
 	CarouselItem,
@@ -173,8 +166,6 @@ import {
 	TypographyList,
 	TypographyMuted,
 	type DataTableColumn,
-} from "@horon/web"
-import {
 	Breadcrumb,
 	BreadcrumbItem,
 	BreadcrumbLink,
@@ -226,8 +217,6 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 	SidebarTrigger,
-} from "@horon/web"
-import {
 	Accordion,
 	AccordionItem,
 	AccordionPanel,
@@ -286,6 +275,7 @@ import {
 	ToggleGroupItem,
 	useForm,
 } from "@horon/web"
+import { FileTextIcon, FolderIcon, ImageIcon, InboxIcon } from "lucide-react"
 
 const meta = {
 	title: "Overview/Web",

@@ -20,14 +20,24 @@ import {
 
 export type ThemeColors = Record<ColorTokenName, string>
 
+const isColorTokenName = (name: string): name is ColorTokenName =>
+	name in colorTokens.light
+
+const colorTokenNames = Object.keys(colorTokens.light).filter(isColorTokenName)
+
+const isThemeColors = (value: Record<string, string>): value is ThemeColors =>
+	colorTokenNames.every((name) => typeof value[name] === "string")
+
 function buildColors(scheme: ColorScheme): ThemeColors {
-	const entries = Object.entries(colorTokens[scheme]) as [
-		ColorTokenName,
-		string,
-	][]
-	return Object.fromEntries(
-		entries.map(([name, value]) => [name, oklchToHex(value)])
-	) as ThemeColors
+	const theme = colorTokens[scheme]
+	const built: Record<string, string> = {}
+	for (const name of colorTokenNames) {
+		built[name] = oklchToHex(theme[name])
+	}
+	if (!isThemeColors(built)) {
+		throw new Error(`@horon/tokens: color scheme "${scheme}" is incomplete`)
+	}
+	return built
 }
 
 /** Semantic colors resolved to hex, keyed by scheme. */

@@ -11,7 +11,6 @@ export type ListProps = {
 
 export function List({ children, style }: ListProps) {
 	const t = useTheme()
-	const rows = Children.toArray(children)
 
 	return (
 		<View
@@ -27,8 +26,8 @@ export function List({ children, style }: ListProps) {
 				style,
 			]}
 		>
-			{rows.map((row, index) => (
-				<Fragment key={index}>
+			{Children.map(children, (row, index) => (
+				<Fragment>
 					{index > 0 ? <Divider /> : null}
 					{row}
 				</Fragment>

@@ -39,7 +39,7 @@ export function Progress({
 	const [anim] = useState(() => new Animated.Value(0))
 
 	useEffect(() => {
-		if (!indeterminate) return
+		if (!indeterminate) return undefined
 		const loop = Animated.loop(
 			Animated.timing(anim, {
 				toValue: 1,

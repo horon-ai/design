@@ -34,8 +34,8 @@ export const Playground: Story = {
 		<MessageScroller className="h-96 w-80 rounded-md border border-border">
 			<MessageScrollerViewport className="p-4">
 				<MessageScrollerContent>
-					{thread.map((entry, index) => (
-						<MessageScrollerItem key={index}>
+					{thread.map((entry) => (
+						<MessageScrollerItem key={`${entry.from}: ${entry.body}`}>
 							<Message align={entry.align}>
 								<MessageContent>
 									<MessageHeader>{entry.from}</MessageHeader>

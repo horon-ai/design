@@ -15,12 +15,15 @@ import {
 } from "./scales"
 import { colorTokens, type ColorTokenName } from "./tokens"
 
+const isColorTokenName = (name: string): name is ColorTokenName =>
+	name in colorTokens.light
+
 /**
  * Renders the Tailwind v4 `@theme` + CSS-variable layer from the token source,
  * so the web side never drifts from what React Native sees.
  */
 export function buildThemeCss(): string {
-	const names = Object.keys(colorTokens.light) as ColorTokenName[]
+	const names = Object.keys(colorTokens.light).filter(isColorTokenName)
 
 	const themeColors = names
 		.map((name) => `  --color-${name}: var(--${name});`)

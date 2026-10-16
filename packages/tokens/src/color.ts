@@ -51,13 +51,15 @@ export function oklchToRgba(input: string): Rgba {
 	const aLab = c * Math.cos(hRad)
 	const bLab = c * Math.sin(hRad)
 
-	const l_ = l + 0.3963377774 * aLab + 0.2158037573 * bLab
-	const m_ = l - 0.1055613458 * aLab - 0.0638541728 * bLab
-	const s_ = l - 0.0894841775 * aLab - 1.291485548 * bLab
+	// Cone response (LMS) before the cube: the linear-sRGB conversion below
+	// expects the cubed values, so the intermediate names carry the cube.
+	const lLinear = l + 0.3963377774 * aLab + 0.2158037573 * bLab
+	const mLinear = l - 0.1055613458 * aLab - 0.0638541728 * bLab
+	const sLinear = l - 0.0894841775 * aLab - 1.291485548 * bLab
 
-	const l3 = l_ ** 3
-	const m3 = m_ ** 3
-	const s3 = s_ ** 3
+	const l3 = lLinear ** 3
+	const m3 = mLinear ** 3
+	const s3 = sLinear ** 3
 
 	const r = 4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3
 	const g = -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3
@@ -71,10 +73,11 @@ export function oklchToRgba(input: string): Rgba {
 	}
 }
 
+const hex = (n: number) => n.toString(16).padStart(2, "0")
+
 /** React Native friendly string: `#rrggbb`, or `#rrggbbaa` when translucent. */
 export function oklchToHex(input: string): string {
 	const { r, g, b, a } = oklchToRgba(input)
-	const hex = (n: number) => n.toString(16).padStart(2, "0")
 	if (a >= 1) return `#${hex(r)}${hex(g)}${hex(b)}`
 	return `#${hex(r)}${hex(g)}${hex(b)}${hex(Math.round(a * 255))}`
 }

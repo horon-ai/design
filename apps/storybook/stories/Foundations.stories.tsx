@@ -10,7 +10,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const names = Object.keys(colorTokens.light) as (keyof typeof colorTokens.light)[]
+const isColorTokenName = (
+	name: string
+): name is keyof typeof colorTokens.light => name in colorTokens.light
+
+const names = Object.keys(colorTokens.light).filter(isColorTokenName)
 
 export const Colors: Story = {
 	render: () => (

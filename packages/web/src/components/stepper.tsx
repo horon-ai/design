@@ -25,6 +25,10 @@ const StepperItemContext = React.createContext<StepperItemContextValue | null>(
 	null
 )
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null
+}
+
 function useStepperContext() {
 	const context = React.useContext(StepperContext)
 	if (context === null) {
@@ -74,7 +78,8 @@ function Stepper({
 				if (!React.isValidElement(child)) {
 					return []
 				}
-				const step = (child.props as { step?: unknown }).step
+				const childProps = isRecord(child.props) ? child.props : undefined
+				const step = childProps?.step
 				return typeof step === "string" ? [step] : []
 			}),
 		[children]

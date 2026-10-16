@@ -13,17 +13,17 @@ import {
 import { Input } from "@horon/web/components/input"
 import { Button } from "@horon/web/components/button"
 
-// FormProvider's props are all required, so Storybook asks every story for args
-// even though each story supplies its own form instance through render.
+// FormProvider's props are all required, so Storybook would ask every story for
+// args even though each story supplies its own form instance through render: the
+// stories are typed against the Partial props instead.
 const meta = {
 	title: "Web/Form",
 	component: Form,
 	parameters: { layout: "centered" },
-	args: {} as React.ComponentProps<typeof Form>,
 } satisfies Meta<typeof Form>
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<Partial<React.ComponentProps<typeof Form>>>
 
 type ProfileValues = {
 	username: string

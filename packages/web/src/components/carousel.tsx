@@ -94,18 +94,29 @@ function Carousel({
 		}
 	}, [api, setApi])
 
+	const contextValue = React.useMemo(
+		() => ({
+			carouselRef,
+			api,
+			orientation,
+			scrollPrev,
+			scrollNext,
+			canScrollPrev,
+			canScrollNext,
+		}),
+		[
+			carouselRef,
+			api,
+			orientation,
+			scrollPrev,
+			scrollNext,
+			canScrollPrev,
+			canScrollNext,
+		]
+	)
+
 	return (
-		<CarouselContext.Provider
-			value={{
-				carouselRef,
-				api,
-				orientation,
-				scrollPrev,
-				scrollNext,
-				canScrollPrev,
-				canScrollNext,
-			}}
-		>
+		<CarouselContext.Provider value={contextValue}>
 			<div
 				data-slot="carousel"
 				data-orientation={orientation}

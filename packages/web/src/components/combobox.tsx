@@ -65,8 +65,8 @@ function ComboboxList({
     (child): child is ComboboxListRender => typeof child === "function"
   )
   const popupBody = rawChildren.filter(
-    (child) => typeof child !== "function"
-  ) as React.ReactNode[]
+    (child): child is React.ReactNode => typeof child !== "function"
+  )
 
   return (
     <ComboboxPrimitive.Portal>

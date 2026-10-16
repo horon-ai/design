@@ -3,6 +3,7 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 	type ReactNode,
@@ -40,7 +41,7 @@ export function Toast({
 	const t = useTheme()
 
 	useEffect(() => {
-		if (!onDismiss || !duration) return
+		if (!onDismiss || !duration) return undefined
 		const id = setTimeout(onDismiss, duration)
 		return () => clearTimeout(id)
 	}, [onDismiss, duration])
@@ -167,8 +168,10 @@ export function ToastProvider({
 		[dismiss, duration],
 	)
 
+	const contextValue = useMemo(() => ({ toast, dismiss }), [toast, dismiss])
+
 	return (
-		<ToastContext.Provider value={{ toast, dismiss }}>
+		<ToastContext.Provider value={contextValue}>
 			{children}
 			<View
 				pointerEvents="box-none"

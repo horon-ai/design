@@ -11,11 +11,10 @@ const meta = {
 	title: "Web/InputOtp",
 	component: InputOTP,
 	parameters: { layout: "centered" },
-	args: {} as React.ComponentProps<typeof InputOTP>,
 } satisfies Meta<typeof InputOTP>
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<Partial<React.ComponentProps<typeof InputOTP>>>
 
 function SixDigitCode() {
 	const [value, setValue] = React.useState("")

@@ -25,10 +25,11 @@ const config: StorybookConfig = {
 		viteConfig.plugins = [...(viteConfig.plugins ?? []), tailwindcss()]
 
 		viteConfig.resolve = viteConfig.resolve ?? {}
-		viteConfig.resolve.alias = {
-			...(viteConfig.resolve.alias as Record<string, string>),
-			"react-native": "react-native-web",
-		}
+		viteConfig.resolve.alias = Object.assign(
+			{},
+			viteConfig.resolve.alias,
+			{ "react-native": "react-native-web" }
+		)
 		viteConfig.resolve.dedupe = [
 			...(viteConfig.resolve.dedupe ?? []),
 			"react",

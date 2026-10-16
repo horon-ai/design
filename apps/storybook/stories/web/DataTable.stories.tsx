@@ -146,11 +146,10 @@ const meta = {
 	title: "Web/DataTable",
 	component: DataTable,
 	parameters: { layout: "padded" },
-	args: {} as React.ComponentProps<typeof DataTable>,
 } satisfies Meta<typeof DataTable>
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<Partial<React.ComponentProps<typeof DataTable>>>
 
 export const Playground: Story = {
 	render: () => (

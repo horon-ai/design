@@ -6,6 +6,28 @@ import { cn } from "cn"
 
 const THEMES = { light: "", dark: ".dark" } as const
 
+const isTheme = (value: string): value is keyof typeof THEMES => value in THEMES
+
+/**
+ * A style block of CSS custom properties. React's `CSSProperties` has no index
+ * signature for `--*` keys, so custom-property blocks get their own type before
+ * they reach a `style` prop.
+ */
+type CssVars = Record<`--${string}`, string | number | undefined>
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null
+}
+
+/** `fill` off a tooltip payload item, whose recharts type is `any`. */
+function getPayloadFill(payload: unknown): string | undefined {
+	if (!isRecord(payload) || !("fill" in payload)) {
+		return undefined
+	}
+	const fill: unknown = payload.fill
+	return typeof fill === "string" ? fill : undefined
+}
+
 type ChartColorConfig =
 	| { color?: string; theme?: never }
 	| { color?: never; theme: Record<keyof typeof THEMES, string> }
@@ -44,9 +66,10 @@ function ChartContainer({
 }) {
 	const uniqueId = React.useId()
 	const chartId = `chart-${id ?? uniqueId.replace(/:/g, "")}`
+	const contextValue = React.useMemo(() => ({ config }), [config])
 
 	return (
-		<ChartContext.Provider value={{ config }}>
+		<ChartContext.Provider value={contextValue}>
 			<div
 				data-chart={chartId}
 				data-slot="chart"
@@ -78,12 +101,11 @@ function ChartStyle({ id, config }: { id: string; config: ChartConfig }) {
 		<style
 			dangerouslySetInnerHTML={{
 				__html: Object.entries(THEMES)
-					.map(
-						([theme, prefix]) => `${prefix} [data-chart=${id}] {
+					.map(([theme, prefix]) => `${prefix} [data-chart=${id}] {
 ${colorConfig
 	.map(([key, itemConfig]) => {
-		const color =
-			itemConfig.theme?.[theme as keyof typeof THEMES] ?? itemConfig.color
+		const themeColor = isTheme(theme) ? itemConfig.theme?.[theme] : undefined
+		const color = themeColor ?? itemConfig.color
 		return color ? `  --color-${key}: ${color};` : null
 	})
 	.join("\n")}
@@ -141,7 +163,7 @@ function ChartTooltipContent({
 		}
 
 		const item = payload[0]
-		const key = `${labelKey ?? item?.dataKey ?? item?.name ?? "value"}`
+		const key = String(labelKey ?? item?.dataKey ?? item?.name ?? "value")
 		const itemConfig = getPayloadConfigFromPayload(config, item, key)
 		const value =
 			!labelKey && typeof label === "string"
@@ -191,15 +213,15 @@ function ChartTooltipContent({
 			{nestLabel ? null : tooltipLabel}
 			<div data-slot="chart-tooltip-items" className="grid gap-1.5">
 				{items.map((item, index) => {
-					const key = `${nameKey ?? item.name ?? item.dataKey ?? "value"}`
+					const key = String(nameKey ?? item.name ?? item.dataKey ?? "value")
 					const itemConfig = getPayloadConfigFromPayload(config, item, key)
-					const payloadFill = (item.payload as { fill?: string } | undefined)?.fill
+					const payloadFill = getPayloadFill(item.payload)
 					const indicatorColor = color ?? payloadFill ?? item.color
 
 					return (
 						<div
 							data-slot="chart-tooltip-item"
-							key={index}
+							key={key}
 							className={cn(
 								"flex w-full flex-wrap items-stretch gap-2 [&>svg]:size-2.5 [&>svg]:text-muted-foreground",
 								indicator === "dot" && "items-center"
@@ -227,7 +249,7 @@ function ChartTooltipContent({
 													{
 														"--color-bg": indicatorColor,
 														"--color-border": indicatorColor,
-													} as React.CSSProperties
+													} as CssVars
 												}
 											/>
 										)
@@ -308,14 +330,14 @@ function ChartLegendContent({
 				className
 			)}
 		>
-			{payload.map((item, index) => {
-				const key = `${nameKey ?? item.dataKey ?? "value"}`
+			{payload.map((item) => {
+				const key = String(nameKey ?? item.dataKey ?? "value")
 				const itemConfig = getPayloadConfigFromPayload(config, item, key)
 
 				return (
 					<div
 						data-slot="chart-legend-item"
-						key={index}
+						key={key}
 						className="flex items-center gap-1.5 [&>svg]:size-3 [&>svg]:text-muted-foreground"
 					>
 						{itemConfig?.icon && !hideIcon ? (
@@ -340,20 +362,16 @@ function getPayloadConfigFromPayload(
 	payload: unknown,
 	key: string
 ) {
-	if (typeof payload !== "object" || payload === null) {
+	if (!isRecord(payload)) {
 		return undefined
 	}
 
-	const record = payload as Record<string, unknown>
-	const nested =
-		typeof record.payload === "object" && record.payload !== null
-			? (record.payload as Record<string, unknown>)
-			: undefined
+	const nested = isRecord(payload.payload) ? payload.payload : undefined
 
 	let configLabelKey = key
 
-	if (typeof record[key] === "string") {
-		configLabelKey = record[key]
+	if (typeof payload[key] === "string") {
+		configLabelKey = payload[key]
 	} else if (nested !== undefined && typeof nested[key] === "string") {
 		configLabelKey = nested[key]
 	}

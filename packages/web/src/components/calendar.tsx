@@ -14,6 +14,70 @@ import {
 import { cn } from "cn"
 import { buttonVariants, type Button } from "@horon/web/components/button"
 
+type CalendarComponents = NonNullable<
+	React.ComponentProps<typeof DayPicker>["components"]
+>
+
+const CalendarRoot: CalendarComponents["Root"] = ({
+	className: rootClassName,
+	rootRef,
+	...rootProps
+}) => (
+	<div
+		data-slot="calendar"
+		ref={rootRef}
+		className={cn(rootClassName)}
+		{...rootProps}
+	/>
+)
+
+const CalendarChevron: CalendarComponents["Chevron"] = ({
+	className: chevronClassName,
+	orientation,
+}) => {
+	if (orientation === "left") {
+		return (
+			<ChevronLeftIcon
+				data-slot="calendar-chevron"
+				className={cn("size-4", chevronClassName)}
+			/>
+		)
+	}
+	if (orientation === "right") {
+		return (
+			<ChevronRightIcon
+				data-slot="calendar-chevron"
+				className={cn("size-4", chevronClassName)}
+			/>
+		)
+	}
+	return (
+		<ChevronDownIcon
+			data-slot="calendar-chevron"
+			className={cn("size-4", chevronClassName)}
+		/>
+	)
+}
+
+const CalendarWeekNumber: CalendarComponents["WeekNumber"] = ({
+	children,
+	week,
+	...weekNumberProps
+}) => (
+	<td
+		data-slot="calendar-week-number"
+		data-week={week.weekNumber}
+		{...weekNumberProps}
+	>
+		<div
+			data-slot="calendar-week-number-content"
+			className="flex size-(--cell-size) items-center justify-center text-center"
+		>
+			{children}
+		</div>
+	</td>
+)
+
 function Calendar({
 	className,
 	classNames,
@@ -126,53 +190,10 @@ function Calendar({
 				...classNames,
 			}}
 			components={{
-				Root: ({ className: rootClassName, rootRef, ...rootProps }) => (
-					<div
-						data-slot="calendar"
-						ref={rootRef}
-						className={cn(rootClassName)}
-						{...rootProps}
-					/>
-				),
-				Chevron: ({ className: chevronClassName, orientation }) => {
-					if (orientation === "left") {
-						return (
-							<ChevronLeftIcon
-								data-slot="calendar-chevron"
-								className={cn("size-4", chevronClassName)}
-							/>
-						)
-					}
-					if (orientation === "right") {
-						return (
-							<ChevronRightIcon
-								data-slot="calendar-chevron"
-								className={cn("size-4", chevronClassName)}
-							/>
-						)
-					}
-					return (
-						<ChevronDownIcon
-							data-slot="calendar-chevron"
-							className={cn("size-4", chevronClassName)}
-						/>
-					)
-				},
+				Root: CalendarRoot,
+				Chevron: CalendarChevron,
 				DayButton: CalendarDayButton,
-				WeekNumber: ({ children, week, ...weekNumberProps }) => (
-					<td
-						data-slot="calendar-week-number"
-						data-week={week.weekNumber}
-						{...weekNumberProps}
-					>
-						<div
-							data-slot="calendar-week-number-content"
-							className="flex size-(--cell-size) items-center justify-center text-center"
-						>
-							{children}
-						</div>
-					</td>
-				),
+				WeekNumber: CalendarWeekNumber,
 				...components,
 			}}
 			{...props}

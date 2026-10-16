@@ -32,6 +32,8 @@ function useFileUpload() {
 	return context
 }
 
+const EMPTY_FILES: File[] = []
+
 function formatBytes(bytes: number) {
 	if (bytes < 1024) {
 		return `${bytes} B`
@@ -49,7 +51,7 @@ function formatBytes(bytes: number) {
 function FileUpload({
 	className,
 	files: filesProp,
-	defaultFiles = [],
+	defaultFiles = EMPTY_FILES,
 	onFilesChange,
 	accept,
 	multiple = true,

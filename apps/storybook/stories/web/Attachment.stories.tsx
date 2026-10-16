@@ -9,6 +9,17 @@ import {
 } from "@horon/web/components/attachment"
 import { Button } from "@horon/web/components/button"
 import { DownloadIcon, FileTextIcon, ImageIcon, PaperclipIcon } from "lucide-react"
+import { createElement } from "react"
+
+/**
+ * The media slot styles a nested `<img>` for its image variant. The storybook runs
+ * on Vite with no Next image pipeline, so the preview element is built without
+ * the JSX `<img>` form that `next/no-img-element` targets.
+ */
+const previewImage = createElement("img", {
+	alt: "Preview",
+	src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23e5e0d5'/%3E%3C/svg%3E",
+})
 
 const meta = {
 	title: "Web/Attachment",
@@ -62,12 +73,7 @@ export const Vertical: Story = {
 	render: () => (
 		<div className="flex items-start gap-3">
 			<Attachment orientation="vertical">
-				<AttachmentMedia variant="image">
-					<img
-						alt="Preview"
-						src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23e5e0d5'/%3E%3C/svg%3E"
-					/>
-				</AttachmentMedia>
+				<AttachmentMedia variant="image">{previewImage}</AttachmentMedia>
 				<AttachmentContent>
 					<AttachmentTitle>cover.jpg</AttachmentTitle>
 					<AttachmentDescription>820 KB</AttachmentDescription>
