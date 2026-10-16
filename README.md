@@ -24,8 +24,9 @@ packages/
 ## import 경계 (중요)
 
 **앱 코드는 `@horon/app`만, 웹 코드는 `@horon/web`만 import 합니다.** 두 패키지는 서로를
-참조하지 않고, 이 경계는 각 패키지·앱의 `eslint.config.js`에 있는
-`no-restricted-imports` 규칙으로 강제됩니다. 어기면 `bun run lint`가 막습니다.
+참조하지 않습니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고,
+`bun run lint`가 이를 실행합니다. 이전 `eslint.config.js`의 `no-restricted-imports`가 맡던
+import 경계 강제는 지금 설정에 없습니다.
 
 | 위치                          | import 가능                   | 금지                                          |
 | ----------------------------- | ----------------------------- | --------------------------------------------- |

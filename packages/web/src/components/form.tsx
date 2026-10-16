@@ -137,7 +137,7 @@ function FormDescription({
 
 function FormMessage({ className, children, ...props }: React.ComponentProps<"p">) {
 	const { error, formMessageId } = useFormField()
-	const body = error ? String(error.message ?? "") : children
+	const body = error ? error.message ?? "" : children
 
 	if (!body) {
 		return null

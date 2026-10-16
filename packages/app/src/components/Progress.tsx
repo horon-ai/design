@@ -44,7 +44,7 @@ export function Progress({
 			Animated.timing(anim, {
 				toValue: 1,
 				duration: 1100,
-				easing: Easing.inOut(Easing.ease),
+				easing: Easing.inOut((progress) => Easing.ease(progress)),
 				useNativeDriver: false,
 			}),
 		)

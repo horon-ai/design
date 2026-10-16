@@ -54,7 +54,7 @@ export function ThemeProvider({
 
 export function useTheme(): Theme {
 	const override = useContext(ThemeContext)
-	const system = (useColorScheme() ?? "light") as ColorScheme
+	const system = useColorScheme() ?? "light"
 	const scheme = override ?? system
 
 	return {

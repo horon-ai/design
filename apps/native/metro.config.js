@@ -1,6 +1,6 @@
 // Learn more: https://docs.expo.dev/guides/monorepos/
 const { getDefaultConfig } = require("expo/metro-config")
-const path = require("path")
+const path = require("node:path")
 
 const projectRoot = __dirname
 const workspaceRoot = path.resolve(projectRoot, "../..")

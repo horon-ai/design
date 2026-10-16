@@ -9,7 +9,6 @@ import {
 	rowSortingFeature,
 	tableFeatures,
 	useTable,
-	type CellData,
 	type ColumnDef,
 	type RowData,
 } from "@tanstack/react-table"
@@ -34,11 +33,7 @@ const dataTableFeatures = tableFeatures({
 
 export type DataTableFeatures = typeof dataTableFeatures
 
-export type DataTableColumn<TData extends RowData> = ColumnDef<
-	DataTableFeatures,
-	TData,
-	CellData
->
+export type DataTableColumn<TData extends RowData> = ColumnDef<DataTableFeatures, TData>
 
 type DataTableProps<TData extends RowData> = {
 	columns: DataTableColumn<TData>[]

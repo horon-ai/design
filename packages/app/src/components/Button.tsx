@@ -68,7 +68,7 @@ export function Button({
 	return (
 		<Pressable
 			accessibilityRole="button"
-			accessibilityState={{ disabled: Boolean(isDisabled), busy: loading }}
+			accessibilityState={{ disabled: isDisabled, busy: loading }}
 			disabled={isDisabled}
 			style={({ pressed }) => [
 				{

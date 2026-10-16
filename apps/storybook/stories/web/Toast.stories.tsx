@@ -55,7 +55,7 @@ export const Types: Story = {
 							variant="outline"
 							onClick={() =>
 								toast.add({
-									title: type[0]!.toUpperCase() + type.slice(1),
+									title: type[0].toUpperCase() + type.slice(1),
 									description: `${type} toast`,
 									type,
 									timeout: 0,
