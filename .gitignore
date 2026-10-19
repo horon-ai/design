@@ -35,13 +35,8 @@ storybook-static
 # typescript
 *.tsbuildinfo
 
-# .omo runtime (keep .omo/plans and .omo/drafts tracked)
-.omo/evidence/
-.omo/ulw-execute/
-.omo/ulw-research/
-.omo/ulw-loop/
-.omo/team-specs/
-.omo/ev/
+# .omo runtime (harness state is local only, never tracked)
+.omo/
 .hyper/
 
 .verify/
