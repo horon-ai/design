@@ -23,7 +23,8 @@
 		"deploy:storybook": "turbo build-storybook --filter=@horon/storybook && wrangler pages deploy apps/storybook/storybook-static --project-name=horon-storybook --branch=main",
 		"site": "turbo dev --filter=@horon/site",
 		"build:site": "turbo build --filter=@horon/site",
-		"deploy:site": "turbo build --filter=@horon/site && wrangler pages deploy apps/site/dist --project-name=horon-design --branch=main"
+		"deploy:site": "turbo build --filter=@horon/site && wrangler pages deploy apps/site/dist --project-name=horon-design --branch=main",
+		"publish:packages": "bun run --filter @horon-ai/tokens build && bun publish --cwd packages/tokens --access public && bun publish --cwd packages/react --access public"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.4.3",
