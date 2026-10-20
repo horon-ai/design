@@ -37,4 +37,35 @@ export const usageSnippets: Record<string, string> = {
 
 <ToastProvider />
 toast({ title: "저장했습니다" });`,
+  sonner: `import { SonnerToaster, sonnerToast } from "@horon-ai/react";
+
+<SonnerToaster />
+sonnerToast.success("저장했습니다");`,
+  resizable: `import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@horon-ai/react";
+
+<ResizablePanelGroup direction="horizontal">
+  <ResizablePanel defaultSize="32%">목록</ResizablePanel>
+  <ResizableHandle withHandle />
+  <ResizablePanel>본문</ResizablePanel>
+</ResizablePanelGroup>`,
+  direction: `import { DirectionProvider } from "@horon-ai/react";
+
+<DirectionProvider direction="rtl">
+  <App />
+</DirectionProvider>`,
+  chart: `// chart is not in the barrel: recharts assigns onto the module at import
+// time, so it ships through its own subpath.
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@horon-ai/react/components/chart";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+
+const config = { visits: { label: "방문", color: "var(--chart-1)" } } satisfies ChartConfig;
+
+<ChartContainer config={config} className="h-56 w-full">
+  <BarChart data={data}>
+    <CartesianGrid vertical={false} />
+    <XAxis dataKey="month" tickLine={false} axisLine={false} />
+    <ChartTooltip content={<ChartTooltipContent />} />
+    <Bar dataKey="visits" fill="var(--color-visits)" radius={4} />
+  </BarChart>
+</ChartContainer>`,
 };
