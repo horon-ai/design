@@ -1,6 +1,6 @@
 /**
  * The component catalog. Every entry maps one file in
- * packages/web/src/components to its docs route, so the site cannot list a
+ * packages/react/src/components to its docs route, so the site cannot list a
  * component the library does not ship. `demo` names a file under
  * src/components/demos; a component without one renders its usage snippet and
  * a Storybook link instead of a live preview.
