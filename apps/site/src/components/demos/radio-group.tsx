@@ -1,4 +1,4 @@
-import { Label, RadioGroup, RadioGroupItem } from "@horon/web";
+import { Label, RadioGroup, RadioGroupItem } from "@horon-ai/react";
 
 export default function RadioGroupDemo() {
   return (

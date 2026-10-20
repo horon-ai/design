@@ -1,4 +1,4 @@
-import { Kbd, KbdGroup } from "@horon/web";
+import { Kbd, KbdGroup } from "@horon-ai/react";
 
 export default function KbdDemo() {
   return (

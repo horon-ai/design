@@ -4,7 +4,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 const slides = [
   { title: "현장 조사", body: "구조가 어떻게 세워지고 바뀌었는지 기록합니다." },

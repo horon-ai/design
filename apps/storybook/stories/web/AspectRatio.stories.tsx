@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { AspectRatio } from "@horon/web/components/aspect-ratio";
+import { AspectRatio } from "@horon-ai/react/components/aspect-ratio";
 
 const meta = {
   title: "Web/AspectRatio",

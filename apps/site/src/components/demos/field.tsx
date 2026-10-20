@@ -1,4 +1,4 @@
-import { Field, FieldDescription, FieldError, FieldLabel, FieldSet, Input } from "@horon/web";
+import { Field, FieldDescription, FieldError, FieldLabel, FieldSet, Input } from "@horon-ai/react";
 
 export default function FieldDemo() {
   return (

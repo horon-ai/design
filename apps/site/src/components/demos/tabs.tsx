@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@horon/web";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@horon-ai/react";
 
 export default function TabsDemo() {
   return (

@@ -1,4 +1,4 @@
-import { GlassSurface, LiquidGlass } from "@horon/web";
+import { GlassSurface, LiquidGlass } from "@horon-ai/react";
 
 export default function GlassDemo() {
   return (

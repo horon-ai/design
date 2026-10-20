@@ -7,10 +7,10 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@horon/web/components/sheet";
-import { Button } from "@horon/web/components/button";
-import { Input } from "@horon/web/components/input";
-import { Label } from "@horon/web/components/label";
+} from "@horon-ai/react/components/sheet";
+import { Button } from "@horon-ai/react/components/button";
+import { Input } from "@horon-ai/react/components/input";
+import { Label } from "@horon-ai/react/components/label";
 
 const meta = {
   title: "Web/Sheet",

@@ -5,7 +5,7 @@
   "tsx": true,
   "tailwind": {
     "config": "",
-    "css": "../../packages/web/src/styles/globals.css",
+    "css": "../../packages/react/src/styles/globals.css",
     "baseColor": "neutral",
     "cssVariables": true
   },
@@ -14,8 +14,8 @@
     "components": "@/components",
     "hooks": "@/hooks",
     "lib": "@/lib",
-    "utils": "@horon/web/lib/utils",
-    "ui": "@horon/web/components"
+    "utils": "@horon-ai/react/lib/utils",
+    "ui": "@horon-ai/react/components"
   },
   "rtl": false,
   "menuColor": "default",

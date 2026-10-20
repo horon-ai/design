@@ -20,7 +20,7 @@ if (!component) {
 
 const group = componentGroups.find((entry) => entry.id === component.group);
 const demoName = resolveDemoName(component.slug, component.demo);
-const snippet = usageSnippets[component.slug] ?? `import { ${component.title.replace(/\s/g, "")} } from "@horon/web";`;
+const snippet = usageSnippets[component.slug] ?? `import { ${component.title.replace(/\s/g, "")} } from "@horon-ai/react";`;
 const storybookHref = `https://storybook.horon.ai/?path=/story/web-${component.slug}--default`;
 const index = components.findIndex((entry) => entry.slug === component.slug);
 const previous = index > 0 ? components[index - 1] : undefined;
@@ -46,7 +46,7 @@ const next = index >= 0 && index < components.length - 1 ? components[index + 1]
         </p>
         <div class="mt-6 flex flex-wrap items-center gap-2">
           <span class="rounded-full border border-border px-2.5 py-1 font-mono text-[11px] text-muted-foreground">
-            @horon/web
+            @horon-ai/react
           </span>
           <span class="rounded-full border border-border px-2.5 py-1 font-mono text-[11px] text-muted-foreground">
             {group?.title}

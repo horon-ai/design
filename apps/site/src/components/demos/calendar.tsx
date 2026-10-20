@@ -1,4 +1,4 @@
-import { Calendar } from "@horon/web";
+import { Calendar } from "@horon-ai/react";
 
 const month = new Date(2026, 9, 1);
 const selected = new Date(2026, 9, 14);

@@ -6,8 +6,8 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@horon/web/components/empty";
-import { Button } from "@horon/web/components/button";
+} from "@horon-ai/react/components/empty";
+import { Button } from "@horon-ai/react/components/button";
 import { InboxIcon, SearchXIcon } from "lucide-react";
 
 const meta = {

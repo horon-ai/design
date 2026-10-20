@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Command, Search } from "lucide-react";
-import { Kbd, KbdGroup } from "@horon/web/components/kbd";
+import { Kbd, KbdGroup } from "@horon-ai/react/components/kbd";
 
 const meta = {
   title: "Web/Kbd",

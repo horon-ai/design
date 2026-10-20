@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, ButtonGroupSeparator } from "@horon/web";
+import { Button, ButtonGroup, ButtonGroupSeparator } from "@horon-ai/react";
 import { MinusIcon, PlusIcon } from "lucide-react";
 
 export default function ButtonGroupDemo() {

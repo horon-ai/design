@@ -1,4 +1,4 @@
-import { NativeSelect } from "@horon/web";
+import { NativeSelect } from "@horon-ai/react";
 
 export default function NativeSelectDemo() {
   return (

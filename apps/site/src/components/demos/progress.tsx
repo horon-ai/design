@@ -1,4 +1,4 @@
-import { Progress, ProgressLabel, ProgressValue } from "@horon/web";
+import { Progress, ProgressLabel, ProgressValue } from "@horon-ai/react";
 
 export default function ProgressDemo() {
   return (

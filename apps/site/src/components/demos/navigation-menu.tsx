@@ -5,7 +5,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function NavigationMenuDemo() {
   return (

@@ -6,7 +6,7 @@ import {
   FileUploadItem,
   FileUploadList,
   FileUploadTrigger,
-} from "@horon/web/components/file-upload";
+} from "@horon-ai/react/components/file-upload";
 import { UploadIcon } from "lucide-react";
 
 const meta = {

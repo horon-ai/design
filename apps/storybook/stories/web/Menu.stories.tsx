@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Menu, MenuItem, MenuLabel, MenuSeparator } from "@horon/web/components/menu";
+import { Menu, MenuItem, MenuLabel, MenuSeparator } from "@horon-ai/react/components/menu";
 
 const meta = {
   title: "Web/Menu",

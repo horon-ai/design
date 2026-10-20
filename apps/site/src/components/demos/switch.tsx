@@ -1,4 +1,4 @@
-import { Label, Switch } from "@horon/web";
+import { Label, Switch } from "@horon-ai/react";
 
 export default function SwitchDemo() {
   return (

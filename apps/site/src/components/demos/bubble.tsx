@@ -1,4 +1,4 @@
-import { Bubble, BubbleContent, BubbleGroup } from "@horon/web";
+import { Bubble, BubbleContent, BubbleGroup } from "@horon-ai/react";
 
 export default function BubbleDemo() {
   return (

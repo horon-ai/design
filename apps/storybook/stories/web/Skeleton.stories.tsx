@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Skeleton } from "@horon/web/components/skeleton";
+import { Skeleton } from "@horon-ai/react/components/skeleton";
 
 const meta = {
   title: "Web/Skeleton",

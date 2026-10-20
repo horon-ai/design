@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Button } from "@horon/web/components/button";
+import { Button } from "@horon-ai/react/components/button";
 import {
   Card,
   CardAction,
@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@horon/web/components/card";
+} from "@horon-ai/react/components/card";
 
 const meta = {
   title: "Web/Card",

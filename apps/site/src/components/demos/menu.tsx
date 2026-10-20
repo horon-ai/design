@@ -1,4 +1,4 @@
-import { Menu, MenuItem, MenuLabel, MenuSeparator } from "@horon/web";
+import { Menu, MenuItem, MenuLabel, MenuSeparator } from "@horon-ai/react";
 
 export default function MenuDemo() {
   return (

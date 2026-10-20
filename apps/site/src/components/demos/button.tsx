@@ -1,4 +1,4 @@
-import { Button } from "@horon/web";
+import { Button } from "@horon-ai/react";
 
 export default function ButtonDemo() {
   return (

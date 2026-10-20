@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Spinner } from "@horon/web/components/spinner";
+import { Spinner } from "@horon-ai/react/components/spinner";
 
 const meta = {
   title: "Web/Spinner",

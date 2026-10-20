@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { DirectionProvider } from "@horon/web/components/direction";
-import { Badge } from "@horon/web/components/badge";
-import { Button } from "@horon/web/components/button";
+import { DirectionProvider } from "@horon-ai/react/components/direction";
+import { Badge } from "@horon-ai/react/components/badge";
+import { Button } from "@horon-ai/react/components/button";
 
 const meta = {
   title: "Web/Direction",

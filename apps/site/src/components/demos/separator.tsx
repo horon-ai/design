@@ -1,4 +1,4 @@
-import { Separator } from "@horon/web";
+import { Separator } from "@horon-ai/react";
 
 export default function SeparatorDemo() {
   return (

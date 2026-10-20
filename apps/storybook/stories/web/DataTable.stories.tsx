@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import * as React from "react";
-import { Chip } from "@horon/web/components/chip";
-import { DataTable, type DataTableColumn } from "@horon/web/components/data-table";
+import { Chip } from "@horon-ai/react/components/chip";
+import { DataTable, type DataTableColumn } from "@horon-ai/react/components/data-table";
 
 type Payment = {
   invoice: string;
