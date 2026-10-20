@@ -6,7 +6,7 @@ const reactNativeSpecifier: string = "react-native-web";
 const reactNativeWeb = await import(reactNativeSpecifier);
 await mock.module("react-native", () => reactNativeWeb);
 
-const web = await import("@horon/web");
+const web = await import("@horon-ai/react");
 const app = await import("@horon/app");
 
 type Layer = {
@@ -20,9 +20,9 @@ type Layer = {
 
 const layers: Layer[] = [
   {
-    label: "@horon/web",
-    componentsDir: `${repoRoot}/packages/web/src/components`,
-    barrelPath: `${repoRoot}/packages/web/src/index.ts`,
+    label: "@horon-ai/react",
+    componentsDir: `${repoRoot}/packages/react/src/components`,
+    barrelPath: `${repoRoot}/packages/react/src/index.ts`,
     storiesDir: `${repoRoot}/apps/storybook/stories/web`,
     overviewPath: `${repoRoot}/apps/storybook/stories/overview/Web.stories.tsx`,
     namespace: web,

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { CheckIcon } from "lucide-react";
 import { cn } from "cn";
-import { Progress } from "@horon/web/components/progress";
+import { Progress } from "@horon-ai/react/components/progress";
 
 function Questionnaire({ className, ...props }: React.ComponentProps<"div">) {
   return <div data-slot="questionnaire" className={cn("flex w-full min-w-0 flex-col gap-6", className)} {...props} />;

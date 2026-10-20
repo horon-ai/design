@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { CircleAlertIcon, FileTextIcon, LoaderCircleIcon, XIcon } from "lucide-react";
-import { Button } from "@horon/web/components/button";
+import { Button } from "@horon-ai/react/components/button";
 import { cn } from "cn";
 
 type FileUploadStatus = "idle" | "uploading" | "done" | "error";

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Checkbox } from "@horon/web/components/checkbox";
-import { Label } from "@horon/web/components/label";
+import { Checkbox } from "@horon-ai/react/components/checkbox";
+import { Label } from "@horon-ai/react/components/label";
 
 const meta = {
   title: "Web/Checkbox",

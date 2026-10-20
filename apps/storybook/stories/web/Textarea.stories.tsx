@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Textarea } from "@horon/web/components/textarea";
-import { Label } from "@horon/web/components/label";
+import { Textarea } from "@horon-ai/react/components/textarea";
+import { Label } from "@horon-ai/react/components/label";
 
 const meta = {
   title: "Web/Textarea",

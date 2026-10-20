@@ -14,7 +14,7 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, "node_modules"),
 ];
 
-// @horon/app and @horon/tokens are workspace packages whose source is bundled
+// @horon/app and @horon-ai/tokens are workspace packages whose source is bundled
 // directly. Bun installs each workspace's dependencies into its own
 // node_modules, so without this a file inside packages/app would resolve
 // react-native from packages/app/node_modules (a different copy than the app's).

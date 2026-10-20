@@ -5,7 +5,7 @@ import {
   ContextMenuLabel,
   ContextMenuSeparator,
   ContextMenuTrigger,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function ContextMenuDemo() {
   return (

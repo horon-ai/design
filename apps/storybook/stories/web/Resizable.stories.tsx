@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@horon/web/components/resizable";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@horon-ai/react/components/resizable";
 
 const meta = {
   title: "Web/Resizable",

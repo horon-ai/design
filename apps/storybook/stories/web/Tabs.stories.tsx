@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@horon/web/components/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@horon-ai/react/components/tabs";
 
 const meta = {
   title: "Web/Tabs",

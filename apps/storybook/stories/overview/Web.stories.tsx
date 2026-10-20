@@ -274,7 +274,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
   useForm,
-} from "@horon/web";
+} from "@horon-ai/react";
 import { FileTextIcon, FolderIcon, ImageIcon, InboxIcon } from "lucide-react";
 
 const meta = {
@@ -346,7 +346,9 @@ export const All: Story = {
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-12 p-6">
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">Web components</h1>
-        <p className="text-sm text-muted-foreground">Every component from the @horon/web package on a single page.</p>
+        <p className="text-sm text-muted-foreground">
+          Every component from the @horon-ai/react package on a single page.
+        </p>
       </header>
 
       <Section title="Buttons">
@@ -856,7 +858,7 @@ export const All: Story = {
               <QuestionnaireItem>
                 <span className="text-sm font-semibold">Where should the palette live?</span>
                 <QuestionnaireOptions>
-                  <QuestionnaireOption>@horon/tokens</QuestionnaireOption>
+                  <QuestionnaireOption>@horon-ai/tokens</QuestionnaireOption>
                   <QuestionnaireOption>Each app keeps its own copy</QuestionnaireOption>
                 </QuestionnaireOptions>
               </QuestionnaireItem>
@@ -1101,7 +1103,7 @@ export const All: Story = {
                 <span className="font-mono">terminal</span>
                 <CodeBlockCopyButton />
               </CodeBlockHeader>
-              <CodeBlockContent>{`bun add @horon/web`}</CodeBlockContent>
+              <CodeBlockContent>{`bun add @horon-ai/react`}</CodeBlockContent>
             </CodeBlock>
           </div>
 
@@ -1167,7 +1169,7 @@ export const All: Story = {
               <TypographyHeading level={3}>Horon design system</TypographyHeading>
               <TypographyLead>A single source of truth.</TypographyLead>
               <p>
-                Install <TypographyInlineCode>@horon/tokens</TypographyInlineCode>.
+                Install <TypographyInlineCode>@horon-ai/tokens</TypographyInlineCode>.
               </p>
               <TypographyList>
                 <li>Add tokens to your workspace.</li>
@@ -1398,7 +1400,7 @@ export const All: Story = {
                       <MessageContent>
                         <MessageHeader>민열</MessageHeader>
                         <Bubble variant="default" align="end">
-                          <BubbleContent>In @horon/tokens.</BubbleContent>
+                          <BubbleContent>In @horon-ai/tokens.</BubbleContent>
                         </Bubble>
                       </MessageContent>
                     </Message>

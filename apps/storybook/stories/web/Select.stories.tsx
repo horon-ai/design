@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@horon/web/components/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@horon-ai/react/components/select";
 
 const meta = {
   title: "Web/Select",

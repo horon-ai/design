@@ -1,4 +1,4 @@
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@horon/web";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@horon-ai/react";
 
 export default function HoverCardDemo() {
   return (

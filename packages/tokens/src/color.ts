@@ -37,7 +37,7 @@ export function parseOklch(input: string): { l: number; c: number; h: number; a:
 
 export function oklchToRgba(input: string): Rgba {
   const parsed = parseOklch(input);
-  if (!parsed) throw new Error(`@horon/tokens: unsupported color value "${input}"`);
+  if (!parsed) throw new Error(`@horon-ai/tokens: unsupported color value "${input}"`);
   const { l, c, h, a } = parsed;
 
   const hRad = (h * Math.PI) / 180;

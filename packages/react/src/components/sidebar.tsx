@@ -4,7 +4,7 @@ import * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { PanelLeftIcon } from "lucide-react";
-import { Button } from "@horon/web/components/button";
+import { Button } from "@horon-ai/react/components/button";
 import { cn } from "cn";
 
 type SidebarContextValue = {

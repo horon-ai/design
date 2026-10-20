@@ -4,7 +4,7 @@ import * as React from "react";
 import { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog";
 import { cn } from "cn";
 
-import { Button } from "@horon/web/components/button";
+import { Button } from "@horon-ai/react/components/button";
 
 function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
   return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />;

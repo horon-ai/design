@@ -4,7 +4,7 @@ import * as React from "react";
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { DayPicker, getDefaultClassNames, type DayButton } from "react-day-picker";
 import { cn } from "cn";
-import { buttonVariants, type Button } from "@horon/web/components/button";
+import { buttonVariants, type Button } from "@horon-ai/react/components/button";
 
 type CalendarComponents = NonNullable<React.ComponentProps<typeof DayPicker>["components"]>;
 

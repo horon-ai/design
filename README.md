@@ -4,7 +4,7 @@
 디자인 토큰을 한 곳에서 정의하고, 웹은 Tailwind CSS v4, 네이티브는 같은 값의 StyleSheet를
 쓰기 때문에 두 플랫폼의 색·간격·타이포가 어긋나지 않습니다.
 
-토큰 정본은 `@horon/tokens` 하나입니다. 확정 Horon 팔레트(sand 중성 + gold 액센트 + 잉크
+토큰 정본은 `@horon-ai/tokens` 하나입니다. 확정 Horon 팔레트(sand 중성 + gold 액센트 + 잉크
 primary), glass 표면, 모션, 그리고 React Native가 그대로 쓰는 폰트·그림자 값이 모두 여기서
 나옵니다.
 
@@ -13,33 +13,33 @@ primary), glass 표면, 모션, 그리고 React Native가 그대로 쓰는 폰�
 ```
 apps/
   native/       @horon/native      Expo 앱 — @horon/app 을 소비해 네이티브 렌더를 증명
-  playground/   @horon/playground  웹 데모 앱 (@horon/web 만 사용)
+  playground/   @horon/playground  웹 데모 앱 (@horon-ai/react 만 사용)
   site/         @horon/site        문서 사이트 — design.horon.ai (Astro + React)
   storybook/    @horon/storybook   두 레이어를 함께 미리보기 (개발 도구)
 packages/
-  tokens/       @horon/tokens      디자인 토큰 단일 소스 (+ 생성된 theme.css)
+  tokens/       @horon-ai/tokens   디자인 토큰 단일 소스 (+ 생성된 theme.css)
   app/          @horon/app         앱(React Native) 컴포넌트 — 네이티브 전용
-  web/          @horon/web         웹 컴포넌트 — shadcn/ui (Base UI) + Tailwind v4
+  react/        @horon-ai/react    웹 컴포넌트 — shadcn/ui (Base UI) + Tailwind v4
 ```
 
 ## import 경계 (중요)
 
-**앱 코드는 `@horon/app`만, 웹 코드는 `@horon/web`만 import 합니다.** 두 패키지는 서로를
+**앱 코드는 `@horon/app`만, 웹 코드는 `@horon-ai/react`만 import 합니다.** 두 패키지는 서로를
 참조하지 않습니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고,
 `bun run lint`가 이를 실행합니다. 이전 `eslint.config.js`의 `no-restricted-imports`가 맡던
 import 경계 강제는 지금 설정에 없습니다.
 
 | 위치                          | import 가능                   | 금지                                          |
 | ----------------------------- | ----------------------------- | --------------------------------------------- |
-| `packages/app`, `apps/native` | `@horon/app`, `@horon/tokens` | `@horon/web`, `react-native-web`, `react-dom` |
-| `packages/web`, 웹 앱         | `@horon/web`, `@horon/tokens` | `@horon/app`, `react-native`                  |
+| `packages/app`, `apps/native` | `@horon/app`, `@horon-ai/tokens` | `@horon-ai/react`, `react-native-web`, `react-dom` |
+| `packages/react`, 웹 앱         | `@horon-ai/react`, `@horon-ai/tokens` | `@horon/app`, `react-native`                  |
 
 ```tsx
 // 앱(React Native)
 import { Button, Card, CardTitle, CardContent, Text } from "@horon/app";
 
 // 웹
-import { Button, Card, CardTitle, CardContent } from "@horon/web";
+import { Button, Card, CardTitle, CardContent } from "@horon-ai/react";
 ```
 
 Storybook(`apps/storybook`)만 예외입니다. 이 앱은 `@horon/app`의 React Native 컴포넌트를
@@ -88,11 +88,11 @@ export function Screen() {
 Metro가 워크스페이스 패키지를 읽도록 `metro.config.js`에 `watchFolders`와
 `nodeModulesPaths`를 모노레포 루트로 잡아 주세요. `apps/native`가 그 예입니다.
 
-### React 웹 앱 — `@horon/web`
+### React 웹 앱 — `@horon-ai/react`
 
 ```tsx
-import { Button, Card, CardHeader, CardTitle } from "@horon/web";
-import "@horon/web/globals.css"; // 엔트리에서 한 번
+import { Button, Card, CardHeader, CardTitle } from "@horon-ai/react";
+import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 
 <Card>
   <CardHeader>
@@ -102,7 +102,7 @@ import "@horon/web/globals.css"; // 엔트리에서 한 번
 </Card>;
 ```
 
-`@horon/web`은 단일 진입점(`"."`)과 하위 경로(`@horon/web/components/button`)를 모두
+`@horon-ai/react`은 단일 진입점(`"."`)과 하위 경로(`@horon-ai/react/components/button`)를 모두
 제공합니다.
 
 ## 토큰
@@ -128,25 +128,25 @@ import "@horon/web/globals.css"; // 엔트리에서 한 번
    `packages/tokens/src/scales.ts`에서 고칩니다.
 2. `bun run tokens`로 `packages/tokens/theme.css`를 다시 생성합니다.
 3. 웹은 Tailwind 유틸리티(`bg-primary`, `rounded-lg` 등)로, 네이티브는
-   `@horon/tokens/native`가 주는 hex·숫자 값으로 같은 색·간격을 씁니다.
+   `@horon-ai/tokens/native`가 주는 hex·숫자 값으로 같은 색·간격을 씁니다.
 
 ## shadcn 컴포넌트 추가·커스텀
 
-`packages/web`에 `components.json`(style: `base-nova`)이 있어 Base UI 기반으로
+`packages/react`에 `components.json`(style: `base-nova`)이 있어 Base UI 기반으로
 벤더링됩니다.
 
 ```bash
-npx shadcn@latest add dialog sheet -c packages/web
+npx shadcn@latest add dialog sheet -c packages/react
 ```
 
-파일은 `packages/web/src/components/`에 생성됩니다. 새 컴포넌트를 단일 진입점에서도
-쓰려면 `packages/web/src/index.ts`에 한 줄 추가하세요.
+파일은 `packages/react/src/components/`에 생성됩니다. 새 컴포넌트를 단일 진입점에서도
+쓰려면 `packages/react/src/index.ts`에 한 줄 추가하세요.
 
 ```ts
 export * from "./components/dialog";
 ```
 
-`cn()`은 `@horon/web/lib/utils`에서 가져옵니다.
+`cn()`은 `@horon-ai/react/lib/utils`에서 가져옵니다.
 
 ## 배포 (Storybook)
 
@@ -195,7 +195,7 @@ lint·typecheck·test·build를 돌립니다.
 - 두 패키지 모두 소스(`.tsx`) 그대로 배포합니다(내부 패키지 방식). 네이티브는 Metro가,
   웹은 Vite가 각각 변환합니다.
 - `@horon/app`의 React Native 컴포넌트를 웹에서 확인하려면 Storybook을 씁니다. 웹 앱은
-  `@horon/web`만 쓰므로 웹 번들에 `react-native-web`이 들어가지 않습니다.
+  `@horon-ai/react`만 쓰므로 웹 번들에 `react-native-web`이 들어가지 않습니다.
 - `apps/native`(Expo)는 `@horon/app`을 그대로 소비해 네이티브 렌더를 증명합니다.
   `metro.config.js`가 모노레포 루트를 watch하고, Geist 폰트는 `expo-font`로 로드해
   `fontFamily.native.sans`가 런타임에 해석됩니다.

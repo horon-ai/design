@@ -5,8 +5,8 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@horon/web/components/carousel";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@horon/web/components/card";
+} from "@horon-ai/react/components/carousel";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@horon-ai/react/components/card";
 
 const meta = {
   title: "Web/Carousel",

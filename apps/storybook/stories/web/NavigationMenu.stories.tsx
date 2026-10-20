@@ -6,7 +6,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@horon/web/components/navigation-menu";
+} from "@horon-ai/react/components/navigation-menu";
 
 const meta = {
   title: "Web/NavigationMenu",

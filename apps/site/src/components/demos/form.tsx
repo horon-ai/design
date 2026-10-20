@@ -9,7 +9,7 @@ import {
   FormMessage,
   Input,
   useForm,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 type ProfileValues = {
   email: string;

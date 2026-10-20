@@ -1,4 +1,4 @@
-@import "@horon/web/globals.css";
+@import "@horon-ai/react/globals.css";
 
 /* @source is relative to this file, and Tailwind cannot discover classes inside
  * .astro templates on its own. The library stylesheet already scans ts/tsx. */

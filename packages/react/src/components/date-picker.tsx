@@ -5,9 +5,9 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 import { cn } from "cn";
-import { Button } from "@horon/web/components/button";
-import { Calendar } from "@horon/web/components/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@horon/web/components/popover";
+import { Button } from "@horon-ai/react/components/button";
+import { Calendar } from "@horon-ai/react/components/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@horon-ai/react/components/popover";
 
 type DatePickerProps = {
   value?: Date;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Animated, Easing, Pressable, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
-import { duration, easing } from "@horon/tokens/native";
+import { duration, easing } from "@horon-ai/tokens/native";
 import { useTheme } from "../theme";
 
 export type SwitchProps = Omit<PressableProps, "onPress" | "style" | "children" | "disabled"> & {

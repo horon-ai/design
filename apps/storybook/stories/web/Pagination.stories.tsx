@@ -7,7 +7,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@horon/web/components/pagination";
+} from "@horon-ai/react/components/pagination";
 
 const meta = {
   title: "Web/Pagination",

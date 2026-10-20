@@ -1,4 +1,4 @@
-import { DataTable, type DataTableColumn } from "@horon/web";
+import { DataTable, type DataTableColumn } from "@horon-ai/react";
 
 interface Member {
   name: string;

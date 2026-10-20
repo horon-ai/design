@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { colorTokens, space, fontSize, radius } from "@horon/tokens";
+import { colorTokens, space, fontSize, radius } from "@horon-ai/tokens";
 import { Stack, Text } from "@horon/app";
 
 const meta = {

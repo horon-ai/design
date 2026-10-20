@@ -14,8 +14,8 @@
 	},
 	"dependencies": {
 		"@astrojs/react": "^4.4.2",
-		"@horon/tokens": "workspace:*",
-		"@horon/web": "workspace:*",
+		"@horon-ai/tokens": "workspace:*",
+		"@horon-ai/react": "workspace:*",
 		"@tailwindcss/vite": "^4",
 		"astro": "^5.15.0",
 		"lucide-react": "^1.56.0",

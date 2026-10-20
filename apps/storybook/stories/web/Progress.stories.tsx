@@ -5,7 +5,7 @@ import {
   ProgressLabel,
   ProgressTrack,
   ProgressValue,
-} from "@horon/web/components/progress";
+} from "@horon-ai/react/components/progress";
 
 const meta = {
   title: "Web/Progress",

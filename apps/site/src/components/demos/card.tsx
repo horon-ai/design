@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function CardDemo() {
   return (

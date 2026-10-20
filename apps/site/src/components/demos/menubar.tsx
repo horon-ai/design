@@ -5,7 +5,7 @@ import {
   MenubarMenu,
   MenubarSeparator,
   MenubarTrigger,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function MenubarDemo() {
   return (

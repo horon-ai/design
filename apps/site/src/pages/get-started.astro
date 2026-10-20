@@ -7,8 +7,8 @@ bun install
 bun run tokens        # packages/tokens/theme.css 생성
 bun run storybook     # http://localhost:6006`;
 
-const consume = `import { Button, Card, CardHeader, CardTitle } from "@horon/web";
-import "@horon/web/globals.css";
+const consume = `import { Button, Card, CardHeader, CardTitle } from "@horon-ai/react";
+import "@horon-ai/react/globals.css";
 
 export function Example() {
   return (
@@ -47,7 +47,7 @@ export function Screen() {
     채움색은 잉크입니다. 이 규칙은 토큰에 값으로 들어 있고, 컴포넌트는 그 값만 참조합니다.
   </p>
   <p>
-    토큰 정본은 <code>@horon/tokens</code> 하나입니다. 이 패키지가 웹용 CSS
+    토큰 정본은 <code>@horon-ai/tokens</code> 하나입니다. 이 패키지가 웹용 CSS
     (<code>theme.css</code>)와 네이티브용 hex·숫자를 함께 내기 때문에, 웹과 앱의 색·간격·타이포가
     어긋나지 않습니다.
   </p>
@@ -57,7 +57,7 @@ export function Screen() {
 
   <h2>웹에서 쓰기</h2>
   <p>
-    엔트리에서 <code>@horon/web/globals.css</code>를 한 번 불러오고, 컴포넌트는 배럴 또는 하위
+    엔트리에서 <code>@horon-ai/react/globals.css</code>를 한 번 불러오고, 컴포넌트는 배럴 또는 하위
     경로로 가져옵니다. Tailwind CSS v4를 쓰는 프로젝트라면 같은 스타일시트를 그대로 공유할 수
     있습니다.
   </p>
@@ -73,8 +73,8 @@ export function Screen() {
   <h2>import 경계</h2>
   <p>두 레이어를 섞으면 경계 규칙에 걸립니다. 정적 검사는 oxlint가 맡습니다.</p>
   <ul>
-    <li><code>packages/app</code>, <code>apps/native</code> — <code>@horon/app</code>, <code>@horon/tokens</code>만</li>
-    <li><code>packages/web</code>, 웹 앱 — <code>@horon/web</code>, <code>@horon/tokens</code>만</li>
+    <li><code>packages/app</code>, <code>apps/native</code> — <code>@horon/app</code>, <code>@horon-ai/tokens</code>만</li>
+    <li><code>packages/web</code>, 웹 앱 — <code>@horon-ai/react</code>, <code>@horon-ai/tokens</code>만</li>
     <li>예외는 Storybook 하나입니다. 두 레이어를 함께 렌더하는 미리보기 도구입니다.</li>
   </ul>
 

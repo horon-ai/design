@@ -1,4 +1,4 @@
-import { Input, Label } from "@horon/web";
+import { Input, Label } from "@horon-ai/react";
 
 export default function LabelDemo() {
   return (

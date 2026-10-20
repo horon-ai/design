@@ -1,4 +1,4 @@
-import { Button, Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@horon/web";
+import { Button, Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@horon-ai/react";
 import { ChevronDownIcon } from "lucide-react";
 
 const activity = [
