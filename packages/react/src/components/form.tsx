@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Controller, FormProvider, useFormContext, useFormState } from "react-hook-form";
 import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
-import { Label } from "@horon/web/components/label";
+import { Label } from "@horon-ai/react/components/label";
 import { cn } from "cn";
 
 const Form = FormProvider;

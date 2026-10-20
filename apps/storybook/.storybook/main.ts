@@ -3,8 +3,8 @@ import type { StorybookConfig } from "@storybook/react-vite";
 
 /**
  * Storybook renders BOTH component layers:
- *  - @horon/web  -> DOM components (shadcn/ui on Base UI)
- *  - @horon/app      -> React Native components, aliased to react-native-web
+ *  - @horon-ai/react  -> DOM components (shadcn/ui on Base UI)
+ *  - @horon/app       -> React Native components, aliased to react-native-web
  */
 const config: StorybookConfig = {
   stories: ["../stories/**/*.mdx", "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"],

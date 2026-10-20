@@ -4,7 +4,7 @@ import {
   QuestionnaireOption,
   QuestionnaireOptions,
   QuestionnaireProgress,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function QuestionnaireDemo() {
   return (

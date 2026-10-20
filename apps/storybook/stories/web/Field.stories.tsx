@@ -1,6 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSet } from "@horon/web/components/field";
-import { Input } from "@horon/web/components/input";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+} from "@horon-ai/react/components/field";
+import { Input } from "@horon-ai/react/components/input";
 
 const meta = {
   title: "Web/Field",

@@ -1,4 +1,4 @@
-import { Badge } from "@horon/web";
+import { Badge } from "@horon-ai/react";
 
 export default function BadgeDemo() {
   return (

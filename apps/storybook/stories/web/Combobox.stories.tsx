@@ -8,7 +8,7 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
-} from "@horon/web/components/combobox";
+} from "@horon-ai/react/components/combobox";
 
 const frameworks = ["Next.js", "Remix", "Astro", "SvelteKit", "Nuxt", "SolidStart"];
 

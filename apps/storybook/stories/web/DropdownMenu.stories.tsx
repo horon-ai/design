@@ -9,7 +9,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@horon/web/components/dropdown-menu";
+} from "@horon-ai/react/components/dropdown-menu";
 import { ChevronDownIcon, PencilIcon, Trash2Icon } from "lucide-react";
 
 const meta = {

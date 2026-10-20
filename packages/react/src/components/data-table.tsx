@@ -13,8 +13,8 @@ import {
 } from "@tanstack/react-table";
 import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDownIcon } from "lucide-react";
 import { cn } from "cn";
-import { Button } from "@horon/web/components/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@horon/web/components/table";
+import { Button } from "@horon-ai/react/components/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@horon-ai/react/components/table";
 
 const dataTableFeatures = tableFeatures({
   rowSortingFeature,

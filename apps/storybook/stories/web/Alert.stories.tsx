@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CircleAlert, CircleCheck, Info, TriangleAlert } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@horon/web/components/alert";
+import { Alert, AlertDescription, AlertTitle } from "@horon-ai/react/components/alert";
 
 const meta = {
   title: "Web/Alert",

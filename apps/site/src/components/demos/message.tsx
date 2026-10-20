@@ -7,7 +7,7 @@ import {
   MessageAvatar,
   MessageContent,
   MessageHeader,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function MessageDemo() {
   return (

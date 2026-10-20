@@ -9,8 +9,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@horon/web/components/alert-dialog";
-import { Button } from "@horon/web/components/button";
+} from "@horon-ai/react/components/alert-dialog";
+import { Button } from "@horon-ai/react/components/button";
 
 const meta = {
   title: "Web/AlertDialog",

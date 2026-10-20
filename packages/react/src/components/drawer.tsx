@@ -4,7 +4,7 @@ import * as React from "react";
 import { Drawer as DrawerPrimitive } from "@base-ui/react/drawer";
 import { cn } from "cn";
 
-import { Button } from "@horon/web/components/button";
+import { Button } from "@horon-ai/react/components/button";
 import { XIcon } from "lucide-react";
 
 function Drawer({ ...props }: DrawerPrimitive.Root.Props) {

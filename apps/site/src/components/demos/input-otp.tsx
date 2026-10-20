@@ -1,5 +1,5 @@
 import * as React from "react";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@horon/web";
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@horon-ai/react";
 
 export default function InputOtpDemo() {
   const [value, setValue] = React.useState("");

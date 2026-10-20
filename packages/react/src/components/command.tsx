@@ -5,7 +5,7 @@ import { Command as CommandPrimitive } from "cmdk";
 import { SearchIcon } from "lucide-react";
 import { cn } from "cn";
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@horon/web/components/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@horon-ai/react/components/dialog";
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
   return (

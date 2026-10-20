@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Separator } from "@horon/web/components/separator";
+import { Separator } from "@horon-ai/react/components/separator";
 import { cn } from "cn";
 
 const buttonGroupVariants = cva(

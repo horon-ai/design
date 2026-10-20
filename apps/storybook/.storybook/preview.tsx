@@ -2,7 +2,7 @@ import { withThemeByClassName } from "@storybook/addon-themes";
 import type { Decorator, Preview } from "@storybook/react-vite";
 import { ThemeProvider as NativeThemeProvider } from "@horon/app";
 
-import "@horon/web/globals.css";
+import "@horon-ai/react/globals.css";
 
 /**
  * The class-based theme drives the DOM (shadcn/ui) components; the

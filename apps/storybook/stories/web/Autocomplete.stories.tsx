@@ -5,7 +5,7 @@ import {
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteList,
-} from "@horon/web/components/autocomplete";
+} from "@horon-ai/react/components/autocomplete";
 
 const frameworks = ["React", "Vue", "Svelte", "Solid", "Angular", "Astro", "Qwik", "Remix"];
 

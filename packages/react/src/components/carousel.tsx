@@ -4,7 +4,7 @@ import * as React from "react";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { cn } from "cn";
-import { Button } from "@horon/web/components/button";
+import { Button } from "@horon-ai/react/components/button";
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;

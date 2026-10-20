@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Button } from "@horon/web/components/button";
-import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "@horon/web/components/button-group";
+import { Button } from "@horon-ai/react/components/button";
+import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "@horon-ai/react/components/button-group";
 import { ChevronLeftIcon, ChevronRightIcon, MinusIcon, PlusIcon } from "lucide-react";
 
 const meta = {

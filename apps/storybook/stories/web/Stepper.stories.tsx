@@ -6,7 +6,7 @@ import {
   StepperSeparator,
   StepperTitle,
   StepperTrigger,
-} from "@horon/web/components/stepper";
+} from "@horon-ai/react/components/stepper";
 
 const meta = {
   title: "Web/Stepper",

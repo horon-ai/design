@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from "@horon/web/components/accordion";
+import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from "@horon-ai/react/components/accordion";
 
 const meta = {
   title: "Web/Accordion",

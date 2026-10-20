@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Switch } from "@horon/web/components/switch";
-import { Label } from "@horon/web/components/label";
+import { Switch } from "@horon-ai/react/components/switch";
+import { Label } from "@horon-ai/react/components/label";
 
 const meta = {
   title: "Web/Switch",

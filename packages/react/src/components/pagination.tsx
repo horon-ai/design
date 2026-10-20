@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { VariantProps } from "class-variance-authority";
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react";
-import { buttonVariants } from "@horon/web/components/button";
+import { buttonVariants } from "@horon-ai/react/components/button";
 import { cn } from "cn";
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {

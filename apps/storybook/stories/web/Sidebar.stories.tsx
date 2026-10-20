@@ -9,7 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
-} from "@horon/web/components/sidebar";
+} from "@horon-ai/react/components/sidebar";
 import { BellIcon, CircleHelpIcon, HomeIcon, SettingsIcon, UsersIcon } from "lucide-react";
 
 const meta = {

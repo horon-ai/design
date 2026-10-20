@@ -15,7 +15,7 @@ import {
   zIndex,
   type ColorScheme,
   type ThemeColors,
-} from "@horon/tokens/native";
+} from "@horon-ai/tokens/native";
 
 export type Theme = {
   scheme: ColorScheme;

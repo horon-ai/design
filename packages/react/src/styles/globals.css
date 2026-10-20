@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-@import "@horon/tokens/theme.css";
+@import "@horon-ai/tokens/theme.css";
 
 @custom-variant dark (&:is(.dark *));
 

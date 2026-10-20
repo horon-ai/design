@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarGroup, AvatarImage } from "@horon/web";
+import { Avatar, AvatarFallback, AvatarGroup, AvatarImage } from "@horon-ai/react";
 
 const PROFILE_IMAGE =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23b08968'/%3E%3C/svg%3E";

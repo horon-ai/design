@@ -11,11 +11,11 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@horon/web/components",
-    "utils": "@horon/web/lib/utils",
-    "hooks": "@horon/web/hooks",
-    "lib": "@horon/web/lib",
-    "ui": "@horon/web/components"
+    "components": "@horon-ai/react/components",
+    "utils": "@horon-ai/react/lib/utils",
+    "hooks": "@horon-ai/react/hooks",
+    "lib": "@horon-ai/react/lib",
+    "ui": "@horon-ai/react/components"
   },
   "rtl": false,
   "menuColor": "default",

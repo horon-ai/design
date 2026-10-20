@@ -5,7 +5,7 @@ import {
   TypographyLead,
   TypographyList,
   TypographyMuted,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function TypographyDemo() {
   return (
@@ -14,7 +14,7 @@ export default function TypographyDemo() {
       <TypographyLead>색, 글자, 움직임을 한곳에서 정의합니다.</TypographyLead>
       <p>
         토큰을 설치한 뒤 전역 스타일시트에서 테마를 불러오면 모든 컴포넌트가 같은 값을 씁니다. 패키지 이름은{" "}
-        <TypographyInlineCode>@horon/tokens</TypographyInlineCode>입니다.
+        <TypographyInlineCode>@horon-ai/tokens</TypographyInlineCode>입니다.
       </p>
       <TypographyList>
         <li>토큰 패키지를 작업 공간에 추가합니다.</li>

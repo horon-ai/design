@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ArrowDownIcon } from "lucide-react";
 import { cn } from "cn";
-import { Button } from "@horon/web/components/button";
+import { Button } from "@horon-ai/react/components/button";
 
 function MessageScroller({ className, ...props }: React.ComponentProps<"div">) {
   return (

@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Chip } from "@horon/web/components/chip";
+import { Chip } from "@horon-ai/react/components/chip";
 
 const meta = {
   title: "Web/Chip",

@@ -1,4 +1,4 @@
-import { Checkbox, Label } from "@horon/web";
+import { Checkbox, Label } from "@horon-ai/react";
 
 export default function CheckboxDemo() {
   return (

@@ -34,7 +34,7 @@ function buildColors(scheme: ColorScheme): ThemeColors {
     built[name] = oklchToHex(theme[name]);
   }
   if (!isThemeColors(built)) {
-    throw new Error(`@horon/tokens: color scheme "${scheme}" is incomplete`);
+    throw new Error(`@horon-ai/tokens: color scheme "${scheme}" is incomplete`);
   }
   return built;
 }

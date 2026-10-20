@@ -1,4 +1,4 @@
-import { Slider, SliderIndicator, SliderThumb, SliderTrack, SliderValue } from "@horon/web";
+import { Slider, SliderIndicator, SliderThumb, SliderTrack, SliderValue } from "@horon-ai/react";
 
 export default function SliderDemo() {
   return (

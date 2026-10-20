@@ -5,9 +5,9 @@ import {
   MessageScrollerContent,
   MessageScrollerItem,
   MessageScrollerViewport,
-} from "@horon/web/components/message-scroller";
-import { Message, MessageContent, MessageHeader } from "@horon/web/components/message";
-import { Bubble, BubbleContent } from "@horon/web/components/bubble";
+} from "@horon-ai/react/components/message-scroller";
+import { Message, MessageContent, MessageHeader } from "@horon-ai/react/components/message";
+import { Bubble, BubbleContent } from "@horon-ai/react/components/bubble";
 
 const meta = {
   title: "Web/MessageScroller",
@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>;
 
 const thread = [
   { from: "Horon Assistant", align: "start" as const, body: "Where should the palette live?" },
-  { from: "민열", align: "end" as const, body: "In @horon/tokens, as the single source." },
+  { from: "민열", align: "end" as const, body: "In @horon-ai/tokens, as the single source." },
   { from: "Horon Assistant", align: "start" as const, body: "Done. theme.css is regenerated." },
   { from: "민열", align: "end" as const, body: "Great. Now port the components." },
   { from: "Horon Assistant", align: "start" as const, body: "Starting with the chat surfaces." },

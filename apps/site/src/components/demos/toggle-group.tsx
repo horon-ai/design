@@ -1,4 +1,4 @@
-import { ToggleGroup, ToggleGroupItem } from "@horon/web";
+import { ToggleGroup, ToggleGroupItem } from "@horon-ai/react";
 
 export default function ToggleGroupDemo() {
   return (

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import * as React from "react";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@horon/web/components/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@horon-ai/react/components/input-otp";
 
 const meta = {
   title: "Web/InputOtp",

@@ -1,5 +1,5 @@
-// Single entry point for the web package.
-// Web code imports components from "@horon/web" (or a subpath) and never from
+// Single entry point for the react package.
+// Web code imports components from "@horon-ai/react" (or a subpath) and never from
 // "@horon/app" — that boundary is enforced by eslint (see eslint.config.js).
 export * from "./components/accordion";
 export * from "./components/alert";
