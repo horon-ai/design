@@ -1,13 +1,8 @@
-import { describe, expect, mock, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 
 const repoRoot = `${import.meta.dir}/../../..`;
 
-const reactNativeSpecifier: string = "react-native-web";
-const reactNativeWeb = await import(reactNativeSpecifier);
-await mock.module("react-native", () => reactNativeWeb);
-
 const web = await import("@horon-ai/react");
-const app = await import("@horon/app");
 
 type Layer = {
   label: string;
@@ -26,14 +21,6 @@ const layers: Layer[] = [
     storiesDir: `${repoRoot}/apps/storybook/stories/web`,
     overviewPath: `${repoRoot}/apps/storybook/stories/overview/Web.stories.tsx`,
     namespace: web,
-  },
-  {
-    label: "@horon/app",
-    componentsDir: `${repoRoot}/packages/app/src/components`,
-    barrelPath: `${repoRoot}/packages/app/src/index.ts`,
-    storiesDir: `${repoRoot}/apps/storybook/stories/app`,
-    overviewPath: `${repoRoot}/apps/storybook/stories/overview/App.stories.tsx`,
-    namespace: app,
   },
 ];
 

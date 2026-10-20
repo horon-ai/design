@@ -1,6 +1,6 @@
 /**
- * Non-color scales. Values are plain numbers (pixels) so React Native can use
- * them directly; the CSS generator turns the ones Tailwind needs into rem.
+ * Non-color scales. Values are plain numbers (pixels); the CSS generator turns
+ * the ones Tailwind needs into rem.
  */
 
 /** 4px base scale, aligned with Tailwind's default spacing scale. */
@@ -91,69 +91,24 @@ export const letterSpacing = {
   wider: 0.05,
 } as const;
 
-/**
- * Font families, split by platform. `web` keeps the CSS stacks; `native`
- * exposes single React Native family names (loaded via expo-font in the app),
- * because RN cannot resolve a CSS font-stack string.
- */
+/** Font families as CSS stacks, keyed by role. */
 export const fontFamily = {
   web: {
     sans: "'Geist Variable', ui-sans-serif, system-ui, sans-serif",
     mono: "ui-monospace, SFMono-Regular, Menlo, monospace",
   },
-  native: {
-    sans: "Geist",
-    mono: "GeistMono",
-  },
 } as const;
 
-/**
- * Elevation, split by platform. `web` is the CSS `box-shadow` string;
- * `native.ios` carries the four RN shadow props and `native.android` the
- * `elevation` level (Android renders shadows through elevation only).
- */
+/** Elevation as CSS `box-shadow` strings. */
 export const shadow = {
-  sm: {
-    web: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-    native: {
-      ios: {
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-        shadowColor: "#000000",
-      },
-      android: { elevation: 1 },
-    },
-  },
-  md: {
-    web: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-    native: {
-      ios: {
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        shadowColor: "#000000",
-      },
-      android: { elevation: 4 },
-    },
-  },
-  lg: {
-    web: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-    native: {
-      ios: {
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 15,
-        shadowColor: "#000000",
-      },
-      android: { elevation: 8 },
-    },
-  },
+  sm: { web: "0 1px 2px 0 rgb(0 0 0 / 0.05)" },
+  md: { web: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)" },
+  lg: { web: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)" },
 } as const;
 
 /**
  * Motion durations in milliseconds, mirroring `core/packages/tokens` DURATION.
- * Plain numbers so React Native can use them directly.
+ * Plain numbers so the CSS generator can append the `ms` unit.
  */
 export const duration = {
   instant: 50,
@@ -163,11 +118,7 @@ export const duration = {
   slower: 300,
 } as const;
 
-/**
- * Motion easing in both platform forms. `web` keeps the CSS keyword /
- * cubic-bezier string; `native` exposes the same curve as a bezier
- * control-point tuple `[x1, y1, x2, y2]` for React Native's `Easing.bezier`.
- */
+/** Motion easing as the CSS keyword / cubic-bezier string. */
 export const easing = {
   web: {
     default: "ease",
@@ -179,17 +130,6 @@ export const easing = {
     "out-cubic": "cubic-bezier(0.215, 0.61, 0.355, 1)",
     "out-quint": "cubic-bezier(0.16, 1, 0.3, 1)",
     "in-out-strong": "cubic-bezier(0.77, 0, 0.175, 1)",
-  },
-  native: {
-    default: [0.25, 0.1, 0.25, 1],
-    in: [0.42, 0, 1, 1],
-    out: [0, 0, 0.58, 1],
-    "in-out": [0.42, 0, 0.58, 1],
-    "in-strong": [0.895, 0.03, 0.685, 0.22],
-    "out-strong": [0.165, 0.84, 0.44, 1],
-    "out-cubic": [0.215, 0.61, 0.355, 1],
-    "out-quint": [0.16, 1, 0.3, 1],
-    "in-out-strong": [0.77, 0, 0.175, 1],
   },
 } as const;
 

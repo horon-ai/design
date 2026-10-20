@@ -19,7 +19,7 @@ const isColorTokenName = (name: string): name is ColorTokenName => name in color
 
 /**
  * Renders the Tailwind v4 `@theme` + CSS-variable layer from the token source,
- * so the web side never drifts from what React Native sees.
+ * so the web styles never drift from the token values.
  */
 export function buildThemeCss(): string {
   const names = Object.keys(colorTokens.light).filter(isColorTokenName);
@@ -104,7 +104,7 @@ ${darkVars}
 `;
 }
 
-/** Hex form of a single token, for React Native. */
+/** Hex form of a single token. */
 export function tokenToHex(name: ColorTokenName, scheme: "light" | "dark") {
   return oklchToHex(colorTokens[scheme][name]);
 }

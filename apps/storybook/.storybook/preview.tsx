@@ -1,24 +1,7 @@
 import { withThemeByClassName } from "@storybook/addon-themes";
-import type { Decorator, Preview } from "@storybook/react-vite";
-import { ThemeProvider as NativeThemeProvider } from "@horon/app";
+import type { Preview } from "@storybook/react-vite";
 
 import "@horon-ai/react/globals.css";
-
-/**
- * The class-based theme drives the DOM (shadcn/ui) components; the
- * NativeThemeProvider drives the React Native components, which cannot read a
- * CSS class. Both follow the same toolbar selection.
- */
-const withNativeTheme: Decorator = (Story, context) => {
-  const theme = context.globals.theme === "dark" ? "dark" : "light";
-  return (
-    <NativeThemeProvider scheme={theme}>
-      <div className="min-h-40 bg-background p-6 text-foreground">
-        <Story />
-      </div>
-    </NativeThemeProvider>
-  );
-};
 
 const preview: Preview = {
   parameters: {
@@ -32,7 +15,7 @@ const preview: Preview = {
     a11y: { test: "todo" },
     options: {
       storySort: {
-        order: ["Overview", ["App", "Web"], "Foundations", "App", "Web"],
+        order: ["Overview", ["Web"], "Foundations", "Web"],
       },
     },
   },
@@ -41,7 +24,6 @@ const preview: Preview = {
       themes: { light: "", dark: "dark" },
       defaultTheme: "light",
     }),
-    withNativeTheme,
   ],
 };
 
