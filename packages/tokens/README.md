@@ -27,6 +27,15 @@ bun run --filter @horon-ai/tokens build   # 저장소 루트에서
 게시할 때도 같은 빌드가 자동으로 돕니다. `package.json`의 `prepublishOnly`가 `bun run build`를
 실행하므로 오래된 `theme.css`가 tarball에 실리지 않습니다.
 
+## 설치
+
+버전 `0.1.0`에 `publishConfig.access: public`을 두었지만 **아직 npm 레지스트리에 게시되지
+않았습니다**(게시용 토큰 만료). 지금은 저장소 안 `file:` 의존으로 가져다 씁니다.
+
+```json
+{ "dependencies": { "@horon-ai/tokens": "file:../design/packages/tokens" } }
+```
+
 ## 소비
 
 앱 진입 CSS에서 한 번 import합니다.
