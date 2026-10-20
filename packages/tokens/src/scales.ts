@@ -3,6 +3,13 @@
  * the ones Tailwind needs into rem.
  */
 
+import { PALETTE } from "./palette";
+import { colorTokens } from "./tokens";
+
+/** `oklch(L C H)` -> `oklch(L C H / A)`, so the alpha stays a single source. */
+const withAlpha = (color: string, alpha: number) =>
+  color.replace(/\)$/, ` / ${alpha})`);
+
 /** 4px base scale, aligned with Tailwind's default spacing scale. */
 export const space = {
   0: 0,
@@ -152,6 +159,22 @@ export const glassLiquidFill = {
   dark: "linear-gradient(180deg, oklch(1 0 0 / 0.08) 10%, oklch(1 0 0 / 0.14))",
 } as const;
 
+/**
+ * Panel variant of the liquid-glass fill. A dropdown panel carries a list over a
+ * wider area than the header bar, so the same 40-80% fill would let the content
+ * behind it read through the links; only the fill is heavier, the blur, ring and
+ * shadow are shared. The light rung is the white sheet at 94-98%; the dark rung
+ * is the sand surface (sand-1100) at 94% fading to the dark card step at 98%,
+ * which is what web shipped (globals.css `--glass-liquid-fill-panel`).
+ */
+export const glassLiquidFillPanel = {
+  light: "linear-gradient(180deg, oklch(1 0 0 / 0.94) 10%, oklch(1 0 0 / 0.98))",
+  dark: `linear-gradient(180deg, ${withAlpha(PALETTE.sand[1100], 0.94)} 10%, ${withAlpha(
+    colorTokens.dark.card,
+    0.98,
+  )})`,
+} as const;
+
 export const glassLiquidBorder = {
   light: "linear-gradient(oklch(1 0 0 / 0.64) 40%, transparent 75% 95%, oklch(1 0 0 / 0.64))",
   dark: "linear-gradient(oklch(1 0 0 / 0.24) 40%, transparent 75% 95%, oklch(1 0 0 / 0.24))",
@@ -177,4 +200,15 @@ export const breakpoint = {
   lg: 1024,
   xl: 1280,
   "2xl": 1536,
+} as const;
+
+/**
+ * Radius by role, so a control, a card, a large panel and a pill all name the
+ * same step instead of each component picking a number off the scale.
+ */
+export const radiusRole = {
+  control: radius.md,
+  card: radius.lg,
+  panel: radius.xl,
+  pill: radius.full,
 } as const;
