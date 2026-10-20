@@ -40,6 +40,58 @@ const groups = [
     </header>
 
     <section class="not-prose mt-12">
+      <h2 class="text-[1.0625rem] font-semibold tracking-[-0.01em]">사이트 적용</h2>
+      <p class="mt-1 text-[13px] text-muted-foreground">
+        이 사이트는 마스코트를 로고와 파비콘, 공유 이미지에 그대로 씁니다.
+      </p>
+      <div class="mt-5 grid gap-3 md:grid-cols-2">
+        <div class="rounded-md border border-border bg-card px-5 py-5">
+          <p class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">Header lockup</p>
+          <div class="mt-4 flex items-center gap-2.5">
+            <img src={mascotImageUrl("face")} alt="" width="30" height="30" class="size-[30px] object-contain" />
+            <span class="text-[15px] font-semibold tracking-[-0.02em]">HORON</span>
+            <span class="text-[13px] text-muted-foreground">Design System</span>
+          </div>
+          <div class="mt-5 flex items-end gap-4">
+            {[24, 32, 48, 64].map((size) => (
+              <div class="flex flex-col items-center gap-1.5">
+                <img
+                  src={mascotImageUrl("face")}
+                  alt={`${size}px 로고`}
+                  width={size}
+                  height={size}
+                  style={`width:${size}px;height:${size}px`}
+                  class="object-contain"
+                />
+                <span class="font-mono text-[10px] text-muted-foreground">{size}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div class="rounded-md border border-border bg-card px-5 py-5">
+          <p class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">Favicon · OG</p>
+          <div class="mt-4 flex items-center gap-4">
+            <img src="/icon.png" alt="파비콘 256px" width="64" height="64" class="size-16 rounded-lg" />
+            <img src="/apple-icon.png" alt="애플 터치 아이콘" width="56" height="56" class="size-14 rounded-lg" />
+            <div class="flex flex-col gap-1">
+              <span class="font-mono text-[11px]">favicon.ico 16 · 32 · 48</span>
+              <span class="font-mono text-[11px]">icon.png 256</span>
+              <span class="font-mono text-[11px]">icon-512.png · apple-icon.png 180</span>
+            </div>
+          </div>
+          <img
+            src="/og.png"
+            alt="공유 이미지 미리보기"
+            width="1200"
+            height="630"
+            loading="lazy"
+            class="mt-5 w-full rounded-md border border-border"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="not-prose mt-12">
       <h2 class="text-[1.0625rem] font-semibold tracking-[-0.01em]">Brand palette</h2>
       <div class="mt-4 grid gap-3 sm:grid-cols-3">
         {
