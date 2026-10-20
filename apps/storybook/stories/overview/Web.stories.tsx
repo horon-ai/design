@@ -135,7 +135,6 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  ChartContainer,
   CodeBlock,
   CodeBlockContent,
   CodeBlockCopyButton,
@@ -152,7 +151,6 @@ import {
   Marker,
   MarkerContent,
   MarkerIcon,
-  RechartsPrimitive,
   Table,
   TableBody,
   TableCell,
@@ -275,6 +273,7 @@ import {
   ToggleGroupItem,
   useForm,
 } from "@horon-ai/react";
+import { ChartContainer, RechartsPrimitive } from "@horon-ai/react/components/chart";
 import { FileTextIcon, FolderIcon, ImageIcon, InboxIcon } from "lucide-react";
 
 const meta = {
