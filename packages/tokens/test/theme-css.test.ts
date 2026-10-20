@@ -2,12 +2,32 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { oklchToHex } from "../src/color";
+import { oklchToHex, oklchToRgba } from "../src/color";
 import { buildThemeCss } from "../src/css";
 import { ACCENT, INK, PALETTE } from "../src/palette";
+import { glassLiquidFillPanel, radius, radiusRole } from "../src/scales";
 import { colorTokens, type ColorTokenName } from "../src/tokens";
 
 const THEME_CSS_PATH = fileURLToPath(new URL("../theme.css", import.meta.url));
+
+/** WCAG 2.1 relative luminance of an sRGB channel (0..255). */
+const channel = (v: number) => {
+  const s = v / 255;
+  return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+};
+
+const luminance = (hex: string) => {
+  const { r, g, b } = oklchToRgba(hex);
+  return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+};
+
+/** WCAG 2.1 contrast ratio between two opaque colors. */
+const contrastRatio = (a: string, b: string) => {
+  const la = luminance(a);
+  const lb = luminance(b);
+  const [hi, lo] = la > lb ? [la, lb] : [lb, la];
+  return (hi + 0.05) / (lo + 0.05);
+};
 
 describe("theme.css drift guard", () => {
   test("the committed theme.css is byte-identical to a fresh regeneration", () => {
@@ -19,7 +39,53 @@ describe("theme.css drift guard", () => {
     expect(committed).toContain("--glass-foreground");
     expect(committed).toContain("--glass-tint");
     expect(committed).toContain("--text-hero");
+    expect(committed).toContain("--brand-gold");
+    expect(committed).toContain("--brand-gold-text");
+    expect(committed).toContain("--radius-card");
+    expect(committed).toContain("--breakpoint-lg");
+    expect(committed).toContain("--glass-liquid-fill-panel");
     expect(committed).toBe(regenerated);
+  });
+});
+
+describe("brand colors carry their own contrast role", () => {
+  test("brand-gold is the palette accent and brand-gold-text is a darker light step", () => {
+    expect(colorTokens.light["brand-gold"]).toBe(PALETTE.gold[500]);
+    expect(colorTokens.dark["brand-gold"]).toBe(PALETTE.gold[500]);
+    // The accent fill itself is not legible as text on the light page (2.70:1),
+    // so the light text role sits a step darker and the dark one a step lighter.
+    expect(colorTokens.light["brand-gold-text"]).toBe(PALETTE.gold[600]);
+    expect(colorTokens.dark["brand-gold-text"]).toBe(PALETTE.gold[400]);
+  });
+
+  test("brand-gold-text clears 4.5:1 on the light background", () => {
+    expect(contrastRatio(colorTokens.light["brand-gold-text"], colorTokens.light.background)).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+describe("role radii and breakpoints", () => {
+  test("radiusRole maps the four roles onto the radius scale", () => {
+    expect(radiusRole).toEqual({
+      control: radius.md,
+      card: radius.lg,
+      panel: radius.xl,
+      pill: radius.full,
+    });
+  });
+
+  test("theme.css emits role radii, breakpoints and the panel glass fill", () => {
+    const css = buildThemeCss();
+    expect(css).toContain("--radius-control: 12px;");
+    expect(css).toContain("--radius-card: 14px;");
+    expect(css).toContain("--radius-panel: 20px;");
+    expect(css).toContain("--radius-pill: 9999px;");
+    expect(css).toContain("--breakpoint-md: 48rem;");
+    expect(css).toContain("--breakpoint-lg: 64rem;");
+    expect(css).toContain(glassLiquidFillPanel.light);
+    expect(css).toContain(glassLiquidFillPanel.dark);
+    // Every degradation rung must rewrite the panel fill, or a panel stays
+    // translucent while the chrome around it goes opaque.
+    expect(css.match(/--glass-liquid-fill-panel:/g)?.length).toBe(4);
   });
 });
 

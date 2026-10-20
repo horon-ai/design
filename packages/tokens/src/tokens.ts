@@ -52,6 +52,23 @@ const light = {
   "sidebar-border": "oklch(0.1448 0 90 / 0.122)",
   "sidebar-ring": ACCENT.light,
 
+  // Brand = the marketing band. `brand-ink` is the near-black band surface,
+  // `brand-ink-2` the slightly lifted step inside it, and the three text
+  // steps ride on that band (foreground 18.97:1, muted 13.35:1, faint
+  // 7.85:1 against sand-1200, all AA). `brand-gold` is the accent FILL (dots,
+  // marks, fills) and `brand-gold-text` the darker step that is legible as
+  // text on the page background (5.27:1 on `background`, 5.50:1 on `card`,
+  // AA); the fill itself is only 2.70:1 there, which is why the two roles are
+  // split. `brand-gold-soft` is the pale wash above the accent.
+  "brand-ink": PALETTE.sand[1200],
+  "brand-ink-2": PALETTE.sand[1100],
+  "brand-ink-foreground": PALETTE.sand[100],
+  "brand-ink-muted": PALETTE.sand[500],
+  "brand-ink-faint": PALETTE.sand[600],
+  "brand-gold": PALETTE.gold[500],
+  "brand-gold-text": PALETTE.gold[600],
+  "brand-gold-soft": PALETTE.gold[400],
+
   // Glass = the floating-chrome surface. It OWNS its foreground (it must not
   // inherit the theme `foreground`). The fill/strong/border values are the
   // canvas glass; `glass-fill-frost` / `glass-fill-solid` are the
@@ -105,6 +122,22 @@ const dark = {
   "sidebar-accent-foreground": PALETTE.sand[100],
   "sidebar-border": "oklch(0.9851 0 90 / 0.122)",
   "sidebar-ring": ACCENT.dark,
+
+  // On a dark page the band cannot be darker than the page, so `brand-ink`
+  // becomes a card-level surface (sand-1100) and `brand-ink-2` the next step
+  // up for nested panels. The text steps stay on the same ramp and hold AA
+  // against that surface (foreground 17.18:1, muted 12.09:1, faint 7.11:1).
+  // `brand-gold` keeps the single accent anchor; `brand-gold-text` moves one
+  // step LIGHTER than the accent (gold-400, 10.49:1 on `background`) and
+  // `brand-gold-soft` one step lighter again.
+  "brand-ink": PALETTE.sand[1100],
+  "brand-ink-2": PALETTE.sand[1000],
+  "brand-ink-foreground": PALETTE.sand[100],
+  "brand-ink-muted": PALETTE.sand[500],
+  "brand-ink-faint": PALETTE.sand[600],
+  "brand-gold": PALETTE.gold[500],
+  "brand-gold-text": PALETTE.gold[400],
+  "brand-gold-soft": PALETTE.gold[300],
 
   // Dark glass is a dark, MORE opaque sheet rather than the canvas's 10% white
   // veil: a translucent veil over LIGHT content lifts its composite toward the
