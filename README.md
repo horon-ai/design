@@ -132,6 +132,37 @@ Storybook 정적 사이트는 Cloudflare Pages 프로젝트 `horon-storybook`으
 파비콘·앱 아이콘은 `web` 앱의 `favicon.ico`·`icon.png`·`apple-icon.png`를 그대로 복사한
 것이므로, 아이콘을 바꿀 때는 두 저장소를 함께 맞춥니다.
 
+## 패키지 게시 (npm)
+
+라이브러리 두 패키지(`@horon-ai/react`, `@horon-ai/tokens`)는 버전 `0.1.0`이고
+`publishConfig.access`가 `public`입니다. 앱 셋(`apps/*`)과 저장소 루트는 `private: true`라
+게시 대상이 아닙니다.
+
+**2026-10-20 현재 두 패키지는 npm 레지스트리에 아직 올라가 있지 않습니다.** 게시용 토큰이
+만료되어 `npm whoami`가 401을 돌려줬습니다. 그래서 지금 `web`과 `desktop`은 커밋된
+`file:` 의존(`file:../design/packages/react`, `file:../design/packages/tokens`)으로 이
+저장소의 소스를 직접 가져다 씁니다. 두 패키지를 설치하는 외부 소비자는 아직 없습니다.
+
+게시할 때는 다음 순서를 따릅니다.
+
+```bash
+# 1. 자격증명이 살아 있는지 먼저 확인한다 (401이면 게시가 불가능하다)
+TOKEN=$(grep -m1 'registry.npmjs.org/:_authToken=' ~/.npmrc | cut -d= -f2-)
+curl -s -o /dev/null -w '%{http_code}\n' -H "Authorization: Bearer $TOKEN" \
+  https://registry.npmjs.org/-/whoami
+
+# 2. 토큰이 살아 있으면 두 패키지를 순서대로 게시한다 (tokens build → tokens → react)
+bun run publish:packages
+
+# 3. 레지스트리에서 확인한다
+npm view @horon-ai/tokens@0.1.0 version
+npm view @horon-ai/react@0.1.0 version
+```
+
+게시한 뒤에는 `web/package.json`과 `desktop/package.json`의 `file:` 의존을
+`"@horon-ai/react": "0.1.0"`, `"@horon-ai/tokens": "0.1.0"` 같은 정확한 버전으로 바꾸고
+`bun install`로 확인합니다. 범위(`^0.1.0`)는 쓰지 않습니다.
+
 ## 검증
 
 ```bash
