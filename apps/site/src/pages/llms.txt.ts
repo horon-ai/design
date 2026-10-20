@@ -16,6 +16,7 @@ export const GET: APIRoute = ({ site }) => {
     `- [Get Started](${link("/get-started")}): 설치와 첫 화면 구성`,
     `- [Foundations](${link("/foundations")}): 색, 타이포, 간격, 반경, 높이, 모션, 유리 표면`,
     `- [Components](${link("/components")}): 컴포넌트 전체 목록`,
+    `- [Mascot](${link("/mascot")}): 마스코트 26컷과 브랜드 팔레트`,
     `- [Updates](${link("/updates")}): 변경 기록`,
     "",
     "## Foundations",

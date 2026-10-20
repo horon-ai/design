@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { componentCount, components, componentGroups, componentsInGroup } from "@/data/components";
+import { mascotImageUrl, mascotSpec } from "@/data/mascots";
 import { demoCount } from "@/lib/demos";
 
 const featured = ["button", "card", "input", "dialog", "tabs", "select", "table", "toast"];
@@ -11,7 +12,7 @@ const showcase = featured
 const stats = [
   { label: "Components", value: componentCount },
   { label: "Live previews", value: demoCount() },
-  { label: "Groups", value: componentGroups.length },
+  { label: "Mascot cuts", value: mascotSpec.count },
   { label: "Platforms", value: "Web · Native" },
 ];
 ---
@@ -50,6 +51,14 @@ const stats = [
           컴포넌트 둘러보기
         </a>
       </div>
+
+      <img
+        src={mascotImageUrl("main")}
+        alt="Horon 마스코트"
+        width="320"
+        height="320"
+        class="pointer-events-none absolute right-6 bottom-6 hidden size-[260px] object-contain lg:block xl:right-16 xl:size-[320px]"
+      />
 
       <dl class="mt-16 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-6 border-t border-border pt-8 sm:grid-cols-4">
         {
@@ -154,6 +163,43 @@ const stats = [
   </section>
 
   <section class="shell py-20">
+    <div class="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:gap-16">
+      <div>
+        <p class="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Mascot</p>
+        <h2 class="mt-4 text-[1.75rem] font-semibold tracking-[-0.025em]">
+          둥근 병아리, {mascotSpec.count}가지 표정
+        </h2>
+        <p class="mt-4 max-w-md text-[14px] leading-7 text-muted-foreground">
+          Horus + ON에서 온 마스코트입니다. 빈 상태, 오류, 로딩처럼 화면이 말을 걸어야 할 때 대신
+          표정을 짓습니다. 1254 × 1254 투명 PNG로 모든 컷을 내려받을 수 있습니다.
+        </p>
+        <a
+          href="/mascot"
+          class="mt-6 inline-flex h-[37px] items-center rounded-md border border-border px-5 text-[13.5px] font-medium transition-colors hover:bg-muted"
+        >
+          마스코트 보기
+        </a>
+      </div>
+      <div class="grid grid-cols-3 gap-2">
+        {
+          ["main", "cheer", "think", "wave", "success", "lost"].map((slug) => (
+            <div class="flex aspect-square items-center justify-center rounded-md border border-border bg-muted/40 p-2">
+              <img
+                src={mascotImageUrl(slug)}
+                alt={`Horon 마스코트 ${slug} 컷`}
+                width="160"
+                height="160"
+                loading="lazy"
+                class="size-full object-contain"
+              />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="shell pb-20">
     <div class="grid gap-10 md:grid-cols-3">
       {
         [
