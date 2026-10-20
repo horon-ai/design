@@ -1,14 +1,14 @@
-import { StrictMode } from "react"
-import { createRoot } from "react-dom/client"
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 
-import "@horon/web/globals.css"
-import { App } from "./App.tsx"
-import { ThemeProvider } from "@/components/theme-provider.tsx"
+import "@horon/web/globals.css";
+import { App } from "./App.tsx";
+import { ThemeProvider } from "@/components/theme-provider.tsx";
 
 createRoot(document.getElementById("root")!).render(
-	<StrictMode>
-		<ThemeProvider defaultTheme="light">
-			<App />
-		</ThemeProvider>
-	</StrictMode>
-)
+  <StrictMode>
+    <ThemeProvider defaultTheme="light">
+      <App />
+    </ThemeProvider>
+  </StrictMode>,
+);

@@ -1,10 +1,10 @@
 {
-	"extends": "../../tsconfig.json",
-	"compilerOptions": {
-		"lib": ["ES2022"],
-		"types": ["node", "bun"],
-		"noEmit": true,
-		"verbatimModuleSyntax": true
-	},
-	"include": ["src", "scripts", "test"]
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": ["node", "bun"],
+    "noEmit": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src", "scripts", "test"]
 }

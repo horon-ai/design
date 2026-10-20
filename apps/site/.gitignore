@@ -1,0 +1,3 @@
+dist/
+.astro/
+src/components/demo-wrappers/

@@ -1,0 +1,129 @@
+---
+import { foundationsNav, isActive } from "@/data/nav";
+import { componentGroups, componentsInGroup } from "@/data/components";
+
+interface Props {
+  section: string;
+}
+
+const { section } = Astro.props;
+const path = Astro.url.pathname;
+const isFoundations = section === "foundations";
+---
+
+<aside class="lg:w-[216px] lg:shrink-0">
+  <details class="rounded-md border border-border px-4 py-3 lg:hidden">
+    <summary class="cursor-pointer text-[13px] font-medium text-foreground">목차</summary>
+    <div class="pt-3">
+      {
+        isFoundations ? (
+          <ul class="space-y-0.5">
+            {foundationsNav.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class:list={[
+                    "block rounded-sm px-2 py-1 text-[13px]",
+                    isActive(path, item.href) ? "bg-muted text-foreground" : "text-muted-foreground",
+                  ]}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div class="space-y-4">
+            {componentGroups.map((group) => (
+              <div>
+                <p class="px-2 pb-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+                  {group.title}
+                </p>
+                <ul class="space-y-0.5">
+                  {componentsInGroup(group.id).map((component) => (
+                    <li>
+                      <a
+                        href={`/components/${component.slug}`}
+                        class:list={[
+                          "block rounded-sm px-2 py-1 text-[13px]",
+                          path === `/components/${component.slug}`
+                            ? "bg-muted text-foreground"
+                            : "text-muted-foreground",
+                        ]}
+                      >
+                        {component.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </details>
+
+  <nav class="hidden lg:sticky lg:top-24 lg:block" aria-label="섹션 목차">
+    {
+      isFoundations ? (
+        <ul class="space-y-0.5">
+          {foundationsNav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isActive(path, item.href) ? "page" : undefined}
+                class:list={[
+                  "block rounded-sm px-2.5 py-1.5 text-[13px] transition-colors",
+                  isActive(path, item.href)
+                    ? "bg-muted font-medium text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                ]}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="max-h-[calc(100vh-8rem)] space-y-5 overflow-y-auto pr-2">
+          <a
+            href="/components"
+            aria-current={path === "/components" ? "page" : undefined}
+            class:list={[
+              "block rounded-sm px-2.5 py-1.5 text-[13px]",
+              path === "/components" ? "bg-muted font-medium text-foreground" : "text-muted-foreground hover:text-foreground",
+            ]}
+          >
+            Overview
+          </a>
+          {componentGroups.map((group) => (
+            <div>
+              <p class="px-2.5 pb-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+                {group.title}
+              </p>
+              <ul class="space-y-0.5">
+                {componentsInGroup(group.id).map((component) => (
+                  <li>
+                    <a
+                      href={`/components/${component.slug}`}
+                      aria-current={path === `/components/${component.slug}` ? "page" : undefined}
+                      class:list={[
+                        "block rounded-sm px-2.5 py-1 text-[13px] transition-colors",
+                        path === `/components/${component.slug}`
+                          ? "bg-muted font-medium text-foreground"
+                          : "text-muted-foreground hover:text-foreground",
+                      ]}
+                    >
+                      {component.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )
+    }
+  </nav>
+</aside>

@@ -1,31 +1,22 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Autocomplete,
   AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteList,
-} from "@horon/web/components/autocomplete"
+} from "@horon/web/components/autocomplete";
 
-const frameworks = [
-  "React",
-  "Vue",
-  "Svelte",
-  "Solid",
-  "Angular",
-  "Astro",
-  "Qwik",
-  "Remix",
-]
+const frameworks = ["React", "Vue", "Svelte", "Solid", "Angular", "Astro", "Qwik", "Remix"];
 
 const meta = {
   title: "Web/Autocomplete",
   component: Autocomplete,
   parameters: { layout: "centered" },
-} satisfies Meta<typeof Autocomplete>
+} satisfies Meta<typeof Autocomplete>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
   render: () => (
@@ -41,7 +32,7 @@ export const Playground: Story = {
       </AutocompleteList>
     </Autocomplete>
   ),
-}
+};
 
 export const Selected: Story = {
   render: () => (
@@ -57,4 +48,4 @@ export const Selected: Story = {
       </AutocompleteList>
     </Autocomplete>
   ),
-}
+};

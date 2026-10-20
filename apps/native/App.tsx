@@ -1,14 +1,14 @@
-import { useState } from "react"
-import { SafeAreaView, ScrollView, View } from "react-native"
-import { StatusBar } from "expo-status-bar"
-import * as Font from "expo-font"
+import { useState } from "react";
+import { SafeAreaView, ScrollView, View } from "react-native";
+import { StatusBar, type StatusBarProps } from "expo-status-bar";
+import * as Font from "expo-font";
 import {
   Geist_400Regular,
   Geist_500Medium,
   Geist_600SemiBold,
   Geist_700Bold,
   useFonts,
-} from "@expo-google-fonts/geist"
+} from "@expo-google-fonts/geist";
 import {
   Badge,
   Button,
@@ -25,22 +25,25 @@ import {
   ThemeProvider,
   VStack,
   useTheme,
-} from "@horon/app"
+} from "@horon/app";
+
+/**
+ * expo-status-bar takes the status bar style *name* ("dark"), not a CSS object,
+ * so the props are built as an object and spread onto the component.
+ */
+const STATUS_BAR_PROPS = { style: "dark" } satisfies StatusBarProps;
 
 /**
  * A minimal screen that renders @horon/app components under the app theme.
  * Every control here is imported from @horon/app - nothing is reimplemented.
  */
 function Screen() {
-  const t = useTheme()
-  const [email, setEmail] = useState("")
+  const t = useTheme();
+  const [email, setEmail] = useState("");
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.colors.background }}>
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ padding: t.space[6], gap: t.space[6] }}
-      >
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: t.space[6], gap: t.space[6] }}>
         <VStack gap={2}>
           <HStack gap={2} align="center">
             <Text variant="title">Horon Native</Text>
@@ -57,10 +60,7 @@ function Screen() {
               <CardTitle>Sign in</CardTitle>
               <Badge>New</Badge>
             </HStack>
-            <CardDescription>
-              Every control below comes from @horon/app; none is reimplemented
-              here.
-            </CardDescription>
+            <CardDescription>Every control below comes from @horon/app; none is reimplemented here.</CardDescription>
           </CardHeader>
           <CardContent>
             <Input
@@ -99,23 +99,20 @@ function Screen() {
         <Card>
           <CardHeader>
             <CardTitle>Font check</CardTitle>
-            <CardDescription>
-              fontFamily.native.sans must resolve to a loaded face at runtime.
-            </CardDescription>
+            <CardDescription>fontFamily.native.sans must resolve to a loaded face at runtime.</CardDescription>
           </CardHeader>
           <CardContent>
             <Text style={{ fontFamily: t.fontFamily.native.sans }}>
               Geist renders this line ({t.fontFamily.native.sans}).
             </Text>
             <Text variant="bodySm" tone="muted">
-              Font.isLoaded(&quot;Geist&quot;) ={" "}
-              {String(Font.isLoaded("Geist"))}
+              Font.isLoaded(&quot;Geist&quot;) = {String(Font.isLoaded("Geist"))}
             </Text>
           </CardContent>
         </Card>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
 
 export default function App() {
@@ -124,20 +121,18 @@ export default function App() {
     Geist_500Medium,
     Geist_600SemiBold,
     Geist_700Bold,
-  })
+  });
 
   return (
     <ThemeProvider scheme="light">
-      <StatusBar style="dark" />
+      <StatusBar {...STATUS_BAR_PROPS} />
       {fontsLoaded || fontError ? (
         <Screen />
       ) : (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
           <Spinner />
         </View>
       )}
     </ThemeProvider>
-  )
+  );
 }

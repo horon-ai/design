@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { Toggle as TogglePrimitive } from "@base-ui/react/toggle"
-import { ToggleGroup as ToggleGroupPrimitive } from "@base-ui/react/toggle-group"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "cn"
+import { Toggle as TogglePrimitive } from "@base-ui/react/toggle";
+import { ToggleGroup as ToggleGroupPrimitive } from "@base-ui/react/toggle-group";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "cn";
 
 const toggleGroupVariants = cva(
   "group/toggle-group flex w-fit items-center gap-0.5 rounded-md p-0.5 data-[orientation=vertical]:flex-col",
@@ -17,8 +17,8 @@ const toggleGroupVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
-)
+  },
+);
 
 const toggleGroupItemVariants = cva(
   "group/toggle inline-flex shrink-0 items-center justify-center gap-1.5 rounded-sm text-[13px] font-medium whitespace-nowrap text-muted-foreground transition-all outline-none select-none hover:text-foreground focus-visible:z-1 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-pressed:text-foreground group-data-[variant=default]/toggle-group:data-pressed:bg-background group-data-[variant=default]/toggle-group:data-pressed:shadow-sm group-data-[variant=outline]/toggle-group:data-pressed:bg-muted [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -33,8 +33,8 @@ const toggleGroupItemVariants = cva(
     defaultVariants: {
       size: "default",
     },
-  }
-)
+  },
+);
 
 function ToggleGroup({
   className,
@@ -48,7 +48,7 @@ function ToggleGroup({
       className={cn(toggleGroupVariants({ variant }), className)}
       {...props}
     />
-  )
+  );
 }
 
 function ToggleGroupItem({
@@ -63,12 +63,7 @@ function ToggleGroupItem({
       className={cn(toggleGroupItemVariants({ size }), className)}
       {...props}
     />
-  )
+  );
 }
 
-export {
-  ToggleGroup,
-  ToggleGroupItem,
-  toggleGroupVariants,
-  toggleGroupItemVariants,
-}
+export { ToggleGroup, ToggleGroupItem, toggleGroupVariants, toggleGroupItemVariants };

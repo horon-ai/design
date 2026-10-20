@@ -62,17 +62,20 @@
     border-radius: inherit;
     padding: 1px;
     background: var(--glass-liquid-border);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
-    mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box exclude,
+      linear-gradient(#fff 0 0);
     mask-composite: exclude;
     pointer-events: none;
   }
 
   /* Motion helpers driven by the duration/ease tokens. */
   .motion-surface {
-    transition-property: background-color, border-color, color, box-shadow,
-      backdrop-filter;
+    transition-property: background-color, border-color, color, box-shadow, backdrop-filter;
     transition-duration: var(--duration-normal);
     transition-timing-function: var(--ease-out-strong);
   }

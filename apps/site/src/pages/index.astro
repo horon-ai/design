@@ -1,0 +1,175 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { componentCount, components, componentGroups, componentsInGroup } from "@/data/components";
+import { demoCount } from "@/lib/demos";
+
+const featured = ["button", "card", "input", "dialog", "tabs", "select", "table", "toast"];
+const showcase = featured
+  .map((slug) => components.find((component) => component.slug === slug))
+  .filter((component): component is NonNullable<typeof component> => Boolean(component));
+
+const stats = [
+  { label: "Components", value: componentCount },
+  { label: "Live previews", value: demoCount() },
+  { label: "Groups", value: componentGroups.length },
+  { label: "Platforms", value: "Web · Native" },
+];
+---
+
+<BaseLayout wide>
+  <section class="relative overflow-hidden border-b border-border">
+    <div
+      class="pointer-events-none absolute inset-0 -z-10 opacity-70"
+      style="background:
+        radial-gradient(52rem 28rem at 12% -10%, var(--muted), transparent 60%),
+        radial-gradient(38rem 24rem at 88% 8%, color-mix(in oklch, var(--ring) 14%, transparent), transparent 62%);"
+    >
+    </div>
+    <div class="shell py-20 md:py-28">
+      <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+        Horon Design System
+      </p>
+      <h1 class="mt-6 max-w-4xl text-[2.75rem] font-semibold leading-[1.02] tracking-[-0.04em] text-balance md:text-[4.5rem]">
+        Seed to Root,<br />Root to Execute.
+      </h1>
+      <p class="mt-7 max-w-xl text-[15px] leading-7 text-muted-foreground text-pretty">
+        데이터를 이해하는 것에서 끝나지 않고 실행과 결과까지 연결하는 시스템. 그 시스템을 지탱하는
+        토큰과 컴포넌트를 하나의 기준으로 정의합니다. 디자인과 코드가 같은 값을 바라봅니다.
+      </p>
+      <div class="mt-9 flex flex-wrap items-center gap-3">
+        <a
+          href="/get-started"
+          class="inline-flex h-[37px] items-center rounded-md bg-primary px-5 text-[13.5px] font-semibold text-primary-foreground transition-opacity hover:opacity-85"
+        >
+          시작하기
+        </a>
+        <a
+          href="/components"
+          class="inline-flex h-[37px] items-center rounded-md border border-border px-5 text-[13.5px] font-medium transition-colors hover:bg-muted"
+        >
+          컴포넌트 둘러보기
+        </a>
+      </div>
+
+      <dl class="mt-16 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-6 border-t border-border pt-8 sm:grid-cols-4">
+        {
+          stats.map((stat) => (
+            <div>
+              <dt class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+                {stat.label}
+              </dt>
+              <dd class="mt-1.5 text-[1.375rem] font-semibold tracking-[-0.02em]">{stat.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="shell py-20">
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
+      <div>
+        <p class="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Principles</p>
+        <h2 class="mt-4 text-[1.75rem] font-semibold leading-tight tracking-[-0.025em]">
+          세 가지 원칙
+        </h2>
+        <p class="mt-4 max-w-md text-[14px] leading-7 text-muted-foreground">
+          HORON의 UI는 중성 백본 위에 단 하나의 액센트만 얹습니다. 색을 많이 쓰지 않고, 계층과
+          상태를 타이포와 여백으로 드러냅니다.
+        </p>
+      </div>
+      <ol class="divide-y divide-border border-y border-border">
+        {
+          [
+            ["Neutral backbone", "표면과 텍스트는 sand 무채색 램프 하나로 정리합니다. 색 캐스트가 없습니다."],
+            ["Single accent", "gold는 포커스 링과 링크, 하이라이트에만 아주 절제해 씁니다. 버튼 fill은 잉크입니다."],
+            ["Same source", "토큰 하나에서 웹 CSS와 네이티브 값이 함께 나옵니다. 두 플랫폼이 어긋나지 않습니다."],
+          ].map(([title, body], i) => (
+            <li class="flex gap-5 py-6">
+              <span class="mt-0.5 font-mono text-[11px] text-muted-foreground">0{i + 1}</span>
+              <div>
+                <p class="text-[14px] font-semibold">{title}</p>
+                <p class="mt-1.5 text-[13.5px] leading-6 text-muted-foreground">{body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="border-y border-border bg-muted/30">
+    <div class="shell py-20">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Components</p>
+          <h2 class="mt-4 text-[1.75rem] font-semibold tracking-[-0.025em]">
+            {componentCount}개 컴포넌트, 5개 그룹
+          </h2>
+        </div>
+        <a href="/components" class="text-[13px] text-muted-foreground transition-colors hover:text-foreground">
+          전체 목록 →
+        </a>
+      </div>
+
+      <div class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          componentGroups.map((group) => (
+            <a
+              href="/components"
+              class="group flex flex-col justify-between gap-6 rounded-md border border-border bg-card px-5 py-5 transition-colors hover:border-foreground/25"
+            >
+              <div>
+                <p class="text-[14px] font-semibold">{group.title}</p>
+                <p class="mt-1.5 text-[12.5px] leading-5 text-muted-foreground">{group.description}</p>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-[11px] text-muted-foreground">
+                  {componentsInGroup(group.id).length} components
+                </span>
+                <span class="text-[12px] text-muted-foreground transition-colors group-hover:text-foreground">
+                  보기 →
+                </span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+
+      <ul class="mt-6 flex flex-wrap gap-x-5 gap-y-2">
+        {
+          showcase.map((component) => (
+            <li>
+              <a
+                href={`/components/${component.slug}`}
+                class="text-[12.5px] text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {component.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="shell py-20">
+    <div class="grid gap-10 md:grid-cols-3">
+      {
+        [
+          ["Foundations", "색, 타이포, 간격, 반경, 모션, 유리 표면까지 — 모든 시각 결정의 값과 규칙.", "/foundations"],
+          ["Get Started", "설치하고 첫 화면을 만드는 데 필요한 최소 절차.", "/get-started"],
+          ["Storybook", "모든 컴포넌트의 상태와 변형을 직접 조작해 보는 미리보기.", "https://storybook.horon.ai"],
+        ].map(([title, body, href]) => (
+          <a href={href} class="group rounded-md border border-border px-5 py-6 transition-colors hover:border-foreground/25">
+            <p class="text-[14px] font-semibold">{title}</p>
+            <p class="mt-2 text-[13px] leading-6 text-muted-foreground">{body}</p>
+            <span class="mt-4 inline-block text-[12px] text-muted-foreground transition-colors group-hover:text-foreground">
+              열기 →
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
