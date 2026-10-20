@@ -1,0 +1,13 @@
+{
+  "name": "HORON Design System",
+  "short_name": "HORON",
+  "description": "HORON 제품을 위한 토큰, 컴포넌트, 가이드.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    { "src": "/icon.png", "sizes": "256x256", "type": "image/png" },
+    { "src": "/apple-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
