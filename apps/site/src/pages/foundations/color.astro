@@ -1,0 +1,120 @@
+---
+import DocsLayout from "@/layouts/DocsLayout.astro";
+import { PALETTE } from "@horon/tokens";
+
+const sand = Object.entries(PALETTE.sand);
+const gold = Object.entries(PALETTE.gold);
+const status = [
+  ["green", Object.entries(PALETTE.green)],
+  ["red", Object.entries(PALETTE.red)],
+  ["blue", Object.entries(PALETTE.blue)],
+] as const;
+
+const semantic = [
+  ["background", "var(--background)"],
+  ["foreground", "var(--foreground)"],
+  ["card", "var(--card)"],
+  ["muted", "var(--muted)"],
+  ["secondary", "var(--secondary)"],
+  ["accent", "var(--accent)"],
+  ["primary", "var(--primary)"],
+  ["border", "var(--border)"],
+  ["ring", "var(--ring)"],
+  ["destructive", "var(--destructive)"],
+  ["success", "var(--success)"],
+  ["warning", "var(--warning)"],
+  ["info", "var(--info)"],
+];
+---
+
+<DocsLayout
+  title="Color"
+  eyebrow="Foundations"
+  section="foundations"
+  description="중성 sand 램프를 백본으로 두고, gold를 단일 액센트로 씁니다. 상태색은 muted 톤으로 낮춰 화면이 여러 색으로 흩어지지 않게 합니다."
+>
+  <p>
+    색은 두 층으로 나뉩니다. <strong>프리미티브</strong>는 캔버스에 적힌 원시 램프이고,
+    <strong>시맨틱</strong>은 컴포넌트가 실제로 참조하는 변수입니다. 다크 모드에서 바뀌는 것은
+    시맨틱 층뿐입니다.
+  </p>
+
+  <h2>Sand — 중성 백본</h2>
+  <p>표면, 텍스트, 테두리가 모두 이 램프에서 나옵니다. 채도가 0이라 어떤 색 캐스트도 없습니다.</p>
+  <div class="not-prose mt-5 overflow-hidden rounded-md border border-border">
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6">
+      {
+        sand.map(([step, value]) => (
+          <div class="border-b border-r border-border last:border-r-0">
+            <div class="h-14" style={`background: ${value}`} />
+            <div class="px-3 py-2">
+              <p class="font-mono text-[11px] text-foreground">sand-{step}</p>
+              <p class="truncate font-mono text-[10px] text-muted-foreground">{value}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <h2>Gold — 단일 액센트</h2>
+  <p>
+    Horus의 금색입니다. 포커스 링, 링크, 하이라이트에만 씁니다. 버튼 fill로는 쓰지 않습니다.
+    <code>accent</code> 변수는 브랜드 색이 아니라 hover·선택 상태의 옅은 중성 표면입니다.
+  </p>
+  <div class="not-prose mt-5 overflow-hidden rounded-md border border-border">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+      {
+        gold.map(([step, value]) => (
+          <div class="border-b border-r border-border last:border-r-0">
+            <div class="h-14" style={`background: ${value}`} />
+            <div class="px-3 py-2">
+              <p class="font-mono text-[11px] text-foreground">gold-{step}</p>
+              <p class="truncate font-mono text-[10px] text-muted-foreground">{value}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <h2>Status — 낮춘 톤</h2>
+  <p>성공·실패·정보는 채도를 낮춰 씁니다. warning은 gold와 같은 값을 공유합니다.</p>
+  <div class="not-prose mt-5 space-y-3">
+    {
+      status.map(([name, steps]) => (
+        <div>
+          <p class="mb-1.5 font-mono text-[11px] text-muted-foreground">{name}</p>
+          <div class="flex overflow-hidden rounded-sm border border-border">
+            {steps.map(([step, value]) => (
+              <div class="h-10 flex-1" style={`background: ${value}`} title={`${name}-${step}`} />
+            ))}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
+  <h2>Semantic</h2>
+  <p>컴포넌트가 참조하는 변수입니다. 아래 견본은 현재 테마의 실제 값을 그대로 그립니다.</p>
+  <div class="not-prose mt-5 grid gap-2 sm:grid-cols-2">
+    {
+      semantic.map(([name, value]) => (
+        <div class="flex items-center gap-3 rounded-sm border border-border px-3 py-2">
+          <span
+            class="size-7 shrink-0 rounded-xs border border-border"
+            style={`background: ${value}`}
+          />
+          <span class="font-mono text-[12px] text-foreground">{name}</span>
+          <span class="ml-auto font-mono text-[10.5px] text-muted-foreground">--{name}</span>
+        </div>
+      ))
+    }
+  </div>
+
+  <h2>대비</h2>
+  <p>
+    모든 전경·배경 조합은 WCAG AA(4.5:1)를 넘깁니다. 유리 표면은 자체 전경색을 갖고, 불투명
+    배경에서는 대비가 떨어지지 않도록 별도 값을 씁니다.
+  </p>
+</DocsLayout>

@@ -1,0 +1,33 @@
+{
+	"name": "@horon/site",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "bun scripts/generate-demo-wrappers.ts && astro dev",
+		"build": "bun scripts/generate-demo-wrappers.ts && astro build",
+		"preview": "astro preview",
+		"typecheck": "bun scripts/generate-demo-wrappers.ts && astro check",
+		"lint": "oxlint --deny-warnings .",
+		"lint:fix": "oxlint --fix .",
+		"format": "prettier --write \"**/*.{ts,tsx,astro,css}\""
+	},
+	"dependencies": {
+		"@astrojs/react": "^4.4.2",
+		"@horon/tokens": "workspace:*",
+		"@horon/web": "workspace:*",
+		"@tailwindcss/vite": "^4",
+		"astro": "^5.15.0",
+		"lucide-react": "^1.56.0",
+		"react": "^19.3.0",
+		"react-dom": "^19.3.0",
+		"tailwindcss": "^4"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.4",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"oxlint": "^1.88.0",
+		"typescript": "~6.0.3"
+	}
+}
