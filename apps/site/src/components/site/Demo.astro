@@ -1,0 +1,26 @@
+---
+import { getDemo } from "@/lib/demos";
+
+interface Props {
+  name: string;
+  layout?: "inline" | "grid";
+  overlay?: boolean;
+  minHeight?: string;
+}
+
+const { name, layout = "inline", overlay = false, minHeight } = Astro.props;
+const Demo = getDemo(name);
+---
+
+<div
+  class:list={[
+    "demo-surface",
+    layout === "grid" && "demo-surface-grid",
+    overlay && "demo-surface-overlay",
+    "not-prose",
+  ]}
+  style={minHeight ? `min-height: ${minHeight}` : undefined}
+  data-demo={name}
+>
+  {Demo ? <Demo /> : <p class="text-[13px] text-muted-foreground">데모를 불러오지 못했습니다.</p>}
+</div>
