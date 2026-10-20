@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { DateRange } from "@horon/web/components/date-picker";
-import { Calendar } from "@horon/web/components/calendar";
+import type { DateRange } from "@horon-ai/react/components/date-picker";
+import { Calendar } from "@horon-ai/react/components/calendar";
 
 const meta = {
   title: "Web/Calendar",

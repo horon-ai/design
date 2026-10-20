@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@horon/web/components/tooltip";
-import { Button } from "@horon/web/components/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@horon-ai/react/components/tooltip";
+import { Button } from "@horon-ai/react/components/button";
 
 const meta = {
   title: "Web/Tooltip",

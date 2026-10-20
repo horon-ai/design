@@ -8,7 +8,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function DrawerDemo() {
   return (

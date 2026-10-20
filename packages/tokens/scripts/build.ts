@@ -4,4 +4,4 @@ import { buildThemeCss } from "../src/css";
 
 const out = fileURLToPath(new URL("../theme.css", import.meta.url));
 await writeFile(out, buildThemeCss(), "utf8");
-console.log(`@horon/tokens -> ${out}`);
+console.log(`@horon-ai/tokens -> ${out}`);

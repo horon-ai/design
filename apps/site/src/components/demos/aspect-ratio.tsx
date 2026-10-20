@@ -1,4 +1,4 @@
-import { AspectRatio } from "@horon/web";
+import { AspectRatio } from "@horon-ai/react";
 
 export default function AspectRatioDemo() {
   return (

@@ -7,8 +7,8 @@ bun install
 bun run tokens        # packages/tokens/theme.css 생성
 bun run storybook     # http://localhost:6006`;
 
-const consume = `import { Button, Card, CardHeader, CardTitle } from "@horon/web";
-import "@horon/web/globals.css";
+const consume = `import { Button, Card, CardHeader, CardTitle } from "@horon-ai/react";
+import "@horon-ai/react/globals.css";
 
 export function Example() {
   return (
@@ -21,24 +21,16 @@ export function Example() {
   );
 }`;
 
-const native = `import { Button, Card, CardTitle, Text } from "@horon/app";
-
-export function Screen() {
-  return (
-    <Card>
-      <CardTitle>제목</CardTitle>
-      <Text variant="bodySm" tone="muted">설명</Text>
-      <Button>확인</Button>
-    </Card>
-  );
-}`;
+const apps = `bun run site          # 문서 사이트 → http://localhost:4321
+bun run playground    # 웹 데모 앱
+bun run storybook     # Storybook → http://localhost:6006`;
 ---
 
 <DocsLayout
   title="Get Started"
   eyebrow="Get Started"
   section="get-started"
-  description="HORON 디자인 시스템은 하나의 토큰 소스에서 웹과 네이티브 값을 함께 냅니다. 아래 절차대로 설치하고, 토큰을 생성하고, 컴포넌트를 가져다 쓰면 됩니다."
+  description="HORON 디자인 시스템은 하나의 토큰 소스에서 웹 컴포넌트와 문서 사이트의 값을 함께 냅니다. 아래 절차대로 설치하고, 토큰을 생성하고, 컴포넌트를 가져다 쓰면 됩니다."
 >
   <h2>무엇인가요</h2>
   <p>
@@ -47,8 +39,8 @@ export function Screen() {
     채움색은 잉크입니다. 이 규칙은 토큰에 값으로 들어 있고, 컴포넌트는 그 값만 참조합니다.
   </p>
   <p>
-    토큰 정본은 <code>@horon/tokens</code> 하나입니다. 이 패키지가 웹용 CSS
-    (<code>theme.css</code>)와 네이티브용 hex·숫자를 함께 내기 때문에, 웹과 앱의 색·간격·타이포가
+    토큰 정본은 <code>@horon-ai/tokens</code> 하나입니다. 이 패키지가 웹용 CSS
+    (<code>theme.css</code>)를 내기 때문에, 컴포넌트와 문서 사이트의 색·간격·타이포가
     어긋나지 않습니다.
   </p>
 
@@ -57,25 +49,29 @@ export function Screen() {
 
   <h2>웹에서 쓰기</h2>
   <p>
-    엔트리에서 <code>@horon/web/globals.css</code>를 한 번 불러오고, 컴포넌트는 배럴 또는 하위
+    엔트리에서 <code>@horon-ai/react/globals.css</code>를 한 번 불러오고, 컴포넌트는 배럴 또는 하위
     경로로 가져옵니다. Tailwind CSS v4를 쓰는 프로젝트라면 같은 스타일시트를 그대로 공유할 수
     있습니다.
   </p>
   <CodeBlock code={consume} title="example.tsx" />
 
-  <h2>네이티브에서 쓰기</h2>
+  <h2>앱에서 확인하기</h2>
   <p>
-    앱 레이어는 <code>@horon/app</code>입니다. 같은 토큰을 StyleSheet 값으로 소비하므로 웹과
-    색·간격이 일치합니다. 두 레이어는 서로를 import 하지 않습니다.
+    저장소의 앱은 모두 같은 컴포넌트 레이어를 소비합니다. 문서 사이트는
+    <code>apps/site</code>, 웹 데모 앱은 <code>apps/playground</code>, 컴포넌트 미리보기는
+    <code>apps/storybook</code>입니다.
   </p>
-  <CodeBlock code={native} title="screen.tsx" />
+  <CodeBlock code={apps} lang="bash" title="terminal" />
 
-  <h2>import 경계</h2>
-  <p>두 레이어를 섞으면 경계 규칙에 걸립니다. 정적 검사는 oxlint가 맡습니다.</p>
+  <h2>패키지 경계</h2>
+  <p>
+    컴포넌트는 <code>@horon-ai/react</code> 하나에만 있고, 앱은 그것을 소비합니다. 정적 검사는
+    oxlint가 맡습니다.
+  </p>
   <ul>
-    <li><code>packages/app</code>, <code>apps/native</code> — <code>@horon/app</code>, <code>@horon/tokens</code>만</li>
-    <li><code>packages/web</code>, 웹 앱 — <code>@horon/web</code>, <code>@horon/tokens</code>만</li>
-    <li>예외는 Storybook 하나입니다. 두 레이어를 함께 렌더하는 미리보기 도구입니다.</li>
+    <li><code>packages/react</code> — <code>@horon-ai/react</code>, <code>@horon-ai/tokens</code>만</li>
+    <li><code>apps/site</code>, <code>apps/playground</code>, <code>apps/storybook</code> — <code>@horon-ai/react</code>, <code>@horon-ai/tokens</code>만</li>
+    <li>스타일 값은 전부 <code>@horon-ai/tokens</code>의 <code>theme.css</code>에서 읽습니다.</li>
   </ul>
 
   <h2>다음 단계</h2>

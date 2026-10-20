@@ -9,7 +9,7 @@ import {
   ItemMedia,
   ItemSeparator,
   ItemTitle,
-} from "@horon/web";
+} from "@horon-ai/react";
 import { FolderIcon, KeyRoundIcon, ShieldCheckIcon } from "lucide-react";
 
 const items = [

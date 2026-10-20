@@ -1,4 +1,4 @@
-import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@horon/web";
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@horon-ai/react";
 
 export default function TooltipDemo() {
   return (

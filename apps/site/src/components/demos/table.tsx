@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@horon/web";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@horon-ai/react";
 
 const rows = [
   { project: "디자인 시스템", status: "진행 중", updated: "오늘" },

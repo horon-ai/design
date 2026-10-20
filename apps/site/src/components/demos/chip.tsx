@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Chip } from "@horon/web";
+import { Chip } from "@horon-ai/react";
 
 export default function ChipDemo() {
   const [visible, setVisible] = useState(true);

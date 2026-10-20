@@ -1,4 +1,4 @@
-import { Button, Toaster, toast } from "@horon/web";
+import { Button, Toaster, toast } from "@horon-ai/react";
 import { useEffect } from "react";
 
 export default function ToastDemo() {

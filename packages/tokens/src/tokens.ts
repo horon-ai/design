@@ -2,8 +2,7 @@
  * Semantic color tokens, expressed in OKLCH.
  *
  * Transcribed from the pen.dev canvas `00 Tokens` board
- * (`horon-design.pen`, board `ev2sU`). `@horon/tokens/native` converts these to
- * hex for React Native. Token names follow the shadcn contract.
+ * (`horon-design.pen`, board `ev2sU`). Token names follow the shadcn contract.
  *
  * Primitives come from `palette.ts`. A few surfaces (card, popover, muted,
  * secondary, accent, sidebar) are bespoke neutrals that are not on the sand

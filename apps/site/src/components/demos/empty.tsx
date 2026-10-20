@@ -1,4 +1,4 @@
-import { Button, Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@horon/web";
+import { Button, Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@horon-ai/react";
 import { InboxIcon } from "lucide-react";
 
 export default function EmptyDemo() {

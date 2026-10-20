@@ -5,7 +5,7 @@ import {
   StepperSeparator,
   StepperTitle,
   StepperTrigger,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 const steps = [
   { value: "order", title: "주문" },

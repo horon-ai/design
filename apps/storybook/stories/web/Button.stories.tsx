@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Button } from "@horon/web/components/button";
+import { Button } from "@horon-ai/react/components/button";
 import { ArrowRight } from "lucide-react";
 
 const meta = {

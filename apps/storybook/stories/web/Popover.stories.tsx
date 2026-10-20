@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Popover, PopoverContent, PopoverTrigger } from "@horon/web/components/popover";
-import { Button } from "@horon/web/components/button";
-import { Input } from "@horon/web/components/input";
-import { Label } from "@horon/web/components/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@horon-ai/react/components/popover";
+import { Button } from "@horon-ai/react/components/button";
+import { Input } from "@horon-ai/react/components/input";
+import { Label } from "@horon-ai/react/components/label";
 
 const meta = {
   title: "Web/Popover",

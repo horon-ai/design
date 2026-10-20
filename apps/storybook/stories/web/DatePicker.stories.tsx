@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { DatePicker, DateRangePicker } from "@horon/web/components/date-picker";
+import { DatePicker, DateRangePicker } from "@horon-ai/react/components/date-picker";
 
 const meta = {
   title: "Web/DatePicker",

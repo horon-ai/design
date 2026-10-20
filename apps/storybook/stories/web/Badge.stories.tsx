@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Badge } from "@horon/web/components/badge";
+import { Badge } from "@horon-ai/react/components/badge";
 
 const meta = {
   title: "Web/Badge",

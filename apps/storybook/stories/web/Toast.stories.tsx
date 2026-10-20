@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Toaster, toast } from "@horon/web/components/toast";
-import { Button } from "@horon/web/components/button";
+import { Toaster, toast } from "@horon-ai/react/components/toast";
+import { Button } from "@horon-ai/react/components/button";
 
 const meta = {
   title: "Web/Toast",

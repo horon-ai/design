@@ -5,7 +5,7 @@ import {
   QuestionnaireOption,
   QuestionnaireOptions,
   QuestionnaireProgress,
-} from "@horon/web/components/questionnaire";
+} from "@horon-ai/react/components/questionnaire";
 
 const meta = {
   title: "Web/Questionnaire",
@@ -29,7 +29,7 @@ export const Playground: Story = {
         </div>
         <QuestionnaireOptions>
           <QuestionnaireOption>
-            <span className="font-medium">@horon/tokens</span>
+            <span className="font-medium">@horon-ai/tokens</span>
             <span className="text-xs text-muted-foreground">One package every surface imports.</span>
           </QuestionnaireOption>
           <QuestionnaireOption>

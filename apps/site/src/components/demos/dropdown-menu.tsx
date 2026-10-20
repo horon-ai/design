@@ -6,7 +6,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function DropdownMenuDemo() {
   return (

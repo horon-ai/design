@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@horon/web/components/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@horon-ai/react/components/hover-card";
 
 const meta = {
   title: "Web/HoverCard",

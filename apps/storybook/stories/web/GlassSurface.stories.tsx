@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { GlassSurface } from "@horon/web/components/glass-surface";
+import { GlassSurface } from "@horon-ai/react/components/glass-surface";
 
 const meta = {
   title: "Web/GlassSurface",

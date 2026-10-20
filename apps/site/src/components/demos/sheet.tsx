@@ -9,7 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function SheetDemo() {
   return (

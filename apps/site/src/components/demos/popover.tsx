@@ -1,4 +1,4 @@
-import { Button, Input, Label, Popover, PopoverContent, PopoverTrigger } from "@horon/web";
+import { Button, Input, Label, Popover, PopoverContent, PopoverTrigger } from "@horon-ai/react";
 
 export default function PopoverDemo() {
   return (

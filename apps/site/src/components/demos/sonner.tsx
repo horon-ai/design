@@ -1,4 +1,4 @@
-import { Button, SonnerToaster, sonnerToast } from "@horon/web";
+import { Button, SonnerToaster, sonnerToast } from "@horon-ai/react";
 import { useEffect } from "react";
 
 export default function SonnerDemo() {

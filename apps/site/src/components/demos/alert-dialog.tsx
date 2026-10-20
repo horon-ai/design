@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
   Button,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function AlertDialogDemo() {
   return (

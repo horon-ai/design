@@ -7,7 +7,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@horon/web/components/breadcrumb";
+} from "@horon-ai/react/components/breadcrumb";
 
 const meta = {
   title: "Web/Breadcrumb",

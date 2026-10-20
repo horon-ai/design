@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { RadioGroup, RadioGroupItem } from "@horon/web/components/radio-group";
-import { Label } from "@horon/web/components/label";
+import { RadioGroup, RadioGroupItem } from "@horon-ai/react/components/radio-group";
+import { Label } from "@horon-ai/react/components/label";
 
 const meta = {
   title: "Web/RadioGroup",
