@@ -73,6 +73,11 @@
     pointer-events: none;
   }
 
+  /* 목록을 담는 패널은 같은 표면의 진한 fill을 쓴다. 변수만 바꿔 blur·1px 링·그림자는 공유한다. */
+  .liquid-glass-panel {
+    --glass-liquid-fill: var(--glass-liquid-fill-panel);
+  }
+
   /* Motion helpers driven by the duration/ease tokens. */
   .motion-surface {
     transition-property: background-color, border-color, color, box-shadow, backdrop-filter;
