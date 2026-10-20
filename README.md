@@ -125,6 +125,13 @@ Storybook 정적 사이트는 Cloudflare Pages 프로젝트 `horon-storybook`으
 데모 래퍼(`components/demo-wrappers/`)는 `bun run build`가 자동으로 생성하므로
 커밋하지 않습니다.
 
+마스코트 컷은 저장소 루트의 `assets/horon-mascot-*.png`가 원본입니다. 사이트 빌드가
+`apps/site/scripts/sync-mascots.ts`로 768px WebP를 `apps/site/public/mascots/`에 만들고
+`/mascot` 페이지가 그 목록(`src/data/mascots.ts`)을 그립니다. 변환물은 커밋하지 않으며,
+컷을 추가하면 `assets/`에 PNG를 넣고 `src/data/mascots.ts`에 항목을 더합니다.
+파비콘·앱 아이콘은 `web` 앱의 `favicon.ico`·`icon.png`·`apple-icon.png`를 그대로 복사한
+것이므로, 아이콘을 바꿀 때는 두 저장소를 함께 맞춥니다.
+
 ## 검증
 
 ```bash
