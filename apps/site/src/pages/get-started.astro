@@ -1,6 +1,7 @@
 ---
 import DocsLayout from "@/layouts/DocsLayout.astro";
 import CodeBlock from "@/components/site/CodeBlock.astro";
+import { mascotImageUrl } from "@/data/mascots";
 
 const install = `# 저장소 루트에서
 bun install
@@ -32,6 +33,22 @@ bun run storybook     # Storybook → http://localhost:6006`;
   section="get-started"
   description="HORON 디자인 시스템은 하나의 토큰 소스에서 웹 컴포넌트와 문서 사이트의 값을 함께 냅니다. 아래 절차대로 설치하고, 토큰을 생성하고, 컴포넌트를 가져다 쓰면 됩니다."
 >
+  <div class="not-prose flex items-start gap-5 rounded-md border border-border bg-card px-5 py-5">
+    <img
+      src={mascotImageUrl("wave")}
+      alt="인사하는 Horon 마스코트"
+      width="88"
+      height="88"
+      class="size-[72px] shrink-0 object-contain sm:size-[88px]"
+    />
+    <div class="min-w-0">
+      <p class="text-[14px] font-semibold">처음 오셨나요?</p>
+      <p class="mt-1.5 text-[13px] leading-6 text-muted-foreground">
+        설치 세 줄, 토큰 생성 한 줄, 그리고 컴포넌트 import 한 줄이면 시작할 수 있습니다.
+      </p>
+    </div>
+  </div>
+
   <h2>무엇인가요</h2>
   <p>
     HORON의 UI는 <strong>중성 백본 + 단일 액센트</strong>로 정리됩니다. 표면과 텍스트는 sand
