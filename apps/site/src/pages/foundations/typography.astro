@@ -1,0 +1,97 @@
+---
+import DocsLayout from "@/layouts/DocsLayout.astro";
+import { text, fontWeight, lineHeight, fontFamily } from "@horon/tokens";
+
+const scale = Object.entries(text);
+const weights = Object.entries(fontWeight);
+const leading = Object.entries(lineHeight);
+const families = Object.entries(fontFamily.web);
+---
+
+<DocsLayout
+  title="Typography"
+  eyebrow="Foundations"
+  section="foundations"
+  description="본문은 Geist Variable 하나로 씁니다. 크기는 캡션 12px부터 히어로 48px까지 7단이고, 무게와 줄 간격은 별도 스케일로 조합합니다."
+>
+  <p>
+    타입 스케일은 두 겹입니다. 컴포넌트가 넓게 쓰는 Tailwind 정렬 스케일(<code>fontSize</code>)과,
+    캔버스의 의미 단위 스케일(<code>text</code>)입니다. 문서와 마케팅 화면은 의미 단위를 씁니다.
+  </p>
+
+  <h2>의미 단위 스케일</h2>
+  <div class="not-prose mt-5 divide-y divide-border border-y border-border">
+    {
+      scale.map(([name, size]) => (
+        <div class="flex items-baseline gap-6 py-4">
+          <span class="w-24 shrink-0 font-mono text-[11px] text-muted-foreground">{name}</span>
+          <span class="w-14 shrink-0 font-mono text-[11px] text-muted-foreground">{size}px</span>
+          <span class="min-w-0 truncate font-semibold tracking-[-0.02em]" style={`font-size:${size}px`}>
+            See. Build. Execute.
+          </span>
+        </div>
+      ))
+    }
+  </div>
+
+  <h2>무게</h2>
+  <div class="not-prose mt-5 grid gap-3 sm:grid-cols-2">
+    {
+      weights.map(([name, value]) => (
+        <div class="rounded-sm border border-border px-4 py-3">
+          <p class="font-mono text-[10.5px] text-muted-foreground">
+            {name} · {value}
+          </p>
+          <p class="mt-1 text-[1.125rem] tracking-[-0.01em]" style={`font-weight:${value}`}>
+            Insight, activated.
+          </p>
+        </div>
+      ))
+    }
+  </div>
+
+  <h2>줄 간격</h2>
+  <div class="not-prose mt-5 overflow-hidden rounded-md border border-border">
+    <table class="w-full text-left text-[12.5px]">
+      <thead class="border-b border-border bg-muted/50 text-muted-foreground">
+        <tr>
+          <th class="px-4 py-2 font-medium">token</th>
+          <th class="px-4 py-2 font-medium">value</th>
+          <th class="px-4 py-2 font-medium">쓰는 곳</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          leading.map(([name, value]) => (
+            <tr class="border-b border-border last:border-b-0">
+              <td class="px-4 py-2 font-mono">{name}</td>
+              <td class="px-4 py-2 font-mono text-muted-foreground">{value}</td>
+              <td class="px-4 py-2 text-muted-foreground">
+                {name === "tight" || name === "snug"
+                  ? "제목, 큰 수치"
+                  : name === "normal"
+                    ? "본문"
+                    : "설명 문단, 긴 글"}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2>폰트 패밀리</h2>
+  <ul>
+    {
+      families.map(([name, stack]) => (
+        <li>
+          <code>{name}</code> — {stack}
+        </li>
+      ))
+    }
+  </ul>
+  <p>
+    네이티브는 CSS 스택 문자열을 해석하지 못하므로 <code>@horon/tokens/native</code>가 단일 패밀리
+    이름(<code>Geist</code>)을 따로 냅니다.
+  </p>
+</DocsLayout>

@@ -1,0 +1,56 @@
+---
+import DocsLayout from "@/layouts/DocsLayout.astro";
+import Demo from "@/components/site/Demo.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+
+const usage = `import { GlassSurface, LiquidGlass } from "@horon/web";
+
+// 떠 있는 패널: 배경을 흐리는 유리 표면
+<GlassSurface className="rounded-lg p-4">…</GlassSurface>
+
+// 헤더·플로팅 바: 리퀴드 글래스 레시피
+<header className="liquid-glass rounded-full px-5 py-2.5">…</header>`;
+---
+
+<DocsLayout
+  title="Glass"
+  eyebrow="Foundations"
+  section="foundations"
+  description="뒤 배경을 흐려 맥락을 남기는 표면입니다. 떠 있는 chrome에만 쓰고, 콘텐츠 표면과 인라인 컨트롤에는 쓰지 않습니다."
+>
+  <p>
+    유리는 뒤에 굴절시킬 대상이 있어야 유리로 읽힙니다. 단조로운 배경 위에서는 그냥 반투명 판이
+    되므로, 유리 표면을 쓰는 화면에는 배경에 색 블롭이나 그라디언트를 함께 둡니다.
+  </p>
+
+  <h2>두 가지 레시피</h2>
+  <ul>
+    <li>
+      <strong>glass</strong> — 32px 흐림. dialog, sheet, popover, dropdown, tooltip 같은 떠 있는 패널
+    </li>
+    <li>
+      <strong>liquid glass</strong> — 4px 흐림 + 흰색 세로 그라디언트 + 마스크 링 테두리 + 2겹 그림자.
+      헤더나 플로팅 바처럼 화면 가장자리에 붙는 chrome
+    </li>
+  </ul>
+
+  <h2>견본</h2>
+  <Demo name="glass" minHeight="220px" />
+
+  <h2>사용</h2>
+  <CodeBlock code={usage} title="tsx" />
+
+  <h2>값</h2>
+  <p>
+    채움·테두리·흐림은 토큰입니다. 라이트에서 채움은 흰색 45% 알파, 테두리는 흰색 95% 알파입니다.
+    다크에서는 같은 흰색 베일을 쓰면 밝은 콘텐츠 위에서 대비가 4.5:1을 넘지 못하므로, 어두운 불투명
+    시트로 바꿉니다.
+  </p>
+
+  <h2>강등</h2>
+  <ul>
+    <li><code>prefers-reduced-transparency</code> — 흐림이 사라지고 더 불투명한 채움으로 바뀝니다</li>
+    <li><code>backdrop-filter</code> 미지원 — 불투명 배경으로 대체됩니다</li>
+    <li>두 경우 모두 전경색은 그대로 유지되어 대비가 떨어지지 않습니다</li>
+  </ul>
+</DocsLayout>

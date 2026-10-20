@@ -1,22 +1,15 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldSet,
-} from "@horon/web/components/field"
-import { Input } from "@horon/web/components/input"
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSet } from "@horon/web/components/field";
+import { Input } from "@horon/web/components/input";
 
 const meta = {
   title: "Web/Field",
   component: Field,
   parameters: { layout: "centered" },
-} satisfies Meta<typeof Field>
+} satisfies Meta<typeof Field>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
   render: () => (
@@ -26,7 +19,7 @@ export const Playground: Story = {
       <FieldDescription>This is how others will see you.</FieldDescription>
     </Field>
   ),
-}
+};
 
 export const WithError: Story = {
   render: () => (
@@ -37,7 +30,7 @@ export const WithError: Story = {
       <FieldError match>Enter a valid email address.</FieldError>
     </Field>
   ),
-}
+};
 
 export const Grouped: Story = {
   render: () => (
@@ -55,4 +48,4 @@ export const Grouped: Story = {
       </FieldGroup>
     </FieldSet>
   ),
-}
+};

@@ -1,0 +1,9 @@
+# Cloudflare Pages config for the Horon design system site.
+# Project: horon-design  ->  https://design.horon.ai
+# Deploy:  bun run deploy:site   (from the repo root)
+# Requires the `wrangler` CLI to be installed and authenticated
+# (`wrangler login`). CI can authenticate with CLOUDFLARE_API_TOKEN +
+# CLOUDFLARE_ACCOUNT_ID instead.
+name = "horon-design"
+compatibility_date = "2026-10-20"
+pages_build_output_dir = "./dist"

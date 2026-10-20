@@ -1,0 +1,55 @@
+---
+import DocsLayout from "@/layouts/DocsLayout.astro";
+import { foundationsNav } from "@/data/nav";
+
+const items = [
+  ["Design Token", "색·간격·반경·모션을 하나의 소스에서 웹 CSS와 네이티브 값으로 냅니다.", "/foundations/tokens"],
+  ["Color", "sand 중성 램프 12단, gold 6단, 상태색 4단과 시맨틱 매핑.", "/foundations/color"],
+  ["Typography", "12px 캡션부터 48px 히어로까지의 타입 스케일과 사용 규칙.", "/foundations/typography"],
+  ["Spacing", "4px 기준 간격 스케일과 레이아웃 리듬.", "/foundations/spacing"],
+  ["Radius", "6px부터 36px까지의 반경 스케일과 컴포넌트별 기본값.", "/foundations/radius"],
+  ["Elevation", "그림자 3단과 떠 있는 표면에서의 사용 규칙.", "/foundations/elevation"],
+  ["Motion", "지속 시간 5단과 이징 커브, 모션을 줄이는 설정 대응.", "/foundations/motion"],
+  ["Glass", "뒤 배경을 흐리는 유리 표면과 리퀴드 글래스 레시피.", "/foundations/glass"],
+];
+---
+
+<DocsLayout
+  title="Foundations"
+  eyebrow="Foundations"
+  section="foundations"
+  description="HORON의 화면을 이루는 가장 아래 층입니다. 색, 타이포, 간격, 반경, 높이, 모션, 유리 표면의 값과 그 값을 언제 쓰는지 정리했습니다."
+>
+  <p>
+    모든 값은 <code>@horon/tokens</code>에 한 번만 적혀 있습니다. 이 문서의 수치와 견본도 그
+    패키지에서 읽어 그리므로, 문서와 라이브러리가 서로 다른 값을 보여줄 수 없습니다.
+  </p>
+
+  <div class="not-prose mt-8 grid gap-3 sm:grid-cols-2">
+    {
+      items.map(([title, body, href]) => (
+        <a
+          href={href}
+          class="group flex flex-col gap-2 rounded-md border border-border bg-card px-5 py-5 transition-colors hover:border-foreground/25"
+        >
+          <span class="text-[14px] font-semibold">{title}</span>
+          <span class="text-[13px] leading-6 text-muted-foreground">{body}</span>
+          <span class="mt-1 text-[12px] text-muted-foreground transition-colors group-hover:text-foreground">
+            열기 →
+          </span>
+        </a>
+      ))
+    }
+  </div>
+
+  <h2>값의 흐름</h2>
+  <p>
+    프리미티브(hex로 옮길 수 있는 원시 램프) → 시맨틱(background, foreground, card, primary …) →
+    컴포넌트 클래스 순서로 흐릅니다. 컴포넌트는 프리미티브를 직접 쓰지 않고 시맨틱 변수만
+    참조하므로, 다크 모드는 시맨틱 층의 값만 바뀝니다.
+  </p>
+  <p>
+    이 문서의 사이드바에 있는 항목이 곧 Foundations의 전체 목록입니다. 항목 수는
+    {" "}<span class="font-mono text-[13px]">{foundationsNav.length - 1}</span>개입니다.
+  </p>
+</DocsLayout>

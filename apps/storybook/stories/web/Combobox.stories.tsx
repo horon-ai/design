@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
-import * as React from "react"
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import * as React from "react";
 import {
   Combobox,
   ComboboxChip,
@@ -8,25 +8,18 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
-} from "@horon/web/components/combobox"
+} from "@horon/web/components/combobox";
 
-const frameworks = [
-  "Next.js",
-  "Remix",
-  "Astro",
-  "SvelteKit",
-  "Nuxt",
-  "SolidStart",
-]
+const frameworks = ["Next.js", "Remix", "Astro", "SvelteKit", "Nuxt", "SolidStart"];
 
 const meta = {
   title: "Web/Combobox",
   component: Combobox,
   parameters: { layout: "centered" },
-} satisfies Meta<typeof Combobox>
+} satisfies Meta<typeof Combobox>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
   render: () => (
@@ -42,10 +35,10 @@ export const Playground: Story = {
       </ComboboxList>
     </Combobox>
   ),
-}
+};
 
 function MultipleCombobox() {
-  const [value, setValue] = React.useState<string[]>(["React", "Vue"])
+  const [value, setValue] = React.useState<string[]>(["React", "Vue"]);
   return (
     <Combobox multiple items={frameworks} value={value} onValueChange={setValue}>
       <ComboboxChips className="w-72">
@@ -66,9 +59,9 @@ function MultipleCombobox() {
         <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
       </ComboboxList>
     </Combobox>
-  )
+  );
 }
 
 export const Multiple: Story = {
   render: () => <MultipleCombobox />,
-}
+};

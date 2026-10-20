@@ -1,31 +1,31 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
-import { Separator } from "@horon/web/components/separator"
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { Separator } from "@horon/web/components/separator";
 
 const meta = {
-	title: "Web/Separator",
-	component: Separator,
-	parameters: { layout: "centered" },
-} satisfies Meta<typeof Separator>
+  title: "Web/Separator",
+  component: Separator,
+  parameters: { layout: "centered" },
+} satisfies Meta<typeof Separator>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 export const Horizontal: Story = {
-	render: () => (
-		<div className="w-64 text-sm">
-			<p>Above</p>
-			<Separator className="my-3" />
-			<p>Below</p>
-		</div>
-	),
-}
+  render: () => (
+    <div className="w-64 text-sm">
+      <p>Above</p>
+      <Separator className="my-3" />
+      <p>Below</p>
+    </div>
+  ),
+};
 
 export const Vertical: Story = {
-	render: () => (
-		<div className="flex h-6 items-center gap-3 text-sm">
-			<span>Draft</span>
-			<Separator orientation="vertical" />
-			<span>Edited</span>
-		</div>
-	),
-}
+  render: () => (
+    <div className="flex h-6 items-center gap-3 text-sm">
+      <span>Draft</span>
+      <Separator orientation="vertical" />
+      <span>Edited</span>
+    </div>
+  ),
+};

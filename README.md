@@ -14,6 +14,7 @@ primary), glass 표면, 모션, 그리고 React Native가 그대로 쓰는 폰�
 apps/
   native/       @horon/native      Expo 앱 — @horon/app 을 소비해 네이티브 렌더를 증명
   playground/   @horon/playground  웹 데모 앱 (@horon/web 만 사용)
+  site/         @horon/site        문서 사이트 — design.horon.ai (Astro + React)
   storybook/    @horon/storybook   두 레이어를 함께 미리보기 (개발 도구)
 packages/
   tokens/       @horon/tokens      디자인 토큰 단일 소스 (+ 생성된 theme.css)
@@ -24,8 +25,9 @@ packages/
 ## import 경계 (중요)
 
 **앱 코드는 `@horon/app`만, 웹 코드는 `@horon/web`만 import 합니다.** 두 패키지는 서로를
-참조하지 않고, 이 경계는 각 패키지·앱의 `eslint.config.js`에 있는
-`no-restricted-imports` 규칙으로 강제됩니다. 어기면 `bun run lint`가 막습니다.
+참조하지 않습니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고,
+`bun run lint`가 이를 실행합니다. 이전 `eslint.config.js`의 `no-restricted-imports`가 맡던
+import 경계 강제는 지금 설정에 없습니다.
 
 | 위치                          | import 가능                   | 금지                                          |
 | ----------------------------- | ----------------------------- | --------------------------------------------- |
@@ -34,10 +36,10 @@ packages/
 
 ```tsx
 // 앱(React Native)
-import { Button, Card, CardTitle, CardContent, Text } from "@horon/app"
+import { Button, Card, CardTitle, CardContent, Text } from "@horon/app";
 
 // 웹
-import { Button, Card, CardTitle, CardContent } from "@horon/web"
+import { Button, Card, CardTitle, CardContent } from "@horon/web";
 ```
 
 Storybook(`apps/storybook`)만 예외입니다. 이 앱은 `@horon/app`의 React Native 컴포넌트를
@@ -51,6 +53,7 @@ bun install
 bun run tokens        # 토큰 CSS(theme.css) 생성
 bun run storybook     # Storybook → http://localhost:6006 (두 레이어 미리보기)
 bun run playground    # 웹 데모 앱
+bun run site          # 문서 사이트 → http://localhost:4321
 ```
 
 네이티브는 별도로 띄웁니다. `apps/native`가 `@horon/app`을 그대로 소비합니다.
@@ -65,18 +68,20 @@ bunx expo start --ios    # iOS 시뮬레이터에서 네이티브 렌더 확인
 ### React Native 앱 — `@horon/app`
 
 ```tsx
-import { Button, Card, CardTitle, CardContent, Text } from "@horon/app"
+import { Button, Card, CardTitle, CardContent, Text } from "@horon/app";
 
 export function Screen() {
   return (
     <Card>
       <CardTitle>제목</CardTitle>
       <CardContent>
-        <Text variant="bodySm" tone="muted">설명</Text>
+        <Text variant="bodySm" tone="muted">
+          설명
+        </Text>
         <Button>확인</Button>
       </CardContent>
     </Card>
-  )
+  );
 }
 ```
 
@@ -86,15 +91,15 @@ Metro가 워크스페이스 패키지를 읽도록 `metro.config.js`에 `watchFo
 ### React 웹 앱 — `@horon/web`
 
 ```tsx
-import { Button, Card, CardHeader, CardTitle } from "@horon/web"
-import "@horon/web/globals.css" // 엔트리에서 한 번
+import { Button, Card, CardHeader, CardTitle } from "@horon/web";
+import "@horon/web/globals.css"; // 엔트리에서 한 번
 
 <Card>
   <CardHeader>
     <CardTitle>제목</CardTitle>
   </CardHeader>
   <Button variant="outline">취소</Button>
-</Card>
+</Card>;
 ```
 
 `@horon/web`은 단일 진입점(`"."`)과 하위 경로(`@horon/web/components/button`)를 모두
@@ -138,7 +143,7 @@ npx shadcn@latest add dialog sheet -c packages/web
 쓰려면 `packages/web/src/index.ts`에 한 줄 추가하세요.
 
 ```ts
-export * from "./components/dialog"
+export * from "./components/dialog";
 ```
 
 `cn()`은 `@horon/web/lib/utils`에서 가져옵니다.
@@ -154,14 +159,31 @@ Storybook 정적 사이트는 Cloudflare Pages 프로젝트 `horon-storybook`으
   - 출력: `apps/storybook/storybook-static`
 - 수동 배포(폴백): `bun run deploy:storybook` — `wrangler` CLI가 설치·로그인돼 있어야 합니다(`wrangler login`).
 
+## 배포 (문서 사이트)
+
+문서 사이트는 별도 Cloudflare Pages 프로젝트 `horon-design`으로 배포합니다.
+
+- 프로덕션 URL: https://design.horon.ai (별칭 https://horon-design.pages.dev)
+- 같은 브랜치 규칙(`main` = 프로덕션)과 같은 GitHub 연동을 씁니다.
+  - 빌드: `bun install && bun run build:site`
+  - 출력: `apps/site/dist`
+- 수동 배포(폴백): `bun run deploy:site`
+
+사이트의 컴포넌트 목록은 `apps/site/src/data/components.ts`가 소유합니다. 컴포넌트를
+추가하면 이 파일에 항목을 넣고, 라이브 프리뷰를 붙이려면
+`apps/site/src/components/demos/<slug>.tsx`를 만들어 같은 항목에 `demo`를 지정합니다.
+데모 래퍼(`components/demo-wrappers/`)는 `bun run build`가 자동으로 생성하므로
+커밋하지 않습니다.
+
 ## 검증
 
 ```bash
 bun test                          # 토큰 드리프트 가드 + 팔레트 스냅샷
 bun run typecheck                 # 전 워크스페이스 타입 검사
 bun run lint                      # 경계 규칙 포함 린트
-bun run build                     # 토큰 + 웹 앱 빌드
+bun run build                     # 토큰 + 웹 앱 + 문서 사이트 빌드
 bun run build:storybook           # Storybook 정적 빌드
+bun run build:site                # 문서 사이트 정적 빌드
 ```
 
 `bun test`가 토큰 드리프트 가드를 돌립니다. `theme.css`를 손으로 고치거나 생성기를 낡게
