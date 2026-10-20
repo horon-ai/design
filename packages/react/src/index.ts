@@ -1,5 +1,13 @@
 // Single entry point for the react package.
 // Web code imports components from "@horon-ai/react" (or a subpath).
+//
+// `chart` is deliberately absent: it is reachable only through the
+// `@horon-ai/react/components/chart` subpath. `recharts` assigns onto
+// `Object.prototype` while it loads (via `decimal.js-light`), so re-exporting it
+// from here throws at import time in any window that runs with Tauri's
+// `freezePrototype: true` — the desktop app is one — and the render tree dies
+// before it mounts. Keep chart out of this file; consumers that render a chart
+// import the subpath and pay the cost only then.
 export * from "./components/accordion";
 export * from "./components/alert";
 export * from "./components/alert-dialog";
@@ -15,7 +23,6 @@ export * from "./components/button-group";
 export * from "./components/calendar";
 export * from "./components/card";
 export * from "./components/carousel";
-export * from "./components/chart";
 export * from "./components/checkbox";
 export * from "./components/chip";
 export * from "./components/code-block";
