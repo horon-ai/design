@@ -1,12 +1,11 @@
 {
-	"name": "@horon/tokens",
+	"name": "@horon-ai/tokens",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
 	"sideEffects": false,
 	"exports": {
 		".": "./src/index.ts",
-		"./native": "./src/native.ts",
 		"./theme.css": "./theme.css",
 		"./package.json": "./package.json"
 	},

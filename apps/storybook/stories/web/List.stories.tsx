@@ -7,9 +7,9 @@ import {
   ListItemMedia,
   ListItemTitle,
   ListItemTrailing,
-} from "@horon/web/components/list";
-import { Chip } from "@horon/web/components/chip";
-import { Avatar, AvatarFallback } from "@horon/web/components/avatar";
+} from "@horon-ai/react/components/list";
+import { Chip } from "@horon-ai/react/components/chip";
+import { Avatar, AvatarFallback } from "@horon-ai/react/components/avatar";
 import { FileTextIcon, FolderIcon, ImageIcon } from "lucide-react";
 
 const meta = {

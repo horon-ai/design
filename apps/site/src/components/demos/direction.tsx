@@ -1,4 +1,4 @@
-import { Button, DirectionProvider } from "@horon/web";
+import { Button, DirectionProvider } from "@horon-ai/react";
 
 export default function DirectionDemo() {
   return (

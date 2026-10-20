@@ -10,7 +10,7 @@
  * a dark glass sheet that turns muddy over light content is caught before it
  * ships.
  *
- * Run: bun run --filter @horon/tokens contrast
+ * Run: bun run --filter @horon-ai/tokens contrast
  *      (or: bun run packages/tokens/scripts/glass-contrast.ts)
  * Exits non-zero if any cell is below the 4.5:1 AA threshold.
  */

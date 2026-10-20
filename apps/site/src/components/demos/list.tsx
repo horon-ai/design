@@ -6,7 +6,7 @@ import {
   ListItemMedia,
   ListItemTitle,
   ListItemTrailing,
-} from "@horon/web";
+} from "@horon-ai/react";
 import { FileTextIcon, FolderIcon, ImageIcon } from "lucide-react";
 
 const items = [

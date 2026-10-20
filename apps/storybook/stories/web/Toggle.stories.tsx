@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Toggle } from "@horon/web/components/toggle";
+import { Toggle } from "@horon-ai/react/components/toggle";
 import { BoldIcon, ItalicIcon, UnderlineIcon } from "lucide-react";
 
 const meta = {

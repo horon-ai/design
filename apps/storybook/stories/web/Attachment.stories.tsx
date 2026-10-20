@@ -6,8 +6,8 @@ import {
   AttachmentDescription,
   AttachmentMedia,
   AttachmentTitle,
-} from "@horon/web/components/attachment";
-import { Button } from "@horon/web/components/button";
+} from "@horon-ai/react/components/attachment";
+import { Button } from "@horon-ai/react/components/button";
 import { DownloadIcon, FileTextIcon, ImageIcon, PaperclipIcon } from "lucide-react";
 import { createElement } from "react";
 

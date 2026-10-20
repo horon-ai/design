@@ -1,4 +1,4 @@
-import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from "@horon/web";
+import { Accordion, AccordionItem, AccordionPanel, AccordionTrigger } from "@horon-ai/react";
 
 const items = [
   {

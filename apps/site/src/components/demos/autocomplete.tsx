@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteEmpty, AutocompleteInput, AutocompleteItem, AutocompleteList } from "@horon/web";
+import { Autocomplete, AutocompleteEmpty, AutocompleteInput, AutocompleteItem, AutocompleteList } from "@horon-ai/react";
 
 const cities = ["서울", "부산", "대구", "인천", "광주", "대전", "제주"];
 

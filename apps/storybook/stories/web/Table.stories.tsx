@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Chip } from "@horon/web/components/chip";
+import { Chip } from "@horon-ai/react/components/chip";
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@horon/web/components/table";
+} from "@horon-ai/react/components/table";
 
 const invoices = [
   { id: "INV-2041", customer: "Northwind", status: "Paid", amount: "$1,250.00" },

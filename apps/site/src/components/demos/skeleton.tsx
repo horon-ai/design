@@ -1,4 +1,4 @@
-import { Skeleton } from "@horon/web";
+import { Skeleton } from "@horon-ai/react";
 
 export default function SkeletonDemo() {
   return (

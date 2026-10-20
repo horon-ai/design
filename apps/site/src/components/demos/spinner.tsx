@@ -1,4 +1,4 @@
-import { Spinner } from "@horon/web";
+import { Spinner } from "@horon-ai/react";
 
 export default function SpinnerDemo() {
   return (

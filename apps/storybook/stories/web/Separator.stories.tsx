@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Separator } from "@horon/web/components/separator";
+import { Separator } from "@horon-ai/react/components/separator";
 
 const meta = {
   title: "Web/Separator",

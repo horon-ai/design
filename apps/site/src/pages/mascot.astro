@@ -1,0 +1,116 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { coreMascots, mascotImageUrl, mascotPalette, mascotSourceUrl, mascotSpec, stateMascots } from "@/data/mascots";
+
+const groups = [
+  { id: "core", title: "Core poses", description: "캐릭터의 기본 자세 일곱 가지입니다.", items: coreMascots },
+  { id: "state", title: "Product states", description: "제품 화면의 상태를 대신 말하는 열아홉 가지 컷입니다.", items: stateMascots },
+];
+---
+
+<BaseLayout
+  title="Mascot"
+  description="HORON의 마스코트는 둥근 송곳니 매 병아리입니다. 제품 이름 Horus + ON에서 왔고, 26가지 컷을 투명 PNG로 제공합니다."
+>
+  <div class="py-14">
+    <header class="max-w-3xl border-b border-border pb-10">
+      <p class="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Mascot</p>
+      <h1 class="text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] md:text-[3.25rem]">
+        Horon mascot
+      </h1>
+      <p class="mt-5 max-w-2xl text-[15px] leading-7 text-muted-foreground text-pretty">
+        제품 이름 Horus + ON에서 온 둥근 병아리입니다. 머리는 모서리가 크게 둥근 사각형이고, 그 위에
+        짧은 깃털 두 가닥이 솟아 있습니다. 얼굴 판은 따뜻한 크림색 타원, 눈은 크고 둥근 검은 눈에
+        작은 흰 하이라이트가 하나씩 있습니다.
+      </p>
+      <dl class="mt-8 flex flex-wrap gap-x-10 gap-y-4">
+        <div>
+          <dt class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">Cuts</dt>
+          <dd class="mt-1 text-[1.5rem] font-semibold tracking-[-0.02em]">{mascotSpec.count}</dd>
+        </div>
+        <div>
+          <dt class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">Size</dt>
+          <dd class="mt-1 text-[1.5rem] font-semibold tracking-[-0.02em]">{mascotSpec.size}</dd>
+        </div>
+        <div>
+          <dt class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">Format</dt>
+          <dd class="mt-1 text-[0.9375rem] font-medium">{mascotSpec.format}</dd>
+        </div>
+      </dl>
+    </header>
+
+    <section class="not-prose mt-12">
+      <h2 class="text-[1.0625rem] font-semibold tracking-[-0.01em]">Brand palette</h2>
+      <div class="mt-4 grid gap-3 sm:grid-cols-3">
+        {
+          mascotPalette.map((swatch) => (
+            <div class="flex items-center gap-3 rounded-md border border-border px-4 py-3">
+              <span
+                class="size-9 shrink-0 rounded-sm border border-border"
+                style={`background: ${swatch.hex}`}
+              />
+              <div class="min-w-0">
+                <p class="font-mono text-[12px]">{swatch.token}</p>
+                <p class="font-mono text-[11px] text-muted-foreground">{swatch.hex}</p>
+                <p class="mt-0.5 text-[11.5px] text-muted-foreground">{swatch.role}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    {
+      groups.map((group) => (
+        <section class="not-prose mt-14">
+          <div class="flex items-baseline justify-between gap-4">
+            <div>
+              <h2 class="text-[1.0625rem] font-semibold tracking-[-0.01em]">{group.title}</h2>
+              <p class="mt-1 text-[13px] text-muted-foreground">{group.description}</p>
+            </div>
+            <span class="font-mono text-[11px] text-muted-foreground">{group.items.length}</span>
+          </div>
+          <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {group.items.map((mascot) => (
+              <figure class="group flex flex-col overflow-hidden rounded-md border border-border bg-card">
+                <div class="flex aspect-square items-center justify-center bg-muted/40 p-4">
+                  <img
+                    src={mascotImageUrl(mascot.slug)}
+                    alt={`Horon 마스코트 ${mascot.name} 컷`}
+                    width="384"
+                    height="384"
+                    loading="lazy"
+                    class="size-full object-contain transition-transform duration-200 group-hover:scale-[1.04]"
+                  />
+                </div>
+                <figcaption class="flex flex-1 flex-col gap-1 border-t border-border px-3 py-2.5">
+                  <span class="font-mono text-[11.5px] text-foreground">horon-mascot-{mascot.name}</span>
+                  <span class="text-[11.5px] leading-4 text-muted-foreground">{mascot.use}</span>
+                  <a
+                    href={mascotSourceUrl(mascot.slug)}
+                    class="mt-1 font-mono text-[10.5px] text-muted-foreground underline decoration-[var(--ring)] underline-offset-2 transition-colors hover:text-foreground"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    PNG 내려받기
+                  </a>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+
+    <section class="prose-docs mt-16 max-w-3xl border-t border-border pt-10">
+      <h2>사용 규칙</h2>
+      <ul>
+        <li>투명 배경 PNG(1254 × 1254)를 원본으로 쓰고, 이 사이트는 768px WebP로 줄여 제공합니다.</li>
+        <li>자르지 않고 원본 비율을 유지합니다. 캐릭터 주변 여백은 컷마다 같습니다.</li>
+        <li>얼굴 판이 있는 쪽으로 시선을 두고, 캐릭터 위에 텍스트를 얹지 않습니다.</li>
+        <li>상태 컷은 화면의 빈 상태·오류·로딩을 대신 말할 때만 씁니다. 장식으로 반복하지 않습니다.</li>
+        <li>색은 브랜드 팔레트 세 값만 씁니다. 다른 색으로 다시 칠하지 않습니다.</li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>

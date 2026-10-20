@@ -7,7 +7,7 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "@horon/web";
+} from "@horon-ai/react";
 import { CalendarIcon, CreditCardIcon, SettingsIcon, UserIcon } from "lucide-react";
 
 export default function CommandDemo() {

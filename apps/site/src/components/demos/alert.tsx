@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertTitle } from "@horon/web";
+import { Alert, AlertDescription, AlertTitle } from "@horon-ai/react";
 
 export default function AlertDemo() {
   return (

@@ -5,7 +5,7 @@ import { defineConfig } from "vite";
 
 const src = fileURLToPath(new URL("./src", import.meta.url));
 
-// Web app: DOM components from @horon/web only. No react-native here.
+// Web app: DOM components from @horon-ai/react only.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {

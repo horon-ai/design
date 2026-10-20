@@ -1,4 +1,4 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@horon/web";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@horon-ai/react";
 
 export default function SelectDemo() {
   return (

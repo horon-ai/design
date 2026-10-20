@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
-} from "@horon/web";
+} from "@horon-ai/react";
 import { BellIcon, HomeIcon, SettingsIcon, UsersIcon } from "lucide-react";
 
 export default function SidebarDemo() {

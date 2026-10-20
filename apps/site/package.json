@@ -4,18 +4,19 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "bun scripts/generate-demo-wrappers.ts && astro dev",
-		"build": "bun scripts/generate-demo-wrappers.ts && astro build",
+		"dev": "bun scripts/generate-demo-wrappers.ts && bun scripts/sync-mascots.ts && astro dev",
+		"build": "bun scripts/generate-demo-wrappers.ts && bun scripts/sync-mascots.ts && astro build",
 		"preview": "astro preview",
 		"typecheck": "bun scripts/generate-demo-wrappers.ts && astro check",
 		"lint": "oxlint --deny-warnings .",
 		"lint:fix": "oxlint --fix .",
-		"format": "prettier --write \"**/*.{ts,tsx,astro,css}\""
+		"format": "prettier --write \"**/*.{ts,tsx,astro,css}\"",
+		"mascots": "bun scripts/sync-mascots.ts"
 	},
 	"dependencies": {
 		"@astrojs/react": "^4.4.2",
-		"@horon/tokens": "workspace:*",
-		"@horon/web": "workspace:*",
+		"@horon-ai/tokens": "workspace:*",
+		"@horon-ai/react": "workspace:*",
 		"@tailwindcss/vite": "^4",
 		"astro": "^5.15.0",
 		"lucide-react": "^1.56.0",

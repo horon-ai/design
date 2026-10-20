@@ -5,7 +5,7 @@ import {
   ScrollAreaScrollbar,
   ScrollAreaThumb,
   ScrollAreaViewport,
-} from "@horon/web/components/scroll-area";
+} from "@horon-ai/react/components/scroll-area";
 
 const meta = {
   title: "Web/ScrollArea",

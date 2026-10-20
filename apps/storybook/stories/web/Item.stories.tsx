@@ -8,8 +8,8 @@ import {
   ItemMedia,
   ItemSeparator,
   ItemTitle,
-} from "@horon/web/components/item";
-import { Button } from "@horon/web/components/button";
+} from "@horon-ai/react/components/item";
+import { Button } from "@horon-ai/react/components/button";
 import { FolderIcon, KeyRoundIcon, ShieldCheckIcon } from "lucide-react";
 
 const meta = {

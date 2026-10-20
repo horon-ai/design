@@ -1,7 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Message, MessageAvatar, MessageContent, MessageFooter, MessageHeader } from "@horon/web/components/message";
-import { Bubble, BubbleContent } from "@horon/web/components/bubble";
-import { Avatar, AvatarFallback } from "@horon/web/components/avatar";
+import {
+  Message,
+  MessageAvatar,
+  MessageContent,
+  MessageFooter,
+  MessageHeader,
+} from "@horon-ai/react/components/message";
+import { Bubble, BubbleContent } from "@horon-ai/react/components/bubble";
+import { Avatar, AvatarFallback } from "@horon-ai/react/components/avatar";
 
 const meta = {
   title: "Web/Message",

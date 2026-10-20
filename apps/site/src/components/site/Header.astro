@@ -71,7 +71,7 @@ const path = Astro.url.pathname;
           href={item.href}
           aria-current={isActive(path, item.href) ? "page" : undefined}
           class:list={[
-            "shrink-0 rounded-sm px-2.5 py-1 text-[13px]",
+            "shrink-0 rounded-sm px-2 py-1 text-[12.5px] sm:px-2.5 sm:text-[13px]",
             isActive(path, item.href) ? "bg-muted text-foreground" : "text-muted-foreground",
           ]}
         >

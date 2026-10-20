@@ -6,7 +6,7 @@ import {
   AttachmentMedia,
   AttachmentTitle,
   Button,
-} from "@horon/web";
+} from "@horon-ai/react";
 import { FileTextIcon, ImageIcon } from "lucide-react";
 
 export default function AttachmentDemo() {

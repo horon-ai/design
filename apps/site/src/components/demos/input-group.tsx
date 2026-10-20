@@ -1,4 +1,4 @@
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@horon/web";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@horon-ai/react";
 import { SearchIcon, XIcon } from "lucide-react";
 
 export default function InputGroupDemo() {

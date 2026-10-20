@@ -11,7 +11,7 @@ import {
   Input,
   Label,
   Separator,
-} from "@horon/web";
+} from "@horon-ai/react";
 import { useTheme } from "@/components/theme-provider";
 
 export function App() {
@@ -23,7 +23,7 @@ export function App() {
         <div>
           <h1 className="text-2xl font-semibold">horon web</h1>
           <p className="text-sm text-muted-foreground">
-            Web-only components from <code>@horon/web</code> — shadcn/ui on Base UI, styled with the shared Horon
+            Web-only components from <code>@horon-ai/react</code> — shadcn/ui on Base UI, styled with the shared Horon
             tokens.
           </p>
         </div>

@@ -9,7 +9,7 @@ import {
   DialogTrigger,
   Input,
   Label,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function DialogDemo() {
   return (

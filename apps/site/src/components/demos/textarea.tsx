@@ -1,4 +1,4 @@
-import { Textarea } from "@horon/web";
+import { Textarea } from "@horon-ai/react";
 
 export default function TextareaDemo() {
   return (

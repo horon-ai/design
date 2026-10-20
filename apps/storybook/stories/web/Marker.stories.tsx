@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CircleAlert, CircleCheck, CircleDashed, Sparkles, TrendingUp } from "lucide-react";
-import { Marker, MarkerContent, MarkerIcon } from "@horon/web/components/marker";
+import { Marker, MarkerContent, MarkerIcon } from "@horon-ai/react/components/marker";
 
 const meta = {
   title: "Web/Marker",

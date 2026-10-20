@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ToggleGroup, ToggleGroupItem } from "@horon/web/components/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@horon-ai/react/components/toggle-group";
 import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, ItalicIcon, UnderlineIcon } from "lucide-react";
 
 const meta = {

@@ -4,7 +4,7 @@ import {
   ScrollAreaScrollbar,
   ScrollAreaThumb,
   ScrollAreaViewport,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 const logs = [
   "세션 시작: design-site 빌드",

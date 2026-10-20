@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { LiquidGlass } from "@horon/web/components/liquid-glass";
-import { Button } from "@horon/web/components/button";
+import { LiquidGlass } from "@horon-ai/react/components/liquid-glass";
+import { Button } from "@horon-ai/react/components/button";
 
 const meta = {
   title: "Web/LiquidGlass",

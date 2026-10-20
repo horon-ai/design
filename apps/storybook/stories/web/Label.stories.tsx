@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Input } from "@horon/web/components/input";
-import { Label } from "@horon/web/components/label";
+import { Input } from "@horon-ai/react/components/input";
+import { Label } from "@horon-ai/react/components/label";
 
 const meta = {
   title: "Web/Label",
