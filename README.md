@@ -14,6 +14,7 @@ primary), glass 표면, 모션, 그리고 React Native가 그대로 쓰는 폰�
 apps/
   native/       @horon/native      Expo 앱 — @horon/app 을 소비해 네이티브 렌더를 증명
   playground/   @horon/playground  웹 데모 앱 (@horon/web 만 사용)
+  site/         @horon/site        문서 사이트 — design.horon.ai (Astro + React)
   storybook/    @horon/storybook   두 레이어를 함께 미리보기 (개발 도구)
 packages/
   tokens/       @horon/tokens      디자인 토큰 단일 소스 (+ 생성된 theme.css)
@@ -52,6 +53,7 @@ bun install
 bun run tokens        # 토큰 CSS(theme.css) 생성
 bun run storybook     # Storybook → http://localhost:6006 (두 레이어 미리보기)
 bun run playground    # 웹 데모 앱
+bun run site          # 문서 사이트 → http://localhost:4321
 ```
 
 네이티브는 별도로 띄웁니다. `apps/native`가 `@horon/app`을 그대로 소비합니다.
@@ -157,14 +159,31 @@ Storybook 정적 사이트는 Cloudflare Pages 프로젝트 `horon-storybook`으
   - 출력: `apps/storybook/storybook-static`
 - 수동 배포(폴백): `bun run deploy:storybook` — `wrangler` CLI가 설치·로그인돼 있어야 합니다(`wrangler login`).
 
+## 배포 (문서 사이트)
+
+문서 사이트는 별도 Cloudflare Pages 프로젝트 `horon-design`으로 배포합니다.
+
+- 프로덕션 URL: https://design.horon.ai (별칭 https://horon-design.pages.dev)
+- 같은 브랜치 규칙(`main` = 프로덕션)과 같은 GitHub 연동을 씁니다.
+  - 빌드: `bun install && bun run build:site`
+  - 출력: `apps/site/dist`
+- 수동 배포(폴백): `bun run deploy:site`
+
+사이트의 컴포넌트 목록은 `apps/site/src/data/components.ts`가 소유합니다. 컴포넌트를
+추가하면 이 파일에 항목을 넣고, 라이브 프리뷰를 붙이려면
+`apps/site/src/components/demos/<slug>.tsx`를 만들어 같은 항목에 `demo`를 지정합니다.
+데모 래퍼(`components/demo-wrappers/`)는 `bun run build`가 자동으로 생성하므로
+커밋하지 않습니다.
+
 ## 검증
 
 ```bash
 bun test                          # 토큰 드리프트 가드 + 팔레트 스냅샷
 bun run typecheck                 # 전 워크스페이스 타입 검사
 bun run lint                      # 경계 규칙 포함 린트
-bun run build                     # 토큰 + 웹 앱 빌드
+bun run build                     # 토큰 + 웹 앱 + 문서 사이트 빌드
 bun run build:storybook           # Storybook 정적 빌드
+bun run build:site                # 문서 사이트 정적 빌드
 ```
 
 `bun test`가 토큰 드리프트 가드를 돌립니다. `theme.css`를 손으로 고치거나 생성기를 낡게

@@ -1,0 +1,47 @@
+---
+interface Props {
+  code: string;
+  lang?: string;
+  title?: string;
+}
+
+const { code, lang = "tsx", title } = Astro.props;
+const trimmed = code.trim();
+---
+
+<figure class="not-prose overflow-hidden rounded-md border border-border bg-card">
+  <figcaption class="flex items-center justify-between border-b border-border px-4 py-2">
+    <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+      {title ?? lang}
+    </span>
+    <button
+      type="button"
+      data-copy-code
+      class="rounded-xs px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+    >
+      복사
+    </button>
+  </figcaption>
+  <pre class="overflow-x-auto px-4 py-4 text-[12.5px] leading-6"><code data-code-block>{trimmed}</code></pre>
+</figure>
+
+<script is:inline>
+  (() => {
+    document.addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-copy-code]");
+      if (!button) return;
+      const code = button.closest("figure")?.querySelector("[data-code-block]");
+      if (!code) return;
+      try {
+        await navigator.clipboard.writeText(code.textContent ?? "");
+        const original = button.textContent;
+        button.textContent = "복사됨";
+        setTimeout(() => {
+          button.textContent = original;
+        }, 1400);
+      } catch {
+        button.textContent = "실패";
+      }
+    });
+  })();
+</script>

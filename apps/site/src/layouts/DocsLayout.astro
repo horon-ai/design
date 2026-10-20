@@ -1,0 +1,40 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Sidebar from "@/components/site/Sidebar.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  section: string;
+  eyebrow?: string;
+}
+
+const { title, description, section, eyebrow } = Astro.props;
+const withSidebar = section === "foundations" || section === "components";
+---
+
+<BaseLayout title={title} description={description}>
+  <div class:list={["flex flex-col gap-10 pb-24 pt-10 lg:flex-row lg:gap-14"]}>
+    {withSidebar && <Sidebar section={section} />}
+    <div class="min-w-0 flex-1">
+      <header class="max-w-3xl border-b border-border pb-8">
+        {eyebrow && (
+          <p class="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            {eyebrow}
+          </p>
+        )}
+        <h1 class="text-[2.25rem] font-semibold leading-[1.1] tracking-[-0.03em] text-balance md:text-[2.75rem]">
+          {title}
+        </h1>
+        {description && (
+          <p class="mt-4 max-w-2xl text-[0.9375rem] leading-7 text-muted-foreground text-pretty">
+            {description}
+          </p>
+        )}
+      </header>
+      <div class="prose-docs max-w-3xl pt-8">
+        <slot />
+      </div>
+    </div>
+  </div>
+</BaseLayout>

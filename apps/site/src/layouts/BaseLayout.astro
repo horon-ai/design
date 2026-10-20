@@ -1,0 +1,53 @@
+---
+import "@/styles/site.css";
+import Footer from "@/components/site/Footer.astro";
+import Header from "@/components/site/Header.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  wide?: boolean;
+}
+
+const {
+  title = "HORON Design System",
+  description = "HORON 제품을 위한 토큰, 컴포넌트, 가이드. 디자인과 코드가 같은 값을 바라보게 만드는 디자인 시스템입니다.",
+  wide = false,
+} = Astro.props;
+const pageTitle = title === "HORON Design System" ? title : `${title} — HORON Design System`;
+---
+
+<!doctype html>
+<html lang="ko" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem("horon-theme");
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          if (stored === "dark" || (!stored && prefersDark)) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch {}
+      })();
+    </script>
+  </head>
+  <body class="min-h-full bg-background text-foreground antialiased">
+    <Header />
+    <main class={wide ? "" : "shell"}>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
