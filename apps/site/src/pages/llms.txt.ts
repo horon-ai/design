@@ -9,7 +9,7 @@ export const GET: APIRoute = ({ site }) => {
   const lines = [
     "# HORON Design System",
     "",
-    "> HORON 제품을 위한 디자인 시스템. 토큰 하나에서 웹 CSS와 네이티브 값이 함께 나오고, @horon-ai/react 컴포넌트가 그 값을 참조합니다.",
+    "> HORON 제품을 위한 디자인 시스템. 토큰 하나에서 웹 CSS가 나오고, @horon-ai/react 컴포넌트가 그 값을 참조합니다.",
     "",
     "## Docs",
     "",

@@ -51,9 +51,6 @@ const groups = [
 const usage = `// 웹: 생성된 CSS를 그대로 import
 import "@horon-ai/react/globals.css";
 
-// 네이티브: 같은 값을 hex·숫자로
-import { colors, space, radius } from "@horon-ai/tokens/native";
-
 // 원시 값이 필요할 때
 import { PALETTE, ACCENT, INK } from "@horon-ai/tokens";`;
 ---
@@ -62,7 +59,7 @@ import { PALETTE, ACCENT, INK } from "@horon-ai/tokens";`;
   title="Design Token"
   eyebrow="Foundations"
   section="foundations"
-  description="토큰은 이 시스템의 단일 소스입니다. 색·간격·반경·타이포·모션·유리 표면의 값이 여기 한 번만 적히고, 웹 CSS와 네이티브 값이 여기서 파생됩니다."
+  description="토큰은 이 시스템의 단일 소스입니다. 색·간격·반경·타이포·모션·유리 표면의 값이 여기 한 번만 적히고, 웹 CSS가 여기서 파생됩니다."
 >
   <p>
     <code>@horon-ai/tokens</code>는 TypeScript 소스에서 <code>theme.css</code>를 생성합니다. 생성 파일에는

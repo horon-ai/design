@@ -1,7 +1,7 @@
 /**
  * Minimal OKLCH -> sRGB conversion so the design tokens can live in one place
- * (OKLCH, which is what the CSS side wants) and still be handed to React Native,
- * which only understands hex / rgb() values.
+ * (OKLCH, which is what the CSS side wants) and still be rendered as hex /
+ * rgb() where a plain color string is needed.
  */
 
 export type Rgba = { r: number; g: number; b: number; a: number };
@@ -68,7 +68,7 @@ export function oklchToRgba(input: string): Rgba {
 
 const hex = (n: number) => n.toString(16).padStart(2, "0");
 
-/** React Native friendly string: `#rrggbb`, or `#rrggbbaa` when translucent. */
+/** Hex string: `#rrggbb`, or `#rrggbbaa` when translucent. */
 export function oklchToHex(input: string): string {
   const { r, g, b, a } = oklchToRgba(input);
   if (a >= 1) return `#${hex(r)}${hex(g)}${hex(b)}`;
