@@ -6,9 +6,24 @@ TypeScript 소스 그대로 배포합니다. 빌드 산출물(`dist`)이 없고,
 
 ## 설치
 
+이 패키지는 버전 `0.1.0`에 `publishConfig.access: public`을 두었지만 **아직 npm 레지스트리에
+게시되지 않았습니다**(게시용 토큰 만료). 지금 소비하는 쪽은 저장소 안 `file:` 의존으로
+가져다 씁니다.
+
+```json
+{
+  "dependencies": {
+    "@horon-ai/react": "file:../design/packages/react",
+    "@horon-ai/tokens": "file:../design/packages/tokens"
+  }
+}
+```
+
+레지스트리에 게시된 뒤에는 같은 줄을 정확한 버전으로 바꿉니다.
+
 ```bash
-bun add @horon-ai/react @horon-ai/tokens react react-dom
-npm install @horon-ai/react @horon-ai/tokens react react-dom
+bun add @horon-ai/react@0.1.0 @horon-ai/tokens@0.1.0 react react-dom
+npm install @horon-ai/react@0.1.0 @horon-ai/tokens@0.1.0 react react-dom
 ```
 
 `react`와 `react-dom`은 peer 의존성입니다. React 19 이상이 필요하고, 패키지는 React 사본을
