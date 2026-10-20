@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { NativeSelect } from "@horon/web/components/native-select";
+import { NativeSelect } from "@horon-ai/react/components/native-select";
 
 const meta = {
   title: "Web/NativeSelect",

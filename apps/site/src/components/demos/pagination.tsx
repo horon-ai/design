@@ -5,7 +5,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 const pages = ["1", "2", "3", "4", "5"];
 

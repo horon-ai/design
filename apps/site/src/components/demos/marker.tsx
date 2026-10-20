@@ -1,4 +1,4 @@
-import { Marker, MarkerContent, MarkerIcon } from "@horon/web";
+import { Marker, MarkerContent, MarkerIcon } from "@horon-ai/react";
 import { CircleCheckIcon, CircleDashedIcon, CircleDotIcon } from "lucide-react";
 
 const steps = [

@@ -9,9 +9,9 @@ import {
   FormLabel,
   FormMessage,
   useForm,
-} from "@horon/web/components/form";
-import { Input } from "@horon/web/components/input";
-import { Button } from "@horon/web/components/button";
+} from "@horon-ai/react/components/form";
+import { Input } from "@horon-ai/react/components/input";
+import { Button } from "@horon-ai/react/components/button";
 
 // FormProvider's props are all required, so Storybook would ask every story for
 // args even though each story supplies its own form instance through render: the

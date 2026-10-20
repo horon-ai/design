@@ -5,7 +5,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@horon/web";
+} from "@horon-ai/react";
 
 export default function BreadcrumbDemo() {
   return (

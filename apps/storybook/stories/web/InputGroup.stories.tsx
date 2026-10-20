@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@horon/web/components/input-group";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@horon-ai/react/components/input-group";
 import { MailIcon, SearchIcon, XIcon } from "lucide-react";
 
 const meta = {

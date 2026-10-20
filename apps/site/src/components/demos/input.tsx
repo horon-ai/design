@@ -1,4 +1,4 @@
-import { Input } from "@horon/web";
+import { Input } from "@horon-ai/react";
 
 export default function InputDemo() {
   return (

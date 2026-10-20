@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Slider, SliderIndicator, SliderThumb, SliderTrack, SliderValue } from "@horon/web/components/slider";
+import { Slider, SliderIndicator, SliderThumb, SliderTrack, SliderValue } from "@horon-ai/react/components/slider";
 
 const meta = {
   title: "Web/Slider",

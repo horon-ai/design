@@ -1,4 +1,4 @@
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@horon/web";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@horon-ai/react";
 
 export default function ResizableDemo() {
   return (

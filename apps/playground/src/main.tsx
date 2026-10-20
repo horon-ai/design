@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import "@horon/web/globals.css";
+import "@horon-ai/react/globals.css";
 import { App } from "./App.tsx";
 import { ThemeProvider } from "@/components/theme-provider.tsx";
 

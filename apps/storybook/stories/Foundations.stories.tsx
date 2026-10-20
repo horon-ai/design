@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { colorTokens, space, fontSize, radius } from "@horon/tokens";
-import { Stack, Text } from "@horon/app";
+import { colorTokens, space, fontSize, radius } from "@horon-ai/tokens";
 
 const meta = {
   title: "Foundations/Tokens",
@@ -16,8 +15,8 @@ const names = Object.keys(colorTokens.light).filter(isColorTokenName);
 
 export const Colors: Story = {
   render: () => (
-    <Stack gap={4}>
-      <Text variant="title">Semantic colors</Text>
+    <section className="flex flex-col gap-4">
+      <h2 className="text-lg font-semibold">Semantic colors</h2>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
         {names.map((name) => (
           <div key={name} className="overflow-hidden rounded-lg border border-border">
@@ -26,15 +25,15 @@ export const Colors: Story = {
           </div>
         ))}
       </div>
-    </Stack>
+    </section>
   ),
 };
 
 export const Scales: Story = {
   render: () => (
-    <Stack gap={6}>
-      <Stack gap={2}>
-        <Text variant="subtitle">Spacing</Text>
+    <div className="flex flex-col gap-6">
+      <section className="flex flex-col gap-2">
+        <h2 className="text-base font-semibold">Spacing</h2>
         {Object.entries(space).map(([key, value]) => (
           <div key={key} className="flex items-center gap-3">
             <span className="w-10 font-mono text-xs text-muted-foreground">{key}</span>
@@ -42,9 +41,9 @@ export const Scales: Story = {
             <span className="font-mono text-xs text-muted-foreground">{value}px</span>
           </div>
         ))}
-      </Stack>
-      <Stack gap={2}>
-        <Text variant="subtitle">Radius</Text>
+      </section>
+      <section className="flex flex-col gap-2">
+        <h2 className="text-base font-semibold">Radius</h2>
         <div className="flex flex-wrap items-end gap-3">
           {Object.entries(radius).map(([key, value]) => (
             <div key={key} className="flex flex-col items-center gap-1">
@@ -53,9 +52,9 @@ export const Scales: Story = {
             </div>
           ))}
         </div>
-      </Stack>
-      <Stack gap={2}>
-        <Text variant="subtitle">Font size</Text>
+      </section>
+      <section className="flex flex-col gap-2">
+        <h2 className="text-base font-semibold">Font size</h2>
         {Object.entries(fontSize).map(([key, value]) => (
           <div key={key} className="flex items-baseline gap-3">
             <span className="w-10 font-mono text-xs text-muted-foreground">{key}</span>
@@ -63,7 +62,7 @@ export const Scales: Story = {
             <span className="font-mono text-xs text-muted-foreground">{value}px</span>
           </div>
         ))}
-      </Stack>
-    </Stack>
+      </section>
+    </div>
   ),
 };

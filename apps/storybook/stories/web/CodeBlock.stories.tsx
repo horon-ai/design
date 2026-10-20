@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { CodeBlock, CodeBlockContent, CodeBlockCopyButton, CodeBlockHeader } from "@horon/web/components/code-block";
+import {
+  CodeBlock,
+  CodeBlockContent,
+  CodeBlockCopyButton,
+  CodeBlockHeader,
+} from "@horon-ai/react/components/code-block";
 
 const meta = {
   title: "Web/CodeBlock",
@@ -18,8 +23,8 @@ export const Playground: Story = {
         <CodeBlockCopyButton />
       </CodeBlockHeader>
       <CodeBlockContent>
-        {`bun add @horon/web
-bun run --filter @horon/web typecheck`}
+        {`bun add @horon-ai/react
+bun run --filter @horon-ai/react typecheck`}
       </CodeBlockContent>
     </CodeBlock>
   ),

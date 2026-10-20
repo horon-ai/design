@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Bubble, BubbleContent, BubbleGroup } from "@horon/web/components/bubble";
+import { Bubble, BubbleContent, BubbleGroup } from "@horon-ai/react/components/bubble";
 
 const meta = {
   title: "Web/Bubble",

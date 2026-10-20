@@ -12,8 +12,8 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "@horon/web/components/command";
-import { Button } from "@horon/web/components/button";
+} from "@horon-ai/react/components/command";
+import { Button } from "@horon-ai/react/components/button";
 
 const meta = {
   title: "Web/Command",

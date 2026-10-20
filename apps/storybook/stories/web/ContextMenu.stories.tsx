@@ -6,7 +6,7 @@ import {
   ContextMenuLabel,
   ContextMenuSeparator,
   ContextMenuTrigger,
-} from "@horon/web/components/context-menu";
+} from "@horon-ai/react/components/context-menu";
 
 const meta = {
   title: "Web/ContextMenu",

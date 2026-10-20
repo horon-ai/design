@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@horon/web/components/collapsible";
-import { Button } from "@horon/web/components/button";
+import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@horon-ai/react/components/collapsible";
+import { Button } from "@horon-ai/react/components/button";
 import { ChevronDownIcon } from "lucide-react";
 
 const meta = {

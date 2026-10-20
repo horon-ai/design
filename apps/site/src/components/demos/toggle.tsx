@@ -1,4 +1,4 @@
-import { Toggle } from "@horon/web";
+import { Toggle } from "@horon-ai/react";
 import { BoldIcon, UnderlineIcon } from "lucide-react";
 
 export default function ToggleDemo() {

@@ -8,8 +8,8 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@horon/web/components/drawer";
-import { Button } from "@horon/web/components/button";
+} from "@horon-ai/react/components/drawer";
+import { Button } from "@horon-ai/react/components/button";
 
 const meta = {
   title: "Web/Drawer",

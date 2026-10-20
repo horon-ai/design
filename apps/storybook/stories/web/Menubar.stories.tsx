@@ -7,7 +7,7 @@ import {
   MenubarMenu,
   MenubarSeparator,
   MenubarTrigger,
-} from "@horon/web/components/menubar";
+} from "@horon-ai/react/components/menubar";
 
 const meta = {
   title: "Web/Menubar",

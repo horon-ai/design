@@ -6,7 +6,7 @@ import {
   TypographyLead,
   TypographyList,
   TypographyMuted,
-} from "@horon/web/components/typography";
+} from "@horon-ai/react/components/typography";
 
 const meta = {
   title: "Web/Typography",
@@ -29,7 +29,7 @@ export const Playground: Story = {
       </p>
       <TypographyList>
         <li>
-          Add <TypographyInlineCode>@horon/tokens</TypographyInlineCode> to your workspace.
+          Add <TypographyInlineCode>@horon-ai/tokens</TypographyInlineCode> to your workspace.
         </li>
         <li>Import the theme CSS once at the app root.</li>
         <li>Compose components with token utilities only.</li>

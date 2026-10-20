@@ -1,4 +1,4 @@
-import { FileUpload, FileUploadDropzone, FileUploadItem, FileUploadList, FileUploadTrigger } from "@horon/web";
+import { FileUpload, FileUploadDropzone, FileUploadItem, FileUploadList, FileUploadTrigger } from "@horon-ai/react";
 import { UploadIcon } from "lucide-react";
 
 export default function FileUploadDemo() {
