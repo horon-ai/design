@@ -4,7 +4,7 @@ import {
   ChartTooltipContent,
   RechartsPrimitive,
   type ChartConfig,
-} from "@horon-ai/react";
+} from "@horon-ai/react/components/chart";
 
 const data = [
   { month: "1월", visits: 320 },

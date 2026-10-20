@@ -11,6 +11,13 @@ type Layer = {
   storiesDir: string;
   overviewPath: string;
   namespace: Record<string, unknown>;
+  /**
+   * Components reachable only through `@horon-ai/react/components/<name>`.
+   * `chart` is one because `recharts` assigns onto `Object.prototype` while it
+   * loads, so importing it from the entry point kills every consumer whose
+   * window runs with Tauri's `freezePrototype: true` (the desktop app does).
+   */
+  subpathOnly: string[];
 };
 
 const layers: Layer[] = [
@@ -21,6 +28,7 @@ const layers: Layer[] = [
     storiesDir: `${repoRoot}/apps/storybook/stories/web`,
     overviewPath: `${repoRoot}/apps/storybook/stories/overview/Web.stories.tsx`,
     namespace: web,
+    subpathOnly: ["chart"],
   },
 ];
 
@@ -53,6 +61,7 @@ const valueExports = (source: string): string[] => {
 for (const layer of layers) {
   const files = listFiles(layer.componentsDir, "*.tsx");
   const storyFiles = listFiles(layer.storiesDir, "*.stories.tsx");
+  const barrelFiles = files.filter((file) => !layer.subpathOnly.includes(withoutExtension(file)));
 
   describe(`${layer.label} export coverage`, () => {
     test("has components to cover", () => {
@@ -61,13 +70,16 @@ for (const layer of layers) {
 
     test("every component file is re-exported from the entry point", async () => {
       const barrel = await Bun.file(layer.barrelPath).text();
-      for (const file of files) {
+      for (const file of barrelFiles) {
         expect(barrel).toContain(`./components/${withoutExtension(file)}`);
+      }
+      for (const name of layer.subpathOnly) {
+        expect(barrel).not.toContain(`./components/${name}"`);
       }
     });
 
     test("every component value export is importable by name from the entry point", async () => {
-      const sources = await Promise.all(files.map((file) => Bun.file(`${layer.componentsDir}/${file}`).text()));
+      const sources = await Promise.all(barrelFiles.map((file) => Bun.file(`${layer.componentsDir}/${file}`).text()));
       for (const source of sources) {
         const names = valueExports(source);
         expect(names.length).toBeGreaterThan(0);
