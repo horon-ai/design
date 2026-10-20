@@ -1,5 +1,6 @@
 import { oklchToHex } from "./color";
 import {
+  breakpoint,
   duration,
   easing,
   fontFamily,
@@ -7,9 +8,11 @@ import {
   glassLiquidBlur,
   glassLiquidBorder,
   glassLiquidFill,
+  glassLiquidFillPanel,
   glassLiquidShadow,
   radius,
   radiusRem,
+  radiusRole,
   shadow,
   text,
 } from "./scales";
@@ -41,6 +44,12 @@ export function buildThemeCss(): string {
     .filter(([name]) => name !== "none" && name !== "full")
     .map(([name, value]) => `  --radius-${name}: ${value}px;`)
     .join("\n");
+  const radiusRoleVars = Object.entries(radiusRole)
+    .map(([name, value]) => `  --radius-${name}: ${value === radius.full ? "9999px" : `${value}px`};`)
+    .join("\n");
+  const breakpointVars = Object.entries(breakpoint)
+    .map(([name, value]) => `  --breakpoint-${name}: ${value / 16}rem;`)
+    .join("\n");
   const textVars = Object.entries(text)
     .map(([name, value]) => `  --text-${name}: ${value / 16}rem;`)
     .join("\n");
@@ -56,6 +65,8 @@ ${themeColors}
   --font-mono: ${fontFamily.web.mono};
   --font-heading: var(--font-sans);
 ${radiusVars}
+${radiusRoleVars}
+${breakpointVars}
 ${textVars}
 ${shadowVars}
 ${durationVars}
@@ -65,9 +76,18 @@ ${easingVars}
 :root {
 ${lightVars}
   --radius: ${radiusRem}rem;
+  /* Role radii and breakpoints are registered in the @theme inline block above
+   * so Tailwind resolves the rounded-card / md: utilities, and repeated here as
+   * plain custom properties because inline inlines the value into the utility
+   * and emits no variable. Consumers that read the token at runtime
+   * (getComputedStyle, a media query written by hand) need the variable, and
+   * both roles are mode-independent so they live only in :root. */
+${radiusRoleVars}
+${breakpointVars}
   --glass-blur: ${glassBlur}px;
   --glass-liquid-blur: ${glassLiquidBlur}px;
   --glass-liquid-fill: ${glassLiquidFill.light};
+  --glass-liquid-fill-panel: ${glassLiquidFillPanel.light};
   --glass-liquid-border: ${glassLiquidBorder.light};
   --glass-liquid-shadow: ${glassLiquidShadow.light};
 }
@@ -75,13 +95,16 @@ ${lightVars}
 .dark {
 ${darkVars}
   --glass-liquid-fill: ${glassLiquidFill.dark};
+  --glass-liquid-fill-panel: ${glassLiquidFillPanel.dark};
   --glass-liquid-border: ${glassLiquidBorder.dark};
   --glass-liquid-shadow: ${glassLiquidShadow.dark};
 }
 
 /* Glass accessibility fallbacks. The floating-chrome surface degrades from the
  * translucent glass fill to the frost (prefers-reduced-transparency) or solid
- * (no backdrop-filter) rung of the ladder, and drops the blur with it. */
+ * (no backdrop-filter) rung of the ladder, and drops the blur with it. The
+ * liquid-glass panel fill rides the same ladder, otherwise a panel would stay
+ * translucent while the chrome around it went opaque. */
 @media (prefers-reduced-transparency: reduce) {
   :root,
   .dark {
@@ -89,6 +112,7 @@ ${darkVars}
     --glass-fill-strong: var(--glass-fill-frost);
     --glass-blur: 0px;
     --glass-liquid-blur: 0px;
+    --glass-liquid-fill-panel: var(--glass-fill-frost);
   }
 }
 
@@ -99,6 +123,7 @@ ${darkVars}
     --glass-fill-strong: var(--glass-fill-solid);
     --glass-blur: 0px;
     --glass-liquid-blur: 0px;
+    --glass-liquid-fill-panel: var(--glass-fill-solid);
   }
 }
 `;
