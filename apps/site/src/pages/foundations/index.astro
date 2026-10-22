@@ -30,7 +30,7 @@ const items = [
       items.map(([title, body, href]) => (
         <a
           href={href}
-          class="group flex flex-col gap-2 rounded-md border border-border bg-card px-5 py-5 transition-colors hover:border-foreground/25"
+          class="group flex flex-col gap-2 rounded-xl bg-muted/40 px-5 py-5 transition-colors hover:bg-muted/70"
         >
           <span class="text-[14px] font-semibold">{title}</span>
           <span class="text-[13px] leading-6 text-muted-foreground">{body}</span>
@@ -50,6 +50,6 @@ const items = [
   </p>
   <p>
     이 문서의 사이드바에 있는 항목이 곧 Foundations의 전체 목록입니다. 항목 수는
-    {" "}<span class="font-mono text-[13px]">{foundationsNav.length - 1}</span>개입니다.
+    {" "}<span class="font-medium">{foundationsNav.length - 1}</span>개입니다.
   </p>
 </DocsLayout>

@@ -28,19 +28,19 @@ const rules = [
       shadows.map(([name, value]) => (
         <div>
           <div
-            class="rounded-md border border-border bg-card px-4 py-8"
+            class="rounded-xl bg-card px-4 py-8"
             style={`box-shadow: ${value.web}`}
           >
-            <p class="font-mono text-[11px]">shadow-{name}</p>
+            <p class="font-mono text-xs">shadow-{name}</p>
           </div>
-          <p class="mt-2 font-mono text-[10px] leading-4 text-muted-foreground">{value.web}</p>
+          <p class="mt-2 font-mono text-xs leading-4 text-muted-foreground">{value.web}</p>
         </div>
       ))
     }
   </div>
 
   <h2>언제 쓰나</h2>
-  <div class="not-prose mt-5 overflow-hidden rounded-md border border-border">
+  <div class="not-prose mt-5 overflow-hidden rounded-xl bg-muted/20">
     <table class="w-full text-left text-[12.5px]">
       <thead class="border-b border-border bg-muted/50 text-muted-foreground">
         <tr>
@@ -54,7 +54,7 @@ const rules = [
           rules.map(([surface, example, rule]) => (
             <tr class="border-b border-border last:border-b-0">
               <td class="px-4 py-2">{surface}</td>
-              <td class="px-4 py-2 font-mono text-[11px] text-muted-foreground">{example}</td>
+              <td class="px-4 py-2 font-mono text-xs text-muted-foreground">{example}</td>
               <td class="px-4 py-2 text-muted-foreground">{rule}</td>
             </tr>
           ))

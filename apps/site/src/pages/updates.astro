@@ -34,17 +34,14 @@ const releases = [
 
 <DocsLayout
   title="Updates"
-  eyebrow="Updates"
   section="updates"
   description="디자인 시스템이 바뀐 기록입니다. 값이 바뀌었는지, 어떤 컴포넌트가 늘었는지 시간순으로 남깁니다."
 >
-  <ol class="not-prose mt-2 space-y-10">
+  <ol class="not-prose mt-2 list-none space-y-10 pl-0">
     {
       releases.map((release) => (
         <li class="border-l border-border pl-6">
-          <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-            {release.date}
-          </p>
+          <p class="text-xs text-muted-foreground">{release.date}</p>
           <h2 class="mt-2 text-[1.125rem] font-semibold tracking-[-0.01em]">{release.title}</h2>
           <ul class="mt-3 space-y-1.5">
             {release.items.map((item) => (

@@ -1,4 +1,5 @@
 ---
+import Demo from "@/components/site/Demo.astro";
 import { componentGroups, componentsInGroup } from "@/data/components";
 import { resolveDemoName } from "@/lib/demos";
 
@@ -11,33 +12,35 @@ const items = componentsInGroup(group.id);
 ---
 
 <section class="not-prose">
-  <div class="mb-5 flex items-baseline justify-between gap-4">
-    <div>
-      <h2 class="text-[1.0625rem] font-semibold tracking-[-0.01em]">{group.title}</h2>
-      <p class="mt-1 text-[13px] text-muted-foreground">{group.description}</p>
-    </div>
-    <span class="font-mono text-[11px] text-muted-foreground">{items.length}</span>
+  <div class="flex items-baseline justify-between gap-4">
+    <h2 class="text-2xl font-medium">{group.title}</h2>
+    <span class="text-xs text-muted-foreground">{items.length}</span>
   </div>
-  <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+  <p class="mt-1.5 text-sm text-muted-foreground">{group.description}</p>
+  <div class="mt-8 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 xl:grid-cols-3">
     {
-      items.map((component) => (
-        <a
-          href={`/components/${component.slug}`}
-          class="group flex flex-col gap-1.5 rounded-md border border-border bg-card px-4 py-3.5 transition-colors hover:border-foreground/25 hover:bg-muted/40"
-        >
-          <span class="flex items-center justify-between gap-2">
-            <span class="text-[13.5px] font-medium text-foreground">{component.title}</span>
-            {resolveDemoName(component.slug, component.demo) ? (
-              <span class="size-1.5 shrink-0 rounded-full bg-[var(--ring)]" title="라이브 프리뷰 제공" />
-            ) : (
-              <span class="size-1.5 shrink-0 rounded-full bg-border" title="코드 예시만 제공" />
-            )}
-          </span>
-          <span class="line-clamp-2 text-[12.5px] leading-5 text-muted-foreground">
-            {component.description}
-          </span>
-        </a>
-      ))
+      items.map((component) => {
+        const demoName = component.overlay
+          ? undefined
+          : resolveDemoName(component.slug, component.demo);
+        return (
+          <a href={`/components/${component.slug}`} class="group flex min-w-0 flex-col gap-5">
+            <div class="demo-tile min-w-0">
+              {demoName ? (
+                <div class="pointer-events-none w-full min-w-0 scale-[0.7] origin-center">
+                  <Demo name={demoName} />
+                </div>
+              ) : (
+                <span class="text-[13px] text-muted-foreground">{component.title}</span>
+              )}
+            </div>
+            <span class="text-xl font-medium">{component.title}</span>
+            <span class="line-clamp-2 text-sm leading-6 text-muted-foreground">
+              {component.description}
+            </span>
+          </a>
+        );
+      })
     }
   </div>
 </section>
