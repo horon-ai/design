@@ -61,3 +61,12 @@ jobs:
 
       - name: Test
         run: flutter test
+
+      # `flutter test`는 패키지 루트만 돌립니다. `example/`은 별도 패키지라
+      # 갤러리 회귀 테스트가 여기서 따로 돌지 않으면 CI에서 한 번도 실행되지
+      # 않습니다. 갤러리는 이 계획의 유일한 시각 검증 창구이므로 함께 돌립니다.
+      - name: Test the gallery
+        working-directory: packages/flutter/example
+        run: |
+          flutter pub get
+          flutter test
