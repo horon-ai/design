@@ -88,7 +88,11 @@ void main() {
     WidgetTester tester,
   ) async {
     _sizeSurface(tester);
-    await tester.pumpWidget(const GalleryApp());
+    // 등록부가 비었을 때의 안내입니다. 기본 `GalleryApp`은 이제 75섹션을 들고
+    // 있으므로 빈 목록을 명시적으로 넘깁니다. 2026-10-22에 todo 24가 등록부를
+    // 채우자 이 단언이 "섹션이 있는데 없다고 한다"로 실패했습니다.
+    await tester.pumpWidget(const GalleryApp(sections: <GallerySection>[]));
+    await tester.pumpAndSettle();
     expect(find.text(const GalleryStrings.ko().noSections), findsWidgets);
 
     await tester.pumpWidget(const GalleryApp(sections: _sections));
