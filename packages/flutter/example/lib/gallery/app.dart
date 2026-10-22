@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'gallery_strings.dart';
 import 'gallery_theme.dart';
 import 'registry.dart';
+import 'section_builder.dart';
 import 'shell.dart';
 
 /// 갤러리 앱의 루트입니다.
@@ -13,14 +14,17 @@ class GalleryApp extends StatefulWidget {
   const GalleryApp({
     super.key,
     this.sections = gallerySections,
-    this.sectionBuilder,
+    this.sectionBuilder = gallerySectionFor,
   });
 
   /// 레일에 나열할 섹션입니다.
   final List<GallerySection> sections;
 
   /// 섹션 본문을 만드는 함수입니다.
-  final Widget Function(BuildContext context, GallerySection section)?
+  ///
+  /// `null`을 돌려주면 셸이 자리표시자를 그립니다. 표에 없는 슬러그를
+  /// 그대로 흘려보내기 위해 반환 타입이 nullable입니다.
+  final Widget? Function(BuildContext context, GallerySection section)?
   sectionBuilder;
 
   @override

@@ -78,7 +78,9 @@ class GalleryShell extends StatefulWidget {
   final List<GallerySection> sections;
 
   /// 섹션 본문을 만드는 함수입니다. 없으면 자리표시자를 그립니다.
-  final Widget Function(BuildContext context, GallerySection section)?
+  ///
+  /// `null`을 돌려주면 그 슬러그는 미등록이므로 셸이 자리표시자를 그립니다.
+  final Widget? Function(BuildContext context, GallerySection section)?
   sectionBuilder;
 
   @override
@@ -490,7 +492,7 @@ class _GalleryPreview extends StatelessWidget {
   final GalleryStrings strings;
   final GalleryWidth width;
   final GallerySection? section;
-  final Widget Function(BuildContext context, GallerySection section)?
+  final Widget? Function(BuildContext context, GallerySection section)?
   sectionBuilder;
 
   @override
@@ -553,31 +555,36 @@ class _GalleryPreview extends StatelessWidget {
                     child: LayoutBuilder(
                       builder:
                           (BuildContext context, BoxConstraints constraints) {
-                            return MediaQuery(
-                              data: MediaQuery.of(context)
-                                  .copyWith(size: constraints.biggest),
-                              child: current == null
-                                  ? Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                          HoronSpace.s6,
-                                        ),
-                                        child: Text(
-                                          strings.noSections,
-                                          textAlign: TextAlign.center,
-                                          style: text.bodyMedium?.copyWith(
-                                            color: scheme.onSurfaceVariant,
+                            // 섹션 본문은 프레임보다 길 수 있습니다(컴포넌트 하나가
+                            // 변형과 상태를 모두 늘어놓으므로). 스크롤을 두지 않으면
+                            // 셸 테스트가 RenderFlex 오버플로로 실패합니다.
+                            return SingleChildScrollView(
+                              child: MediaQuery(
+                                data: MediaQuery.of(context)
+                                    .copyWith(size: constraints.biggest),
+                                child: current == null
+                                    ? Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(
+                                            HoronSpace.s6,
+                                          ),
+                                          child: Text(
+                                            strings.noSections,
+                                            textAlign: TextAlign.center,
+                                            style: text.bodyMedium?.copyWith(
+                                              color: scheme.onSurfaceVariant,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    )
-                                  : sectionBuilder?.call(context, current) ??
-                                        GallerySectionScaffold(
-                                          title: current.title,
-                                          variants: const <Widget>[],
-                                          states: const <Widget>[],
-                                          notes: strings.notImplemented,
-                                        ),
+                                      )
+                                    : sectionBuilder?.call(context, current) ??
+                                          GallerySectionScaffold(
+                                            title: current.title,
+                                            variants: const <Widget>[],
+                                            states: const <Widget>[],
+                                            notes: strings.notImplemented,
+                                          ),
+                              ),
                             );
                           },
                     ),
