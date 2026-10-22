@@ -69,7 +69,7 @@ import { PALETTE, ACCENT, INK } from "@horon-ai/tokens";`;
   <CodeBlock code="bun run --filter @horon-ai/tokens build" lang="bash" title="terminal" />
 
   <h2>무엇이 나오나</h2>
-  <div class="not-prose mt-5 overflow-hidden rounded-md border border-border">
+  <div class="not-prose mt-5 overflow-hidden rounded-xl bg-muted/20">
     <table class="w-full text-left text-[12.5px]">
       <thead class="border-b border-border bg-muted/50 text-muted-foreground">
         <tr>
@@ -83,10 +83,10 @@ import { PALETTE, ACCENT, INK } from "@horon-ai/tokens";`;
           groups.map((group) => (
             <tr class="border-b border-border align-top last:border-b-0">
               <td class="px-4 py-2.5 font-medium">{group.name}</td>
-              <td class="px-4 py-2.5 font-mono text-[11px] text-muted-foreground">{group.source}</td>
-              <td class="px-4 py-2.5 font-mono text-[11px] text-muted-foreground">
+              <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground">{group.source}</td>
+              <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground">
                 {group.output}
-                <span class="mt-1 block text-[10.5px] opacity-70">{group.count}</span>
+                <span class="mt-1 block text-xs opacity-70">{group.count}</span>
               </td>
             </tr>
           ))

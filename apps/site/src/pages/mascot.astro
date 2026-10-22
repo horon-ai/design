@@ -12,12 +12,10 @@ const groups = [
   title="Mascot"
   description="HORON의 마스코트는 둥근 송곳니 매 병아리입니다. 제품 이름 Horus + ON에서 왔고, 26가지 컷을 투명 PNG로 제공합니다."
 >
-  <div class="py-14">
-    <header class="max-w-3xl border-b border-border pb-10">
-      <p class="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Mascot</p>
-      <h1 class="text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] md:text-[3.25rem]">
-        Horon mascot
-      </h1>
+  <div class="site-shell py-16">
+    <header class="max-w-3xl">
+      <p class="mb-3 text-sm text-muted-foreground">Mascot</p>
+      <h1 class="doc-title">Horon mascot</h1>
       <p class="mt-5 max-w-2xl text-[15px] leading-7 text-muted-foreground text-pretty">
         제품 이름 Horus + ON에서 온 둥근 병아리입니다. 머리는 모서리가 크게 둥근 사각형이고, 그 위에
         짧은 깃털 두 가닥이 솟아 있습니다. 얼굴 판은 따뜻한 크림색 타원, 눈은 크고 둥근 검은 눈에
@@ -25,28 +23,28 @@ const groups = [
       </p>
       <dl class="mt-8 flex flex-wrap gap-x-10 gap-y-4">
         <div>
-          <dt class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">Cuts</dt>
+          <dt class="text-xs text-muted-foreground">Cuts</dt>
           <dd class="mt-1 text-[1.5rem] font-semibold tracking-[-0.02em]">{mascotSpec.count}</dd>
         </div>
         <div>
-          <dt class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">Size</dt>
+          <dt class="text-xs text-muted-foreground">Size</dt>
           <dd class="mt-1 text-[1.5rem] font-semibold tracking-[-0.02em]">{mascotSpec.size}</dd>
         </div>
         <div>
-          <dt class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">Format</dt>
+          <dt class="text-xs text-muted-foreground">Format</dt>
           <dd class="mt-1 text-[0.9375rem] font-medium">{mascotSpec.format}</dd>
         </div>
       </dl>
     </header>
 
     <section class="not-prose mt-12">
-      <h2 class="text-[1.0625rem] font-semibold tracking-[-0.01em]">사이트 적용</h2>
+      <h2 class="text-2xl font-medium">사이트 적용</h2>
       <p class="mt-1 text-[13px] text-muted-foreground">
         이 사이트는 마스코트를 로고와 파비콘, 공유 이미지에 그대로 씁니다.
       </p>
       <div class="mt-5 grid gap-3 md:grid-cols-2">
-        <div class="rounded-md border border-border bg-card px-5 py-5">
-          <p class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">Header lockup</p>
+        <div class="rounded-xl bg-muted/40 px-5 py-5">
+          <p class="text-sm text-muted-foreground">Header lockup</p>
           <div class="mt-4 flex items-center gap-2.5">
             <img src={mascotImageUrl("face")} alt="" width="30" height="30" class="size-[30px] object-contain" />
             <span class="text-[15px] font-semibold tracking-[-0.02em]">HORON</span>
@@ -68,8 +66,8 @@ const groups = [
             ))}
           </div>
         </div>
-        <div class="rounded-md border border-border bg-card px-5 py-5">
-          <p class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">Favicon · OG</p>
+        <div class="rounded-xl bg-muted/40 px-5 py-5">
+          <p class="text-sm text-muted-foreground">Favicon · OG</p>
           <div class="mt-4 flex items-center gap-4">
             <img src="/icon.png" alt="파비콘 256px" width="64" height="64" class="size-16 rounded-lg" />
             <img src="/apple-icon.png" alt="애플 터치 아이콘" width="56" height="56" class="size-14 rounded-lg" />
@@ -92,11 +90,11 @@ const groups = [
     </section>
 
     <section class="not-prose mt-12">
-      <h2 class="text-[1.0625rem] font-semibold tracking-[-0.01em]">Brand palette</h2>
+      <h2 class="text-2xl font-medium">Brand palette</h2>
       <div class="mt-4 grid gap-3 sm:grid-cols-3">
         {
           mascotPalette.map((swatch) => (
-            <div class="flex items-center gap-3 rounded-md border border-border px-4 py-3">
+            <div class="flex items-center gap-3 rounded-xl bg-muted/40 px-4 py-3">
               <span
                 class="size-9 shrink-0 rounded-sm border border-border"
                 style={`background: ${swatch.hex}`}
@@ -117,15 +115,15 @@ const groups = [
         <section class="not-prose mt-14">
           <div class="flex items-baseline justify-between gap-4">
             <div>
-              <h2 class="text-[1.0625rem] font-semibold tracking-[-0.01em]">{group.title}</h2>
+              <h2 class="text-2xl font-medium">{group.title}</h2>
               <p class="mt-1 text-[13px] text-muted-foreground">{group.description}</p>
             </div>
             <span class="font-mono text-[11px] text-muted-foreground">{group.items.length}</span>
           </div>
           <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {group.items.map((mascot) => (
-              <figure class="group flex flex-col overflow-hidden rounded-md border border-border bg-card">
-                <div class="flex aspect-square items-center justify-center bg-muted/40 p-4">
+              <figure class="group flex flex-col overflow-hidden rounded-xl bg-muted/40">
+                <div class="flex aspect-square items-center justify-center p-4">
                   <img
                     src={mascotImageUrl(mascot.slug)}
                     alt={`Horon 마스코트 ${mascot.name} 컷`}
@@ -135,7 +133,7 @@ const groups = [
                     class="size-full object-contain transition-transform duration-200 group-hover:scale-[1.04]"
                   />
                 </div>
-                <figcaption class="flex flex-1 flex-col gap-1 border-t border-border px-3 py-2.5">
+                <figcaption class="flex flex-1 flex-col gap-1 px-3 py-2.5">
                   <span class="font-mono text-[11.5px] text-foreground">horon-mascot-{mascot.name}</span>
                   <span class="text-[11.5px] leading-4 text-muted-foreground">{mascot.use}</span>
                   <a

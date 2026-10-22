@@ -21,8 +21,8 @@ const steps = Object.entries(space);
     {
       steps.map(([name, value]) => (
         <div class="flex items-center gap-4">
-          <span class="w-10 shrink-0 font-mono text-[11px] text-muted-foreground">{name}</span>
-          <span class="w-12 shrink-0 font-mono text-[11px] text-muted-foreground">{value}px</span>
+          <span class="w-10 shrink-0 font-mono text-xs text-muted-foreground">{name}</span>
+          <span class="w-12 shrink-0 font-mono text-xs text-muted-foreground">{value}px</span>
           <span class="h-2.5 rounded-xs bg-[var(--ring)]" style={`width: ${Math.max(value, 2)}px`} />
         </div>
       ))
