@@ -58,7 +58,7 @@ void main() {
           },
         ),
       ),
-      );
+    );
     expect(resolved, isNotNull);
     expect(resolved!.glassFill, isNotNull);
   });
