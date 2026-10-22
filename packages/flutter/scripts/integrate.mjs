@@ -165,3 +165,20 @@ console.log(
   `implemented=${implemented.length} pending=${75 - implemented.length} section_widgets=${sectionClass.size} ${counts.join(" ")}`,
 );
 if (CHECK) console.log("(--check: 아무것도 쓰지 않았습니다)");
+
+// 마지막 단계: 통합이 만진 파일의 모양을 CI와 같은 도구로 맞춥니다.
+//
+// 하위 경로 import를 지우면 import 블록에 빈 줄이 남고, 여러 줄로 쓴
+// `GallerySection(...)`은 손으로 맞추기 어렵습니다. `dart format`이 CI의 포맷
+// 검사와 같은 도구이므로 여기서 한 번 돌립니다.
+if (!CHECK) {
+  const { spawnSync } = await import("node:child_process");
+  const result = spawnSync("dart", ["format", "lib", "test", "example"], {
+    cwd: PKG,
+    stdio: "inherit",
+  });
+  if (result.status !== 0) {
+    console.error("dart format failed; run it by hand before committing");
+    process.exitCode = 1;
+  }
+}
