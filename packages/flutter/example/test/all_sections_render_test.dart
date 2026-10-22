@@ -4,7 +4,7 @@ import 'package:horon_ui_example/gallery/gallery_theme.dart';
 import 'package:horon_ui_example/gallery/registry.dart';
 import 'package:horon_ui_example/gallery/section_builder.dart';
 
-/// 등록된 갤러리 섹션이 전부 예외 없이 그려지는지 확인합니다.
+/// 갤러리의 모든 섹션이 예외 없이 그려지는지 확인합니다.
 ///
 /// 이 테스트가 잡는 결함의 종류는 두 가지입니다.
 ///
@@ -14,8 +14,13 @@ import 'package:horon_ui_example/gallery/section_builder.dart';
 ///    않아 전부 초록이었습니다.
 /// 2. 섹션 위젯 자체가 던지는 경우(잘못된 assert, 없는 토큰 이름 등).
 ///
-/// 그래서 섹션마다 라이트·다크 두 번, 폰 폭과 태블릿 폭 두 번 그립니다. 이
-/// 테스트는 등록부를 그대로 순회하므로 컴포넌트가 늘면 자동으로 따라갑니다.
+/// 그래서 섹션마다 라이트·다크 두 번, 폰 폭과 태블릿 폭 두 번 그립니다.
+///
+/// 빌더에 컨텍스트를 넘겨야 하는데, `tester.element`는 위젯이 이미 붙어 있어야
+/// 동작합니다. 그래서 `Builder`로 감싸 그 안에서 컨텍스트를 받습니다.
+/// 2026-10-22 이전 판은 `pumpWidget` 전에 `tester.element`를 불러 항상
+/// `Bad state: No element`로 실패했고, 등록부가 비어 있는 동안에는 케이스가
+/// 0개라 조용히 통과했습니다.
 void main() {
   const List<({String name, double width})> surfaces =
       <({String name, double width})>[
@@ -40,9 +45,10 @@ void main() {
                   body: SizedBox(
                     width: surface.width,
                     child: SingleChildScrollView(
-                      child: gallerySectionFor(
-                        tester.element(find.byType(Scaffold)),
-                        section,
+                      child: Builder(
+                        builder: (BuildContext context) =>
+                            gallerySectionFor(context, section) ??
+                            const SizedBox.shrink(),
                       ),
                     ),
                   ),
@@ -63,10 +69,9 @@ void main() {
     }
   }
 
-  // 등록부가 비면 위 섹션 루프가 0번 돌아 이 파일이 조용히 통과합니다.
-  // 그 조용한 통과를 막으려고 등록부가 채워졌는지 확인합니다. 통합 전에는
-  // 등록부가 비어 있는 것이 정상이므로(각 웨이브 끝에 통합 스크립트가 채웁니다)
-  // 실패가 아니라 건너뛰기로 표시합니다.
+  // 등록부가 비면 위 루프가 0번 돌아 이 파일이 조용히 통과합니다. 그 조용한
+  // 통과를 막으려고 등록부가 채워졌는지 확인합니다. 통합 전에는 비어 있는 것이
+  // 정상이므로 실패가 아니라 건너뛰기로 표시합니다.
   test(
     'the registry is populated so the render sweep covers every component',
     () {
