@@ -22,8 +22,8 @@ const easings = Object.entries(easing.web);
     {
       durations.map(([name, value]) => (
         <div class="flex items-center gap-4">
-          <span class="w-20 shrink-0 font-mono text-[11px] text-muted-foreground">{name}</span>
-          <span class="w-14 shrink-0 font-mono text-[11px] text-muted-foreground">{value}ms</span>
+          <span class="w-20 shrink-0 font-mono text-xs text-muted-foreground">{name}</span>
+          <span class="w-14 shrink-0 font-mono text-xs text-muted-foreground">{value}ms</span>
           <span class="h-2 rounded-xs bg-[var(--ring)]" style={`width: ${value * 1.4}px`} />
         </div>
       ))
@@ -38,7 +38,7 @@ const easings = Object.entries(easing.web);
   </ul>
 
   <h2>이징</h2>
-  <div class="not-prose mt-5 overflow-hidden rounded-md border border-border">
+  <div class="not-prose mt-5 overflow-hidden rounded-xl bg-muted/20">
     <table class="w-full text-left text-[12.5px]">
       <thead class="border-b border-border bg-muted/50 text-muted-foreground">
         <tr>
@@ -51,7 +51,7 @@ const easings = Object.entries(easing.web);
           easings.map(([name, value]) => (
             <tr class="border-b border-border last:border-b-0">
               <td class="px-4 py-2 font-mono">{name}</td>
-              <td class="px-4 py-2 font-mono text-[11px] text-muted-foreground">{value}</td>
+              <td class="px-4 py-2 font-mono text-xs text-muted-foreground">{value}</td>
             </tr>
           ))
         }

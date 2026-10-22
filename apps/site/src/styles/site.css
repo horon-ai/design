@@ -11,6 +11,16 @@
     text-rendering: optimizeLegibility;
   }
 
+  body {
+    padding-top: 4rem;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      padding-top: 4.75rem;
+    }
+  }
+
   :target {
     scroll-margin-top: 6rem;
   }
@@ -22,32 +32,202 @@
 }
 
 @layer components {
-  .shell {
+  .site-shell {
     width: 100%;
-    max-width: 1400px;
     margin-inline: auto;
-    padding-inline: 1.25rem;
+    padding-inline: 1rem;
   }
 
   @media (min-width: 768px) {
-    .shell {
-      padding-inline: 2rem;
+    .site-shell {
+      padding-inline: 1.5rem;
     }
   }
 
-  .demo-surface {
+  .docs-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  @media (min-width: 1024px) {
+    .docs-grid {
+      grid-template-columns: 15rem minmax(0, 1fr);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .docs-grid:has(.docs-toc) {
+      grid-template-columns: 15rem minmax(0, 1fr) 12.5rem;
+    }
+  }
+
+  .docs-sidebar {
+    padding: 0.75rem;
+  }
+
+  @media (min-width: 1024px) {
+    .docs-sidebar {
+      position: sticky;
+      top: 4.75rem;      height: calc(100vh - 4.75rem);
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    .docs-sidebar::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .docs-main {
+    min-width: 0;
+    padding: 1.5rem 1rem 4rem;
+  }
+
+  .docs-main-wide {
+    min-width: 0;
+    padding: 1.5rem 1rem 4rem;
+  }
+
+  @media (min-width: 768px) {
+    .docs-main {
+      padding: 3.5rem 2rem 6rem;
+    }
+
+    .docs-main-wide {
+      padding: 4rem 2rem 6rem;
+    }
+  }
+
+  .docs-toc {
+    display: none;
+    padding: 3.5rem 1rem 2rem 0;
+  }
+  @media (min-width: 1280px) {
+    .docs-toc {
+      display: block;
+      position: sticky;
+      top: 4.75rem;
+      max-height: calc(100vh - 4.75rem);
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    .docs-toc::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+    padding-inline: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--muted-foreground);
+    transition:
+      color 120ms ease,
+      background-color 120ms ease;
+  }
+
+  .nav-item:hover {
+    color: var(--foreground);
+  }
+
+  .nav-item[aria-current="page"] {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+
+  .nav-group-label {
+    margin-top: 1.5rem;
+    padding-inline: 0.5rem;
+    padding-bottom: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.625rem;
+    color: var(--muted-foreground);
+  }
+
+  .toc-item {
+    display: block;
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--border);
+    font-size: 0.75rem;
+    line-height: 2rem;
+    color: var(--muted-foreground);
+    transition: color 120ms ease;
+  }
+
+  .toc-item:hover {
+    color: var(--foreground);
+  }
+
+  .toc-item[data-level="3"] {
+    padding-left: 2rem;
+  }
+
+  .toc-item[aria-current="true"] {
+    color: var(--foreground);
+  }
+
+  .doc-title {
+    font-size: 2.25rem;
+    line-height: 1.1;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .doc-title-wide {
+    font-size: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .doc-title {
+      font-size: 3.75rem;
+      letter-spacing: -0.025em;
+    }
+
+    .doc-title-wide {
+      font-size: 2.5rem;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .doc-title-wide {
+    font-size: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .doc-title-wide {
+      font-size: 2.5rem;
+    }
+  }
+
+  .doc-lead {
+    max-width: 48rem;
+    font-size: 1rem;
+    line-height: 1.75rem;
+    color: var(--muted-foreground);
+    text-wrap: pretty;
+  }
+
+  .demo-stage {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
     gap: 0.75rem;
-    padding: 2rem 1.5rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    background: var(--card);
-    color: var(--card-foreground);
+    min-height: 26rem;
+    padding: 2rem;
+    border-radius: 1rem;
+    background: color-mix(in oklab, var(--muted) 60%, transparent);
+    color: var(--foreground);
   }
 
-  .demo-surface-grid {
+  .demo-stage-grid {
     align-items: stretch;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -55,17 +235,49 @@
 
   /* Overlay previews keep a fixed-height stage so the trigger sits centered
    * and the page below does not jump when the panel opens. */
-  .demo-surface-overlay {
+  .demo-stage-overlay {
     position: relative;
-    min-height: 18rem;
     align-content: center;
     justify-content: center;
   }
 
+  .demo-tile {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    background: color-mix(in oklab, var(--muted) 60%, transparent);
+  }
+
+  /* A demo rendered inside an index tile keeps its own controls but drops the
+   * full-page stage: the tile supplies the surface and the fixed aspect ratio. */
+  .demo-tile .demo-stage {
+    min-height: 0;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .card-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.875rem 1.25rem;
+    border-radius: 0.75rem;
+    background: var(--muted);
+    transition: background-color 120ms ease;
+  }
+
+  .card-link:hover {
+    background: color-mix(in oklab, var(--muted) 70%, var(--foreground) 8%);
+  }
+
   .prose-docs {
-    color: var(--foreground);
-    font-size: 0.9375rem;
-    line-height: 1.75;
+    font-size: 1rem;
+    line-height: 1.75rem;
+    color: color-mix(in oklab, var(--foreground) 90%, transparent);
   }
 
   .prose-docs > * + * {
@@ -73,17 +285,29 @@
   }
 
   .prose-docs h2 {
-    margin-top: 3rem;
+    margin-top: 4rem;
+    margin-bottom: 1.5rem;
     font-size: 1.5rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    line-height: 2rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+    text-wrap: balance;
+    scroll-margin-top: 6rem;
+  }
+
+  .prose-docs h2:first-child {
+    margin-top: 0;
   }
 
   .prose-docs h3 {
-    margin-top: 2rem;
-    font-size: 1.0625rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 500;
+    color: var(--foreground);
+    scroll-margin-top: 6rem;
   }
 
   .prose-docs p,
@@ -123,9 +347,9 @@
 
   .prose-docs code:not(pre code) {
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     padding: 0.125rem 0.375rem;
-    border-radius: var(--radius-xs);
+    border-radius: 0.375rem;
     background: var(--muted);
     color: var(--foreground);
   }

@@ -1,40 +1,56 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Footer from "@/components/site/Footer.astro";
 import Sidebar from "@/components/site/Sidebar.astro";
+import Toc from "@/components/site/Toc.astro";
 
 interface Props {
   title: string;
   description?: string;
   section: string;
   eyebrow?: string;
+  toc?: boolean;
+  breadcrumb?: { label: string; href: string }[];
 }
 
-const { title, description, section, eyebrow } = Astro.props;
-const withSidebar = section === "foundations" || section === "components";
+const { title, description, section, eyebrow, toc = true, breadcrumb } = Astro.props;
+const sidebarSections = ["foundations", "components", "get-started", "updates"];
+const withSidebar = sidebarSections.includes(section);
+const showToc = toc && withSidebar;
+const contentWidth = withSidebar ? "max-w-[56.25rem]" : "max-w-[68.75rem]";
 ---
 
-<BaseLayout title={title} description={description}>
-  <div class:list={["flex flex-col gap-10 pb-24 pt-10 lg:flex-row lg:gap-14"]}>
+<BaseLayout title={title} description={description} footer={false}>
+  <div class:list={[withSidebar ? "docs-grid" : "block"]}>
     {withSidebar && <Sidebar section={section} />}
-    <div class="min-w-0 flex-1">
-      <header class="max-w-3xl border-b border-border pb-8">
-        {eyebrow && (
-          <p class="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            {eyebrow}
-          </p>
-        )}
-        <h1 class="text-[2.25rem] font-semibold leading-[1.1] tracking-[-0.03em] text-balance md:text-[2.75rem]">
-          {title}
-        </h1>
-        {description && (
-          <p class="mt-4 max-w-2xl text-[0.9375rem] leading-7 text-muted-foreground text-pretty">
-            {description}
-          </p>
-        )}
-      </header>
-      <div class="prose-docs max-w-3xl pt-8">
-        <slot />
+    <article class:list={[withSidebar ? "docs-main" : "docs-main-wide"]}>
+      <div class:list={["mx-auto w-full", contentWidth]}>
+        {
+          breadcrumb && breadcrumb.length > 0 && (
+            <nav
+              aria-label="현재 위치"
+              class="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
+            >
+              {breadcrumb.map((item, index) => (
+                <Fragment>
+                  {index > 0 && <span aria-hidden="true">/</span>}
+                  <a href={item.href} class="transition-colors hover:text-foreground">
+                    {item.label}
+                  </a>
+                </Fragment>
+              ))}
+            </nav>
+          )
+        }
+        {eyebrow && <p class="mt-3 text-sm text-muted-foreground">{eyebrow}</p>}
+        <h1 class:list={[withSidebar ? "doc-title" : "doc-title doc-title-wide"]}>{title}</h1>
+        {description && <p class="doc-lead mt-4">{description}</p>}
+        <div class="prose-docs mt-10">
+          <slot />
+        </div>
+        <Footer />
       </div>
-    </div>
+    </article>
+    {showToc && <Toc />}
   </div>
 </BaseLayout>

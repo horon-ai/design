@@ -1,0 +1,151 @@
+---
+import { searchIndex } from "@/data/search-index";
+---
+
+<button
+  type="button"
+  data-search-open
+  aria-label="검색"
+  class="grid size-9 place-items-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground"
+>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.6"
+    stroke-linecap="round"
+    aria-hidden="true"
+  >
+    <circle cx="11" cy="11" r="6.5"></circle>
+    <path d="m16 16 4.5 4.5"></path>
+  </svg>
+</button>
+
+<dialog data-search-dialog aria-label="검색">
+  <div class="flex max-h-[70vh] flex-col">
+    <div class="flex items-center gap-2 border-b border-border px-3 py-2">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        class="shrink-0 text-muted-foreground"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="6.5"></circle>
+        <path d="m16 16 4.5 4.5"></path>
+      </svg>
+      <input
+        type="search"
+        data-search-input
+        aria-label="검색어"
+        placeholder="컴포넌트와 문서 검색"
+        autocomplete="off"
+        spellcheck="false"
+        class="h-9 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+      />
+    </div>
+    <div class="min-h-0 flex-1 overflow-y-auto p-2">
+      <div data-search-results class="flex flex-col"></div>
+      <p data-search-empty class="hidden px-3 py-6 text-center text-sm text-muted-foreground">
+        결과 없음
+      </p>
+    </div>
+  </div>
+</dialog>
+
+<script is:inline type="application/json" data-search-index set:html={JSON.stringify(searchIndex)}></script>
+
+<script is:inline>
+  (() => {
+    const dialog = document.querySelector("[data-search-dialog]");
+    const source = document.querySelector("script[data-search-index]");
+    if (!dialog || !source) return;
+
+    const entries = JSON.parse(source.textContent || "[]");
+    const input = dialog.querySelector("[data-search-input]");
+    const results = dialog.querySelector("[data-search-results]");
+    const empty = dialog.querySelector("[data-search-empty]");
+
+    const render = (query) => {
+      const needle = query.trim().toLowerCase();
+      const matched = needle
+        ? entries.filter(
+            (entry) =>
+              entry.title.toLowerCase().includes(needle) ||
+              entry.group.toLowerCase().includes(needle),
+          )
+        : entries;
+      const rows = matched.slice(0, 12).map((entry) => {
+        const link = document.createElement("a");
+        link.href = entry.href;
+        link.className =
+          "flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted";
+        const title = document.createElement("span");
+        title.textContent = entry.title;
+        const group = document.createElement("span");
+        group.className = "text-xs text-muted-foreground";
+        group.textContent = entry.group;
+        link.append(title, group);
+        return link;
+      });
+      results.replaceChildren(...rows);
+      empty.classList.toggle("hidden", rows.length > 0);
+    };
+
+    const open = () => {
+      if (dialog.open) return;
+      input.value = "";
+      render("");
+      dialog.showModal();
+      input.focus();
+    };
+
+    document.querySelectorAll("[data-search-open]").forEach((trigger) => {
+      trigger.addEventListener("click", open);
+    });
+
+    input.addEventListener("input", () => render(input.value));
+
+    // Escape is the dialog's native cancel behavior; a click whose target is the
+    // dialog element itself (not the content box) landed on the backdrop.
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    // A type=search input consumes Escape to clear itself, so close explicitly.
+    dialog.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      dialog.close();
+    });
+  })();
+</script>
+
+<style>
+  [data-search-dialog] {
+    position: fixed;
+    inset: 12vh 0 auto;
+    margin-inline: auto;
+    width: min(40rem, calc(100vw - 2rem));
+    max-height: 70vh;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--popover);
+    color: var(--popover-foreground);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* --brand-ink is dark in both themes, so the scrim dims the page instead of
+   * lightening it the way a foreground-based scrim would in dark mode. */
+  [data-search-dialog]::backdrop {
+    background: color-mix(in oklab, var(--brand-ink) 55%, transparent);
+  }
+</style>
