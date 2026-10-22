@@ -250,76 +250,75 @@ class _GalleryControls extends StatelessWidget {
             ],
           ),
           const SizedBox(height: HoronSpace.s3),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                _GalleryControlGroup(
-                  label: strings.brightness,
-                  child: SegmentedButton<Brightness>(
-                    showSelectedIcon: false,
-                    segments: <ButtonSegment<Brightness>>[
-                      ButtonSegment<Brightness>(
-                        value: Brightness.light,
+          // 컨트롤 세 묶음은 좁은 폭에서 한 줄에 다 들어가지 않습니다.
+          // 가로 스크롤에 넣으면 네 번째 폭 값이 `12…`로 잘려 보이므로
+          // (2026-10-22 시뮬레이터 캡처), 폭이 모자라면 다음 줄로 흘립니다.
+          Wrap(
+            spacing: HoronSpace.s5,
+            runSpacing: HoronSpace.s3,
+            crossAxisAlignment: WrapCrossAlignment.end,
+            children: <Widget>[
+              _GalleryControlGroup(
+                label: strings.brightness,
+                child: SegmentedButton<Brightness>(
+                  showSelectedIcon: false,
+                  segments: <ButtonSegment<Brightness>>[
+                    ButtonSegment<Brightness>(
+                      value: Brightness.light,
+                      label: Text(
+                        strings.light,
+                        key: galleryBrightnessKey(Brightness.light),
+                      ),
+                    ),
+                    ButtonSegment<Brightness>(
+                      value: Brightness.dark,
+                      label: Text(
+                        strings.dark,
+                        key: galleryBrightnessKey(Brightness.dark),
+                      ),
+                    ),
+                  ],
+                  selected: <Brightness>{brightness},
+                  onSelectionChanged: (Set<Brightness> selection) =>
+                      onBrightnessChanged?.call(selection.first),
+                ),
+              ),
+              _GalleryControlGroup(
+                label: strings.width,
+                child: SegmentedButton<GalleryWidth>(
+                  showSelectedIcon: false,
+                  segments: <ButtonSegment<GalleryWidth>>[
+                    for (final GalleryWidth value in GalleryWidth.values)
+                      ButtonSegment<GalleryWidth>(
+                        value: value,
+                        label: Text(value.label, key: galleryWidthKey(value)),
+                      ),
+                  ],
+                  selected: <GalleryWidth>{width},
+                  onSelectionChanged: (Set<GalleryWidth> selection) =>
+                      onWidthChanged(selection.first),
+                ),
+              ),
+              _GalleryControlGroup(
+                label: strings.language,
+                child: SegmentedButton<GalleryLanguage>(
+                  showSelectedIcon: false,
+                  segments: <ButtonSegment<GalleryLanguage>>[
+                    for (final GalleryLanguage value in GalleryLanguage.values)
+                      ButtonSegment<GalleryLanguage>(
+                        value: value,
                         label: Text(
-                          strings.light,
-                          key: galleryBrightnessKey(Brightness.light),
+                          value.label,
+                          key: galleryLanguageKey(value),
                         ),
                       ),
-                      ButtonSegment<Brightness>(
-                        value: Brightness.dark,
-                        label: Text(
-                          strings.dark,
-                          key: galleryBrightnessKey(Brightness.dark),
-                        ),
-                      ),
-                    ],
-                    selected: <Brightness>{brightness},
-                    onSelectionChanged: (Set<Brightness> selection) =>
-                        onBrightnessChanged?.call(selection.first),
-                  ),
+                  ],
+                  selected: <GalleryLanguage>{language},
+                  onSelectionChanged: (Set<GalleryLanguage> selection) =>
+                      onLanguageChanged?.call(selection.first),
                 ),
-                const SizedBox(width: HoronSpace.s5),
-                _GalleryControlGroup(
-                  label: strings.width,
-                  child: SegmentedButton<GalleryWidth>(
-                    showSelectedIcon: false,
-                    segments: <ButtonSegment<GalleryWidth>>[
-                      for (final GalleryWidth value in GalleryWidth.values)
-                        ButtonSegment<GalleryWidth>(
-                          value: value,
-                          label: Text(value.label, key: galleryWidthKey(value)),
-                        ),
-                    ],
-                    selected: <GalleryWidth>{width},
-                    onSelectionChanged: (Set<GalleryWidth> selection) =>
-                        onWidthChanged(selection.first),
-                  ),
-                ),
-                const SizedBox(width: HoronSpace.s5),
-                _GalleryControlGroup(
-                  label: strings.language,
-                  child: SegmentedButton<GalleryLanguage>(
-                    showSelectedIcon: false,
-                    segments: <ButtonSegment<GalleryLanguage>>[
-                      for (final GalleryLanguage value
-                          in GalleryLanguage.values)
-                        ButtonSegment<GalleryLanguage>(
-                          value: value,
-                          label: Text(
-                            value.label,
-                            key: galleryLanguageKey(value),
-                          ),
-                        ),
-                    ],
-                    selected: <GalleryLanguage>{language},
-                    onSelectionChanged: (Set<GalleryLanguage> selection) =>
-                        onLanguageChanged?.call(selection.first),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
