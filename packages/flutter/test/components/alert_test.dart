@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/alert.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
-import 'package:horon_ui/src/tokens/horon_tokens.g.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 알림의 다섯 변형이 각자의 의미 색을 쓰는지, 제목·설명·아이콘 슬롯이 그 색을
 /// 따라가는지 확인합니다.

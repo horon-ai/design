@@ -4,7 +4,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/checkbox.dart';
 
 /// 체크박스의 상자 모양·상태 색·표시 도형·값 동작을 확인합니다.
 ///

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/autocomplete.dart';
 
 /// `autocomplete`의 후보 제안·거르기·선택·빈 상태·경계 뒤집기·키보드 없는 조작을
 /// 확인합니다. 키보드 없이 동작한다는 것은 입력에 포커스를 주지 않고 펼침 버튼만

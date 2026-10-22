@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:horon_ui/horon_ui.dart';
 // 배럴 export는 통합 담당자가 소유합니다. 이 파일은 자기 컴포넌트만 하위 경로로 읽어,
 // 배럴에 export가 추가된 뒤에도 `unnecessary_import`가 생기지 않게 합니다.
-import 'package:horon_ui/src/components/combobox.dart';
 
 import '../section_scaffold.dart';
 

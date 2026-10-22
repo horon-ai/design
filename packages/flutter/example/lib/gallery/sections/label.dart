@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:horon_ui/src/components/field.dart';
-import 'package:horon_ui/src/components/label.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 import '../section_scaffold.dart';
 

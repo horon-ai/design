@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/slider.dart';
 
 /// 슬라이더의 범위·눈금·방향·비활성을 확인합니다.
 ///

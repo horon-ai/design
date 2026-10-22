@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:horon_ui/src/components/empty.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 import '../section_scaffold.dart';
 

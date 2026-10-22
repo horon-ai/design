@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/field.dart';
-import 'package:horon_ui/src/components/input.dart';
 
 /// `field`의 부품·간격·상태를 확인합니다.
 void main() {

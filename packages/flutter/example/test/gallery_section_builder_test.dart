@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/badge.dart';
+import 'package:horon_ui/horon_ui.dart';
 import 'package:horon_ui_example/gallery/app.dart';
 import 'package:horon_ui_example/gallery/gallery_strings.dart';
 import 'package:horon_ui_example/gallery/registry.dart';

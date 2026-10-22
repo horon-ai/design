@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 // 배럴은 아직 컴포넌트를 내보내지 않습니다(통합 담당자가 채웁니다).
 // 이 테스트는 테마 슬롯을 읽는 컴포넌트 하나만 필요로 합니다.
-import 'package:horon_ui/src/components/badge.dart';
 import 'package:horon_ui_example/gallery/gallery_theme.dart';
 
 /// 갤러리 테마가 실제 테마 브리지를 쓰는지 고정합니다.

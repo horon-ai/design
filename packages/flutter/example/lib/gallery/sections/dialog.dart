@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 // 배럴은 통합 스크립트가 채웁니다. 그 전에는 하위 경로로 가져옵니다.
-import 'package:horon_ui/src/components/alert_dialog.dart';
-import 'package:horon_ui/src/components/button.dart';
-import 'package:horon_ui/src/components/dialog.dart';
 
 import '../section_scaffold.dart';
 

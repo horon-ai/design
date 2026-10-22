@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/input_otp.dart';
 
 /// `input_otp`의 칸 그리기·붙여넣기·완료 콜백을 확인합니다.
 ///

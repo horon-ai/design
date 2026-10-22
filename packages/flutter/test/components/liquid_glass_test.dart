@@ -3,8 +3,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
+
 // 배럴 export는 통합 담당자가 소유하므로, 이 랜은 자기 컴포넌트를 하위 경로로 읽습니다.
-import 'package:horon_ui/src/components/liquid_glass.dart';
 
 /// [HoronLiquidGlass]를 내용 위에 띄웁니다.
 Future<void> pumpLiquid(WidgetTester tester, Widget child, {Brightness brightness = Brightness.light}) async {

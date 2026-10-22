@@ -2,9 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/sonner.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
-import 'package:horon_ui/src/tokens/horon_tokens.g.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// sonner 토스터의 promise 상태 이동, 스와이프 닫기, 겹친 스택, 모서리 배치를
 /// 확인합니다.

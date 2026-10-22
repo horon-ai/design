@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/checkbox.dart';
-import 'package:horon_ui/src/components/native_select.dart';
 
 /// `native_select`의 라벨·오류·비활성·플랫폼 선택기·높이를 확인합니다.
 ///

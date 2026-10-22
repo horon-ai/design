@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/attachment.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
-import 'package:horon_ui/src/tokens/horon_tokens.g.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 첨부의 세 크기·두 방향·다섯 상태·제거 콜백을 확인합니다.
 ///

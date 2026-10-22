@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/button.dart';
-import 'package:horon_ui/src/components/file_upload.dart';
-import 'package:horon_ui/src/components/progress.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
-import 'package:horon_ui/src/tokens/horon_tokens.g.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 파일 업로드의 주입식 선택 콜백·다섯 상태·크기 포맷·제거·재시도를 확인합니다.
 ///

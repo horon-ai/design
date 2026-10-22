@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/button.dart';
-import 'package:horon_ui/src/components/button_group.dart';
 
 Future<void> pumpGroup(WidgetTester tester, Widget child, {Brightness brightness = Brightness.light}) async {
   await tester.pumpWidget(

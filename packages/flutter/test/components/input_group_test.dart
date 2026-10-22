@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/input_group.dart';
 
 /// `input-group`의 addon 자리·상태·한 테두리 묶음을 확인합니다.
 void main() {

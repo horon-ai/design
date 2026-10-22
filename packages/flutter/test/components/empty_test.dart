@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/empty.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
-import 'package:horon_ui/src/tokens/horon_tokens.g.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 빈 상태 상자의 폭·테두리와 여섯 조각(Empty·Header·Title·Description·Content·Media)을
 /// 확인합니다.

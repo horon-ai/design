@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/navigation_menu.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 내비게이션 메뉴가 열리고 닫히는지, 그리고 배치가 공유 유틸을 쓰는지 확인합니다.
 void main() {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/input_otp.dart';
 
 import '../section_scaffold.dart';
 

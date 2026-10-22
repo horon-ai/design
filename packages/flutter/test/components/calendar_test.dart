@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/calendar.dart';
 
 /// `calendar`의 그리드 배치·선택 강조·월 이동을 확인합니다.
 ///

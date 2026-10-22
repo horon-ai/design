@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:horon_ui/src/components/toast.dart';
-import 'package:horon_ui/src/tokens/horon_tokens.g.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 import '../section_scaffold.dart';
 

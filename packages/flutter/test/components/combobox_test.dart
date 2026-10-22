@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/checkbox.dart';
-import 'package:horon_ui/src/components/chip.dart';
-import 'package:horon_ui/src/components/combobox.dart';
 
 /// `combobox`의 거르기·단일·다중 선택·칩·빈 상태·경계 뒤집기를 확인합니다.
 void main() {

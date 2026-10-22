@@ -70,15 +70,33 @@ for (const slug of implemented) {
 // 배럴: 컴포넌트 export를 정렬해 넣고 chart는 뺍니다.
 {
   const source = await readFile(BARREL, "utf8");
-  const marker = "export 'src/contracts/horon_strings.dart';";
-  const header = source.slice(0, source.indexOf(marker));
+  // 헤더는 첫 `export 'src/` 줄 앞까지입니다. 예전에는 `contracts` 줄을 표식으로
+  // 썼는데, 정렬을 도입하면서 그 줄이 첫 export가 아니게 되어 헤더가 이전
+  // export 블록을 통째로 포함했고, 다시 돌리자 배럴이 중복됐습니다.
+  const firstExport = source.search(/^export 'src\//m);
+  if (firstExport < 0) throw new Error("barrel has no `export 'src/` line");
+  const header = source.slice(0, firstExport);
   const componentExports = implemented
     .filter((s) => !BARREL_EXCEPTIONS.has(s))
     .map((s) => `export 'src/components/${s}.dart';`);
+  // `src/overlay/`는 컴포넌트가 아니지만 앱이 직접 쓰는 표면입니다
+  // (`showHoronModal`, `HoronModalSurface`, 오버레이 위치 계산). 그래서 배럴에
+  // 넣습니다.
+  const overlayExports = (await readdir(join(PKG, "lib/src/overlay")))
+    .filter((f) => f.endsWith(".dart"))
+    .map((f) => `export 'src/overlay/${f}';`);
   const rest = source
     .split("\n")
-    .filter((line) => line.startsWith("export 'src/") && !line.startsWith("export 'src/components/"));
-  const next = `${header + componentExports.join("\n")}\n${rest.join("\n")}`;
+    .filter(
+      (line) =>
+        line.startsWith("export 'src/") &&
+        !line.startsWith("export 'src/components/") &&
+        !line.startsWith("export 'src/overlay/"),
+    );
+  // `directives_ordering`는 같은 묶음의 export를 경로 순으로 정렬합니다.
+  // 컴포넌트·overlay·나머지를 모두 합쳐 한 번에 정렬해야 lint를 통과합니다.
+  const sorted = [...componentExports, ...overlayExports, ...rest].sort();
+  const next = `${header + sorted.join("\n")}`;
   if (!CHECK) await writeFile(BARREL, next.endsWith("\n") ? next : `${next}\n`);
 }
 

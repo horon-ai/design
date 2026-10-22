@@ -4,7 +4,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/radio_group.dart';
 
 /// 라디오 그룹의 링·점 모양과 단일 선택을 확인합니다.
 ///

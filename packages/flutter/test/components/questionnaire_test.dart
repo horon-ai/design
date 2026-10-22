@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/progress.dart';
-import 'package:horon_ui/src/components/questionnaire.dart';
 
 /// 설문 하나를 horon 테마 아래 고정 폭 상자에 띄웁니다.
 Future<void> pumpQuestionnaire(

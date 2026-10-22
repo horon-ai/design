@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/button.dart';
-import 'package:horon_ui/src/components/carousel.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 캐러셀의 스냅·화살표 비활성·인디케이터를 확인합니다.
 ///

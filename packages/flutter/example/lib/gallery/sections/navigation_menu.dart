@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 // 배럴은 통합 스크립트가 채웁니다. 그 전에는 하위 경로로 가져옵니다.
 // 통합 뒤 `scripts/sweep-imports.mjs`가 이 줄을 지우고 배럴만 남깁니다.
-import 'package:horon_ui/src/components/navigation_menu.dart';
 
 import '../section_scaffold.dart';
 

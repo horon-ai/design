@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/message_scroller.dart';
 
 /// 메시지 스크롤 영역 하나를 띄웁니다.
 ///

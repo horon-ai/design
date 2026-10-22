@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/switch.dart';
 
 /// 스위치의 트랙·썸 모양과 두 크기, 그리고 값 동작을 확인합니다.
 ///
