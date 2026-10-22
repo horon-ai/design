@@ -84,6 +84,23 @@ void main() {
           case HoronOverlaySide.left:
             expect(panel.right, lessThanOrEqualTo(trigger.left + 0.01));
         }
+
+        // 부등호만 보면 패널이 화면 밖으로 밀려나도 통과합니다. 2026-10-22에
+        // `top` 패널이 y=-474에 그려졌는데 위 단언은 그대로 초록이었습니다.
+        // 가장자리가 트리거에 붙어 있는지, 그리고 화면 안에 있는지 함께 봅니다.
+        const double gap = HoronOverlayPosition.gap;
+        switch (side) {
+          case HoronOverlaySide.bottom:
+            expect(panel.top, closeTo(trigger.bottom + gap, 0.51));
+          case HoronOverlaySide.top:
+            expect(panel.bottom, closeTo(trigger.top - gap, 0.51));
+          case HoronOverlaySide.right:
+            expect(panel.left, closeTo(trigger.right + gap, 0.51));
+          case HoronOverlaySide.left:
+            expect(panel.right, closeTo(trigger.left - gap, 0.51));
+        }
+        expect(panel.top, greaterThanOrEqualTo(0), reason: '$side must stay on screen vertically');
+        expect(panel.left, greaterThanOrEqualTo(0), reason: '$side must stay on screen horizontally');
       });
     }
   });
