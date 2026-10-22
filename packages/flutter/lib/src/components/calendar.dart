@@ -404,22 +404,30 @@ class _HoronCalendarState extends State<HoronCalendar> {
             ],
           );
 
+    // 달력의 폭은 칸 크기와 달 수로 정해집니다(한 달 224, 두 달 488). 폭이 모자라면
+    // 그대로 두었을 때 `Row`가 부모를 넘어 `RenderFlex overflowed`가 납니다(360 폭에서
+    // 151px·208px, 2026-10-22 렌더 스윕). 가로 스크롤 뷰는 자식이 들어가면 자식 폭을
+    // 그대로 보고하므로 넓은 자리에서는 지금과 같은 크기로 서고, 모자랄 때만 흔려
+    // 보냅니다. date-picker 패널이 쓰는 방식과 같습니다.
     return Semantics(
       container: true,
       label: widget.semanticLabel,
       // React의 루트는 `w-fit`입니다. 폭을 주지 않으면 부모가 넓을 때 캡션 줄이
       // 화면 폭까지 늘어나 좌우 화살표가 달력에서 멀어집니다(2026-10-22 렌더 확인).
-      child: SizedBox(
-        width: _cellSize * 7 * widget.months + _calendarGap * (widget.months - 1) + _calendarPadding * 2,
-        child: widget.background
-            ? DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(HoronRadiusRole.card),
-                ),
-                child: Padding(padding: const EdgeInsets.all(_calendarPadding), child: body),
-              )
-            : body,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(
+          width: _cellSize * 7 * widget.months + _calendarGap * (widget.months - 1) + _calendarPadding * 2,
+          child: widget.background
+              ? DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(HoronRadiusRole.card),
+                  ),
+                  child: Padding(padding: const EdgeInsets.all(_calendarPadding), child: body),
+                )
+              : body,
+        ),
       ),
     );
   }

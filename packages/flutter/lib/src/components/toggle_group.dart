@@ -197,6 +197,23 @@ class _HoronToggleGroupState extends State<HoronToggleGroup> {
         : Colors.transparent;
     final Border? border = widget.variant == HoronToggleGroupVariant.outline ? Border.all(color: scheme.outline) : null;
 
+    final Widget group = Flex(
+      direction: widget.vertical ? Axis.vertical : Axis.horizontal,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        for (int index = 0; index < widget.children.length; index++) ...<Widget>[
+          // "gap-0.5" - 항목 사이 2px입니다.
+          if (index > 0)
+            SizedBox(
+              width: widget.vertical ? HoronSpace.s0 : HoronSpace.s0_5,
+              height: widget.vertical ? HoronSpace.s0_5 : HoronSpace.s0,
+            ),
+          widget.children[index],
+        ],
+      ],
+    );
+
     return Semantics(
       container: true,
       label: widget.semanticLabel,
@@ -213,22 +230,14 @@ class _HoronToggleGroupState extends State<HoronToggleGroup> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(HoronSpace.s0_5),
-            child: Flex(
-              direction: widget.vertical ? Axis.vertical : Axis.horizontal,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                for (int index = 0; index < widget.children.length; index++) ...<Widget>[
-                  // "gap-0.5" - 항목 사이 2px입니다.
-                  if (index > 0)
-                    SizedBox(
-                      width: widget.vertical ? HoronSpace.s0 : HoronSpace.s0_5,
-                      height: widget.vertical ? HoronSpace.s0_5 : HoronSpace.s0,
-                    ),
-                  widget.children[index],
-                ],
-              ],
-            ),
+            // React의 항목은 `shrink-0`이라 좁은 부모에서도 줄지 않고 넘칩니다.
+            // Flutter에서 그대로 두면 안쪽 Flex가 부모를 넘어 `RenderFlex
+            // overflowed`가 납니다(360 폭에서 40px, 2026-10-22 렌더 스윕).
+            // 가로 스크롤 뷰는 자식이 들어가면 자식 폭을 그대로 보고하므로 넓은
+            // 자리에서는 모양이 바뀌지 않고, 모자랄 때만 흔려 보냅니다.
+            child: widget.vertical
+                ? IntrinsicWidth(child: group)
+                : SingleChildScrollView(scrollDirection: Axis.horizontal, child: group),
           ),
         ),
       ),
@@ -322,10 +331,17 @@ class _HoronToggleGroupItemState extends State<HoronToggleGroupItem> {
           ),
         if (widget.icon != null && (widget.label != null || widget.child != null))
           const SizedBox(width: HoronSpace.s1_5),
+        // React는 `whitespace-nowrap`이라 글자를 줄이지 않고, 좁은 부모에서는 그대로
+        // 넘깁니다. Flutter에서 그대로 두면 이 Row가 부모를 넘쳐 `RenderFlex
+        // overflowed`가 납니다(360 폭에서 40px, 2026-10-22 렌더 스윕).
         if (widget.label != null)
-          Text(widget.label!, maxLines: 1, softWrap: false, style: textStyle)
+          Flexible(
+            child: Text(widget.label!, maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis, style: textStyle),
+          )
         else if (widget.child != null)
-          DefaultTextStyle(style: textStyle, child: widget.child!),
+          Flexible(
+            child: DefaultTextStyle(style: textStyle, child: widget.child!),
+          ),
       ],
     );
 

@@ -81,6 +81,16 @@ class HoronButtonGroup extends StatelessWidget {
       ],
     );
 
-    return Semantics(container: true, child: horizontal ? group : IntrinsicWidth(child: group));
+    // React의 `flex w-fit`은 한 줄짜리 합성입니다. 버튼은 `whitespace-nowrap`이라
+    // 글자를 줄이지 않고, 묶인 자식끼리 이음매를 맞춰야 해서 줄을 바꾸면 표면이
+    // 끊깁니다. 그래서 폭이 모자라면 버튼을 짜그러뜨리지 않고 가로로 흔려 보냅니다.
+    // 스크롤 뷰는 자식이 들어가면 자식 폭을 그대로 보고하므로 넓은 자리에서는 지금과
+    // 같은 크기로 서고, 모자랄 때만 흔려 보냅니다. 이 저장소의 data-table·pagination이
+    // 한 줄짜리 합성을 다루는 방식과 같습니다.
+    final Widget sized = horizontal
+        ? SingleChildScrollView(scrollDirection: Axis.horizontal, child: group)
+        : IntrinsicWidth(child: group);
+
+    return Semantics(container: true, child: sized);
   }
 }

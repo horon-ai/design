@@ -185,10 +185,18 @@ class _HoronToggleState extends State<HoronToggle> {
           ),
         if (widget.icon != null && (widget.label != null || widget.child != null))
           const SizedBox(width: HoronSpace.s1_5),
+        // React는 `whitespace-nowrap`이라 글자를 줄이지 않고, 좁은 부모에서는 그대로
+        // 넘깁니다. Flutter에서 그대로 두면 이 Row가 부모를 넘쳐 `RenderFlex
+        // overflowed`가 납니다(360 폭에서 98px, 2026-10-22 렌더 스윕). 글자를
+        // [Flexible]로 두면 자리가 모자랄 때만 줄고, 남을 때는 제 폭을 그대로 씁니다.
         if (widget.label != null)
-          Text(widget.label!, maxLines: 1, softWrap: false, style: textStyle)
+          Flexible(
+            child: Text(widget.label!, maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis, style: textStyle),
+          )
         else if (widget.child != null)
-          DefaultTextStyle(style: textStyle, child: widget.child!),
+          Flexible(
+            child: DefaultTextStyle(style: textStyle, child: widget.child!),
+          ),
       ],
     );
 

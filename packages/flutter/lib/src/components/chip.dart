@@ -148,10 +148,24 @@ class _HoronChipState extends State<HoronChip> {
               ),
               const SizedBox(width: HoronSpace.s1),
             ],
+            // React는 `whitespace-nowrap overflow-hidden`이라 넘치는 글자를 자릅니다.
+            // Flutter에서 같은 자리를 [Flexible] 없이 두면 이 Row가 부모를 넘칩니다
+            // (360 폭에서 129px, 2026-10-22 렌더 스윕). 자리가 모자랄 때만 줄어들고
+            // 남을 때는 제 폭을 그대로 쓰므로 평상시 모양은 같습니다.
             if (widget.label != null)
-              Text(widget.label!, maxLines: 1, softWrap: false, style: textStyle)
+              Flexible(
+                child: Text(
+                  widget.label!,
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.ellipsis,
+                  style: textStyle,
+                ),
+              )
             else
-              DefaultTextStyle(style: textStyle, child: widget.child!),
+              Flexible(
+                child: DefaultTextStyle(style: textStyle, child: widget.child!),
+              ),
             if (widget.onRemove != null) ...<Widget>[
               const SizedBox(width: HoronSpace.s1),
               _RemoveButton(
