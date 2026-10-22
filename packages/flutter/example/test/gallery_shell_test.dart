@@ -113,4 +113,28 @@ void main() {
     expect(_railEntries(), findsNothing);
     expect(find.text(const GalleryStrings.ko().noMatches), findsOneWidget);
   });
+
+  testWidgets('the rail labels each group once, in registry order', (
+    WidgetTester tester,
+  ) async {
+    // todo 24가 요구하는 그룹 헤더입니다. 등록부는 그룹 순서로 정렬되어 있고
+    // 레일은 그 위에 그룹 이름을 한 번씩만 얹습니다.
+    _sizeSurface(tester);
+    await tester.pumpWidget(const GalleryApp(sections: _sections));
+    await tester.pumpAndSettle();
+
+    final GalleryStrings strings = const GalleryStrings.ko();
+    expect(find.text(strings.groupInputs), findsOneWidget);
+    expect(find.text(strings.groupDisplay), findsOneWidget);
+    expect(find.text(strings.groupLayout), findsOneWidget);
+
+    // 섹션 셋이 서로 다른 그룹이므로 헤더도 셋입니다.
+    expect(find.text(strings.groupLayout), findsOneWidget);
+
+    // 영어로 바꿔도 헤더가 따라옵니다.
+    await tester.tap(find.byKey(galleryLanguageKey(GalleryLanguage.en)));
+    await tester.pumpAndSettle();
+    expect(find.text(const GalleryStrings.en().groupInputs), findsOneWidget);
+    expect(find.text(const GalleryStrings.en().groupDisplay), findsOneWidget);
+  });
 }

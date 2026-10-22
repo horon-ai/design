@@ -377,6 +377,24 @@ class _GalleryRail extends StatelessWidget {
   final ValueChanged<String> onQueryChanged;
   final ValueChanged<GallerySection> onSelected;
 
+  /// 레일에 그릴 항목을 그룹 헤더와 섹션으로 펼칩니다.
+  ///
+  /// 등록부는 이미 그룹 순서로 정렬되어 있으므로, 앞 섹션과 그룹이 달라지는
+  /// 자리에만 헤더를 하나 넣습니다. 검색으로 걸러진 결과에도 같은 규칙이
+  /// 적용되므로 좁힌 뒤에도 그룹 이름이 따라옵니다.
+  List<_RailEntry> _entries() {
+    final List<_RailEntry> entries = <_RailEntry>[];
+    String? previousGroup;
+    for (final GallerySection section in sections) {
+      if (section.group != previousGroup) {
+        entries.add(_RailEntry.group(strings.groupLabel(section.group)));
+        previousGroup = section.group;
+      }
+      entries.add(_RailEntry.section(section));
+    }
+    return entries;
+  }
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
@@ -421,9 +439,29 @@ class _GalleryRail extends StatelessWidget {
                       HoronSpace.s2,
                       HoronSpace.s3,
                     ),
-                    itemCount: sections.length,
+                    itemCount: _entries().length,
                     itemBuilder: (BuildContext context, int index) {
-                      final GallerySection section = sections[index];
+                      final _RailEntry entry = _entries()[index];
+                      final String? group = entry.groupLabel;
+                      if (group != null) {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            HoronSpace.s3,
+                            HoronSpace.s3,
+                            HoronSpace.s3,
+                            HoronSpace.s1,
+                          ),
+                          child: Text(
+                            group,
+                            style: text.labelSmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                              fontWeight: HoronFontWeight.semibold,
+                              letterSpacing: HoronLetterSpacing.wide,
+                            ),
+                          ),
+                        );
+                      }
+                      final GallerySection section = entry.section!;
                       final bool selected = section.slug == selectedSlug;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: HoronSpace.s0_5),
@@ -597,4 +635,21 @@ class _GalleryPreview extends StatelessWidget {
       ),
     );
   }
+}
+
+/// 레일의 한 줄입니다. 그룹 헤더이거나 섹션 하나입니다.
+///
+/// 등록부는 그룹 순서로 정렬되어 있고, 레일은 그 위에 그룹 이름을 한 번씩만
+/// 얹습니다. 두 종류를 한 목록에 담아 `ListView.builder`가 인덱스로 그리게
+/// 하려고 한 타입으로 묶었습니다.
+class _RailEntry {
+  const _RailEntry.group(this.groupLabel) : section = null;
+
+  const _RailEntry.section(this.section) : groupLabel = null;
+
+  /// 그룹 헤더일 때의 이름입니다.
+  final String? groupLabel;
+
+  /// 섹션 줄일 때의 섹션입니다.
+  final GallerySection? section;
 }
