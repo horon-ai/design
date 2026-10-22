@@ -50,8 +50,22 @@ jobs:
           channel: stable
           cache: true
 
+      # 토큰 드리프트 가드가 bun 테스트라 bun이 필요합니다. 루트 `ci` 잡과 같은
+      # 버전을 씁니다.
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+
       - name: Install dependencies
         run: flutter pub get
+
+      # 토큰 드리프트 가드는 bun 테스트입니다(`scripts/generate-tokens.test.mjs`).
+      # `packages/flutter`는 `package.json`이 없어 bun 워크스페이스 멤버가 아니므로
+      # 루트 `bun test`가 이 파일을 주우지 않습니다. 그래서 여기서 따로 돌립니다.
+      # 이 가드가 없으면 생성된 Dart 토큰이 TypeScript 정본과 어긋나도 CI가 모릅니다.
+      - name: Token drift guard
+        run: bun test scripts/generate-tokens.test.mjs
 
       - name: Analyze
         run: flutter analyze --fatal-infos
