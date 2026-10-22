@@ -484,12 +484,40 @@ class _OverlayBodyState extends State<_OverlayBody> {
       panelSize: _panelSize,
     );
 
+    // 패널의 왼쪽 위를 직접 계산하고, 팔로워 기준점을 양쪽 다 topLeft로 고정합니다.
+    //
+    // `CompositedTransformFollower`의 `followerAnchor`는 **팔로워 상자** 기준입니다.
+    // 이 상자는 오버레이가 주는 단단한(tight) 제약 때문에 화면 크기로 늘어나고,
+    // 그러면 기준점이 화면이 되어 `top`·`left` 패널이 `화면 − 패널`만큼 밀려납니다.
+    // 2026-10-22에 툴팁 레인이 측정했습니다: 트리거 y=430, 화면 900, 패널 33에서
+    // `top` 패널이 y=-474에 그렸습니다(차이 867 = 900 - 33). `bottom`·`right`는
+    // 팔로워 기준점이 topLeft라 우연히 맞았고, 기존 11개 테스트는 부등호만 보므로
+    // 음수 좌표에서도 통과했습니다.
+    //
+    // 아래 식은 "트리거의 a 점에 패널의 f 점을 맞추고 offset을 더한다"는 원래
+    // 뜻을 그대로 옮긴 것입니다. `Alignment`는 -1..1이라 0..1 비율로 바꿉니다.
+    // `bottom`·`right`에서는 f가 topLeft라 결과가 기존과 같고, `top`·`left`만
+    // 바로잡힙니다.
+    final Size panel = _panelSize ?? Size.zero;
+    final Offset targetFraction = Offset((placement.targetAnchor.x + 1) / 2, (placement.targetAnchor.y + 1) / 2);
+    final Offset followerFraction = Offset((placement.followerAnchor.x + 1) / 2, (placement.followerAnchor.y + 1) / 2);
+    final Offset panelTopLeft = Offset(
+      widget.anchor.left +
+          targetFraction.dx * widget.anchor.width -
+          followerFraction.dx * panel.width +
+          placement.offset.dx,
+      widget.anchor.top +
+          targetFraction.dy * widget.anchor.height -
+          followerFraction.dy * panel.height +
+          placement.offset.dy,
+    );
+
     return CompositedTransformFollower(
       link: widget.link,
       showWhenUnlinked: false,
-      targetAnchor: placement.targetAnchor,
-      followerAnchor: placement.followerAnchor,
-      offset: placement.offset,
+      targetAnchor: Alignment.topLeft,
+      followerAnchor: Alignment.topLeft,
+      offset: panelTopLeft - widget.anchor.topLeft,
       child: Align(
         alignment: Alignment.topLeft,
         child: _FadeIn(
