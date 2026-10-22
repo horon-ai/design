@@ -27,10 +27,10 @@ const usage = [
   <div class="not-prose mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
     {
       radii.map(([name, value]) => (
-        <div class="rounded-sm border border-border px-4 py-3">
-          <div class="mb-2 h-14 border border-border bg-muted" style={`border-radius: ${value}px`} />
-          <p class="font-mono text-[11px]">radius-{name}</p>
-          <p class="font-mono text-[10.5px] text-muted-foreground">
+        <div class="rounded-xl bg-muted/40 px-4 py-3">
+          <div class="mb-2 h-14 bg-muted" style={`border-radius: ${value}px`} />
+          <p class="font-mono text-xs">radius-{name}</p>
+          <p class="font-mono text-xs text-muted-foreground">
             {value === 9999 ? "9999px" : `${value}px`}
           </p>
         </div>
@@ -39,7 +39,7 @@ const usage = [
   </div>
 
   <h2>컴포넌트별 기본값</h2>
-  <div class="not-prose mt-5 overflow-hidden rounded-md border border-border">
+  <div class="not-prose mt-5 overflow-hidden rounded-xl bg-muted/20">
     <table class="w-full text-left text-[12.5px]">
       <thead class="border-b border-border bg-muted/50 text-muted-foreground">
         <tr>

@@ -20,12 +20,12 @@ const families = Object.entries(fontFamily.web);
   </p>
 
   <h2>의미 단위 스케일</h2>
-  <div class="not-prose mt-5 divide-y divide-border border-y border-border">
+  <div class="not-prose mt-5 divide-y divide-border rounded-xl bg-muted/20">
     {
       scale.map(([name, size]) => (
         <div class="flex items-baseline gap-6 py-4">
-          <span class="w-24 shrink-0 font-mono text-[11px] text-muted-foreground">{name}</span>
-          <span class="w-14 shrink-0 font-mono text-[11px] text-muted-foreground">{size}px</span>
+          <span class="w-24 shrink-0 font-mono text-xs text-muted-foreground">{name}</span>
+          <span class="w-14 shrink-0 font-mono text-xs text-muted-foreground">{size}px</span>
           <span class="min-w-0 truncate font-semibold tracking-[-0.02em]" style={`font-size:${size}px`}>
             See. Build. Execute.
           </span>
@@ -38,8 +38,8 @@ const families = Object.entries(fontFamily.web);
   <div class="not-prose mt-5 grid gap-3 sm:grid-cols-2">
     {
       weights.map(([name, value]) => (
-        <div class="rounded-sm border border-border px-4 py-3">
-          <p class="font-mono text-[10.5px] text-muted-foreground">
+        <div class="rounded-xl bg-muted/40 px-4 py-3">
+          <p class="font-mono text-xs text-muted-foreground">
             {name} · {value}
           </p>
           <p class="mt-1 text-[1.125rem] tracking-[-0.01em]" style={`font-weight:${value}`}>
@@ -51,7 +51,7 @@ const families = Object.entries(fontFamily.web);
   </div>
 
   <h2>줄 간격</h2>
-  <div class="not-prose mt-5 overflow-hidden rounded-md border border-border">
+  <div class="not-prose mt-5 overflow-hidden rounded-xl bg-muted/20">
     <table class="w-full text-left text-[12.5px]">
       <thead class="border-b border-border bg-muted/50 text-muted-foreground">
         <tr>

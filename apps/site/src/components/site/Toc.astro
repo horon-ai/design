@@ -1,0 +1,65 @@
+---
+---
+
+<aside class="docs-toc" aria-label="이 페이지 목차" data-toc>
+  <p class="mb-3 text-xs text-muted-foreground">목차</p>
+  <nav aria-label="이 페이지 목차"></nav>
+</aside>
+
+<script is:inline>
+  const initPageToc = () => {
+    const aside = document.querySelector("[data-toc]");
+    if (!aside) return;
+    const nav = aside.querySelector("nav");
+    if (!nav) return;
+
+    const headings = Array.from(
+      document.querySelectorAll("article .prose-docs h2, article .prose-docs h3"),
+    );
+
+    if (headings.length < 2) {
+      aside.classList.add("hidden");
+      return;
+    }
+
+    const links = headings.map((heading, index) => {
+      if (!heading.id) heading.id = `section-${index + 1}`;
+      const link = document.createElement("a");
+      link.className = "toc-item";
+      link.href = `#${heading.id}`;
+      link.textContent = heading.textContent ?? "";
+      if (heading.tagName === "H3") link.dataset.level = "3";
+      nav.appendChild(link);
+      return link;
+    });
+
+    const markCurrent = (id) => {
+      links.forEach((link) => {
+        if (link.getAttribute("href") === `#${id}`) {
+          link.setAttribute("aria-current", "true");
+        } else {
+          link.removeAttribute("aria-current");
+        }
+      });
+    };
+
+    markCurrent(headings[0].id);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) markCurrent(entry.target.id);
+        });
+      },
+      { rootMargin: "-5rem 0px -70% 0px" },
+    );
+
+    headings.forEach((heading) => observer.observe(heading));
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPageToc, { once: true });
+  } else {
+    initPageToc();
+  }
+</script>

@@ -1,129 +1,122 @@
 ---
-import { foundationsNav, isActive } from "@/data/nav";
+import { foundationsNav, isActive, primaryNav } from "@/data/nav";
 import { componentGroups, componentsInGroup } from "@/data/components";
 
 interface Props {
   section: string;
 }
 
+interface NavBlock {
+  label?: string;
+  entries: { label: string; href: string; current: boolean }[];
+}
+
 const { section } = Astro.props;
-const path = Astro.url.pathname;
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
 const isFoundations = section === "foundations";
+const isComponents = section === "components";
+
+const blocks: NavBlock[] = isFoundations
+  ? [
+      {
+        entries: foundationsNav.map((item) => ({
+          label: item.label,
+          href: item.href,
+          current:
+            item.href === "/foundations" ? path === "/foundations" : isActive(path, item.href),
+        })),
+      },
+    ]
+  : isComponents
+    ? [
+        {
+          entries: [{ label: "Overview", href: "/components", current: path === "/components" }],
+        },
+        ...componentGroups.map((group) => ({
+          label: group.title,
+          entries: componentsInGroup(group.id).map((component) => ({
+            label: component.title,
+            href: `/components/${component.slug}`,
+            current: path === `/components/${component.slug}`,
+          })),
+        })),
+      ]
+    : [
+        {
+          label: "Docs",
+          entries: primaryNav.map((item) => ({
+            label: item.label,
+            href: item.href,
+            current: isActive(path, item.href),
+          })),
+        },
+      ];
 ---
 
-<aside class="lg:w-[216px] lg:shrink-0">
-  <details class="rounded-md border border-border px-4 py-3 lg:hidden">
-    <summary class="cursor-pointer text-[13px] font-medium text-foreground">목차</summary>
-    <div class="pt-3">
+<aside class="docs-sidebar">
+  <details class="group lg:hidden">
+    <summary
+      class="flex cursor-pointer list-none items-center justify-between rounded-lg px-2 py-2 text-sm text-muted-foreground [&::-webkit-details-marker]:hidden"
+    >
+      목차
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        aria-hidden="true"
+        class="transition-transform group-open:rotate-180"
+      >
+        <path d="m6 9 6 6 6-6"></path>
+      </svg>
+    </summary>
+    <nav class="pt-2" aria-label="섹션 목차">
       {
-        isFoundations ? (
-          <ul class="space-y-0.5">
-            {foundationsNav.map((item) => (
+        blocks.map((block) => (
+          <>
+            {block.label && <p class="nav-group-label">{block.label}</p>}
+            <ul>
+              {block.entries.map((entry) => (
+                <li>
+                  <a
+                    href={entry.href}
+                    aria-current={entry.current ? "page" : undefined}
+                    class="nav-item"
+                  >
+                    {entry.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        ))
+      }
+    </nav>
+  </details>
+
+  <nav class="hidden lg:block" aria-label="섹션 목차">
+    {
+      blocks.map((block) => (
+        <>
+          {block.label && <p class="nav-group-label">{block.label}</p>}
+          <ul>
+            {block.entries.map((entry) => (
               <li>
                 <a
-                  href={item.href}
-                  class:list={[
-                    "block rounded-sm px-2 py-1 text-[13px]",
-                    isActive(path, item.href) ? "bg-muted text-foreground" : "text-muted-foreground",
-                  ]}
+                  href={entry.href}
+                  aria-current={entry.current ? "page" : undefined}
+                  class="nav-item"
                 >
-                  {item.label}
+                  {entry.label}
                 </a>
               </li>
             ))}
           </ul>
-        ) : (
-          <div class="space-y-4">
-            {componentGroups.map((group) => (
-              <div>
-                <p class="px-2 pb-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
-                  {group.title}
-                </p>
-                <ul class="space-y-0.5">
-                  {componentsInGroup(group.id).map((component) => (
-                    <li>
-                      <a
-                        href={`/components/${component.slug}`}
-                        class:list={[
-                          "block rounded-sm px-2 py-1 text-[13px]",
-                          path === `/components/${component.slug}`
-                            ? "bg-muted text-foreground"
-                            : "text-muted-foreground",
-                        ]}
-                      >
-                        {component.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        )
-      }
-    </div>
-  </details>
-
-  <nav class="hidden lg:sticky lg:top-24 lg:block" aria-label="섹션 목차">
-    {
-      isFoundations ? (
-        <ul class="space-y-0.5">
-          {foundationsNav.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                aria-current={isActive(path, item.href) ? "page" : undefined}
-                class:list={[
-                  "block rounded-sm px-2.5 py-1.5 text-[13px] transition-colors",
-                  isActive(path, item.href)
-                    ? "bg-muted font-medium text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                ]}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div class="max-h-[calc(100vh-8rem)] space-y-5 overflow-y-auto pr-2">
-          <a
-            href="/components"
-            aria-current={path === "/components" ? "page" : undefined}
-            class:list={[
-              "block rounded-sm px-2.5 py-1.5 text-[13px]",
-              path === "/components" ? "bg-muted font-medium text-foreground" : "text-muted-foreground hover:text-foreground",
-            ]}
-          >
-            Overview
-          </a>
-          {componentGroups.map((group) => (
-            <div>
-              <p class="px-2.5 pb-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
-                {group.title}
-              </p>
-              <ul class="space-y-0.5">
-                {componentsInGroup(group.id).map((component) => (
-                  <li>
-                    <a
-                      href={`/components/${component.slug}`}
-                      aria-current={path === `/components/${component.slug}` ? "page" : undefined}
-                      class:list={[
-                        "block rounded-sm px-2.5 py-1 text-[13px] transition-colors",
-                        path === `/components/${component.slug}`
-                          ? "bg-muted font-medium text-foreground"
-                          : "text-muted-foreground hover:text-foreground",
-                      ]}
-                    >
-                      {component.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )
+        </>
+      ))
     }
   </nav>
 </aside>
