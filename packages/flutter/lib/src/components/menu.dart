@@ -307,6 +307,7 @@ class HoronMenuShortcut extends StatelessWidget {
       softWrap: false,
       style: TextStyle(
         fontFamily: HoronFont.mono,
+        fontFamilyFallback: HoronFont.fontFamilyFallback,
         fontSize: _labelFontSize,
         height: HoronLineHeight.none,
         color: scheme.onSurfaceVariant,
