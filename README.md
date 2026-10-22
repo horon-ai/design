@@ -17,16 +17,32 @@ apps/
 packages/
   tokens/       @horon-ai/tokens   디자인 토큰 단일 소스 (+ 생성된 theme.css)
   react/        @horon-ai/react    웹 컴포넌트 — shadcn/ui (Base UI) + Tailwind v4
+  flutter/      horon_ui           Flutter 컴포넌트 — 같은 75개 + example 갤러리 앱
 ```
 
 ## 레이어
 
-컴포넌트 레이어는 `@horon-ai/react` 하나입니다. playground·site·storybook은 모두 이 패키지를
-소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. 정적 검사는 각 패키지·앱의
-`.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다.
+컴포넌트 레이어는 둘입니다. `@horon-ai/react`가 웹을, `horon_ui`가 Flutter를 맡고, 둘 다 같은 토큰을 읽고 같은 75개 컴포넌트를 제공합니다. playground·site·storybook은 React 패키지를 소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다. Flutter 패키지는 bun 워크스페이스 밖이고(`package.json`이 없습니다) `dart`·`flutter` 명령으로 검사합니다.
 
 ```tsx
 import { Button, Card, CardTitle, CardContent } from "@horon-ai/react";
+```
+
+```dart
+import 'package:horon_ui/horon_ui.dart';
+
+HoronCard(
+  children: <Widget>[
+    HoronCardHeader(
+      children: <Widget>[HoronCardTitle(text: '제목')],
+    ),
+    HoronButton(
+      label: '취소',
+      variant: HoronButtonVariant.outline,
+      onPressed: () {},
+    ),
+  ],
+);
 ```
 
 ## 시작하기
@@ -57,6 +73,29 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 
 `@horon-ai/react`은 단일 진입점(`"."`)과 하위 경로(`@horon-ai/react/components/button`)를 모두
 제공합니다.
+
+### Flutter 앱 — `horon_ui`
+
+`design/packages/flutter`에 있고 패키지 이름은 `horon_ui`입니다. 소비는 `pubspec.yaml`의 경로
+의존으로 합니다.
+
+```yaml
+dependencies:
+  horon_ui:
+    path: ../design/packages/flutter
+```
+
+```dart
+import 'package:horon_ui/horon_ui.dart';
+
+MaterialApp(
+  theme: horonTheme(Brightness.light),
+  darkTheme: horonTheme(Brightness.dark),
+);
+```
+
+단일 진입점은 `package:horon_ui/horon_ui.dart`이고, 하위 경로는 `package:horon_ui/chart.dart`
+하나뿐입니다. `chart`는 `fl_chart`에 의존하므로 모든 앱 번들에 실리지 않도록 배럴에서 뺐습니다.
 
 ## 토큰
 
@@ -177,6 +216,19 @@ bun run build:site                # 문서 사이트 정적 빌드
 `bun test`가 토큰 드리프트 가드를 돌립니다. `theme.css`를 손으로 고치거나 생성기를 낡게
 두면 재생성 결과와 달라져 테스트가 실패합니다. CI(GitHub Actions)도 같은
 lint·typecheck·test·build를 돌립니다.
+
+Flutter 패키지는 별도 잡으로 검사합니다.
+
+```bash
+cd packages/flutter
+flutter pub get
+dart analyze --fatal-infos
+dart format --output=none --set-exit-if-changed lib test example
+flutter test
+```
+
+`flutter test`가 토큰 드리프트 가드와 게이트 다섯을 함께 돌립니다. 게이트는 React 75개와 Dart
+파일의 전수 대조, 갤러리 등록, `Horon` 이름, 변형 어휘, 원시 리터럴 금지를 검사합니다.
 
 ## 알아 둘 점
 

@@ -1,0 +1,13 @@
+# Flutter 패키지 생성물입니다. 저장소에 넣지 않습니다.
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+
+# 테스트 캐시
+coverage/
+
+# IDE 모듈 파일 (flutter create가 example/에 남깁니다)
+*.iml
