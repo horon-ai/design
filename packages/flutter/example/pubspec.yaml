@@ -1,0 +1,16 @@
+name: horon_ui_example
+description: horon_ui 갤러리 앱입니다.
+publish_to: none
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  horon_ui:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
