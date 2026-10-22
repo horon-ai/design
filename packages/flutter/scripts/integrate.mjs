@@ -105,10 +105,15 @@ for (const slug of implemented) {
     const gb = GROUP_ORDER.indexOf(catalog.get(b).group);
     return ga !== gb ? ga - gb : catalog.get(a).order - catalog.get(b).order;
   });
-  const entries = ordered.map(
-    (s) =>
-      `  GallerySection(slug: '${s}', title: '${catalog.get(s).title.replaceAll("'", "\\'")}', group: '${catalog.get(s).group}'),`,
-  );
+  const entries = ordered.map((s) => {
+    const title = catalog.get(s).title.replaceAll("'", "\\'");
+    const group = catalog.get(s).group;
+    const oneLine = `  GallerySection(slug: '${s}', title: '${title}', group: '${group}'),`;
+    // `analysis_options.yaml`의 page_width는 120입니다. 그보다 긴 줄을 그대로 쓰면
+    // `dart format --set-exit-if-changed`가 실패하므로 처음부터 여러 줄로 씁니다.
+    if (oneLine.length <= 120) return oneLine;
+    return `  GallerySection(\n    slug: '${s}',\n    title: '${title}',\n    group: '${group}',\n  ),`;
+  });
   const body =
     entries.length === 0
       ? "const List<GallerySection> gallerySections = <GallerySection>[];\n"

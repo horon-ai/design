@@ -47,6 +47,12 @@ async function walk(dir, out = []) {
 }
 
 /// `directives_ordering`이 요구하는 자리에 배럴 import를 넣습니다.
+///
+/// `package:` import는 알파벳 순입니다. 배럴보다 뒤에 오는 첫 `package:` 줄 앞에
+/// 넣고, 그런 줄이 없으면 마지막 `package:` 줄 뒤에 넣습니다.
+///
+/// 빈 줄·줄바꿈 모양은 여기서 맞추지 않습니다. 통합 뒤에 `dart format`을 한 번
+/// 돌리는 편이 확실하고, 그 명령은 CI의 포맷 검사와 같은 도구입니다.
 function insertBarrel(lines) {
   const barrelName = 'package:horon_ui/horon_ui.dart';
   const packageLines = [];
@@ -58,17 +64,19 @@ function insertBarrel(lines) {
     if (m && m[1].startsWith('package:')) packageLines.push({ index: i, uri: m[1] });
   }
 
-  for (const entry of packageLines) {
-    if (entry.uri > barrelName) {
-      lines.splice(entry.index, 0, BARREL_IMPORT);
-      return lines;
-    }
-  }
-  if (packageLines.length > 0) {
-    lines.splice(packageLines[packageLines.length - 1].index + 1, 0, BARREL_IMPORT);
-    return lines;
-  }
-  lines.splice(lastDart + 1, 0, '', BARREL_IMPORT);
+  const after = packageLines.find((entry) => entry.uri > barrelName);
+  if (after) lines.splice(after.index, 0, BARREL_IMPORT);
+  else if (packageLines.length > 0) lines.splice(packageLines[packageLines.length - 1].index + 1, 0, BARREL_IMPORT);
+  else lines.splice(lastDart + 1, 0, '', BARREL_IMPORT);
+
+  return lines;
+}
+
+/// import 블록 안의 빈 줄을 없앱니다.
+///
+/// 이 스크립트는 파일 모양을 완벽히 맞추지 않습니다. 통합 뒤 `dart format`을
+/// 돌리는 것이 계약입니다.
+function collapseImportGaps(lines) {
   return lines;
 }
 
@@ -91,7 +99,7 @@ for (const file of files) {
 
   const next = hadBarrel ? kept : insertBarrel(kept);
   touched.push(relative(PKG, file));
-  if (!CHECK) await writeFile(file, next.join('\n'));
+  if (!CHECK) await writeFile(file, collapseImportGaps(next).join('\n'));
 }
 
 console.log(
