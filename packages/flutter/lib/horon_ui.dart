@@ -7,4 +7,5 @@ library;
 export 'src/contracts/horon_strings.dart';
 export 'src/contracts/icon_slot.dart';
 export 'src/contracts/naming.dart';
+export 'src/tokens/horon_tokens.g.dart';
 export 'src/version.dart';
