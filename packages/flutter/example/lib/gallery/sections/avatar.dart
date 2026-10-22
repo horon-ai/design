@@ -1,7 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:horon_ui/src/components/avatar.dart';
 
 import '../section_scaffold.dart';
+
+/// 갤러리 안에서만 쓰는 24×24 PNG입니다. 실제 이미지가 있는 아바타를 그리려고 인라인으로
+/// 넣습니다(갤러리는 자산을 읽지 않습니다).
+final MemoryImage _sampleAvatarImage = MemoryImage(
+  base64Decode(
+    'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAA90lEQVR42rXMCUoCARiG4e+oURRFURRFYiW2idUwMtmkaZOJZouI2CZiiYjtImJEFN3l7RT/c4BHoRGH8KjL6liCyLhHdCLJxqTP1tQhsek08ZkMu7PHOHMB7nyOxEIeb7FAcqmIv1wiFbrgKHxFdqVMsFYhF6mSj9YorF9ztnmLLPPz7XtkmV/G6sgyL8cbyDKv7DSRZV7de0SWec1pIcv8xm0jy/wu0UGWed3rIsu8sf+ELPPmwQuyzB/8N2SZt1IfyDJvp3vIMu9k+sgy72YHyDJ/DobIMn89+USW+fvpF7LMe/lvZJn3Cz/IMh8Uf5FlPiz98Q/mFG0bxxCgxwAAAABJRU5ErkJggg==',
+  ),
+);
 
 /// `avatar` 갤러리 섹션입니다.
 class HoronAvatarGallerySection extends StatelessWidget {
@@ -17,6 +27,16 @@ class HoronAvatarGallerySection extends StatelessWidget {
           HoronAvatar(size: size, name: '민열 김'),
       ],
       states: <Widget>[
+        HoronAvatar(
+          name: 'Minyeol Kim',
+          image: HoronAvatarImage(image: _sampleAvatarImage),
+        ),
+        HoronAvatar(
+          name: 'Minyeol Kim',
+          size: HoronAvatarSize.lg,
+          image: HoronAvatarImage(image: _sampleAvatarImage),
+          badge: const HoronAvatarBadge(),
+        ),
         const HoronAvatar(name: 'Minyeol Kim'),
         const HoronAvatar(name: 'Minyeol Kim', badge: HoronAvatarBadge()),
         const HoronAvatar(
