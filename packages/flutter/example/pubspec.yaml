@@ -14,3 +14,22 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  # 갤러리는 실제 글꼴로 그려야 시각 검증이 의미를 가집니다. mobile/assets/fonts의 사본이며,
+  # 패키지(lib/)에는 자산을 넣지 않습니다.
+  fonts:
+    - family: Pretendard
+      fonts:
+        - asset: assets/fonts/PretendardVariable.ttf
+    - family: Geist
+      fonts:
+        - asset: assets/fonts/Geist-Variable.ttf
+    - family: GeistMono
+      fonts:
+        - asset: assets/fonts/GeistMono-Variable.ttf
+    - family: BuzzTabler
+      fonts:
+        - asset: assets/fonts/TablerIcons.ttf
