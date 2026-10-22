@@ -145,6 +145,12 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
 const Map<String, Widget Function()> _builders = <String, Widget Function()>{
 ${entries.join("\n")}
 };
+
+/// 이 표가 알고 있는 슬러그입니다.
+///
+/// 갤러리 렌더 확인 테스트가 이 목록을 순회합니다. 등록부가 아직 비어 있어도
+/// 섹션 위젯 자체는 전부 그려 볼 수 있습니다.
+Set<String> get gallerySectionBuilderSlugs => _builders.keys.toSet();
 `;
   if (!CHECK) await writeFile(SECTION_BUILDER, body);
 }
