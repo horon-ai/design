@@ -126,8 +126,8 @@ class _HoronSelectGallerySectionState extends State<HoronSelectGallerySection> {
                 child: HoronSelectValue(placeholder: '빈 목록'),
               ),
               const HoronSelectContent(
-                children: <Widget>[],
                 emptyLabel: '고를 도시가 없습니다',
+                children: <Widget>[],
               ),
             ],
           ),
