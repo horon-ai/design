@@ -41,10 +41,12 @@ function SheetContent({
   children,
   side = "right",
   showCloseButton = true,
+  closeLabel = "Close",
   ...props
 }: SheetPrimitive.Popup.Props & {
   side?: "top" | "right" | "bottom" | "left";
   showCloseButton?: boolean;
+  closeLabel?: string;
 }) {
   return (
     <SheetPortal>
@@ -62,6 +64,7 @@ function SheetContent({
         {showCloseButton && (
           <SheetPrimitive.Close
             data-slot="sheet-close"
+            aria-label={closeLabel}
             render={
               <Button
                 variant="ghost"
@@ -70,8 +73,7 @@ function SheetContent({
               />
             }
           >
-            <XIcon />
-            <span className="sr-only">Close</span>
+            <XIcon aria-hidden="true" />
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Popup>
