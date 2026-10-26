@@ -92,6 +92,14 @@
     box-shadow: none !important;
   }
 
+  /* The library sizes its body and rim layers in px from a getBoundingClientRect
+   * reading, which comes out smaller under a scaled ancestor (the docs index
+   * shrinks its previews) and draws a second, smaller outline inside the glass. */
+  .liquid-layers > :not([data-layer]) {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
   .liquid-layers[data-refract="on"] > [data-layer="tint"],
   .liquid-layers[data-refract="on"] > [data-layer="inner-shade"] {
     -webkit-backdrop-filter: none;
