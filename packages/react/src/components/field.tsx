@@ -1,53 +1,28 @@
-import * as React from "react";
-import { Field as FieldPrimitive } from "@base-ui/react/field";
-import { Fieldset as FieldsetPrimitive } from "@base-ui/react/fieldset";
-import { cn } from "cn";
+import { Field as BaseField } from "@base-ui/react/field";
+import type { ComponentProps } from "react";
 
-function Field({ className, ...props }: FieldPrimitive.Root.Props) {
-  return <FieldPrimitive.Root data-slot="field" className={cn("flex w-full flex-col gap-2", className)} {...props} />;
+import { cn } from "../lib/cn";
+
+type WithClass<T> = Omit<T, "className"> & { className?: string };
+
+/** Figma `Field examples` (58:163): label, control and help text, 8px apart. */
+export function Field({ className, ...props }: WithClass<ComponentProps<typeof BaseField.Root>>) {
+  return <BaseField.Root className={cn("flex flex-col items-start gap-2", className)} {...props} />;
 }
 
-function FieldLabel({ className, ...props }: FieldPrimitive.Label.Props) {
+export function FieldLabel({ className, ...props }: WithClass<ComponentProps<typeof BaseField.Label>>) {
   return (
-    <FieldPrimitive.Label
-      data-slot="field-label"
-      className={cn(
-        "flex w-fit items-center gap-2 text-sm leading-none font-medium select-none data-disabled:pointer-events-none data-disabled:opacity-50",
-        className,
-      )}
+    <BaseField.Label
+      className={cn("text-label-md text-text-primary data-disabled:text-text-disabled", className)}
       {...props}
     />
   );
 }
 
-function FieldDescription({ className, ...props }: FieldPrimitive.Description.Props) {
-  return (
-    <FieldPrimitive.Description
-      data-slot="field-description"
-      className={cn("text-xs text-muted-foreground", className)}
-      {...props}
-    />
-  );
+export function FieldDescription({ className, ...props }: WithClass<ComponentProps<typeof BaseField.Description>>) {
+  return <BaseField.Description className={cn("text-caption text-text-secondary", className)} {...props} />;
 }
 
-function FieldError({ className, ...props }: FieldPrimitive.Error.Props) {
-  return (
-    <FieldPrimitive.Error data-slot="field-error" className={cn("text-xs text-destructive", className)} {...props} />
-  );
+export function FieldError({ className, ...props }: WithClass<ComponentProps<typeof BaseField.Error>>) {
+  return <BaseField.Error className={cn("text-caption text-text-danger", className)} {...props} />;
 }
-
-function FieldGroup({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="field-group" className={cn("flex w-full flex-col gap-4", className)} {...props} />;
-}
-
-function FieldSet({ className, ...props }: FieldsetPrimitive.Root.Props) {
-  return (
-    <FieldsetPrimitive.Root
-      data-slot="field-set"
-      className={cn("flex w-full flex-col gap-4 border-0 p-0", className)}
-      {...props}
-    />
-  );
-}
-
-export { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSet };

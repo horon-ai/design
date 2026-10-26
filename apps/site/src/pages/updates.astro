@@ -3,6 +3,16 @@ import DocsLayout from "@/layouts/DocsLayout.astro";
 
 const releases = [
   {
+    date: "2026-10-26",
+    title: "Figma 기준으로 처음부터 다시 만듦",
+    items: [
+      "토큰을 Figma Horon 파일의 변수에서 다시 읽었습니다. 라이트·다크 색, 13개 글자 스타일의 Web·Desktop·Mobile 크기, 반경, 그림자가 바뀌었습니다.",
+      "shadcn/ui를 걷어내고 Base UI만으로 컴포넌트 55개를 새로 만들었습니다. 대화와 에이전트 블록이 새 그룹으로 들어왔습니다.",
+      "유리 표면이 Figma의 Liquid layers를 그대로 따르며, 흐림이 표면 높이에 비례합니다.",
+      "아이콘을 Lucide에서 Phosphor로 바꿨습니다.",
+    ],
+  },
+  {
     date: "2026-10-20",
     title: "design.horon.ai 공개",
     items: [
@@ -40,12 +50,12 @@ const releases = [
   <ol class="not-prose mt-2 list-none space-y-10 pl-0">
     {
       releases.map((release) => (
-        <li class="border-l border-border pl-6">
-          <p class="text-xs text-muted-foreground">{release.date}</p>
+        <li class="border-l border-border-default pl-6">
+          <p class="text-caption text-text-secondary">{release.date}</p>
           <h2 class="mt-2 text-[1.125rem] font-semibold tracking-[-0.01em]">{release.title}</h2>
           <ul class="mt-3 space-y-1.5">
             {release.items.map((item) => (
-              <li class="text-[13.5px] leading-6 text-muted-foreground">{item}</li>
+              <li class="text-[13.5px] leading-6 text-text-secondary">{item}</li>
             ))}
           </ul>
         </li>

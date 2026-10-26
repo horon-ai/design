@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { colorTokens, space, fontSize, radius } from "@horon-ai/tokens";
+import { lightColors, platforms, radius, textStyles } from "@horon-ai/tokens";
 
 const meta = {
   title: "Foundations/Tokens",
@@ -9,60 +9,84 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const isColorTokenName = (name: string): name is keyof typeof colorTokens.light => name in colorTokens.light;
-
-const names = Object.keys(colorTokens.light).filter(isColorTokenName);
+const groups = ["bg", "surface", "text", "border", "interactive", "status", "glass", "overlay", "accent", "syntax"];
 
 export const Colors: Story = {
   render: () => (
-    <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-semibold">Semantic colors</h2>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-        {names.map((name) => (
-          <div key={name} className="overflow-hidden rounded-lg border border-border">
-            <div className="h-14" style={{ backgroundColor: `var(--${name})` }} />
-            <div className="px-2 py-1 font-mono text-xs">{name}</div>
+    <div className="flex flex-col gap-6">
+      {groups.map((group) => (
+        <section key={group} className="flex flex-col gap-2">
+          <h2 className="text-title-sm text-text-primary">{group}</h2>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+            {Object.keys(lightColors)
+              .filter((name) => name.split("-")[0] === group)
+              .map((name) => (
+                <div key={name} className="overflow-hidden rounded-md border border-border-default">
+                  <div className="h-12" style={{ backgroundColor: `var(--color-${name})` }} />
+                  <div className="px-2 py-1 font-mono text-caption text-text-secondary">{name}</div>
+                </div>
+              ))}
           </div>
-        ))}
-      </div>
-    </section>
+        </section>
+      ))}
+    </div>
   ),
 };
 
-export const Scales: Story = {
+export const Typography: Story = {
   render: () => (
-    <div className="flex flex-col gap-6">
-      <section className="flex flex-col gap-2">
-        <h2 className="text-base font-semibold">Spacing</h2>
-        {Object.entries(space).map(([key, value]) => (
-          <div key={key} className="flex items-center gap-3">
-            <span className="w-10 font-mono text-xs text-muted-foreground">{key}</span>
-            <span className="h-3 bg-primary" style={{ width: value }} />
-            <span className="font-mono text-xs text-muted-foreground">{value}px</span>
-          </div>
-        ))}
-      </section>
-      <section className="flex flex-col gap-2">
-        <h2 className="text-base font-semibold">Radius</h2>
-        <div className="flex flex-wrap items-end gap-3">
-          {Object.entries(radius).map(([key, value]) => (
-            <div key={key} className="flex flex-col items-center gap-1">
-              <div className="size-12 border border-border bg-muted" style={{ borderRadius: Math.min(value, 24) }} />
-              <span className="font-mono text-xs text-muted-foreground">{key}</span>
-            </div>
+    <table className="w-full border-collapse text-left">
+      <thead>
+        <tr className="text-caption text-text-secondary">
+          <th className="py-2">Style</th>
+          {platforms.map((platform) => (
+            <th key={platform} className="py-2">
+              {platform}
+            </th>
           ))}
-        </div>
-      </section>
-      <section className="flex flex-col gap-2">
-        <h2 className="text-base font-semibold">Font size</h2>
-        {Object.entries(fontSize).map(([key, value]) => (
-          <div key={key} className="flex items-baseline gap-3">
-            <span className="w-10 font-mono text-xs text-muted-foreground">{key}</span>
-            <span style={{ fontSize: value }}>The quick brown fox</span>
-            <span className="font-mono text-xs text-muted-foreground">{value}px</span>
-          </div>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.entries(textStyles).map(([name, style]) => (
+          <tr key={name} className="border-t border-border-default">
+            <td
+              className="py-3 pr-6 text-text-primary"
+              style={{
+                fontSize: `var(--text-${name})`,
+                lineHeight: `var(--text-${name}--line-height)`,
+                letterSpacing: `var(--text-${name}--letter-spacing)`,
+                fontWeight: `var(--text-${name}--font-weight)`,
+                fontFamily: style.family === "mono" ? "var(--font-mono)" : undefined,
+              }}
+            >
+              {name}
+            </td>
+            {platforms.map((platform) => (
+              <td key={platform} className="py-3 font-mono text-caption text-text-secondary">
+                {style.size[platform]} / {style.lineHeight[platform]}
+              </td>
+            ))}
+          </tr>
         ))}
-      </section>
+      </tbody>
+    </table>
+  ),
+};
+
+export const Radius: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-4">
+      {Object.entries(radius).map(([name, value]) => (
+        <div key={name} className="flex flex-col items-center gap-2">
+          <div
+            className="size-20 border border-border-strong bg-bg-subtle"
+            style={{ borderRadius: Math.min(value, 40) }}
+          />
+          <span className="font-mono text-caption text-text-secondary">
+            {name} {value}
+          </span>
+        </div>
+      ))}
     </div>
   ),
 };

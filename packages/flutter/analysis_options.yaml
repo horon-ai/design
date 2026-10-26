@@ -1,0 +1,19 @@
+# 이 패키지의 Dart lint·format 단일 기준입니다. mobile/analysis_options.yaml과 같은 값을 씁니다.
+include: package:flutter_lints/flutter.yaml
+
+# riverpod_lint는 이 패키지가 riverpod을 쓰지 않으므로 등록하지 않습니다.
+
+analyzer:
+  exclude:
+    - build/**
+
+# dart format에는 별도 설정 파일이 없고 이 절이 그 자리입니다.
+# 120은 mobile·rustfmt와 같은 값입니다.
+formatter:
+  page_width: 120
+
+linter:
+  rules:
+    directives_ordering: true
+    prefer_single_quotes: true
+    unawaited_futures: true

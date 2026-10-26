@@ -3,14 +3,12 @@ import DocsLayout from "@/layouts/DocsLayout.astro";
 import { foundationsNav } from "@/data/nav";
 
 const items = [
-  ["Design Token", "색·간격·반경·모션을 하나의 소스에서 웹 CSS로 냅니다.", "/foundations/tokens"],
-  ["Color", "sand 중성 램프 12단, gold 6단, 상태색 4단과 시맨틱 매핑.", "/foundations/color"],
-  ["Typography", "12px 캡션부터 48px 히어로까지의 타입 스케일과 사용 규칙.", "/foundations/typography"],
-  ["Spacing", "4px 기준 간격 스케일과 레이아웃 리듬.", "/foundations/spacing"],
-  ["Radius", "6px부터 36px까지의 반경 스케일과 컴포넌트별 기본값.", "/foundations/radius"],
-  ["Elevation", "그림자 3단과 떠 있는 표면에서의 사용 규칙.", "/foundations/elevation"],
-  ["Motion", "지속 시간 5단과 이징 커브, 모션을 줄이는 설정 대응.", "/foundations/motion"],
-  ["Glass", "뒤 배경을 흐리는 유리 표면과 리퀴드 글래스 레시피.", "/foundations/glass"],
+  ["Design Token", "Figma 변수에서 읽은 값을 하나의 패키지에서 웹 CSS로 냅니다.", "/foundations/tokens"],
+  ["Color", "라이트·다크 시맨틱 색과 sky·red 프리미티브.", "/foundations/color"],
+  ["Typography", "13개 글자 스타일의 Web·Desktop·Mobile 크기와 자간.", "/foundations/typography"],
+  ["Spacing", "2px부터 32px까지의 간격 스케일.", "/foundations/spacing"],
+  ["Radius", "반경 7단과 떠 있는 표면의 그림자 2종.", "/foundations/radius"],
+  ["Glass", "높이에 비례해 흐려지는 리퀴드 글래스 레이어.", "/foundations/glass"],
 ];
 ---
 
@@ -18,25 +16,20 @@ const items = [
   title="Foundations"
   eyebrow="Foundations"
   section="foundations"
-  description="HORON의 화면을 이루는 가장 아래 층입니다. 색, 타이포, 간격, 반경, 높이, 모션, 유리 표면의 값과 그 값을 언제 쓰는지 정리했습니다."
+  description="HORON의 화면을 이루는 가장 아래 층입니다. 색, 글자, 간격, 반경, 유리 표면의 값과 그 값을 언제 쓰는지 정리했습니다."
 >
   <p>
-    모든 값은 <code>@horon-ai/tokens</code>에 한 번만 적혀 있습니다. 이 문서의 수치와 견본도 그
-    패키지에서 읽어 그리므로, 문서와 라이브러리가 서로 다른 값을 보여줄 수 없습니다.
+    모든 값은 Figma <code>Horon</code> 파일의 변수에서 읽어 <code>@horon-ai/tokens</code>에 한 번만 적었습니다.
+    이 문서의 수치와 견본도 그 패키지에서 읽어 그리므로, 문서와 라이브러리가 서로 다른 값을 보여줄 수 없습니다.
   </p>
 
   <div class="not-prose mt-8 grid gap-3 sm:grid-cols-2">
     {
       items.map(([title, body, href]) => (
-        <a
-          href={href}
-          class="group flex flex-col gap-2 rounded-xl bg-muted/40 px-5 py-5 transition-colors hover:bg-muted/70"
-        >
+        <a href={href} class="group flex flex-col gap-2 rounded-xl bg-bg-subtle px-5 py-5 transition-colors hover:bg-overlay-ink-6">
           <span class="text-[14px] font-semibold">{title}</span>
-          <span class="text-[13px] leading-6 text-muted-foreground">{body}</span>
-          <span class="mt-1 text-[12px] text-muted-foreground transition-colors group-hover:text-foreground">
-            열기 →
-          </span>
+          <span class="text-[13px] leading-6 text-text-secondary">{body}</span>
+          <span class="mt-1 text-[12px] text-text-secondary transition-colors group-hover:text-text-primary">열기 →</span>
         </a>
       ))
     }
@@ -44,12 +37,12 @@ const items = [
 
   <h2>값의 흐름</h2>
   <p>
-    프리미티브(hex로 옮길 수 있는 원시 램프) → 시맨틱(background, foreground, card, primary …) →
-    컴포넌트 클래스 순서로 흐릅니다. 컴포넌트는 프리미티브를 직접 쓰지 않고 시맨틱 변수만
-    참조하므로, 다크 모드는 시맨틱 층의 값만 바뀝니다.
+    Figma 변수(Primitives → Semantic, Type, Scale) → <code>@horon-ai/tokens</code>의 TypeScript 값 →
+    생성된 <code>theme.css</code> → 컴포넌트의 Tailwind 클래스 순서로 흐릅니다. 변수 이름은 Figma Dev Mode의 WEB 코드와
+    같아서 <code>var(--color-text-primary)</code>가 양쪽에서 같은 값입니다. 다크 모드는 시맨틱 층의 값만 바뀝니다.
   </p>
   <p>
-    이 문서의 사이드바에 있는 항목이 곧 Foundations의 전체 목록입니다. 항목 수는
+    사이드바의 항목이 Foundations의 전체 목록입니다. 항목 수는
     {" "}<span class="font-medium">{foundationsNav.length - 1}</span>개입니다.
   </p>
 </DocsLayout>

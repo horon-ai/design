@@ -1,17 +1,17 @@
 import { Button } from "@horon-ai/react";
+import { Plus } from "@phosphor-icons/react";
+
+import { Backdrop } from "../demo-backdrop";
 
 export default function ButtonDemo() {
   return (
-    <>
-      <Button>저장</Button>
-      <Button variant="outline">취소</Button>
-      <Button variant="secondary">보조</Button>
-      <Button variant="ghost">고스트</Button>
-      <Button variant="destructive">삭제</Button>
-      <Button variant="link">링크</Button>
+    <Backdrop>
+      <Button icon={<Plus />}>New bot</Button>
+      <Button variant="glass">Cancel</Button>
+      <Button variant="danger">Delete bot</Button>
       <Button size="sm">Small</Button>
       <Button size="lg">Large</Button>
-      <Button disabled>비활성</Button>
-    </>
+      <Button disabled>Disabled</Button>
+    </Backdrop>
   );
 }

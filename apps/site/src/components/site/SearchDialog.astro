@@ -6,7 +6,7 @@ import { searchIndex } from "@/data/search-index";
   type="button"
   data-search-open
   aria-label="검색"
-  class="grid size-9 place-items-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground"
+  class="grid size-9 place-items-center rounded-full bg-bg-subtle text-text-secondary transition-colors hover:text-text-primary"
 >
   <svg
     width="16"
@@ -25,7 +25,7 @@ import { searchIndex } from "@/data/search-index";
 
 <dialog data-search-dialog aria-label="검색">
   <div class="flex max-h-[70vh] flex-col">
-    <div class="flex items-center gap-2 border-b border-border px-3 py-2">
+    <div class="flex items-center gap-2 border-b border-border-default px-3 py-2">
       <svg
         width="16"
         height="16"
@@ -34,7 +34,7 @@ import { searchIndex } from "@/data/search-index";
         stroke="currentColor"
         stroke-width="1.6"
         stroke-linecap="round"
-        class="shrink-0 text-muted-foreground"
+        class="shrink-0 text-text-secondary"
         aria-hidden="true"
       >
         <circle cx="11" cy="11" r="6.5"></circle>
@@ -47,12 +47,12 @@ import { searchIndex } from "@/data/search-index";
         placeholder="컴포넌트와 문서 검색"
         autocomplete="off"
         spellcheck="false"
-        class="h-9 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+        class="h-9 w-full bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
       />
     </div>
     <div class="min-h-0 flex-1 overflow-y-auto p-2">
       <div data-search-results class="flex flex-col"></div>
-      <p data-search-empty class="hidden px-3 py-6 text-center text-sm text-muted-foreground">
+      <p data-search-empty class="hidden px-3 py-6 text-center text-body-sm text-text-secondary">
         결과 없음
       </p>
     </div>
@@ -85,11 +85,11 @@ import { searchIndex } from "@/data/search-index";
         const link = document.createElement("a");
         link.href = entry.href;
         link.className =
-          "flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted";
+          "flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-body-sm text-text-primary transition-colors hover:bg-bg-subtle";
         const title = document.createElement("span");
         title.textContent = entry.title;
         const group = document.createElement("span");
-        group.className = "text-xs text-muted-foreground";
+        group.className = "text-caption text-text-secondary";
         group.textContent = entry.group;
         link.append(title, group);
         return link;
@@ -136,16 +136,16 @@ import { searchIndex } from "@/data/search-index";
     max-height: 70vh;
     padding: 0;
     overflow: hidden;
-    border: 1px solid var(--border);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    background: var(--popover);
-    color: var(--popover-foreground);
-    box-shadow: var(--shadow-lg);
+    background: var(--color-bg-surface);
+    color: var(--color-text-primary);
+    box-shadow: var(--shadow-popover);
   }
 
   /* --brand-ink is dark in both themes, so the scrim dims the page instead of
    * lightening it the way a foreground-based scrim would in dark mode. */
   [data-search-dialog]::backdrop {
-    background: color-mix(in oklab, var(--brand-ink) 55%, transparent);
+    background: color-mix(in oklab, var(--color-surface-ink) 55%, transparent);
   }
 </style>

@@ -1,77 +1,56 @@
 ---
 import DocsLayout from "@/layouts/DocsLayout.astro";
-import { text, fontWeight, lineHeight, fontFamily } from "@horon-ai/tokens";
+import { fontFamily, fontWeight, platforms, textStyles } from "@horon-ai/tokens";
 
-const scale = Object.entries(text);
-const weights = Object.entries(fontWeight);
-const leading = Object.entries(lineHeight);
-const families = Object.entries(fontFamily.web);
+const styles = Object.entries(textStyles);
 ---
 
 <DocsLayout
   title="Typography"
   eyebrow="Foundations"
   section="foundations"
-  description="본문은 Geist Variable 하나로 씁니다. 크기는 캡션 12px부터 히어로 48px까지 7단이고, 무게와 줄 간격은 별도 스케일로 조합합니다."
+  description="Pretendard 하나와 코드용 Geist Mono를 씁니다. 글자 스타일은 13개이고, 같은 이름이 플랫폼마다 다른 크기를 가집니다."
 >
+  <h2>서체와 굵기</h2>
   <p>
-    타입 스케일은 두 겹입니다. 컴포넌트가 넓게 쓰는 Tailwind 정렬 스케일(<code>fontSize</code>)과,
-    캔버스의 의미 단위 스케일(<code>text</code>)입니다. 문서와 마케팅 화면은 의미 단위를 씁니다.
+    본문 서체는 <code>{fontFamily.sans[0]}</code>, 코드는 <code>{fontFamily.mono[0]}</code>입니다. 굵기는
+    {" "}{Object.entries(fontWeight).map(([name, value]) => `${name} ${value}`).join(", ")} 네 가지만 씁니다.
   </p>
 
-  <h2>의미 단위 스케일</h2>
-  <div class="not-prose mt-5 divide-y divide-border rounded-xl bg-muted/20">
-    {
-      scale.map(([name, size]) => (
-        <div class="flex items-baseline gap-6 py-4">
-          <span class="w-24 shrink-0 font-mono text-xs text-muted-foreground">{name}</span>
-          <span class="w-14 shrink-0 font-mono text-xs text-muted-foreground">{size}px</span>
-          <span class="min-w-0 truncate font-semibold tracking-[-0.02em]" style={`font-size:${size}px`}>
-            See. Build. Execute.
-          </span>
-        </div>
-      ))
-    }
-  </div>
-
-  <h2>무게</h2>
-  <div class="not-prose mt-5 grid gap-3 sm:grid-cols-2">
-    {
-      weights.map(([name, value]) => (
-        <div class="rounded-xl bg-muted/40 px-4 py-3">
-          <p class="font-mono text-xs text-muted-foreground">
-            {name} · {value}
-          </p>
-          <p class="mt-1 text-[1.125rem] tracking-[-0.01em]" style={`font-weight:${value}`}>
-            Insight, activated.
-          </p>
-        </div>
-      ))
-    }
-  </div>
-
-  <h2>줄 간격</h2>
-  <div class="not-prose mt-5 overflow-hidden rounded-xl bg-muted/20">
-    <table class="w-full text-left text-[12.5px]">
-      <thead class="border-b border-border bg-muted/50 text-muted-foreground">
+  <h2>글자 스타일</h2>
+  <p>
+    크기와 줄 높이는 Figma Typography 보드(26:2)의 표를 그대로 옮겼습니다. 웹은 기본값이 Web이고, 데스크톱 앱은
+    <code>data-platform="desktop"</code>, 모바일 웹은 <code>data-platform="mobile"</code>을 상위 요소에 둡니다.
+    자간은 em 단위라 크기가 바뀌어도 비율이 유지됩니다.
+  </p>
+  <div class="not-prose mt-5 overflow-x-auto rounded-xl border border-border-default">
+    <table class="w-full text-left">
+      <thead class="bg-bg-subtle text-caption text-text-secondary">
         <tr>
-          <th class="px-4 py-2 font-medium">token</th>
-          <th class="px-4 py-2 font-medium">value</th>
-          <th class="px-4 py-2 font-medium">쓰는 곳</th>
+          <th class="px-4 py-2.5 font-medium">스타일</th>
+          {platforms.map((platform) => <th class="px-4 py-2.5 font-medium">{platform}</th>)}
+          <th class="px-4 py-2.5 font-medium">굵기 · 자간</th>
         </tr>
       </thead>
       <tbody>
         {
-          leading.map(([name, value]) => (
-            <tr class="border-b border-border last:border-b-0">
-              <td class="px-4 py-2 font-mono">{name}</td>
-              <td class="px-4 py-2 font-mono text-muted-foreground">{value}</td>
-              <td class="px-4 py-2 text-muted-foreground">
-                {name === "tight" || name === "snug"
-                  ? "제목, 큰 수치"
-                  : name === "normal"
-                    ? "본문"
-                    : "설명 문단, 긴 글"}
+          styles.map(([name, style]) => (
+            <tr class="border-t border-border-default">
+              <td class="px-4 py-3">
+                <span
+                  class="block text-text-primary"
+                  style={`font-size: var(--text-${name}); line-height: var(--text-${name}--line-height); letter-spacing: var(--text-${name}--letter-spacing); font-weight: var(--text-${name}--font-weight);${style.family === "mono" ? " font-family: var(--font-mono);" : ""}`}
+                >
+                  {name}
+                </span>
+              </td>
+              {platforms.map((platform) => (
+                <td class="px-4 py-3 font-mono text-caption whitespace-nowrap text-text-secondary">
+                  {style.size[platform]} / {style.lineHeight[platform]}
+                </td>
+              ))}
+              <td class="px-4 py-3 font-mono text-caption whitespace-nowrap text-text-secondary">
+                {fontWeight[style.weight]} · {style.tracking}em
               </td>
             </tr>
           ))
@@ -80,18 +59,10 @@ const families = Object.entries(fontFamily.web);
     </table>
   </div>
 
-  <h2>폰트 패밀리</h2>
+  <h2>규칙</h2>
   <ul>
-    {
-      families.map(([name, stack]) => (
-        <li>
-          <code>{name}</code> — {stack}
-        </li>
-      ))
-    }
+    <li>13개 스타일만 씁니다. 없는 크기가 필요하면 세 플랫폼 값을 함께 토큰으로 추가합니다.</li>
+    <li>본문 문단 뒤에는 빈 줄 대신 0.75em을 띄웁니다.</li>
+    <li>한국어는 단어 단위로 줄을 바꿉니다(<code>word-break: keep-all</code>).</li>
   </ul>
-  <p>
-    패밀리 값은 <code>fontFamily.web</code>에서 CSS 스택 문자열로 나오고, 컴포넌트와 문서 사이트가
-    같은 스택을 씁니다.
-  </p>
 </DocsLayout>

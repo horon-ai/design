@@ -32,3 +32,55 @@ jobs:
 
       - name: Build
         run: bun run build
+
+  flutter:
+    name: flutter analyze / format / test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/flutter
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.7
+          channel: stable
+          cache: true
+
+      # 토큰 드리프트 가드가 bun 테스트라 bun이 필요합니다. 루트 `ci` 잡과 같은
+      # 버전을 씁니다.
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 토큰 드리프트 가드는 bun 테스트입니다(`scripts/generate-tokens.test.mjs`).
+      # `packages/flutter`는 `package.json`이 없어 bun 워크스페이스 멤버가 아니므로
+      # 루트 `bun test`가 이 파일을 주우지 않습니다. 그래서 여기서 따로 돌립니다.
+      # 이 가드가 없으면 생성된 Dart 토큰이 TypeScript 정본과 어긋나도 CI가 모릅니다.
+      - name: Token drift guard
+        run: bun test scripts/generate-tokens.test.mjs
+
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test example
+
+      - name: Test
+        run: flutter test
+
+      # `flutter test`는 패키지 루트만 돌립니다. `example/`은 별도 패키지라
+      # 갤러리 회귀 테스트가 여기서 따로 돌지 않으면 CI에서 한 번도 실행되지
+      # 않습니다. 갤러리는 이 계획의 유일한 시각 검증 창구이므로 함께 돌립니다.
+      - name: Test the gallery
+        working-directory: packages/flutter/example
+        run: |
+          flutter pub get
+          flutter test

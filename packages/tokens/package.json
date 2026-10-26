@@ -19,7 +19,6 @@
 	"scripts": {
 		"build": "bun run scripts/build.ts",
 		"prepublishOnly": "bun run build",
-		"contrast": "bun run scripts/glass-contrast.ts",
 		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {

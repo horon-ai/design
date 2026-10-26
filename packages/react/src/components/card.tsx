@@ -1,69 +1,49 @@
-import * as React from "react";
-import { cn } from "cn";
+import { useRender } from "@base-ui/react/use-render";
+import { CaretRight } from "@phosphor-icons/react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 
-function Card({ className, size = "default", ...props }: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
-  return (
-    <div
-      data-slot="card"
-      data-size={size}
-      className={cn(
-        "group/card flex flex-col gap-2.5 overflow-hidden rounded-md border border-border bg-card py-(--card-spacing) text-[13px] text-card-foreground [--card-spacing:18px] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-md *:[img:last-child]:rounded-b-md",
+import { cn } from "../lib/cn";
+import { LiquidGlass } from "./liquid-glass";
+
+export type CardProps = Omit<ComponentProps<"div">, "className" | "title"> & {
+  title?: ReactNode;
+  description?: ReactNode;
+  /** Shows the trailing caret, for cards that open something. */
+  interactive?: boolean;
+  /** Brand rim for the selected card. */
+  selected?: boolean;
+  /** Render as another element, such as `<button />` or `<a />`. */
+  render?: ReactElement;
+  className?: string;
+};
+
+/** Figma `Card` (63:310): a 320px thick-glass card, 20px padding and radius, Default / Interactive / Selected. */
+export function Card({ title, description, interactive, selected, render, className, children, ...props }: CardProps) {
+  return useRender({
+    render: render ?? <div />,
+    props: {
+      ...props,
+      "data-selected": selected ? "" : undefined,
+      className: cn(
+        "relative flex flex-col items-start gap-2 overflow-clip rounded-xl border bg-glass-thick p-5 text-left",
+        selected ? "border-border-brand" : "border-glass-rim-strong",
+        interactive &&
+          "cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
         className,
-      )}
-      {...props}
-    />
-  );
+      ),
+      children: (
+        <>
+          <LiquidGlass tier="thick" />
+          {(title || interactive) && (
+            <div className="relative flex w-full items-center gap-2">
+              <span className="min-w-0 flex-1 text-title-sm text-text-primary">{title}</span>
+              {interactive && <CaretRight aria-hidden className="size-4 shrink-0 text-text-secondary" />}
+            </div>
+          )}
+          {description && <p className="relative text-body-sm text-text-secondary">{description}</p>}
+          {children && <div className="relative w-full">{children}</div>}
+        </>
+      ),
+    },
+  });
 }
-
-function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card-header"
-      className={cn(
-        "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-md px-(--card-spacing) has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-(--card-spacing)",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card-title"
-      className={cn("text-base leading-snug font-semibold group-data-[size=sm]/card:text-sm", className)}
-      {...props}
-    />
-  );
-}
-
-function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-description" className={cn("text-[13px] text-muted-foreground", className)} {...props} />;
-}
-
-function CardAction({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card-action"
-      className={cn("col-start-2 row-span-2 row-start-1 self-start justify-self-end", className)}
-      {...props}
-    />
-  );
-}
-
-function CardContent({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-content" className={cn("px-(--card-spacing)", className)} {...props} />;
-}
-
-function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card-footer"
-      className={cn("flex items-center rounded-b-md border-t bg-muted/50 p-(--card-spacing)", className)}
-      {...props}
-    />
-  );
-}
-
-export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };
