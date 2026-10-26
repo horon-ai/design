@@ -1,93 +1,83 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
+@import "@fontsource-variable/geist-mono";
 @import "@horon-ai/tokens/theme.css";
 
 @custom-variant dark (&:is(.dark *));
 
-/* Scan the whole monorepo for class usage. */
-@source "../../../apps/**/*.{ts,tsx}";
+@source "../../../../apps/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--color-bg-default);
+    color: var(--color-text-primary);
   }
 }
 
-/* Glass surface utilities. Floating chrome (dialogs, sheets, tooltips, popovers)
- * uses these; content surfaces do not. Every value is read from the generated
- * theme (packages/tokens/theme.css) so this file never re-declares a palette
- * value. The surface inherits the token degradation ladder automatically: it
- * frosts under prefers-reduced-transparency and goes solid without
- * backdrop-filter, because theme.css rewrites --glass-fill/--glass-blur there. */
+/* Liquid glass, after the Figma `Liquid layers` group (values and the height
+ * rules in @horon-ai/tokens glass.ts). The layer group is a size container, so
+ * `100cqh` is the host height and the blurs and inset scale like they do in Figma. */
 @layer components {
-  .glass {
-    background: var(--glass-fill);
-    border: 1px solid var(--glass-border);
-    color: var(--glass-foreground);
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    backdrop-filter: blur(var(--glass-blur));
+  .liquid-layers {
+    position: absolute;
+    inset: -1px;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+    container-type: size;
   }
 
-  .glass-strong {
-    background: var(--glass-fill-strong);
-    border: 1px solid var(--glass-border);
-    color: var(--glass-foreground);
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    backdrop-filter: blur(var(--glass-blur));
-  }
-
-  /* Liquid glass - the baalda.com header recipe: a vertical white gradient fill,
-   * a low 4px blur, a masked 1px gradient border (the ::before ring), and a soft
-   * two-layer shadow. The border radius is inherited from the element's own
-   * rounded-* class, so the same surface works at any radius (pill header to
-   * rounded card). Values come from theme.css, so it never re-declares a color. */
-  .liquid-glass {
-    position: relative;
-    background: var(--glass-liquid-fill);
-    -webkit-backdrop-filter: blur(var(--glass-liquid-blur));
-    backdrop-filter: blur(var(--glass-liquid-blur));
-    box-shadow: var(--glass-liquid-shadow);
-  }
-
-  .liquid-glass::before {
-    content: "";
+  .liquid-layers > [data-layer] {
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    padding: 1px;
-    background: var(--glass-liquid-border);
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask:
-      linear-gradient(#fff 0 0) content-box exclude,
-      linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    pointer-events: none;
+    opacity: var(--glass-layer-opacity);
   }
 
-  /* 목록을 담는 패널은 같은 표면의 진한 fill을 쓴다. 변수만 바꿔 blur·1px 링·그림자는 공유한다. */
-  .liquid-glass-panel {
-    --glass-liquid-fill: var(--glass-liquid-fill-panel);
+  .liquid-layers > [data-layer="tint"] {
+    background: var(--glass-tint);
+    -webkit-backdrop-filter: blur(var(--glass-tint-blur));
+    backdrop-filter: blur(var(--glass-tint-blur));
   }
 
-  /* Motion helpers driven by the duration/ease tokens. */
-  .motion-surface {
-    transition-property: background-color, border-color, color, box-shadow, backdrop-filter;
-    transition-duration: var(--duration-normal);
-    transition-timing-function: var(--ease-out-strong);
+  .liquid-layers > [data-layer="inner-shade"] {
+    inset: min(100cqh * var(--glass-inner-inset-ratio), var(--glass-inner-inset-max-y))
+      min(100cqh * var(--glass-inner-inset-ratio), var(--glass-inner-inset-max-x));
+    background: var(--glass-inner-shade);
+    mix-blend-mode: overlay;
+    -webkit-backdrop-filter: blur(var(--glass-inner-shade-blur));
+    backdrop-filter: blur(var(--glass-inner-shade-blur));
   }
 
-  .motion-transform {
-    transition-property: transform, opacity;
-    transition-duration: var(--duration-normal);
-    transition-timing-function: var(--ease-out-strong);
+  .liquid-layers > [data-layer="edge-dark"] {
+    border: 1px solid var(--glass-edge-dark);
+    mix-blend-mode: multiply;
+    filter: blur(min(100cqh * var(--glass-edge-dark-ratio), var(--glass-edge-dark-max)));
+  }
+
+  .liquid-layers > [data-layer="edge-light"],
+  .liquid-layers > [data-layer="edge-light-soft"] {
+    mix-blend-mode: plus-lighter;
+    filter: blur(
+      clamp(var(--glass-edge-light-min), 100cqh * var(--glass-edge-light-ratio), var(--glass-edge-light-max))
+    );
+  }
+
+  .liquid-layers > [data-layer="edge-light"] {
+    border: 1px solid var(--glass-edge-light);
+  }
+
+  .liquid-layers > [data-layer="edge-light-soft"] {
+    border: 1px solid var(--glass-edge-light-soft);
+  }
+
+  .liquid-layers[data-tier="thick"] > [data-layer="edge-dark"] {
+    display: none;
   }
 }

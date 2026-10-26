@@ -1,0 +1,17 @@
+name: horon_ui
+description: Flutter port of the Horon design system.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  fl_chart: ^1.3.0
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter

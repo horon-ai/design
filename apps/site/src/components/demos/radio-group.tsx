@@ -1,24 +1,11 @@
-import { Label, RadioGroup, RadioGroupItem } from "@horon-ai/react";
+import { Radio, RadioGroup } from "@horon-ai/react";
 
 export default function RadioGroupDemo() {
   return (
-    <RadioGroup defaultValue="a" className="w-64">
-      <Label>
-        <RadioGroupItem value="a" />
-        옵션 A
-      </Label>
-      <Label>
-        <RadioGroupItem value="b" />
-        옵션 B
-      </Label>
-      <Label>
-        <RadioGroupItem value="c" />
-        옵션 C
-      </Label>
-      <Label>
-        <RadioGroupItem value="d" disabled />
-        옵션 D
-      </Label>
+    <RadioGroup aria-label="Report to" defaultValue="email">
+      <Radio value="email" label="Email" />
+      <Radio value="slack" label="Slack" />
+      <Radio value="none" label="Don't report" disabled />
     </RadioGroup>
   );
 }

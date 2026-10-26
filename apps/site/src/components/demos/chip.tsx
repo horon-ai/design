@@ -1,18 +1,14 @@
-import { useState } from "react";
 import { Chip } from "@horon-ai/react";
 
-export default function ChipDemo() {
-  const [visible, setVisible] = useState(true);
+import { Backdrop } from "../demo-backdrop";
 
+export default function ChipDemo() {
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <Chip variant="outline">기본</Chip>
-      <Chip>선택됨</Chip>
-      {visible ? (
-        <Chip variant="secondary" removeLabel="태그 삭제" onRemove={() => setVisible(false)}>
-          디자인
-        </Chip>
-      ) : null}
-    </div>
+    <Backdrop>
+      <Chip>All</Chip>
+      <Chip defaultPressed>Inbox</Chip>
+      <Chip>Drafts</Chip>
+      <Chip disabled>Archive</Chip>
+    </Backdrop>
   );
 }

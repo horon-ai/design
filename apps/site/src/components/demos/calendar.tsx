@@ -1,10 +1,13 @@
 import { Calendar } from "@horon-ai/react";
+import { useState } from "react";
 
-const month = new Date(2026, 9, 1);
-const selected = new Date(2026, 9, 14);
+import { Backdrop } from "../demo-backdrop";
 
 export default function CalendarDemo() {
+  const [value, setValue] = useState<Date | null>(() => new Date());
   return (
-    <Calendar mode="single" selected={selected} defaultMonth={month} className="rounded-md border border-border" />
+    <Backdrop>
+      <Calendar value={value} onValueChange={setValue} />
+    </Backdrop>
   );
 }

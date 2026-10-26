@@ -1,31 +1,43 @@
-import { Button, Toaster, toast } from "@horon-ai/react";
-import { useEffect } from "react";
+import { Button, Toaster, useToast } from "@horon-ai/react";
 
-export default function ToastDemo() {
-  useEffect(() => {
-    toast.add({
-      title: "저장했습니다",
-      description: "변경 사항이 바로 반영됩니다.",
-      type: "success",
-      timeout: 3_600_000,
-    });
-  }, []);
-
+function Triggers() {
+  const toast = useToast();
   return (
-    <Toaster>
+    <div className="flex flex-wrap gap-2">
       <Button
-        variant="outline"
+        variant="glass"
+        onClick={() => toast.add({ title: "Saved", description: "The routine runs every morning at 8." })}
+      >
+        Neutral
+      </Button>
+      <Button
+        variant="glass"
+        onClick={() =>
+          toast.add({ type: "success", title: "Sent to the team", description: "Q3 board deck v5 is in #board." })
+        }
+      >
+        Success
+      </Button>
+      <Button
+        variant="glass"
         onClick={() =>
           toast.add({
-            title: "저장했습니다",
-            description: "변경 사항이 바로 반영됩니다.",
-            type: "success",
-            timeout: 4000,
+            type: "danger",
+            title: "Couldn't reach Gmail",
+            description: "Reconnect to keep Inbox Manager running.",
           })
         }
       >
-        알림 보기
+        Danger
       </Button>
+    </div>
+  );
+}
+
+export default function ToastDemo() {
+  return (
+    <Toaster>
+      <Triggers />
     </Toaster>
   );
 }

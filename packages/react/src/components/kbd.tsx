@@ -1,21 +1,16 @@
-import * as React from "react";
-import { cn } from "cn";
+import type { ComponentProps } from "react";
 
-function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
+import { cn } from "../lib/cn";
+
+/** Figma `Kbd` (Command palette 110:676): a 6% ink chip with caption text. */
+export function Kbd({ className, ...props }: Omit<ComponentProps<"kbd">, "className"> & { className?: string }) {
   return (
     <kbd
-      data-slot="kbd"
       className={cn(
-        "pointer-events-none inline-flex h-5 w-fit min-w-5 items-center justify-center gap-1 rounded-sm border border-border bg-muted px-1.5 font-mono text-[11px] font-medium text-muted-foreground select-none [&_svg:not([class*='size-'])]:size-3",
+        "inline-flex shrink-0 items-center gap-1 rounded-xs bg-overlay-ink-6 px-1.5 py-px font-sans text-caption whitespace-nowrap text-text-secondary [&_svg]:size-3",
         className,
       )}
       {...props}
     />
   );
 }
-
-function KbdGroup({ className, ...props }: React.ComponentProps<"kbd">) {
-  return <kbd data-slot="kbd-group" className={cn("inline-flex items-center gap-1", className)} {...props} />;
-}
-
-export { Kbd, KbdGroup };

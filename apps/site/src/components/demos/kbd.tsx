@@ -1,19 +1,11 @@
-import { Kbd, KbdGroup } from "@horon-ai/react";
+import { Kbd } from "@horon-ai/react";
 
 export default function KbdDemo() {
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <Kbd>Esc</Kbd>
-      <Kbd>Shift</Kbd>
-      <Kbd>Enter</Kbd>
-      <KbdGroup>
-        <Kbd>⌘</Kbd>
-        <Kbd>K</Kbd>
-      </KbdGroup>
-      <KbdGroup>
-        <Kbd>Ctrl</Kbd>
-        <Kbd>S</Kbd>
-      </KbdGroup>
+    <div className="flex items-center gap-2">
+      <Kbd>⌘</Kbd>
+      <Kbd>K</Kbd>
+      <Kbd>esc</Kbd>
     </div>
   );
 }
