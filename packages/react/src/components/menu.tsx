@@ -23,6 +23,7 @@ export type MenuContentProps = WithClass<ComponentProps<typeof BaseMenu.Popup>> 
   side?: ComponentProps<typeof BaseMenu.Positioner>["side"];
   align?: ComponentProps<typeof BaseMenu.Positioner>["align"];
   sideOffset?: number;
+  alignOffset?: number;
 };
 
 export const menuPopupClass = {
@@ -36,13 +37,20 @@ export function MenuContent({
   side,
   align = "start",
   sideOffset = 8,
+  alignOffset,
   className,
   children,
   ...props
 }: MenuContentProps) {
   return (
     <BaseMenu.Portal>
-      <BaseMenu.Positioner side={side} align={align} sideOffset={sideOffset} className="z-50 outline-none">
+      <BaseMenu.Positioner
+        side={side}
+        align={align}
+        sideOffset={sideOffset}
+        alignOffset={alignOffset}
+        className="z-50 outline-none"
+      >
         <BaseMenu.Popup
           className={cn(
             "relative flex w-55 origin-(--transform-origin) flex-col gap-0.5 overflow-clip border border-glass-rim-strong p-1.5 outline-none",

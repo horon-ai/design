@@ -48,7 +48,12 @@ const surfaceClass: Record<SegmentedControlSurface, string> = {
   "inset-faint": "bg-overlay-ink-4",
 };
 
-/** Single-choice segmented control; the selected segment is 10% ink. */
+/**
+ * Single-choice segmented control. On the glass track the selected segment is a
+ * clear glass pill (Figma 62:379): thick-glass fill, 1px strong rim and a
+ * 0 1 3 8% shadow; dark mode keeps a 10% fill, as the Components / Dark board
+ * does. On the inset tracks it is 10% ink.
+ */
 export function SegmentedControl({
   items,
   value,
@@ -83,13 +88,17 @@ export function SegmentedControl({
           disabled={item.disabled}
           className={cn(
             "relative flex min-w-0 cursor-pointer items-center justify-center rounded-full text-label-md whitespace-nowrap text-text-secondary",
-            "data-disabled:cursor-not-allowed data-disabled:opacity-40 data-pressed:bg-overlay-ink-10 data-pressed:text-text-primary",
+            "data-disabled:cursor-not-allowed data-disabled:opacity-40 data-pressed:text-text-primary",
+            surface === "glass"
+              ? "border border-transparent data-pressed:border-glass-rim-strong data-pressed:bg-glass-thick data-pressed:shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:data-pressed:bg-overlay-ink-10 [&:not([data-pressed])>.liquid-layers]:hidden"
+              : "data-pressed:bg-overlay-ink-10",
             "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
             segmentClass[size],
             fill && "flex-1",
           )}
         >
-          {item.label}
+          {surface === "glass" && <LiquidGlass tier="clear" />}
+          <span className="relative">{item.label}</span>
         </Toggle>
       ))}
     </ToggleGroup>

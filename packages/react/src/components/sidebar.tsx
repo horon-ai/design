@@ -1,5 +1,5 @@
 import { Collapsible } from "@base-ui/react/collapsible";
-import { CaretDown, CaretLeft, CaretUpDown } from "@phosphor-icons/react";
+import { CaretDown, CaretLeft, CaretRight, CaretUpDown, DotsThree, PlusCircle } from "@phosphor-icons/react";
 import { Children, type ComponentProps, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
@@ -8,7 +8,7 @@ import { LiquidGlass } from "./liquid-glass";
 type DivProps = Omit<ComponentProps<"div">, "className"> & { className?: string };
 type ButtonProps = Omit<ComponentProps<"button">, "className"> & { className?: string };
 
-/** Figma `Sidebar` (Panels 88:808): a 280px thick-glass column, 24px radius, 16/12/12px padding. */
+/** Figma `Sidebar` (88:848): a 280px thick-glass column with a 1px right border, 16/12/12px padding. */
 export function Sidebar({
   className,
   children,
@@ -17,7 +17,7 @@ export function Sidebar({
   return (
     <nav
       className={cn(
-        "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip rounded-[24px] border border-glass-rim-strong bg-glass-thick px-3 pt-4 pb-3",
+        "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip border-r border-border-default bg-glass-thick px-3 pt-4 pb-3",
         className,
       )}
       {...props}
@@ -39,7 +39,7 @@ export type SidebarHeaderProps = {
   className?: string;
 };
 
-/** Header: workspace switch (tile, name, up-down caret) and the 28px collapse button. 10px gap below. */
+/** Header: workspace switch (tile, name, up-down caret) and an optional 28px collapse button. 10px gap below. */
 export function SidebarHeader({
   initial,
   name,
@@ -50,7 +50,7 @@ export function SidebarHeader({
 }: SidebarHeaderProps) {
   const { className: switchClass, ...switchRest } = switchProps ?? {};
   return (
-    <div className={cn("relative mb-2.5 flex h-9 items-center gap-1.5", className)}>
+    <div className={cn("relative mb-3 flex h-9 items-center gap-1.5", className)}>
       <button
         type="button"
         className={cn(
@@ -104,7 +104,11 @@ export function SidebarItem({ icon, count, attention, current, className, childr
       )}
       {...props}
     >
-      {icon && <span className="flex shrink-0 [&>svg]:size-4.5">{icon}</span>}
+      {icon && (
+        <span data-slot="icon" className="flex shrink-0 [&>svg]:size-4.5">
+          {icon}
+        </span>
+      )}
       <span className="min-w-0 flex-1 truncate">{children}</span>
       {count !== undefined && <span className="shrink-0 text-body-sm text-text-secondary">{count}</span>}
       {attention && <span aria-label="Needs attention" className="size-[7px] shrink-0 rounded-full bg-text-danger" />}
@@ -138,7 +142,7 @@ export type SidebarGroupProps = {
 /** A collapsible group: 28px label in secondary text with a 14px caret, 14px above. */
 export function SidebarGroup({ label, defaultOpen = true, children, className }: SidebarGroupProps) {
   return (
-    <Collapsible.Root defaultOpen={defaultOpen} className={cn("relative mt-3.5 flex flex-col gap-0.5", className)}>
+    <Collapsible.Root defaultOpen={defaultOpen} className={cn("relative mt-4 flex flex-col gap-0.5", className)}>
       <Collapsible.Trigger className="group flex h-7 w-fit cursor-pointer items-center gap-1 px-2.5 text-label-md text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand">
         {label}
         <CaretDown
@@ -166,12 +170,12 @@ function branchesPath(count: number): string {
   return [trunk, ...branches].join("");
 }
 
-/** Figma `Tree`: nested sidebar items, 18px in, joined to the parent by curved connectors. */
+/** Figma `Tree`: nested sidebar items with 16px icons, 20px in, joined to the parent by curved connectors. */
 export function SidebarTree({ children, className }: { children: ReactNode; className?: string }) {
   const count = Children.count(children);
   const height = ROW / 2 + (count - 1) * (ROW + GAP) + 0.75;
   return (
-    <div className={cn("relative flex items-start pl-4.5", className)}>
+    <div className={cn("relative flex items-start pl-5 [&_[data-slot=icon]>svg]:size-4", className)}>
       <svg
         aria-hidden
         width="16"
@@ -198,13 +202,13 @@ export type SidebarAccountProps = ButtonProps & {
   email?: ReactNode;
 };
 
-/** Figma sidebar `Account`: 75% surface card (95% while its menu is open), 36px sky avatar tile. */
+/** Figma sidebar `Account`: a 54px row with a 36px sky avatar tile and an up-down caret. */
 export function SidebarAccount({ initials, name, email, className, ...props }: SidebarAccountProps) {
   return (
     <button
       type="button"
       className={cn(
-        "relative flex w-full cursor-pointer items-center gap-2.5 rounded-lg bg-bg-surface-75 py-2 pr-2.5 pl-2 text-left data-popup-open:bg-bg-surface-95",
+        "relative flex w-full cursor-pointer items-center gap-2.5 rounded-lg py-2 pr-2 pl-1.5 text-left hover:bg-overlay-ink-4 data-popup-open:bg-overlay-ink-6",
         "focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}
@@ -217,7 +221,152 @@ export function SidebarAccount({ initials, name, email, className, ...props }: S
         <span className="truncate text-label-md text-text-primary">{name}</span>
         {email && <span className="truncate text-caption text-text-secondary">{email}</span>}
       </span>
-      <CaretUpDown aria-hidden className="size-4 shrink-0 text-text-secondary" />
+      <CaretUpDown aria-hidden className="size-4 shrink-0 text-text-primary" />
+    </button>
+  );
+}
+
+export type SidebarProjectProps = {
+  /** A `SidebarProjectTile`. */
+  icon: ReactNode;
+  label: ReactNode;
+  current?: boolean;
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /**
+   * The project's "More" control, such as a `MenuTrigger` whose render target is
+   * `<SidebarProjectMore />`. It replaces the chevron while the row is hovered or its menu is open.
+   */
+  actions?: ReactNode;
+  /** Chats and documents in the project, shown in a `SidebarTree` when open. */
+  children?: ReactNode;
+  className?: string;
+};
+
+/**
+ * Figma sidebar project row (88:848, Menu=Project 314:12407): tile, name and a
+ * 14px chevron (down when open). Hovering the row, or opening its menu, shows the
+ * 16px "More" button in place of the chevron, on a 6% ink row.
+ */
+export function SidebarProject({
+  icon,
+  label,
+  current,
+  defaultOpen = false,
+  open,
+  onOpenChange,
+  actions,
+  children,
+  className,
+}: SidebarProjectProps) {
+  const hasChildren = Children.count(children) > 0;
+  return (
+    <Collapsible.Root
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      className={cn("flex flex-col gap-0.5", className)}
+    >
+      <div
+        className={cn(
+          "group/project relative flex h-8 items-center rounded-md has-data-popup-open:bg-overlay-ink-6",
+          current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-6",
+        )}
+      >
+        <Collapsible.Trigger
+          aria-current={current ? "page" : undefined}
+          className={cn(
+            "group/trigger flex h-8 min-w-0 flex-1 cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-label-md text-text-primary",
+            "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
+          )}
+        >
+          <span data-slot="icon" className="flex shrink-0">
+            {icon}
+          </span>
+          <span className="min-w-0 flex-1 truncate">{label}</span>
+          {hasChildren && (
+            <span
+              aria-hidden
+              className={cn(
+                "flex size-3.5 shrink-0 [&>svg]:size-3.5",
+                actions !== undefined && "group-hover/project:invisible group-has-data-popup-open/project:invisible",
+              )}
+            >
+              <CaretRight className="group-data-panel-open/trigger:hidden" />
+              <CaretDown className="hidden group-data-panel-open/trigger:block" />
+            </span>
+          )}
+        </Collapsible.Trigger>
+        {actions !== undefined && (
+          <span className="absolute right-2.5 flex opacity-0 group-focus-within/project:opacity-100 group-hover/project:opacity-100 group-has-data-popup-open/project:opacity-100">
+            {actions}
+          </span>
+        )}
+      </div>
+      {hasChildren && (
+        <Collapsible.Panel>
+          <SidebarTree>{children}</SidebarTree>
+        </Collapsible.Panel>
+      )}
+    </Collapsible.Root>
+  );
+}
+
+export type SidebarProjectMoreProps = ButtonProps & { label?: string };
+
+/** The 16px "More" button of a project row. */
+export function SidebarProjectMore({ label = "Project actions", className, ...props }: SidebarProjectMoreProps) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      className={cn(
+        "flex size-4 cursor-pointer items-center justify-center rounded-xs text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand",
+        className,
+      )}
+      {...props}
+    >
+      <DotsThree aria-hidden weight="bold" className="size-4" />
+    </button>
+  );
+}
+
+export type SidebarAddButtonProps = ButtonProps & { icon?: ReactNode };
+
+/**
+ * Figma `Add project`: a 36px button with a 1px inside dashed border (4/3 dash,
+ * 20% ink), label then a 16px plus-circle, 12px above. The border is an SVG rect
+ * so the dash matches; its 2px stroke is clipped to the inner 1px.
+ */
+const addIcon = <PlusCircle />;
+
+export function SidebarAddButton({ icon = addIcon, className, children, ...props }: SidebarAddButtonProps) {
+  return (
+    <button
+      type="button"
+      className={cn(
+        "relative mt-2.5 flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-[10px] text-label-md text-text-secondary hover:bg-overlay-ink-4",
+        "focus-visible:outline-2 focus-visible:outline-text-brand [&>[data-slot=icon]]:size-4",
+        className,
+      )}
+      {...props}
+    >
+      <svg aria-hidden className="pointer-events-none absolute inset-0 size-full text-overlay-ink-20">
+        <rect
+          width="100%"
+          height="100%"
+          rx="10"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeDasharray="4 3"
+        />
+      </svg>
+      {children}
+      <span data-slot="icon" className="flex [&>svg]:size-4">
+        {icon}
+      </span>
     </button>
   );
 }
