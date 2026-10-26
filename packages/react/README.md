@@ -45,6 +45,11 @@ Figma의 `Liquid layers`(tint, inner shade, 경계선 세 겹을 50% 세기로 �
 그립니다. 유리 컴포넌트는 이것을 첫 자식으로 두고, 채움은 `glass-clear` / `glass-regular` /
 `glass-thick` 토큰으로 정합니다. 경계선 흐림과 안쪽 그림자 여백은 Figma처럼 높이에 비례합니다.
 
+Chromium 계열 브라우저에서는 그 아래에 [liquid-glass-react](https://github.com/rdev/liquid-glass-react)(MIT)를
+호스트 크기에 맞춰 띄웁니다. SVG 변위 필터가 뒤 배경을 가장자리에서 휘게 하고, 테두리가 빛을 받습니다.
+Safari와 Firefox는 배경에 SVG 필터를 걸지 못해서 CSS 유리 그대로 그립니다. 투명도 줄이기 설정이 켜져 있거나
+`<LiquidGlass refract={false} />`이면 굴절을 쓰지 않습니다.
+
 ## 컴포넌트 (55개)
 
 | 파일 | Figma 노드 | 내용 |
