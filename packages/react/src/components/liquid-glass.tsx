@@ -10,6 +10,14 @@ export type LiquidGlassProps = {
 
 type Shape = { width: number; height: number; radius: number };
 
+/** Opaque hosts (solid menus, fields) show nothing through them, so bending their backdrop only drags in what sits beside them. */
+function isOpaque(host: HTMLElement): boolean {
+  const color = getComputedStyle(host).backgroundColor;
+  const alpha = /rgba?\([^)]*?,\s*([\d.]+)\s*\)$/.exec(color)?.[1] ?? /\/\s*([\d.]+%?)\s*\)$/.exec(color)?.[1];
+  if (alpha === undefined) return color.startsWith("rgb(");
+  return alpha.endsWith("%") ? Number.parseFloat(alpha) >= 95 : Number.parseFloat(alpha) >= 0.95;
+}
+
 /** Chromium is the only engine that runs an SVG filter over a backdrop. iOS browsers are WebKit and send `CriOS`/`EdgiOS`, not `Chrome/`. */
 function supportsBackdropDisplacement(): boolean {
   return /Chrome\//.test(navigator.userAgent);
@@ -39,7 +47,7 @@ export function LiquidGlass({ tier = "clear", refract = true }: LiquidGlassProps
     const element = group.current;
     const host = element?.parentElement;
     if (!refract || !element || !host) return undefined;
-    if (!supportsBackdropDisplacement()) return undefined;
+    if (!supportsBackdropDisplacement() || isOpaque(host)) return undefined;
     if (window.matchMedia("(prefers-reduced-transparency: reduce)").matches) return undefined;
     const measure = () => {
       const width = element.offsetWidth;
