@@ -80,4 +80,24 @@
   .liquid-layers[data-tier="thick"] > [data-layer="edge-dark"] {
     display: none;
   }
+
+  /* The lens target for liquid-gl; the library makes it transparent itself. */
+  .liquid-layers > [data-layer="lens"] {
+    opacity: 1;
+  }
+
+  /* Refraction on: liquid-gl paints the refracted page into a canvas at z-index 0
+   * in the body stacking context. Lifting the host to z-index 1 puts its own
+   * translucent fill, rim, edges and content over that canvas, so the refraction
+   * shows through the fill and hover or pressed fills keep working. The snapshot
+   * already carries the blur, so the tint layers stop blurring the backdrop. */
+  [data-liquid="on"] {
+    z-index: 1;
+  }
+
+  [data-liquid="on"] > .liquid-layers > [data-layer="tint"],
+  [data-liquid="on"] > .liquid-layers > [data-layer="inner-shade"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
