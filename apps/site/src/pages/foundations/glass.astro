@@ -34,6 +34,13 @@ const usage = `import { LiquidGlass } from "@horon-ai/react";
   </ul>
   <p>H는 표면 높이입니다. 레이어 묶음을 CSS 크기 컨테이너로 만들어 <code>100cqh</code>로 높이를 읽기 때문에, 32px 칩부터 큰 카드까지 Figma와 같은 비율로 흐려집니다. 두꺼운 유리(<code>tier="thick"</code>)는 어두운 경계선을 뺍니다.</p>
 
+  <h2>굴절</h2>
+  <p>
+    Chromium 계열 브라우저에서는 <a href="https://github.com/rdev/liquid-glass-react">liquid-glass-react</a>가 유리 아래에서
+    뒤 배경을 가장자리부터 휘게 하고, 테두리가 빛을 받게 합니다. Safari와 Firefox는 배경에 SVG 필터를 걸지 못해서 위의 CSS
+    레이어만으로 그립니다.
+  </p>
+
   <h2>쓰는 법</h2>
   <CodeBlock code={usage} title="tsx" />
 </DocsLayout>

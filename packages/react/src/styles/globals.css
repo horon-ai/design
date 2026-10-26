@@ -80,4 +80,21 @@
   .liquid-layers[data-tier="thick"] > [data-layer="edge-dark"] {
     display: none;
   }
+
+  /* liquid-glass-react, mounted on the client (see liquid-glass.tsx). Its glass
+   * body is an inline-flex box sized by content, so it is stretched to the host,
+   * and its drop shadow is dropped: Figma glass floats on rims and blur only.
+   * The library's warp layer already blurs the backdrop, so the Figma tint and
+   * inner shade keep their fills but stop blurring a second time. */
+  .liquid-layers .glass {
+    width: 100%;
+    height: 100%;
+    box-shadow: none !important;
+  }
+
+  .liquid-layers[data-refract="on"] > [data-layer="tint"],
+  .liquid-layers[data-refract="on"] > [data-layer="inner-shade"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
