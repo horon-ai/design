@@ -1,51 +1,29 @@
-import * as React from "react";
-import { XIcon } from "lucide-react";
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "cn";
+import { Toggle } from "@base-ui/react/toggle";
+import { Check } from "@phosphor-icons/react";
+import type { ComponentProps } from "react";
 
-const chipVariants = cva(
-  "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border px-2.5 py-[3px] text-[11px] font-semibold whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 [&>svg]:pointer-events-none [&>svg:not([class*='size-'])]:size-3",
-  {
-    variants: {
-      variant: {
-        default: "border-transparent bg-primary text-primary-foreground",
-        secondary: "border-transparent bg-secondary text-secondary-foreground",
-        outline: "border-border text-foreground",
-        accent: "border-transparent bg-accent text-accent-foreground",
-        success: "border-transparent bg-success text-success-foreground",
-        warning: "border-transparent bg-warning text-warning-foreground",
-        destructive: "border-transparent bg-destructive text-destructive-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  },
-);
+import { cn } from "../lib/cn";
+import { LiquidGlass } from "./liquid-glass";
 
-type ChipProps = React.ComponentProps<"span"> &
-  VariantProps<typeof chipVariants> & {
-    onRemove?: React.MouseEventHandler<HTMLButtonElement>;
-    removeLabel?: string;
-  };
+export type ChipProps = Omit<ComponentProps<typeof Toggle>, "className"> & { className?: string };
 
-function Chip({ className, variant = "default", children, onRemove, removeLabel = "Remove", ...props }: ChipProps) {
+/** Figma `Chip` (61:302): a 32px clear-glass toggle; selected shows a check and the brand rim. */
+export function Chip({ className, children, ...props }: ChipProps) {
   return (
-    <span data-slot="chip" data-variant={variant} className={cn(chipVariants({ variant }), className)} {...props}>
-      {children}
-      {onRemove ? (
-        <button
-          type="button"
-          data-slot="chip-remove"
-          aria-label={removeLabel}
-          onClick={onRemove}
-          className="-mr-1 inline-flex size-3.5 shrink-0 cursor-pointer items-center justify-center rounded-full opacity-70 transition-opacity outline-none hover:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/50"
-        >
-          <XIcon aria-hidden="true" />
-        </button>
-      ) : null}
-    </span>
+    <Toggle
+      className={cn(
+        "group relative inline-flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 overflow-clip rounded-full border px-3 text-label-md whitespace-nowrap",
+        "border-glass-rim-strong bg-glass-clear text-text-primary hover:not-data-disabled:bg-glass-clear-hover",
+        "data-pressed:border-border-brand data-pressed:bg-glass-clear-pressed data-pressed:text-text-brand hover:not-data-disabled:data-pressed:bg-glass-clear-pressed",
+        "data-disabled:cursor-not-allowed data-disabled:opacity-40",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
+        className,
+      )}
+      {...props}
+    >
+      <LiquidGlass />
+      <Check aria-hidden className="relative hidden size-3.5 group-data-pressed:block" />
+      <span className="relative">{children}</span>
+    </Toggle>
   );
 }
-
-export { Chip, chipVariants, type ChipProps };

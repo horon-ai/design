@@ -1,175 +1,225 @@
-"use client";
+import { Collapsible } from "@base-ui/react/collapsible";
+import { CaretDown, CaretLeft, CaretUpDown } from "@phosphor-icons/react";
+import { Children, type ComponentProps, type ReactNode } from "react";
 
-import * as React from "react";
-import { mergeProps } from "@base-ui/react/merge-props";
-import { useRender } from "@base-ui/react/use-render";
-import { PanelLeftIcon } from "lucide-react";
-import { Button } from "@horon-ai/react/components/button";
-import { cn } from "cn";
+import { cn } from "../lib/cn";
+import { LiquidGlass } from "./liquid-glass";
 
-type SidebarContextValue = {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  toggle: () => void;
-};
+type DivProps = Omit<ComponentProps<"div">, "className"> & { className?: string };
+type ButtonProps = Omit<ComponentProps<"button">, "className"> & { className?: string };
 
-const SidebarContext = React.createContext<SidebarContextValue | null>(null);
-
-function useSidebar() {
-  const context = React.useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebar must be used within a Sidebar");
-  }
-  return context;
-}
-
-function Sidebar({
+/** Figma `Sidebar` (Panels 88:808): a 280px thick-glass column, 24px radius, 16/12/12px padding. */
+export function Sidebar({
   className,
-  open: openProp,
-  defaultOpen = true,
-  onOpenChange,
   children,
   ...props
-}: React.ComponentProps<"aside"> & {
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-}) {
-  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
-  const controlled = openProp !== undefined;
-  const open = controlled ? openProp : uncontrolledOpen;
-
-  const setOpen = React.useCallback(
-    (next: boolean) => {
-      if (!controlled) {
-        setUncontrolledOpen(next);
-      }
-      onOpenChange?.(next);
-    },
-    [controlled, onOpenChange],
-  );
-
-  const toggle = React.useCallback(() => setOpen(!open), [open, setOpen]);
-
-  const value = React.useMemo(() => ({ open, setOpen, toggle }), [open, setOpen, toggle]);
-
+}: Omit<ComponentProps<"nav">, "className"> & { className?: string }) {
   return (
-    <SidebarContext.Provider value={value}>
-      <aside
-        data-slot="sidebar"
-        data-state={open ? "expanded" : "collapsed"}
-        className={cn(
-          "group/sidebar flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-border bg-card text-card-foreground transition-[width] duration-200 ease-out data-[state=collapsed]:w-14",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </aside>
-    </SidebarContext.Provider>
-  );
-}
-
-function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="sidebar-header"
-      className={cn("flex h-14 shrink-0 items-center gap-2 px-3", className)}
+    <nav
+      className={cn(
+        "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip rounded-[24px] border border-glass-rim-strong bg-glass-thick px-3 pt-4 pb-3",
+        className,
+      )}
       {...props}
-    />
-  );
-}
-
-function SidebarContent({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="sidebar-content"
-      className={cn("flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-2 py-2", className)}
-      {...props}
-    />
-  );
-}
-
-function SidebarFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="sidebar-footer"
-      className={cn("mt-auto flex shrink-0 flex-col gap-1 border-t border-border px-2 py-2", className)}
-      {...props}
-    />
-  );
-}
-
-function SidebarGroup({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="sidebar-group" className={cn("flex flex-col gap-0.5", className)} {...props} />;
-}
-
-function SidebarMenuItem({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="sidebar-menu-item" className={cn("relative", className)} {...props} />;
-}
-
-function SidebarMenuButton({
-  className,
-  active = false,
-  render,
-  ...props
-}: useRender.ComponentProps<"button"> & { active?: boolean }) {
-  return useRender({
-    defaultTagName: "button",
-    props: mergeProps<"button">(
-      {
-        type: "button",
-        className: cn(
-          "flex w-full cursor-pointer items-center gap-2.5 overflow-hidden rounded-sm px-2.5 py-2 text-left text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors outline-none group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0 hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-secondary data-[active]:text-secondary-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&>span]:truncate group-data-[state=collapsed]/sidebar:[&>span]:hidden",
-          className,
-        ),
-      },
-      props,
-    ),
-    render,
-    state: { slot: "sidebar-menu-button", active },
-  });
-}
-
-function SidebarTrigger({ className, onClick, children, ...props }: React.ComponentProps<typeof Button>) {
-  const { toggle } = useSidebar();
-
-  return (
-    <Button
-      data-slot="sidebar-trigger"
-      variant="ghost"
-      size="icon-sm"
-      aria-label="Toggle sidebar"
-      {...props}
-      className={cn(className)}
-      onClick={(event) => {
-        onClick?.(event);
-        toggle();
-      }}
     >
-      {children ?? <PanelLeftIcon />}
-    </Button>
+      <LiquidGlass tier="thick" />
+      {children}
+    </nav>
   );
 }
 
-function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
+export type SidebarHeaderProps = {
+  /** Workspace initial shown on the 28px ink tile. */
+  initial: ReactNode;
+  name: ReactNode;
+  /** Props for the workspace switch button, such as a `MenuTrigger` render target. */
+  switchProps?: ButtonProps;
+  onCollapse?: () => void;
+  collapseLabel?: string;
+  className?: string;
+};
+
+/** Header: workspace switch (tile, name, up-down caret) and the 28px collapse button. 10px gap below. */
+export function SidebarHeader({
+  initial,
+  name,
+  switchProps,
+  onCollapse,
+  collapseLabel = "Collapse sidebar",
+  className,
+}: SidebarHeaderProps) {
+  const { className: switchClass, ...switchRest } = switchProps ?? {};
   return (
-    <main
-      data-slot="sidebar-inset"
-      className={cn("flex min-h-0 min-w-0 flex-1 flex-col bg-background", className)}
+    <div className={cn("relative mb-2.5 flex h-9 items-center gap-1.5", className)}>
+      <button
+        type="button"
+        className={cn(
+          "flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-[10px] pr-1 pl-2 text-left hover:bg-overlay-ink-6 data-popup-open:bg-overlay-ink-6",
+          "focus-visible:outline-2 focus-visible:outline-text-brand",
+          switchClass,
+        )}
+        {...switchRest}
+      >
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-sm bg-interactive-primary text-label-md text-text-inverse">
+          {initial}
+        </span>
+        <span className="min-w-0 flex-1 truncate text-label-lg text-text-primary">{name}</span>
+        <CaretUpDown aria-hidden className="size-3.5 shrink-0 text-text-secondary" />
+      </button>
+      {onCollapse && (
+        <button
+          type="button"
+          aria-label={collapseLabel}
+          onClick={onCollapse}
+          className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm border border-overlay-ink-8 bg-bg-surface-70 text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
+        >
+          <CaretLeft aria-hidden className="size-4" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+export type SidebarItemProps = ButtonProps & {
+  /** 18px icon, or a `SidebarProjectTile`. */
+  icon?: ReactNode;
+  /** Count on the right, such as unread items. */
+  count?: ReactNode;
+  /** Trailing 7px red dot for attention. */
+  attention?: boolean;
+  current?: boolean;
+};
+
+/** Figma sidebar `Item`: 32px row, 12px radius, 10px gap; the current item is 6% ink. */
+export function SidebarItem({ icon, count, attention, current, className, children, ...props }: SidebarItemProps) {
+  return (
+    <button
+      type="button"
+      aria-current={current ? "page" : undefined}
+      className={cn(
+        "relative flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-label-md text-text-primary",
+        current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-4",
+        "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
+        className,
+      )}
+      {...props}
+    >
+      {icon && <span className="flex shrink-0 [&>svg]:size-4.5">{icon}</span>}
+      <span className="min-w-0 flex-1 truncate">{children}</span>
+      {count !== undefined && <span className="shrink-0 text-body-sm text-text-secondary">{count}</span>}
+      {attention && <span aria-label="Needs attention" className="size-[7px] shrink-0 rounded-full bg-text-danger" />}
+    </button>
+  );
+}
+
+/** A 22px rounded tile with a 14px inverse icon, for project rows. Set the fill with `className`. */
+export function SidebarProjectTile({
+  className,
+  ...props
+}: Omit<ComponentProps<"span">, "className"> & { className?: string }) {
+  return (
+    <span
+      className={cn(
+        "flex size-5.5 items-center justify-center rounded-xs bg-interactive-primary text-text-inverse [&>svg]:size-3.5",
+        className,
+      )}
       {...props}
     />
   );
 }
 
-export {
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarTrigger,
-  SidebarInset,
+export type SidebarGroupProps = {
+  label: ReactNode;
+  defaultOpen?: boolean;
+  children: ReactNode;
+  className?: string;
 };
+
+/** A collapsible group: 28px label in secondary text with a 14px caret, 14px above. */
+export function SidebarGroup({ label, defaultOpen = true, children, className }: SidebarGroupProps) {
+  return (
+    <Collapsible.Root defaultOpen={defaultOpen} className={cn("relative mt-3.5 flex flex-col gap-0.5", className)}>
+      <Collapsible.Trigger className="group flex h-7 w-fit cursor-pointer items-center gap-1 px-2.5 text-label-md text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand">
+        {label}
+        <CaretDown
+          aria-hidden
+          className="size-3.5 transition-transform group-not-data-panel-open:-rotate-90 group-data-panel-open:rotate-0"
+        />
+      </Collapsible.Trigger>
+      <Collapsible.Panel className="flex flex-col gap-0.5">{children}</Collapsible.Panel>
+    </Collapsible.Root>
+  );
+}
+
+const ROW = 32;
+const GAP = 2;
+
+/** Connector path of the Figma `Tree`: one 1.5px line with a 9px curve into the middle of each child row. */
+function branchesPath(count: number): string {
+  const centers = Array.from({ length: count }, (_, index) => ROW / 2 + index * (ROW + GAP));
+  const last = centers.at(-1) ?? 0;
+  const trunk = `M0.75 0V${last - 9}`;
+  const branches = centers.map((center) => {
+    const start = center - 9;
+    return `M0.75 ${start}C0.75 ${start + 4.909} 4.841 ${center} 9.75 ${center}H13.75`;
+  });
+  return [trunk, ...branches].join("");
+}
+
+/** Figma `Tree`: nested sidebar items, 18px in, joined to the parent by curved connectors. */
+export function SidebarTree({ children, className }: { children: ReactNode; className?: string }) {
+  const count = Children.count(children);
+  const height = ROW / 2 + (count - 1) * (ROW + GAP) + 0.75;
+  return (
+    <div className={cn("relative flex items-start pl-4.5", className)}>
+      <svg
+        aria-hidden
+        width="16"
+        height={height}
+        viewBox={`0 0 16 ${height}`}
+        fill="none"
+        className="shrink-0 overflow-visible"
+      >
+        <path d={branchesPath(count)} strokeWidth="1.5" className="stroke-overlay-ink-16" />
+      </svg>
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">{children}</div>
+    </div>
+  );
+}
+
+/** Pushes the account card to the bottom. */
+export function SidebarSpacer() {
+  return <div aria-hidden className="min-h-px flex-1" />;
+}
+
+export type SidebarAccountProps = ButtonProps & {
+  initials: ReactNode;
+  name: ReactNode;
+  email?: ReactNode;
+};
+
+/** Figma sidebar `Account`: 75% surface card (95% while its menu is open), 36px sky avatar tile. */
+export function SidebarAccount({ initials, name, email, className, ...props }: SidebarAccountProps) {
+  return (
+    <button
+      type="button"
+      className={cn(
+        "relative flex w-full cursor-pointer items-center gap-2.5 rounded-lg bg-bg-surface-75 py-2 pr-2.5 pl-2 text-left data-popup-open:bg-bg-surface-95",
+        "focus-visible:outline-2 focus-visible:outline-text-brand",
+        className,
+      )}
+      {...props}
+    >
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-200 text-label-md text-surface-ink">
+        {initials}
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className="truncate text-label-md text-text-primary">{name}</span>
+        {email && <span className="truncate text-caption text-text-secondary">{email}</span>}
+      </span>
+      <CaretUpDown aria-hidden className="size-4 shrink-0 text-text-secondary" />
+    </button>
+  );
+}
+
+export type { DivProps as SidebarDivProps };
