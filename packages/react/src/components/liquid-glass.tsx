@@ -27,7 +27,9 @@ function supportsBackdropDisplacement(): boolean {
  * free-standing widget, so it is pinned to the host here: centred with its own
  * top/left 50% and translate, rigid (`elasticity` 0) and without pointer events,
  * so the host keeps its layout and interaction. It measures its size only on
- * mount, so it is remounted when the host is resized.
+ * mount, so it is remounted when the host is resized. It measures with
+ * getBoundingClientRect, which a scaled ancestor shrinks, so its layers are
+ * stretched to the host in CSS and the size here is the untransformed one.
  */
 export function LiquidGlass({ tier = "clear", refract = true }: LiquidGlassProps) {
   const group = useRef<HTMLSpanElement>(null);
@@ -40,7 +42,8 @@ export function LiquidGlass({ tier = "clear", refract = true }: LiquidGlassProps
     if (!supportsBackdropDisplacement()) return undefined;
     if (window.matchMedia("(prefers-reduced-transparency: reduce)").matches) return undefined;
     const measure = () => {
-      const { width, height } = element.getBoundingClientRect();
+      const width = element.offsetWidth;
+      const height = element.offsetHeight;
       if (width === 0 || height === 0) return;
       const radius = Math.min(Number.parseFloat(getComputedStyle(host).borderTopLeftRadius) || 0, height / 2);
       setShape({ width: Math.round(width), height: Math.round(height), radius });
