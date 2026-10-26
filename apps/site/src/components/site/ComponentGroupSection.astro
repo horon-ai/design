@@ -24,23 +24,58 @@ const items = componentsInGroup(group.id);
           ? undefined
           : resolveDemoName(component.slug);
         return (
-          <a href={`/components/${component.slug}`} class="group flex min-w-0 flex-col gap-5">
+          <div class="group relative flex min-w-0 flex-col gap-5">
             <div class="demo-tile min-w-0">
               {demoName ? (
-                <div class="pointer-events-none w-full min-w-0 scale-[0.7] origin-center">
+                <div class="demo-fit pointer-events-none" inert>
                   <Demo name={demoName} />
                 </div>
               ) : (
                 <span class="text-[13px] text-text-secondary">{component.title}</span>
               )}
             </div>
-            <span class="text-title-sm font-medium">{component.title}</span>
+            <a
+              href={`/components/${component.slug}`}
+              class="text-title-sm font-medium after:absolute after:inset-0 after:content-['']"
+            >
+              {component.title}
+            </a>
             <span class="line-clamp-2 text-body-sm leading-6 text-text-secondary">
               {component.description}
             </span>
-          </a>
+          </div>
         );
       })
     }
   </div>
 </section>
+
+<script>
+  /* Each index preview is laid out at its natural size and scaled down to fit
+   * its 16:9 tile, so wide demos (Composer) and tall ones (Calendar, Schedule)
+   * are shown whole instead of being cut off by the tile. */
+  const MAX_SCALE = 0.8;
+
+  function fit(preview: HTMLElement) {
+    const tile = preview.parentElement;
+    if (!tile || preview.offsetWidth === 0 || preview.offsetHeight === 0) return;
+    const style = getComputedStyle(tile);
+    const width = tile.clientWidth - Number.parseFloat(style.paddingLeft) - Number.parseFloat(style.paddingRight);
+    const height = tile.clientHeight - Number.parseFloat(style.paddingTop) - Number.parseFloat(style.paddingBottom);
+    const scale = Math.min(MAX_SCALE, width / preview.offsetWidth, height / preview.offsetHeight);
+    preview.style.setProperty("--demo-fit", String(scale));
+  }
+
+  const observer = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const target = entry.target as HTMLElement;
+      const preview = target.matches(".demo-fit") ? target : target.querySelector<HTMLElement>(":scope > .demo-fit");
+      if (preview) fit(preview);
+    }
+  });
+
+  for (const preview of document.querySelectorAll<HTMLElement>(".demo-fit")) {
+    observer.observe(preview);
+    if (preview.parentElement) observer.observe(preview.parentElement);
+  }
+</script>
