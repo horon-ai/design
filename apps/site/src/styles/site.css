@@ -26,8 +26,8 @@
   }
 
   ::selection {
-    background: var(--ring);
-    color: var(--background);
+    background: var(--color-text-brand);
+    color: var(--color-bg-default);
   }
 }
 
@@ -126,19 +126,19 @@
     border-radius: 0.5rem;
     font-size: 0.875rem;
     line-height: 1.25rem;
-    color: var(--muted-foreground);
+    color: var(--color-text-secondary);
     transition:
       color 120ms ease,
       background-color 120ms ease;
   }
 
   .nav-item:hover {
-    color: var(--foreground);
+    color: var(--color-text-primary);
   }
 
   .nav-item[aria-current="page"] {
-    background: var(--muted);
-    color: var(--foreground);
+    background: var(--color-bg-subtle);
+    color: var(--color-text-primary);
   }
 
   .nav-group-label {
@@ -147,21 +147,21 @@
     padding-bottom: 0.25rem;
     font-size: 0.75rem;
     line-height: 1.625rem;
-    color: var(--muted-foreground);
+    color: var(--color-text-secondary);
   }
 
   .toc-item {
     display: block;
     padding-left: 1.25rem;
-    border-left: 1px solid var(--border);
+    border-left: 1px solid var(--color-border-default);
     font-size: 0.75rem;
     line-height: 2rem;
-    color: var(--muted-foreground);
+    color: var(--color-text-secondary);
     transition: color 120ms ease;
   }
 
   .toc-item:hover {
-    color: var(--foreground);
+    color: var(--color-text-primary);
   }
 
   .toc-item[data-level="3"] {
@@ -169,7 +169,7 @@
   }
 
   .toc-item[aria-current="true"] {
-    color: var(--foreground);
+    color: var(--color-text-primary);
   }
 
   .doc-title {
@@ -210,7 +210,7 @@
     max-width: 48rem;
     font-size: 1rem;
     line-height: 1.75rem;
-    color: var(--muted-foreground);
+    color: var(--color-text-secondary);
     text-wrap: pretty;
   }
 
@@ -223,8 +223,8 @@
     min-height: 26rem;
     padding: 2rem;
     border-radius: 1rem;
-    background: color-mix(in oklab, var(--muted) 60%, transparent);
-    color: var(--foreground);
+    background: color-mix(in oklab, var(--color-bg-subtle) 60%, transparent);
+    color: var(--color-text-primary);
   }
 
   .demo-stage-grid {
@@ -248,7 +248,7 @@
     overflow: hidden;
     padding: 1.5rem;
     border-radius: 0.5rem;
-    background: color-mix(in oklab, var(--muted) 60%, transparent);
+    background: color-mix(in oklab, var(--color-bg-subtle) 60%, transparent);
   }
 
   /* A demo rendered inside an index tile keeps its own controls but drops the
@@ -266,18 +266,18 @@
     gap: 0.25rem;
     padding: 0.875rem 1.25rem;
     border-radius: 0.75rem;
-    background: var(--muted);
+    background: var(--color-bg-subtle);
     transition: background-color 120ms ease;
   }
 
   .card-link:hover {
-    background: color-mix(in oklab, var(--muted) 70%, var(--foreground) 8%);
+    background: color-mix(in oklab, var(--color-bg-subtle) 70%, var(--color-text-primary) 8%);
   }
 
   .prose-docs {
     font-size: 1rem;
     line-height: 1.75rem;
-    color: color-mix(in oklab, var(--foreground) 90%, transparent);
+    color: color-mix(in oklab, var(--color-text-primary) 90%, transparent);
   }
 
   .prose-docs > * + * {
@@ -291,7 +291,7 @@
     line-height: 2rem;
     font-weight: 500;
     letter-spacing: -0.01em;
-    color: var(--foreground);
+    color: var(--color-text-primary);
     text-wrap: balance;
     scroll-margin-top: 6rem;
   }
@@ -306,24 +306,24 @@
     font-size: 1.25rem;
     line-height: 1.75rem;
     font-weight: 500;
-    color: var(--foreground);
+    color: var(--color-text-primary);
     scroll-margin-top: 6rem;
   }
 
   .prose-docs p,
   .prose-docs li {
-    color: var(--muted-foreground);
+    color: var(--color-text-secondary);
   }
 
   .prose-docs strong {
-    color: var(--foreground);
+    color: var(--color-text-primary);
     font-weight: 600;
   }
 
   .prose-docs a {
-    color: var(--foreground);
+    color: var(--color-text-primary);
     text-decoration: underline;
-    text-decoration-color: var(--ring);
+    text-decoration-color: var(--color-text-brand);
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
   }
@@ -350,7 +350,7 @@
     font-size: 0.875rem;
     padding: 0.125rem 0.375rem;
     border-radius: 0.375rem;
-    background: var(--muted);
-    color: var(--foreground);
+    background: var(--color-bg-subtle);
+    color: var(--color-text-primary);
   }
 }

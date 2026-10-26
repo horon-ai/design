@@ -7,14 +7,15 @@ const modules = import.meta.glob<{ default: AstroComponentFactory }>("../compone
 const wrappers = new Map<string, AstroComponentFactory>();
 
 for (const [path, module] of Object.entries(modules)) {
-  const name = path.split("/").pop()?.replace(/\.astro$/, "");
+  const name = path
+    .split("/")
+    .pop()
+    ?.replace(/\.astro$/, "");
   if (name) wrappers.set(name, module.default);
 }
 
-export function resolveDemoName(slug: string, demo?: string): string | undefined {
-  const candidate = demo ?? slug;
-  if (wrappers.has(candidate)) return candidate;
-  return demo && wrappers.has(demo) ? demo : undefined;
+export function resolveDemoName(slug: string): string | undefined {
+  return wrappers.has(slug) ? slug : undefined;
 }
 
 export function getDemo(name: string | undefined): AstroComponentFactory | undefined {

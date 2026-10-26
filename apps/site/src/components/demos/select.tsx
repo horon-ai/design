@@ -1,28 +1,19 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@horon-ai/react";
+import { Select } from "@horon-ai/react";
+
+import { Backdrop } from "../demo-backdrop";
+
+const items = [
+  { value: "chief", label: "Chief of staff" },
+  { value: "researcher", label: "Researcher" },
+  { value: "writer", label: "Writer" },
+  { value: "triage", label: "Inbox triage" },
+];
 
 export default function SelectDemo() {
   return (
-    <div className="flex flex-wrap items-start gap-3">
-      <Select defaultValue="apple">
-        <SelectTrigger className="w-56">
-          <SelectValue placeholder="과일 선택" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="apple">사과</SelectItem>
-          <SelectItem value="banana">바나나</SelectItem>
-          <SelectItem value="cherry">체리</SelectItem>
-        </SelectContent>
-      </Select>
-      <Select defaultOpen defaultValue="banana">
-        <SelectTrigger className="w-56">
-          <SelectValue placeholder="과일 선택" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="apple">사과</SelectItem>
-          <SelectItem value="banana">바나나</SelectItem>
-          <SelectItem value="cherry">체리</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+    <Backdrop>
+      <Select aria-label="Bot" items={items} placeholder="Select a bot" />
+      <Select aria-label="Bot" items={items} surface="solid" defaultValue="chief" />
+    </Backdrop>
   );
 }

@@ -1,93 +1,44 @@
 ---
 import DocsLayout from "@/layouts/DocsLayout.astro";
 import CodeBlock from "@/components/site/CodeBlock.astro";
-import { text, radius, space, shadow, duration, glassBlur } from "@horon-ai/tokens";
+import { lightColors, primitives, radius, shadow, spacing, textStyles } from "@horon-ai/tokens";
 
-const groups = [
-  {
-    name: "Color",
-    source: "src/palette.ts · src/tokens.ts",
-    output: "--background, --foreground, --card, --primary, --ring, …",
-    count: "36 시맨틱 × 2 모드",
-  },
-  {
-    name: "Radius",
-    source: "src/scales.ts",
-    output: `--radius-xs … --radius-4xl (${Object.values(radius).length}단)`,
-    count: `${Object.keys(radius).length} 값`,
-  },
-  {
-    name: "Spacing",
-    source: "src/scales.ts",
-    output: `space 0 … 24 (${Object.keys(space).length}단)`,
-    count: `${Object.keys(space).length} 값`,
-  },
-  {
-    name: "Text",
-    source: "src/scales.ts",
-    output: `--text-caption … --text-hero (${Object.keys(text).length}단)`,
-    count: `${Object.keys(text).length} 값`,
-  },
-  {
-    name: "Elevation",
-    source: "src/scales.ts",
-    output: `--shadow-sm, --shadow-md, --shadow-lg`,
-    count: `${Object.keys(shadow).length} 값`,
-  },
-  {
-    name: "Motion",
-    source: "src/scales.ts",
-    output: `--duration-* (${Object.keys(duration).length}단), --ease-*`,
-    count: `${Object.keys(duration).length} 지속 시간`,
-  },
-  {
-    name: "Glass",
-    source: "src/scales.ts · src/tokens.ts",
-    output: `--glass-fill, --glass-border, --glass-blur (${glassBlur}px), --glass-liquid-*`,
-    count: "7 값 × 2 모드",
-  },
+const rows = [
+  ["color.ts", "시맨틱 색 라이트·다크, sky·red 프리미티브", `${Object.keys(lightColors).length}개 + ${Object.keys(primitives).length}개`, "Components 54:81, Components / Dark 166:1107"],
+  ["typography.ts", "글꼴, 굵기 4종, 글자 스타일의 플랫폼별 크기", `${Object.keys(textStyles).length}개 스타일 × 3 플랫폼`, "Typography 26:2"],
+  ["scale.ts", "간격, 반경, 그림자", `${Object.keys(spacing).length} · ${Object.keys(radius).length} · ${Object.keys(shadow).length}`, "Scale 컬렉션, Menus 88:495"],
+  ["glass.ts", "유리 레이어 값과 높이 비례 규칙", "레이어 5장", "Button 55:339 외"],
 ];
 
-const usage = `// 웹: 생성된 CSS를 그대로 import
-import "@horon-ai/react/globals.css";
+const build = `# 저장소 루트에서
+bun run --filter @horon-ai/tokens build   # packages/tokens/theme.css 재생성
+bun test packages/tokens                  # 생성 결과와 커밋된 파일이 같은지 확인`;
 
-// 원시 값이 필요할 때
-import { PALETTE, ACCENT, INK } from "@horon-ai/tokens";`;
+const usage = `<p class="text-label-md text-text-secondary">라벨</p>
+<div class="rounded-xl bg-glass-thick border border-glass-rim-strong" />
+<span style="color: var(--color-text-brand)">브랜드</span>`;
 ---
 
 <DocsLayout
   title="Design Token"
   eyebrow="Foundations"
   section="foundations"
-  description="토큰은 이 시스템의 단일 소스입니다. 색·간격·반경·타이포·모션·유리 표면의 값이 여기 한 번만 적히고, 웹 CSS가 여기서 파생됩니다."
+  description="토큰은 Figma 변수를 그대로 옮긴 TypeScript 값입니다. 여기서 웹용 theme.css가 생성됩니다."
 >
-  <p>
-    <code>@horon-ai/tokens</code>는 TypeScript 소스에서 <code>theme.css</code>를 생성합니다. 생성 파일에는
-    자동 생성 헤더가 붙고, 손으로 고치지 않습니다. 값을 바꾸려면 소스를 고치고 다시 빌드합니다.
-  </p>
-
-  <CodeBlock code="bun run --filter @horon-ai/tokens build" lang="bash" title="terminal" />
-
-  <h2>무엇이 나오나</h2>
-  <div class="not-prose mt-5 overflow-hidden rounded-xl bg-muted/20">
-    <table class="w-full text-left text-[12.5px]">
-      <thead class="border-b border-border bg-muted/50 text-muted-foreground">
-        <tr>
-          <th class="px-4 py-2 font-medium">그룹</th>
-          <th class="px-4 py-2 font-medium">소스</th>
-          <th class="px-4 py-2 font-medium">출력</th>
-        </tr>
+  <h2>파일 구성</h2>
+  <div class="not-prose mt-5 overflow-x-auto rounded-xl border border-border-default">
+    <table class="w-full text-left text-[13px]">
+      <thead class="bg-bg-subtle text-text-secondary">
+        <tr><th class="px-4 py-2.5 font-medium">파일</th><th class="px-4 py-2.5 font-medium">내용</th><th class="px-4 py-2.5 font-medium">개수</th><th class="px-4 py-2.5 font-medium">Figma 출처</th></tr>
       </thead>
       <tbody>
         {
-          groups.map((group) => (
-            <tr class="border-b border-border align-top last:border-b-0">
-              <td class="px-4 py-2.5 font-medium">{group.name}</td>
-              <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground">{group.source}</td>
-              <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground">
-                {group.output}
-                <span class="mt-1 block text-xs opacity-70">{group.count}</span>
-              </td>
+          rows.map(([file, body, count, source]) => (
+            <tr class="border-t border-border-default">
+              <td class="px-4 py-2.5 font-mono">{file}</td>
+              <td class="px-4 py-2.5">{body}</td>
+              <td class="px-4 py-2.5 text-text-secondary">{count}</td>
+              <td class="px-4 py-2.5 text-text-secondary">{source}</td>
             </tr>
           ))
         }
@@ -95,19 +46,15 @@ import { PALETTE, ACCENT, INK } from "@horon-ai/tokens";`;
     </table>
   </div>
 
-  <h2>세 층</h2>
-  <ol>
-    <li><strong>프리미티브</strong> — <code>sand-100…1200</code>, <code>gold-100…600</code>, 상태색. 모드와 무관한 단일 값입니다.</li>
-    <li><strong>시맨틱</strong> — <code>background</code>, <code>card</code>, <code>primary</code>, <code>ring</code> 등. 라이트·다크 두 벌이 있습니다.</li>
-    <li><strong>스케일</strong> — 간격, 반경, 타이포, 그림자, 모션, 유리. 모드와 무관합니다.</li>
-  </ol>
-
-  <h2>소비</h2>
-  <CodeBlock code={usage} title="tsx" />
-
-  <h2>드리프트 가드</h2>
+  <h2>이름 규칙</h2>
   <p>
-    <code>bun test</code>가 생성된 CSS와 소스의 값이 어긋나면 실패합니다. 팔레트 각 단계는 캔버스의
-    hex로 왕복 단언되므로, 값을 손으로 바꾸면 테스트가 먼저 알려 줍니다.
+    CSS 변수 이름은 Figma 변수의 WEB 코드 문법과 같습니다. Tailwind에서는 앞의 <code>--color-</code>,
+    <code>--text-</code>, <code>--radius-</code>를 떼고 씁니다. Tailwind 기본 팔레트, 글자 크기, 반경은 비웠기 때문에
+    <code>text-sm</code>이나 <code>bg-zinc-100</code>은 동작하지 않습니다. 이름이 없는 값이 필요하면 토큰을 먼저 추가합니다.
   </p>
+  <CodeBlock code={usage} title="html" />
+
+  <h2>재생성</h2>
+  <p><code>theme.css</code>는 손으로 고치지 않습니다. 값을 바꾼 뒤 아래 명령으로 다시 만듭니다.</p>
+  <CodeBlock code={build} lang="bash" title="terminal" />
 </DocsLayout>

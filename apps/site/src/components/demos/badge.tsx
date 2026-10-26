@@ -2,11 +2,15 @@ import { Badge } from "@horon-ai/react";
 
 export default function BadgeDemo() {
   return (
-    <>
-      <Badge>기본</Badge>
-      <Badge variant="secondary">보조</Badge>
-      <Badge variant="outline">외곽선</Badge>
-      <Badge variant="destructive">오류</Badge>
-    </>
+    <div className="flex flex-wrap gap-2">
+      <Badge dot>Draft</Badge>
+      <Badge dot tone="brand">
+        ON
+      </Badge>
+      <Badge dot tone="danger">
+        Failed
+      </Badge>
+      <Badge tone="solid">New</Badge>
+    </div>
   );
 }

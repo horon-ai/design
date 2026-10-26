@@ -1,47 +1,24 @@
 ---
 import DocsLayout from "@/layouts/DocsLayout.astro";
-import { space } from "@horon-ai/tokens";
-
-const steps = Object.entries(space);
+import { spacing } from "@horon-ai/tokens";
 ---
 
 <DocsLayout
   title="Spacing"
   eyebrow="Foundations"
   section="foundations"
-  description="4px을 기준으로 하는 간격 스케일입니다. 컴포넌트 내부 여백과 레이아웃 사이 간격 모두 이 값에서 고릅니다."
+  description="Figma Scale 컬렉션의 간격 값입니다. Tailwind의 4px 기본 단위와 같아서 p-3, gap-1.5 같은 클래스가 그대로 맞습니다."
 >
-  <p>
-    스케일은 0부터 96px까지 4px 배수로 이어집니다. 같은 계층의 요소에는 같은 단계를 쓰고, 인접한
-    두 단계를 섞어 미세 조정하지 않습니다.
-  </p>
-
-  <h2>스케일</h2>
-  <div class="not-prose mt-5 space-y-1.5">
+  <div class="not-prose mt-5 flex flex-col gap-2">
     {
-      steps.map(([name, value]) => (
+      Object.entries(spacing).map(([step, value]) => (
         <div class="flex items-center gap-4">
-          <span class="w-10 shrink-0 font-mono text-xs text-muted-foreground">{name}</span>
-          <span class="w-12 shrink-0 font-mono text-xs text-muted-foreground">{value}px</span>
-          <span class="h-2.5 rounded-xs bg-[var(--ring)]" style={`width: ${Math.max(value, 2)}px`} />
+          <span class="w-24 shrink-0 font-mono text-caption text-text-secondary">spacing-{step}</span>
+          <span class="h-4 rounded-[3px] bg-sky-500" style={`width: ${value * 4}px`} />
+          <span class="font-mono text-caption text-text-primary">{value}px</span>
         </div>
       ))
     }
   </div>
-
-  <h2>쓰는 곳</h2>
-  <ul>
-    <li><strong>2 · 3</strong> — 아이콘과 라벨 사이, 배지 내부</li>
-    <li><strong>4 · 5</strong> — 버튼 좌우 여백, 인풋 내부</li>
-    <li><strong>6 · 8</strong> — 카드 내부 여백, 폼 필드 사이</li>
-    <li><strong>10 · 12 · 16</strong> — 섹션 사이, 페이지 여백</li>
-    <li><strong>20 · 24</strong> — 큰 섹션 구분, 랜딩 블록</li>
-  </ul>
-
-  <h2>레이아웃 폭</h2>
-  <p>
-    문서 본문은 최대 <code>768px</code>, 문서 셸은 <code>1400px</code>입니다. 데스크톱에서 사이드바는
-    <code>216px</code> 고정이고 본문이 남은 폭을 가져갑니다. 모바일에서는 사이드바가 접히고 본문이
-    전체 폭을 씁니다.
-  </p>
+  <p>막대 길이는 보기 쉽게 실제 값의 4배로 그렸습니다.</p>
 </DocsLayout>

@@ -1,23 +1,22 @@
 ---
 import DocsLayout from "@/layouts/DocsLayout.astro";
 import CodeBlock from "@/components/site/CodeBlock.astro";
+import { componentCount } from "@/data/components";
 import { mascotImageUrl } from "@/data/mascots";
 
 const install = `# 저장소 루트에서
 bun install
-bun run tokens        # packages/tokens/theme.css 생성
+bun run --filter @horon-ai/tokens build   # packages/tokens/theme.css 생성
 bun run storybook     # http://localhost:6006`;
 
-const consume = `import { Button, Card, CardHeader, CardTitle } from "@horon-ai/react";
+const consume = `import { Button, Card } from "@horon-ai/react";
+import { Plus } from "@phosphor-icons/react";
 import "@horon-ai/react/globals.css";
 
 export function Example() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>제목</CardTitle>
-      </CardHeader>
-      <Button variant="outline">취소</Button>
+    <Card title="Inbox Manager" description="6 emails need you.">
+      <Button icon={<Plus />}>New bot</Button>
     </Card>
   );
 }`;
@@ -32,7 +31,7 @@ bun run storybook     # Storybook → http://localhost:6006`;
   section="get-started"
   description="HORON 디자인 시스템은 하나의 토큰 소스에서 웹 컴포넌트와 문서 사이트의 값을 함께 냅니다. 아래 절차대로 설치하고, 토큰을 생성하고, 컴포넌트를 가져다 쓰면 됩니다."
 >
-  <div class="not-prose flex items-start gap-5 rounded-xl bg-muted/40 px-5 py-5">
+  <div class="not-prose flex items-start gap-5 rounded-xl bg-bg-subtle/40 px-5 py-5">
     <img
       src={mascotImageUrl("wave")}
       alt="인사하는 Horon 마스코트"
@@ -42,7 +41,7 @@ bun run storybook     # Storybook → http://localhost:6006`;
     />
     <div class="min-w-0">
       <p class="text-[14px] font-semibold">처음 오셨나요?</p>
-      <p class="mt-1.5 text-[13px] leading-6 text-muted-foreground">
+      <p class="mt-1.5 text-[13px] leading-6 text-text-secondary">
         설치 세 줄, 토큰 생성 한 줄, 그리고 컴포넌트 import 한 줄이면 시작할 수 있습니다.
       </p>
     </div>
@@ -50,9 +49,8 @@ bun run storybook     # Storybook → http://localhost:6006`;
 
   <h2>무엇인가요</h2>
   <p>
-    HORON의 UI는 <strong>중성 백본 + 단일 액센트</strong>로 정리됩니다. 표면과 텍스트는 sand
-    무채색 램프 하나를 쓰고, gold는 포커스 링과 링크, 하이라이트에만 절제해 씁니다. 버튼의
-    채움색은 잉크입니다. 이 규칙은 토큰에 값으로 들어 있고, 컴포넌트는 그 값만 참조합니다.
+    HORON의 UI는 <strong>잉크와 종이, 하늘색 액센트, 리퀴드 글래스</strong>로 정리됩니다. 값은 모두
+    Figma <code>Horon</code> 파일의 변수에서 읽었고, 컴포넌트는 Base UI 위에 그 값만 참조해 만들었습니다.
   </p>
   <p>
     토큰 정본은 <code>@horon-ai/tokens</code> 하나입니다. 이 패키지가 웹용 CSS
@@ -66,8 +64,7 @@ bun run storybook     # Storybook → http://localhost:6006`;
   <h2>웹에서 쓰기</h2>
   <p>
     엔트리에서 <code>@horon-ai/react/globals.css</code>를 한 번 불러오고, 컴포넌트는 배럴 또는 하위
-    경로로 가져옵니다. Tailwind CSS v4를 쓰는 프로젝트라면 같은 스타일시트를 그대로 공유할 수
-    있습니다.
+    경로로 가져옵니다. Tailwind CSS v4가 함께 들어오고, 아이콘은 <code>@phosphor-icons/react</code>를 씁니다.
   </p>
   <CodeBlock code={consume} title="example.tsx" />
 
@@ -92,8 +89,8 @@ bun run storybook     # Storybook → http://localhost:6006`;
 
   <h2>다음 단계</h2>
   <ul>
-    <li><a href="/foundations">Foundations</a> — 색, 타이포, 간격, 반경, 모션, 유리 표면의 값과 규칙</li>
-    <li><a href="/components">Components</a> — 75개 컴포넌트의 프리뷰와 코드 예시</li>
+    <li><a href="/foundations">Foundations</a> — 색, 글자, 간격, 반경, 유리 표면의 값과 규칙</li>
+    <li><a href="/components">Components</a> — {componentCount}개 컴포넌트의 프리뷰와 코드 예시</li>
     <li><a href="https://storybook.horon.ai">Storybook</a> — 모든 상태와 변형을 직접 조작</li>
   </ul>
 </DocsLayout>
