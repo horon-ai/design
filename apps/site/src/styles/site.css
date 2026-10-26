@@ -253,6 +253,22 @@
 
   /* A demo rendered inside an index tile keeps its own controls but drops the
    * full-page stage: the tile supplies the surface and the fixed aspect ratio. */
+  .demo-tile {
+    position: relative;
+  }
+
+  /* Index previews keep their natural size and are scaled to the tile by the
+   * script in ComponentGroupSection.astro. */
+  .demo-fit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max-content;
+    max-width: 40rem;
+    transform: translate(-50%, -50%) scale(var(--demo-fit, 0.7));
+    transform-origin: center;
+  }
+
   .demo-tile .demo-stage {
     min-height: 0;
     padding: 0;
