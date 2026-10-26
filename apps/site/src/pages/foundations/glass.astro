@@ -36,9 +36,9 @@ const usage = `import { LiquidGlass } from "@horon-ai/react";
 
   <h2>굴절</h2>
   <p>
-    뒤 배경의 굴절은 <a href="https://github.com/naughtyduk/liquidGL">liquid-gl</a>이 WebGPU, 안 되면 WebGL로 그립니다.
-    페이지를 낮은 해상도로 찍어 부드럽게 흐린 뒤, 가장자리를 렌즈처럼 휘게 하고 위쪽에 빛 반사를 얹습니다. 화면의 모든 유리가
-    캔버스 하나를 나눠 씁니다. GPU를 쓸 수 없거나 투명도 줄이기 설정이 켜져 있으면 위의 CSS 레이어만으로 그립니다.
+    Chromium 계열 브라우저에서는 <a href="https://github.com/rdev/liquid-glass-react">liquid-glass-react</a>가 유리 아래에서
+    뒤 배경을 가장자리부터 휘게 하고, 테두리가 빛을 받게 합니다. Safari와 Firefox는 배경에 SVG 필터를 걸지 못해서 위의 CSS
+    레이어만으로 그립니다.
   </p>
 
   <h2>쓰는 법</h2>

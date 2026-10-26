@@ -45,16 +45,10 @@ Figma의 `Liquid layers`(tint, inner shade, 경계선 세 겹을 50% 세기로 �
 그립니다. 유리 컴포넌트는 이것을 첫 자식으로 두고, 채움은 `glass-clear` / `glass-regular` /
 `glass-thick` 토큰으로 정합니다. 경계선 흐림과 안쪽 그림자 여백은 Figma처럼 높이에 비례합니다.
 
-뒤 배경의 굴절은 [liquid-gl](https://github.com/naughtyduk/liquidGL)(MIT)이 WebGPU, 안 되면 WebGL로
-그립니다. 화면 전체가 캔버스 하나를 나눠 쓰기 때문에 유리 요소가 많아도 그래픽 컨텍스트가 늘지
-않습니다. 다음 경우에는 굴절 없이 CSS 유리로 그립니다.
-
-- GPU를 쓸 수 없거나 `prefers-reduced-transparency: reduce`일 때
-- 비활성 상태처럼 호스트가 반투명하거나, 팝업처럼 위로 뜬 층·변형(transform) 안에 있을 때
-- `<LiquidGlass refract={false} />`로 끈 경우, 또는 앱에서 `setLiquidRefraction(false)`를 부른 경우
-
-굴절은 페이지를 한 번 찍어 둔 사진(스냅샷)을 흐려서 씁니다. 창 크기가 바뀌면 다시 찍지만, 그 밖에
-뒤 배경이 바뀌면 바로 따라가지 않습니다.
+Chromium 계열 브라우저에서는 그 아래에 [liquid-glass-react](https://github.com/rdev/liquid-glass-react)(MIT)를
+호스트 크기에 맞춰 띄웁니다. SVG 변위 필터가 뒤 배경을 가장자리에서 휘게 하고, 테두리가 빛을 받습니다.
+Safari와 Firefox는 배경에 SVG 필터를 걸지 못해서 CSS 유리 그대로 그립니다. 투명도 줄이기 설정이 켜져 있거나
+`<LiquidGlass refract={false} />`이면 굴절을 쓰지 않습니다.
 
 ## 컴포넌트 (55개)
 

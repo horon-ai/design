@@ -54,4 +54,3 @@ export * from "./components/tool-call";
 export * from "./components/tooltip";
 export * from "./components/usage-meter";
 export { cn, type ClassValue } from "./lib/cn";
-export { setLiquidRefraction } from "./lib/liquid-refraction";
