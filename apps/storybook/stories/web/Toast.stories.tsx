@@ -1,91 +1,55 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Toaster, toast } from "@horon-ai/react/components/toast";
-import { Button } from "@horon-ai/react/components/button";
+import { Button, Toaster, useToast } from "@horon-ai/react";
+
+import { onBackdrop } from "../support";
+
+function Triggers() {
+  const toast = useToast();
+  return (
+    <div className="flex gap-2">
+      <Button
+        variant="glass"
+        onClick={() => toast.add({ title: "Saved", description: "The routine runs every morning at 8." })}
+      >
+        Neutral
+      </Button>
+      <Button
+        variant="glass"
+        onClick={() =>
+          toast.add({ type: "success", title: "Sent to the team", description: "Q3 board deck v5 is in #board." })
+        }
+      >
+        Success
+      </Button>
+      <Button
+        variant="glass"
+        onClick={() =>
+          toast.add({
+            type: "danger",
+            title: "Couldn't reach Gmail",
+            description: "Reconnect to keep Inbox Manager running.",
+          })
+        }
+      >
+        Danger
+      </Button>
+    </div>
+  );
+}
 
 const meta = {
   title: "Web/Toast",
-  parameters: { layout: "centered" },
-} satisfies Meta;
+  component: Toaster,
+  decorators: [onBackdrop],
+} satisfies Meta<typeof Toaster>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {
+export const Default: Story = {
   render: () => (
     <Toaster>
-      <div className="flex flex-col items-start gap-2">
-        <Button
-          onClick={() =>
-            toast.add({
-              title: "Saved",
-              description: "Your changes are live.",
-              type: "success",
-              timeout: 3000,
-            })
-          }
-        >
-          Auto-dismiss toast
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() =>
-            toast.add({
-              title: "Heads up",
-              description: "This one stays until you close it.",
-              type: "info",
-              timeout: 0,
-            })
-          }
-        >
-          Manual dismiss toast
-        </Button>
-      </div>
-    </Toaster>
-  ),
-};
-
-export const Types: Story = {
-  render: () => (
-    <Toaster>
-      <div className="flex flex-wrap items-center gap-2">
-        {(["success", "info", "warning", "error", "loading"] as const).map((type) => (
-          <Button
-            key={type}
-            variant="outline"
-            onClick={() =>
-              toast.add({
-                title: type[0].toUpperCase() + type.slice(1),
-                description: `${type} toast`,
-                type,
-                timeout: 0,
-              })
-            }
-          >
-            {type}
-          </Button>
-        ))}
-      </div>
-    </Toaster>
-  ),
-};
-
-export const WithAction: Story = {
-  render: () => (
-    <Toaster>
-      <Button
-        variant="outline"
-        onClick={() =>
-          toast.add({
-            title: "Item deleted",
-            description: "The item moved to trash.",
-            type: "warning",
-            timeout: 0,
-            actionProps: { children: "Undo" },
-          })
-        }
-      >
-        Show toast with action
-      </Button>
+      <Triggers />
     </Toaster>
   ),
 };

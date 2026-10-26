@@ -1,34 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@horon-ai/react/components/tooltip";
-import { Button } from "@horon-ai/react/components/button";
+import { IconButton, Tooltip } from "@horon-ai/react";
+import { Copy } from "@phosphor-icons/react";
 
 const meta = {
   title: "Web/Tooltip",
   component: Tooltip,
   parameters: { layout: "centered" },
+  args: { label: "Copy", children: <IconButton icon={<Copy />} label="Copy" /> },
 } satisfies Meta<typeof Tooltip>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Interactive: Story = {
-  render: () => (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger render={<Button variant="outline" />}>Hover me</TooltipTrigger>
-        <TooltipContent>Add to library</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  ),
-};
-
-export const Open: Story = {
-  render: () => (
-    <TooltipProvider>
-      <Tooltip defaultOpen>
-        <TooltipTrigger render={<Button variant="outline" />}>Hover me</TooltipTrigger>
-        <TooltipContent>Add to library</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  ),
-};
+export const Top: Story = {};
+export const Bottom: Story = { args: { side: "bottom" } };
