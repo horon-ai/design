@@ -81,22 +81,19 @@
     display: none;
   }
 
-  /* The lens target for liquid-gl; the library makes it transparent itself. */
-  .liquid-layers > [data-layer="lens"] {
-    opacity: 1;
+  /* liquid-glass-react, mounted on the client (see liquid-glass.tsx). Its glass
+   * body is an inline-flex box sized by content, so it is stretched to the host,
+   * and its drop shadow is dropped: Figma glass floats on rims and blur only.
+   * The library's warp layer already blurs the backdrop, so the Figma tint and
+   * inner shade keep their fills but stop blurring a second time. */
+  .liquid-layers .glass {
+    width: 100%;
+    height: 100%;
+    box-shadow: none !important;
   }
 
-  /* Refraction on: liquid-gl paints the refracted page into a canvas at z-index 0
-   * in the body stacking context. Lifting the host to z-index 1 puts its own
-   * translucent fill, rim, edges and content over that canvas, so the refraction
-   * shows through the fill and hover or pressed fills keep working. The snapshot
-   * already carries the blur, so the tint layers stop blurring the backdrop. */
-  [data-liquid="on"] {
-    z-index: 1;
-  }
-
-  [data-liquid="on"] > .liquid-layers > [data-layer="tint"],
-  [data-liquid="on"] > .liquid-layers > [data-layer="inner-shade"] {
+  .liquid-layers[data-refract="on"] > [data-layer="tint"],
+  .liquid-layers[data-refract="on"] > [data-layer="inner-shade"] {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
