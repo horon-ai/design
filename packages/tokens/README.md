@@ -1,79 +1,25 @@
 # @horon-ai/tokens
 
-Horon 디자인 토큰의 정본입니다. 색(sand 중성, gold 액센트, 잉크 primary, 상태색, 유리 표면),
-반경, 간격, 타이포, 모션, 그림자 값이 TypeScript 객체로 정의되어 있고, `theme.css`가 그 값에서
-생성됩니다.
+Horon 디자인 토큰입니다. 모든 값은 Figma `Horon` 파일(fileKey `JinNQfldIXR0eYcjZuL3ey`)에서
+읽었고, `theme.css`는 이 값에서 생성됩니다.
 
-## 구성
+| 파일 | 내용 | Figma 출처 |
+| --- | --- | --- |
+| `src/color.ts` | 시맨틱 색 라이트·다크, 직접 쓰는 sky·red 단계 | Components `54:81`, Components / Dark `166:1107` |
+| `src/typography.ts` | 글꼴, 네 가지 굵기, 13개 글자 스타일의 Web / Desktop / Mobile 크기 | Typography `26:2` |
+| `src/scale.ts` | 반경, 간격, 그림자 | Scale 컬렉션, Menus `88:495`, Command palette `110:676` |
+| `src/glass.ts` | 유리 레이어 값과 높이 비례 규칙 | Button `55:339` 외 유리 컴포넌트 |
+| `src/css.ts` | `theme.css` 생성기 | |
 
-| 파일 | 역할 |
-| --- | --- |
-| `src/palette.ts` | 원본 팔레트 단계(oklch) |
-| `src/tokens.ts` | 라이트·다크 의미 색 토큰 |
-| `src/scales.ts` | 반경, 간격, 타이포, 모션, 그림자, 유리 표면 값 |
-| `src/css.ts` | 토큰을 CSS로 직렬화하는 생성기 |
-| `src/color.ts` | oklch 파싱·변환 유틸 |
-| `theme.css` | 위 값에서 생성된 CSS (직접 수정하지 않습니다) |
+CSS 변수 이름은 Figma 변수의 WEB 코드 문법과 같습니다. Figma Dev Mode에서
+`var(--color-text-primary)`로 보이는 값이 여기서도 `--color-text-primary`이고, Tailwind에서는
+`text-text-primary`, `bg-bg-default`처럼 씁니다. Tailwind 기본 팔레트와 반경, 글자 크기는 비웠습니다.
 
 ## theme.css 재생성
 
-`theme.css`는 손으로 고치지 않습니다. 토큰 소스를 바꾼 뒤 다음 명령으로 다시 씁니다.
+`theme.css`는 손으로 고치지 않습니다.
 
 ```bash
-bun run build            # packages/tokens 안에서
-bun run --filter @horon-ai/tokens build   # 저장소 루트에서
+bun run build                   # packages/tokens 안에서
+bun test packages/tokens        # 저장소 루트에서, 생성기 출력과 커밋된 파일이 같은지 확인
 ```
-
-게시할 때도 같은 빌드가 자동으로 돕니다. `package.json`의 `prepublishOnly`가 `bun run build`를
-실행하므로 오래된 `theme.css`가 tarball에 실리지 않습니다.
-
-## 설치
-
-버전 `0.1.0`에 `publishConfig.access: public`을 두었지만 **아직 npm 레지스트리에 게시되지
-않았습니다**(게시용 토큰 만료). 지금은 저장소 안 `file:` 의존으로 가져다 씁니다.
-
-```json
-{ "dependencies": { "@horon-ai/tokens": "file:../design/packages/tokens" } }
-```
-
-## 소비
-
-앱 진입 CSS에서 한 번 import합니다.
-
-```css
-@import "@horon-ai/tokens/theme.css";
-```
-
-`@horon-ai/react`를 쓴다면 이 import는 `@horon-ai/react/globals.css`에 이미 들어 있으므로
-따로 적지 않아도 됩니다. Tailwind v4의 `@theme inline` 변수, `:root`·`.dark` 색 변수,
-브레이크포인트, 역할 반경(`--radius-control|card|panel|pill`)이 모두 이 파일에서 나옵니다.
-
-## 검사
-
-드리프트 가드는 커밋된 `theme.css`가 생성기 출력과 바이트 단위로 같은지 확인합니다. 토큰을
-바꾸고 재생성을 잊으면 테스트가 실패합니다.
-
-```bash
-bun test packages/tokens      # 저장소 루트에서
-```
-
-대비 검사 스크립트는 유리 표면의 전경색이 여러 배경 위에서 WCAG AA(4.5:1)를 넘는지 계산하고,
-하나라도 미달이면 0이 아닌 종료 코드로 끝납니다.
-
-```bash
-bun run --filter @horon-ai/tokens contrast
-```
-
-## 패키지 내용
-
-tarball에는 `src/`, 생성된 `theme.css`, 이 README가 들어갑니다. 토큰 소스를 그대로 배포하므로
-소비 프로젝트가 값을 직접 import해 계산에 쓸 수도 있습니다.
-
-```ts
-import { colorTokens, radiusRole } from "@horon-ai/tokens";
-```
-
-## 게시
-
-`@horon-ai` 스코프는 공개 패키지입니다(`publishConfig.access: public`). 저장소 루트의
-`bun run publish:packages`가 tokens를 빌드하고 tokens → react 순서로 게시합니다.

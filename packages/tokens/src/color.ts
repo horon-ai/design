@@ -1,81 +1,192 @@
 /**
- * Minimal OKLCH -> sRGB conversion so the design tokens can live in one place
- * (OKLCH, which is what the CSS side wants) and still be rendered as hex /
- * rgb() where a plain color string is needed.
+ * Semantic color tokens, read from the Horon Figma file (fileKey
+ * JinNQfldIXR0eYcjZuL3ey) on 2026-10-26: the light values from the Components
+ * board `54:81`, the dark values from the Components / Dark board `166:1107`.
+ *
+ * Keys are the Figma variable WEB code syntax without the `--color-` prefix, so
+ * `text-primary` is `var(--color-text-primary)` in Figma Dev Mode and here.
  */
 
-export type Rgba = { r: number; g: number; b: number; a: number };
+export const lightColors = {
+  "bg-brand": "#f3f7fa",
+  "bg-danger": "#fff4f2",
+  "bg-default": "#ffffff",
+  "bg-scrim": "#0b0c0e",
+  "bg-subtle": "#f3f4f5",
+  "bg-surface": "#ffffff",
+  "bg-surface-6": "#ffffff0f",
+  "bg-surface-70": "#ffffffb2",
+  "bg-surface-75": "#ffffffbf",
+  "bg-surface-80": "#ffffffcc",
+  "bg-surface-85": "#ffffffd9",
+  "bg-surface-90": "#ffffffe5",
+  "bg-surface-95": "#fffffff2",
+  "surface-ink": "#17181a",
+  "text-brand": "#3b617b",
+  "text-danger": "#993a33",
+  "text-disabled": "#b0b1b3",
+  "text-inverse": "#f9fafb",
+  "text-on-ink": "#ffffff",
+  "text-placeholder": "#7e8082",
+  "text-placeholder-12": "#7e80821f",
+  "text-placeholder-18": "#7e80822e",
+  "text-placeholder-90": "#7e8082e5",
+  "text-primary": "#17181a",
+  "text-secondary": "#5f6163",
+  "border-brand": "#b7cedf",
+  "border-danger": "#e39289",
+  "border-default": "#e5e6e7",
+  "border-strong": "#d3d4d6",
+  "interactive-danger": "#b84e45",
+  "interactive-danger-hover": "#993a33",
+  "interactive-on-danger": "#ffffff",
+  "interactive-on-primary": "#ffffff",
+  "interactive-primary": "#17181a",
+  "interactive-primary-12": "#17181a1f",
+  "interactive-primary-75": "#17181abf",
+  "interactive-primary-90": "#17181ae5",
+  "interactive-primary-hover": "#2a2b2d",
+  "interactive-primary-pressed": "#434547",
+  "interactive-secondary-hover": "#e5e6e7",
+  "status-live": "#7199b6",
+  "glass-clear": "#ffffff33",
+  "glass-clear-hover": "#ffffff4d",
+  "glass-clear-pressed": "#ffffff66",
+  "glass-fill-frost": "#ffffffe5",
+  "glass-fill-solid": "#ffffff",
+  "glass-regular": "#ffffff8c",
+  "glass-rim": "#ffffff52",
+  "glass-rim-strong": "#ffffff66",
+  "glass-thick": "#ffffffcc",
+  "overlay-ink-10": "#0000001a",
+  "overlay-ink-12": "#0000001f",
+  "overlay-ink-14": "#00000024",
+  "overlay-ink-16": "#00000029",
+  "overlay-ink-18": "#0000002e",
+  "overlay-ink-20": "#00000033",
+  "overlay-ink-3": "#00000008",
+  "overlay-ink-30": "#0000004d",
+  "overlay-ink-35": "#00000059",
+  "overlay-ink-4": "#0000000a",
+  "overlay-ink-5": "#0000000d",
+  "overlay-ink-55": "#0000008c",
+  "overlay-ink-6": "#0000000f",
+  "overlay-ink-7": "#00000012",
+  "overlay-ink-8": "#00000014",
+  "overlay-ink-80": "#000000cc",
+  "accent-red-500-14": "#d36d6324",
+  "accent-red-500-90": "#d36d63e5",
+  "accent-sky-500-10": "#7199b61a",
+  "accent-sky-500-12": "#7199b61f",
+  "accent-sky-500-16": "#7199b629",
+  "accent-sky-500-18": "#7199b62e",
+  "accent-sky-500-20": "#7199b633",
+  "accent-sky-500-60": "#7199b699",
+  "accent-sky-500-90": "#7199b6e5",
+  "accent-sky-700-12": "#3b617b1f",
+  "accent-sky-700-18": "#3b617b2e",
+  "accent-sky-700-90": "#3b617be5",
+  "syntax-key": "#3b617b",
+  "syntax-number": "#527b98",
+  "syntax-punctuation": "#b0b1b3",
+  "syntax-string": "#17181a",
+} as const;
 
-const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+export type ColorToken = keyof typeof lightColors;
 
-function linearToSrgb(x: number): number {
-  const v = x <= 0.0031308 ? 12.92 * x : 1.055 * Math.pow(x, 1 / 2.4) - 0.055;
-  return clamp(Math.round(v * 255), 0, 255);
-}
+export const darkColors: Record<ColorToken, string> = {
+  "bg-brand": "#0f202c",
+  "bg-danger": "#3d110e",
+  "bg-default": "#0b0c0e",
+  "bg-scrim": "#0b0c0e",
+  "bg-subtle": "#2a2b2d",
+  "bg-surface": "#17181a",
+  "bg-surface-6": "#17181a0f",
+  "bg-surface-70": "#17181ab2",
+  "bg-surface-75": "#17181abf",
+  "bg-surface-80": "#17181acc",
+  "bg-surface-85": "#17181ad9",
+  "bg-surface-90": "#17181ae5",
+  "bg-surface-95": "#17181af2",
+  "surface-ink": "#2a2b2d",
+  "text-brand": "#b7cedf",
+  "text-danger": "#f2b7af",
+  "text-disabled": "#5f6163",
+  "text-inverse": "#17181a",
+  "text-on-ink": "#f9fafb",
+  "text-placeholder": "#7e8082",
+  "text-placeholder-12": "#7e80821f",
+  "text-placeholder-18": "#7e80822e",
+  "text-placeholder-90": "#7e8082e5",
+  "text-primary": "#f9fafb",
+  "text-secondary": "#b0b1b3",
+  "border-brand": "#3b617b",
+  "border-danger": "#d36d63",
+  "border-default": "#2a2b2d",
+  "border-strong": "#434547",
+  "interactive-danger": "#d36d63",
+  "interactive-danger-hover": "#e39289",
+  "interactive-on-danger": "#0b0c0e",
+  "interactive-on-primary": "#0b0c0e",
+  "interactive-primary": "#f9fafb",
+  "interactive-primary-12": "#f9fafb1f",
+  "interactive-primary-75": "#f9fafbbf",
+  "interactive-primary-90": "#f9fafbe5",
+  "interactive-primary-hover": "#e5e6e7",
+  "interactive-primary-pressed": "#d3d4d6",
+  "interactive-secondary-hover": "#434547",
+  "status-live": "#95b6ce",
+  "glass-clear": "#17181a4d",
+  "glass-clear-hover": "#17181a66",
+  "glass-clear-pressed": "#17181a80",
+  "glass-fill-frost": "#17181ae5",
+  "glass-fill-solid": "#17181a",
+  "glass-regular": "#17181a99",
+  "glass-rim": "#ffffff14",
+  "glass-rim-strong": "#ffffff24",
+  "glass-thick": "#17181acc",
+  "overlay-ink-10": "#ffffff1a",
+  "overlay-ink-12": "#ffffff1f",
+  "overlay-ink-14": "#ffffff24",
+  "overlay-ink-16": "#ffffff29",
+  "overlay-ink-18": "#ffffff2e",
+  "overlay-ink-20": "#ffffff33",
+  "overlay-ink-3": "#ffffff08",
+  "overlay-ink-30": "#ffffff4d",
+  "overlay-ink-35": "#ffffff59",
+  "overlay-ink-4": "#ffffff0a",
+  "overlay-ink-5": "#ffffff0d",
+  "overlay-ink-55": "#ffffff8c",
+  "overlay-ink-6": "#ffffff0f",
+  "overlay-ink-7": "#ffffff12",
+  "overlay-ink-8": "#ffffff14",
+  "overlay-ink-80": "#ffffffcc",
+  "accent-red-500-14": "#d36d6324",
+  "accent-red-500-90": "#d36d63e5",
+  "accent-sky-500-10": "#7199b61a",
+  "accent-sky-500-12": "#7199b61f",
+  "accent-sky-500-16": "#7199b629",
+  "accent-sky-500-18": "#7199b62e",
+  "accent-sky-500-20": "#7199b633",
+  "accent-sky-500-60": "#7199b699",
+  "accent-sky-500-90": "#7199b6e5",
+  "accent-sky-700-12": "#3b617b1f",
+  "accent-sky-700-18": "#3b617b2e",
+  "accent-sky-700-90": "#3b617be5",
+  "syntax-key": "#b7cedf",
+  "syntax-number": "#95b6ce",
+  "syntax-punctuation": "#7e8082",
+  "syntax-string": "#f9fafb",
+};
 
-/** Parse `oklch(L C H)` or `oklch(L C H / A)`; L and A may be percentages. */
-export function parseOklch(input: string): { l: number; c: number; h: number; a: number } | null {
-  const match = input.trim().match(/^oklch\(\s*([^)]+?)\s*\)$/i);
-  if (!match) return null;
-
-  const [head, alphaPart] = match[1].split("/");
-  const parts = head.trim().split(/\s+/);
-  if (parts.length < 3) return null;
-
-  const l = parts[0].endsWith("%") ? parseFloat(parts[0]) / 100 : parseFloat(parts[0]);
-  const c = parts[1].endsWith("%") ? (parseFloat(parts[1]) / 100) * 0.4 : parseFloat(parts[1]);
-  const h = parseFloat(parts[2]);
-  const a = alphaPart
-    ? alphaPart.trim().endsWith("%")
-      ? parseFloat(alphaPart.trim()) / 100
-      : parseFloat(alphaPart.trim())
-    : 1;
-
-  if ([l, c, h, a].some((n) => Number.isNaN(n))) return null;
-  return { l, c, h, a };
-}
-
-export function oklchToRgba(input: string): Rgba {
-  const parsed = parseOklch(input);
-  if (!parsed) throw new Error(`@horon-ai/tokens: unsupported color value "${input}"`);
-  const { l, c, h, a } = parsed;
-
-  const hRad = (h * Math.PI) / 180;
-  const aLab = c * Math.cos(hRad);
-  const bLab = c * Math.sin(hRad);
-
-  // Cone response (LMS) before the cube: the linear-sRGB conversion below
-  // expects the cubed values, so the intermediate names carry the cube.
-  const lLinear = l + 0.3963377774 * aLab + 0.2158037573 * bLab;
-  const mLinear = l - 0.1055613458 * aLab - 0.0638541728 * bLab;
-  const sLinear = l - 0.0894841775 * aLab - 1.291485548 * bLab;
-
-  const l3 = lLinear ** 3;
-  const m3 = mLinear ** 3;
-  const s3 = sLinear ** 3;
-
-  const r = 4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3;
-  const g = -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3;
-  const b = -0.0041960863 * l3 - 0.7034186147 * m3 + 1.707614701 * s3;
-
-  return {
-    r: linearToSrgb(r),
-    g: linearToSrgb(g),
-    b: linearToSrgb(b),
-    a: clamp(a, 0, 1),
-  };
-}
-
-const hex = (n: number) => n.toString(16).padStart(2, "0");
-
-/** Hex string: `#rrggbb`, or `#rrggbbaa` when translucent. */
-export function oklchToHex(input: string): string {
-  const { r, g, b, a } = oklchToRgba(input);
-  if (a >= 1) return `#${hex(r)}${hex(g)}${hex(b)}`;
-  return `#${hex(r)}${hex(g)}${hex(b)}${hex(Math.round(a * 255))}`;
-}
-
-export function oklchToRgbString(input: string): string {
-  const { r, g, b, a } = oklchToRgba(input);
-  return a >= 1 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${Number(a.toFixed(3))})`;
-}
+/** Primitive steps that the Components board references directly. */
+export const primitives = {
+  "red-500": "#d36d63",
+  "sky-100": "#e7eff5",
+  "sky-200": "#d2e0eb",
+  "sky-400": "#95b6ce",
+  "sky-500": "#7199b6",
+  "sky-600": "#527b98",
+  "sky-700": "#3b617b",
+  "sky-800": "#2a495e",
+} as const;
