@@ -275,7 +275,7 @@ export const components: ComponentEntry[] = [
     slug: "sidebar",
     title: "Sidebar",
     group: "navigation",
-    description: "워크스페이스, 루틴, 프로젝트, 계정을 담는 왼쪽 패널입니다.",
+    description: "워크스페이스, 메뉴, 펼쳐지는 프로젝트, 계정을 담는 왼쪽 패널입니다.",
     story: "web-sidebar--default",
   },
   {
