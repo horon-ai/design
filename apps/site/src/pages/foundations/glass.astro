@@ -34,6 +34,13 @@ const usage = `import { LiquidGlass } from "@horon-ai/react";
   </ul>
   <p>H는 표면 높이입니다. 레이어 묶음을 CSS 크기 컨테이너로 만들어 <code>100cqh</code>로 높이를 읽기 때문에, 32px 칩부터 큰 카드까지 Figma와 같은 비율로 흐려집니다. 두꺼운 유리(<code>tier="thick"</code>)는 어두운 경계선을 뺍니다.</p>
 
+  <h2>굴절</h2>
+  <p>
+    뒤 배경의 굴절은 <a href="https://github.com/naughtyduk/liquidGL">liquid-gl</a>이 WebGPU, 안 되면 WebGL로 그립니다.
+    페이지를 낮은 해상도로 찍어 부드럽게 흐린 뒤, 가장자리를 렌즈처럼 휘게 하고 위쪽에 빛 반사를 얹습니다. 화면의 모든 유리가
+    캔버스 하나를 나눠 씁니다. GPU를 쓸 수 없거나 투명도 줄이기 설정이 켜져 있으면 위의 CSS 레이어만으로 그립니다.
+  </p>
+
   <h2>쓰는 법</h2>
   <CodeBlock code={usage} title="tsx" />
 </DocsLayout>
