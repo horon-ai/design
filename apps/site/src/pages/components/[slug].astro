@@ -6,7 +6,6 @@ import Footer from "@/components/site/Footer.astro";
 import Sidebar from "@/components/site/Sidebar.astro";
 import Toc from "@/components/site/Toc.astro";
 import { components, componentBySlug, componentGroups } from "@/data/components";
-import { usageSnippets } from "@/data/usage";
 import { resolveDemoName } from "@/lib/demos";
 
 export function getStaticPaths() {
@@ -21,11 +20,17 @@ if (!component) {
 }
 
 const group = componentGroups.find((entry) => entry.id === component.group);
-const demoName = resolveDemoName(component.slug, component.demo);
-const snippet =
-  usageSnippets[component.slug] ??
-  `import { ${component.title.replace(/\s/g, "")} } from "@horon-ai/react";`;
-const storybookHref = `https://storybook.horon.ai/?path=/story/web-${component.slug}--default`;
+const demoName = resolveDemoName(component.slug);
+const sources = import.meta.glob<string>("../../components/demos/*.tsx", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+const snippet = (sources[`../../components/demos/${component.slug}.tsx`] ?? "")
+  .replace(/^import \{ Backdrop \} from "\.\.\/demo-backdrop";\n\n?/m, "")
+  .replace(/<Backdrop[^>]*>\n?/g, "<>\n")
+  .replace(/<\/Backdrop>/g, "</>");
+const storybookHref = `https://storybook.horon.ai/?path=/story/${component.story}`;
 const index = components.findIndex((entry) => entry.slug === component.slug);
 const previous = index > 0 ? components[index - 1] : undefined;
 const next = index >= 0 && index < components.length - 1 ? components[index + 1] : undefined;
@@ -39,10 +44,10 @@ const showToc = true;
     <article class="docs-main">
       <div class="mx-auto w-full max-w-[56.25rem]">
         <nav
-          class="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
+          class="flex flex-wrap items-center gap-2 text-body-sm text-text-secondary"
           aria-label="현재 위치"
         >
-          <a href="/components" class="transition-colors hover:text-foreground">Components</a>
+          <a href="/components" class="transition-colors hover:text-text-primary">Components</a>
           <span aria-hidden="true">/</span>
           {group && <span>{group.title}</span>}
         </nav>
@@ -51,12 +56,12 @@ const showToc = true;
         <p class="doc-lead mt-4">{component.description}</p>
 
         <div class="mt-6 flex flex-wrap items-center gap-2">
-          <span class="inline-flex h-9 items-center rounded-lg bg-muted px-3 text-sm">
+          <span class="inline-flex h-9 items-center rounded-lg bg-bg-subtle px-3 text-body-sm">
             @horon-ai/react
           </span>
           {
             group && (
-              <span class="inline-flex h-9 items-center rounded-lg bg-muted px-3 text-sm">
+              <span class="inline-flex h-9 items-center rounded-lg bg-bg-subtle px-3 text-body-sm">
                 {group.title}
               </span>
             )
@@ -65,7 +70,7 @@ const showToc = true;
             href={storybookHref}
             target="_blank"
             rel="noreferrer"
-            class="inline-flex h-9 items-center rounded-lg bg-muted px-3 text-sm transition-colors hover:text-foreground"
+            class="inline-flex h-9 items-center rounded-lg bg-bg-subtle px-3 text-body-sm transition-colors hover:text-text-primary"
           >
             Storybook ↗
           </a>
@@ -73,13 +78,13 @@ const showToc = true;
 
         {/* Toc.astro collects its links from `article .prose-docs h2, h3`. */}
         <div class="prose-docs">
-          <h2 class="mt-14 mb-6 text-2xl font-medium">Preview</h2>
+          <h2 class="mt-14 mb-6 text-title-md font-medium">Preview</h2>
           {
             demoName ? (
               <Demo name={demoName} overlay={component.overlay} />
             ) : (
               <div class="demo-stage">
-                <p class="max-w-md text-center text-sm leading-6 text-muted-foreground">
+                <p class="max-w-md text-center text-body-sm leading-6 text-text-secondary">
                   이 컴포넌트는 라이브 프리뷰 대신 코드 예시와 Storybook 링크로 안내합니다. 전체
                   상태와 변형은 Storybook에서 확인할 수 있습니다.
                 </p>
@@ -87,16 +92,16 @@ const showToc = true;
             )
           }
 
-          <h2 class="mt-16 mb-6 text-2xl font-medium">Usage</h2>
+          <h2 class="mt-16 mb-6 text-title-md font-medium">Usage</h2>
           <CodeBlock code={snippet} title="tsx" />
         </div>
 
-        <nav class="mt-16 grid gap-6 border-t border-border pt-8 sm:grid-cols-2">
+        <nav class="mt-16 grid gap-6 border-t border-border-default pt-8 sm:grid-cols-2">
           {
             previous ? (
               <a href={`/components/${previous.slug}`} class="card-link">
-                <span class="text-xs text-muted-foreground">← 이전</span>
-                <span class="text-base font-medium">{previous.title}</span>
+                <span class="text-caption text-text-secondary">← 이전</span>
+                <span class="text-body-md font-medium">{previous.title}</span>
               </a>
             ) : (
               <span />
@@ -105,8 +110,8 @@ const showToc = true;
           {
             next ? (
               <a href={`/components/${next.slug}`} class="card-link text-right">
-                <span class="text-xs text-muted-foreground">다음 →</span>
-                <span class="text-base font-medium">{next.title}</span>
+                <span class="text-caption text-text-secondary">다음 →</span>
+                <span class="text-body-md font-medium">{next.title}</span>
               </a>
             ) : (
               <span />

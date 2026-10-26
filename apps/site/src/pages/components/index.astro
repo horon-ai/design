@@ -8,30 +8,28 @@ import { demoCount } from "@/lib/demos";
 
 <BaseLayout
   title="Components"
-  description="HORON 디자인 시스템의 컴포넌트 75개. 입력, 표시, 내비게이션, 오버레이, 레이아웃으로 나눠 정리했습니다."
+  description="HORON 디자인 시스템의 컴포넌트. 입력, 표시, 내비게이션, 오버레이, 대화, 에이전트로 나눠 정리했습니다."
 >
   <div class="docs-grid">
     <Sidebar section="components" />
     <article class="docs-main pb-16">
-      <p class="text-sm text-muted-foreground">Components</p>
+      <p class="text-body-sm text-text-secondary">Components</p>
       <h1 class="doc-title">{componentCount}개의 컴포넌트</h1>
       <p class="doc-lead mt-4">
-        <code class="font-mono text-[13px]">@horon-ai/react</code>가 제공하는 컴포넌트 전부입니다. 카드에
-        프리뷰가 보이는 항목은 이 페이지에서 바로 동작하고, 나머지는 코드 예시와 Storybook 링크를
-        제공합니다.
+        <code class="font-mono text-[13px]">@horon-ai/react</code>가 제공하는 컴포넌트 전부입니다. Figma Components 보드를 Base UI로 옮겼고, 카드의 프리뷰는 실제 컴포넌트입니다. 화면을 덮는 오버레이는 상세 페이지에서 열어 볼 수 있습니다.
       </p>
       <dl class="mt-10 flex flex-wrap gap-x-10 gap-y-4">
         <div>
-          <dt class="text-xs text-muted-foreground">Total</dt>
-          <dd class="mt-1 text-2xl font-semibold">{componentCount}</dd>
+          <dt class="text-caption text-text-secondary">Total</dt>
+          <dd class="mt-1 text-title-md font-semibold">{componentCount}</dd>
         </div>
         <div>
-          <dt class="text-xs text-muted-foreground">Live previews</dt>
-          <dd class="mt-1 text-2xl font-semibold">{demoCount()}</dd>
+          <dt class="text-caption text-text-secondary">Live previews</dt>
+          <dd class="mt-1 text-title-md font-semibold">{demoCount()}</dd>
         </div>
         <div>
-          <dt class="text-xs text-muted-foreground">Groups</dt>
-          <dd class="mt-1 text-2xl font-semibold">{componentGroups.length}</dd>
+          <dt class="text-caption text-text-secondary">Groups</dt>
+          <dd class="mt-1 text-title-md font-semibold">{componentGroups.length}</dd>
         </div>
       </dl>
 

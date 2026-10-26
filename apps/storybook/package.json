@@ -11,9 +11,9 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@horon-ai/tokens": "workspace:*",
 		"@horon-ai/react": "workspace:*",
-		"lucide-react": "^1.56.0",
+		"@horon-ai/tokens": "workspace:*",
+		"@phosphor-icons/react": "^2.1.10",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0"
 	},

@@ -1,4 +1,4 @@
-/// Components that exist in `packages/react/src/components` but have no
+/// Components that exist in [reactComponentsPath] but have no
 /// `lib/src/components/<slug>.dart` file yet.
 ///
 /// The parity gate asserts `reactSlugs == implementedSlugs ∪ pendingComponents`,

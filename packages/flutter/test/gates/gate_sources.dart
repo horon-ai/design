@@ -3,15 +3,15 @@ import 'dart:io';
 /// Shared lookups for the component gates.
 ///
 /// React is the source of truth for which components exist. The gates read the
-/// `@horon-ai/react` sources from the file system rather than depending on the
-/// package: a Dart package cannot depend on a TypeScript workspace, and reading
-/// the directory keeps the gate honest about the file list at the moment it
-/// runs.
+/// React sources from the file system rather than depending on the package: a
+/// Dart package cannot depend on a TypeScript workspace.
 ///
-/// `flutter test` runs with the package root (`packages/flutter`) as its working
-/// directory, so `../react/src/components` resolves and `../../../react/...`
-/// does not. That was measured on 2026-10-22.
-const String reactComponentsPath = '../react/src/components';
+/// Until the Flutter layer is rebuilt against the web components that were
+/// rebuilt from Figma on 2026-10-26, the gates read the frozen copy of the
+/// earlier 75 components in `reference/react-components/` (see its README).
+/// Paths resolve from the package root, which is `flutter test`'s working
+/// directory.
+const String reactComponentsPath = 'reference/react-components';
 const String flutterComponentsPath = 'lib/src/components';
 const String galleryRegistryPath = 'example/lib/gallery/registry.dart';
 

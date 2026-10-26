@@ -1,135 +1,133 @@
-"use client";
+import { Plus } from "@phosphor-icons/react";
+import type { ComponentProps, ReactNode } from "react";
 
-import {
-  createPaginatedRowModel,
-  createSortedRowModel,
-  flexRender,
-  rowPaginationFeature,
-  rowSortingFeature,
-  tableFeatures,
-  useTable,
-  type ColumnDef,
-  type RowData,
-} from "@tanstack/react-table";
-import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDownIcon } from "lucide-react";
-import { cn } from "cn";
-import { Button } from "@horon-ai/react/components/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@horon-ai/react/components/table";
+import { cn } from "../lib/cn";
 
-const dataTableFeatures = tableFeatures({
-  rowSortingFeature,
-  rowPaginationFeature,
-  sortedRowModel: createSortedRowModel(),
-  paginatedRowModel: createPaginatedRowModel(),
-});
+type WithClass<T> = Omit<T, "className"> & { className?: string };
 
-export type DataTableFeatures = typeof dataTableFeatures;
+/** Figma `Data table` (192:9046): a solid surface card, 20px radius, 1px default border. */
+export function DataTable({ className, ...props }: WithClass<ComponentProps<"div">>) {
+  return (
+    <div
+      className={cn("flex flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface", className)}
+      {...props}
+    />
+  );
+}
 
-export type DataTableColumn<TData extends RowData> = ColumnDef<DataTableFeatures, TData>;
-
-type DataTableProps<TData extends RowData> = {
-  columns: DataTableColumn<TData>[];
-  data: TData[];
-  pageSize?: number;
-  emptyMessage?: string;
+export type DataTableHeaderProps = {
+  /** 16px icon on the 26px brand tile. */
+  icon?: ReactNode;
+  title: ReactNode;
+  /** Trailing 16px icon buttons. */
+  actions?: ReactNode;
   className?: string;
 };
 
-function DataTable<TData extends RowData>({
-  columns,
-  data,
-  pageSize = 10,
-  emptyMessage = "No results.",
-  className,
-}: DataTableProps<TData>) {
-  const table = useTable({
-    features: dataTableFeatures,
-    columns,
-    data,
-    initialState: { pagination: { pageIndex: 0, pageSize } },
-  });
-
-  const pagination = table.state.pagination;
-  const pageCount = Math.max(table.getPageCount(), 1);
-
+export function DataTableHeader({ icon, title, actions, className }: DataTableHeaderProps) {
   return (
-    <div data-slot="data-table" className={cn("flex w-full flex-col gap-3", className)}>
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                const sorted = header.column.getIsSorted();
-                const canSort = header.column.getCanSort();
-
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : canSort ? (
-                      <button
-                        type="button"
-                        data-slot="data-table-sort"
-                        onClick={header.column.getToggleSortingHandler()}
-                        className="inline-flex items-center gap-1.5 rounded-xs transition-colors outline-none hover:text-foreground focus-visible:text-foreground"
-                      >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        {sorted === "asc" ? (
-                          <ArrowUpIcon className="size-3.5" />
-                        ) : sorted === "desc" ? (
-                          <ArrowDownIcon className="size-3.5" />
-                        ) : (
-                          <ChevronsUpDownIcon className="size-3.5 opacity-60" />
-                        )}
-                      </button>
-                    ) : (
-                      flexRender(header.column.columnDef.header, header.getContext())
-                    )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                {emptyMessage}
-              </TableCell>
-            </TableRow>
-          ) : (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getAllCells().map((cell) => (
-                  <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                ))}
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-      <div data-slot="data-table-pagination" className="flex items-center justify-between gap-4">
-        <p data-slot="data-table-row-count" className="text-[13px] text-muted-foreground">
-          {table.getRowCount()} row(s)
-        </p>
-        <div data-slot="data-table-pagination-controls" className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <span data-slot="data-table-page-status" className="text-[13px] text-muted-foreground tabular-nums">
-            Page {pagination.pageIndex + 1} of {pageCount}
-          </span>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            Next
-          </Button>
-        </div>
-      </div>
+    <div className={cn("flex items-center gap-3 px-6 py-4.5", className)}>
+      {icon && (
+        <span className="flex size-6.5 shrink-0 items-center justify-center rounded-[7px] bg-bg-brand text-text-brand [&>svg]:size-4">
+          {icon}
+        </span>
+      )}
+      <h3 className="min-w-0 flex-1 truncate text-label-lg text-text-primary">{title}</h3>
+      {actions && <div className="flex items-center gap-3 text-text-secondary [&_svg]:size-4">{actions}</div>}
     </div>
   );
 }
 
-export { DataTable };
+export function DataTableTable({ className, ...props }: WithClass<ComponentProps<"table">>) {
+  return (
+    <div className="w-full overflow-x-auto">
+      <table className={cn("w-full border-collapse text-left", className)} {...props} />
+    </div>
+  );
+}
+
+/** Header cell: 52px, 14px icon and label-md secondary text. */
+export function DataTableHead({
+  icon,
+  className,
+  children,
+  ...props
+}: WithClass<ComponentProps<"th">> & { icon?: ReactNode }) {
+  return (
+    <th
+      className={cn(
+        "font-normal h-13 border-y border-border-default pr-3 align-middle first:pl-6 last:pr-6 [&_svg]:size-3.5",
+        className,
+      )}
+      {...props}
+    >
+      <span className="flex items-center gap-2 text-label-md whitespace-nowrap text-text-secondary">
+        {icon}
+        {children}
+      </span>
+    </th>
+  );
+}
+
+export function DataTableRow({ className, ...props }: WithClass<ComponentProps<"tr">>) {
+  return <tr className={cn("border-b border-border-default", className)} {...props} />;
+}
+
+/** Body cell: 52px; body-sm secondary text unless the content sets its own. */
+export function DataTableCell({ className, ...props }: WithClass<ComponentProps<"td">>) {
+  return (
+    <td
+      className={cn("h-13 pr-3 align-middle text-body-sm text-text-secondary first:pl-6 last:pr-6", className)}
+      {...props}
+    />
+  );
+}
+
+/** The 24px ink logo tile with a label-sm initial, beside a label-lg name. */
+export function DataTableItem({ logo, children }: { logo: ReactNode; children: ReactNode }) {
+  return (
+    <span className="flex items-center gap-2.5">
+      <span className="flex size-6 shrink-0 items-center justify-center rounded-xs bg-surface-ink text-label-sm text-text-on-ink">
+        {logo}
+      </span>
+      <span className="truncate text-label-lg text-text-primary">{children}</span>
+    </span>
+  );
+}
+
+/** Figma `Table tag`: brand (sky tint) or neutral (subtle) label, 8px radius. */
+export function DataTableTag({
+  tone = "brand",
+  className,
+  ...props
+}: WithClass<ComponentProps<"span">> & { tone?: "brand" | "neutral" }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex rounded-sm px-2.5 py-[3px] text-label-md whitespace-nowrap",
+        tone === "brand" ? "bg-bg-brand text-text-brand" : "bg-bg-subtle text-text-secondary",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export type DataTableFooterProps = { onAdd?: () => void; addLabel?: string; hint?: ReactNode; className?: string };
+
+/** Footer: "Add row" with a 16px plus and a caption hint on the right. */
+export function DataTableFooter({ onAdd, addLabel = "Add row", hint, className }: DataTableFooterProps) {
+  return (
+    <div className={cn("flex items-center gap-2 px-6 pt-3.5 pb-4", className)}>
+      <button
+        type="button"
+        onClick={onAdd}
+        className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-label-md text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
+      >
+        <Plus aria-hidden className="size-4" />
+        {addLabel}
+      </button>
+      {hint && <span className="shrink-0 text-caption text-text-secondary">{hint}</span>}
+    </div>
+  );
+}

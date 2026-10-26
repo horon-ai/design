@@ -17,7 +17,7 @@
 		"test": "bun test",
 		"format": "turbo format",
 		"tokens": "turbo build --filter=@horon-ai/tokens && bun run tokens:flutter",
-		"tokens:flutter": "node packages/flutter/scripts/generate-tokens.mjs",
+		"tokens:flutter": "bun packages/flutter/scripts/generate-tokens.mjs",
 		"storybook": "turbo storybook --filter=@horon/storybook",
 		"build:storybook": "turbo build-storybook --filter=@horon/storybook",
 		"playground": "turbo dev --filter=@horon/playground",

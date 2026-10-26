@@ -1,18 +1,29 @@
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@horon-ai/react";
-import { SearchIcon, XIcon } from "lucide-react";
+import { InputGroup } from "@horon-ai/react";
+import { CaretDown } from "@phosphor-icons/react";
+
+import { Backdrop } from "../demo-backdrop";
 
 export default function InputGroupDemo() {
   return (
-    <InputGroup className="w-80">
-      <InputGroupAddon>
-        <SearchIcon />
-      </InputGroupAddon>
-      <InputGroupInput placeholder="컴포넌트 검색" />
-      <InputGroupAddon align="inline-end">
-        <InputGroupButton aria-label="검색어 지우기">
-          <XIcon />
-        </InputGroupButton>
-      </InputGroupAddon>
-    </InputGroup>
+    <Backdrop className="flex-col">
+      <InputGroup
+        className="w-80"
+        placeholder="Phone number"
+        prefix={
+          <>
+            +82 <CaretDown />
+          </>
+        }
+      />
+      <InputGroup
+        className="w-80"
+        placeholder="Amount"
+        suffix={
+          <>
+            KRW <CaretDown />
+          </>
+        }
+      />
+    </Backdrop>
   );
 }

@@ -1,64 +1,45 @@
-import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { DateRange } from "@horon-ai/react/components/date-picker";
-import { Calendar } from "@horon-ai/react/components/calendar";
+import { Calendar, type DateRange } from "@horon-ai/react";
+import { useState } from "react";
+
+import { onBackdrop } from "../support";
 
 const meta = {
   title: "Web/Calendar",
   component: Calendar,
-  parameters: { layout: "centered" },
+  decorators: [onBackdrop],
 } satisfies Meta<typeof Calendar>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function SingleCalendar() {
-  const [date, setDate] = React.useState<Date | undefined>(new Date(2026, 9, 14));
+const today = new Date(2026, 9, 26);
 
-  return (
-    <Calendar
-      mode="single"
-      selected={date}
-      onSelect={setDate}
-      defaultMonth={date}
-      className="rounded-md border border-border"
-    />
-  );
-}
-
-export const Playground: Story = {
-  render: () => <SingleCalendar />,
+export const Single: Story = {
+  render: () => {
+    const [value, setValue] = useState<Date | null>(new Date(2026, 9, 20));
+    return <Calendar today={today} value={value} onValueChange={setValue} />;
+  },
 };
-
-function RangeCalendar() {
-  const [range, setRange] = React.useState<DateRange | undefined>({
-    from: new Date(2026, 9, 5),
-    to: new Date(2026, 9, 18),
-  });
-
-  return (
-    <Calendar
-      mode="range"
-      selected={range}
-      onSelect={setRange}
-      defaultMonth={range?.from}
-      numberOfMonths={2}
-      className="rounded-md border border-border"
-    />
-  );
-}
 
 export const Range: Story = {
-  render: () => <RangeCalendar />,
+  render: () => {
+    const [value, setValue] = useState<DateRange>({ start: new Date(2026, 9, 20), end: new Date(2026, 9, 24) });
+    return (
+      <Calendar
+        mode="range"
+        today={today}
+        value={value}
+        onValueChange={setValue}
+        isDateDisabled={(date) => date > new Date(2026, 9, 28)}
+      />
+    );
+  },
 };
 
-export const Dropdown: Story = {
-  render: () => (
-    <Calendar
-      mode="single"
-      captionLayout="dropdown"
-      defaultMonth={new Date(2026, 9, 14)}
-      className="rounded-md border border-border"
-    />
-  ),
+export const Popover: Story = {
+  render: () => {
+    const [value, setValue] = useState<Date | null>(new Date(2026, 9, 26));
+    return <Calendar variant="popover" today={today} value={value} onValueChange={setValue} />;
+  },
 };

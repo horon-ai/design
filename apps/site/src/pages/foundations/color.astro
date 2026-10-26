@@ -1,120 +1,75 @@
 ---
 import DocsLayout from "@/layouts/DocsLayout.astro";
-import { PALETTE } from "@horon-ai/tokens";
+import { darkColors, lightColors, primitives } from "@horon-ai/tokens";
 
-const sand = Object.entries(PALETTE.sand);
-const gold = Object.entries(PALETTE.gold);
-const status = [
-  ["green", Object.entries(PALETTE.green)],
-  ["red", Object.entries(PALETTE.red)],
-  ["blue", Object.entries(PALETTE.blue)],
+const groups = [
+  ["Background", "bg-"],
+  ["Surface", "surface-"],
+  ["Text", "text-"],
+  ["Border", "border-"],
+  ["Interactive", "interactive-"],
+  ["Status", "status-"],
+  ["Glass", "glass-"],
+  ["Overlay", "overlay-"],
+  ["Accent", "accent-"],
+  ["Syntax", "syntax-"],
 ] as const;
 
-const semantic = [
-  ["background", "var(--background)"],
-  ["foreground", "var(--foreground)"],
-  ["card", "var(--card)"],
-  ["muted", "var(--muted)"],
-  ["secondary", "var(--secondary)"],
-  ["accent", "var(--accent)"],
-  ["primary", "var(--primary)"],
-  ["border", "var(--border)"],
-  ["ring", "var(--ring)"],
-  ["destructive", "var(--destructive)"],
-  ["success", "var(--success)"],
-  ["warning", "var(--warning)"],
-  ["info", "var(--info)"],
-];
+const names = Object.keys(lightColors) as (keyof typeof lightColors)[];
+const dark = darkColors as Record<string, string>;
 ---
 
 <DocsLayout
   title="Color"
   eyebrow="Foundations"
   section="foundations"
-  description="중성 sand 램프를 백본으로 두고, gold를 단일 액센트로 씁니다. 상태색은 muted 톤으로 낮춰 화면이 여러 색으로 흩어지지 않게 합니다."
+  description="잉크와 흰 종이를 백본으로 두고, 하늘색(sky)을 브랜드 액센트로 씁니다. 위험은 낮춘 붉은색 하나로 표시합니다."
 >
   <p>
-    색은 두 층으로 나뉩니다. <strong>프리미티브</strong>는 캔버스에 적힌 원시 램프이고,
-    <strong>시맨틱</strong>은 컴포넌트가 실제로 참조하는 변수입니다. 다크 모드에서 바뀌는 것은
-    시맨틱 층뿐입니다.
+    색은 두 층입니다. <strong>프리미티브</strong>는 Figma Primitives 컬렉션의 원시 값이고,
+    <strong>시맨틱</strong>은 컴포넌트가 실제로 참조하는 변수입니다. 다크 모드에서 바뀌는 것은 시맨틱 층뿐입니다.
+    견본의 왼쪽 반은 라이트, 오른쪽 반은 다크 값입니다.
   </p>
 
-  <h2>Sand — 중성 백본</h2>
-  <p>표면, 텍스트, 테두리가 모두 이 램프에서 나옵니다. 채도가 0이라 어떤 색 캐스트도 없습니다.</p>
-  <div class="not-prose mt-5 overflow-hidden rounded-xl bg-muted/20">
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6">
-      {
-        sand.map(([step, value]) => (
-          <div class="border-b border-r border-border last:border-r-0">
-            <div class="h-14" style={`background: ${value}`} />
-            <div class="px-3 py-2">
-              <p class="font-mono text-xs text-foreground">sand-{step}</p>
-              <p class="truncate font-mono text-xs text-muted-foreground">{value}</p>
-            </div>
-          </div>
-        ))
-      }
-    </div>
-  </div>
-
-  <h2>Gold — 단일 액센트</h2>
-  <p>
-    Horus의 금색입니다. 포커스 링, 링크, 하이라이트에만 씁니다. 버튼 fill로는 쓰지 않습니다.
-    <code>accent</code> 변수는 브랜드 색이 아니라 hover·선택 상태의 옅은 중성 표면입니다.
-  </p>
-  <div class="not-prose mt-5 overflow-hidden rounded-xl bg-muted/20">
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
-      {
-        gold.map(([step, value]) => (
-          <div class="border-b border-r border-border last:border-r-0">
-            <div class="h-14" style={`background: ${value}`} />
-            <div class="px-3 py-2">
-              <p class="font-mono text-xs text-foreground">gold-{step}</p>
-              <p class="truncate font-mono text-xs text-muted-foreground">{value}</p>
-            </div>
-          </div>
-        ))
-      }
-    </div>
-  </div>
-
-  <h2>Status — 낮춘 톤</h2>
-  <p>성공·실패·정보는 채도를 낮춰 씁니다. warning은 gold와 같은 값을 공유합니다.</p>
-  <div class="not-prose mt-5 space-y-3">
+  <h2>Primitives</h2>
+  <p>컴포넌트가 직접 쓰는 프리미티브는 이것뿐입니다. 아바타 타일, 프로젝트 타일, 진행 막대처럼 시맨틱 이름이 없는 자리에 씁니다.</p>
+  <div class="not-prose mt-5 grid grid-cols-2 overflow-hidden rounded-xl border border-border-default sm:grid-cols-4">
     {
-      status.map(([name, steps]) => (
-        <div>
-          <p class="mb-1.5 font-mono text-xs text-muted-foreground">{name}</p>
-          <div class="flex overflow-hidden rounded-lg">
-            {steps.map(([step, value]) => (
-              <div class="h-10 flex-1" style={`background: ${value}`} title={`${name}-${step}`} />
+      Object.entries(primitives).map(([name, value]) => (
+        <div class="border-r border-b border-border-default">
+          <div class="h-14" style={`background: ${value}`} />
+          <div class="px-3 py-2">
+            <p class="font-mono text-caption text-text-primary">{name}</p>
+            <p class="font-mono text-caption text-text-secondary">{value}</p>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
+  {
+    groups.map(([title, prefix]) => (
+      <Fragment>
+        <h2>{title}</h2>
+        <div class="not-prose mt-5 grid gap-2 sm:grid-cols-2">
+          {names
+            .filter((name) => name.startsWith(prefix))
+            .map((name) => (
+              <div class="flex items-center gap-3 rounded-lg bg-bg-subtle px-3 py-2">
+                <span class="flex size-8 shrink-0 overflow-hidden rounded-xs border border-border-default">
+                  <span class="flex-1" style={`background: ${lightColors[name]}`} />
+                  <span class="flex-1" style={`background: ${dark[name] ?? lightColors[name]}`} />
+                </span>
+                <span class="min-w-0">
+                  <span class="block truncate font-mono text-caption text-text-primary">--color-{name}</span>
+                  <span class="block font-mono text-caption text-text-secondary">
+                    {lightColors[name]} · {dark[name] ?? "—"}
+                  </span>
+                </span>
+              </div>
             ))}
-          </div>
         </div>
-      ))
-    }
-  </div>
-
-  <h2>Semantic</h2>
-  <p>컴포넌트가 참조하는 변수입니다. 아래 견본은 현재 테마의 실제 값을 그대로 그립니다.</p>
-  <div class="not-prose mt-5 grid gap-2 sm:grid-cols-2">
-    {
-      semantic.map(([name, value]) => (
-        <div class="flex items-center gap-3 rounded-lg bg-muted/20 px-3 py-2">
-          <span
-            class="size-7 shrink-0 rounded-xs border border-border"
-            style={`background: ${value}`}
-          />
-          <span class="font-mono text-xs text-foreground">{name}</span>
-          <span class="ml-auto font-mono text-xs text-muted-foreground">--{name}</span>
-        </div>
-      ))
-    }
-  </div>
-
-  <h2>대비</h2>
-  <p>
-    모든 전경·배경 조합은 WCAG AA(4.5:1)를 넘깁니다. 유리 표면은 자체 전경색을 갖고, 불투명
-    배경에서는 대비가 떨어지지 않도록 별도 값을 씁니다.
-  </p>
+      </Fragment>
+    ))
+  }
 </DocsLayout>

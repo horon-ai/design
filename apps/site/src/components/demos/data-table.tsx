@@ -1,30 +1,56 @@
-import { DataTable, type DataTableColumn } from "@horon-ai/react";
+import {
+  Checkbox,
+  DataTable,
+  DataTableCell,
+  DataTableFooter,
+  DataTableHead,
+  DataTableHeader,
+  DataTableItem,
+  DataTableRow,
+  DataTableTable,
+  DataTableTag,
+} from "@horon-ai/react";
+import { CalendarBlank, FileText, ListChecks, SquaresFour } from "@phosphor-icons/react";
 
-interface Member {
-  name: string;
-  role: string;
-  commits: number;
-}
-
-const columns: DataTableColumn<Member>[] = [
-  { accessorKey: "name", header: "이름" },
-  { accessorKey: "role", header: "역할" },
-  { accessorKey: "commits", header: "커밋" },
-];
-
-const data: Member[] = [
-  { name: "민열", role: "설계", commits: 128 },
-  { name: "지우", role: "프론트엔드", commits: 94 },
-  { name: "도현", role: "백엔드", commits: 76 },
-  { name: "서연", role: "디자인", commits: 61 },
-  { name: "하람", role: "QA", commits: 43 },
-  { name: "유진", role: "문서", commits: 28 },
+const rows = [
+  { logo: "F", name: "Figma", tag: "Design", tone: "brand" as const, renews: "Mar 12, 2026" },
+  { logo: "L", name: "Linear", tag: "Issue tracking", tone: "brand" as const, renews: "Jun 3, 2026" },
+  { logo: "L", name: "Loom", tag: "Video", tone: "neutral" as const, renews: "Nov 18, 2026" },
 ];
 
 export default function DataTableDemo() {
   return (
-    <div className="w-full">
-      <DataTable columns={columns} data={data} pageSize={4} emptyMessage="결과가 없습니다." />
-    </div>
+    <DataTable className="max-w-160">
+      <DataTableHeader icon={<FileText />} title="Design Stack" />
+      <DataTableTable>
+        <thead>
+          <tr>
+            <DataTableHead className="w-12">
+              <Checkbox size="sm" aria-label="Select all" />
+            </DataTableHead>
+            <DataTableHead icon={<ListChecks />}>Tool</DataTableHead>
+            <DataTableHead icon={<SquaresFour />}>Category</DataTableHead>
+            <DataTableHead icon={<CalendarBlank />}>Renews</DataTableHead>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <DataTableRow key={row.name}>
+              <DataTableCell>
+                <Checkbox size="sm" aria-label={`Select ${row.name}`} />
+              </DataTableCell>
+              <DataTableCell>
+                <DataTableItem logo={row.logo}>{row.name}</DataTableItem>
+              </DataTableCell>
+              <DataTableCell>
+                <DataTableTag tone={row.tone}>{row.tag}</DataTableTag>
+              </DataTableCell>
+              <DataTableCell>{row.renews}</DataTableCell>
+            </DataTableRow>
+          ))}
+        </tbody>
+      </DataTableTable>
+      <DataTableFooter hint="Double-click a cell to edit" />
+    </DataTable>
   );
 }

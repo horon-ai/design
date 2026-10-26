@@ -1,10 +1,15 @@
 import { Input } from "@horon-ai/react";
+import { MagnifyingGlass } from "@phosphor-icons/react";
+
+import { Backdrop } from "../demo-backdrop";
 
 export default function InputDemo() {
   return (
-    <div className="flex w-72 flex-col gap-3">
-      <Input type="email" placeholder="이메일" />
-      <Input placeholder="비활성" disabled />
-    </div>
+    <Backdrop className="flex-col">
+      <Input className="w-72" icon={<MagnifyingGlass />} placeholder="Search bots" />
+      <Input className="w-72" surface="solid" icon={<MagnifyingGlass />} placeholder="Search bots" />
+      <Input className="w-72" invalid defaultValue="Inbox Manager" />
+      <Input className="w-72" disabled placeholder="Search bots" />
+    </Backdrop>
   );
 }

@@ -4,7 +4,7 @@ import { componentCount, components, componentGroups, componentsInGroup } from "
 import { mascotImageUrl, mascotSpec } from "@/data/mascots";
 import { demoCount } from "@/lib/demos";
 
-const featured = ["button", "card", "input", "dialog", "tabs", "select", "table", "toast"];
+const featured = ["button", "card", "input", "dialog", "tabs", "select", "sidebar", "tool-call"];
 const showcase = featured
   .map((slug) => components.find((component) => component.slug === slug))
   .filter((component): component is NonNullable<typeof component> => Boolean(component));
@@ -22,31 +22,31 @@ const stats = [
     <div
       class="pointer-events-none absolute inset-0 -z-10 opacity-70"
       style="background:
-        radial-gradient(52rem 28rem at 12% -10%, var(--muted), transparent 60%),
-        radial-gradient(38rem 24rem at 88% 8%, color-mix(in oklch, var(--ring) 14%, transparent), transparent 62%);"
+        radial-gradient(52rem 28rem at 12% -10%, var(--color-bg-subtle), transparent 60%),
+        radial-gradient(38rem 24rem at 88% 8%, color-mix(in oklch, var(--color-text-brand) 14%, transparent), transparent 62%);"
     >
     </div>
     <div class="site-shell py-20 md:py-28">
-      <p class="text-sm text-muted-foreground">Horon Design System</p>
+      <p class="text-body-sm text-text-secondary">Horon Design System</p>
       <h1
         class="mt-6 max-w-4xl text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.04em] text-balance md:text-[4.5rem]"
       >
         Seed to Root,<br />Root to Execute.
       </h1>
-      <p class="mt-7 max-w-xl text-base leading-7 text-muted-foreground text-pretty md:text-lg">
+      <p class="mt-7 max-w-xl text-body-md leading-7 text-text-secondary text-pretty md:text-body-lg">
         데이터를 이해하는 것에서 끝나지 않고 실행과 결과까지 연결하는 시스템. 그 시스템을 지탱하는
         토큰과 컴포넌트를 하나의 기준으로 정의합니다. 디자인과 코드가 같은 값을 바라봅니다.
       </p>
       <div class="mt-9 flex flex-wrap items-center gap-3">
         <a
           href="/get-started"
-          class="inline-flex h-[37px] items-center rounded-md bg-primary px-5 text-[13.5px] font-semibold text-primary-foreground transition-opacity hover:opacity-85"
+          class="inline-flex h-[37px] items-center rounded-md bg-interactive-primary px-5 text-[13.5px] font-semibold text-interactive-on-primary transition-opacity hover:opacity-85"
         >
           시작하기
         </a>
         <a
           href="/components"
-          class="inline-flex h-[37px] items-center rounded-md border border-border px-5 text-[13.5px] font-medium transition-colors hover:bg-muted"
+          class="inline-flex h-[37px] items-center rounded-md border border-border-default px-5 text-[13.5px] font-medium transition-colors hover:bg-bg-subtle"
         >
           컴포넌트 둘러보기
         </a>
@@ -60,12 +60,12 @@ const stats = [
         class="pointer-events-none absolute right-6 bottom-6 hidden size-[260px] object-contain lg:block xl:right-16 xl:size-[320px]"
       />
 
-      <dl class="mt-16 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-6 border-t border-border pt-8 sm:grid-cols-4">
+      <dl class="mt-16 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-6 border-t border-border-default pt-8 sm:grid-cols-4">
         {
           stats.map((stat) => (
             <div>
-              <dt class="text-xs text-muted-foreground">{stat.label}</dt>
-              <dd class="mt-1.5 text-2xl font-semibold">{stat.value}</dd>
+              <dt class="text-caption text-text-secondary">{stat.label}</dt>
+              <dd class="mt-1.5 text-title-md font-semibold">{stat.value}</dd>
             </div>
           ))
         }
@@ -73,31 +73,31 @@ const stats = [
     </div>
   </section>
 
-  <section class="border-t border-border">
+  <section class="border-t border-border-default">
     <div class="site-shell py-20">
       <div class="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
         <div>
-          <p class="text-sm text-muted-foreground">Principles</p>
+          <p class="text-body-sm text-text-secondary">Principles</p>
           <h2 class="mt-4 text-[1.75rem] md:text-[2rem] font-medium tracking-[-0.02em]">
             세 가지 원칙
           </h2>
-          <p class="mt-4 max-w-md text-[14px] leading-7 text-muted-foreground">
-            HORON의 UI는 중성 백본 위에 단 하나의 액센트만 얹습니다. 색을 많이 쓰지 않고, 계층과
-            상태를 타이포와 여백으로 드러냅니다.
+          <p class="mt-4 max-w-md text-[14px] leading-7 text-text-secondary">
+            HORON의 UI는 잉크와 종이 위에 하늘색 액센트 하나만 얹습니다. 떠 있는 표면은 유리로, 계층과
+            상태는 글자와 여백으로 드러냅니다.
           </p>
         </div>
-        <ol class="divide-y divide-border border-y border-border">
+        <ol class="divide-y divide-border-default border-y border-border-default">
           {
             [
-              ["Neutral backbone", "표면과 텍스트는 sand 무채색 램프 하나로 정리합니다. 색 캐스트가 없습니다."],
-              ["Single accent", "gold는 포커스 링과 링크, 하이라이트에만 아주 절제해 씁니다. 버튼 fill은 잉크입니다."],
-              ["Same source", "토큰 하나에서 웹 CSS와 네이티브 값이 함께 나옵니다. 두 플랫폼이 어긋나지 않습니다."],
+              ["Ink and paper", "표면은 흰 종이, 글자와 버튼은 잉크입니다. 계층은 색보다 글자와 여백으로 드러냅니다."],
+              ["Liquid glass", "떠 있는 표면은 유리입니다. 흐림과 경계선이 표면 높이에 비례해 Figma와 같은 질감을 냅니다."],
+              ["Same source", "값은 Figma 변수에서 읽어 토큰 한 곳에 둡니다. 디자인과 코드가 같은 이름, 같은 값을 씁니다."],
             ].map(([title, body], i) => (
               <li class="flex gap-5 py-6">
-                <span class="mt-0.5 font-mono text-[11px] text-muted-foreground">0{i + 1}</span>
+                <span class="mt-0.5 font-mono text-[11px] text-text-secondary">0{i + 1}</span>
                 <div>
                   <p class="text-[14px] font-semibold">{title}</p>
-                  <p class="mt-1.5 text-[13.5px] leading-6 text-muted-foreground">{body}</p>
+                  <p class="mt-1.5 text-[13.5px] leading-6 text-text-secondary">{body}</p>
                 </div>
               </li>
             ))
@@ -107,16 +107,16 @@ const stats = [
     </div>
   </section>
 
-  <section class="border-t border-border">
+  <section class="border-t border-border-default">
     <div class="site-shell py-20">
       <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p class="text-sm text-muted-foreground">Components</p>
+          <p class="text-body-sm text-text-secondary">Components</p>
           <h2 class="mt-4 text-[1.75rem] md:text-[2rem] font-medium tracking-[-0.02em]">
-            {componentCount}개 컴포넌트, 5개 그룹
+            {componentCount}개 컴포넌트, {componentGroups.length}개 그룹
           </h2>
         </div>
-        <a href="/components" class="text-[13px] text-muted-foreground transition-colors hover:text-foreground">
+        <a href="/components" class="text-[13px] text-text-secondary transition-colors hover:text-text-primary">
           전체 목록 →
         </a>
       </div>
@@ -126,15 +126,15 @@ const stats = [
           componentGroups.map((group) => (
             <a
               href="/components"
-              class="group flex flex-col justify-between gap-6 rounded-xl bg-muted/40 px-5 py-5 transition-colors hover:bg-muted/70"
+              class="group flex flex-col justify-between gap-6 rounded-xl bg-bg-subtle/40 px-5 py-5 transition-colors hover:bg-bg-subtle/70"
             >
               <div>
                 <p class="text-[14px] font-semibold">{group.title}</p>
-                <p class="mt-1.5 text-[12.5px] leading-5 text-muted-foreground">{group.description}</p>
+                <p class="mt-1.5 text-[12.5px] leading-5 text-text-secondary">{group.description}</p>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-xs text-muted-foreground">{componentsInGroup(group.id).length} components</span>
-                <span class="text-[12px] text-muted-foreground transition-colors group-hover:text-foreground">
+                <span class="text-caption text-text-secondary">{componentsInGroup(group.id).length} components</span>
+                <span class="text-[12px] text-text-secondary transition-colors group-hover:text-text-primary">
                   보기 →
                 </span>
               </div>
@@ -149,7 +149,7 @@ const stats = [
             <li>
               <a
                 href={`/components/${component.slug}`}
-                class="text-[12.5px] text-muted-foreground transition-colors hover:text-foreground"
+                class="text-[12.5px] text-text-secondary transition-colors hover:text-text-primary"
               >
                 {component.title}
               </a>
@@ -160,21 +160,21 @@ const stats = [
     </div>
   </section>
 
-  <section class="border-t border-border">
+  <section class="border-t border-border-default">
     <div class="site-shell py-20">
       <div class="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:gap-16">
         <div>
-          <p class="text-sm text-muted-foreground">Mascot</p>
+          <p class="text-body-sm text-text-secondary">Mascot</p>
           <h2 class="mt-4 text-[1.75rem] md:text-[2rem] font-medium tracking-[-0.02em]">
             둥근 병아리, {mascotSpec.count}가지 표정
           </h2>
-          <p class="mt-4 max-w-md text-[14px] leading-7 text-muted-foreground">
+          <p class="mt-4 max-w-md text-[14px] leading-7 text-text-secondary">
             Horus + ON에서 온 마스코트입니다. 빈 상태, 오류, 로딩처럼 화면이 말을 걸어야 할 때 대신
             표정을 짓습니다. 1254 × 1254 투명 PNG로 모든 컷을 내려받을 수 있습니다.
           </p>
           <a
             href="/mascot"
-            class="mt-6 inline-flex h-[37px] items-center rounded-md border border-border px-5 text-[13.5px] font-medium transition-colors hover:bg-muted"
+            class="mt-6 inline-flex h-[37px] items-center rounded-md border border-border-default px-5 text-[13.5px] font-medium transition-colors hover:bg-bg-subtle"
           >
             마스코트 보기
           </a>
@@ -182,7 +182,7 @@ const stats = [
         <div class="grid grid-cols-3 gap-2">
           {
             ["main", "cheer", "think", "wave", "success", "lost"].map((slug) => (
-              <div class="flex aspect-square items-center justify-center rounded-xl bg-muted/40 p-2">
+              <div class="flex aspect-square items-center justify-center rounded-xl bg-bg-subtle/40 p-2">
                 <img
                   src={mascotImageUrl(slug)}
                   alt={`Horon 마스코트 ${slug} 컷`}
@@ -199,22 +199,22 @@ const stats = [
     </div>
   </section>
 
-  <section class="border-t border-border">
+  <section class="border-t border-border-default">
     <div class="site-shell py-20">
       <div class="grid gap-10 md:grid-cols-3">
         {
           [
-            ["Foundations", "색, 타이포, 간격, 반경, 모션, 유리 표면까지 — 모든 시각 결정의 값과 규칙.", "/foundations"],
+            ["Foundations", "색, 글자, 간격, 반경, 유리 표면까지 모든 시각 결정의 값과 규칙.", "/foundations"],
             ["Get Started", "설치하고 첫 화면을 만드는 데 필요한 최소 절차.", "/get-started"],
             ["Storybook", "모든 컴포넌트의 상태와 변형을 직접 조작해 보는 미리보기.", "https://storybook.horon.ai"],
           ].map(([title, body, href]) => (
             <a
               href={href}
-              class="group rounded-xl bg-muted/40 px-5 py-5 transition-colors hover:bg-muted/70"
+              class="group rounded-xl bg-bg-subtle/40 px-5 py-5 transition-colors hover:bg-bg-subtle/70"
             >
               <p class="text-[14px] font-semibold">{title}</p>
-              <p class="mt-2 text-[13px] leading-6 text-muted-foreground">{body}</p>
-              <span class="mt-4 inline-block text-[12px] text-muted-foreground transition-colors group-hover:text-foreground">
+              <p class="mt-2 text-[13px] leading-6 text-text-secondary">{body}</p>
+              <span class="mt-4 inline-block text-[12px] text-text-secondary transition-colors group-hover:text-text-primary">
                 열기 →
               </span>
             </a>

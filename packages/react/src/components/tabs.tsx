@@ -1,57 +1,39 @@
-import { Tabs as TabsPrimitive } from "@base-ui/react/tabs";
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "cn";
+import { Tabs as BaseTabs } from "@base-ui/react/tabs";
+import type { ComponentProps } from "react";
 
-function Tabs({ className, orientation = "horizontal", ...props }: TabsPrimitive.Root.Props) {
-  return (
-    <TabsPrimitive.Root
-      data-slot="tabs"
-      data-orientation={orientation}
-      className={cn("group/tabs flex gap-2 data-horizontal:flex-col", className)}
-      {...props}
-    />
-  );
+import { cn } from "../lib/cn";
+import { LiquidGlass } from "./liquid-glass";
+
+type WithClass<T> = Omit<T, "className"> & { className?: string };
+
+export function Tabs({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Root>>) {
+  return <BaseTabs.Root className={cn("flex flex-col gap-4", className)} {...props} />;
 }
 
-const tabsListVariants = cva(
-  "group/tabs-list inline-flex w-fit items-center justify-center gap-1 rounded-sm p-1 text-muted-foreground group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none",
-  {
-    variants: {
-      variant: {
-        default: "bg-muted",
-        line: "gap-1 bg-transparent",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  },
-);
-
-function TabsList({
-  className,
-  variant = "default",
-  ...props
-}: TabsPrimitive.List.Props & VariantProps<typeof tabsListVariants>) {
+/** Figma `Tabs example` (62:353): a regular-glass pill tray, 4px padding, 24px between tabs. */
+export function TabsList({ className, children, ...props }: WithClass<ComponentProps<typeof BaseTabs.List>>) {
   return (
-    <TabsPrimitive.List
-      data-slot="tabs-list"
-      data-variant={variant}
-      className={cn(tabsListVariants({ variant }), className)}
-      {...props}
-    />
-  );
-}
-
-function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
-  return (
-    <TabsPrimitive.Tab
-      data-slot="tabs-trigger"
+    <BaseTabs.List
       className={cn(
-        "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-sm border border-transparent px-3.5 py-1.5 text-[13px] font-medium whitespace-nowrap text-foreground/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-muted-foreground dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent",
-        "data-active:border-border data-active:bg-background data-active:font-semibold data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/30 dark:data-active:text-foreground",
-        "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100",
+        "relative flex w-fit items-start gap-6 overflow-clip rounded-full border border-glass-rim-strong bg-glass-regular p-1",
+        className,
+      )}
+      {...props}
+    >
+      <LiquidGlass tier="regular" />
+      {children}
+    </BaseTabs.List>
+  );
+}
+
+/** Figma `Tabs` (62:335): a pill tab; selected is 10% ink, hover adds 5% (14% when selected). */
+export function TabsTab({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Tab>>) {
+  return (
+    <BaseTabs.Tab
+      className={cn(
+        "relative cursor-pointer rounded-full px-1 py-2.5 text-label-lg whitespace-nowrap text-text-secondary",
+        "hover:bg-overlay-ink-5 hover:text-text-primary data-active:bg-overlay-ink-10 data-active:text-text-primary hover:data-active:bg-overlay-ink-14",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed data-disabled:opacity-40",
         className,
       )}
       {...props}
@@ -59,10 +41,6 @@ function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
   );
 }
 
-function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
-  return (
-    <TabsPrimitive.Panel data-slot="tabs-content" className={cn("flex-1 text-sm outline-none", className)} {...props} />
-  );
+export function TabsPanel({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Panel>>) {
+  return <BaseTabs.Panel className={cn("outline-none", className)} {...props} />;
 }
-
-export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants };
