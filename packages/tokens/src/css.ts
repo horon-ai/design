@@ -1,135 +1,105 @@
-import { oklchToHex } from "./color";
-import {
-  breakpoint,
-  duration,
-  easing,
-  fontFamily,
-  glassBlur,
-  glassLiquidBlur,
-  glassLiquidBorder,
-  glassLiquidFill,
-  glassLiquidFillPanel,
-  glassLiquidShadow,
-  radius,
-  radiusRem,
-  radiusRole,
-  shadow,
-  text,
-} from "./scales";
-import { colorTokens, type ColorTokenName } from "./tokens";
+import { darkColors, lightColors, primitives } from "./color";
+import { glass } from "./glass";
+import { radius, shadow } from "./scale";
+import { fontFamily, fontWeight, textStyles, type Platform } from "./typography";
 
-const isColorTokenName = (name: string): name is ColorTokenName => name in colorTokens.light;
+const px = (value: number) => (value === 0 ? "0" : `${Number(value.toFixed(4))}px`);
 
-/**
- * Renders the Tailwind v4 `@theme` + CSS-variable layer from the token source,
- * so the web styles never drift from the token values.
- */
+const ratio = (value: number) => Number(value.toFixed(6));
+
+const family = (stack: readonly string[]) => stack.map((name) => (name.includes(" ") ? `"${name}"` : name)).join(", ");
+
+const em = (value: number) => (value === 0 ? "0" : `${value}em`);
+
+/** Font size, line height, tracking and weight of every text style for one platform. */
+function textLines(platform: Platform): string[] {
+  const lines: string[] = [];
+  for (const [name, style] of Object.entries(textStyles)) {
+    lines.push(`  --text-${name}: ${px(style.size[platform])};`);
+    lines.push(`  --text-${name}--line-height: ${px(style.lineHeight[platform])};`);
+    if (platform === "web") {
+      lines.push(`  --text-${name}--letter-spacing: ${em(style.tracking)};`);
+      lines.push(`  --text-${name}--font-weight: ${fontWeight[style.weight]};`);
+    }
+  }
+  return lines;
+}
+
+function themeBlock(): string[] {
+  const lines = [
+    "  --color-*: initial;",
+    "  --radius-*: initial;",
+    "  --text-*: initial;",
+    "  --font-*: initial;",
+    "  --font-weight-*: initial;",
+    "  --shadow-*: initial;",
+    "",
+  ];
+  for (const [name, value] of Object.entries(lightColors)) lines.push(`  --color-${name}: ${value};`);
+  for (const [name, value] of Object.entries(primitives)) lines.push(`  --color-${name}: ${value};`);
+  lines.push("");
+  for (const [name, value] of Object.entries(radius)) lines.push(`  --radius-${name}: ${px(value)};`);
+  lines.push("");
+  for (const [name, value] of Object.entries(shadow)) lines.push(`  --shadow-${name}: ${value};`);
+  lines.push("");
+  for (const [name, stack] of Object.entries(fontFamily)) lines.push(`  --font-${name}: ${family(stack)};`);
+  for (const [name, value] of Object.entries(fontWeight)) lines.push(`  --font-weight-${name}: ${value};`);
+  lines.push("");
+  lines.push(...textLines("web"));
+  return lines;
+}
+
+function rootBlock(): string[] {
+  const lines = [
+    `  --glass-layer-opacity: ${glass.layerOpacity};`,
+    `  --glass-tint: ${glass.tint.color};`,
+    `  --glass-tint-blur: ${px(glass.tint.blur)};`,
+    `  --glass-inner-shade: ${glass.innerShade.color};`,
+    `  --glass-inner-shade-blur: ${px(glass.innerShade.blur)};`,
+    `  --glass-inner-inset-ratio: ${ratio(glass.innerShade.insetPerPx)};`,
+    `  --glass-inner-inset-max-y: ${px(glass.innerShade.maxInsetY)};`,
+    `  --glass-inner-inset-max-x: ${px(glass.innerShade.maxInsetX)};`,
+    `  --glass-edge-dark: ${glass.edgeDark.color};`,
+    `  --glass-edge-dark-ratio: ${ratio(glass.edgeDark.blurPerPx)};`,
+    `  --glass-edge-dark-max: ${px(glass.edgeDark.maxBlur)};`,
+    `  --glass-edge-light: ${glass.edgeLight.color};`,
+    `  --glass-edge-light-ratio: ${ratio(glass.edgeLight.blurPerPx)};`,
+    `  --glass-edge-light-min: ${px(glass.edgeLight.minBlur)};`,
+    `  --glass-edge-light-max: ${px(glass.edgeLight.maxBlur)};`,
+    `  --glass-edge-light-soft: ${glass.edgeLightSoft.color};`,
+  ];
+  for (const [name, style] of Object.entries(textStyles)) {
+    if ("paragraph" in style) lines.push(`  --paragraph-${name}: ${style.paragraph}em;`);
+  }
+  return lines;
+}
+
+/** The full `theme.css`: Tailwind v4 `@theme` with the light values, `.dark` overrides, and raw `:root` values. */
 export function buildThemeCss(): string {
-  const names = Object.keys(colorTokens.light).filter(isColorTokenName);
-
-  const themeColors = names.map((name) => `  --color-${name}: var(--${name});`).join("\n");
-  const lightVars = names.map((name) => `  --${name}: ${colorTokens.light[name]};`).join("\n");
-  const darkVars = names.map((name) => `  --${name}: ${colorTokens.dark[name]};`).join("\n");
-
-  const shadowVars = Object.entries(shadow)
-    .map(([name, value]) => `  --shadow-${name}: ${value.web};`)
-    .join("\n");
-  const durationVars = Object.entries(duration)
-    .map(([name, value]) => `  --duration-${name}: ${value}ms;`)
-    .join("\n");
-  const easingVars = Object.entries(easing.web)
-    .map(([name, value]) => `  --ease-${name}: ${value};`)
-    .join("\n");
-  const radiusVars = Object.entries(radius)
-    .filter(([name]) => name !== "none" && name !== "full")
-    .map(([name, value]) => `  --radius-${name}: ${value}px;`)
-    .join("\n");
-  const radiusRoleVars = Object.entries(radiusRole)
-    .map(([name, value]) => `  --radius-${name}: ${value === radius.full ? "9999px" : `${value}px`};`)
-    .join("\n");
-  const breakpointVars = Object.entries(breakpoint)
-    .map(([name, value]) => `  --breakpoint-${name}: ${value / 16}rem;`)
-    .join("\n");
-  const textVars = Object.entries(text)
-    .map(([name, value]) => `  --text-${name}: ${value / 16}rem;`)
-    .join("\n");
-
-  return `/* AUTO-GENERATED by @horon-ai/tokens — do not edit by hand.
- * Source: packages/tokens/src/tokens.ts + src/scales.ts
- * Regenerate: bun run --filter @horon-ai/tokens build
- */
-
-@theme inline {
-${themeColors}
-  --font-sans: ${fontFamily.web.sans};
-  --font-mono: ${fontFamily.web.mono};
-  --font-heading: var(--font-sans);
-${radiusVars}
-${radiusRoleVars}
-${breakpointVars}
-${textVars}
-${shadowVars}
-${durationVars}
-${easingVars}
-}
-
-:root {
-${lightVars}
-  --radius: ${radiusRem}rem;
-  /* Role radii and breakpoints are registered in the @theme inline block above
-   * so Tailwind resolves the rounded-card / md: utilities, and repeated here as
-   * plain custom properties because inline inlines the value into the utility
-   * and emits no variable. Consumers that read the token at runtime
-   * (getComputedStyle, a media query written by hand) need the variable, and
-   * both roles are mode-independent so they live only in :root. */
-${radiusRoleVars}
-${breakpointVars}
-  --glass-blur: ${glassBlur}px;
-  --glass-liquid-blur: ${glassLiquidBlur}px;
-  --glass-liquid-fill: ${glassLiquidFill.light};
-  --glass-liquid-fill-panel: ${glassLiquidFillPanel.light};
-  --glass-liquid-border: ${glassLiquidBorder.light};
-  --glass-liquid-shadow: ${glassLiquidShadow.light};
-}
-
-.dark {
-${darkVars}
-  --glass-liquid-fill: ${glassLiquidFill.dark};
-  --glass-liquid-fill-panel: ${glassLiquidFillPanel.dark};
-  --glass-liquid-border: ${glassLiquidBorder.dark};
-  --glass-liquid-shadow: ${glassLiquidShadow.dark};
-}
-
-/* Glass accessibility fallbacks. The floating-chrome surface degrades from the
- * translucent glass fill to the frost (prefers-reduced-transparency) or solid
- * (no backdrop-filter) rung of the ladder, and drops the blur with it. The
- * liquid-glass panel fill rides the same ladder, otherwise a panel would stay
- * translucent while the chrome around it went opaque. */
-@media (prefers-reduced-transparency: reduce) {
-  :root,
-  .dark {
-    --glass-fill: var(--glass-fill-frost);
-    --glass-fill-strong: var(--glass-fill-frost);
-    --glass-blur: 0px;
-    --glass-liquid-blur: 0px;
-    --glass-liquid-fill-panel: var(--glass-fill-frost);
-  }
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :root,
-  .dark {
-    --glass-fill: var(--glass-fill-solid);
-    --glass-fill-strong: var(--glass-fill-solid);
-    --glass-blur: 0px;
-    --glass-liquid-blur: 0px;
-    --glass-liquid-fill-panel: var(--glass-fill-solid);
-  }
-}
-`;
-}
-
-/** Hex form of a single token. */
-export function tokenToHex(name: ColorTokenName, scheme: "light" | "dark") {
-  return oklchToHex(colorTokens[scheme][name]);
+  const dark = Object.entries(darkColors).map(([name, value]) => `  --color-${name}: ${value};`);
+  return [
+    "/* Generated by packages/tokens/scripts/build.ts from src/*.ts. Do not edit. */",
+    "",
+    "@theme static {",
+    ...themeBlock(),
+    "}",
+    "",
+    ":root {",
+    ...rootBlock(),
+    "}",
+    "",
+    '[data-platform="desktop"] {',
+    ...textLines("desktop"),
+    "}",
+    "",
+    '[data-platform="mobile"] {',
+    ...textLines("mobile"),
+    "}",
+    "",
+    ".dark {",
+    "  color-scheme: dark;",
+    ...dark,
+    "}",
+    "",
+  ].join("\n");
 }

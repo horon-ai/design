@@ -9,15 +9,15 @@ const { code, lang = "tsx", title } = Astro.props;
 const trimmed = code.trim();
 ---
 
-<figure class="not-prose overflow-hidden rounded-md border border-border bg-card">
-  <figcaption class="flex items-center justify-between border-b border-border px-4 py-2">
-    <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+<figure class="not-prose overflow-hidden rounded-md border border-border-default bg-bg-surface">
+  <figcaption class="flex items-center justify-between border-b border-border-default px-4 py-2">
+    <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-text-secondary">
       {title ?? lang}
     </span>
     <button
       type="button"
       data-copy-code
-      class="rounded-xs px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      class="rounded-xs px-2 py-1 font-mono text-[11px] text-text-secondary transition-colors hover:bg-bg-subtle hover:text-text-primary"
     >
       복사
     </button>

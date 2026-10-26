@@ -1,57 +1,38 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@horon-ai/react/components/tabs";
+import { Tabs, TabsList, TabsPanel, TabsTab } from "@horon-ai/react";
+
+import { onBackdrop } from "../support";
 
 const meta = {
   title: "Web/Tabs",
   component: Tabs,
-  parameters: { layout: "centered" },
-  args: { defaultValue: "overview" },
+  decorators: [onBackdrop],
 } satisfies Meta<typeof Tabs>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {
-  render: (args) => (
-    <Tabs {...args} className="w-96">
+export const Default: Story = {
+  render: () => (
+    <Tabs defaultValue="activity">
       <TabsList>
-        <TabsTrigger value="overview">Overview</TabsTrigger>
-        <TabsTrigger value="activity">Activity</TabsTrigger>
-        <TabsTrigger value="settings">Settings</TabsTrigger>
+        <TabsTab value="activity">Activity</TabsTab>
+        <TabsTab value="routines">Routines</TabsTab>
+        <TabsTab value="tools">Tools</TabsTab>
+        <TabsTab value="settings">Settings</TabsTab>
       </TabsList>
-      <TabsContent value="overview">A summary of everything happening in this workspace.</TabsContent>
-      <TabsContent value="activity">Recent changes, comments and reviews.</TabsContent>
-      <TabsContent value="settings">Manage members, billing and integrations.</TabsContent>
-    </Tabs>
-  ),
-};
-
-export const Line: Story = {
-  render: (args) => (
-    <Tabs {...args} className="w-96">
-      <TabsList variant="line">
-        <TabsTrigger value="overview">Overview</TabsTrigger>
-        <TabsTrigger value="activity">Activity</TabsTrigger>
-        <TabsTrigger value="settings">Settings</TabsTrigger>
-      </TabsList>
-      <TabsContent value="overview">Overview panel</TabsContent>
-      <TabsContent value="activity">Activity panel</TabsContent>
-      <TabsContent value="settings">Settings panel</TabsContent>
-    </Tabs>
-  ),
-};
-
-export const Vertical: Story = {
-  render: (args) => (
-    <Tabs {...args} orientation="vertical" className="w-96">
-      <TabsList>
-        <TabsTrigger value="overview">Overview</TabsTrigger>
-        <TabsTrigger value="activity">Activity</TabsTrigger>
-        <TabsTrigger value="settings">Settings</TabsTrigger>
-      </TabsList>
-      <TabsContent value="overview">Overview panel</TabsContent>
-      <TabsContent value="activity">Activity panel</TabsContent>
-      <TabsContent value="settings">Settings panel</TabsContent>
+      <TabsPanel value="activity" className="text-body-md text-text-primary">
+        Recent runs show up here.
+      </TabsPanel>
+      <TabsPanel value="routines" className="text-body-md text-text-primary">
+        Routines run on a schedule.
+      </TabsPanel>
+      <TabsPanel value="tools" className="text-body-md text-text-primary">
+        Connected tools.
+      </TabsPanel>
+      <TabsPanel value="settings" className="text-body-md text-text-primary">
+        Workspace settings.
+      </TabsPanel>
     </Tabs>
   ),
 };

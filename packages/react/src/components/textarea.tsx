@@ -1,17 +1,34 @@
-import * as React from "react";
-import { cn } from "cn";
+import { Field } from "@base-ui/react/field";
+import type { ComponentProps } from "react";
 
-function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
+import { cn } from "../lib/cn";
+import { fieldBoxClass } from "./input";
+import { LiquidGlass } from "./liquid-glass";
+
+export type TextareaProps = Omit<ComponentProps<"textarea">, "className"> & {
+  invalid?: boolean;
+  className?: string;
+  textareaClassName?: string;
+};
+
+/** Figma `Textarea` (58:137): a 112px glass box with 14/12px padding. */
+export function Textarea({ invalid, className, textareaClassName, rows = 3, ...props }: TextareaProps) {
   return (
-    <textarea
-      data-slot="textarea"
+    <div
       className={cn(
-        "flex field-sizing-content min-h-[88px] w-full rounded-sm border border-input bg-card p-3 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
+        "relative flex min-h-28 overflow-clip rounded-md border px-3.5 py-3",
+        fieldBoxClass.glass,
+        "focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
         className,
       )}
-      {...props}
-    />
+      data-invalid={invalid ? "" : undefined}
+    >
+      <LiquidGlass tier="regular" />
+      <Field.Control
+        render={<textarea rows={rows} {...props} />}
+        aria-invalid={invalid || undefined}
+        className={cn("relative resize-none text-body-md", fieldBoxClass.text, textareaClassName)}
+      />
+    </div>
   );
 }
-
-export { Textarea };

@@ -1,20 +1,11 @@
-import { Progress, ProgressLabel, ProgressValue } from "@horon-ai/react";
+import { Progress } from "@horon-ai/react";
 
 export default function ProgressDemo() {
   return (
-    <>
-      <Progress value={35} className="w-72 flex-col gap-1">
-        <div className="flex w-full items-center justify-between">
-          <ProgressLabel>업로드</ProgressLabel>
-          <ProgressValue>{(formatted) => `${formatted ?? 0}%`}</ProgressValue>
-        </div>
-      </Progress>
-      <Progress value={80} className="w-72 flex-col gap-1">
-        <div className="flex w-full items-center justify-between">
-          <ProgressLabel>동기화</ProgressLabel>
-          <ProgressValue>{(formatted) => `${formatted ?? 0}%`}</ProgressValue>
-        </div>
-      </Progress>
-    </>
+    <div className="flex flex-col gap-4">
+      <Progress value={0} aria-label="Not started" />
+      <Progress value={40} aria-label="In progress" />
+      <Progress value={100} aria-label="Done" />
+    </div>
   );
 }

@@ -1,85 +1,56 @@
-// Single entry point for the react package.
-// Web code imports components from "@horon-ai/react" (or a subpath).
-//
-// `chart` is deliberately absent: it is reachable only through the
-// `@horon-ai/react/components/chart` subpath. `recharts` assigns onto
-// `Object.prototype` while it loads (via `decimal.js-light`), so re-exporting it
-// from here throws at import time in any window that runs with Tauri's
-// `freezePrototype: true` — the desktop app is one — and the render tree dies
-// before it mounts. Keep chart out of this file; consumers that render a chart
-// import the subpath and pay the cost only then.
-export * from "./components/accordion";
-export * from "./components/alert";
-export * from "./components/alert-dialog";
-export * from "./components/aspect-ratio";
-export * from "./components/attachment";
-export * from "./components/autocomplete";
+export * from "./components/agent-activity";
+export * from "./components/agent-lane";
+export * from "./components/agent-panel";
+export * from "./components/approval-card";
 export * from "./components/avatar";
 export * from "./components/badge";
+export * from "./components/banner";
+export * from "./components/bot-list-row";
+export * from "./components/bottom-sheet";
 export * from "./components/breadcrumb";
-export * from "./components/bubble";
 export * from "./components/button";
-export * from "./components/button-group";
 export * from "./components/calendar";
 export * from "./components/card";
-export * from "./components/carousel";
+export * from "./components/chat-bubble";
+export * from "./components/chat-controls";
 export * from "./components/checkbox";
 export * from "./components/chip";
-export * from "./components/code-block";
-export * from "./components/collapsible";
-export * from "./components/combobox";
-export * from "./components/command";
-export * from "./components/context-menu";
+export * from "./components/command-palette";
+export * from "./components/composer";
 export * from "./components/data-table";
-export * from "./components/date-picker";
+export * from "./components/date-field";
 export * from "./components/dialog";
-export * from "./components/direction";
-export * from "./components/drawer";
-export * from "./components/dropdown-menu";
-export * from "./components/empty";
+export * from "./components/empty-state";
 export * from "./components/field";
-export * from "./components/file-upload";
-export * from "./components/form";
-export * from "./components/glass-surface";
-export * from "./components/hover-card";
+export * from "./components/horon-icon";
+export * from "./components/horon-wordmark";
+export * from "./components/icon-button";
 export * from "./components/input";
 export * from "./components/input-group";
-export * from "./components/input-otp";
-export * from "./components/item";
+export * from "./components/integration-row";
 export * from "./components/kbd";
-export * from "./components/label";
 export * from "./components/liquid-glass";
-export * from "./components/list";
-export * from "./components/marker";
 export * from "./components/menu";
-export * from "./components/menubar";
-export * from "./components/message";
-export * from "./components/message-scroller";
-export * from "./components/native-select";
-export * from "./components/navigation-menu";
-export * from "./components/pagination";
-export * from "./components/popover";
+export * from "./components/message-extras";
+export * from "./components/page-header";
+export * from "./components/plan-step";
 export * from "./components/progress";
-export * from "./components/questionnaire";
 export * from "./components/radio-group";
-export * from "./components/resizable";
-export * from "./components/scroll-area";
+export * from "./components/schedule";
+export * from "./components/segmented-control";
 export * from "./components/select";
-export * from "./components/separator";
-export * from "./components/sheet";
 export * from "./components/sidebar";
 export * from "./components/skeleton";
-export * from "./components/slider";
-export * from "./components/sonner";
+export * from "./components/source-row";
 export * from "./components/spinner";
-export * from "./components/stepper";
 export * from "./components/switch";
-export * from "./components/table";
+export * from "./components/tab-bar";
 export * from "./components/tabs";
+export * from "./components/task-row";
 export * from "./components/textarea";
+export * from "./components/textarea-field";
 export * from "./components/toast";
-export * from "./components/toggle";
-export * from "./components/toggle-group";
+export * from "./components/tool-call";
 export * from "./components/tooltip";
-export * from "./components/typography";
-export { cn } from "./lib/utils";
+export * from "./components/usage-meter";
+export { cn, type ClassValue } from "./lib/cn";

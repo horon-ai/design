@@ -1,90 +1,82 @@
-import * as React from "react";
-import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar";
-import { cn } from "cn";
+import { Avatar as BaseAvatar } from "@base-ui/react/avatar";
+import { Robot } from "@phosphor-icons/react";
+import type { ReactNode } from "react";
 
-function Avatar({
-  className,
-  size = "default",
-  ...props
-}: AvatarPrimitive.Root.Props & {
-  size?: "default" | "sm" | "lg";
-}) {
+import { cn } from "../lib/cn";
+
+export type AvatarSize = "sm" | "md" | "lg" | "xl";
+
+export type AvatarProps = {
+  /** `initials` (default), `bot` (robot on the brand tint) or `image`. */
+  type?: "initials" | "bot" | "image";
+  size?: AvatarSize;
+  /** Image URL for `type="image"`; initials show while it loads or if it fails. */
+  src?: string;
+  alt?: string;
+  /** Initials, or any fallback content. */
+  children?: ReactNode;
+  /** Shows the live status dot at the bottom right. */
+  live?: boolean;
+  className?: string;
+};
+
+const sizeClass: Record<AvatarSize, string> = {
+  sm: "size-6 text-label-sm",
+  md: "size-8 text-label-md",
+  lg: "size-10 text-label-lg",
+  xl: "size-14 text-title-sm",
+};
+
+const botIconClass: Record<AvatarSize, string> = {
+  sm: "size-[13px]",
+  md: "size-[18px]",
+  lg: "size-[22px]",
+  xl: "size-[31px]",
+};
+
+/** Live dot outer size: Figma dot diameter (10, 11, 13, 18) plus its 2px centered white stroke. */
+const liveClass: Record<AvatarSize, string> = {
+  sm: "size-3",
+  md: "size-[13px]",
+  lg: "size-[15px]",
+  xl: "size-5",
+};
+
+const typeClass = {
+  initials: "bg-bg-subtle text-text-secondary",
+  bot: "bg-bg-brand text-text-brand",
+  image: "bg-sky-200 text-text-secondary",
+} as const;
+
+/** Figma `Avatar` (61:347): Initials, Bot and Image in four sizes, with an optional live dot. */
+export function Avatar({ type = "initials", size = "md", src, alt = "", children, live, className }: AvatarProps) {
   return (
-    <AvatarPrimitive.Root
-      data-slot="avatar"
-      data-size={size}
-      className={cn(
-        "group/avatar relative flex size-8 shrink-0 rounded-full select-none after:absolute after:inset-0 after:rounded-full after:border after:border-border after:mix-blend-darken data-[size=lg]:size-10 data-[size=sm]:size-6 dark:after:mix-blend-lighten",
-        className,
+    <span className={cn("relative inline-flex shrink-0", className)}>
+      <BaseAvatar.Root
+        className={cn(
+          "inline-flex items-center justify-center overflow-clip rounded-full select-none",
+          sizeClass[size],
+          typeClass[type],
+        )}
+      >
+        {type === "bot" ? (
+          <Robot aria-hidden className={botIconClass[size]} />
+        ) : (
+          <>
+            {type === "image" && src && <BaseAvatar.Image src={src} alt={alt} className="size-full object-cover" />}
+            <BaseAvatar.Fallback>{children}</BaseAvatar.Fallback>
+          </>
+        )}
+      </BaseAvatar.Root>
+      {live && (
+        <span
+          aria-hidden
+          className={cn(
+            "absolute -right-0.5 -bottom-0.5 rounded-full border-2 border-bg-default bg-status-live",
+            liveClass[size],
+          )}
+        />
       )}
-      {...props}
-    />
+    </span>
   );
 }
-
-function AvatarImage({ className, ...props }: AvatarPrimitive.Image.Props) {
-  return (
-    <AvatarPrimitive.Image
-      data-slot="avatar-image"
-      className={cn("aspect-square size-full rounded-full object-cover", className)}
-      {...props}
-    />
-  );
-}
-
-function AvatarFallback({ className, ...props }: AvatarPrimitive.Fallback.Props) {
-  return (
-    <AvatarPrimitive.Fallback
-      data-slot="avatar-fallback"
-      className={cn(
-        "flex size-full items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground group-data-[size=sm]/avatar:text-xs",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function AvatarBadge({ className, ...props }: React.ComponentProps<"span">) {
-  return (
-    <span
-      data-slot="avatar-badge"
-      className={cn(
-        "absolute right-0 bottom-0 z-10 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground bg-blend-color ring-2 ring-background select-none",
-        "group-data-[size=sm]/avatar:size-2 group-data-[size=sm]/avatar:[&>svg]:hidden",
-        "group-data-[size=default]/avatar:size-2.5 group-data-[size=default]/avatar:[&>svg]:size-2",
-        "group-data-[size=lg]/avatar:size-3 group-data-[size=lg]/avatar:[&>svg]:size-2",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function AvatarGroup({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="avatar-group"
-      className={cn(
-        "group/avatar-group flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function AvatarGroupCount({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="avatar-group-count"
-      className={cn(
-        "relative flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm text-muted-foreground ring-2 ring-background group-has-data-[size=lg]/avatar-group:size-10 group-has-data-[size=sm]/avatar-group:size-6 [&>svg]:size-4 group-has-data-[size=lg]/avatar-group:[&>svg]:size-5 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-export { Avatar, AvatarImage, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarBadge };

@@ -1,58 +1,33 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldSet,
-} from "@horon-ai/react/components/field";
-import { Input } from "@horon-ai/react/components/input";
+import { Field, FieldDescription, FieldError, FieldLabel, Input } from "@horon-ai/react";
+
+import { onBackdrop } from "../support";
 
 const meta = {
   title: "Web/Field",
   component: Field,
-  parameters: { layout: "centered" },
+  decorators: [onBackdrop],
 } satisfies Meta<typeof Field>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {
+export const Filled: Story = {
   render: () => (
-    <Field className="w-72">
-      <FieldLabel htmlFor="field-name">Display name</FieldLabel>
-      <Input id="field-name" placeholder="Ada Lovelace" />
-      <FieldDescription>This is how others will see you.</FieldDescription>
+    <Field className="w-80">
+      <FieldLabel>Bot name</FieldLabel>
+      <Input className="w-full" defaultValue="Chief of staff" />
+      <FieldDescription>Shown in chat and notifications.</FieldDescription>
     </Field>
   ),
 };
 
-export const WithError: Story = {
+export const Error: Story = {
   render: () => (
-    <Field className="w-72">
-      <FieldLabel htmlFor="field-email">Email</FieldLabel>
-      <Input id="field-email" defaultValue="not-an-email" aria-invalid />
-      <FieldDescription>We only use this to reach you.</FieldDescription>
-      <FieldError match>Enter a valid email address.</FieldError>
+    <Field className="w-80" invalid>
+      <FieldLabel>Bot name</FieldLabel>
+      <Input className="w-full" defaultValue="Inbox Manager" />
+      <FieldError match>Name is already used by another bot.</FieldError>
     </Field>
-  ),
-};
-
-export const Grouped: Story = {
-  render: () => (
-    <FieldSet className="w-72">
-      <FieldGroup>
-        <Field>
-          <FieldLabel htmlFor="field-first">First name</FieldLabel>
-          <Input id="field-first" placeholder="Ada" />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="field-last">Last name</FieldLabel>
-          <Input id="field-last" placeholder="Lovelace" />
-          <FieldDescription>As it appears on your ID.</FieldDescription>
-        </Field>
-      </FieldGroup>
-    </FieldSet>
   ),
 };

@@ -1,42 +1,139 @@
-import * as React from "react";
-import { cn } from "cn";
+import { Menu as BaseMenu } from "@base-ui/react/menu";
+import { createContext, useContext, type ComponentProps, type ReactNode } from "react";
 
-function Menu({ className, ...props }: React.ComponentProps<"div">) {
+import { cn } from "../lib/cn";
+import { LiquidGlass } from "./liquid-glass";
+
+type WithClass<T> = Omit<T, "className"> & { className?: string };
+
+export type MenuSurface = "glass" | "solid";
+
+const SurfaceContext = createContext<MenuSurface>("glass");
+
+export const Menu = BaseMenu.Root;
+export const MenuTrigger = BaseMenu.Trigger;
+
+export type MenuContentProps = WithClass<ComponentProps<typeof BaseMenu.Popup>> & {
+  /**
+   * `glass` is the Figma `Menu` (thick glass, 20px radius, 40px rows).
+   * `solid` is the Account / Workspace menu that opens over glass chrome
+   * (opaque fill, 18px radius, soft shadow, 36px rows).
+   */
+  surface?: MenuSurface;
+  side?: ComponentProps<typeof BaseMenu.Positioner>["side"];
+  align?: ComponentProps<typeof BaseMenu.Positioner>["align"];
+  sideOffset?: number;
+};
+
+export const menuPopupClass = {
+  glass: "rounded-xl bg-glass-thick",
+  solid: "rounded-[18px] bg-glass-fill-solid shadow-popover",
+} as const;
+
+/** Figma `Menus and popovers` (88:495): `Menu`, `Account menu` and `Workspace menu`. */
+export function MenuContent({
+  surface = "glass",
+  side,
+  align = "start",
+  sideOffset = 8,
+  className,
+  children,
+  ...props
+}: MenuContentProps) {
   return (
-    <div
-      data-slot="menu"
-      role="menu"
-      className={cn("glass-strong flex w-[200px] flex-col gap-px rounded-md p-1 text-foreground", className)}
+    <BaseMenu.Portal>
+      <BaseMenu.Positioner side={side} align={align} sideOffset={sideOffset} className="z-50 outline-none">
+        <BaseMenu.Popup
+          className={cn(
+            "relative flex w-55 origin-(--transform-origin) flex-col gap-0.5 overflow-clip border border-glass-rim-strong p-1.5 outline-none",
+            "transition-[scale,opacity] duration-100 data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0",
+            menuPopupClass[surface],
+            className,
+          )}
+          {...props}
+        >
+          <LiquidGlass tier="thick" />
+          <SurfaceContext value={surface}>{children}</SurfaceContext>
+        </BaseMenu.Popup>
+      </BaseMenu.Positioner>
+    </BaseMenu.Portal>
+  );
+}
+
+export type MenuItemProps = WithClass<ComponentProps<typeof BaseMenu.Item>> & {
+  /** 18px leading icon, or a 28px workspace tile. */
+  icon?: ReactNode;
+  /** Caption under the label, such as "3 members". */
+  description?: ReactNode;
+  /** Right side: a shortcut such as "⌘C", or a check. */
+  trailing?: ReactNode;
+  danger?: boolean;
+};
+
+export function MenuItem({ icon, description, trailing, danger, className, children, ...props }: MenuItemProps) {
+  const surface = useContext(SurfaceContext);
+  return (
+    <BaseMenu.Item
+      className={cn(
+        "relative flex w-full cursor-pointer items-center gap-2.5 outline-none select-none data-disabled:cursor-not-allowed data-disabled:opacity-40 data-highlighted:bg-overlay-ink-6",
+        surface === "glass" ? "rounded-md px-3" : "rounded-[10px] px-2.5",
+        description ? "h-11.5 pl-2" : surface === "glass" ? "h-10" : "h-9",
+        className,
+      )}
       {...props}
+    >
+      {icon && (
+        <span
+          className={cn(
+            "flex shrink-0 [&>svg]:size-4.5",
+            danger ? "text-text-danger" : surface === "glass" ? "text-text-secondary" : "text-text-primary",
+          )}
+        >
+          {icon}
+        </span>
+      )}
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className={cn("text-label-md", danger ? "text-text-danger" : "text-text-primary")}>{children}</span>
+        {description && <span className="text-caption text-text-secondary">{description}</span>}
+      </span>
+      {trailing && (
+        <span className="flex shrink-0 text-caption text-text-secondary [&>svg]:size-4 [&>svg]:text-text-primary">
+          {trailing}
+        </span>
+      )}
+    </BaseMenu.Item>
+  );
+}
+
+export function MenuSeparator({ className, ...props }: WithClass<ComponentProps<typeof BaseMenu.Separator>>) {
+  const surface = useContext(SurfaceContext);
+  return (
+    <BaseMenu.Separator
+      className={cn("relative flex py-1", surface === "glass" ? "px-1.5" : "px-2.5", className)}
+      {...props}
+      render={(separatorProps) => (
+        <div {...separatorProps}>
+          <span className="h-px flex-1 bg-overlay-ink-8" />
+        </div>
+      )}
     />
   );
 }
 
-function MenuItem({ className, tabIndex = 0, ...props }: React.ComponentProps<"div">) {
+/** A caption heading for a group of items, such as "Workspaces" or the account email. */
+export function MenuLabel({ className, ...props }: WithClass<ComponentProps<"div">>) {
+  return <div className={cn("relative px-2.5 pt-2 pb-1 text-caption text-text-secondary", className)} {...props} />;
+}
+
+/** A 28px rounded tile for a workspace initial, used as a `MenuItem` icon. */
+export function MenuTile({ className, ...props }: WithClass<ComponentProps<"span">>) {
   return (
-    <div
-      data-slot="menu-item"
-      role="menuitem"
-      tabIndex={tabIndex}
+    <span
       className={cn(
-        "flex w-full items-center gap-2 rounded-[5px] px-2.5 py-[7px] text-xs text-foreground outline-none select-none hover:bg-foreground/5 focus-visible:bg-foreground/5 data-disabled:pointer-events-none data-disabled:opacity-50",
+        "flex size-7 shrink-0 items-center justify-center rounded-sm bg-interactive-primary text-label-md text-text-inverse",
         className,
       )}
       {...props}
     />
   );
 }
-
-function MenuLabel({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div data-slot="menu-label" className={cn("px-2.5 py-1 text-[11px] text-muted-foreground", className)} {...props} />
-  );
-}
-
-function MenuSeparator({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div data-slot="menu-separator" role="separator" className={cn("my-1 h-px bg-border", className)} {...props} />
-  );
-}
-
-export { Menu, MenuItem, MenuLabel, MenuSeparator };
