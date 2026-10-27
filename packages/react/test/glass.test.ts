@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
 
+import { tryTakeSlot, returnSlot } from "../src/lib/glass/filters";
 import { buildDisplacementMap, glassBezel, glassKey, glassScale, normalizeShape } from "../src/lib/glass/map";
+import { MAX_REFRACTING, areaAllowed, engineRefracts, type RefractionEnv } from "../src/lib/glass/support";
 
 const MAP_SHAPE = { width: 200, height: 100, radius: 16 };
 
@@ -117,5 +119,85 @@ describe("glass map", () => {
     expect(map.width).toBe(1);
     expect(map.height).toBe(12);
     expect(map.data.length).toBe(map.width * map.height * 4);
+  });
+});
+
+const CHROME_MAC_UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+const SAFARI_UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15";
+const FIREFOX_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0";
+const CRIOS_UA =
+  "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/131.0.6778.73 Mobile/15E148 Safari/604.1";
+
+const env = (overrides: Partial<RefractionEnv>): RefractionEnv => ({
+  userAgent: "",
+  brands: [],
+  reducedTransparency: false,
+  coarsePointer: false,
+  ...overrides,
+});
+
+describe("glass support", () => {
+  test("refracts in Chromium, whatever the brand list calls it", () => {
+    expect(engineRefracts(env({ userAgent: CHROME_MAC_UA, brands: ["Chromium", "Google Chrome"] }))).toBe(true);
+    expect(engineRefracts(env({ brands: ["Chromium", "Microsoft Edge"] }))).toBe(true);
+  });
+
+  test("falls back to the user agent only when the browser reports no brands", () => {
+    expect(engineRefracts(env({ userAgent: CHROME_MAC_UA }))).toBe(true);
+    expect(engineRefracts(env({ userAgent: CHROME_MAC_UA, brands: ["Not?A_Brand"] }))).toBe(false);
+  });
+
+  test("keeps frosted glass in every non-Chromium engine", () => {
+    expect(engineRefracts(env({ userAgent: SAFARI_UA }))).toBe(false);
+    expect(engineRefracts(env({ userAgent: FIREFOX_UA }))).toBe(false);
+    expect(engineRefracts(env({ userAgent: CRIOS_UA }))).toBe(false);
+    expect(
+      engineRefracts(
+        env({
+          userAgent:
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile/15E148 Safari/604.1",
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  test("never refracts when transparency is reduced, even in Chromium", () => {
+    expect(engineRefracts(env({ userAgent: CHROME_MAC_UA, brands: ["Chromium"], reducedTransparency: true }))).toBe(
+      false,
+    );
+  });
+
+  test("allows area up to the pointer's budget on the normalized shape", () => {
+    expect(areaAllowed({ width: 500, height: 500, radius: 0 }, true)).toBe(true);
+    expect(areaAllowed({ width: 600, height: 600, radius: 0 }, true)).toBe(false);
+    expect(areaAllowed({ width: 700, height: 800, radius: 0 }, false)).toBe(true);
+    expect(areaAllowed({ width: 800, height: 800, radius: 0 }, false)).toBe(false);
+    expect(areaAllowed({ width: 500.6, height: 500, radius: 0 }, true)).toBe(false);
+    expect(areaAllowed({ width: 500.4, height: 500, radius: 0 }, true)).toBe(true);
+  });
+
+  test("caps refraction slots by pointer type", () => {
+    for (const [coarsePointer, cap] of [
+      [false, MAX_REFRACTING.fine],
+      [true, MAX_REFRACTING.coarse],
+    ] as const) {
+      let taken = 0;
+      while (tryTakeSlot(coarsePointer)) taken += 1;
+      expect(taken).toBe(cap);
+      for (let index = 0; index < taken; index += 1) returnSlot();
+      expect(tryTakeSlot(coarsePointer)).toBe(true);
+      returnSlot();
+    }
+  });
+
+  test("keeps the slot count at zero when it is returned more often than taken", () => {
+    returnSlot();
+    returnSlot();
+    let taken = 0;
+    while (tryTakeSlot(false)) taken += 1;
+    expect(taken).toBe(MAX_REFRACTING.fine);
+    for (let index = 0; index < taken; index += 1) returnSlot();
   });
 });
