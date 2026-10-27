@@ -1,10 +1,25 @@
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 
-import { tryTakeSlot, returnSlot } from "../src/lib/glass/filters";
-import { buildDisplacementMap, glassBezel, glassKey, glassScale, normalizeShape } from "../src/lib/glass/map";
+import {
+  acquireFilter,
+  canBuildFilters,
+  onSlotFreed,
+  releaseFilter,
+  returnSlot,
+  slotUseCount,
+  slotWaiterCount,
+  tryTakeSlot,
+} from "../src/lib/glass/filters";
+import { createGlassHost, type GlassHostDeps } from "../src/lib/glass/host";
+import { buildDisplacementMap, glassBezel, glassKey, glassScale, normalizeShape, type GlassShape } from "../src/lib/glass/map";
 import { MAX_REFRACTING, areaAllowed, engineRefracts, type RefractionEnv } from "../src/lib/glass/support";
 
 const MAP_SHAPE = { width: 200, height: 100, radius: 16 };
+
+/** Every test in this file leaves the page-wide slot counter and waiter set empty. */
+afterEach(() => {
+  expect({ slots: slotUseCount(), waiters: slotWaiterCount() }).toEqual({ slots: 0, waiters: 0 });
+});
 
 type Map = { width: number; height: number; data: Uint8ClampedArray };
 
@@ -178,7 +193,8 @@ describe("glass support", () => {
     expect(areaAllowed({ width: 500.4, height: 500, radius: 0 }, true)).toBe(true);
   });
 
-  test("caps refraction slots by pointer type", () => {
+  test("caps refraction slots by pointer type", async () => {
+    await drainSlots();
     for (const [coarsePointer, cap] of [
       [false, MAX_REFRACTING.fine],
       [true, MAX_REFRACTING.coarse],
@@ -186,18 +202,403 @@ describe("glass support", () => {
       let taken = 0;
       while (tryTakeSlot(coarsePointer)) taken += 1;
       expect(taken).toBe(cap);
+      expect(slotUseCount()).toBe(cap);
       for (let index = 0; index < taken; index += 1) returnSlot();
+      expect(slotUseCount()).toBe(0);
       expect(tryTakeSlot(coarsePointer)).toBe(true);
       returnSlot();
     }
+    expect(slotUseCount()).toBe(0);
+    await flushWake();
   });
 
-  test("keeps the slot count at zero when it is returned more often than taken", () => {
-    returnSlot();
-    returnSlot();
+  test("never drives the slot count below zero", async () => {
+    await drainSlots();
+    for (let index = 0; index < 5; index += 1) returnSlot();
+    expect(slotUseCount()).toBe(0);
     let taken = 0;
     while (tryTakeSlot(false)) taken += 1;
     expect(taken).toBe(MAX_REFRACTING.fine);
+    expect(slotUseCount()).toBe(MAX_REFRACTING.fine);
     for (let index = 0; index < taken; index += 1) returnSlot();
+    for (let index = 0; index < 3; index += 1) returnSlot();
+    await flushWake();
+    expect(slotUseCount()).toBe(0);
+  });
+});
+
+/** A wake is one microtask, so one await reaches the pass the release queued. */
+const flushWake = async (): Promise<void> => {
+  await Promise.resolve();
+};
+
+const drainSlots = async (): Promise<void> => {
+  for (let index = 0; index < MAX_REFRACTING.fine; index += 1) returnSlot();
+  await flushWake();
+};
+
+describe("glass slot waiters", () => {
+  test("wakes a denied host once when a slot frees and forgets it", async () => {
+    await drainSlots();
+    let taken = 0;
+    while (tryTakeSlot(false)) taken += 1;
+    let wakes = 0;
+    onSlotFreed(() => {
+      wakes += 1;
+    });
+    expect(slotWaiterCount()).toBe(1);
+    returnSlot();
+    await flushWake();
+    expect(wakes).toBe(1);
+    expect(slotWaiterCount()).toBe(0);
+    while (taken > 1) {
+      returnSlot();
+      taken -= 1;
+    }
+    await flushWake();
+    expect(wakes).toBe(1);
+    await drainSlots();
+  });
+
+  test("calls a waiter that unsubscribes itself inside its callback only once", async () => {
+    await drainSlots();
+    let calls = 0;
+    const off = onSlotFreed(() => {
+      calls += 1;
+      off();
+    });
+    tryTakeSlot(false);
+    tryTakeSlot(false);
+    returnSlot();
+    await flushWake();
+    expect(calls).toBe(1);
+    returnSlot();
+    await flushWake();
+    expect(calls).toBe(1);
+    expect(slotWaiterCount()).toBe(0);
+  });
+
+  test("unsubscribing is idempotent and leaves nothing to wake", async () => {
+    await drainSlots();
+    let calls = 0;
+    const off = onSlotFreed(() => {
+      calls += 1;
+    });
+    off();
+    off();
+    expect(slotWaiterCount()).toBe(0);
+    tryTakeSlot(false);
+    returnSlot();
+    await flushWake();
+    expect(calls).toBe(0);
+    await drainSlots();
+  });
+
+  test("does not wake a waiter that unsubscribed before the queued wake ran", async () => {
+    await drainSlots();
+    tryTakeSlot(false);
+    let calls = 0;
+    const off = onSlotFreed(() => {
+      calls += 1;
+    });
+    returnSlot();
+    off();
+    await flushWake();
+    expect(calls).toBe(0);
+    expect(slotWaiterCount()).toBe(0);
+    await drainSlots();
+  });
+
+  test("does not call a waiter that a sibling removed during the same wake", async () => {
+    await drainSlots();
+    tryTakeSlot(false);
+    let sibling = 0;
+    let offSibling: (() => void) | null = null;
+    onSlotFreed(() => {
+      offSibling?.();
+    });
+    offSibling = onSlotFreed(() => {
+      sibling += 1;
+    });
+    returnSlot();
+    await flushWake();
+    expect(sibling).toBe(0);
+    expect(slotWaiterCount()).toBe(0);
+    await drainSlots();
+  });
+
+  test("leaves no listener behind after registering and dropping in a loop", async () => {
+    await drainSlots();
+    for (let index = 0; index < 100; index += 1) onSlotFreed(() => {})();
+    expect(slotWaiterCount()).toBe(0);
+  });
+
+  test("builds no filter and no slot outside a browser", async () => {
+    await drainSlots();
+    expect(canBuildFilters()).toBe(false);
+    expect(acquireFilter({ width: 10, height: 10, radius: 2 })).toBe("");
+    releaseFilter({ width: 10, height: 10, radius: 2 });
+    expect(slotUseCount()).toBe(0);
+    let taken = 0;
+    while (tryTakeSlot(false)) taken += 1;
+    expect(taken).toBe(MAX_REFRACTING.fine);
+    await drainSlots();
+  });
+});
+
+function hostHarness() {
+  const slots: { taken: number; cap: number } = { taken: 0, cap: MAX_REFRACTING.fine };
+  const waiters = new Set<() => void>();
+  const changes: (string | null)[] = [];
+  const acquired: GlassShape[] = [];
+  const released: GlassShape[] = [];
+  const timers: (() => void)[] = [];
+  let nextFilter = 0;
+  const wake = (): void => {
+    for (const waiter of Array.from(waiters)) {
+      waiters.delete(waiter);
+      waiter();
+    }
+  };
+  const deps: GlassHostDeps<number> = {
+    takeSlot: () => {
+      if (slots.taken >= slots.cap) return false;
+      slots.taken += 1;
+      return true;
+    },
+    returnSlot: () => {
+      slots.taken = Math.max(0, slots.taken - 1);
+      wake();
+    },
+    acquireFilter: (shape) => {
+      nextFilter += 1;
+      acquired.push(shape);
+      return `f${nextFilter}`;
+    },
+    releaseFilter: (shape) => {
+      released.push(shape);
+    },
+    waitForSlot: (waiter) => {
+      waiters.add(waiter);
+      return () => {
+        waiters.delete(waiter);
+      };
+    },
+    shapeFor: ({ width, height }) => ({ width, height, radius: 8 }),
+    onChange: (filterId) => {
+      changes.push(filterId);
+    },
+    scheduler: {
+      after: (_ms, task) => {
+        timers.push(task);
+        return timers.length - 1;
+      },
+      cancel: () => {},
+    },
+  };
+  return { deps, slots, waiters, changes, acquired, released, timers, wake };
+}
+
+describe("glass host ownership", () => {
+  test("deny, wake, unmount leaves no slot, filter or waiter", () => {
+    const harness = hostHarness();
+    harness.slots.cap = 0;
+    const host = createGlassHost(harness.deps);
+    host.sizeChanged(160, 44);
+    host.visibilityChanged(true);
+    host.visibilityChanged(true);
+    expect(harness.waiters.size).toBe(1);
+    expect(harness.acquired.length).toBe(0);
+
+    harness.slots.cap = MAX_REFRACTING.fine;
+    harness.wake();
+    expect(harness.waiters.size).toBe(0);
+    expect(harness.slots.taken).toBe(1);
+    expect(harness.acquired.length).toBe(1);
+    expect(harness.changes.at(-1)).toBe("f1");
+    expect(host.inspect().held).toEqual({ width: 160, height: 44, radius: 8 });
+
+    host.destroy();
+    expect(harness.slots.taken).toBe(0);
+    expect(harness.released.length).toBe(1);
+    expect(harness.changes.at(-1)).toBeNull();
+    expect(harness.waiters.size).toBe(0);
+    expect(host.inspect().held).toBeNull();
+    expect(host.inspect().alive).toBe(false);
+  });
+
+  test("unmounting while denied frees the waiter and nothing else", () => {
+    const harness = hostHarness();
+    harness.slots.cap = 0;
+    const host = createGlassHost(harness.deps);
+    host.sizeChanged(160, 44);
+    host.visibilityChanged(true);
+    expect(harness.waiters.size).toBe(1);
+    host.destroy();
+    expect(harness.waiters.size).toBe(0);
+    expect(harness.acquired.length).toBe(0);
+    expect(harness.slots.taken).toBe(0);
+    expect(harness.changes.at(-1)).toBeNull();
+  });
+
+  test("a wake that reaches a destroyed host takes nothing", () => {
+    const harness = hostHarness();
+    harness.slots.cap = 0;
+    const host = createGlassHost(harness.deps);
+    host.sizeChanged(160, 44);
+    host.visibilityChanged(true);
+    const stale = Array.from(harness.waiters);
+    expect(stale.length).toBe(1);
+
+    host.destroy();
+    harness.slots.cap = MAX_REFRACTING.fine;
+    for (const wake of stale) wake();
+    expect(harness.acquired.length).toBe(0);
+    expect(harness.slots.taken).toBe(0);
+    expect(harness.changes.at(-1)).toBeNull();
+  });
+
+  test("a zero size releases the slot and the filter without scheduling", () => {
+    const harness = hostHarness();
+    const host = createGlassHost(harness.deps);
+    host.sizeChanged(160, 44);
+    host.visibilityChanged(true);
+    expect(host.inspect().held).not.toBeNull();
+
+    host.sizeChanged(0, 0);
+    expect(host.inspect().held).toBeNull();
+    expect(host.inspect().scheduled).toBe(false);
+    expect(harness.slots.taken).toBe(0);
+    expect(harness.released.length).toBe(1);
+    expect(harness.changes.at(-1)).toBeNull();
+    expect(harness.timers.length).toBe(0);
+  });
+
+  test("losing visibility releases and stops waiting", () => {
+    const harness = hostHarness();
+    const host = createGlassHost(harness.deps);
+    host.sizeChanged(160, 44);
+    host.visibilityChanged(true);
+    expect(host.inspect().held).not.toBeNull();
+    host.visibilityChanged(false);
+    expect(host.inspect().held).toBeNull();
+    expect(harness.slots.taken).toBe(0);
+
+    harness.slots.cap = 0;
+    host.visibilityChanged(true);
+    expect(harness.waiters.size).toBe(1);
+    host.visibilityChanged(false);
+    expect(harness.waiters.size).toBe(0);
+    expect(harness.acquired.length).toBe(1);
+  });
+
+  test("a size change settles before it asks for a filter again", () => {
+    const harness = hostHarness();
+    const host = createGlassHost(harness.deps);
+    host.sizeChanged(160, 44);
+    host.visibilityChanged(true);
+    expect(harness.acquired.length).toBe(1);
+
+    host.sizeChanged(200, 60);
+    expect(host.inspect().held).toBeNull();
+    expect(harness.slots.taken).toBe(0);
+    expect(harness.acquired.length).toBe(1);
+    expect(harness.timers.length).toBe(1);
+
+    harness.timers[0]();
+    expect(harness.acquired.length).toBe(2);
+    expect(harness.acquired.at(-1)).toEqual({ width: 200, height: 60, radius: 8 });
+    expect(harness.slots.taken).toBe(1);
+  });
+
+  test("acquires once however often visibility is reported", () => {
+    const harness = hostHarness();
+    const host = createGlassHost(harness.deps);
+    host.sizeChanged(160, 44);
+    for (let index = 0; index < 5; index += 1) host.visibilityChanged(true);
+    expect(harness.acquired.length).toBe(1);
+    expect(harness.slots.taken).toBe(1);
+    host.destroy();
+    expect(harness.slots.taken).toBe(0);
+  });
+
+  test("a host outside its area budget keeps no waiter", () => {
+    const harness = hostHarness();
+    harness.slots.cap = 0;
+    const host = createGlassHost({ ...harness.deps, shapeFor: () => null });
+    host.sizeChanged(900, 900);
+    host.visibilityChanged(true);
+    expect(harness.waiters.size).toBe(0);
+    expect(harness.acquired.length).toBe(0);
+    expect(host.inspect().waiting).toBe(false);
+  });
+});
+
+describe("glass host against the shared slot registry", () => {
+  const noTimers = {
+    after: (_ms: number, _task: () => void) => 0,
+    cancel: (_handle: number) => {},
+  };
+
+  const mountHost = (width: number, height: number, acquired: string[]) => {
+    const host = createGlassHost<number>({
+      takeSlot: () => tryTakeSlot(false),
+      returnSlot,
+      acquireFilter: (shape) => {
+        const id = `filter-${glassKey(shape)}`;
+        acquired.push(id);
+        return id;
+      },
+      releaseFilter: () => {},
+      waitForSlot: onSlotFreed,
+      shapeFor: ({ width: w, height: h }) => ({ width: w, height: h, radius: 8 }),
+      onChange: () => {},
+      scheduler: noTimers,
+    });
+    host.sizeChanged(width, height);
+    host.visibilityChanged(true);
+    return host;
+  };
+
+  test("mounting past the cap and unmounting every host leaves no slot and no waiter", async () => {
+    await drainSlots();
+    const acquired: string[] = [];
+    const hosts = [];
+    for (let index = 0; index < MAX_REFRACTING.fine + 4; index += 1) {
+      hosts.push(mountHost(120 + index, 44, acquired));
+    }
+    expect(slotUseCount()).toBe(MAX_REFRACTING.fine);
+    expect(slotWaiterCount()).toBe(4);
+    expect(acquired.length).toBe(MAX_REFRACTING.fine);
+
+    for (const host of hosts) host.destroy();
+    expect(slotUseCount()).toBe(0);
+    expect(slotWaiterCount()).toBe(0);
+    for (const host of hosts) {
+      expect(host.inspect().held).toBeNull();
+      expect(host.inspect().alive).toBe(false);
+    }
+
+    await flushWake();
+    expect(slotUseCount()).toBe(0);
+    expect(acquired.length).toBe(MAX_REFRACTING.fine);
+  });
+
+  test("a host that unmounts while denied never takes a slot when the wake arrives", async () => {
+    await drainSlots();
+    let taken = 0;
+    while (tryTakeSlot(false)) taken += 1;
+    const acquired: string[] = [];
+    const host = mountHost(160, 44, acquired);
+    expect(slotWaiterCount()).toBe(1);
+
+    host.destroy();
+    expect(slotWaiterCount()).toBe(0);
+    for (let index = 0; index < taken; index += 1) returnSlot();
+    await flushWake();
+
+    expect(slotUseCount()).toBe(0);
+    expect(acquired.length).toBe(0);
+    expect(host.inspect().held).toBeNull();
   });
 });

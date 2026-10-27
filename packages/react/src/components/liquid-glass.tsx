@@ -1,7 +1,16 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
-import { acquireFilter, onSlotFreed, releaseFilter, returnSlot, tryTakeSlot } from "../lib/glass/filters";
+import {
+  acquireFilter,
+  canBuildFilters,
+  onSlotFreed,
+  releaseFilter,
+  returnSlot,
+  tryTakeSlot,
+} from "../lib/glass/filters";
+import { createGlassHost, type GlassHostScheduler, type HostSize } from "../lib/glass/host";
+import type { GlassShape } from "../lib/glass/map";
 import { watchHost } from "../lib/glass/observe";
 import { areaAllowed, engineRefracts, readEnv } from "../lib/glass/support";
 
@@ -15,14 +24,15 @@ export type LiquidGlassProps = {
   refract?: boolean;
 };
 
-type Size = { width: number; height: number };
-type Shape = Size & { radius: number };
-
 /** The one custom property this component sets; React's `CSSProperties` has no index signature. */
 type RefractStyle = CSSProperties & { "--glass-refract-filter": string };
 
-/** How long a host holds one size before the engine builds a filter for it again. */
-const SETTLE_MS = 150;
+const SCHEDULER: GlassHostScheduler<ReturnType<typeof setTimeout>> = {
+  after: (ms, task) => setTimeout(task, ms),
+  cancel: (handle) => {
+    clearTimeout(handle);
+  },
+};
 
 /** Opaque hosts (solid menus, fields) show nothing through them, so bending their backdrop only drags in what sits beside them. */
 function isOpaque(host: HTMLElement): boolean {
@@ -56,7 +66,9 @@ function isOpaque(host: HTMLElement): boolean {
  * at once and asks for a new one 150ms after the size settles, which keeps a
  * dragged sidebar from rebuilding a map on every frame without remounting
  * anything. A host that scrolls out of view releases both, and takes them back
- * when it returns.
+ * when it returns. The slot and the filter are one pair taken and handed back
+ * through `lib/glass/host`, so a host that unmounts, loses its size or is
+ * removed from the document leaves neither a slot nor a filter behind.
  *
  * Safari, every iOS browser and Firefox cannot apply an SVG filter to a
  * backdrop (WebKit drops the blur with it), so they keep the CSS glass and the
@@ -73,97 +85,36 @@ export function LiquidGlass({ tier = "clear", refract = true }: LiquidGlassProps
     const host = element?.parentElement;
     if (!refract || !element || !host) return undefined;
     const env = readEnv();
-    if (!engineRefracts(env) || isOpaque(host)) return undefined;
+    if (!engineRefracts(env) || isOpaque(host) || !canBuildFilters()) return undefined;
 
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    let size: Size | null = null;
-    let held: Shape | null = null;
-    let visible = false;
-    let reported = false;
-    const waiting: { stop: (() => void) | null } = { stop: null };
-
-    const stopWaiting = (): void => {
-      waiting.stop?.();
-      waiting.stop = null;
-    };
-
-    const release = (): void => {
-      stopWaiting();
-      if (!held) return;
-      releaseFilter(held);
-      returnSlot();
-      held = null;
-      setFilterId(null);
-    };
-
-    const acquire = (measured: Size): boolean => {
-      if (held) return true;
-      if (!visible || measured.width <= 0 || measured.height <= 0) return false;
+    const shapeFor = ({ width, height }: HostSize): GlassShape | null => {
       const radius = Math.min(
         Number.parseFloat(getComputedStyle(host).borderTopLeftRadius) || 0,
-        measured.height / 2,
-        measured.width / 2,
+        height / 2,
+        width / 2,
       );
-      const shape: Shape = { width: measured.width, height: measured.height, radius };
-      if (!areaAllowed(shape, env.coarsePointer)) return false;
-      if (!tryTakeSlot(env.coarsePointer)) {
-        waiting.stop ??= onSlotFreed(() => {
-          waiting.stop = null;
-          if (size) acquire(size);
-        });
-        return false;
-      }
-      stopWaiting();
-      const id = acquireFilter(shape);
-      // Without a 2d context the map comes back empty and the filter would bend
-      // nothing, so the host keeps the CSS look and gives the slot back.
-      const href = id ? document.getElementById(id)?.querySelector("feImage")?.getAttribute("href") : null;
-      if (!id || !href) {
-        if (id) releaseFilter(shape);
-        returnSlot();
-        return false;
-      }
-      held = shape;
-      setFilterId(id);
-      return true;
+      const shape = { width, height, radius };
+      return areaAllowed(shape, env.coarsePointer) ? shape : null;
     };
 
-    const clearTimer = (): void => {
-      if (timer === undefined) return;
-      clearTimeout(timer);
-      timer = undefined;
-    };
+    const glass = createGlassHost({
+      takeSlot: () => tryTakeSlot(env.coarsePointer),
+      returnSlot,
+      acquireFilter,
+      releaseFilter,
+      waitForSlot: onSlotFreed,
+      shapeFor,
+      onChange: setFilterId,
+      scheduler: SCHEDULER,
+    });
 
     const unwatch = watchHost(element, {
-      onSize: (width, height) => {
-        size = { width, height };
-        release();
-        clearTimer();
-        if (width <= 0 || height <= 0) return;
-        if (!reported) {
-          reported = true;
-          acquire(size);
-          return;
-        }
-        timer = setTimeout(() => {
-          timer = undefined;
-          if (size) acquire(size);
-        }, SETTLE_MS);
-      },
-      onVisible: (next) => {
-        visible = next;
-        if (next) {
-          if (size) acquire(size);
-          return;
-        }
-        clearTimer();
-        release();
-      },
+      onSize: glass.sizeChanged,
+      onVisible: glass.visibilityChanged,
     });
 
     return () => {
-      clearTimer();
-      release();
+      glass.destroy();
       unwatch();
     };
   }, [refract]);
