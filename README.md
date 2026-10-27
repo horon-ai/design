@@ -11,7 +11,6 @@ primary), glass 표면, 모션, 폰트·그림자 값이 모두 여기서 나옵
 
 ```
 apps/
-  playground/   @horon/playground  웹 데모 앱 (@horon-ai/react 만 사용)
   site/         @horon/site        문서 사이트 — design.horon.ai (Astro + React)
   storybook/    @horon/storybook   컴포넌트 미리보기 (개발 도구)
 packages/
@@ -22,7 +21,7 @@ packages/
 
 ## 레이어
 
-컴포넌트 레이어는 둘입니다. `@horon-ai/react`가 웹을, `horon_ui`가 Flutter를 맡고, 둘 다 같은 토큰을 읽고 같은 75개 컴포넌트를 제공합니다. playground·site·storybook은 React 패키지를 소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다. Flutter 패키지는 bun 워크스페이스 밖이고(`package.json`이 없습니다) `dart`·`flutter` 명령으로 검사합니다.
+컴포넌트 레이어는 둘입니다. `@horon-ai/react`가 웹을, `horon_ui`가 Flutter를 맡고, 둘 다 같은 토큰을 읽고 같은 75개 컴포넌트를 제공합니다. site·storybook은 React 패키지를 소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다. Flutter 패키지는 bun 워크스페이스 밖이고(`package.json`이 없습니다) `dart`·`flutter` 명령으로 검사합니다.
 
 ```tsx
 import { Button, Card, CardTitle, CardContent } from "@horon-ai/react";
@@ -51,7 +50,6 @@ HoronCard(
 bun install
 bun run tokens        # 토큰 CSS(theme.css) 생성
 bun run storybook     # Storybook → http://localhost:6006
-bun run playground    # 웹 데모 앱
 bun run site          # 문서 사이트 → http://localhost:4321
 ```
 
