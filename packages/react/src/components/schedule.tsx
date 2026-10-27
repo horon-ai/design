@@ -37,7 +37,7 @@ export function PickerField({
         className={cn(
           "relative flex h-10 w-40 cursor-pointer items-center gap-2 rounded-md px-3 text-left motion-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
           surface === "glass"
-            ? "group overflow-clip border border-glass-rim-strong bg-glass-regular"
+            ? "group overflow-clip bg-glass-regular"
             : "group bg-overlay-ink-4",
           className,
         )}
@@ -123,7 +123,7 @@ export function ScheduleCard({ title, nextRun, children, className }: ScheduleCa
   return (
     <section
       className={cn(
-        "relative flex w-95 flex-col items-stretch gap-3.5 overflow-clip rounded-xl border border-glass-rim-strong bg-glass-thick p-4.5",
+        "relative flex w-95 flex-col items-stretch gap-3.5 overflow-clip rounded-xl bg-glass-thick p-4.5",
         className,
       )}
     >

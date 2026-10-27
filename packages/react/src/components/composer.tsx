@@ -49,7 +49,7 @@ export function Composer({
     <form
       onSubmit={submit}
       className={cn(
-        "relative flex items-center gap-2 overflow-clip rounded-full border border-glass-rim-strong bg-glass-regular p-2 motion-colors",
+        "relative flex items-center gap-2 overflow-clip rounded-full bg-glass-regular p-2 motion-colors",
         className,
       )}
     >
@@ -64,10 +64,20 @@ export function Composer({
         className="relative min-w-0 flex-1 bg-transparent text-body-md text-text-primary outline-none placeholder:text-text-placeholder"
       />
       {value.trim() ? (
-        <IconButton type="submit" variant="primary" icon={<ArrowUp />} label="Send" disabled={disabled} />
+        <IconButton
+          key="send"
+          type="submit"
+          variant="primary"
+          icon={<ArrowUp />}
+          label="Send"
+          disabled={disabled}
+          className="animate-pop-in"
+        />
       ) : (
         <IconButton
+          key="voice"
           type="button"
+          className="animate-pop-in"
           icon={<Microphone className="text-text-secondary" />}
           label="Voice input"
           onClick={onVoice}
