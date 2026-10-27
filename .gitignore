@@ -18,9 +18,6 @@ dist-ssr
 # turbo
 .turbo
 
-# storybook
-storybook-static
-
 # editor directories and files
 .vscode/*
 !.vscode/extensions.json
