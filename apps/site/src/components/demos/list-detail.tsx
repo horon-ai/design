@@ -9,7 +9,7 @@ import {
   ListDetailMeta,
   Switch,
 } from "@horon-ai/react";
-import { DotsThree, FileText, Sparkle } from "@phosphor-icons/react";
+import { DotsThree, FileText, Sparkle, Trash } from "@phosphor-icons/react";
 
 import { Backdrop } from "../demo-backdrop";
 
@@ -79,7 +79,7 @@ export default function ListDetailDemo() {
                 Export
               </Button>
               <span className="flex-1" />
-              <Button variant="glass" size="sm">
+              <Button variant="glass" size="sm" icon={<Trash className="text-interactive-danger" />}>
                 Delete
               </Button>
             </ListDetailFooter>

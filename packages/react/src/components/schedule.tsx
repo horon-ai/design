@@ -52,7 +52,7 @@ export function PickerField({
       </BaseSelect.Trigger>
       <BaseSelect.Portal>
         <BaseSelect.Positioner sideOffset={8} alignItemWithTrigger={false} className="z-50 outline-none">
-          <BaseSelect.Popup className="relative max-h-72 min-w-(--anchor-width) motion-popup overflow-y-auto rounded-xl border border-glass-rim-strong bg-glass-thick p-1.5 outline-none">
+          <BaseSelect.Popup className="relative max-h-72 min-w-(--anchor-width) motion-popup overflow-y-auto rounded-xl bg-glass-thick p-1.5 outline-none">
             <LiquidGlass tier="thick" />
             <BaseSelect.List className="relative flex flex-col gap-0.5">
               {items.map((item) => (

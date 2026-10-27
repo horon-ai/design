@@ -96,6 +96,7 @@ export default function DocumentExtractPanelDemo() {
               { id: "vendor", label: "Vendor", value: "Larkspur Studio GmbH", type: "Text" },
               { id: "no", label: "Invoice no.", value: "INV-2026-0418", type: "Text" },
               { id: "issue", label: "Issue date", value: "2026-10-14", type: "Date" },
+              { id: "customer", label: "Customer no.", value: "FJ-20931", type: "Text" },
               { id: "due", label: "Due date", value: "2026-11-13", type: "Date", status: "check" },
               {
                 id: "lines",
@@ -111,6 +112,7 @@ export default function DocumentExtractPanelDemo() {
                   ["Product design sprint, week 41", "5", "1,400.00", "7,000.00"],
                   ["Usability testing sessions", "6", "260.00", "1,560.00"],
                   ["Design system audit", "1", "2,400.00", "2,400.00"],
+                  ["Prototype hosting, October", "1", "45.00", "45.00"],
                 ],
               },
             ],
