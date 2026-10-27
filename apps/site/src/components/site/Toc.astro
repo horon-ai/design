@@ -14,7 +14,9 @@
     if (!nav) return;
 
     const headings = Array.from(
-      document.querySelectorAll("article .prose-docs h2, article .prose-docs h3"),
+      document.querySelectorAll(
+        "article .prose-docs h2:not(.demo-stage *), article .prose-docs h3:not(.demo-stage *)",
+      ),
     );
 
     if (headings.length < 2) {
