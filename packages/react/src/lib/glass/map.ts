@@ -23,7 +23,6 @@ export type GlassShape = {
 /** A channel value of 128 leaves the sample point where it is. */
 const NEUTRAL = 128;
 const CHANNEL_RANGE = 127;
-const PROFILE_EXPONENT = 4;
 const MIN_BEZEL = 6;
 const MAX_BEZEL = 24;
 const MIN_SCALE = 8;
@@ -107,9 +106,10 @@ const geometryOf = ({ width, height, radius }: GlassShape): MapGeometry => {
  *
  * The pixel's distance to the rounded edge, inside positive, is `radius` minus
  * the box distance of the corner centres. Inside the bezel band the magnitude
- * follows the convex squircle profile, 1 at the edge and 0 at the inner end of
- * the band, and the displacement points inward, so an edge pixel samples the
- * backdrop from further inside the shape.
+ * falls off quadratically, `(1 - x)^2` with `x` the depth into the band over its
+ * width, so it is 1 at the edge and 0 at the inner end of the band; the
+ * displacement points inward, so an edge pixel samples the backdrop from
+ * further inside the shape.
  */
 const channelsAt = (column: number, row: number, geometry: MapGeometry): Channels => {
   const dx = column + 0.5 - geometry.halfWidth;
@@ -121,7 +121,7 @@ const channelsAt = (column: number, row: number, geometry: MapGeometry): Channel
   if (depth <= 0 || depth >= geometry.bezel) return NEUTRAL_CHANNELS;
 
   const ratio = depth / geometry.bezel;
-  const magnitude = 1 - (1 - (1 - ratio) ** PROFILE_EXPONENT) ** (1 / PROFILE_EXPONENT);
+  const magnitude = (1 - ratio) ** 2;
   let normalX = 0;
   let normalY = 0;
   if (qx > 0 && qy > 0) {
