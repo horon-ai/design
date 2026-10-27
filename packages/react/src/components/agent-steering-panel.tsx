@@ -194,6 +194,7 @@ export function AgentSteeringPanel({
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={(event) => {
+              if (event.nativeEvent.isComposing || event.keyCode === 229) return;
               if (event.key === "Enter") {
                 event.preventDefault();
                 submit(event.metaKey || event.ctrlKey);

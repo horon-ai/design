@@ -27,6 +27,7 @@ export function FileDrop({
   onFiles,
   disabled,
   className,
+  onChange,
   ...props
 }: FileDropProps) {
   const id = useId();
@@ -65,7 +66,10 @@ export function FileDrop({
         type="file"
         className="sr-only"
         disabled={disabled || uploading}
-        onChange={(event) => onFiles?.(Array.from(event.target.files ?? []))}
+        onChange={(event) => {
+          onFiles?.(Array.from(event.target.files ?? []));
+          onChange?.(event);
+        }}
         {...props}
       />
       {uploading ? (

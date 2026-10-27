@@ -8,6 +8,16 @@ import { Menu, MenuContent, MenuTrigger } from "./menu";
 
 const pillClass = "inline-flex h-5.5 items-center rounded-full px-2 text-[12px]/[16px] font-medium";
 
+/** Suffixes repeated values with their occurrence so duplicate tags never share a React key. */
+const withKeys = (values: string[] | undefined) => {
+  const seen = new Map<string, number>();
+  return (values ?? []).map((value) => {
+    const count = seen.get(value) ?? 0;
+    seen.set(value, count + 1);
+    return { value, key: count === 0 ? value : `${value}#${count}` };
+  });
+};
+
 export type McpServerRowProps = Omit<ComponentProps<"div">, "className" | "title"> & {
   /** Server name; its first two letters fill the 40px tile unless `initials` is set. */
   name: string;
@@ -55,24 +65,24 @@ export function McpServerRow({
       <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[14px]/[20px] font-semibold text-text-primary">{name}</span>
-          {tags?.map((tag) => (
-            <span key={tag} className={cn(pillClass, "bg-overlay-ink-6 text-text-secondary dark:bg-bg-surface-6")}>
-              {tag}
+          {withKeys(tags).map(({ value, key }) => (
+            <span key={key} className={cn(pillClass, "bg-overlay-ink-6 text-text-secondary dark:bg-bg-surface-6")}>
+              {value}
             </span>
           ))}
-          {brandTags?.map((tag) => (
-            <span key={tag} className={cn(pillClass, "bg-accent-sky-500-18 text-text-brand")}>
-              {tag}
+          {withKeys(brandTags).map(({ value, key }) => (
+            <span key={key} className={cn(pillClass, "bg-accent-sky-500-18 text-text-brand")}>
+              {value}
             </span>
           ))}
         </div>
         {description && <span className="text-[13px]/[18px] text-text-secondary">{description}</span>}
         {meta && meta.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5 text-[12px]/[16px] text-text-placeholder">
-            {meta.map((item, i) => (
-              <span key={item} className="inline-flex items-center gap-1.5">
+            {withKeys(meta).map(({ value, key }, i) => (
+              <span key={key} className="inline-flex items-center gap-1.5">
                 {i > 0 && <span aria-hidden>·</span>}
-                {item}
+                {value}
               </span>
             ))}
           </div>
