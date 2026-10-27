@@ -33,7 +33,7 @@ export function SkeletonCard({ type = "row", className }: SkeletonCardProps) {
       role="status"
       aria-label="Loading"
       className={cn(
-        "relative flex gap-2.5 overflow-clip rounded-[16px] border border-glass-rim-strong bg-glass-thick p-3.5",
+        "relative flex gap-2.5 overflow-clip rounded-[16px] bg-glass-thick p-3.5",
         type === "row" ? "w-75 items-center" : "w-70 flex-col items-start",
         className,
       )}
