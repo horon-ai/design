@@ -27,12 +27,12 @@ describe("glass map", () => {
 
   test("pulls the backdrop inward at each straight edge", () => {
     const map = buildDisplacementMap(MAP_SHAPE);
-    expect(redAt(map, 1, 50)).toBeGreaterThan(150);
+    expect(redAt(map, 1, 50)).toBeGreaterThan(200);
     expect(Math.abs(greenAt(map, 1, 50) - 128)).toBeLessThanOrEqual(2);
-    expect(greenAt(map, 100, 1)).toBeGreaterThan(150);
+    expect(greenAt(map, 100, 1)).toBeGreaterThan(200);
     expect(Math.abs(redAt(map, 100, 1) - 128)).toBeLessThanOrEqual(2);
-    expect(redAt(map, 198, 50)).toBeLessThan(106);
-    expect(greenAt(map, 100, 98)).toBeLessThan(106);
+    expect(redAt(map, 198, 50)).toBeLessThan(56);
+    expect(greenAt(map, 100, 98)).toBeLessThan(56);
   });
 
   test("bends hardest at the edge and fades to neutral by the bezel end", () => {
