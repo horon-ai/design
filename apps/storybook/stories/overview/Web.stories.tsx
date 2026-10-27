@@ -20,7 +20,7 @@ const components = [
   { name: "Chip", figma: "61:302", note: "Clear-glass toggle chip." },
   { name: "CommandPalette", figma: "110:676", note: "Frosted command palette." },
   { name: "Composer", figma: "63:462", note: "Glass message composer." },
-  { name: "DataTable", figma: "192:9046", note: "Solid data table with header, tags and footer." },
+  { name: "DataTable", figma: "192:9046", note: "TanStack data table: sorting, search, selection, pages." },
   { name: "DateField", figma: "60:244", note: "Glass field that opens the calendar." },
   { name: "Dialog", figma: "63:329", note: "Thick-glass dialog on a scrim." },
   { name: "EmptyState", figma: "64:485", note: "Mascot empty state." },
