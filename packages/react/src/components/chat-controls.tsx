@@ -7,7 +7,7 @@ import { LiquidGlass } from "./liquid-glass";
 type ButtonProps = Omit<ComponentProps<"button">, "className"> & { className?: string };
 
 const clearGlass =
-  "motion-press relative flex animate-[tab-panel-in_220ms_var(--ease-out-quint)] cursor-pointer items-center overflow-clip rounded-full border border-glass-rim-strong bg-glass-clear text-text-primary hover:bg-glass-clear-hover active:bg-glass-clear-pressed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
+  "motion-press relative flex animate-[tab-panel-in_220ms_var(--ease-out-quint)] cursor-pointer items-center overflow-clip rounded-full bg-glass-clear text-text-primary hover:bg-glass-clear-hover active:bg-glass-clear-pressed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
 
 /** Figma `Jump to latest` (Chat controls 88:659): a 44px clear-glass circle with a 20px caret. */
 export function JumpToLatest({ className, "aria-label": ariaLabel = "Jump to latest", ...props }: ButtonProps) {
@@ -43,19 +43,28 @@ export type VoiceInputProps = {
   elapsed: ReactNode;
   /** 0-1 levels for the 18 bars; defaults to the Figma waveform. */
   levels?: number[];
+  /** Animates the waveform while true; set false once recording stops. */
+  recording?: boolean;
   onStop?: () => void;
   stopLabel?: string;
   className?: string;
 };
 
 /** Figma `Voice input` (88:659): a 52px regular-glass pill with a red stop button, waveform and timer. */
-export function VoiceInput({ elapsed, levels, onStop, stopLabel = "Stop recording", className }: VoiceInputProps) {
+export function VoiceInput({
+  elapsed,
+  levels,
+  recording = true,
+  onStop,
+  stopLabel = "Stop recording",
+  className,
+}: VoiceInputProps) {
   const heights = levels ? levels.map((level) => Math.max(4, Math.round(level * 28))) : WAVEFORM;
   const bars = heights.map((height, position) => ({ height, id: `bar-${position}` }));
   return (
     <div
       className={cn(
-        "relative flex h-13 w-60 items-center gap-3 overflow-clip rounded-full border border-glass-rim-strong bg-glass-regular px-2",
+        "relative flex h-13 w-60 items-center gap-3 overflow-clip rounded-full bg-glass-regular px-2",
         className,
       )}
     >
@@ -69,11 +78,14 @@ export function VoiceInput({ elapsed, levels, onStop, stopLabel = "Stop recordin
         <span className="size-3 rounded-[3px] bg-bg-surface" />
       </button>
       <div aria-hidden className="relative flex min-w-0 flex-1 items-center gap-[3px] overflow-hidden">
-        {bars.map((bar) => (
+        {bars.map((bar, position) => (
           <span
             key={bar.id}
-            className="w-[3px] shrink-0 rounded-[2px] bg-interactive-primary-75"
-            style={{ height: bar.height }}
+            className={cn(
+              "w-[3px] shrink-0 rounded-[2px] bg-interactive-primary-75",
+              recording && "animate-wave motion-reduce:animate-none",
+            )}
+            style={{ height: bar.height, animationDelay: recording ? `${position * 120}ms` : undefined }}
           />
         ))}
       </div>

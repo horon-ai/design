@@ -25,8 +25,8 @@ export function EmptyState({ illustration, title, description, action, className
         <div className="flex size-35 shrink-0 items-center justify-center [&>*]:size-full">{illustration}</div>
       )}
       <p className="text-title-md text-text-primary">{title}</p>
-      {description && <p className="text-body-md text-text-secondary">{description}</p>}
-      {action && <div className="mt-1 flex">{action}</div>}
+      {description && <p className="self-stretch text-body-md text-text-secondary">{description}</p>}
+      {action && <div className="mt-4 flex">{action}</div>}
     </div>
   );
 }
