@@ -137,12 +137,17 @@ export function acquireFilter(shape: GlassShape): string {
   return id;
 }
 
-/** Drops one use of the filter; the last one removes it, and the last filter removes the `<svg>`. */
+/**
+ * Drops one use of the filter; the last one removes it, and the last filter
+ * removes the `<svg>`. A shape this page holds no use of is ignored: slots and
+ * filters are separate counts, and the host that holds them hands both back
+ * from one place, so a release here never touches a slot.
+ */
 export function releaseFilter(shape: GlassShape): void {
   if (typeof document === "undefined") return;
   const key = glassKey(shape);
   const entry = entries.get(key);
-  if (!entry) return;
+  if (!entry || entry.uses <= 0) return;
   entry.uses -= 1;
   if (entry.uses > 0) return;
   entries.delete(key);
@@ -164,7 +169,81 @@ export function tryTakeSlot(coarsePointer: boolean): boolean {
   return true;
 }
 
-/** Releases a slot taken by `tryTakeSlot`; a stray call never drives the count below zero. */
+/**
+ * Hosts denied a slot, retried when one frees so a visible surface never stays
+ * frosted behind the cap. A waiter leaves the set before its callback runs, so
+ * one wake calls it at most once, and a callback that subscribes again for its
+ * next attempt is not called twice in the same wake.
+ */
+const slotWaiters = new Set<() => void>();
+
+/**
+ * Calls `waiter` each time a slot frees; returns the unsubscribe. The
+ * unsubscribe is idempotent, so a host may drop it while a wake is running.
+ */
+export function onSlotFreed(waiter: () => void): () => void {
+  slotWaiters.add(waiter);
+  return () => {
+    slotWaiters.delete(waiter);
+  };
+}
+
+/**
+ * Wakes the hosts waiting for a slot, over a copy of the set, skipping any host
+ * that unsubscribed while the copy was being taken: that host is gone, and a
+ * wake must never ask it to take a slot back. A host that subscribes again from
+ * inside its callback waits for the next free slot instead of being called
+ * twice in this pass.
+ */
+const wakeWaiters = (): void => {
+  for (const waiter of Array.from(slotWaiters)) {
+    if (!slotWaiters.delete(waiter)) continue;
+    waiter();
+  }
+};
+
+/** A wake runs in a microtask, so a host that hands its slot back from inside one cannot recurse into the release that woke it. */
+let wakeQueued = false;
+
+const queueWake = (): void => {
+  if (wakeQueued) return;
+  wakeQueued = true;
+  queueMicrotask(() => {
+    wakeQueued = false;
+    wakeWaiters();
+  });
+};
+
+/** Releases a slot taken by `tryTakeSlot`, then wakes the hosts the cap turned away. */
 export function returnSlot(): void {
-  if (slotsTaken > 0) slotsTaken -= 1;
+  if (slotsTaken === 0) return;
+  slotsTaken -= 1;
+  queueWake();
+}
+
+/** Internal: slots in use. Read by the unit tests; the component never calls it. */
+export function slotUseCount(): number {
+  return slotsTaken;
+}
+
+/** Internal: hosts waiting for a slot. Read by the unit tests; the component never calls it. */
+export function slotWaiterCount(): number {
+  return slotWaiters.size;
+}
+
+let paintable: boolean | null = null;
+
+/**
+ * Whether this page can paint a displacement map: a canvas with no 2d context
+ * hands back an empty filter, which would bend nothing while holding a slot.
+ * Asked once per page, before any host takes a slot, because the answer cannot
+ * change without a reload.
+ */
+export function canBuildFilters(): boolean {
+  if (typeof document === "undefined") return false;
+  paintable ??= (() => {
+    const canvas = document.createElement("canvas");
+    return canvas.getContext("2d") !== null;
+  })();
+  return paintable;
 }

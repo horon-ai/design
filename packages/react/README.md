@@ -45,10 +45,16 @@ Figma의 `Liquid layers`(tint, inner shade, 경계선 세 겹을 50% 세기로 �
 그립니다. 유리 컴포넌트는 이것을 첫 자식으로 두고, 채움은 `glass-clear` / `glass-regular` /
 `glass-thick` 토큰으로 정합니다. 경계선 흐림과 안쪽 그림자 여백은 Figma처럼 높이에 비례합니다.
 
-Chromium 계열 브라우저에서는 그 아래에 [liquid-glass-react](https://github.com/rdev/liquid-glass-react)(MIT)를
-호스트 크기에 맞춰 띄웁니다. SVG 변위 필터가 뒤 배경을 가장자리에서 휘게 하고, 테두리가 빛을 받습니다.
-Safari와 Firefox는 배경에 SVG 필터를 걸지 못해서 CSS 유리 그대로 그립니다. 투명도 줄이기 설정이 켜져 있거나
-`<LiquidGlass refract={false} />`이면 굴절을 쓰지 않습니다.
+Chromium 계열 브라우저(Chrome, Edge, Arc, Android Chrome, Windows 데스크톱 앱)에서는 패키지가 만든 SVG 변위 필터가
+뒤 배경을 표면 가장자리에서 휘게 합니다. 칩이나 버튼처럼 작은 표면뿐 아니라 카드, 시트 같은 큰 사각형도 같은 방식으로
+휘고, 같은 크기의 표면은 필터 하나를 나눠 씁니다. 한 번에 굴절하는 표면은 16개까지이고, 터치 기기에서는 6개까지입니다.
+화면 밖 표면과 터치 기기에서 너무 큰 표면은 굴절하지 않습니다.
+
+Safari, iOS의 모든 브라우저, Firefox, macOS 데스크톱 앱은 배경에 SVG 필터를 걸지 못합니다
+([WebKit 245510](https://bugs.webkit.org/show_bug.cgi?id=245510), [Gecko 1961378](https://bugzilla.mozilla.org/show_bug.cgi?id=1961378)).
+이 엔진에서는 위의 CSS 레이어에 밝은 테두리를 더한 흐린 유리로 그립니다. 투명도 줄이기 설정이 켜져 있거나
+브라우저가 `backdrop-filter`를 지원하지 않으면 불투명한 흐린 표면이 됩니다. `<LiquidGlass refract={false} />`처럼
+`refract`를 끄면 굴절만 사라집니다.
 
 ## 컴포넌트 (55개)
 
