@@ -30,7 +30,6 @@ const snippet = (sources[`../../components/demos/${component.slug}.tsx`] ?? "")
   .replace(/^import \{ Backdrop \} from "\.\.\/demo-backdrop";\n\n?/m, "")
   .replace(/<Backdrop[^>]*>\n?/g, "<>\n")
   .replace(/<\/Backdrop>/g, "</>");
-const storybookHref = `https://storybook.horon.ai/?path=/story/${component.story}`;
 const index = components.findIndex((entry) => entry.slug === component.slug);
 const previous = index > 0 ? components[index - 1] : undefined;
 const next = index >= 0 && index < components.length - 1 ? components[index + 1] : undefined;
@@ -66,14 +65,6 @@ const showToc = true;
               </span>
             )
           }
-          <a
-            href={storybookHref}
-            target="_blank"
-            rel="noreferrer"
-            class="inline-flex h-9 items-center rounded-lg bg-bg-subtle px-3 text-body-sm transition-colors hover:text-text-primary"
-          >
-            Storybook ↗
-          </a>
         </div>
 
         {/* Toc.astro collects its links from `article .prose-docs h2, h3`. */}
@@ -85,8 +76,8 @@ const showToc = true;
             ) : (
               <div class="demo-stage">
                 <p class="max-w-md text-center text-body-sm leading-6 text-text-secondary">
-                  이 컴포넌트는 라이브 프리뷰 대신 코드 예시와 Storybook 링크로 안내합니다. 전체
-                  상태와 변형은 Storybook에서 확인할 수 있습니다.
+                  이 컴포넌트는 라이브 프리뷰를 아직 준비하지 않았습니다. Usage의 코드 예시를
+                  참고하세요.
                 </p>
               </div>
             )
