@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
-import { acquireFilter, releaseFilter, returnSlot, tryTakeSlot } from "../lib/glass/filters";
+import { acquireFilter, onSlotFreed, releaseFilter, returnSlot, tryTakeSlot } from "../lib/glass/filters";
 import { watchHost } from "../lib/glass/observe";
 import { areaAllowed, engineRefracts, readEnv } from "../lib/glass/support";
 
@@ -48,7 +48,9 @@ function isOpaque(host: HTMLElement): boolean {
  * The engine is budgeted rather than free: a page holds at most 16 refracting
  * surfaces with a precise pointer and 6 with a finger, a host larger than
  * 600000px² (250000px² on touch) keeps the CSS look, and so does an opaque host
- * or a reader who asked for reduced transparency. Size comes from the shared
+ * or a reader who asked for reduced transparency. Only an intersecting host
+ * asks for a slot, and a host the cap turns away waits for one to free
+ * instead of staying frosted. Size comes from the shared
  * observers in `lib/glass/observe`, in layout pixels, so a scaled ancestor does
  * not shrink the shape. A host that changes size drops its filter and its slot
  * at once and asks for a new one 150ms after the size settles, which keeps a
@@ -76,10 +78,17 @@ export function LiquidGlass({ tier = "clear", refract = true }: LiquidGlassProps
     let timer: ReturnType<typeof setTimeout> | undefined;
     let size: Size | null = null;
     let held: Shape | null = null;
-    let visible = true;
+    let visible = false;
     let reported = false;
+    const waiting: { stop: (() => void) | null } = { stop: null };
+
+    const stopWaiting = (): void => {
+      waiting.stop?.();
+      waiting.stop = null;
+    };
 
     const release = (): void => {
+      stopWaiting();
       if (!held) return;
       releaseFilter(held);
       returnSlot();
@@ -96,7 +105,15 @@ export function LiquidGlass({ tier = "clear", refract = true }: LiquidGlassProps
         measured.width / 2,
       );
       const shape: Shape = { width: measured.width, height: measured.height, radius };
-      if (!areaAllowed(shape, env.coarsePointer) || !tryTakeSlot(env.coarsePointer)) return false;
+      if (!areaAllowed(shape, env.coarsePointer)) return false;
+      if (!tryTakeSlot(env.coarsePointer)) {
+        waiting.stop ??= onSlotFreed(() => {
+          waiting.stop = null;
+          if (size) acquire(size);
+        });
+        return false;
+      }
+      stopWaiting();
       const id = acquireFilter(shape);
       // Without a 2d context the map comes back empty and the filter would bend
       // nothing, so the host keeps the CSS look and gives the slot back.
@@ -122,7 +139,8 @@ export function LiquidGlass({ tier = "clear", refract = true }: LiquidGlassProps
         size = { width, height };
         release();
         clearTimer();
-        if (!reported && width > 0 && height > 0) {
+        if (width <= 0 || height <= 0) return;
+        if (!reported) {
           reported = true;
           acquire(size);
           return;

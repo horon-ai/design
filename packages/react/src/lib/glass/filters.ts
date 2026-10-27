@@ -164,7 +164,20 @@ export function tryTakeSlot(coarsePointer: boolean): boolean {
   return true;
 }
 
-/** Releases a slot taken by `tryTakeSlot`; a stray call never drives the count below zero. */
+/** Hosts denied a slot, retried when one frees so a visible surface never stays frosted behind the cap. */
+const slotWaiters = new Set<() => void>();
+
+/** Calls `waiter` each time a slot frees; returns the unsubscribe, which the caller drops once it holds a slot. */
+export function onSlotFreed(waiter: () => void): () => void {
+  slotWaiters.add(waiter);
+  return () => {
+    slotWaiters.delete(waiter);
+  };
+}
+
+/** Releases a slot taken by `tryTakeSlot`, then wakes the hosts the cap turned away. */
 export function returnSlot(): void {
-  if (slotsTaken > 0) slotsTaken -= 1;
+  if (slotsTaken === 0) return;
+  slotsTaken -= 1;
+  for (const waiter of Array.from(slotWaiters)) waiter();
 }
