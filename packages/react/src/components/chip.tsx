@@ -12,7 +12,7 @@ export function Chip({ className, children, ...props }: ChipProps) {
   return (
     <Toggle
       className={cn(
-        "group relative inline-flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 overflow-clip rounded-full border px-3 text-label-md whitespace-nowrap",
+        "group relative inline-flex h-8 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 overflow-clip rounded-full border px-3 text-label-md whitespace-nowrap",
         "border-glass-rim-strong bg-glass-clear text-text-primary hover:not-data-disabled:bg-glass-clear-hover",
         "data-pressed:border-border-brand data-pressed:bg-glass-clear-pressed data-pressed:text-text-brand hover:not-data-disabled:data-pressed:bg-glass-clear-pressed",
         "data-disabled:cursor-not-allowed data-disabled:opacity-40",
@@ -22,7 +22,7 @@ export function Chip({ className, children, ...props }: ChipProps) {
       {...props}
     >
       <LiquidGlass />
-      <Check aria-hidden className="relative hidden size-3.5 group-data-pressed:block" />
+      <Check aria-hidden className="relative hidden size-3.5 animate-pop-in group-data-pressed:block" />
       <span className="relative">{children}</span>
     </Toggle>
   );

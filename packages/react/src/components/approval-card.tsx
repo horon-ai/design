@@ -47,7 +47,7 @@ export function ApprovalCard({
   return (
     <div
       className={cn(
-        "relative flex w-90 flex-col items-start gap-3 overflow-clip rounded-xl border bg-glass-thick p-4",
+        "relative flex w-90 flex-col items-start gap-3 overflow-clip rounded-xl border bg-glass-thick p-4 motion-colors",
         state === "pending" ? "border-border-brand" : "border-glass-rim-strong",
         className,
       )}

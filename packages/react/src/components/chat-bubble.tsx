@@ -14,7 +14,7 @@ export function ChatBubble({ from = "me", className, ...props }: ChatBubbleProps
     <div
       data-from={from}
       className={cn(
-        "w-fit max-w-[min(100%,560px)] rounded-xl px-4 py-3 text-body-md",
+        "w-fit max-w-[min(100%,560px)] animate-[tab-panel-in_220ms_var(--ease-out-quint)] rounded-xl px-4 py-3 text-body-md",
         from === "me" ? "ml-auto bg-interactive-primary text-interactive-on-primary" : "bg-bg-subtle text-text-primary",
         className,
       )}

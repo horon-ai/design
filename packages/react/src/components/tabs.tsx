@@ -10,7 +10,11 @@ export function Tabs({ className, ...props }: WithClass<ComponentProps<typeof Ba
   return <BaseTabs.Root className={cn("flex flex-col gap-4", className)} {...props} />;
 }
 
-/** Figma `Tabs example` (62:353): a regular-glass pill tray, 4px padding, 24px between tabs. */
+/**
+ * Figma `Tabs example` (62:353): a regular-glass pill tray, 4px padding, 24px
+ * between tabs. The 10% ink selection is one indicator that slides to the
+ * active tab (Base UI `Tabs.Indicator` positions it).
+ */
 export function TabsList({ className, children, ...props }: WithClass<ComponentProps<typeof BaseTabs.List>>) {
   return (
     <BaseTabs.List
@@ -21,18 +25,19 @@ export function TabsList({ className, children, ...props }: WithClass<ComponentP
       {...props}
     >
       <LiquidGlass tier="regular" />
+      <BaseTabs.Indicator className="absolute top-(--active-tab-top) left-(--active-tab-left) h-(--active-tab-height) w-(--active-tab-width) rounded-full bg-overlay-ink-10 motion-indicator" />
       {children}
     </BaseTabs.List>
   );
 }
 
-/** Figma `Tabs` (62:335): a pill tab; selected is 10% ink, hover adds 5% (14% when selected). */
+/** Figma `Tabs` (62:335): a pill tab; the list's indicator draws the 10% selection, hover adds 5% (4% over the selection, 14% total). */
 export function TabsTab({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Tab>>) {
   return (
     <BaseTabs.Tab
       className={cn(
         "relative cursor-pointer rounded-full px-1 py-2.5 text-label-lg whitespace-nowrap text-text-secondary",
-        "hover:bg-overlay-ink-5 hover:text-text-primary data-active:bg-overlay-ink-10 data-active:text-text-primary hover:data-active:bg-overlay-ink-14",
+        "motion-colors hover:bg-overlay-ink-5 hover:text-text-primary data-active:text-text-primary hover:data-active:bg-overlay-ink-4",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed data-disabled:opacity-40",
         className,
       )}
@@ -42,5 +47,10 @@ export function TabsTab({ className, ...props }: WithClass<ComponentProps<typeof
 }
 
 export function TabsPanel({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Panel>>) {
-  return <BaseTabs.Panel className={cn("outline-none", className)} {...props} />;
+  return (
+    <BaseTabs.Panel
+      className={cn("animate-[tab-panel-in_200ms_var(--ease-out-quint)] outline-none", className)}
+      {...props}
+    />
+  );
 }

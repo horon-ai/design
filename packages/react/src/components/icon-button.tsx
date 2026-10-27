@@ -36,7 +36,7 @@ export function IconButton({ variant = "ghost", size = "md", icon, label, classN
     <BaseButton
       aria-label={label}
       className={cn(
-        "relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full select-none",
+        "relative inline-flex shrink-0 motion-press cursor-pointer items-center justify-center rounded-full select-none",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed data-disabled:opacity-40",
         sizeClass[size],
         variantClass[variant],

@@ -45,7 +45,7 @@ export function TextareaField({
       </div>
       <div
         className={cn(
-          "relative flex h-30 w-full overflow-clip rounded-md border px-3.5 py-3",
+          "relative flex h-30 w-full overflow-clip rounded-md border px-3.5 py-3 motion-colors",
           fieldBoxClass.glass,
           "focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
         )}

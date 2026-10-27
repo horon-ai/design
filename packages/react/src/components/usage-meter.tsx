@@ -31,7 +31,7 @@ export function UsageMeter({ label, value, detail, note, className }: UsageMeter
         <Meter.Value className="shrink-0 text-text-secondary" />
       </div>
       <Meter.Track className="relative h-1.5 w-full overflow-clip rounded-full bg-overlay-ink-8">
-        <Meter.Indicator className="h-full rounded-full bg-sky-500" />
+        <Meter.Indicator className="h-full rounded-full bg-sky-500 transition-[width] duration-400 ease-out-quint" />
       </Meter.Track>
       {(detail || note) && (
         <div className="relative flex w-full items-center gap-2 text-caption text-text-secondary">

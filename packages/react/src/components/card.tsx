@@ -25,10 +25,10 @@ export function Card({ title, description, interactive, selected, render, classN
       ...props,
       "data-selected": selected ? "" : undefined,
       className: cn(
-        "relative flex flex-col items-start gap-2 overflow-clip rounded-xl border bg-glass-thick p-5 text-left",
+        "relative flex flex-col items-start gap-2 overflow-clip rounded-xl border bg-glass-thick p-5 text-left motion-colors",
         selected ? "border-border-brand" : "border-glass-rim-strong",
         interactive &&
-          "cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
+          "cursor-pointer transition-[border-color,scale] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand active:scale-[0.99]",
         className,
       ),
       children: (

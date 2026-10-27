@@ -122,7 +122,7 @@ export function DataTableFooter({ onAdd, addLabel = "Add row", hint, className }
       <button
         type="button"
         onClick={onAdd}
-        className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-label-md text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
+        className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-label-md text-text-secondary motion-colors focus-visible:outline-2 focus-visible:outline-text-brand"
       >
         <Plus aria-hidden className="size-4" />
         {addLabel}
