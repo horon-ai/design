@@ -20,7 +20,6 @@
 		"tokens:flutter": "bun packages/flutter/scripts/generate-tokens.mjs",
 		"storybook": "turbo storybook --filter=@horon/storybook",
 		"build:storybook": "turbo build-storybook --filter=@horon/storybook",
-		"playground": "turbo dev --filter=@horon/playground",
 		"deploy:storybook": "turbo build-storybook --filter=@horon/storybook && wrangler pages deploy apps/storybook/storybook-static --project-name=horon-storybook --branch=main",
 		"site": "turbo dev --filter=@horon/site",
 		"build:site": "turbo build --filter=@horon/site",
