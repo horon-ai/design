@@ -10,9 +10,13 @@ const items = [
 
 export default function FilterBarDemo() {
   return (
-    <div className="flex w-full flex-col items-center gap-4 rounded-2xl bg-bg-surface p-8">
-      <FilterBar items={items} defaultValue="all" />
-      <FilterBar items={items} defaultValue="review" />
+    <div className="flex w-full flex-col items-center gap-4 rounded-2xl bg-bg-surface p-4 sm:p-8">
+      <div className="max-w-full overflow-x-auto rounded-full">
+        <FilterBar items={items} defaultValue="all" />
+      </div>
+      <div className="max-w-full overflow-x-auto rounded-full">
+        <FilterBar items={items} defaultValue="review" />
+      </div>
     </div>
   );
 }

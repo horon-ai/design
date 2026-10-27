@@ -6,7 +6,7 @@ export default function TextareaFieldDemo() {
   return (
     <Backdrop className="flex-col">
       <TextareaField
-        className="w-96"
+        className="w-full max-w-96"
         label="Instructions"
         hint="Optional"
         placeholder="Tell the bot how you like your inbox handled"
@@ -14,7 +14,7 @@ export default function TextareaFieldDemo() {
         maxLength={240}
       />
       <TextareaField
-        className="w-96"
+        className="w-full max-w-96"
         label="Instructions"
         defaultValue="Skip newsletters."
         error="Add at least 40 characters."

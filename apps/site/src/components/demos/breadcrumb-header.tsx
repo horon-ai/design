@@ -13,7 +13,7 @@ export default function BreadcrumbHeaderDemo() {
           { label: "Chief of staff" },
         ]}
       />
-      <BreadcrumbHeader className="w-97.5" crumbs={[{ label: "Horon HQ", tile: "H", href: "#" }, { label: "Settings" }]} />
+      <BreadcrumbHeader className="w-full max-w-97.5" crumbs={[{ label: "Horon HQ", tile: "H", href: "#" }, { label: "Settings" }]} />
     </Backdrop>
   );
 }
