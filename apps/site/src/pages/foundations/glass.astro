@@ -6,7 +6,7 @@ import { glass } from "@horon-ai/tokens";
 
 const usage = `import { LiquidGlass } from "@horon-ai/react";
 
-<div className="relative overflow-clip rounded-xl border border-glass-rim-strong bg-glass-thick p-5">
+<div className="relative overflow-clip rounded-xl bg-glass-thick p-5">
   <LiquidGlass tier="thick" />
   <p className="relative">내용</p>
 </div>`;
@@ -22,17 +22,18 @@ const usage = `import { LiquidGlass } from "@horon-ai/react";
 
   <h2>레이어</h2>
   <p>
-    유리는 채움색(<code>glass-clear</code>, <code>glass-regular</code>, <code>glass-thick</code>) 위에 다섯 장의 레이어를
+    유리는 채움색(<code>glass-clear</code>, <code>glass-regular</code>, <code>glass-thick</code>) 위에 세 장의 레이어를
     겹친 것입니다. Figma는 이 묶음 전체를 50% 마스크로 덮어서, 모든 레이어가 {glass.layerOpacity * 100}% 세기로 그려집니다.
+    칩은 Paper의 Texture층을 하나 더 얹고, 배경을 휘게 하는 엔진에서는 refraction층이, 그렇지 않은 엔진에서는 rim sheen이
+    표면 가장자리를 대신합니다.
   </p>
   <ul>
     <li>Tint: {glass.tint.color}, 배경 흐림 {glass.tint.blur}px</li>
     <li>Inner shade: {glass.innerShade.color}, 흐림 {glass.innerShade.blur}px, 여백은 높이의 1/14 (위아래 최대 {glass.innerShade.maxInsetY}px, 좌우 최대 {glass.innerShade.maxInsetX}px)</li>
-    <li>Dark edge: {glass.edgeDark.color}, 흐림 min(4, 4H/84)px</li>
-    <li>Light edge: {glass.edgeLight.color}, 흐림 clamp(0.75, 1.5H/84, 1.5)px</li>
-    <li>Soft light edge: {glass.edgeLightSoft.color}</li>
+    <li>Soft light edge: {glass.edgeLightSoft.color}, 테두리 1px, 흐림 clamp(0.75, 1.5H/84, 1.5)px</li>
+    <li>Texture(칩만): 흰색 3% 바탕을 위아래 -9px, 좌우 -8px로 넓히고 2px 흐림을 겁니다</li>
   </ul>
-  <p>H는 표면 높이입니다. 레이어 묶음을 CSS 크기 컨테이너로 만들어 <code>100cqh</code>로 높이를 읽기 때문에, 32px 칩부터 큰 카드까지 Figma와 같은 비율로 흐려집니다. 두꺼운 유리(<code>tier="thick"</code>)는 어두운 경계선을 뺍니다.</p>
+  <p>H는 표면 높이입니다. 레이어 묶음을 CSS 크기 컨테이너로 만들어 <code>100cqh</code>로 높이를 읽기 때문에, 32px 칩부터 큰 카드까지 Figma와 같은 비율로 흐려집니다.</p>
 
   <h2>굴절</h2>
   <p>
@@ -44,7 +45,7 @@ const usage = `import { LiquidGlass } from "@horon-ai/react";
     Safari, iOS의 모든 브라우저, Firefox, macOS 데스크톱 앱은 배경에 SVG 필터를 걸지 못합니다
     (<a href="https://bugs.webkit.org/show_bug.cgi?id=245510">WebKit 245510</a>,
     <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1961378">Gecko 1961378</a>). 이 엔진에서는 위의 CSS 레이어에
-    밝은 테두리를 더한 흐린 유리로 그립니다.
+    rim sheen(밝은 테두리)을 더한 흐린 유리로 그립니다.
   </p>
   <ul>
     <li>한 번에 굴절하는 표면은 16개까지이고, 터치 기기에서는 6개까지입니다.</li>
