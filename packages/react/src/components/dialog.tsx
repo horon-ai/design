@@ -35,7 +35,9 @@ export function DialogContent({
       <BaseDialog.Viewport className="fixed inset-0 flex items-center justify-center px-4">
         <BaseDialog.Popup
           className={cn(
-            "relative flex w-105 max-w-[calc(100vw-2rem)] flex-col items-start gap-2 overflow-clip rounded-xl border border-glass-rim-strong bg-glass-thick p-6",
+            "relative flex w-105 max-w-[calc(100vw-2rem)] flex-col items-start gap-2 overflow-clip rounded-xl bg-glass-fill-frost p-6 backdrop-blur-[24px]",
+            "shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost),0_0_0_1px_var(--color-overlay-ink-3)]",
+            "dark:bg-glass-thick dark:backdrop-blur-none dark:shadow-none",
             "motion-popup duration-240 data-starting-style:translate-y-2",
             className,
           )}
