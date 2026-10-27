@@ -1,6 +1,16 @@
 import { Collapsible } from "@base-ui/react/collapsible";
 import { CaretDown, CaretLeft, CaretRight, CaretUpDown, DotsThree, PlusCircle } from "@phosphor-icons/react";
-import { Children, type ComponentProps, type ReactNode } from "react";
+import {
+  Children,
+  type ComponentProps,
+  type CSSProperties,
+  type KeyboardEvent,
+  type PointerEvent,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
@@ -8,22 +18,135 @@ import { LiquidGlass } from "./liquid-glass";
 type DivProps = Omit<ComponentProps<"div">, "className"> & { className?: string };
 type ButtonProps = Omit<ComponentProps<"button">, "className"> & { className?: string };
 
-/** Figma `Sidebar` (88:848): a 280px thick-glass column with a 1px right border, 16/12/12px padding. */
+export type SidebarProps = Omit<ComponentProps<"nav">, "className"> & {
+  className?: string;
+  /**
+   * Drag the right edge to change the width, from the `md` breakpoint (768px) up.
+   * Below `md` the handle is hidden and the sidebar keeps its fixed 280px width.
+   */
+  resizable?: boolean;
+  /** Starting width in px when `resizable`. Double-clicking the handle returns to it. */
+  defaultWidth?: number;
+  minWidth?: number;
+  maxWidth?: number;
+  /** Called with the clamped width as it changes, during a drag too. */
+  onWidthChange?: (width: number) => void;
+  resizeLabel?: string;
+};
+
+const RESIZE_STEP = 16;
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.round(Math.min(max, Math.max(min, value)));
+}
+
+/**
+ * Figma `Sidebar` (88:848): a 280px thick-glass column with a 1px right border, 16/12/12px padding.
+ * With `resizable`, an 8px handle on the right edge drags the width between `minWidth` and `maxWidth`.
+ */
 export function Sidebar({
   className,
+  style,
   children,
+  resizable = false,
+  defaultWidth = 280,
+  minWidth = 240,
+  maxWidth = 400,
+  onWidthChange,
+  resizeLabel = "Resize sidebar",
   ...props
-}: Omit<ComponentProps<"nav">, "className"> & { className?: string }) {
+}: SidebarProps) {
+  const [width, setWidth] = useState(() => clamp(defaultWidth, minWidth, maxWidth));
+  const [dragging, setDragging] = useState(false);
+  const drag = useRef<{ x: number; width: number } | null>(null);
+
+  const resize = (next: number) => {
+    const clamped = clamp(next, minWidth, maxWidth);
+    if (clamped === width) return;
+    setWidth(clamped);
+    onWidthChange?.(clamped);
+  };
+
+  // Keep the col-resize cursor and stop text selection while the pointer is off the handle mid-drag.
+  useEffect(() => {
+    if (!dragging) return undefined;
+    const root = document.documentElement.style;
+    const previous = { cursor: root.cursor, userSelect: root.userSelect };
+    root.cursor = "col-resize";
+    root.userSelect = "none";
+    return () => {
+      root.cursor = previous.cursor;
+      root.userSelect = previous.userSelect;
+    };
+  }, [dragging]);
+
+  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    drag.current = { x: event.clientX, width };
+    setDragging(true);
+  };
+
+  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (!drag.current) return;
+    resize(drag.current.width + event.clientX - drag.current.x);
+  };
+
+  const endDrag = () => {
+    drag.current = null;
+    setDragging(false);
+  };
+
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const next = {
+      ArrowLeft: width - RESIZE_STEP,
+      ArrowRight: width + RESIZE_STEP,
+      Home: minWidth,
+      End: maxWidth,
+    }[event.key];
+    if (next === undefined) return;
+    event.preventDefault();
+    resize(next);
+  };
+
   return (
     <nav
       className={cn(
         "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip border-r border-border-default bg-glass-thick px-3 pt-4 pb-3",
+        resizable && "md:w-(--sidebar-width)",
         className,
       )}
+      style={resizable ? ({ ...style, "--sidebar-width": `${width}px` } as CSSProperties) : style}
       {...props}
     >
       <LiquidGlass tier="thick" />
       {children}
+      {resizable && (
+        <div
+          role="separator"
+          aria-orientation="vertical"
+          aria-label={resizeLabel}
+          aria-valuenow={width}
+          aria-valuemin={minWidth}
+          aria-valuemax={maxWidth}
+          tabIndex={0}
+          data-dragging={dragging || undefined}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onLostPointerCapture={endDrag}
+          onKeyDown={onKeyDown}
+          onDoubleClick={() => resize(defaultWidth)}
+          className="group/resize absolute inset-y-0 right-0 z-10 hidden w-2 cursor-col-resize touch-none outline-none md:block"
+        >
+          <span
+            aria-hidden
+            className="absolute inset-y-0 right-0 w-0.5 transition-colors duration-150 group-hover/resize:bg-overlay-ink-16 group-focus-visible/resize:bg-text-brand group-data-dragging/resize:bg-text-brand"
+          />
+        </div>
+      )}
     </nav>
   );
 }

@@ -22,10 +22,7 @@ export const foundationsNav: NavItem[] = [
   { label: "Glass", href: "/foundations/glass" },
 ];
 
-export const externalLinks = [
-  { label: "Storybook", href: "https://storybook.horon.ai" },
-  { label: "GitHub", href: "https://github.com/horon-ai/design" },
-];
+export const externalLinks = [{ label: "GitHub", href: "https://github.com/horon-ai/design" }];
 
 export function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";

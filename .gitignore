@@ -18,8 +18,8 @@ dist-ssr
 # turbo
 .turbo
 
-# storybook
-storybook-static
+# Cloudflare wrangler local state (miniflare DBs, caches) - never committed
+.wrangler/
 
 # editor directories and files
 .vscode/*
