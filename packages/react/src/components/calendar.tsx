@@ -141,7 +141,7 @@ export function Calendar(props: CalendarProps) {
               key={label}
               type="button"
               aria-label={label}
-              className="flex size-8 cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 [&_svg]:size-4.5"
+              className="flex size-8 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 [&_svg]:size-4.5"
               onClick={() => setMonth(addMonths(month, step))}
             >
               {icon}
@@ -205,7 +205,7 @@ export function Calendar(props: CalendarProps) {
                   onClick={() => select(date)}
                   onFocus={() => setFocused(date)}
                   className={cn(
-                    "relative flex size-10 cursor-pointer flex-col items-center justify-center",
+                    "relative flex size-10 cursor-pointer flex-col items-center justify-center motion-colors",
                     "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
                     between
                       ? "bg-overlay-ink-8 text-body-md text-text-primary"

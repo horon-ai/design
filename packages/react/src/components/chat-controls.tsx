@@ -7,7 +7,7 @@ import { LiquidGlass } from "./liquid-glass";
 type ButtonProps = Omit<ComponentProps<"button">, "className"> & { className?: string };
 
 const clearGlass =
-  "relative flex cursor-pointer items-center overflow-clip rounded-full border border-glass-rim-strong bg-glass-clear text-text-primary hover:bg-glass-clear-hover active:bg-glass-clear-pressed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
+  "motion-press relative flex animate-[tab-panel-in_220ms_var(--ease-out-quint)] cursor-pointer items-center overflow-clip rounded-full border border-glass-rim-strong bg-glass-clear text-text-primary hover:bg-glass-clear-hover active:bg-glass-clear-pressed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
 
 /** Figma `Jump to latest` (Chat controls 88:659): a 44px clear-glass circle with a 20px caret. */
 export function JumpToLatest({ className, "aria-label": ariaLabel = "Jump to latest", ...props }: ButtonProps) {
@@ -64,7 +64,7 @@ export function VoiceInput({ elapsed, levels, onStop, stopLabel = "Stop recordin
         type="button"
         aria-label={stopLabel}
         onClick={onStop}
-        className="relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+        className="relative flex size-9 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
       >
         <span className="size-3 rounded-[3px] bg-bg-surface" />
       </button>

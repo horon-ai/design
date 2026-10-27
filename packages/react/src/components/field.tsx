@@ -24,5 +24,10 @@ export function FieldDescription({ className, ...props }: WithClass<ComponentPro
 }
 
 export function FieldError({ className, ...props }: WithClass<ComponentProps<typeof BaseField.Error>>) {
-  return <BaseField.Error className={cn("text-caption text-text-danger", className)} {...props} />;
+  return (
+    <BaseField.Error
+      className={cn("animate-[tab-panel-in_160ms_var(--ease-out-quint)] text-caption text-text-danger", className)}
+      {...props}
+    />
+  );
 }

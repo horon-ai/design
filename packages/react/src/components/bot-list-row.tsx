@@ -22,7 +22,7 @@ export function BotListRow({ name, time, preview, live, selected, className, ...
       type="button"
       aria-pressed={selected}
       className={cn(
-        "flex w-full cursor-pointer items-center gap-3 rounded-lg p-3 text-left",
+        "flex w-full motion-press cursor-pointer items-center gap-3 rounded-lg p-3 text-left",
         selected ? "bg-overlay-ink-10" : "hover:bg-overlay-ink-5",
         "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
         className,

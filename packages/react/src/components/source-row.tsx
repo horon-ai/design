@@ -44,7 +44,10 @@ export function SourceRow({ status, icon, name, detail, progress = 0, onRetry, c
         <span className={stage("done")} />
         {status === "indexing" ? (
           <span className={stage("todo")}>
-            <span className="block h-full rounded-full bg-sky-500" style={{ width: `${progress}%` }} />
+            <span
+              className="block h-full rounded-full bg-sky-500 transition-[width] duration-400 ease-out-quint"
+              style={{ width: `${progress}%` }}
+            />
           </span>
         ) : (
           <span className={stage(status === "failed" ? "failed" : "done")} />
@@ -58,7 +61,7 @@ export function SourceRow({ status, icon, name, detail, progress = 0, onRetry, c
           <button
             type="button"
             onClick={onRetry}
-            className="flex h-7 cursor-pointer items-center rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex h-7 motion-press cursor-pointer items-center rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             Retry
           </button>

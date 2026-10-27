@@ -16,7 +16,7 @@ export function Tooltip({ children, label, side = "top", delay }: TooltipProps) 
       <BaseTooltip.Trigger delay={delay} render={children} />
       <BaseTooltip.Portal>
         <BaseTooltip.Positioner side={side} sideOffset={6}>
-          <BaseTooltip.Popup className="flex origin-(--transform-origin) rounded-sm bg-interactive-primary px-2.5 py-1.5 text-label-sm text-interactive-on-primary transition-[scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0">
+          <BaseTooltip.Popup className="flex motion-popup rounded-sm bg-interactive-primary px-2.5 py-1.5 text-label-sm text-interactive-on-primary duration-150">
             {label}
             <BaseTooltip.Arrow className="flex data-[side=bottom]:-top-1.5 data-[side=bottom]:rotate-180 data-[side=left]:-right-2 data-[side=left]:-rotate-90 data-[side=right]:-left-2 data-[side=right]:rotate-90 data-[side=top]:-bottom-1.5">
               <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden className="fill-interactive-primary">

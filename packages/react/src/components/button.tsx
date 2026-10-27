@@ -35,7 +35,7 @@ export function Button({ variant = "primary", size = "md", icon, className, chil
   return (
     <BaseButton
       className={cn(
-        "relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full whitespace-nowrap select-none",
+        "relative inline-flex shrink-0 motion-press cursor-pointer items-center justify-center rounded-full whitespace-nowrap select-none",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed data-disabled:opacity-40",
         sizeClass[size],
         variantClass[variant],

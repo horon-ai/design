@@ -15,14 +15,14 @@ export type InputGroupProps = Omit<ComponentProps<typeof BaseInput>, "className"
 };
 
 const divider =
-  "h-full w-px shrink-0 bg-border-default group-hover:bg-border-strong group-data-invalid:bg-border-danger";
+  "h-full w-px shrink-0 bg-border-default transition-colors duration-150 group-hover:bg-border-strong group-data-invalid:bg-border-danger";
 
 /** Figma `Input group` (60:429): a glass field split into a select segment and an input segment. */
 export function InputGroup({ prefix, suffix, invalid, className, disabled, ...props }: InputGroupProps) {
   return (
     <div
       className={cn(
-        "group relative flex h-10 items-center overflow-clip rounded-md border",
+        "group relative flex h-10 items-center overflow-clip rounded-md border motion-colors",
         fieldBoxClass.glass,
         "focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
         className,

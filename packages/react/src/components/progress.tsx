@@ -10,7 +10,7 @@ export function Progress({ className, ...props }: ProgressProps) {
   return (
     <BaseProgress.Root className={cn("w-60", className)} {...props}>
       <BaseProgress.Track className="h-1.5 w-full overflow-clip rounded-full bg-overlay-ink-8">
-        <BaseProgress.Indicator className="h-full rounded-full bg-interactive-primary transition-[width] duration-300" />
+        <BaseProgress.Indicator className="h-full rounded-full bg-interactive-primary transition-[width] duration-400 ease-out-quint" />
       </BaseProgress.Track>
     </BaseProgress.Root>
   );
