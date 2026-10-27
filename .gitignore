@@ -18,6 +18,9 @@ dist-ssr
 # turbo
 .turbo
 
+# Cloudflare wrangler local state (miniflare DBs, caches) - never committed
+.wrangler/
+
 # editor directories and files
 .vscode/*
 !.vscode/extensions.json
