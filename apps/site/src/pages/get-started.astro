@@ -7,7 +7,7 @@ import { mascotImageUrl } from "@/data/mascots";
 const install = `# 저장소 루트에서
 bun install
 bun run --filter @horon-ai/tokens build   # packages/tokens/theme.css 생성
-bun run storybook     # http://localhost:6006`;
+bun run site          # http://localhost:4321`;
 
 const consume = `import { Button, Card } from "@horon-ai/react";
 import { Plus } from "@phosphor-icons/react";
@@ -21,8 +21,7 @@ export function Example() {
   );
 }`;
 
-const apps = `bun run site          # 문서 사이트 → http://localhost:4321
-bun run storybook     # Storybook → http://localhost:6006`;
+const apps = `bun run site          # 문서 사이트 → http://localhost:4321`;
 ---
 
 <DocsLayout
@@ -69,8 +68,8 @@ bun run storybook     # Storybook → http://localhost:6006`;
 
   <h2>앱에서 확인하기</h2>
   <p>
-    저장소의 앱은 모두 같은 컴포넌트 레이어를 소비합니다. 문서 사이트는
-    <code>apps/site</code>, 컴포넌트 미리보기는 <code>apps/storybook</code>입니다.
+    저장소의 앱은 같은 컴포넌트 레이어를 소비합니다. 문서 사이트는 <code>apps/site</code>이고,
+    컴포넌트의 라이브 프리뷰도 이 사이트의 컴포넌트 페이지에 있습니다.
   </p>
   <CodeBlock code={apps} lang="bash" title="terminal" />
 
@@ -81,7 +80,7 @@ bun run storybook     # Storybook → http://localhost:6006`;
   </p>
   <ul>
     <li><code>packages/react</code> — <code>@horon-ai/react</code>, <code>@horon-ai/tokens</code>만</li>
-    <li><code>apps/site</code>, <code>apps/storybook</code> — <code>@horon-ai/react</code>, <code>@horon-ai/tokens</code>만</li>
+    <li><code>apps/site</code> — <code>@horon-ai/react</code>, <code>@horon-ai/tokens</code>만</li>
     <li>스타일 값은 전부 <code>@horon-ai/tokens</code>의 <code>theme.css</code>에서 읽습니다.</li>
   </ul>
 
@@ -89,6 +88,6 @@ bun run storybook     # Storybook → http://localhost:6006`;
   <ul>
     <li><a href="/foundations">Foundations</a> — 색, 글자, 간격, 반경, 유리 표면의 값과 규칙</li>
     <li><a href="/components">Components</a> — {componentCount}개 컴포넌트의 프리뷰와 코드 예시</li>
-    <li><a href="https://storybook.horon.ai">Storybook</a> — 모든 상태와 변형을 직접 조작</li>
+    <li><a href="/foundations/tokens">Design Token</a> — 값을 바꿀 때 고치는 파일과 생성 절차</li>
   </ul>
 </DocsLayout>
