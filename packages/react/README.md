@@ -114,5 +114,5 @@ Safari와 Firefox는 배경에 SVG 필터를 걸지 못해서 CSS 유리 그대�
 
 ```bash
 bun run lint && bun run typecheck   # 이 패키지에서
-bun test apps/storybook             # 저장소 루트에서, 진입점·스토리 커버리지
+bun test                            # 저장소 루트에서, 진입점 재수출 커버리지
 ```
