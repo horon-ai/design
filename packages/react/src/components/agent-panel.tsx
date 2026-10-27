@@ -7,7 +7,12 @@ import { Kbd } from "./kbd";
 type WithClass<T> = Omit<T, "className"> & { className?: string };
 
 /** The solid panel that hosts the Figma Agents blocks (Agent tasks 112:797): surface fill, 24px radius, 16px padding. */
-export function AgentPanel({ className, ...props }: WithClass<ComponentProps<"section">>) {
+export function AgentPanel({
+  className,
+  filter,
+  children,
+  ...props
+}: WithClass<ComponentProps<"section">> & { /** Filter slot under the panel top, such as a `FilterBar`. */ filter?: ReactNode }) {
   return (
     <section
       className={cn(
@@ -15,12 +20,15 @@ export function AgentPanel({ className, ...props }: WithClass<ComponentProps<"se
         className,
       )}
       {...props}
-    />
+    >
+      {filter}
+      {children}
+    </section>
   );
 }
 
 export type ComposerChipProps = WithClass<ComponentProps<"button">> & {
-  /** 18px tile initial (bots) or a 14px icon (projects). */
+  /** 16px tile initial (bots) or a 14px icon (projects). */
   leading?: ReactNode;
   tileClassName?: string;
 };
@@ -39,7 +47,7 @@ export function ComposerChip({ leading, tileClassName, className, children, ...p
       {typeof leading === "string" ? (
         <span
           className={cn(
-            "flex size-4.5 items-center justify-center rounded-[5px] text-label-sm text-text-inverse",
+            "flex size-4 items-center justify-center rounded-[5px] text-label-sm text-text-inverse",
             tileClassName ?? "bg-interactive-primary",
           )}
         >

@@ -12,7 +12,7 @@ export type CommandItem = {
   label: string;
   /** 28px leading tile: an initial or a 16px icon. */
   tile?: ReactNode;
-  /** Tile fill class, such as "bg-sky-500"; defaults to a 5% ink tile. */
+  /** Tile fill class, such as "bg-sky-500"; defaults to the primary tile. */
   tileClassName?: string;
   /** Caption after the label, such as the workspace. */
   meta?: ReactNode;
@@ -56,7 +56,7 @@ export function CommandPalette({
           <Dialog.Popup
             aria-label={placeholder}
             className={cn(
-              "relative flex w-140 motion-popup flex-col overflow-clip rounded-[24px] border border-glass-rim-strong bg-glass-fill-frost p-1.5 shadow-palette",
+              "relative flex w-140 motion-popup flex-col overflow-clip rounded-[24px] bg-glass-fill-frost p-1.5 shadow-palette",
               "duration-240 data-starting-style:translate-y-2",
               className,
             )}
@@ -64,7 +64,7 @@ export function CommandPalette({
             <LiquidGlass tier="thick" />
             <Autocomplete.Root open inline items={groups} autoHighlight="always" keepHighlight>
               <div className="relative flex h-12 items-center gap-2.5 px-3.5">
-                <MagnifyingGlass aria-hidden className="size-4 shrink-0 text-text-secondary" />
+                <MagnifyingGlass aria-hidden className="size-5 shrink-0 text-text-secondary" />
                 <Autocomplete.Input
                   placeholder={placeholder}
                   className="min-w-0 flex-1 bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
@@ -98,7 +98,7 @@ export function CommandPalette({
                             <span
                               className={cn(
                                 "flex size-7 shrink-0 items-center justify-center rounded-sm text-label-sm [&>svg]:size-4",
-                                item.tileClassName ?? "bg-overlay-ink-5 text-text-primary",
+                                item.tileClassName ?? "bg-interactive-primary text-interactive-on-primary",
                               )}
                             >
                               {item.tile}

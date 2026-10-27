@@ -27,7 +27,7 @@ export function TabBar({ items, value, onValueChange, className, ...props }: Tab
       ref={track}
       aria-label={props["aria-label"] ?? "Main"}
       className={cn(
-        "relative flex w-fit items-center gap-1 overflow-clip rounded-full border border-glass-rim-strong bg-glass-regular p-1.5",
+        "relative flex w-fit items-center gap-1 overflow-clip rounded-full bg-glass-regular p-1.5",
         className,
       )}
     >

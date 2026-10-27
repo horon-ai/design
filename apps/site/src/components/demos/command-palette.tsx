@@ -11,7 +11,6 @@ const groups = [
         label: "Chief of staff",
         meta: "Horon HQ",
         tile: "C",
-        tileClassName: "bg-interactive-primary text-text-inverse",
       },
       {
         value: "inbox",
@@ -22,8 +21,9 @@ const groups = [
       },
     ],
   },
-  { label: "Projects", items: [{ value: "q4", label: "Q4 hiring", tile: <Folder /> }] },
-  { label: "Actions", items: [{ value: "new", label: "New bot", tile: <Plus />, hint: <Kbd>⌘N</Kbd> }] },
+  { label: "Projects", items: [{ value: "q4", label: "Q4 hiring", tile: <Folder />, tileClassName: "bg-overlay-ink-5 text-text-primary" }] },
+  { label: "Actions", items: [{ value: "new", label: "New bot", tile: <Plus />,
+        tileClassName: "bg-overlay-ink-5 text-text-primary", hint: <Kbd>⌘N</Kbd> }] },
 ];
 
 export default function CommandPaletteDemo() {

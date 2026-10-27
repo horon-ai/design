@@ -53,7 +53,8 @@ export function MenuContent({
       >
         <BaseMenu.Popup
           className={cn(
-            "relative flex w-55 motion-popup flex-col gap-0.5 overflow-clip border border-glass-rim-strong p-1.5 outline-none",
+            "relative flex motion-popup flex-col gap-0.5 overflow-clip p-1.5 outline-none",
+            surface === "glass" ? "w-55" : "w-64",
             menuPopupClass[surface],
             className,
           )}

@@ -24,6 +24,23 @@ export default function SourceRowDemo() {
         detail="Embedding timed out after 41 of 68 chunks"
         onRetry={() => undefined}
       />
+      <div className="flex flex-col">
+        <SourceRow
+          variant="list"
+          status="ready"
+          icon={<FileText />}
+          name="Pricing FAQ.pdf"
+          detail="8 pages · 31 chunks · Uploaded Oct 9"
+        />
+        <SourceRow
+          variant="list"
+          status="indexing"
+          icon={<Globe />}
+          name="docs.horon.ai"
+          detail="Embedding · 90 of 296 chunks"
+          progress={30}
+        />
+      </div>
     </div>
   );
 }

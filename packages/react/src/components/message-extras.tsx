@@ -23,7 +23,7 @@ export function MessageActions({ actions, className }: { actions: MessageAction[
     <div
       role="toolbar"
       className={cn(
-        "relative flex w-fit items-center gap-0.5 overflow-clip rounded-full border border-glass-rim-strong bg-glass-regular p-[3px]",
+        "relative flex w-fit items-center gap-0.5 overflow-clip rounded-full bg-glass-regular p-[3px]",
         className,
       )}
     >
@@ -34,7 +34,7 @@ export function MessageActions({ actions, className }: { actions: MessageAction[
           type="button"
           aria-label={action.label}
           onClick={action.onClick}
-          className="relative flex size-7.5 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
+          className="relative flex size-7.5 motion-colors motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
         >
           {action.icon}
         </button>
@@ -121,7 +121,7 @@ export function CodeBlock({
           {copied ? copiedLabel : copyLabel}
         </button>
       </div>
-      <pre className="overflow-x-auto px-3.5 pt-3 pb-3.5 font-mono text-[13px] leading-5 text-text-on-ink">
+      <pre className="overflow-x-auto px-3.5 pt-3 pb-3.5 font-mono text-[13px] leading-[22px] text-text-on-ink">
         <code>{code}</code>
       </pre>
     </div>

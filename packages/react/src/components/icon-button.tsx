@@ -27,7 +27,7 @@ const variantClass: Record<IconButtonVariant, string> = {
     "bg-interactive-primary text-interactive-on-primary hover:not-data-disabled:bg-interactive-primary-hover active:not-data-disabled:bg-interactive-primary-pressed",
   ghost: "text-text-primary hover:not-data-disabled:bg-overlay-ink-6 active:not-data-disabled:bg-overlay-ink-10",
   glass:
-    "overflow-clip border border-glass-rim-strong bg-glass-clear text-text-primary hover:not-data-disabled:bg-glass-clear-hover active:not-data-disabled:bg-glass-clear-pressed",
+    "overflow-clip bg-glass-clear text-text-primary hover:not-data-disabled:bg-glass-clear-hover active:not-data-disabled:bg-glass-clear-pressed",
 };
 
 /** Figma `Icon button` (57:167): Primary, Ghost and Glass in three sizes. */

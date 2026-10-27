@@ -8,8 +8,9 @@ import {
   dataTableSelectColumn,
   useDataTable,
   type DataTableColumn,
+  type DataTableDevice,
 } from "@horon-ai/react";
-import { CalendarBlank, FileText, ListChecks, SquaresFour } from "@phosphor-icons/react";
+import { ArrowClockwise, CalendarBlank, DotsThree, FileText, ListChecks, SquaresFour } from "@phosphor-icons/react";
 
 type Tool = { logo: string; name: string; tag: string; tone: "brand" | "neutral"; renews: Date };
 
@@ -43,14 +44,47 @@ const columns: DataTableColumn<Tool>[] = [
   },
 ];
 
-export default function DataTableDemo() {
-  const table = useDataTable({ data: rows, columns, getRowId: (row) => row.name, enableRowSelection: true });
+const mobileColumns = columns.slice(0, 3);
+const widths = ["w-11", "w-37.5", "w-41"];
+const mobileCols: DataTableColumn<Tool>[] = mobileColumns.map((c, n) => ({
+  ...c,
+  meta: { ...c.meta, headClassName: widths[n] },
+}));
 
+function Table({
+  device,
+  className,
+  cols,
+}: {
+  device: DataTableDevice;
+  className: string;
+  cols: DataTableColumn<Tool>[];
+}) {
+  const table = useDataTable({ data: rows, columns: cols, getRowId: (row) => row.name, enableRowSelection: true });
   return (
-    <DataTable className="w-full max-w-160">
-      <DataTableHeader icon={<FileText />} title="Design Stack" />
+    <DataTable device={device} className={className}>
+      <DataTableHeader
+        icon={<FileText />}
+        title="Design Stack"
+        actions={
+          <>
+            <ArrowClockwise aria-hidden />
+            <DotsThree aria-hidden />
+          </>
+        }
+      />
       <DataTableView table={table} />
-      <DataTableFooter hint="Double-click a cell to edit" />
+      <DataTableFooter hint={device === "mobile" ? "Scroll for more" : "Double-click a cell to edit"} />
     </DataTable>
+  );
+}
+
+export default function DataTableDemo() {
+  return (
+    <div className="flex w-full flex-col items-start gap-6">
+      <Table device="desktop" className="w-full max-w-240" cols={columns} />
+      <Table device="tablet" className="w-full max-w-192" cols={columns} />
+      <Table device="mobile" className="w-full max-w-89.5" cols={mobileCols} />
+    </div>
   );
 }

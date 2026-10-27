@@ -36,10 +36,10 @@ const botIconClass: Record<AvatarSize, string> = {
 
 /** Live dot outer size: Figma dot diameter (10, 11, 13, 18) plus its 2px centered white stroke. */
 const liveClass: Record<AvatarSize, string> = {
-  sm: "size-3",
-  md: "size-[13px]",
-  lg: "size-[15px]",
-  xl: "size-5",
+  sm: "size-2.5",
+  md: "size-[11px]",
+  lg: "size-[13px]",
+  xl: "size-[18px]",
 };
 
 const typeClass = {
@@ -63,19 +63,20 @@ export function Avatar({ type = "initials", size = "md", src, alt = "", children
           <Robot aria-hidden className={botIconClass[size]} />
         ) : (
           <>
-            {type === "image" && src && <BaseAvatar.Image src={src} alt={alt} className="size-full object-cover" />}
+            {type === "image" && src && <BaseAvatar.Image src={src} alt={alt} className="size-full motion-fade object-cover" />}
             <BaseAvatar.Fallback>{children}</BaseAvatar.Fallback>
           </>
         )}
       </BaseAvatar.Root>
       {live && (
-        <span
-          aria-hidden
-          className={cn(
-            "absolute -right-0.5 -bottom-0.5 animate-live-pulse rounded-full border-2 border-bg-default bg-status-live text-status-live",
-            liveClass[size],
-          )}
-        />
+        <span aria-hidden className="absolute -right-0.5 -bottom-0.5 flex animate-pop-in">
+          <span
+            className={cn(
+              "animate-live-pulse rounded-full border-2 border-bg-default bg-status-live text-status-live",
+              liveClass[size],
+            )}
+          />
+        </span>
       )}
     </span>
   );

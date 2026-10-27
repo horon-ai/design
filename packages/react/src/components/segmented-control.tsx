@@ -44,7 +44,7 @@ const segmentClass: Record<SegmentedControlSize, string> = {
 };
 
 const surfaceClass: Record<SegmentedControlSurface, string> = {
-  glass: "overflow-clip border border-glass-rim-strong bg-glass-regular",
+  glass: "overflow-clip bg-glass-regular",
   inset: "bg-overlay-ink-5",
   "inset-faint": "bg-overlay-ink-4",
 };
@@ -91,14 +91,14 @@ export function SegmentedControl({
         aria-hidden
         className={cn(
           "pointer-events-none absolute overflow-clip rounded-full",
-          surface === "glass"
+          surface === "glass" && size !== "lg"
             ? "border border-glass-rim-strong bg-glass-thick shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:bg-overlay-ink-10"
             : "bg-overlay-ink-10",
           animate && "motion-indicator",
         )}
         style={rect ? { ...rect, opacity: 1 } : { opacity: 0 }}
       >
-        {surface === "glass" && <LiquidGlass tier="clear" refract={false} />}
+        {surface === "glass" && size !== "lg" && <LiquidGlass tier="clear" refract={false} />}
       </span>
       {items.map((item) => (
         <Toggle
