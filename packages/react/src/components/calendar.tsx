@@ -69,6 +69,12 @@ export function Calendar(props: CalendarProps) {
   const month = monthProp ? firstOfMonth(monthProp) : monthState;
   const [focused, setFocused] = useState<Date>(() => anchor ?? today);
   const grid = useRef<HTMLDivElement>(null);
+  const [shownMonth, setShownMonth] = useState(month);
+  const [slide, setSlide] = useState<"next" | "prev" | null>(null);
+  if (month.getTime() !== shownMonth.getTime()) {
+    setSlide(month > shownMonth ? "next" : "prev");
+    setShownMonth(month);
+  }
 
   const setMonth = (next: Date) => {
     if (!monthProp) setMonthState(next);
@@ -120,8 +126,10 @@ export function Calendar(props: CalendarProps) {
   return (
     <div
       className={cn(
-        "relative flex w-fit flex-col overflow-clip border border-glass-rim-strong bg-glass-thick",
-        variant === "popover" ? "gap-2 rounded-[24px] p-3.5" : "gap-3 rounded-xl p-4",
+        "relative flex flex-col overflow-clip bg-glass-thick",
+        variant === "popover" ? "w-77 gap-2 rounded-[24px] p-3.5" : "w-fit gap-3 rounded-xl p-4",
+        // Paper renders every popover day as label-md (14/20 500); the default calendar mixes body-md and label-lg.
+        variant === "popover" && "[&_[role=gridcell]]:text-label-md",
         className,
       )}
     >
@@ -153,7 +161,7 @@ export function Calendar(props: CalendarProps) {
           <button
             type="button"
             aria-label="Previous month"
-            className="flex size-5 cursor-pointer text-text-secondary [&_svg]:size-5"
+            className="flex size-5 motion-press cursor-pointer text-text-secondary [&_svg]:size-5"
             onClick={() => setMonth(addMonths(month, -1))}
           >
             <CaretLeft />
@@ -164,14 +172,25 @@ export function Calendar(props: CalendarProps) {
           <button
             type="button"
             aria-label="Next month"
-            className="flex size-5 cursor-pointer text-text-secondary [&_svg]:size-5"
+            className="flex size-5 motion-press cursor-pointer text-text-secondary [&_svg]:size-5"
             onClick={() => setMonth(addMonths(month, 1))}
           >
             <CaretRight />
           </button>
         </div>
       )}
-      <div ref={grid} role="grid" aria-label={title} className="relative flex flex-col" onKeyDown={onKeyDown}>
+      <div
+        key={month.getTime()}
+        ref={grid}
+        role="grid"
+        aria-label={title}
+        className={cn(
+          "relative flex flex-col",
+          slide === "next" && "animate-slide-next",
+          slide === "prev" && "animate-slide-prev",
+        )}
+        onKeyDown={onKeyDown}
+      >
         <div role="row" className="flex">
           {days.slice(0, 7).map((date) => (
             <span
@@ -210,14 +229,14 @@ export function Calendar(props: CalendarProps) {
                     between
                       ? "bg-overlay-ink-8 text-body-md text-text-primary"
                       : selected
-                        ? "rounded-full bg-interactive-primary text-label-lg text-interactive-on-primary"
+                        ? "rounded-full bg-interactive-primary text-label-lg text-text-inverse"
                         : "rounded-full hover:not-disabled:bg-overlay-ink-5",
                     !between &&
                       !selected &&
                       (disabled
                         ? "cursor-not-allowed text-body-md text-text-disabled"
                         : outside
-                          ? "text-body-md text-text-placeholder"
+                          ? "text-body-md text-text-disabled"
                           : isToday
                             ? "text-label-lg text-text-brand"
                             : "text-body-md text-text-primary"),

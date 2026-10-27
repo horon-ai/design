@@ -26,7 +26,7 @@
 @layer components {
   .liquid-layers {
     position: absolute;
-    inset: -1px;
+    inset: 0;
     overflow: hidden;
     border-radius: inherit;
     pointer-events: none;
@@ -55,13 +55,15 @@
     backdrop-filter: blur(var(--glass-inner-shade-blur));
   }
 
-  .liquid-layers > [data-layer="edge-dark"] {
-    border: 1px solid var(--glass-edge-dark);
-    mix-blend-mode: multiply;
-    filter: blur(min(100cqh * var(--glass-edge-dark-ratio), var(--glass-edge-dark-max)));
+  /* Paper's Texture layer (Chip): a faint 2px blur that bleeds past the host. */
+  .liquid-layers > [data-layer="texture"] {
+    inset: -9px -8px;
+    background: #ffffff03;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    opacity: 1;
   }
 
-  .liquid-layers > [data-layer="edge-light"],
   .liquid-layers > [data-layer="edge-light-soft"] {
     mix-blend-mode: plus-lighter;
     filter: blur(
@@ -69,16 +71,8 @@
     );
   }
 
-  .liquid-layers > [data-layer="edge-light"] {
-    border: 1px solid var(--glass-edge-light);
-  }
-
   .liquid-layers > [data-layer="edge-light-soft"] {
     border: 1px solid var(--glass-edge-light-soft);
-  }
-
-  .liquid-layers[data-tier="thick"] > [data-layer="edge-dark"] {
-    display: none;
   }
 
   /* The bending layer, filled by the in-house engine through
@@ -179,6 +173,10 @@
   --animate-caret: caret-blink 1s steps(1, end) infinite;
   --animate-thinking: thinking-dot 1.2s ease-in-out infinite;
   --animate-pop-in: pop-in 220ms var(--ease-spring) both;
+  --animate-pop-out: pop-out 130ms ease-in both;
+  --animate-wave: wave-level 900ms ease-in-out infinite;
+  --animate-slide-next: slide-next 200ms var(--ease-out-quint) both;
+  --animate-slide-prev: slide-prev 200ms var(--ease-out-quint) both;
 
   @keyframes shimmer {
     from {
@@ -243,6 +241,54 @@
       scale: 1;
     }
   }
+
+  @keyframes pop-out {
+    from {
+      opacity: 1;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 0.97;
+    }
+  }
+
+  @keyframes wave-level {
+    0%,
+    100% {
+      scale: 1 0.35;
+    }
+    50% {
+      scale: 1 1;
+    }
+  }
+
+  @keyframes slide-next {
+    from {
+      opacity: 0;
+      translate: 12px 0;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  @keyframes slide-prev {
+    from {
+      opacity: 0;
+      translate: -12px 0;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+}
+
+/* Panel, lane and row entrance; stagger with animation-delay: calc(var(--i) * 30ms). */
+@utility motion-rise {
+  animation: tab-panel-in 220ms var(--ease-out-quint) both;
 }
 
 /* Popups (Select, Menu, Tooltip, Popover, Dialog): fade and grow from the

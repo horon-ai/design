@@ -33,7 +33,7 @@ export function StreamingText({ children, className }: { children: ReactNode; cl
       )}
     >
       <span>{children}</span>
-      <span aria-hidden className="mb-[3px] h-4 w-0.5 shrink-0 animate-caret rounded-[1px] bg-interactive-primary" />
+      <span aria-hidden className="h-4 w-0.5 shrink-0 animate-caret rounded-[1px] bg-interactive-primary" />
     </div>
   );
 }

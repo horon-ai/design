@@ -17,6 +17,8 @@ import {
   SidebarProjectMore,
   SidebarProjectTile,
   SidebarSpacer,
+  SidebarWorkspaceSwitch,
+  WorkspaceMenu,
 } from "@horon-ai/react";
 import {
   Archive,
@@ -42,9 +44,15 @@ import {
   UserPlus,
   UsersThree,
 } from "@phosphor-icons/react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { Backdrop } from "../demo-backdrop";
+
+const workspaces = [
+  { id: "hq", name: "Horon HQ", meta: "12 members" },
+  { id: "labs", name: "Horon Labs", meta: "4 members" },
+  { id: "personal", name: "Personal", meta: "Just you" },
+];
 
 const projects: { name: string; icon: ReactNode; tile?: string; children?: { icon: ReactNode; name: string }[] }[] = [
   {
@@ -85,12 +93,25 @@ function ProjectMenu() {
 }
 
 export default function SidebarDemo() {
+  const [workspace, setWorkspace] = useState("hq");
+  const current = workspaces.find((item) => item.id === workspace) ?? workspaces[0];
   return (
     <Backdrop>
       {/* Left-aligned so the right edge follows the pointer while resizing. */}
       <div className="flex w-full">
         <Sidebar resizable className="h-190">
-          <SidebarHeader initial="H" name="Horon HQ" />
+          <SidebarHeader
+            initial={current.name.charAt(0)}
+            name={current.name}
+            switchSlot={
+              <WorkspaceMenu
+                workspaces={workspaces}
+                value={workspace}
+                onValueChange={setWorkspace}
+                trigger={<SidebarWorkspaceSwitch initial={current.name.charAt(0)} name={current.name} />}
+              />
+            }
+          />
           <SidebarItem icon={<HoronIcon />} current aria-label="Horon">
             <HoronWordmark height={9.6} />
           </SidebarItem>

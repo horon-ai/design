@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Backdrop } from "../demo-backdrop";
 
 export default function DateFieldDemo() {
-  const [date, setDate] = useState<Date | null>(null);
+  const [date, setDate] = useState<Date | null>(new Date(2026, 9, 20));
   const [range, setRange] = useState<DateRange>({ start: null, end: null });
   return (
     <Backdrop className="flex-col">

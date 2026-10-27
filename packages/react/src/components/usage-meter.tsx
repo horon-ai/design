@@ -21,7 +21,7 @@ export function UsageMeter({ label, value, detail, note, className }: UsageMeter
     <Meter.Root
       value={value}
       className={cn(
-        "relative flex w-75 flex-col gap-2.5 overflow-clip rounded-xl border border-glass-rim-strong bg-glass-thick p-4",
+        "relative flex w-75 flex-col gap-2.5 overflow-clip rounded-xl bg-glass-thick p-4",
         className,
       )}
     >

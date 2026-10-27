@@ -30,6 +30,26 @@ export default function TaskRowDemo() {
         message="Sent"
         detail="Delivered to 4 people · 2 opened"
       />
+      <div className="flex flex-col">
+        <TaskRow
+          variant="list"
+          status="running"
+          title="Summarize this week's support tickets"
+          elapsed="1m 56s"
+          bot={{ initial: "S", name: "Support" }}
+          project="Customer care"
+          message="Reading tickets"
+        />
+        <TaskRow
+          variant="list"
+          status="done"
+          title="Send the Q3 board deck to the team"
+          elapsed="9m"
+          bot={{ initial: "C", name: "Chief of staff" }}
+          project="Horon HQ"
+          message="Sent"
+        />
+      </div>
     </div>
   );
 }

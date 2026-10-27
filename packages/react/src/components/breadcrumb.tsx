@@ -2,14 +2,30 @@ import { CaretRight } from "@phosphor-icons/react";
 import { Children, type ComponentProps, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
+import { LiquidGlass } from "./liquid-glass";
 
-export type BreadcrumbProps = Omit<ComponentProps<"nav">, "className"> & { className?: string };
+export type BreadcrumbProps = Omit<ComponentProps<"nav">, "className"> & {
+  /** `glass` wraps the crumbs in a regular-glass tray. Omitted keeps them bare. */
+  surface?: "glass";
+  className?: string;
+};
 
 /** Figma `Breadcrumb` (110:948): crumbs 6px apart with 14px carets; the last crumb is the current page. */
-export function Breadcrumb({ className, children, "aria-label": ariaLabel = "Breadcrumb", ...props }: BreadcrumbProps) {
+export function Breadcrumb({
+  surface,
+  className,
+  children,
+  "aria-label": ariaLabel = "Breadcrumb",
+  ...props
+}: BreadcrumbProps) {
   return (
-    <nav aria-label={ariaLabel} className={className} {...props}>
-      <ol className="flex items-center gap-1.5">
+    <nav
+      aria-label={ariaLabel}
+      className={cn(surface === "glass" && "relative w-fit overflow-clip rounded-xl bg-glass-regular px-4 py-3.5", className)}
+      {...props}
+    >
+      {surface === "glass" && <LiquidGlass tier="regular" />}
+      <ol className="relative flex items-center gap-1.5">
         {Children.map(children, (item, index) => (
           <>
             {index > 0 && (

@@ -41,8 +41,8 @@ export function IntegrationRow({
   return (
     <div
       className={cn(
-        "relative flex items-center gap-3 overflow-clip rounded-[16px] border bg-glass-thick py-3 pr-3.5 pl-3",
-        status === "reconnect" ? "border-border-danger" : "border-glass-rim-strong",
+        "relative flex items-center gap-3 overflow-clip rounded-[16px] bg-glass-thick py-3 pr-3.5 pl-3",
+        status === "reconnect" && "border border-border-danger",
         className,
       )}
     >

@@ -41,7 +41,7 @@ import { Plus } from "@phosphor-icons/react";
 
 ## 유리 표면
 
-Figma의 `Liquid layers`(tint, inner shade, 경계선 세 겹을 50% 세기로 겹친 것)를 `LiquidGlass`가
+Figma의 `Liquid layers`(tint, inner shade, soft light edge를 50% 세기로 겹친 것)를 `LiquidGlass`가
 그립니다. 유리 컴포넌트는 이것을 첫 자식으로 두고, 채움은 `glass-clear` / `glass-regular` /
 `glass-thick` 토큰으로 정합니다. 경계선 흐림과 안쪽 그림자 여백은 Figma처럼 높이에 비례합니다.
 
@@ -56,34 +56,45 @@ Safari, iOS의 모든 브라우저, Firefox, macOS 데스크톱 앱은 배경에
 브라우저가 `backdrop-filter`를 지원하지 않으면 불투명한 흐린 표면이 됩니다. `<LiquidGlass refract={false} />`처럼
 `refract`를 끄면 굴절만 사라집니다.
 
-## 컴포넌트 (55개)
+## 컴포넌트 (80개)
 
 | 파일 | Figma 노드 | 내용 |
 | --- | --- | --- |
 | `agent-activity` | 108:660 | Thinking, streaming, tool steps and work log. |
 | `agent-lane` | 113:953 | Sub-agent lane card. |
+| `agent-lanes-timeline` | YCO-1 | Timeline of each bot's run spans. |
 | `agent-panel` | 112:797 | Solid agent panel, task composer and picker chips. |
+| `agent-steering-panel` | Y51-1 | Steering panel that redirects a running bot. |
 | `approval-card` | 64:398 | Glass approval card. |
 | `avatar` | 61:347 | Initials, Bot and Image avatar with a live dot. |
 | `badge` | 61:283 | Neutral, Brand, Danger and Solid status pill. |
 | `banner` | 62:318 | Info and Danger glass banner. |
+| `bot-instructions-panel` | YN3-1 | Bot instructions and examples in tabs. |
 | `bot-list-row` | 64:456 | Bot list row with live avatar. |
-| `bottom-sheet` | 88:808 | Thick-glass bottom sheet. |
+| `bot-memory-panel` | ZO2-1 | Bot memory grouped by category. |
+| `bottom-sheet` | 88:808 | Thick-glass bottom sheet; the light board adds frost. |
 | `breadcrumb` | 110:948 | Breadcrumb with workspace tile. |
-| `button` | 55:339 | Primary, Glass and Danger in three sizes. |
+| `breadcrumb-header` | U8H-1 | Glass header row with a breadcrumb and two icon buttons. |
+| `button` | 55:339 | Primary, Glass, Danger and Link in three sizes. |
 | `calendar` | 60:245 | Month grid with single and range selection. |
 | `card` | 63:310 | Thick-glass card: Default, Interactive, Selected. |
 | `chat-bubble` | 64:359 | Flat Me and Bot chat bubbles. |
 | `chat-controls` | 88:659 | Jump to latest, new messages, voice input. |
 | `checkbox` | 58:217 | Off, On and Mixed checkbox. |
 | `chip` | 61:302 | Clear-glass toggle chip. |
+| `choice-card` | 1VXM-0 | Radio card that picks one of two options. |
+| `code-panel` | 1VV9-0 | Light code panel for settings screens. |
 | `command-palette` | 110:676 | Frosted command palette. |
 | `composer` | 63:462 | Glass message composer. |
 | `data-table` | 192:9046 | Solid data table with header, tags and footer. |
 | `date-field` | 60:244 | Glass field that opens the calendar. |
-| `dialog` | 63:329 | Thick-glass dialog on a scrim. |
+| `dialog` | 63:329 | Thick-glass dialog on a scrim; the light board adds frost. |
+| `directory-card` | 1VJJ-0 | Directory card with a description and an add button. |
+| `document-extract-panel` | YUT-1 | Document viewer beside the extracted fields. |
 | `empty-state` | 64:485 | Mascot empty state. |
 | `field` | 58:163 | Label, control, help and error text. |
+| `file-drop` | 1VWI-0 | Dashed drop zone for files. |
+| `filter-bar` | WLN-1 | Pill filter bar with counts. |
 | `horon-icon` | 256:9116 | The Horon falcon-eye icon. |
 | `horon-wordmark` | 88:808 | UI-size Horon wordmark. |
 | `icon-button` | 57:167 | Primary, Ghost and Glass icon-only buttons. |
@@ -91,20 +102,30 @@ Safari, iOS의 모든 브라우저, Firefox, macOS 데스크톱 앱은 배경에
 | `input-group` | 60:429 | Input with a prefix or suffix segment. |
 | `integration-row` | 110:883 | Integration row: connected, reconnect, not connected. |
 | `kbd` | 110:676 | Keyboard hint chip. |
+| `knowledge-base-panel` | XVM-1 | Indexing state of each knowledge source. |
 | `liquid-glass` | 55:339 | The liquid glass layer stack. |
+| `list-detail` | 1W6P-0 | Two-pane layout with a list on the left and detail on the right. |
+| `marketplace-card` | 1VMY-0 | Marketplace card with a description and an install button. |
+| `mcp-server-row` | 1VHS-0 | Connected MCP server row with name, tags and state. |
 | `menu` | 88:495 | Glass menu and solid account/workspace menu. |
 | `message-extras` | 109:667 | Message actions, date separator, attachment, code block. |
+| `orchestrator-panel` | X01-1 | Lead bot, parallel lanes and a summary. |
 | `page-header` | 88:723 | Glass header with back, title, actions and filter. |
+| `plan-card` | XMH-1 | Card shell that wraps plan steps. |
 | `plan-step` | 191:8296 | Plan step on a rail. |
+| `plugin-row` | 1VKS-0 | Plugin row with name, version, update and an enable switch. |
 | `progress` | 109:733 | 6px progress bar. |
 | `radio-group` | 58:239 | Radio group with 20px radios. |
+| `research-run-panel` | ZUU-1 | Research question, progress and search terms. |
 | `schedule` | 110:765 | Time field, weekday picker and routine schedule card. |
 | `segmented-control` | 62:379 | Glass segmented control. |
 | `select` | 58:162 | Glass or Solid select with a glass list. |
+| `settings-list` | 1VD8-0 | Settings card of label and switch rows split by dividers. |
 | `sidebar` | 88:808 | Thick-glass sidebar with groups, tree and account. |
 | `skeleton` | 109:733 | Placeholder blocks and cards. |
 | `source-row` | 114:1287 | Knowledge source with pipeline stages. |
 | `spinner` | 109:733 | Ink spinner in three sizes. |
+| `split-button` | 1VGK-0 | One pill with a primary action and a secondary menu caret. |
 | `switch` | 58:264 | MD and SM switch. |
 | `tab-bar` | 63:441 | Mobile glass tab bar. |
 | `tabs` | 62:335 | Pill tabs on a glass tray. |
@@ -113,8 +134,12 @@ Safari, iOS의 모든 브라우저, Firefox, macOS 데스크톱 앱은 배경에
 | `textarea-field` | 60:466 | Labeled textarea with footer and counter. |
 | `toast` | 62:307 | Glass toast with Neutral, Success and Danger tones. |
 | `tool-call` | 186:7811 | Expandable tool call with JSON arguments and result. |
+| `tool-calls-header` | XDG-1 | Title row and tool chips for a group of tool calls. |
+| `tool-permissions` | 1VT5-0 | Per-tool permission list: allow, confirm or off. |
 | `tooltip` | 62:282 | Ink tooltip with an arrow. |
+| `top-bar` | UR5-1 | Mobile app bar with back, bot avatar, title and subtitle, and overflow. |
 | `usage-meter` | 109:733 | Glass usage meter card. |
+| `workspace-menu` | V56-1 | Solid menu to pick a workspace or create one. |
 
 ## 검사
 

@@ -14,6 +14,7 @@ export default function SelectDemo() {
     <Backdrop>
       <Select aria-label="Bot" items={items} placeholder="Select a bot" />
       <Select aria-label="Bot" items={items} surface="solid" defaultValue="chief" />
+      <Select aria-label="Bot" items={items} surface="solid-on-page" defaultValue="chief" />
     </Backdrop>
   );
 }
