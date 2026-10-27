@@ -14,7 +14,11 @@ export function Skeleton({ shape = "block", className, ...props }: SkeletonProps
   return (
     <div
       aria-hidden
-      className={cn("bg-overlay-ink-7", shape === "pill" ? "rounded-full" : "rounded-xs", className)}
+      className={cn(
+        "animate-shimmer bg-overlay-ink-7 bg-[linear-gradient(90deg,transparent_30%,rgba(255,255,255,0.4)_50%,transparent_70%)] bg-size-[200%_100%] dark:bg-[linear-gradient(90deg,transparent_30%,rgba(255,255,255,0.06)_50%,transparent_70%)]",
+        shape === "pill" ? "rounded-full" : "rounded-xs",
+        className,
+      )}
       {...props}
     />
   );

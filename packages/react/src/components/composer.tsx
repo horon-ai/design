@@ -49,7 +49,7 @@ export function Composer({
     <form
       onSubmit={submit}
       className={cn(
-        "relative flex items-center gap-2 overflow-clip rounded-full border border-glass-rim-strong bg-glass-regular p-2",
+        "relative flex items-center gap-2 overflow-clip rounded-full border border-glass-rim-strong bg-glass-regular p-2 motion-colors",
         className,
       )}
     >

@@ -40,7 +40,7 @@ export function BreadcrumbItem({ current, tile, href, className, children, ...pr
       href={Element === "a" ? href : undefined}
       aria-current={current ? "page" : undefined}
       className={cn(
-        "flex items-center gap-1.5 rounded-sm py-1 pr-2 pl-1.5 text-label-md whitespace-nowrap",
+        "flex items-center gap-1.5 rounded-sm py-1 pr-2 pl-1.5 text-label-md whitespace-nowrap motion-colors",
         current ? "text-text-primary" : "text-text-secondary",
         Element === "a" && "hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand",
         className,

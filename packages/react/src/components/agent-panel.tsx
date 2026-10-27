@@ -31,7 +31,7 @@ export function ComposerChip({ leading, tileClassName, className, children, ...p
     <button
       type="button"
       className={cn(
-        "flex h-7.5 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-5 pr-2.5 pl-2 text-label-sm text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand",
+        "flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-5 pr-2.5 pl-2 text-label-sm text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}
       {...props}
@@ -96,7 +96,7 @@ export function TaskComposer({
         <button
           type="button"
           onClick={onStart}
-          className="flex h-8 shrink-0 cursor-pointer items-center rounded-full bg-interactive-primary px-3 text-label-sm text-text-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+          className="flex h-8 shrink-0 motion-press cursor-pointer items-center rounded-full bg-interactive-primary px-3 text-label-sm text-text-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
         >
           {startLabel}
         </button>

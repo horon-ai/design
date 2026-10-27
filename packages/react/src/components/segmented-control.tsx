@@ -1,8 +1,9 @@
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
-import type { ReactNode } from "react";
+import { type ReactNode, useRef } from "react";
 
 import { cn } from "../lib/cn";
+import { useActiveIndicator } from "../lib/use-active-indicator";
 import { LiquidGlass } from "./liquid-glass";
 
 export type SegmentedControlSize = "sm" | "md" | "lg";
@@ -49,10 +50,12 @@ const surfaceClass: Record<SegmentedControlSurface, string> = {
 };
 
 /**
- * Single-choice segmented control. On the glass track the selected segment is a
- * clear glass pill (Figma 62:379): thick-glass fill, 1px strong rim and a
- * 0 1 3 8% shadow; dark mode keeps a 10% fill, as the Components / Dark board
- * does. On the inset tracks it is 10% ink.
+ * Single-choice segmented control. The selection is one pill that slides to the
+ * pressed segment. On the glass track it is a clear glass pill (Figma 62:379):
+ * thick-glass fill, 1px strong rim and a 0 1 3 8% shadow; dark mode keeps a 10%
+ * fill, as the Components / Dark board does. On the inset tracks it is 10% ink.
+ * The moving pill keeps the CSS glass: refraction on a sliding layer leaks a
+ * square frost past its rounded clip and re-renders every frame.
  */
 export function SegmentedControl({
   items,
@@ -65,8 +68,11 @@ export function SegmentedControl({
   className,
   ...props
 }: SegmentedControlProps) {
+  const track = useRef<HTMLDivElement>(null);
+  const { rect, animate } = useActiveIndicator(track, "[data-pressed]");
   return (
     <ToggleGroup
+      ref={track}
       value={value === undefined ? undefined : [value]}
       defaultValue={defaultValue === undefined ? undefined : [defaultValue]}
       onValueChange={(next) => {
@@ -81,24 +87,33 @@ export function SegmentedControl({
       aria-label={props["aria-label"]}
     >
       {surface === "glass" && <LiquidGlass tier="regular" />}
+      <span
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute overflow-clip rounded-full",
+          surface === "glass"
+            ? "border border-glass-rim-strong bg-glass-thick shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:bg-overlay-ink-10"
+            : "bg-overlay-ink-10",
+          animate && "motion-indicator",
+        )}
+        style={rect ? { ...rect, opacity: 1 } : { opacity: 0 }}
+      >
+        {surface === "glass" && <LiquidGlass tier="clear" refract={false} />}
+      </span>
       {items.map((item) => (
         <Toggle
           key={item.value}
           value={item.value}
           disabled={item.disabled}
           className={cn(
-            "relative flex min-w-0 cursor-pointer items-center justify-center rounded-full text-label-md whitespace-nowrap text-text-secondary",
+            "relative flex min-w-0 cursor-pointer items-center justify-center rounded-full text-label-md whitespace-nowrap text-text-secondary motion-colors",
             "data-disabled:cursor-not-allowed data-disabled:opacity-40 data-pressed:text-text-primary",
-            surface === "glass"
-              ? "border border-transparent data-pressed:border-glass-rim-strong data-pressed:bg-glass-thick data-pressed:shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:data-pressed:bg-overlay-ink-10 [&:not([data-pressed])>.liquid-layers]:hidden"
-              : "data-pressed:bg-overlay-ink-10",
             "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
             segmentClass[size],
             fill && "flex-1",
           )}
         >
-          {surface === "glass" && <LiquidGlass tier="clear" />}
-          <span className="relative">{item.label}</span>
+          {item.label}
         </Toggle>
       ))}
     </ToggleGroup>

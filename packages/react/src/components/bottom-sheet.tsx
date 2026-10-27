@@ -28,12 +28,12 @@ export function BottomSheetContent({
 }: BottomSheetContentProps) {
   return (
     <Drawer.Portal>
-      <Drawer.Backdrop className="fixed inset-0 bg-bg-scrim opacity-40 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0" />
+      <Drawer.Backdrop className="fixed inset-0 bg-bg-scrim motion-fade opacity-40" />
       <Drawer.Viewport className="fixed inset-x-0 bottom-0 flex justify-center">
         <Drawer.Popup
           className={cn(
             "relative flex w-full max-w-93.5 flex-col items-stretch gap-1 overflow-clip rounded-t-[32px] border border-b-0 border-glass-rim-strong bg-glass-thick px-4 pt-2 pb-5",
-            "transition-transform duration-300 data-ending-style:translate-y-full data-starting-style:translate-y-full",
+            "transition-[translate] duration-320 ease-out-quint data-ending-style:translate-y-full data-ending-style:duration-220 data-ending-style:ease-in data-starting-style:translate-y-full",
             className,
           )}
           {...props}
@@ -45,7 +45,7 @@ export function BottomSheetContent({
               <Drawer.Title className="min-w-0 flex-1 text-label-lg text-text-primary">{title}</Drawer.Title>
               <Drawer.Close
                 aria-label={closeLabel}
-                className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
+                className="flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
               >
                 <X aria-hidden className="size-4" />
               </Drawer.Close>
@@ -71,7 +71,7 @@ export function BottomSheetRow({ icon, value, className, children, ...props }: B
     <button
       type="button"
       className={cn(
-        "flex h-12 w-full cursor-pointer items-center gap-3 rounded-lg px-2 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
+        "flex h-12 w-full motion-press cursor-pointer items-center gap-3 rounded-lg px-2 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
         className,
       )}
       {...props}
@@ -102,7 +102,7 @@ export function BottomSheetAction({ variant = "secondary", className, ...props }
     <button
       type="button"
       className={cn(
-        "flex h-11 min-w-25 cursor-pointer items-center justify-center rounded-full px-4 text-label-md whitespace-nowrap",
+        "flex h-11 min-w-25 motion-press cursor-pointer items-center justify-center rounded-full px-4 text-label-md whitespace-nowrap",
         variant === "primary" ? "bg-interactive-primary text-text-inverse" : "bg-overlay-ink-6 text-text-primary",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
         className,

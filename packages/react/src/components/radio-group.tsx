@@ -26,14 +26,14 @@ export function Radio({ label, className, ...props }: RadioProps) {
     >
       <BaseRadio.Root
         className={cn(
-          "flex size-5 shrink-0 items-center justify-center rounded-full border-[1.5px] border-border-strong bg-bg-surface",
+          "flex size-5 shrink-0 items-center justify-center rounded-full border-[1.5px] border-border-strong bg-bg-surface motion-colors",
           "hover:not-data-disabled:border-text-secondary",
           "data-checked:border-0 data-checked:bg-interactive-primary hover:not-data-disabled:data-checked:bg-interactive-primary-hover",
           "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
         )}
         {...props}
       >
-        <BaseRadio.Indicator className="size-2 rounded-full bg-interactive-on-primary data-unchecked:hidden" />
+        <BaseRadio.Indicator className="size-2 animate-pop-in rounded-full bg-interactive-on-primary data-unchecked:hidden" />
       </BaseRadio.Root>
       {label}
     </label>

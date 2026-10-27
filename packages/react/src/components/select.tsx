@@ -40,7 +40,7 @@ export function Select({
         className={cn(
           fieldBoxClass.base,
           fieldBoxClass[surface],
-          "group h-10 w-60 cursor-pointer text-left data-disabled:cursor-not-allowed",
+          "group h-10 w-60 cursor-pointer text-left motion-colors data-disabled:cursor-not-allowed",
           "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
           className,
         )}
@@ -53,13 +53,13 @@ export function Select({
             surface === "solid" ? "text-body-lg" : "text-body-md",
           )}
         />
-        <BaseSelect.Icon className="relative flex shrink-0 text-text-secondary [&_svg]:size-4">
+        <BaseSelect.Icon className="relative flex shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-popup-open:rotate-180 [&_svg]:size-4">
           <CaretDown />
         </BaseSelect.Icon>
       </BaseSelect.Trigger>
       <BaseSelect.Portal>
         <BaseSelect.Positioner sideOffset={8} alignItemWithTrigger={false} className="z-50 outline-none">
-          <BaseSelect.Popup className="relative min-w-(--anchor-width) origin-(--transform-origin) overflow-clip rounded-xl border border-glass-rim-strong bg-glass-thick p-1.5 transition-[scale,opacity] duration-100 outline-none data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0">
+          <BaseSelect.Popup className="relative min-w-(--anchor-width) motion-popup overflow-clip rounded-xl border border-glass-rim-strong bg-glass-thick p-1.5 outline-none">
             <LiquidGlass tier="thick" />
             <BaseSelect.List className="relative flex flex-col gap-0.5">
               {items.map((item) => (
@@ -67,7 +67,7 @@ export function Select({
                   key={item.value}
                   value={item.value}
                   disabled={item.disabled}
-                  className="flex h-10 cursor-pointer items-center gap-2.5 rounded-md px-3 text-label-md text-text-primary outline-none select-none data-disabled:cursor-not-allowed data-disabled:opacity-40 data-highlighted:bg-overlay-ink-6 data-selected:bg-overlay-ink-6"
+                  className="flex h-10 cursor-pointer items-center gap-2.5 rounded-md px-3 text-label-md text-text-primary motion-colors outline-none select-none data-disabled:cursor-not-allowed data-disabled:opacity-40 data-highlighted:bg-overlay-ink-6 data-selected:bg-overlay-ink-6"
                 >
                   <BaseSelect.ItemText className="min-w-0 flex-1">{item.label}</BaseSelect.ItemText>
                   <BaseSelect.ItemIndicator className="flex shrink-0 text-text-primary [&_svg]:size-4.5">

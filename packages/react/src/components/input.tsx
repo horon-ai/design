@@ -31,7 +31,7 @@ const textClass: Record<InputSize, string> = {
 };
 
 export const fieldBoxClass = {
-  base: "relative flex items-center gap-2 overflow-clip rounded-md border px-3.5",
+  base: "motion-colors relative flex items-center gap-2 overflow-clip rounded-md border px-3.5",
   glass:
     "border-glass-rim-strong bg-glass-regular has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
   solid:

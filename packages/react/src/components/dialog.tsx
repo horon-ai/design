@@ -31,34 +31,36 @@ export function DialogContent({
 }: DialogContentProps) {
   return (
     <BaseDialog.Portal>
-      <BaseDialog.Backdrop className="fixed inset-0 bg-bg-scrim opacity-40 transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
-      <BaseDialog.Popup
-        className={cn(
-          "fixed top-1/2 left-1/2 flex w-105 max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col items-start gap-2 overflow-clip rounded-xl border border-glass-rim-strong bg-glass-thick p-6",
-          "transition-[scale,opacity] duration-150 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
-          className,
-        )}
-        {...props}
-      >
-        <LiquidGlass tier="thick" />
-        <div className="relative flex w-full items-start gap-2">
-          <BaseDialog.Title className="min-w-0 flex-1 text-title-md text-text-primary">{title}</BaseDialog.Title>
-          {closeLabel !== null && (
-            <BaseDialog.Close
-              aria-label={closeLabel}
-              className="flex shrink-0 cursor-pointer text-text-secondary [&_svg]:size-5"
-            >
-              <X />
-            </BaseDialog.Close>
+      <BaseDialog.Backdrop className="fixed inset-0 bg-bg-scrim motion-fade opacity-40" />
+      <BaseDialog.Viewport className="fixed inset-0 flex items-center justify-center px-4">
+        <BaseDialog.Popup
+          className={cn(
+            "relative flex w-105 max-w-[calc(100vw-2rem)] flex-col items-start gap-2 overflow-clip rounded-xl border border-glass-rim-strong bg-glass-thick p-6",
+            "motion-popup duration-240 data-starting-style:translate-y-2",
+            className,
           )}
-        </div>
-        {description && (
-          <BaseDialog.Description className="relative text-body-md text-text-secondary">
-            {description}
-          </BaseDialog.Description>
-        )}
-        {children}
-      </BaseDialog.Popup>
+          {...props}
+        >
+          <LiquidGlass tier="thick" />
+          <div className="relative flex w-full items-start gap-2">
+            <BaseDialog.Title className="min-w-0 flex-1 text-title-md text-text-primary">{title}</BaseDialog.Title>
+            {closeLabel !== null && (
+              <BaseDialog.Close
+                aria-label={closeLabel}
+                className="flex shrink-0 motion-press cursor-pointer text-text-secondary [&_svg]:size-5"
+              >
+                <X />
+              </BaseDialog.Close>
+            )}
+          </div>
+          {description && (
+            <BaseDialog.Description className="relative text-body-md text-text-secondary">
+              {description}
+            </BaseDialog.Description>
+          )}
+          {children}
+        </BaseDialog.Popup>
+      </BaseDialog.Viewport>
     </BaseDialog.Portal>
   );
 }

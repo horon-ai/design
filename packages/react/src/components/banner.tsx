@@ -24,7 +24,7 @@ export function Banner({ tone = "info", action, className, children, ...props }:
     <div
       role={tone === "danger" ? "alert" : "status"}
       className={cn(
-        "relative flex items-center gap-3 overflow-clip rounded-md border bg-glass-regular px-4 py-3",
+        "relative flex animate-[tab-panel-in_220ms_var(--ease-out-quint)] items-center gap-3 overflow-clip rounded-md border bg-glass-regular px-4 py-3",
         toneClass[tone],
         className,
       )}
