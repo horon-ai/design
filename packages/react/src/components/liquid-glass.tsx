@@ -28,14 +28,18 @@ function supportsBackdropDisplacement(): boolean {
  * half strength, scaled to the host height. Render it as the first child of a
  * `relative` host with a border radius; the host keeps its own fill and rim.
  *
- * In Chromium it also mounts liquid-glass-react underneath, sized to the host:
+ * In Chromium, on pill-shaped hosts (buttons, chips, segmented controls, tab
+ * bars), it also mounts liquid-glass-react underneath, sized to the host. Its
+ * displacement map is drawn for a pill, so on rectangles (cards, popups, fields)
+ * it smears the corners into blobs; those keep the CSS glass. Underneath, it:
  * its SVG displacement filter bends the backdrop at the edges and its rims catch
  * the light. Safari and Firefox cannot apply an SVG filter to a backdrop (in
  * WebKit the library's layer loses its blur as well), so they keep the CSS glass. The library is a
  * free-standing widget, so it is pinned to the host here: centred with its own
  * top/left 50% and translate, rigid (`elasticity` 0) and without pointer events,
  * so the host keeps its layout and interaction. It measures its size only on
- * mount, so it is remounted when the host is resized. It measures with
+ * mount, so it is remounted when the host is resized, 150ms after the size
+ * settles so a host that is animating its size does not remount every frame. It measures with
  * getBoundingClientRect, which a scaled ancestor shrinks, so its layers are
  * stretched to the host in CSS and the size here is the untransformed one.
  */
@@ -54,11 +58,26 @@ export function LiquidGlass({ tier = "clear", refract = true }: LiquidGlassProps
       const height = element.offsetHeight;
       if (width === 0 || height === 0) return;
       const radius = Math.min(Number.parseFloat(getComputedStyle(host).borderTopLeftRadius) || 0, height / 2);
+      if (radius < height / 2 - 1) {
+        setShape(null);
+        return;
+      }
       setShape({ width: Math.round(width), height: Math.round(height), radius });
     };
-    const observer = new ResizeObserver(measure);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let measured = false;
+    const observer = new ResizeObserver(() => {
+      if (!measured) {
+        measured = true;
+        measure();
+        return;
+      }
+      clearTimeout(timer);
+      timer = setTimeout(measure, 150);
+    });
     observer.observe(element);
     return () => {
+      clearTimeout(timer);
       observer.disconnect();
       setShape(null);
     };

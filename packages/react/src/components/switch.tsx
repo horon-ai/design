@@ -26,7 +26,7 @@ export function Switch({ size = "md", label, className, ...props }: SwitchProps)
   const control = (
     <BaseSwitch.Root
       className={cn(
-        "relative inline-flex shrink-0 cursor-pointer items-center rounded-full bg-border-strong transition-colors",
+        "relative inline-flex shrink-0 cursor-pointer items-center rounded-full bg-border-strong motion-colors",
         "hover:not-data-disabled:bg-interactive-secondary-hover data-checked:bg-interactive-primary hover:not-data-disabled:data-checked:bg-interactive-primary-hover",
         "data-disabled:cursor-not-allowed data-disabled:opacity-40",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
@@ -37,7 +37,7 @@ export function Switch({ size = "md", label, className, ...props }: SwitchProps)
     >
       <BaseSwitch.Thumb
         className={cn(
-          "rounded-full bg-text-on-ink transition-transform data-checked:bg-interactive-on-primary",
+          "rounded-full bg-text-on-ink transition-[translate,background-color] duration-220 ease-spring data-checked:bg-interactive-on-primary",
           thumbClass[size],
         )}
       />

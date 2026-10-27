@@ -54,7 +54,7 @@ export function SidebarHeader({
       <button
         type="button"
         className={cn(
-          "flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-[10px] pr-1 pl-2 text-left hover:bg-overlay-ink-6 data-popup-open:bg-overlay-ink-6",
+          "flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-[10px] pr-1 pl-2 text-left motion-colors hover:bg-overlay-ink-6 data-popup-open:bg-overlay-ink-6",
           "focus-visible:outline-2 focus-visible:outline-text-brand",
           switchClass,
         )}
@@ -98,6 +98,7 @@ export function SidebarItem({ icon, count, attention, current, className, childr
       aria-current={current ? "page" : undefined}
       className={cn(
         "relative flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-label-md text-text-primary",
+        "motion-colors",
         current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-4",
         "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
         className,
@@ -147,10 +148,10 @@ export function SidebarGroup({ label, defaultOpen = true, children, className }:
         {label}
         <CaretDown
           aria-hidden
-          className="size-3.5 transition-transform group-not-data-panel-open:-rotate-90 group-data-panel-open:rotate-0"
+          className="size-3.5 transition-transform duration-200 ease-out-quint group-not-data-panel-open:-rotate-90 group-data-panel-open:rotate-0"
         />
       </Collapsible.Trigger>
-      <Collapsible.Panel className="flex flex-col gap-0.5">{children}</Collapsible.Panel>
+      <Collapsible.Panel className="flex motion-collapse flex-col gap-0.5">{children}</Collapsible.Panel>
     </Collapsible.Root>
   );
 }
@@ -208,7 +209,7 @@ export function SidebarAccount({ initials, name, email, className, ...props }: S
     <button
       type="button"
       className={cn(
-        "relative flex w-full cursor-pointer items-center gap-2.5 rounded-lg py-2 pr-2 pl-1.5 text-left hover:bg-overlay-ink-4 data-popup-open:bg-overlay-ink-6",
+        "relative flex w-full cursor-pointer items-center gap-2.5 rounded-lg py-2 pr-2 pl-1.5 text-left motion-colors hover:bg-overlay-ink-4 data-popup-open:bg-overlay-ink-6",
         "focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}
@@ -271,6 +272,7 @@ export function SidebarProject({
       <div
         className={cn(
           "group/project relative flex h-8 items-center rounded-md has-data-popup-open:bg-overlay-ink-6",
+          "motion-colors",
           current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-6",
         )}
       >
@@ -293,19 +295,18 @@ export function SidebarProject({
                 actions !== undefined && "group-hover/project:invisible group-has-data-popup-open/project:invisible",
               )}
             >
-              <CaretRight className="group-data-panel-open/trigger:hidden" />
-              <CaretDown className="hidden group-data-panel-open/trigger:block" />
+              <CaretRight className="transition-transform duration-200 ease-out-quint group-data-panel-open/trigger:rotate-90" />
             </span>
           )}
         </Collapsible.Trigger>
         {actions !== undefined && (
-          <span className="absolute right-2.5 flex opacity-0 group-focus-within/project:opacity-100 group-hover/project:opacity-100 group-has-data-popup-open/project:opacity-100">
+          <span className="absolute right-2.5 flex opacity-0 transition-opacity duration-150 group-focus-within/project:opacity-100 group-hover/project:opacity-100 group-has-data-popup-open/project:opacity-100">
             {actions}
           </span>
         )}
       </div>
       {hasChildren && (
-        <Collapsible.Panel>
+        <Collapsible.Panel className="motion-collapse">
           <SidebarTree>{children}</SidebarTree>
         </Collapsible.Panel>
       )}
@@ -346,7 +347,7 @@ export function SidebarAddButton({ icon = addIcon, className, children, ...props
     <button
       type="button"
       className={cn(
-        "relative mt-2.5 flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-[10px] text-label-md text-text-secondary hover:bg-overlay-ink-4",
+        "relative mt-2.5 flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-[10px] text-label-md text-text-secondary motion-colors hover:bg-overlay-ink-4",
         "focus-visible:outline-2 focus-visible:outline-text-brand [&>[data-slot=icon]]:size-4",
         className,
       )}

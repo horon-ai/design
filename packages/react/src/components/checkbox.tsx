@@ -22,7 +22,7 @@ export function Checkbox({ label, size = "md", className, ...props }: CheckboxPr
     >
       <BaseCheckbox.Root
         className={cn(
-          "flex shrink-0 items-center justify-center border-[1.5px] border-border-strong bg-bg-surface",
+          "flex shrink-0 items-center justify-center border-[1.5px] border-border-strong bg-bg-surface motion-colors",
           size === "sm" ? "size-4.5 rounded-[5px]" : "size-5 rounded-xs",
           "hover:not-data-disabled:border-text-secondary",
           "data-checked:border-0 data-checked:bg-interactive-primary data-indeterminate:border-0 data-indeterminate:bg-interactive-primary",
@@ -32,7 +32,7 @@ export function Checkbox({ label, size = "md", className, ...props }: CheckboxPr
         {...props}
       >
         <BaseCheckbox.Indicator
-          className="flex text-interactive-on-primary [&_svg]:size-3.5"
+          className="flex animate-pop-in text-interactive-on-primary [&_svg]:size-3.5"
           render={(indicatorProps, state) => (
             <span {...indicatorProps}>{state.indeterminate ? <Minus /> : <Check />}</span>
           )}

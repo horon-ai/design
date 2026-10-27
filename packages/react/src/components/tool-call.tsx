@@ -119,40 +119,42 @@ export function ToolCall({
         {elapsed && <span className="shrink-0 text-caption text-text-secondary">{elapsed}</span>}
         <CaretDown
           aria-hidden
-          className="size-4 shrink-0 text-text-secondary transition-transform group-data-panel-open:rotate-180"
+          className="size-4 shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-panel-open:rotate-180"
         />
       </Collapsible.Trigger>
-      <Collapsible.Panel className="flex flex-col gap-3.5 px-4 pb-4">
-        {status === "failed" && error && (
-          <div className="flex items-center gap-2.5 rounded-[10px] bg-bg-danger px-3.5 py-3">
-            <WarningCircle aria-hidden className="size-4 shrink-0 text-text-danger" />
-            <p className="min-w-0 flex-1 text-body-sm text-text-danger">{error}</p>
-            {onRetry && (
-              <button
-                type="button"
-                onClick={onRetry}
-                className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-sm border border-border-default bg-bg-surface px-2.5 py-1.5 text-label-sm text-text-primary"
-              >
-                <ArrowClockwise aria-hidden className="size-3.5" />
-                Retry
-              </button>
-            )}
-          </div>
-        )}
-        {args !== undefined && (
-          <Section label="Arguments">
-            <JsonCode value={args} />
-          </Section>
-        )}
-        {status !== "failed" && (
-          <Section label="Result">
-            {status === "running" || result === undefined ? (
-              <p className="text-body-sm text-text-secondary">Waiting for result…</p>
-            ) : (
-              <JsonCode value={result} />
-            )}
-          </Section>
-        )}
+      <Collapsible.Panel className="motion-collapse">
+        <div className="flex flex-col gap-3.5 px-4 pb-4">
+          {status === "failed" && error && (
+            <div className="flex items-center gap-2.5 rounded-[10px] bg-bg-danger px-3.5 py-3">
+              <WarningCircle aria-hidden className="size-4 shrink-0 text-text-danger" />
+              <p className="min-w-0 flex-1 text-body-sm text-text-danger">{error}</p>
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="flex shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-sm border border-border-default bg-bg-surface px-2.5 py-1.5 text-label-sm text-text-primary"
+                >
+                  <ArrowClockwise aria-hidden className="size-3.5" />
+                  Retry
+                </button>
+              )}
+            </div>
+          )}
+          {args !== undefined && (
+            <Section label="Arguments">
+              <JsonCode value={args} />
+            </Section>
+          )}
+          {status !== "failed" && (
+            <Section label="Result">
+              {status === "running" || result === undefined ? (
+                <p className="text-body-sm text-text-secondary">Waiting for result…</p>
+              ) : (
+                <JsonCode value={result} />
+              )}
+            </Section>
+          )}
+        </div>
       </Collapsible.Panel>
     </Collapsible.Root>
   );

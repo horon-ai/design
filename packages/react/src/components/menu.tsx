@@ -53,8 +53,7 @@ export function MenuContent({
       >
         <BaseMenu.Popup
           className={cn(
-            "relative flex w-55 origin-(--transform-origin) flex-col gap-0.5 overflow-clip border border-glass-rim-strong p-1.5 outline-none",
-            "transition-[scale,opacity] duration-100 data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0",
+            "relative flex w-55 motion-popup flex-col gap-0.5 overflow-clip border border-glass-rim-strong p-1.5 outline-none",
             menuPopupClass[surface],
             className,
           )}
@@ -83,7 +82,7 @@ export function MenuItem({ icon, description, trailing, danger, className, child
   return (
     <BaseMenu.Item
       className={cn(
-        "relative flex w-full cursor-pointer items-center gap-2.5 outline-none select-none data-disabled:cursor-not-allowed data-disabled:opacity-40 data-highlighted:bg-overlay-ink-6",
+        "relative flex w-full cursor-pointer items-center gap-2.5 motion-colors outline-none select-none data-disabled:cursor-not-allowed data-disabled:opacity-40 data-highlighted:bg-overlay-ink-6",
         surface === "glass" ? "rounded-md px-3" : "rounded-[10px] px-2.5",
         description ? "h-11.5 pl-2" : surface === "glass" ? "h-10" : "h-9",
         className,

@@ -33,7 +33,7 @@ const botTile: Record<TaskStatus, string> = {
 };
 
 const pill =
-  "flex h-7.5 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-full px-3 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
+  "motion-press flex h-7.5 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-full px-3 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
 
 /** Figma `Task row` (Agent tasks 112:939): a flat subtle row, 16px radius, with Running / Review / Failed / Done. */
 export function TaskRow({
@@ -112,7 +112,7 @@ export function TaskRow({
             type="button"
             aria-label="Archive"
             onClick={onArchive}
-            className="flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex size-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             <Archive aria-hidden className="size-4" />
           </button>

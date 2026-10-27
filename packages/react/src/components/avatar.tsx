@@ -72,7 +72,7 @@ export function Avatar({ type = "initials", size = "md", src, alt = "", children
         <span
           aria-hidden
           className={cn(
-            "absolute -right-0.5 -bottom-0.5 rounded-full border-2 border-bg-default bg-status-live",
+            "absolute -right-0.5 -bottom-0.5 animate-live-pulse rounded-full border-2 border-bg-default bg-status-live text-status-live",
             liveClass[size],
           )}
         />

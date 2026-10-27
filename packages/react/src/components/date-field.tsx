@@ -66,7 +66,7 @@ export function DateField({
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner sideOffset={8} align="start">
-          <Popover.Popup className="origin-(--transform-origin) transition-[scale,opacity] duration-100 ease-out data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0">
+          <Popover.Popup className="motion-popup">
             <Calendar {...calendar} />
           </Popover.Popup>
         </Popover.Positioner>

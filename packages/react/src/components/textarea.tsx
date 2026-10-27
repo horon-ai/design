@@ -16,7 +16,7 @@ export function Textarea({ invalid, className, textareaClassName, rows = 3, ...p
   return (
     <div
       className={cn(
-        "relative flex min-h-28 overflow-clip rounded-md border px-3.5 py-3",
+        "relative flex min-h-28 overflow-clip rounded-md border px-3.5 py-3 motion-colors",
         fieldBoxClass.glass,
         "focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
         className,

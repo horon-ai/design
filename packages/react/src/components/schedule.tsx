@@ -35,26 +35,31 @@ export function PickerField({
       <BaseSelect.Trigger
         aria-label={ariaLabel}
         className={cn(
-          "relative flex h-10 w-40 cursor-pointer items-center gap-2 rounded-md px-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
-          surface === "glass" ? "overflow-clip border border-glass-rim-strong bg-glass-regular" : "bg-overlay-ink-4",
+          "relative flex h-10 w-40 cursor-pointer items-center gap-2 rounded-md px-3 text-left motion-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
+          surface === "glass"
+            ? "group overflow-clip border border-glass-rim-strong bg-glass-regular"
+            : "group bg-overlay-ink-4",
           className,
         )}
       >
         {surface === "glass" && <LiquidGlass tier="regular" />}
         <span className="relative flex shrink-0 text-text-secondary [&>svg]:size-4">{icon ?? <Clock />}</span>
         <BaseSelect.Value className="relative min-w-0 flex-1 truncate text-body-sm text-text-primary" />
-        <CaretDown aria-hidden className="relative size-3.5 shrink-0 text-text-secondary" />
+        <CaretDown
+          aria-hidden
+          className="relative size-3.5 shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-popup-open:rotate-180"
+        />
       </BaseSelect.Trigger>
       <BaseSelect.Portal>
         <BaseSelect.Positioner sideOffset={8} alignItemWithTrigger={false} className="z-50 outline-none">
-          <BaseSelect.Popup className="relative max-h-72 min-w-(--anchor-width) overflow-y-auto rounded-xl border border-glass-rim-strong bg-glass-thick p-1.5 outline-none">
+          <BaseSelect.Popup className="relative max-h-72 min-w-(--anchor-width) motion-popup overflow-y-auto rounded-xl border border-glass-rim-strong bg-glass-thick p-1.5 outline-none">
             <LiquidGlass tier="thick" />
             <BaseSelect.List className="relative flex flex-col gap-0.5">
               {items.map((item) => (
                 <BaseSelect.Item
                   key={item.value}
                   value={item.value}
-                  className="flex h-10 cursor-pointer items-center gap-2.5 rounded-md px-3 text-label-md text-text-primary outline-none select-none data-highlighted:bg-overlay-ink-6 data-selected:bg-overlay-ink-6"
+                  className="flex h-10 cursor-pointer items-center gap-2.5 rounded-md px-3 text-label-md text-text-primary motion-colors outline-none select-none data-highlighted:bg-overlay-ink-6 data-selected:bg-overlay-ink-6"
                 >
                   <BaseSelect.ItemText className="min-w-0 flex-1">{item.label}</BaseSelect.ItemText>
                   <BaseSelect.ItemIndicator className="flex shrink-0 [&_svg]:size-4.5">
@@ -96,7 +101,7 @@ export function WeekdayPicker({ days, value, defaultValue, onValueChange, classN
           key={day.value}
           value={day.value}
           aria-label={day.name}
-          className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-label-md text-text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-pressed:bg-interactive-primary data-pressed:text-text-inverse"
+          className="flex size-9 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-label-md text-text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-pressed:bg-interactive-primary data-pressed:text-text-inverse"
         >
           {day.label}
         </Toggle>
