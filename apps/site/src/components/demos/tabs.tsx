@@ -21,6 +21,19 @@ export default function TabsDemo() {
           Connected tools.
         </TabsPanel>
       </Tabs>
+      <Tabs defaultValue="mcp" className="mt-6">
+        <TabsList className="gap-1">
+          <TabsTab value="skills" count={6}>
+            Skills
+          </TabsTab>
+          <TabsTab value="mcp" count={4}>
+            MCP
+          </TabsTab>
+          <TabsTab value="plugins" count={3}>
+            Plugins
+          </TabsTab>
+        </TabsList>
+      </Tabs>
     </Backdrop>
   );
 }
