@@ -219,7 +219,7 @@ export const components: ComponentEntry[] = [
     slug: "data-table",
     title: "Data Table",
     group: "display",
-    description: "머리 행, 태그, 행 추가를 갖춘 표입니다.",
+    description: "TanStack Table로 정렬, 검색, 행 선택, 페이지 나눔을 처리하는 표입니다.",
     story: "web-datatable--default",
   },
   {
