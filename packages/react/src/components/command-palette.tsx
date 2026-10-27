@@ -51,13 +51,13 @@ export function CommandPalette({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       {trigger}
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-bg-scrim opacity-40 transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
+        <Dialog.Backdrop className="fixed inset-0 bg-bg-scrim motion-fade opacity-40" />
         <Dialog.Viewport className="fixed inset-0 flex items-start justify-center px-2 pt-24">
           <Dialog.Popup
             aria-label={placeholder}
             className={cn(
-              "max- relative flex w-140 flex-col overflow-clip rounded-[24px] border border-glass-rim-strong bg-glass-fill-frost p-1.5 shadow-palette",
-              "transition-[scale,opacity] duration-150 data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.98] data-starting-style:opacity-0",
+              "relative flex w-140 motion-popup flex-col overflow-clip rounded-[24px] border border-glass-rim-strong bg-glass-fill-frost p-1.5 shadow-palette",
+              "duration-240 data-starting-style:translate-y-2",
               className,
             )}
           >
@@ -69,7 +69,7 @@ export function CommandPalette({
                   placeholder={placeholder}
                   className="min-w-0 flex-1 bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
                 />
-                <Dialog.Close render={<Kbd className="cursor-pointer" />}>esc</Dialog.Close>
+                <Dialog.Close render={<Kbd className="motion-press cursor-pointer" />}>esc</Dialog.Close>
               </div>
               <div className="relative pt-1 pb-1.5">
                 <div className="h-px bg-overlay-ink-8" />
@@ -92,7 +92,7 @@ export function CommandPalette({
                             item.onSelect?.();
                             onOpenChange?.(false);
                           }}
-                          className="flex h-11 cursor-pointer items-center gap-2.5 rounded-md pr-3 pl-2.5 outline-none select-none data-highlighted:bg-overlay-ink-6"
+                          className="flex h-11 cursor-pointer items-center gap-2.5 rounded-md pr-3 pl-2.5 motion-colors outline-none select-none data-highlighted:bg-overlay-ink-6"
                         >
                           {item.tile && (
                             <span

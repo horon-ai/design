@@ -34,7 +34,7 @@ export function MessageActions({ actions, className }: { actions: MessageAction[
           type="button"
           aria-label={action.label}
           onClick={action.onClick}
-          className="relative flex size-7.5 cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
+          className="relative flex size-7.5 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
         >
           {action.icon}
         </button>
@@ -78,7 +78,7 @@ export function Attachment({ name, detail, thumbnail, onRemove, removeLabel = "R
           type="button"
           aria-label={removeLabel}
           onClick={onRemove}
-          className="flex shrink-0 cursor-pointer text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="flex shrink-0 motion-press cursor-pointer text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
         >
           <X aria-hidden className="size-4" />
         </button>
@@ -115,7 +115,7 @@ export function CodeBlock({
         <button
           type="button"
           onClick={copy}
-          className="flex shrink-0 cursor-pointer items-center gap-1 focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="flex shrink-0 motion-press cursor-pointer items-center gap-1 focus-visible:outline-2 focus-visible:outline-text-brand"
         >
           <Copy aria-hidden className="size-3.5" />
           {copied ? copiedLabel : copyLabel}

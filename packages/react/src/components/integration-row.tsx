@@ -75,7 +75,7 @@ export function IntegrationRow({
           type="button"
           onClick={onAction}
           className={cn(
-            "relative flex h-7.5 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
+            "relative flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full px-3 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
             status === "reconnect"
               ? "bg-accent-red-500-14 text-text-danger"
               : "bg-interactive-primary text-text-inverse",

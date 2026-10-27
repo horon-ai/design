@@ -84,7 +84,7 @@ export function PlanStep({
           <button
             type="button"
             onClick={onRetry}
-            className="flex w-fit cursor-pointer items-center gap-1.5 rounded-[10px] border border-border-default bg-bg-surface px-3 py-[7px] text-label-md text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex w-fit motion-press cursor-pointer items-center gap-1.5 rounded-[10px] border border-border-default bg-bg-surface px-3 py-[7px] text-label-md text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             <ArrowClockwise aria-hidden className="size-3.5" />
             Retry from here

@@ -30,7 +30,7 @@ function ToastList() {
         toast={toast}
         className={cn(
           toastClass,
-          "transition-[opacity,translate] duration-200 data-ending-style:translate-y-2 data-ending-style:opacity-0 data-starting-style:translate-y-2 data-starting-style:opacity-0",
+          "transition-[opacity,translate,scale] duration-260 ease-out-quint data-ending-style:translate-x-6 data-ending-style:opacity-0 data-ending-style:duration-180 data-ending-style:ease-in data-starting-style:translate-y-4 data-starting-style:scale-95 data-starting-style:opacity-0",
         )}
       >
         <LiquidGlass tier="regular" />
@@ -41,7 +41,7 @@ function ToastList() {
         </BaseToast.Content>
         <BaseToast.Close
           aria-label="Close"
-          className="relative flex shrink-0 cursor-pointer text-text-secondary [&_svg]:size-4"
+          className="relative flex shrink-0 motion-press cursor-pointer text-text-secondary [&_svg]:size-4"
         >
           <X />
         </BaseToast.Close>
