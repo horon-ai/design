@@ -37,7 +37,7 @@ export function Switch({ size = "md", label, className, ...props }: SwitchProps)
     >
       <BaseSwitch.Thumb
         className={cn(
-          "rounded-full bg-text-on-ink transition-[translate,background-color] duration-220 ease-spring data-checked:bg-interactive-on-primary",
+          "rounded-full bg-text-on-ink dark:bg-bg-default transition-[translate,background-color] duration-220 ease-spring data-checked:bg-interactive-on-primary dark:data-checked:bg-bg-default",
           thumbClass[size],
         )}
       />

@@ -90,6 +90,15 @@
   --color-syntax-number: #527b98;
   --color-syntax-punctuation: #b0b1b3;
   --color-syntax-string: #17181a;
+  --color-border-focus: #527b98;
+  --color-interactive-secondary: #f3f4f5;
+  --color-glass-fill: #ffffff52;
+  --color-glass-fill-strong: #ffffff8c;
+  --color-glass-border: #ffffff99;
+  --color-glass-tint: #0b0c0e0a;
+  --color-glass-rim-frost: #ffffffb3;
+  --color-bg-inset: #fcfcfd;
+  --color-border-dashed: #c9cbcd;
   --color-red-500: #d36d63;
   --color-sky-100: #e7eff5;
   --color-sky-200: #d2e0eb;
@@ -98,6 +107,36 @@
   --color-sky-600: #527b98;
   --color-sky-700: #3b617b;
   --color-sky-800: #2a495e;
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #f3f4f5;
+  --color-neutral-200: #e5e6e7;
+  --color-neutral-300: #d3d4d6;
+  --color-neutral-400: #b0b1b3;
+  --color-neutral-500: #7e8082;
+  --color-neutral-600: #5f6163;
+  --color-neutral-700: #434547;
+  --color-neutral-800: #2a2b2d;
+  --color-neutral-900: #17181a;
+  --color-neutral-950: #0b0c0e;
+  --color-red-50: #fff4f2;
+  --color-red-100: #fde7e4;
+  --color-red-200: #f9d2cc;
+  --color-red-300: #f2b7af;
+  --color-red-400: #e39289;
+  --color-red-600: #b84e45;
+  --color-red-700: #993a33;
+  --color-red-800: #782a25;
+  --color-red-900: #5a1d19;
+  --color-red-950: #3d110e;
+  --color-sky-50: #f3f7fa;
+  --color-sky-300: #b7cedf;
+  --color-sky-900: #1b3343;
+  --color-sky-950: #0f202c;
+  --color-base-white: #ffffff;
+  --color-base-black: #000000;
+  --color-mascot-ink: #1c1a17;
+  --color-mascot-cream: #fbf7f0;
+  --color-mascot-gold: #e0921f;
 
   --radius-none: 0;
   --radius-xs: 6px;
@@ -105,6 +144,7 @@
   --radius-md: 12px;
   --radius-lg: 14px;
   --radius-xl: 20px;
+  --radius-2xl: 16px;
   --radius-full: 9999px;
 
   --shadow-popover: 0 8px 24px 0 rgba(10, 13, 15, 0.1);
@@ -335,4 +375,13 @@
   --color-syntax-number: #95b6ce;
   --color-syntax-punctuation: #7e8082;
   --color-syntax-string: #f9fafb;
+  --color-border-focus: #95b6ce;
+  --color-interactive-secondary: #2a2b2d;
+  --color-glass-fill: #17181a8c;
+  --color-glass-fill-strong: #17181ab8;
+  --color-glass-border: #ffffff1f;
+  --color-glass-tint: #ffffff0f;
+  --color-glass-rim-frost: #ffffff1f;
+  --color-bg-inset: #141518;
+  --color-border-dashed: #4a4c4f;
 }

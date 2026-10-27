@@ -50,7 +50,7 @@ export function Select({
           placeholder={placeholder}
           className={cn(
             "relative min-w-0 flex-1 truncate text-text-primary group-data-disabled:text-text-disabled data-placeholder:text-text-placeholder",
-            surface === "solid" ? "text-body-lg" : "text-body-md",
+            surface === "glass" ? "text-body-md" : "text-body-lg",
           )}
         />
         <BaseSelect.Icon className="relative flex shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-popup-open:rotate-180 [&_svg]:size-4">
@@ -59,7 +59,7 @@ export function Select({
       </BaseSelect.Trigger>
       <BaseSelect.Portal>
         <BaseSelect.Positioner sideOffset={8} alignItemWithTrigger={false} className="z-50 outline-none">
-          <BaseSelect.Popup className="relative min-w-(--anchor-width) motion-popup overflow-clip rounded-xl border border-glass-rim-strong bg-glass-thick p-1.5 outline-none">
+          <BaseSelect.Popup className="relative min-w-(--anchor-width) motion-popup overflow-clip rounded-xl bg-glass-thick p-1.5 outline-none">
             <LiquidGlass tier="thick" />
             <BaseSelect.List className="relative flex flex-col gap-0.5">
               {items.map((item) => (

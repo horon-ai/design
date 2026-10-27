@@ -5,11 +5,11 @@ import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
 export type InputSize = "md" | "lg";
-export type InputSurface = "glass" | "solid";
+export type InputSurface = "glass" | "solid" | "solid-on-page";
 
 export type InputProps = Omit<ComponentProps<typeof BaseInput>, "className" | "size"> & {
   size?: InputSize;
-  /** `glass` over imagery and glass panels, `solid` on plain backgrounds. */
+  /** `glass` over imagery and glass panels, `solid` on raised surfaces, `solid-on-page` directly on the page background. */
   surface?: InputSurface;
   /** Leading icon, 16px (md) or 20px (lg), in the secondary text color. */
   icon?: ReactNode;
@@ -33,9 +33,11 @@ const textClass: Record<InputSize, string> = {
 export const fieldBoxClass = {
   base: "motion-colors relative flex items-center gap-2 overflow-clip rounded-md border px-3.5",
   glass:
-    "border-glass-rim-strong bg-glass-regular has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
+    "border-transparent bg-glass-regular has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
   solid:
     "border-border-default bg-bg-surface hover:border-border-strong has-[[data-disabled]]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
+  "solid-on-page":
+    "border-border-default bg-bg-default hover:border-border-strong has-[[data-disabled]]:border-border-default has-[[data-disabled]]:bg-bg-subtle dark:has-[[data-disabled]]:bg-neutral-800 has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
   text: "min-w-0 flex-1 bg-transparent text-text-primary outline-none placeholder:text-text-placeholder disabled:cursor-not-allowed disabled:text-text-disabled",
 } as const;
 

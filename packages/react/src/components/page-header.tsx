@@ -21,7 +21,7 @@ export function PageHeader({ title, onBack, backLabel = "Back", actions, childre
   return (
     <header
       className={cn(
-        "relative flex flex-col gap-1.5 overflow-clip rounded-[28px] border border-glass-rim-strong bg-glass-regular p-2",
+        "relative flex flex-col gap-1.5 overflow-clip rounded-[28px] bg-glass-regular p-2",
         className,
       )}
     >

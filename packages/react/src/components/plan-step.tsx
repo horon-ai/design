@@ -40,7 +40,7 @@ export function PlanStep({
       <div className="flex shrink-0 flex-col items-center gap-1">
         <span
           className={cn(
-            "flex size-6 shrink-0 items-center justify-center rounded-md text-label-sm",
+            "flex size-6 shrink-0 motion-colors items-center justify-center rounded-md text-label-sm",
             status === "done" && "bg-status-live text-interactive-on-primary",
             status === "failed" && "bg-bg-danger text-text-danger",
             status === "pending" && "border border-border-default text-text-secondary",
@@ -53,7 +53,7 @@ export function PlanStep({
         </span>
         {!last && (
           <span
-            className={cn("w-0.5 flex-1 rounded-[1px]", status === "done" ? "bg-status-live" : "bg-border-default")}
+            className={cn("w-0.5 flex-1 motion-colors rounded-[1px]", status === "done" ? "bg-status-live" : "bg-border-default")}
           />
         )}
       </div>

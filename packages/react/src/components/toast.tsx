@@ -14,7 +14,7 @@ const toneIcon: Record<ToastTone, ReactNode> = {
 };
 
 const toastClass =
-  "relative flex w-90 items-start gap-3 overflow-clip rounded-lg border border-glass-rim-strong bg-glass-regular px-4 py-3.5";
+  "relative flex w-90 items-start gap-3 overflow-clip rounded-lg bg-glass-regular px-4 py-3.5";
 
 function isTone(value: string | undefined): value is ToastTone {
   return value === "neutral" || value === "success" || value === "danger";

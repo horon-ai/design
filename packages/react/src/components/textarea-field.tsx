@@ -69,12 +69,15 @@ export function TextareaField({
       {(description || error || maxLength) && (
         <div
           className={cn(
-            "flex w-full items-center gap-2 text-caption",
+            "motion-colors flex w-full items-center gap-2 text-caption",
             invalid ? "text-text-danger" : "text-text-secondary",
           )}
         >
           {invalid ? (
-            <BaseField.Error match className="min-w-0 flex-1">
+            <BaseField.Error
+              match
+              className="min-w-0 flex-1 animate-[tab-panel-in_160ms_var(--ease-out-quint)]"
+            >
               {error}
             </BaseField.Error>
           ) : (
