@@ -327,7 +327,7 @@ export function SidebarProjectMore({ label = "Project actions", className, ...pr
       )}
       {...props}
     >
-      <DotsThree aria-hidden weight="bold" className="size-4" />
+      <DotsThree aria-hidden className="size-4" />
     </button>
   );
 }
