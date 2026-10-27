@@ -90,7 +90,7 @@ export default function SidebarDemo() {
       <Sidebar className="h-190">
         <SidebarHeader initial="H" name="Horon HQ" />
         <SidebarItem icon={<HoronIcon />} current aria-label="Horon">
-          <HoronWordmark height={10} />
+          <HoronWordmark height={9.6} />
         </SidebarItem>
         <SidebarItem icon={<Bell />} count={12}>
           Inbox
