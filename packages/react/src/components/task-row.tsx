@@ -22,6 +22,8 @@ export type TaskRowProps = {
   onRetry?: () => void;
   onReview?: () => void;
   onArchive?: () => void;
+  /** `card` is a standalone subtle row; `list` is transparent with a 1px divider, for stacking inside a list. */
+  variant?: "card" | "list";
   className?: string;
 };
 
@@ -48,10 +50,19 @@ export function TaskRow({
   onRetry,
   onReview,
   onArchive,
+  variant = "card",
   className,
 }: TaskRowProps) {
   return (
-    <div className={cn("flex flex-col gap-2 rounded-[16px] bg-bg-subtle px-4 py-3.5", className)}>
+    <div
+      className={cn(
+        "flex flex-col gap-2 px-4 py-3.5",
+        variant === "list"
+          ? "relative rounded-b-[16px] after:absolute after:inset-x-4 after:bottom-0 after:h-px after:bg-overlay-ink-8 last:after:hidden"
+          : "rounded-[16px] bg-bg-subtle",
+        className,
+      )}
+    >
       <div className="flex items-center gap-2">
         <p className="min-w-0 flex-1 truncate text-label-lg text-text-primary">{title}</p>
         {elapsed && <span className="shrink-0 text-caption text-text-secondary">{elapsed}</span>}
@@ -82,7 +93,7 @@ export function TaskRow({
         {status === "failed" && <WarningCircle aria-hidden className="size-4 shrink-0 text-text-danger" />}
         <span
           className={cn(
-            "shrink-0 text-label-md whitespace-nowrap",
+            "shrink-0 text-label-md whitespace-nowrap motion-colors",
             status === "failed" ? "text-text-danger" : status === "done" ? "text-text-secondary" : "text-text-primary",
           )}
         >

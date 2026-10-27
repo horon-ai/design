@@ -157,44 +157,55 @@ export type SidebarHeaderProps = {
   name: ReactNode;
   /** Props for the workspace switch button, such as a `MenuTrigger` render target. */
   switchProps?: ButtonProps;
+  /** Replaces the default switch, such as a `WorkspaceMenu` whose trigger is a `SidebarWorkspaceSwitch`. */
+  switchSlot?: ReactNode;
   onCollapse?: () => void;
   collapseLabel?: string;
   className?: string;
 };
+
+export type SidebarWorkspaceSwitchProps = Omit<ButtonProps, "name"> & { initial: ReactNode; name: ReactNode };
+
+/** The workspace switch button: 28px ink tile, name and up-down caret. Highlights while its menu is open. */
+export function SidebarWorkspaceSwitch({ initial, name, className, ...props }: SidebarWorkspaceSwitchProps) {
+  return (
+    <button
+      type="button"
+      className={cn(
+        "flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-[10px] pr-1 pl-2 text-left motion-colors hover:bg-overlay-ink-6 data-popup-open:bg-overlay-ink-6",
+        "focus-visible:outline-2 focus-visible:outline-text-brand",
+        className,
+      )}
+      {...props}
+    >
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-sm bg-interactive-primary text-label-md text-text-inverse">
+        {initial}
+      </span>
+      <span className="min-w-0 flex-1 truncate text-label-lg text-text-primary">{name}</span>
+      <CaretUpDown aria-hidden className="size-3.5 shrink-0 text-text-secondary" />
+    </button>
+  );
+}
 
 /** Header: workspace switch (tile, name, up-down caret) and an optional 28px collapse button. 10px gap below. */
 export function SidebarHeader({
   initial,
   name,
   switchProps,
+  switchSlot,
   onCollapse,
   collapseLabel = "Collapse sidebar",
   className,
 }: SidebarHeaderProps) {
-  const { className: switchClass, ...switchRest } = switchProps ?? {};
   return (
-    <div className={cn("relative mb-3 flex h-9 items-center gap-1.5", className)}>
-      <button
-        type="button"
-        className={cn(
-          "flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-[10px] pr-1 pl-2 text-left motion-colors hover:bg-overlay-ink-6 data-popup-open:bg-overlay-ink-6",
-          "focus-visible:outline-2 focus-visible:outline-text-brand",
-          switchClass,
-        )}
-        {...switchRest}
-      >
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-sm bg-interactive-primary text-label-md text-text-inverse">
-          {initial}
-        </span>
-        <span className="min-w-0 flex-1 truncate text-label-lg text-text-primary">{name}</span>
-        <CaretUpDown aria-hidden className="size-3.5 shrink-0 text-text-secondary" />
-      </button>
+    <div className={cn("relative mb-2.5 flex h-9 items-center gap-1.5", className)}>
+      {switchSlot ?? <SidebarWorkspaceSwitch {...switchProps} name={name} initial={initial} />}
       {onCollapse && (
         <button
           type="button"
           aria-label={collapseLabel}
           onClick={onCollapse}
-          className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm border border-overlay-ink-8 bg-bg-surface-70 text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
         >
           <CaretLeft aria-hidden className="size-4" />
         </button>
@@ -266,7 +277,7 @@ export type SidebarGroupProps = {
 /** A collapsible group: 28px label in secondary text with a 14px caret, 14px above. */
 export function SidebarGroup({ label, defaultOpen = true, children, className }: SidebarGroupProps) {
   return (
-    <Collapsible.Root defaultOpen={defaultOpen} className={cn("relative mt-4 flex flex-col gap-0.5", className)}>
+    <Collapsible.Root defaultOpen={defaultOpen} className={cn("relative mt-3.5 flex flex-col gap-0.5", className)}>
       <Collapsible.Trigger className="group flex h-7 w-fit cursor-pointer items-center gap-1 px-2.5 text-label-md text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand">
         {label}
         <CaretDown
@@ -470,7 +481,7 @@ export function SidebarAddButton({ icon = addIcon, className, children, ...props
     <button
       type="button"
       className={cn(
-        "relative mt-2.5 flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-[10px] text-label-md text-text-secondary motion-colors hover:bg-overlay-ink-4",
+        "relative mt-2 flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-[10px] text-label-md text-text-secondary motion-colors hover:bg-overlay-ink-4",
         "focus-visible:outline-2 focus-visible:outline-text-brand [&>[data-slot=icon]]:size-4",
         className,
       )}

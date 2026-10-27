@@ -3,6 +3,7 @@ import { ArrowClockwise, CaretDown, CheckCircle, Copy, WarningCircle } from "@ph
 import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
+import { Button } from "./button";
 import { Spinner } from "./spinner";
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
@@ -69,6 +70,9 @@ export type ToolCallProps = {
   result?: Json;
   error?: ReactNode;
   onRetry?: () => void;
+  /** The result is cut off; shows a "Show all" link under it. */
+  truncated?: boolean;
+  onShowAll?: () => void;
   defaultOpen?: boolean;
   className?: string;
 };
@@ -95,6 +99,8 @@ export function ToolCall({
   result,
   error,
   onRetry,
+  truncated,
+  onShowAll,
   defaultOpen,
   className,
 }: ToolCallProps) {
@@ -119,7 +125,7 @@ export function ToolCall({
         {elapsed && <span className="shrink-0 text-caption text-text-secondary">{elapsed}</span>}
         <CaretDown
           aria-hidden
-          className="size-4 shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-panel-open:rotate-180"
+          className="size-4 shrink-0 text-text-secondary motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out-quint group-data-panel-open:rotate-180"
         />
       </Collapsible.Trigger>
       <Collapsible.Panel className="motion-collapse">
@@ -150,7 +156,14 @@ export function ToolCall({
               {status === "running" || result === undefined ? (
                 <p className="text-body-sm text-text-secondary">Waiting for result…</p>
               ) : (
-                <JsonCode value={result} />
+                <div className="flex flex-col items-start gap-2">
+                  <JsonCode value={result} className="self-stretch" />
+                  {truncated && (
+                    <Button variant="link" onClick={onShowAll}>
+                      Show all
+                    </Button>
+                  )}
+                </div>
               )}
             </Section>
           )}

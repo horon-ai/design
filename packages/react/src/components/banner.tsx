@@ -36,7 +36,7 @@ export function Banner({ tone = "info", action, className, children, ...props }:
       </span>
       <p className="relative min-w-0 flex-1 text-body-md">{children}</p>
       {action && (
-        <span className="relative shrink-0 text-label-md whitespace-nowrap underline [&_a]:cursor-pointer [&_button]:cursor-pointer">
+        <span className="relative shrink-0 text-label-lg leading-5 whitespace-nowrap underline [&_a]:cursor-pointer [&_button]:cursor-pointer">
           {action}
         </span>
       )}

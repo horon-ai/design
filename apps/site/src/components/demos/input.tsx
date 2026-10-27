@@ -8,6 +8,7 @@ export default function InputDemo() {
     <Backdrop className="flex-col">
       <Input className="w-72" icon={<MagnifyingGlass />} placeholder="Search bots" />
       <Input className="w-72" surface="solid" icon={<MagnifyingGlass />} placeholder="Search bots" />
+      <Input className="w-72" surface="solid-on-page" icon={<MagnifyingGlass />} placeholder="Search bots" />
       <Input className="w-72" invalid defaultValue="Inbox Manager" />
       <Input className="w-72" disabled placeholder="Search bots" />
     </Backdrop>

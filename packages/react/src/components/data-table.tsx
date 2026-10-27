@@ -28,11 +28,24 @@ import { Input } from "./input";
 
 type WithClass<T> = Omit<T, "className"> & { className?: string };
 
-/** Figma `Data table` (192:9046): a solid surface card, 20px radius, 1px default border. */
-export function DataTable({ className, ...props }: WithClass<ComponentProps<"div">>) {
+export type DataTableDevice = "desktop" | "tablet" | "mobile";
+
+/**
+ * Figma `Data table`: a solid surface card, 20px radius, 1px default border.
+ * `device` sets the gutters: 24px on desktop and tablet, 18px on mobile (where the table scrolls sideways).
+ */
+export function DataTable({
+  device = "desktop",
+  className,
+  ...props
+}: WithClass<ComponentProps<"div">> & { device?: DataTableDevice }) {
   return (
     <div
-      className={cn("flex flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface", className)}
+      data-device={device}
+      className={cn(
+        "group/dt flex flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
+        className,
+      )}
       {...props}
     />
   );
@@ -49,7 +62,7 @@ export type DataTableHeaderProps = {
 
 export function DataTableHeader({ icon, title, actions, className }: DataTableHeaderProps) {
   return (
-    <div className={cn("flex items-center gap-3 px-6 py-4.5", className)}>
+    <div className={cn("flex items-center gap-3 px-6 py-4.5 group-data-[device=mobile]/dt:px-4.5", className)}>
       {icon && (
         <span className="flex size-6.5 shrink-0 items-center justify-center rounded-[7px] bg-bg-brand text-text-brand [&>svg]:size-4">
           {icon}
@@ -66,7 +79,10 @@ export function DataTableHeader({ icon, title, actions, className }: DataTableHe
 export function DataTableTable({ className, ...props }: WithClass<ComponentProps<"table">>) {
   return (
     <div className="w-full overflow-x-auto">
-      <table className={cn("w-full border-collapse text-left", className)} {...props} />
+      <table
+        className={cn("w-full border-collapse text-left group-data-[device=mobile]/dt:min-w-max", className)}
+        {...props}
+      />
     </div>
   );
 }
@@ -81,7 +97,7 @@ export function DataTableHead({
   return (
     <th
       className={cn(
-        "font-normal h-13 border-y border-border-default pr-3 align-middle first:pl-6 last:pr-6 [&_svg]:size-3.5",
+        "font-normal h-13 border-y border-border-default pr-3 align-middle first:pl-6 group-data-[device=mobile]/dt:first:pl-4.5 last:pr-6 group-data-[device=mobile]/dt:last:pr-4.5 [&_svg]:size-3.5",
         className,
       )}
       {...props}
@@ -103,7 +119,7 @@ export function DataTableCell({ className, ...props }: WithClass<ComponentProps<
   return (
     <td
       className={cn(
-        "h-13 pr-3 align-middle text-body-sm whitespace-nowrap text-text-secondary first:pl-6 last:pr-6 [&>label]:flex",
+        "h-13 pr-3 align-middle text-body-sm whitespace-nowrap text-text-secondary first:pl-6 group-data-[device=mobile]/dt:first:pl-4.5 last:pr-6 group-data-[device=mobile]/dt:last:pr-4.5 [&>label]:flex",
         className,
       )}
       {...props}
@@ -146,7 +162,7 @@ export type DataTableFooterProps = { onAdd?: () => void; addLabel?: string; hint
 /** Footer: "Add row" with a 16px plus and a caption hint on the right. */
 export function DataTableFooter({ onAdd, addLabel = "Add row", hint, className }: DataTableFooterProps) {
   return (
-    <div className={cn("flex items-center gap-2 px-6 pt-3.5 pb-4", className)}>
+    <div className={cn("flex items-center gap-2 px-6 pt-3.5 pb-4 group-data-[device=mobile]/dt:px-4.5", className)}>
       <button
         type="button"
         onClick={onAdd}
@@ -314,7 +330,11 @@ export function DataTableView<TData extends RowData>({
           </DataTableRow>
         ) : (
           rows.map((row) => (
-            <DataTableRow key={row.id} data-selected={row.getIsSelected() ? "" : undefined}>
+            <DataTableRow
+              key={row.id}
+              className="motion-colors hover:bg-overlay-ink-3"
+              data-selected={row.getIsSelected() ? "" : undefined}
+            >
               {row.getAllCells().map((cell) => (
                 <DataTableCell key={cell.id} className={cell.column.columnDef.meta?.cellClassName}>
                   <table.FlexRender cell={cell} />
@@ -365,7 +385,12 @@ export function DataTablePagination<TData extends RowData>({ table, className }:
   const pageCount = Math.max(table.getPageCount(), 1);
 
   return (
-    <div className={cn("flex items-center justify-between gap-4 px-6 py-3", className)}>
+    <div
+      className={cn(
+        "flex items-center justify-between gap-4 px-6 py-3 group-data-[device=mobile]/dt:px-4.5",
+        className,
+      )}
+    >
       <p className="text-caption text-text-secondary tabular-nums">
         {selected > 0 ? `${selected} of ${total} selected` : `${total} ${total === 1 ? "row" : "rows"}`}
       </p>

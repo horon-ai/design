@@ -32,19 +32,24 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
   return (
     <div
       className={cn(
-        "flex flex-col gap-1.5 rounded-[16px] bg-bg-subtle px-3.5 py-3",
+        "motion-colors flex flex-col gap-1.5 rounded-[16px] bg-bg-subtle px-3.5 py-3",
         status === "failed" && "border border-border-danger",
         className,
       )}
     >
       <div className="flex items-center gap-2 text-caption text-text-secondary">
+        {/* live-pulse draws its ring in currentColor, so the running wrapper carries the tile's sky tone. */}
         <span
-          className={cn(
-            "flex size-4.5 shrink-0 items-center justify-center rounded-[5px] text-label-sm text-text-inverse",
-            botTile[status],
-          )}
+          className={cn("shrink-0 rounded-[5px]", status === "running" && "animate-live-pulse text-sky-400")}
         >
-          {bot.initial}
+          <span
+            className={cn(
+              "motion-colors flex size-4.5 items-center justify-center rounded-[5px] text-label-sm text-text-inverse",
+              botTile[status],
+            )}
+          >
+            {bot.initial}
+          </span>
         </span>
         <span className="min-w-0 flex-1 truncate">{bot.name}</span>
         {status === "running" && <Spinner size={12} />}

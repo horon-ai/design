@@ -24,6 +24,26 @@ export default function InputGroupDemo() {
           </>
         }
       />
+      <InputGroup
+        className="w-80"
+        invalid
+        defaultValue="12"
+        suffix={
+          <>
+            KRW <CaretDown />
+          </>
+        }
+      />
+      <InputGroup
+        className="w-80"
+        disabled
+        placeholder="Phone number"
+        prefix={
+          <>
+            +82 <CaretDown />
+          </>
+        }
+      />
     </Backdrop>
   );
 }

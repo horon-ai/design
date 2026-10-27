@@ -37,7 +37,7 @@ export function PickerField({
         className={cn(
           "relative flex h-10 w-40 cursor-pointer items-center gap-2 rounded-md px-3 text-left motion-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
           surface === "glass"
-            ? "group overflow-clip border border-glass-rim-strong bg-glass-regular"
+            ? "group overflow-clip bg-glass-regular"
             : "group bg-overlay-ink-4",
           className,
         )}
@@ -52,7 +52,7 @@ export function PickerField({
       </BaseSelect.Trigger>
       <BaseSelect.Portal>
         <BaseSelect.Positioner sideOffset={8} alignItemWithTrigger={false} className="z-50 outline-none">
-          <BaseSelect.Popup className="relative max-h-72 min-w-(--anchor-width) motion-popup overflow-y-auto rounded-xl border border-glass-rim-strong bg-glass-thick p-1.5 outline-none">
+          <BaseSelect.Popup className="relative max-h-72 min-w-(--anchor-width) motion-popup overflow-y-auto rounded-xl bg-glass-thick p-1.5 outline-none">
             <LiquidGlass tier="thick" />
             <BaseSelect.List className="relative flex flex-col gap-0.5">
               {items.map((item) => (
@@ -123,7 +123,7 @@ export function ScheduleCard({ title, nextRun, children, className }: ScheduleCa
   return (
     <section
       className={cn(
-        "relative flex w-95 flex-col items-stretch gap-3.5 overflow-clip rounded-xl border border-glass-rim-strong bg-glass-thick p-4.5",
+        "relative flex w-95 flex-col items-stretch gap-3.5 overflow-clip rounded-xl bg-glass-thick p-4.5",
         className,
       )}
     >

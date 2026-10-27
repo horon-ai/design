@@ -6,6 +6,7 @@ export default function ToolCallDemo() {
     <div className="flex w-full max-w-160 flex-col gap-3">
       <ToolCall
         defaultOpen
+        truncated
         status="done"
         tool={{ icon: <MagnifyingGlass />, name: "Web search" }}
         summary="Searched the web for 'CRM pricing 2026'"
