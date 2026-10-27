@@ -15,8 +15,9 @@ import { watchHost } from "../lib/glass/observe";
 import { areaAllowed, engineRefracts, readEnv } from "../lib/glass/support";
 
 export type LiquidGlassProps = {
-  /** `thick` hosts drop the dark edge, as the Figma thick-glass components do. */
   tier?: "clear" | "regular" | "thick";
+  /** Paper's Texture layer, drawn behind the glass layers (Chip only). */
+  texture?: boolean;
   /**
    * Bends the host's backdrop at its edges through the in-house engine. Off, or
    * on an engine that cannot filter a backdrop, keeps the CSS-only glass.
@@ -43,7 +44,7 @@ function isOpaque(host: HTMLElement): boolean {
 }
 
 /**
- * The Figma `Liquid layers` group: tint, inner shade and three edges, each at
+ * The Paper `Liquid layers` group: tint, inner shade and a soft light edge, each at
  * half strength, scaled to the host height. Render it as the first child of a
  * `relative` host with a border radius; the host keeps its own fill and rim.
  *
@@ -76,7 +77,7 @@ function isOpaque(host: HTMLElement): boolean {
  * all, the host also keeps the CSS look. `sheen`, a gradient rim, is rendered
  * for every host and hidden by CSS whenever refraction is on.
  */
-export function LiquidGlass({ tier = "clear", refract = true }: LiquidGlassProps) {
+export function LiquidGlass({ tier = "clear", refract = true, texture = false }: LiquidGlassProps) {
   const group = useRef<HTMLSpanElement>(null);
   const [filterId, setFilterId] = useState<string | null>(null);
 
@@ -133,10 +134,9 @@ export function LiquidGlass({ tier = "clear", refract = true }: LiquidGlassProps
       style={refractStyle}
     >
       {filterId && <span data-layer="refraction" />}
+      {texture && <span data-layer="texture" />}
       <span data-layer="tint" />
       <span data-layer="inner-shade" />
-      <span data-layer="edge-dark" />
-      <span data-layer="edge-light" />
       <span data-layer="edge-light-soft" />
       <span data-layer="sheen" />
     </span>
