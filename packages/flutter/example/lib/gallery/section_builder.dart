@@ -10,6 +10,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'registry.dart';
+import 'sections/avatar.dart';
 import 'sections/banner.dart';
 import 'sections/button.dart';
 import 'sections/checkbox.dart';
@@ -24,6 +25,7 @@ import 'sections/kbd.dart';
 import 'sections/liquid_glass.dart';
 import 'sections/progress.dart';
 import 'sections/radio_group.dart';
+import 'sections/skeleton.dart';
 import 'sections/slider.dart';
 import 'sections/spinner.dart';
 import 'sections/split_button.dart';
@@ -38,6 +40,7 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
 
 /// 슬러그별 섹션 생성자입니다.
 const Map<String, Widget Function()> _builders = <String, Widget Function()>{
+  'avatar': HoronAvatarGallerySection.new,
   'banner': HoronBannerGallerySection.new,
   'button': HoronButtonGallerySection.new,
   'checkbox': HoronCheckboxGallerySection.new,
@@ -52,6 +55,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'liquid_glass': HoronLiquidGlassGallerySection.new,
   'progress': HoronProgressGallerySection.new,
   'radio_group': HoronRadioGroupGallerySection.new,
+  'skeleton': HoronSkeletonGallerySection.new,
   'slider': HoronSliderGallerySection.new,
   'spinner': HoronSpinnerGallerySection.new,
   'split_button': HoronSplitButtonGallerySection.new,

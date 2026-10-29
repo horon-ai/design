@@ -4,6 +4,7 @@
 /// 디렉터리 목록에서 만듭니다.
 library;
 
+export 'src/components/avatar.dart';
 export 'src/components/banner.dart';
 export 'src/components/button.dart';
 export 'src/components/checkbox.dart';
@@ -18,6 +19,7 @@ export 'src/components/kbd.dart';
 export 'src/components/liquid_glass.dart';
 export 'src/components/progress.dart';
 export 'src/components/radio_group.dart';
+export 'src/components/skeleton.dart';
 export 'src/components/slider.dart';
 export 'src/components/spinner.dart';
 export 'src/components/split_button.dart';
