@@ -6,8 +6,8 @@ import { cn } from "../lib/cn";
 import { useActiveIndicator } from "../lib/use-active-indicator";
 import { LiquidGlass } from "./liquid-glass";
 
-export type SegmentedControlSize = "sm" | "md" | "lg";
-export type SegmentedControlSurface = "glass" | "inset" | "inset-faint";
+export type SegmentedControlSize = "sm" | "md" | "lg" | "tab";
+export type SegmentedControlSurface = "glass" | "inset" | "inset-faint" | "subtle";
 
 export type SegmentedControlProps = {
   items: { value: string; label: ReactNode; disabled?: boolean }[];
@@ -18,11 +18,13 @@ export type SegmentedControlProps = {
    * `md`: Segmented control (62:379), 36px track, 30px segments, 16px padding.
    * `sm`: Frequency (110:765), 30px segments with 12px padding.
    * `lg`: Segmented filter (88:723), 44px track, 36px segments.
+   * `tab`: Paper page tabs (Projects Active/Archived), 4px track padding and gap, 32px segments with 14px padding.
    */
   size?: SegmentedControlSize;
   /**
    * `glass` is regular glass. `inset` is the 5% ink track inside the routine card,
-   * `inset-faint` the 4% ink track inside the header filter.
+   * `inset-faint` the 4% ink track inside the header filter. `subtle` is the bg-subtle page-tab tray whose
+   * selection is a plain white pill.
    */
   surface?: SegmentedControlSurface;
   /** Segments share the width equally instead of hugging their labels. */
@@ -35,18 +37,21 @@ const trackClass: Record<SegmentedControlSize, string> = {
   sm: "p-[3px]",
   md: "h-9 p-[3px]",
   lg: "h-11 px-1",
+  tab: "gap-1 p-1",
 };
 
 const segmentClass: Record<SegmentedControlSize, string> = {
   sm: "h-7.5 px-3",
   md: "h-7.5 px-4",
   lg: "h-9 px-4",
+  tab: "h-8 px-3.5",
 };
 
 const surfaceClass: Record<SegmentedControlSurface, string> = {
   glass: "overflow-clip bg-glass-regular",
   inset: "bg-overlay-ink-5",
   "inset-faint": "bg-overlay-ink-4",
+  subtle: "bg-bg-subtle",
 };
 
 /**
@@ -93,7 +98,9 @@ export function SegmentedControl({
           "pointer-events-none absolute overflow-clip rounded-full",
           surface === "glass" && size !== "lg"
             ? "border border-glass-rim-strong bg-glass-thick shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:bg-overlay-ink-10"
-            : "bg-overlay-ink-10",
+            : surface === "subtle"
+              ? "bg-bg-default"
+              : "bg-overlay-ink-10",
           animate && "motion-indicator",
         )}
         style={rect ? { ...rect, opacity: 1 } : { opacity: 0 }}

@@ -13,6 +13,8 @@ export type SelectProps = Omit<ComponentProps<typeof BaseSelect.Root>, "items" |
   placeholder?: ReactNode;
   surface?: InputSurface;
   invalid?: boolean;
+  /** `chip` is the Paper filter chip: a 32px bg-subtle pill, 12px padding, 13/18 medium, sized to its label. */
+  variant?: "field" | "chip";
   className?: string;
   "aria-label"?: string;
 };
@@ -27,6 +29,7 @@ export function Select({
   placeholder = "Select",
   surface = "glass",
   invalid,
+  variant = "field",
   className,
   "aria-label": ariaLabel,
   ...props
@@ -38,19 +41,24 @@ export function Select({
         aria-invalid={invalid || undefined}
         data-invalid={invalid ? "" : undefined}
         className={cn(
-          fieldBoxClass.base,
-          fieldBoxClass[surface],
-          "group h-10 w-60 cursor-pointer text-left motion-colors data-disabled:cursor-not-allowed",
+          variant === "chip"
+            ? "relative inline-flex h-8 items-center gap-1 rounded-full bg-bg-subtle px-3"
+            : `${fieldBoxClass.base} ${fieldBoxClass[surface]} h-10 w-60`,
+          "group cursor-pointer text-left motion-colors data-disabled:cursor-not-allowed",
           "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
           className,
         )}
       >
-        {surface === "glass" && <LiquidGlass tier="regular" />}
+        {variant === "field" && surface === "glass" && <LiquidGlass tier="regular" />}
         <BaseSelect.Value
           placeholder={placeholder}
           className={cn(
             "relative min-w-0 flex-1 truncate text-text-primary group-data-disabled:text-text-disabled data-placeholder:text-text-placeholder",
-            surface === "glass" ? "text-body-md" : "text-body-lg",
+            variant === "chip"
+              ? "text-[13px]/[18px] font-medium"
+              : surface === "glass"
+                ? "text-body-md"
+                : "text-body-lg",
           )}
         />
         <BaseSelect.Icon className="relative flex shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-popup-open:rotate-180 [&_svg]:size-4">
