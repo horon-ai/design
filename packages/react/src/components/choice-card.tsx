@@ -4,11 +4,13 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
-export type ChoiceCardProps = Omit<ComponentProps<typeof BaseRadio.Root>, "className" | "children"> & {
+export type ChoiceCardProps = Omit<ComponentProps<typeof BaseRadio.Root>, "className" | "children" | "title"> & {
   title: ReactNode;
   description?: ReactNode;
   /** Pill at the end of the title line, e.g. "Recommended": 22px, 8px padding, 18% sky with brand text (Paper Mobile connection). */
   badge?: ReactNode;
+  /** `brand` (default) is 18% sky with brand text; `neutral` is 6% ink with secondary text. */
+  badgeTone?: "brand" | "neutral";
   className?: string;
 };
 
@@ -16,7 +18,7 @@ export type ChoiceCardProps = Omit<ComponentProps<typeof BaseRadio.Root>, "class
  * Paper `Choice card` (1VXM-0 selected, 1VXR-0 default): a 252px glass card, padding 14, radius 16, gap 12.
  * Use inside `RadioGroup`. The 18px radio is a ring: 1.5px grey when off, a 5px ink ring around an 8px core when on.
  */
-export function ChoiceCard({ title, description, badge, className, ...props }: ChoiceCardProps) {
+export function ChoiceCard({ title, description, badge, badgeTone = "brand", className, ...props }: ChoiceCardProps) {
   return (
     <BaseRadio.Root
       className={cn(
@@ -44,7 +46,12 @@ export function ChoiceCard({ title, description, badge, className, ...props }: C
         <span className="flex items-center gap-2.5">
           <span className="text-sm/5 min-w-0 flex-1 font-semibold text-text-primary">{title}</span>
           {badge && (
-            <span className="text-xs/4 inline-flex h-[22px] shrink-0 items-center rounded-full bg-accent-sky-500-18 px-2 font-medium text-text-brand">
+            <span
+              className={cn(
+                "text-xs/4 inline-flex h-[22px] shrink-0 items-center rounded-full px-2 font-medium",
+                badgeTone === "brand" ? "bg-accent-sky-500-18 text-text-brand" : "bg-overlay-ink-6 text-text-secondary",
+              )}
+            >
               {badge}
             </span>
           )}
