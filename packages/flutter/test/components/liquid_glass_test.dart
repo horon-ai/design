@@ -2,10 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/glass/glass_geometry.dart';
-import 'package:horon_ui/src/glass/glass_shader.dart';
-import 'package:horon_ui/src/glass/horon_glass.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// `HoronLiquidGlass`의 레이어 스택과 강등 경로를 검사합니다.
 ///

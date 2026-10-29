@@ -2,9 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/glass/flue_background.dart';
-import 'package:horon_ui/src/glass/glass_shader.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// Flue 배경의 팔레트, 감쇠, 그리고 위젯의 강등·정지 규칙을 검사합니다.
 ///

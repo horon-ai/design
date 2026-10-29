@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/choice_card.dart';
 
 /// `choice_card` 갤러리 섹션입니다.
 ///

@@ -10,7 +10,19 @@
 import 'package:flutter/widgets.dart';
 
 import 'registry.dart';
+import 'sections/button.dart';
+import 'sections/checkbox.dart';
+import 'sections/chip.dart';
+import 'sections/choice_card.dart';
+import 'sections/composer.dart';
+import 'sections/file_drop.dart';
+import 'sections/icon_button.dart';
 import 'sections/liquid_glass.dart';
+import 'sections/radio_group.dart';
+import 'sections/slider.dart';
+import 'sections/split_button.dart';
+import 'sections/switch.dart';
+import 'sections/tool_permissions.dart';
 
 /// 섹션 위젯을 슬러그로 찾습니다.
 ///
@@ -20,7 +32,19 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
 
 /// 슬러그별 섹션 생성자입니다.
 const Map<String, Widget Function()> _builders = <String, Widget Function()>{
+  'button': HoronButtonGallerySection.new,
+  'checkbox': HoronCheckboxGallerySection.new,
+  'chip': HoronChipGallerySection.new,
+  'choice_card': HoronChoiceCardGallerySection.new,
+  'composer': HoronComposerGallerySection.new,
+  'file_drop': HoronFileDropGallerySection.new,
+  'icon_button': HoronIconButtonGallerySection.new,
   'liquid_glass': HoronLiquidGlassGallerySection.new,
+  'radio_group': HoronRadioGroupGallerySection.new,
+  'slider': HoronSliderGallerySection.new,
+  'split_button': HoronSplitButtonGallerySection.new,
+  'switch': HoronSwitchGallerySection.new,
+  'tool_permissions': HoronToolPermissionsGallerySection.new,
 };
 
 /// 이 표가 알고 있는 슬러그입니다.

@@ -18,5 +18,21 @@ class GallerySection {
 /// component files under `lib/src/components/`. Each component todo adds its
 /// own line here and its own `sections/<slug>.dart`.
 const List<GallerySection> gallerySections = <GallerySection>[
+  GallerySection(slug: 'button', title: 'Button', group: 'inputs'),
+  GallerySection(slug: 'icon_button', title: 'Icon Button', group: 'inputs'),
+  GallerySection(slug: 'checkbox', title: 'Checkbox', group: 'inputs'),
+  GallerySection(slug: 'radio_group', title: 'Radio Group', group: 'inputs'),
+  GallerySection(slug: 'switch', title: 'Switch', group: 'inputs'),
+  GallerySection(slug: 'slider', title: 'Slider', group: 'inputs'),
+  GallerySection(slug: 'chip', title: 'Chip', group: 'inputs'),
+  GallerySection(slug: 'composer', title: 'Composer', group: 'inputs'),
+  GallerySection(slug: 'split_button', title: 'Split Button', group: 'inputs'),
+  GallerySection(
+    slug: 'tool_permissions',
+    title: 'Tool Permissions',
+    group: 'inputs',
+  ),
+  GallerySection(slug: 'file_drop', title: 'File Drop', group: 'inputs'),
+  GallerySection(slug: 'choice_card', title: 'Choice Card', group: 'inputs'),
   GallerySection(slug: 'liquid_glass', title: 'Liquid Glass', group: 'display'),
 ];

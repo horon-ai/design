@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/theme/horon_fonts.dart';
-import 'package:horon_ui/src/tokens/horon_tokens.g.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 생성된 토큰이 `packages/tokens/src`의 값을 그대로 드러내는지 확인합니다.
 ///

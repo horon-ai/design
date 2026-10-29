@@ -1,8 +1,7 @@
 import 'dart:ui' show Brightness, Color, Rect, Size;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/glass/glass_geometry.dart';
-import 'package:horon_ui/src/tokens/horon_tokens.g.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 리퀴드 글래스의 순수 계산을 검사합니다.
 ///

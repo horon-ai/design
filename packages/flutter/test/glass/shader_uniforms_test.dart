@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/painting.dart' show Size;
 import 'package:flutter/services.dart' show ByteData, rootBundle;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/glass/glass_shader.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 셰이더 자산과 유니폼 계약을 검사합니다.
 ///
