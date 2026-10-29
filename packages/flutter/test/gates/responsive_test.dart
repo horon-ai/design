@@ -13,11 +13,18 @@ import 'gate_sources.dart';
 /// call whose own argument list (not a nested call's) contains
 /// `scrollDirection: Axis.horizontal`. It reports file and line.
 ///
-/// Exactly one file is exempt: `lib/src/components/data_table.dart`. A data
-/// table's body legitimately scrolls horizontally inside its card (React uses
-/// `overflow-x-auto` plus `min-w-max` on the table), and the data-table lane's
-/// contract allows it there. Every other component still fails.
-const Set<String> horizontalScrollExemptSlugs = <String>{'data_table'};
+/// Exactly two files are exempt, both because their content has to keep its
+/// columns rather than reflow:
+///
+///  * `lib/src/components/data_table.dart` - a data table's body scrolls
+///    horizontally inside its card (React uses `overflow-x-auto` plus
+///    `min-w-max` on the table).
+///  * `lib/src/components/code_panel.dart` - a code block's lines are laid out
+///    at a fixed pitch, so wrapping them would destroy the alignment; React
+///    scrolls the `pre` instead.
+///
+/// Every other component still fails.
+const Set<String> horizontalScrollExemptSlugs = <String>{'data_table', 'code_panel'};
 
 void main() {
   test('responsive: no component scrolls a control horizontally', () {
@@ -57,8 +64,8 @@ final nested = SingleChildScrollView(
     expect(horizontalScrollViewLines(source), <int>[9]);
   });
 
-  test('responsive: only the data table is exempt', () {
-    expect(horizontalScrollExemptSlugs, <String>{'data_table'});
+  test('responsive: only the data table and the code panel are exempt', () {
+    expect(horizontalScrollExemptSlugs, <String>{'data_table', 'code_panel'});
   });
 
   test('responsive: the scan covers every file the component directory lists', () {

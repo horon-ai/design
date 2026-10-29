@@ -10,10 +10,12 @@
 import 'package:flutter/widgets.dart';
 
 import 'registry.dart';
+import 'sections/banner.dart';
 import 'sections/button.dart';
 import 'sections/checkbox.dart';
 import 'sections/chip.dart';
 import 'sections/choice_card.dart';
+import 'sections/code_panel.dart';
 import 'sections/composer.dart';
 import 'sections/empty_state.dart';
 import 'sections/file_drop.dart';
@@ -36,10 +38,12 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
 
 /// 슬러그별 섹션 생성자입니다.
 const Map<String, Widget Function()> _builders = <String, Widget Function()>{
+  'banner': HoronBannerGallerySection.new,
   'button': HoronButtonGallerySection.new,
   'checkbox': HoronCheckboxGallerySection.new,
   'chip': HoronChipGallerySection.new,
   'choice_card': HoronChoiceCardGallerySection.new,
+  'code_panel': HoronCodePanelGallerySection.new,
   'composer': HoronComposerGallerySection.new,
   'empty_state': HoronEmptyStateGallerySection.new,
   'file_drop': HoronFileDropGallerySection.new,
