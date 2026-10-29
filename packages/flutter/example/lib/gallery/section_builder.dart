@@ -18,6 +18,7 @@ import 'sections/chip.dart';
 import 'sections/choice_card.dart';
 import 'sections/code_panel.dart';
 import 'sections/composer.dart';
+import 'sections/directory_card.dart';
 import 'sections/empty_state.dart';
 import 'sections/file_drop.dart';
 import 'sections/icon_button.dart';
@@ -31,6 +32,7 @@ import 'sections/spinner.dart';
 import 'sections/split_button.dart';
 import 'sections/switch.dart';
 import 'sections/tool_permissions.dart';
+import 'sections/usage_meter.dart';
 
 /// 섹션 위젯을 슬러그로 찾습니다.
 ///
@@ -48,6 +50,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'choice_card': HoronChoiceCardGallerySection.new,
   'code_panel': HoronCodePanelGallerySection.new,
   'composer': HoronComposerGallerySection.new,
+  'directory_card': HoronDirectoryCardGallerySection.new,
   'empty_state': HoronEmptyStateGallerySection.new,
   'file_drop': HoronFileDropGallerySection.new,
   'icon_button': HoronIconButtonGallerySection.new,
@@ -61,6 +64,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'split_button': HoronSplitButtonGallerySection.new,
   'switch': HoronSwitchGallerySection.new,
   'tool_permissions': HoronToolPermissionsGallerySection.new,
+  'usage_meter': HoronUsageMeterGallerySection.new,
 };
 
 /// 이 표가 알고 있는 슬러그입니다.

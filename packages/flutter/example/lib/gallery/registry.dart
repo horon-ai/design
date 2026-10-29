@@ -38,9 +38,15 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(slug: 'banner', title: 'Banner', group: 'display'),
   GallerySection(slug: 'kbd', title: 'Kbd', group: 'display'),
   GallerySection(slug: 'progress', title: 'Progress', group: 'display'),
+  GallerySection(slug: 'usage_meter', title: 'Usage Meter', group: 'display'),
   GallerySection(slug: 'spinner', title: 'Spinner', group: 'display'),
   GallerySection(slug: 'skeleton', title: 'Skeleton', group: 'display'),
   GallerySection(slug: 'empty_state', title: 'Empty State', group: 'display'),
   GallerySection(slug: 'liquid_glass', title: 'Liquid Glass', group: 'display'),
+  GallerySection(
+    slug: 'directory_card',
+    title: 'Directory Card',
+    group: 'display',
+  ),
   GallerySection(slug: 'code_panel', title: 'Code Panel', group: 'display'),
 ];
