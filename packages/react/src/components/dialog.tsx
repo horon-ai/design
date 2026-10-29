@@ -14,6 +14,8 @@ export type DialogContentProps = Omit<ComponentProps<typeof BaseDialog.Popup>, "
   description?: ReactNode;
   /** Label for the close button; hides it when `null`. */
   closeLabel?: string | null;
+  /** Slot marker on the close control, for a surface its own app selects the control by. */
+  closeSlot?: string;
   className?: string;
 };
 
@@ -25,6 +27,7 @@ export function DialogContent({
   title,
   description,
   closeLabel = "Close",
+  closeSlot,
   className,
   children,
   ...props
@@ -49,6 +52,7 @@ export function DialogContent({
             {closeLabel !== null && (
               <BaseDialog.Close
                 aria-label={closeLabel}
+                data-slot={closeSlot}
                 className="flex shrink-0 motion-press cursor-pointer text-text-secondary [&_svg]:size-5"
               >
                 <X />
