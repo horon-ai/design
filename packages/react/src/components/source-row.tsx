@@ -74,8 +74,8 @@ export function SourceRow({
         </span>
       </span>
       <span aria-hidden className="flex shrink-0 items-center gap-1">
-        {stageNames.map((stageName, i) => {
-          const state = stages[i];
+        {stages.map((state, i) => {
+          const stageName = stageNames[i];
           return state === "active" ? (
             <span key={stageName} className={stage("todo")}>
               <span
