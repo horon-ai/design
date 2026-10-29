@@ -52,7 +52,7 @@ export function ToolPermissions({
   };
   return (
     <div className={cn("flex w-full max-w-130.25 flex-col", className)} {...props}>
-      <div className="flex items-center gap-2 rounded-lg bg-neutral-50 px-3 py-2 dark:bg-neutral-800">
+      <div className="flex items-center gap-2 rounded-sm bg-neutral-50 px-3 py-2 dark:bg-neutral-800">
         <span className="text-[13px]/[18px] font-semibold text-text-primary">{title}</span>
         <span className="inline-flex h-5.5 items-center rounded-full bg-overlay-ink-6 px-2 text-[12px]/[16px] font-medium text-text-secondary">
           {tools.length}
@@ -69,14 +69,12 @@ export function ToolPermissions({
       {tools.map((tool, index) => (
         <div
           key={tool.name}
-          className="motion-rise flex items-center gap-3 border-b border-border-default py-[11px] pr-1 pl-3 last:border-b-0"
+          className="flex motion-rise items-center gap-3 border-b border-border-default py-[11px] pr-1 pl-3 last:border-b-0"
           style={{ animationDelay: `${index * 30}ms` }}
         >
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <span className="truncate font-mono text-[13px]/[18px] font-medium text-text-primary">{tool.name}</span>
-            {tool.description && (
-              <span className="text-[12px]/[16px] text-text-placeholder">{tool.description}</span>
-            )}
+            {tool.description && <span className="text-[12px]/[16px] text-text-placeholder">{tool.description}</span>}
           </div>
           <SegmentedControl
             aria-label={`${tool.name} permission`}

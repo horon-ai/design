@@ -19,14 +19,7 @@ export type PanelPillTabsProps = {
  * The 5% ink pill track shared by the Bot panels (Paper `YNQ-1`): 3px padding, 2px gap, 28px options with
  * 12px inset and a 10% ink selection that slides between options in 280ms.
  */
-export function PanelPillTabs({
-  items,
-  value,
-  defaultValue,
-  onValueChange,
-  className,
-  ...props
-}: PanelPillTabsProps) {
+export function PanelPillTabs({ items, value, defaultValue, onValueChange, className, ...props }: PanelPillTabsProps) {
   const [inner, setInner] = useState(defaultValue ?? items[0]?.value ?? "");
   const selected = value ?? inner;
   const track = useRef<HTMLDivElement>(null);
@@ -128,8 +121,16 @@ function partKey(part: InstructionPart) {
   return typeof part === "string" ? part : part.variable;
 }
 
-function VariableChip({ tone = "sky", className, children }: { tone?: InstructionVariableTone; className?: string; children: ReactNode }) {
-  return <span className={cn("rounded-md px-1.5 py-px", variableToneClass[tone], className)}>{children}</span>;
+function VariableChip({
+  tone = "sky",
+  className,
+  children,
+}: {
+  tone?: InstructionVariableTone;
+  className?: string;
+  children: ReactNode;
+}) {
+  return <span className={cn("rounded-xs px-1.5 py-px", variableToneClass[tone], className)}>{children}</span>;
 }
 
 function Divider() {
@@ -173,7 +174,7 @@ export function BotInstructionsPanel({
         {version ? (
           <button
             type="button"
-            className="flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-5 px-2.5 text-label-sm text-text-primary motion-press hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex h-7 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-5 px-2.5 text-label-sm text-text-primary hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             {version}
             {versionStatus ? (
@@ -188,7 +189,7 @@ export function BotInstructionsPanel({
         <span className="min-w-0 flex-1" />
         <button
           type="button"
-          className="flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-5 pr-2.5 pl-1.5 text-label-sm text-text-primary motion-press hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="flex h-7 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-5 pr-2.5 pl-1.5 text-label-sm text-text-primary hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
         >
           <span className="flex size-4.5 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
             {bot.initial}
@@ -210,14 +211,23 @@ export function BotInstructionsPanel({
             ]}
           />
           <span className="min-w-0 flex-1" />
-          {tokenCount === undefined ? null : <span className="text-caption text-text-secondary">{tokenCount} tokens</span>}
+          {tokenCount === undefined ? null : (
+            <span className="text-caption text-text-secondary">{tokenCount} tokens</span>
+          )}
         </div>
-        <div key={tab} className="motion-rise group flex flex-col gap-1 rounded-lg outline-none focus-visible:outline-2 focus-visible:outline-text-brand" tabIndex={0}>
+        <div
+          key={tab}
+          className="group flex motion-rise flex-col gap-1 rounded-lg outline-none focus-visible:outline-2 focus-visible:outline-text-brand"
+          tabIndex={0}
+        >
           {tab === "example" && example !== undefined ? (
             <div className="text-body-sm text-text-primary">{example}</div>
           ) : (
             instructions.map((line, index) => (
-              <p key={line.map(partKey).join("|")} className="flex flex-wrap items-center gap-1 text-body-sm text-text-primary">
+              <p
+                key={line.map(partKey).join("|")}
+                className="flex flex-wrap items-center gap-1 text-body-sm text-text-primary"
+              >
                 {line.map((part) =>
                   typeof part === "string" ? (
                     <span key={part}>{part}</span>
@@ -228,7 +238,10 @@ export function BotInstructionsPanel({
                   ),
                 )}
                 {index === instructions.length - 1 ? (
-                  <span aria-hidden className="hidden h-4 w-px animate-caret bg-text-primary group-focus-within:inline-block" />
+                  <span
+                    aria-hidden
+                    className="hidden h-4 w-px animate-caret bg-text-primary group-focus-within:inline-block"
+                  />
                 ) : null}
               </p>
             ))
@@ -249,7 +262,10 @@ export function BotInstructionsPanel({
                 {variables.map((variable) => (
                   <div key={variable.name} className="flex min-w-35 flex-1 flex-col gap-1.5">
                     <div className="flex items-center gap-1.5 text-caption text-text-secondary">
-                      <span aria-hidden className={cn("size-1.5 rounded-full", variableDotClass[variable.tone ?? "sky"])} />
+                      <span
+                        aria-hidden
+                        className={cn("size-1.5 rounded-full", variableDotClass[variable.tone ?? "sky"])}
+                      />
                       {variable.name}
                     </div>
                     <div className="flex h-9.5 items-center rounded-xl bg-overlay-ink-5 px-3 text-body-sm text-text-primary">
@@ -275,18 +291,26 @@ export function BotInstructionsPanel({
                   setRunning(true);
                   onRun?.(scenario);
                 }}
-                className="flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-full bg-interactive-primary pr-3.5 pl-3 text-label-sm text-text-inverse motion-press hover:bg-interactive-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+                className="flex h-8 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full bg-interactive-primary pr-3.5 pl-3 text-label-sm text-text-inverse hover:bg-interactive-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
               >
                 <Play aria-hidden className="size-3.5" />
                 Run
-                <kbd className="rounded-md bg-overlay-ink-6 px-1.5 py-px font-sans text-caption text-text-secondary">⌘↵</kbd>
+                <kbd className="rounded-md bg-overlay-ink-6 px-1.5 py-px font-sans text-caption text-text-secondary">
+                  ⌘↵
+                </kbd>
               </button>
             </div>
           </div>
         </>
       ) : null}
       {output === undefined ? null : (
-        <div key={running ? "ran" : "idle"} className={cn("bg-overlay-ink-3 pt-3.5 pr-4.5 pb-4 pl-4.5 text-body-sm text-text-secondary", running && "motion-rise")}>
+        <div
+          key={running ? "ran" : "idle"}
+          className={cn(
+            "bg-overlay-ink-3 pt-3.5 pr-4.5 pb-4 pl-4.5 text-body-sm text-text-secondary",
+            running && "motion-rise",
+          )}
+        >
           {output}
         </div>
       )}
