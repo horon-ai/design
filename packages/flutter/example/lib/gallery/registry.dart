@@ -34,5 +34,9 @@ const List<GallerySection> gallerySections = <GallerySection>[
   ),
   GallerySection(slug: 'file_drop', title: 'File Drop', group: 'inputs'),
   GallerySection(slug: 'choice_card', title: 'Choice Card', group: 'inputs'),
+  GallerySection(slug: 'kbd', title: 'Kbd', group: 'display'),
+  GallerySection(slug: 'progress', title: 'Progress', group: 'display'),
+  GallerySection(slug: 'spinner', title: 'Spinner', group: 'display'),
+  GallerySection(slug: 'empty_state', title: 'Empty State', group: 'display'),
   GallerySection(slug: 'liquid_glass', title: 'Liquid Glass', group: 'display'),
 ];

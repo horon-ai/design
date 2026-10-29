@@ -15,11 +15,15 @@ import 'sections/checkbox.dart';
 import 'sections/chip.dart';
 import 'sections/choice_card.dart';
 import 'sections/composer.dart';
+import 'sections/empty_state.dart';
 import 'sections/file_drop.dart';
 import 'sections/icon_button.dart';
+import 'sections/kbd.dart';
 import 'sections/liquid_glass.dart';
+import 'sections/progress.dart';
 import 'sections/radio_group.dart';
 import 'sections/slider.dart';
+import 'sections/spinner.dart';
 import 'sections/split_button.dart';
 import 'sections/switch.dart';
 import 'sections/tool_permissions.dart';
@@ -37,11 +41,15 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'chip': HoronChipGallerySection.new,
   'choice_card': HoronChoiceCardGallerySection.new,
   'composer': HoronComposerGallerySection.new,
+  'empty_state': HoronEmptyStateGallerySection.new,
   'file_drop': HoronFileDropGallerySection.new,
   'icon_button': HoronIconButtonGallerySection.new,
+  'kbd': HoronKbdGallerySection.new,
   'liquid_glass': HoronLiquidGlassGallerySection.new,
+  'progress': HoronProgressGallerySection.new,
   'radio_group': HoronRadioGroupGallerySection.new,
   'slider': HoronSliderGallerySection.new,
+  'spinner': HoronSpinnerGallerySection.new,
   'split_button': HoronSplitButtonGallerySection.new,
   'switch': HoronSwitchGallerySection.new,
   'tool_permissions': HoronToolPermissionsGallerySection.new,
