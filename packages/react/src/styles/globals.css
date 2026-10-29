@@ -379,3 +379,12 @@
     }
   }
 }
+
+/* Paper sidebar ground: #EEF3F8 under the Horon photo (bottom-anchored cover) and a 55% white veil. */
+@utility bg-sidebar-photo {
+  background-color: #eef3f8;
+  background-image: linear-gradient(#ffffff8c, #ffffff8c), url("../assets/sidebar-photo.jpg");
+  background-size: auto, cover;
+  background-position: center, 50% 100%;
+  background-repeat: no-repeat;
+}

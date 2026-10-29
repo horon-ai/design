@@ -21,6 +21,11 @@ type ButtonProps = Omit<ComponentProps<"button">, "className"> & { className?: s
 export type SidebarProps = Omit<ComponentProps<"nav">, "className"> & {
   className?: string;
   /**
+   * `glass` (default) is the thick-glass column. `photo` is the Paper app sidebar: the Horon photo
+   * on #EEF3F8 under a 55% white veil, with the thick glass kept for dark mode.
+   */
+  surface?: "glass" | "photo";
+  /**
    * Drag the right edge to change the width, from the `md` breakpoint (768px) up.
    * Below `md` the handle is hidden and the sidebar keeps its fixed 280px width.
    */
@@ -48,6 +53,7 @@ export function Sidebar({
   className,
   style,
   children,
+  surface = "glass",
   resizable = false,
   defaultWidth = 280,
   minWidth = 240,
@@ -114,13 +120,14 @@ export function Sidebar({
     <nav
       className={cn(
         "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip border-r border-border-default bg-glass-thick px-3 pt-4 pb-3",
+        surface === "photo" && "bg-sidebar-photo dark:bg-glass-thick dark:bg-none",
         resizable && "md:w-(--sidebar-width)",
         className,
       )}
       style={resizable ? ({ ...style, "--sidebar-width": `${width}px` } as CSSProperties) : style}
       {...props}
     >
-      <LiquidGlass tier="thick" />
+      {surface === "photo" ? null : <LiquidGlass tier="thick" />}
       {children}
       {resizable && (
         <div
