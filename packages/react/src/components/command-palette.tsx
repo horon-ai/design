@@ -10,6 +10,7 @@ import { LiquidGlass } from "./liquid-glass";
 export type CommandItem = {
   value: string;
   label: string;
+  keywords?: string;
   /** 28px leading tile: an initial or a 16px icon. */
   tile?: ReactNode;
   /** Tile fill class, such as "bg-sky-500"; defaults to the primary tile. */
@@ -56,65 +57,22 @@ export function CommandPalette({
           <Dialog.Popup
             aria-label={placeholder}
             className={cn(
-              "relative flex w-140 motion-popup flex-col overflow-clip rounded-[24px] bg-glass-fill-frost p-1.5 shadow-palette",
+              "relative flex w-140 max-w-full motion-popup flex-col overflow-clip rounded-[24px] bg-glass-fill-frost p-1.5 shadow-palette",
               "duration-240 data-starting-style:translate-y-2",
               className,
             )}
           >
             <LiquidGlass tier="thick" />
-            <Autocomplete.Root open inline items={groups} autoHighlight="always" keepHighlight>
-              <div className="relative flex h-12 items-center gap-2.5 px-3.5">
-                <MagnifyingGlass aria-hidden className="size-5 shrink-0 text-text-secondary" />
-                <Autocomplete.Input
-                  placeholder={placeholder}
-                  className="min-w-0 flex-1 bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
-                />
-                <Dialog.Close render={<Kbd className="motion-press cursor-pointer" />}>esc</Dialog.Close>
-              </div>
-              <div className="relative pt-1 pb-1.5">
-                <div className="h-px bg-overlay-ink-8" />
-              </div>
-              <Autocomplete.Empty className="relative px-3 py-4 text-body-sm text-text-secondary">
-                No results
-              </Autocomplete.Empty>
-              <Autocomplete.List className="relative flex max-h-[min(60dvh,24rem)] flex-col overflow-y-auto">
-                {(group: CommandGroup) => (
-                  <Autocomplete.Group key={group.label} items={group.items} className="flex flex-col">
-                    <Autocomplete.GroupLabel className="px-3 pt-2 pb-1 text-caption text-text-secondary">
-                      {group.label}
-                    </Autocomplete.GroupLabel>
-                    <Autocomplete.Collection>
-                      {(item: CommandItem) => (
-                        <Autocomplete.Item
-                          key={item.value}
-                          value={item}
-                          onClick={() => {
-                            item.onSelect?.();
-                            onOpenChange?.(false);
-                          }}
-                          className="flex h-11 cursor-pointer items-center gap-2.5 rounded-md pr-3 pl-2.5 motion-colors outline-none select-none data-highlighted:bg-overlay-ink-6"
-                        >
-                          {item.tile && (
-                            <span
-                              className={cn(
-                                "flex size-7 shrink-0 items-center justify-center rounded-sm text-label-sm [&>svg]:size-4",
-                                item.tileClassName ?? "bg-interactive-primary text-interactive-on-primary",
-                              )}
-                            >
-                              {item.tile}
-                            </span>
-                          )}
-                          <span className="truncate text-label-md text-text-primary">{item.label}</span>
-                          {item.meta && <span className="shrink-0 text-caption text-text-secondary">{item.meta}</span>}
-                          <span className="flex-1" />
-                          {item.hint}
-                        </Autocomplete.Item>
-                      )}
-                    </Autocomplete.Collection>
-                  </Autocomplete.Group>
-                )}
-              </Autocomplete.List>
-            </Autocomplete.Root>
+            <CommandPaletteBody
+              groups={groups}
+              placeholder={placeholder}
+              closeControl={
+                <Dialog.Close aria-label="Close" className="motion-press cursor-pointer">
+                  <Kbd>esc</Kbd>
+                </Dialog.Close>
+              }
+              onSelect={() => onOpenChange?.(false)}
+            />
             {hints && hints.length > 0 && (
               <div className="relative flex items-center gap-3.5 px-3 pt-2.5 pb-1.5">
                 {hints.map(([key, label]) => (
@@ -129,5 +87,92 @@ export function CommandPalette({
         </Dialog.Viewport>
       </Dialog.Portal>
     </Dialog.Root>
+  );
+}
+
+export type CommandPaletteBodyProps = {
+  groups: CommandGroup[];
+  placeholder?: string;
+  empty?: ReactNode;
+  closeLabel?: string;
+  /** A ready close control; the dialog passes its own `Dialog.Close` so uncontrolled palettes still close. */
+  closeControl?: ReactNode;
+  onClose?: () => void;
+  onSelect?: () => void;
+};
+
+export function CommandPaletteBody({
+  groups,
+  placeholder = "Search",
+  empty = "No results",
+  closeLabel = "Close",
+  closeControl,
+  onClose,
+  onSelect,
+}: CommandPaletteBodyProps) {
+  return (
+    <Autocomplete.Root
+      open
+      inline
+      items={groups}
+      itemToStringValue={(item: CommandItem) => `${item.label} ${item.keywords ?? ""}`}
+      autoHighlight="always"
+      keepHighlight
+    >
+      <div className="relative flex h-12 items-center gap-2.5 px-3.5">
+        <MagnifyingGlass aria-hidden className="size-5 shrink-0 text-text-secondary" />
+        <Autocomplete.Input
+          placeholder={placeholder}
+          className="min-w-0 flex-1 bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
+        />
+        {closeControl ??
+          (onClose === undefined ? null : (
+            <button type="button" aria-label={closeLabel} className="motion-press cursor-pointer" onClick={onClose}>
+              <Kbd>esc</Kbd>
+            </button>
+          ))}
+      </div>
+      <div className="relative pt-1 pb-1.5">
+        <div className="h-px bg-overlay-ink-8" />
+      </div>
+      <Autocomplete.Empty className="relative px-3 py-4 text-body-sm text-text-secondary">{empty}</Autocomplete.Empty>
+      <Autocomplete.List className="relative flex max-h-[min(60dvh,24rem)] flex-col overflow-y-auto">
+        {(group: CommandGroup) => (
+          <Autocomplete.Group key={group.label} items={group.items} className="flex flex-col">
+            <Autocomplete.GroupLabel className="px-3 pt-2 pb-1 text-caption text-text-secondary">
+              {group.label}
+            </Autocomplete.GroupLabel>
+            <Autocomplete.Collection>
+              {(item: CommandItem) => (
+                <Autocomplete.Item
+                  key={item.value}
+                  value={item}
+                  onClick={() => {
+                    item.onSelect?.();
+                    onSelect?.();
+                  }}
+                  className="flex h-11 cursor-pointer items-center gap-2.5 rounded-md pr-3 pl-2.5 motion-colors outline-none select-none data-highlighted:bg-overlay-ink-6"
+                >
+                  {item.tile && (
+                    <span
+                      className={cn(
+                        "flex size-7 shrink-0 items-center justify-center rounded-sm text-label-sm [&>svg]:size-4",
+                        item.tileClassName ?? "bg-interactive-primary text-interactive-on-primary",
+                      )}
+                    >
+                      {item.tile}
+                    </span>
+                  )}
+                  <span className="truncate text-label-md text-text-primary">{item.label}</span>
+                  {item.meta && <span className="shrink-0 text-caption text-text-secondary">{item.meta}</span>}
+                  <span className="flex-1" />
+                  {item.hint}
+                </Autocomplete.Item>
+              )}
+            </Autocomplete.Collection>
+          </Autocomplete.Group>
+        )}
+      </Autocomplete.List>
+    </Autocomplete.Root>
   );
 }
