@@ -15,6 +15,7 @@ export type SelectProps = Omit<ComponentProps<typeof BaseSelect.Root>, "items" |
   invalid?: boolean;
   /** `chip` is the Paper filter chip: a 32px bg-subtle pill, 12px padding, 13/18 medium, sized to its label. */
   variant?: "field" | "chip";
+  showIndicator?: boolean;
   className?: string;
   "aria-label"?: string;
 };
@@ -30,6 +31,7 @@ export function Select({
   surface = "glass",
   invalid,
   variant = "field",
+  showIndicator = true,
   className,
   "aria-label": ariaLabel,
   ...props
@@ -61,9 +63,11 @@ export function Select({
                 : "text-body-lg",
           )}
         />
-        <BaseSelect.Icon className="relative flex shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-popup-open:rotate-180 [&_svg]:size-4">
-          <CaretDown />
-        </BaseSelect.Icon>
+        {showIndicator ? (
+          <BaseSelect.Icon className="relative flex shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-popup-open:rotate-180 [&_svg]:size-4">
+            <CaretDown />
+          </BaseSelect.Icon>
+        ) : null}
       </BaseSelect.Trigger>
       <BaseSelect.Portal>
         <BaseSelect.Positioner sideOffset={8} alignItemWithTrigger={false} className="z-50 outline-none">

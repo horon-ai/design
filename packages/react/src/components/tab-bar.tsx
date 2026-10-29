@@ -10,6 +10,7 @@ export type TabBarProps = {
   items: TabBarItem[];
   value: string;
   onValueChange?: (value: string) => void;
+  surface?: "glass" | "flat";
   "aria-label"?: string;
   className?: string;
 };
@@ -19,7 +20,7 @@ export type TabBarProps = {
  * with icon-only 64x48 tabs and 22px icons; the current tab is a 10% ink pill
  * that slides to the tab you pick.
  */
-export function TabBar({ items, value, onValueChange, className, ...props }: TabBarProps) {
+export function TabBar({ items, value, onValueChange, surface = "glass", className, ...props }: TabBarProps) {
   const track = useRef<HTMLElement>(null);
   const { rect, animate } = useActiveIndicator(track, '[aria-current="page"]');
   return (
@@ -31,7 +32,7 @@ export function TabBar({ items, value, onValueChange, className, ...props }: Tab
         className,
       )}
     >
-      <LiquidGlass tier="regular" />
+      {surface === "glass" ? <LiquidGlass tier="regular" /> : null}
       <span
         aria-hidden
         className={cn("pointer-events-none absolute rounded-full bg-overlay-ink-10", animate && "motion-indicator")}
