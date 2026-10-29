@@ -21,6 +21,10 @@ export type BottomSheetContentProps = Omit<ComponentProps<typeof Drawer.Popup>, 
   variant?: "panel" | "detail";
   /** `glass` is the frost sheet; `solid` is the Paper workspace sheet: opaque default fill, 20px top corners, 8/24/16 padding. */
   surface?: "glass" | "solid";
+  /** Draws the dimmed, blurred scrim behind the sheet. Paper's floating panel sheet has none. */
+  backdrop?: boolean;
+  /** Insets the sheet 16px from the sides and bottom edge (Paper's 358px panel sheet) instead of docking it full width. */
+  floating?: boolean;
   className?: string;
 };
 
@@ -33,6 +37,8 @@ export function BottomSheetContent({
   closeLabel = "Close",
   variant = "panel",
   surface = "glass",
+  backdrop = true,
+  floating = false,
   className,
   children,
   ...props
@@ -41,8 +47,12 @@ export function BottomSheetContent({
   const solid = surface === "solid";
   return (
     <Drawer.Portal>
-      <Drawer.Backdrop className="fixed inset-0 z-50 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]" />
-      <Drawer.Viewport className="fixed inset-x-0 bottom-0 z-50 flex justify-center">
+      {backdrop ? (
+        <Drawer.Backdrop className="fixed inset-0 z-50 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]" />
+      ) : null}
+      <Drawer.Viewport
+        className={cn("fixed z-50 flex justify-center", floating ? "inset-x-4 bottom-4" : "inset-x-0 bottom-0")}
+      >
         <Drawer.Popup
           className={cn(
             "relative flex w-full flex-col items-stretch overflow-clip px-4 pt-2 outline-none",
@@ -50,14 +60,14 @@ export function BottomSheetContent({
               ? "rounded-t-[20px] bg-bg-default pb-6"
               : "rounded-t-[32px] bg-glass-fill-frost pb-5 shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost),0_0_0_1px_var(--color-overlay-ink-3)] backdrop-blur-[24px] dark:bg-glass-thick dark:shadow-none dark:backdrop-blur-none",
             "transition-[translate] duration-320 ease-out-quint data-ending-style:translate-y-full data-ending-style:duration-220 data-ending-style:ease-in data-starting-style:translate-y-full",
-            detail ? "gap-4.5" : "max-w-93.5 gap-1",
+            detail ? "gap-4.5" : floating ? "gap-3" : "max-w-93.5 gap-1",
             className,
           )}
           {...props}
         >
-          {solid ? null : <LiquidGlass tier="thick" />}
+          {solid || floating ? null : <LiquidGlass tier="thick" />}
           <span aria-hidden className="relative mx-auto h-[5px] w-9 rounded-[3px] bg-overlay-ink-20" />
-          <Drawer.Content className={cn("relative flex flex-col", detail ? "gap-4.5" : "gap-1")}>
+          <Drawer.Content className={cn("relative flex flex-col", detail ? "gap-4.5" : floating ? "gap-3" : "gap-1")}>
             <div className={cn("flex gap-2", detail ? "items-start" : "items-center pt-2.5 pb-2 pl-1")}>
               <Drawer.Title className={cn("min-w-0 flex-1 text-text-primary", detail ? "flex" : "text-label-lg")}>
                 {title}
