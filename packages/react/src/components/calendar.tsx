@@ -115,9 +115,10 @@ export function Calendar(props: CalendarProps) {
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const step: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
-    if (event.key in step) {
+    const offset = step[event.key];
+    if (typeof offset === "number") {
       event.preventDefault();
-      moveFocus(addDays(focused, step[event.key]));
+      moveFocus(addDays(focused, offset));
     }
   };
 
