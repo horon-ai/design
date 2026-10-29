@@ -92,6 +92,12 @@ export const components: ComponentEntry[] = [
     description: "즉시 반영되는 켜짐·꺼짐을 전환합니다.",
   },
   {
+    slug: "slider",
+    title: "Slider",
+    group: "inputs",
+    description: "가는 트랙 위 손잡이로 값을 고릅니다.",
+  },
+  {
     slug: "chip",
     title: "Chip",
     group: "inputs",
