@@ -1,83 +1,9 @@
 /// Horon UI — Horon 디자인 시스템의 Flutter 컴포넌트 라이브러리입니다.
 ///
-/// 컴포넌트는 이 배럴로 노출합니다. 예외는 차트뿐이고, 그쪽은 `package:horon_ui/chart.dart`
-/// 하위 경로로만 엽니다.
+/// 컴포넌트는 이 배럴로 노출합니다. 컴포넌트 export 줄은 `scripts/integrate.mjs`가
+/// 디렉터리 목록에서 만듭니다.
 library;
 
-export 'src/components/accordion.dart';
-export 'src/components/alert.dart';
-export 'src/components/alert_dialog.dart';
-export 'src/components/aspect_ratio.dart';
-export 'src/components/attachment.dart';
-export 'src/components/autocomplete.dart';
-export 'src/components/avatar.dart';
-export 'src/components/badge.dart';
-export 'src/components/breadcrumb.dart';
-export 'src/components/bubble.dart';
-export 'src/components/button.dart';
-export 'src/components/button_group.dart';
-export 'src/components/calendar.dart';
-export 'src/components/card.dart';
-export 'src/components/carousel.dart';
-export 'src/components/checkbox.dart';
-export 'src/components/chip.dart';
-export 'src/components/code_block.dart';
-export 'src/components/collapsible.dart';
-export 'src/components/combobox.dart';
-export 'src/components/command.dart';
-export 'src/components/context_menu.dart';
-export 'src/components/data_table.dart';
-export 'src/components/date_picker.dart';
-export 'src/components/dialog.dart';
-export 'src/components/direction.dart';
-export 'src/components/drawer.dart';
-export 'src/components/dropdown_menu.dart';
-export 'src/components/empty.dart';
-export 'src/components/field.dart';
-export 'src/components/file_upload.dart';
-export 'src/components/form.dart';
-export 'src/components/glass_surface.dart';
-export 'src/components/hover_card.dart';
-export 'src/components/input.dart';
-export 'src/components/input_group.dart';
-export 'src/components/input_otp.dart';
-export 'src/components/item.dart';
-export 'src/components/kbd.dart';
-export 'src/components/label.dart';
-export 'src/components/liquid_glass.dart';
-export 'src/components/list.dart';
-export 'src/components/marker.dart';
-export 'src/components/menu.dart';
-export 'src/components/menubar.dart';
-export 'src/components/message.dart';
-export 'src/components/message_scroller.dart';
-export 'src/components/native_select.dart';
-export 'src/components/navigation_menu.dart';
-export 'src/components/pagination.dart';
-export 'src/components/popover.dart';
-export 'src/components/progress.dart';
-export 'src/components/questionnaire.dart';
-export 'src/components/radio_group.dart';
-export 'src/components/resizable.dart';
-export 'src/components/scroll_area.dart';
-export 'src/components/select.dart';
-export 'src/components/separator.dart';
-export 'src/components/sheet.dart';
-export 'src/components/sidebar.dart';
-export 'src/components/skeleton.dart';
-export 'src/components/slider.dart';
-export 'src/components/sonner.dart';
-export 'src/components/spinner.dart';
-export 'src/components/stepper.dart';
-export 'src/components/switch.dart';
-export 'src/components/table.dart';
-export 'src/components/tabs.dart';
-export 'src/components/textarea.dart';
-export 'src/components/toast.dart';
-export 'src/components/toggle.dart';
-export 'src/components/toggle_group.dart';
-export 'src/components/tooltip.dart';
-export 'src/components/typography.dart';
 export 'src/contracts/horon_strings.dart';
 export 'src/contracts/icon_slot.dart';
 export 'src/contracts/naming.dart';
