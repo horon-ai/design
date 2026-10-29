@@ -12,6 +12,12 @@ export const BottomSheetClose = Drawer.Close;
 export type BottomSheetContentProps = Omit<ComponentProps<typeof Drawer.Popup>, "className" | "title"> & {
   title: ReactNode;
   closeLabel?: string;
+  /**
+   * `panel` is the Figma panel sheet (374px max, label-lg title, 6% ink close). `detail` is the Paper
+   * detail sheet: full width, 18px rhythm, a caller-built header (tile, title, description) set flush
+   * left and a transparent 32px close with an 18px glyph.
+   */
+  variant?: "panel" | "detail";
   className?: string;
 };
 
@@ -22,32 +28,40 @@ export type BottomSheetContentProps = Omit<ComponentProps<typeof Drawer.Popup>, 
 export function BottomSheetContent({
   title,
   closeLabel = "Close",
+  variant = "panel",
   className,
   children,
   ...props
 }: BottomSheetContentProps) {
+  const detail = variant === "detail";
   return (
     <Drawer.Portal>
       <Drawer.Backdrop className="fixed inset-0 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]" />
       <Drawer.Viewport className="fixed inset-x-0 bottom-0 flex justify-center">
         <Drawer.Popup
           className={cn(
-            "relative flex w-full max-w-93.5 flex-col items-stretch gap-1 overflow-clip rounded-t-[32px] bg-glass-fill-frost px-4 pt-2 pb-5 shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost),0_0_0_1px_var(--color-overlay-ink-3)] backdrop-blur-[24px] outline-none dark:bg-glass-thick dark:shadow-none dark:backdrop-blur-none",
+            "relative flex w-full flex-col items-stretch overflow-clip rounded-t-[32px] bg-glass-fill-frost px-4 pt-2 pb-5 shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost),0_0_0_1px_var(--color-overlay-ink-3)] backdrop-blur-[24px] outline-none dark:bg-glass-thick dark:shadow-none dark:backdrop-blur-none",
             "transition-[translate] duration-320 ease-out-quint data-ending-style:translate-y-full data-ending-style:duration-220 data-ending-style:ease-in data-starting-style:translate-y-full",
+            detail ? "gap-4.5" : "max-w-93.5 gap-1",
             className,
           )}
           {...props}
         >
           <LiquidGlass tier="thick" />
           <span aria-hidden className="relative mx-auto h-[5px] w-9 rounded-[3px] bg-overlay-ink-20" />
-          <Drawer.Content className="relative flex flex-col gap-1">
-            <div className="flex items-center gap-2 pt-2.5 pb-2 pl-1">
-              <Drawer.Title className="min-w-0 flex-1 text-label-lg text-text-primary">{title}</Drawer.Title>
+          <Drawer.Content className={cn("relative flex flex-col", detail ? "gap-4.5" : "gap-1")}>
+            <div className={cn("flex gap-2", detail ? "items-start" : "items-center pt-2.5 pb-2 pl-1")}>
+              <Drawer.Title className={cn("min-w-0 flex-1 text-text-primary", detail ? "flex" : "text-label-lg")}>
+                {title}
+              </Drawer.Title>
               <Drawer.Close
                 aria-label={closeLabel}
-                className="flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
+                className={cn(
+                  "flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand",
+                  detail ? "bg-transparent" : "bg-overlay-ink-6",
+                )}
               >
-                <X aria-hidden className="size-4" />
+                <X aria-hidden className={detail ? "size-[18px]" : "size-4"} />
               </Drawer.Close>
             </div>
             {children}
