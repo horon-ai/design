@@ -42,7 +42,6 @@ const List<String> pendingComponents = <String>[
   'empty_state',
   'data_table',
   'integration_row',
-  'liquid_glass',
   'horon_icon',
   'horon_wordmark',
   'settings_list',

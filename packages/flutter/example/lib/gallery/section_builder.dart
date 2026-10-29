@@ -10,6 +10,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'registry.dart';
+import 'sections/liquid_glass.dart';
 
 /// 섹션 위젯을 슬러그로 찾습니다.
 ///
@@ -18,7 +19,9 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
     _builders[section.slug]?.call();
 
 /// 슬러그별 섹션 생성자입니다.
-const Map<String, Widget Function()> _builders = <String, Widget Function()>{};
+const Map<String, Widget Function()> _builders = <String, Widget Function()>{
+  'liquid_glass': HoronLiquidGlassGallerySection.new,
+};
 
 /// 이 표가 알고 있는 슬러그입니다.
 ///

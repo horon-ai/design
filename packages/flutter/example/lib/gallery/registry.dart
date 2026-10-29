@@ -17,4 +17,6 @@ class GallerySection {
 /// todo 4's registry gate compares these slugs, in both directions, with the
 /// component files under `lib/src/components/`. Each component todo adds its
 /// own line here and its own `sections/<slug>.dart`.
-const List<GallerySection> gallerySections = <GallerySection>[];
+const List<GallerySection> gallerySections = <GallerySection>[
+  GallerySection(slug: 'liquid_glass', title: 'Liquid Glass', group: 'display'),
+];
