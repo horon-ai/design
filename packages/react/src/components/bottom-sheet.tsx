@@ -41,8 +41,8 @@ export function BottomSheetContent({
   const solid = surface === "solid";
   return (
     <Drawer.Portal>
-      <Drawer.Backdrop className="fixed inset-0 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]" />
-      <Drawer.Viewport className="fixed inset-x-0 bottom-0 flex justify-center">
+      <Drawer.Backdrop className="fixed inset-0 z-50 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]" />
+      <Drawer.Viewport className="fixed inset-x-0 bottom-0 z-50 flex justify-center">
         <Drawer.Popup
           className={cn(
             "relative flex w-full flex-col items-stretch overflow-clip px-4 pt-2 outline-none",

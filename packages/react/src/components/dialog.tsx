@@ -44,8 +44,8 @@ export function DialogContent({
   const solid = surface === "solid";
   return (
     <BaseDialog.Portal>
-      <BaseDialog.Backdrop className="fixed inset-0 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]" />
-      <BaseDialog.Viewport className="fixed inset-0 flex items-center justify-center px-4">
+      <BaseDialog.Backdrop className="fixed inset-0 z-50 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]" />
+      <BaseDialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <BaseDialog.Popup
           className={cn(
             "relative flex w-105 max-w-[calc(100vw-2rem)] flex-col items-start overflow-clip p-6 outline-none",
