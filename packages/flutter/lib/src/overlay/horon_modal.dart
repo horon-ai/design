@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
@@ -41,7 +42,7 @@ class _HoronModalRoute<T> extends PopupRoute<T> {
   Color? get barrierColor => null;
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: HoronDuration.fast);
+  Duration get transitionDuration => HoronMotion.popupEnterDuration;
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
@@ -95,7 +96,7 @@ class HoronModalSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final BorderRadius radius = borderRadius ?? BorderRadius.circular(HoronRadiusRole.panel);
+    final BorderRadius radius = borderRadius ?? BorderRadius.circular(theme.radius.xl);
 
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth ?? double.infinity, maxHeight: maxHeight ?? double.infinity),
@@ -105,10 +106,10 @@ class HoronModalSurface extends StatelessWidget {
         type: MaterialType.transparency,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: theme.glassFillStrong,
+            color: theme.colors.glassFillStrong,
             borderRadius: radius,
-            border: Border.all(color: theme.glassBorder),
-            boxShadow: HoronShadow.lg,
+            border: Border.all(color: theme.colors.glassBorder),
+            boxShadow: theme.shadows.palette,
           ),
           child: ClipRRect(
             borderRadius: radius,
