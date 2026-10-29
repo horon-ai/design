@@ -40,6 +40,12 @@ export function Button({ variant = "primary", size = "md", icon, className, chil
         variant === "link" ? "" : "motion-press rounded-full",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed data-disabled:opacity-40",
         variant !== "link" && sizeClass[size],
+        // Paper's small buttons are 32px tall. Paint the 44px reach without moving the control;
+        // glass clips to its own box, so it keeps its visible size as the only target.
+        variant !== "link" &&
+          variant !== "glass" &&
+          size !== "lg" &&
+          "relative after:absolute after:top-1/2 after:left-1/2 after:min-h-11 after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-['']",
         variantClass[variant],
         className,
       )}

@@ -37,6 +37,9 @@ export function IconButton({ variant = "ghost", size = "md", icon, label, classN
       aria-label={label}
       className={cn(
         "relative inline-flex shrink-0 motion-press cursor-pointer items-center justify-center rounded-full select-none",
+        // Paper draws icon buttons down to 32px. The painted hit area keeps the 44px reach
+        // without moving a single pixel of the visible control.
+        "relative after:absolute after:top-1/2 after:left-1/2 after:min-h-11 after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-['']",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed data-disabled:opacity-40",
         sizeClass[size],
         variantClass[variant],
