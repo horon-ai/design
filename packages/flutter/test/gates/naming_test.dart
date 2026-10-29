@@ -38,13 +38,34 @@ List<File> listedComponentFiles() {
   ];
 }
 
+/// Types a component file answers for: its own declarations plus the types of
+/// the libraries it re-exports.
+///
+/// One component is a re-export rather than a declaration: `liquid_glass.dart`
+/// opens the engine's `HoronLiquidGlass` (in `lib/src/glass/`) to the barrel and
+/// the gallery, so the class lives in the engine and the component file is the
+/// surface. Resolving the relative `export` targets keeps the prefix rule
+/// meaningful for that file instead of exempting it.
+List<String> componentTypeNames(File file) {
+  final source = stripComments(file.readAsStringSync());
+  final names = <String>[...declaredTypeNames(source)];
+  for (final match in RegExp('''export\\s+['"]([^'"]+)['"]''').allMatches(source)) {
+    final target = match.group(1)!;
+    if (!target.startsWith('.')) continue;
+    final resolved = File.fromUri(file.parent.uri.resolve(target));
+    if (!resolved.existsSync()) continue;
+    names.addAll(declaredTypeNames(resolved.readAsStringSync()));
+  }
+  return names;
+}
+
 void main() {
   final declarations = <String, String>{}; // name -> slug
   final violations = <String>[];
 
   setUpAll(() {
     for (final entry in componentFilesBySlug().entries) {
-      for (final name in declaredTypeNames(entry.value.readAsStringSync())) {
+      for (final name in componentTypeNames(entry.value)) {
         declarations[name] = entry.key;
         if (name.startsWith('_')) continue; // private declarations are internal
         if (!name.startsWith('Horon')) violations.add('${entry.key}.dart: $name');
@@ -75,7 +96,7 @@ void main() {
     // A landed file that declares no class or enum at all is not a component.
     final bare = <String>[
       for (final entry in componentFilesBySlug().entries)
-        if (declaredTypeNames(entry.value.readAsStringSync()).isEmpty) '${entry.key}.dart',
+        if (!componentTypeNames(entry.value).any((String name) => name.startsWith('Horon'))) '${entry.key}.dart',
     ]..sort();
     expect(bare, isEmpty, reason: 'These files declare no class or enum, so the scan cannot judge them: $bare');
     for (final slug in componentFilesBySlug().keys) {
