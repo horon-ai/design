@@ -28,11 +28,11 @@ export function BottomSheetContent({
 }: BottomSheetContentProps) {
   return (
     <Drawer.Portal>
-      <Drawer.Backdrop className="fixed inset-0 bg-bg-scrim motion-fade opacity-40" />
+      <Drawer.Backdrop className="fixed inset-0 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]" />
       <Drawer.Viewport className="fixed inset-x-0 bottom-0 flex justify-center">
         <Drawer.Popup
           className={cn(
-            "relative flex w-full max-w-93.5 outline-none flex-col items-stretch gap-1 overflow-clip rounded-t-[32px] bg-glass-fill-frost px-4 pt-2 pb-5 shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost),0_0_0_1px_var(--color-overlay-ink-3)] backdrop-blur-[24px] dark:bg-glass-thick dark:shadow-none dark:backdrop-blur-none",
+            "relative flex w-full max-w-93.5 flex-col items-stretch gap-1 overflow-clip rounded-t-[32px] bg-glass-fill-frost px-4 pt-2 pb-5 shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost),0_0_0_1px_var(--color-overlay-ink-3)] backdrop-blur-[24px] outline-none dark:bg-glass-thick dark:shadow-none dark:backdrop-blur-none",
             "transition-[translate] duration-320 ease-out-quint data-ending-style:translate-y-full data-ending-style:duration-220 data-ending-style:ease-in data-starting-style:translate-y-full",
             className,
           )}
