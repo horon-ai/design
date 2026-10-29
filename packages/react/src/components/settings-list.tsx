@@ -13,24 +13,45 @@ export function SettingsList({ className, ...props }: WithClass<ComponentProps<"
 export type SettingsRowProps = Omit<ComponentProps<"div">, "className" | "title"> & {
   title: ReactNode;
   description?: ReactNode;
+  /** Leading slot before the title, usually a `SettingsRowIcon`; the row tightens to 12px gap and 13px block padding. */
+  leading?: ReactNode;
   /** Trailing control slot: a `Switch`, a `SettingsKeys` pair, a button. */
   control?: ReactNode;
   className?: string;
 };
 
 /** One row: title and subtitle on the left, control on the right, 1px divider except on the last row. */
-export function SettingsRow({ title, description, control, className, ...props }: SettingsRowProps) {
+export function SettingsRow({ title, description, leading, control, className, ...props }: SettingsRowProps) {
   return (
     <div
-      className={cn("flex items-center gap-4 border-b border-border-default py-4 last:border-b-0", className)}
+      className={cn(
+        "flex items-center border-b border-border-default last:border-b-0",
+        leading ? "gap-3 py-[13px]" : "gap-4 py-4",
+        className,
+      )}
       {...props}
     >
+      {leading}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="text-label-md text-text-primary">{title}</span>
         {description && <span className="text-[13px]/[18px] text-text-secondary">{description}</span>}
       </div>
       {control && <div className="flex shrink-0 items-center">{control}</div>}
     </div>
+  );
+}
+
+/** Paper settings row icon tile: 32px, 9px radius, subtle fill, 16px glyph centered. */
+export function SettingsRowIcon({ className, ...props }: WithClass<ComponentProps<"span">>) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-bg-subtle text-text-primary [&_svg]:size-4",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 

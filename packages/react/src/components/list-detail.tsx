@@ -85,10 +85,7 @@ export function ListDetail({
           </div>
         ))}
       </div>
-      <div
-        key={selected?.id}
-        className="motion-rise relative flex min-w-0 flex-1 flex-col gap-5 px-6 py-5.5"
-      >
+      <div key={selected?.id} className="relative flex min-w-0 flex-1 motion-rise flex-col gap-5 px-6 py-5.5">
         {selected && children(selected)}
       </div>
     </div>
@@ -131,7 +128,10 @@ export type ListDetailMetaProps = Omit<ComponentProps<"dl">, "className"> & {
 export function ListDetailMeta({ items, className, ...props }: ListDetailMetaProps) {
   return (
     <dl
-      className={cn("m-0 grid grid-cols-2 gap-x-4 gap-y-3 rounded-xl bg-neutral-50 px-4 py-3.5 dark:bg-neutral-800", className)}
+      className={cn(
+        "m-0 grid grid-cols-2 gap-x-4 gap-y-3 rounded-md bg-neutral-50 px-4 py-3.5 dark:bg-neutral-800",
+        className,
+      )}
       {...props}
     >
       {items.map((item) => (
@@ -209,7 +209,7 @@ export function ListDetailInstructions({
           {editing ? "Done" : "Edit"}
         </Button>
       </div>
-      <pre className="m-0 overflow-x-auto rounded-[10px] border border-border-default bg-neutral-50 px-4 py-3.5 font-mono text-[12px]/[19px] font-normal whitespace-pre text-syntax-string dark:bg-neutral-800">
+      <pre className="font-normal m-0 overflow-x-auto rounded-[10px] border border-border-default bg-neutral-50 px-4 py-3.5 font-mono text-[12px]/[19px] whitespace-pre text-syntax-string dark:bg-neutral-800">
         {renderInstructions(text)}
       </pre>
       <Collapsible.Root open={editing} onOpenChange={setEditing}>
@@ -248,6 +248,9 @@ export function ListDetailFiles({ label = "Files", children, className, ...props
 }
 
 /** Footer: a 1px top rule and 8px-spaced glass buttons; use `<span className="flex-1" />` as the spacer. */
-export function ListDetailFooter({ className, ...props }: Omit<ComponentProps<"div">, "className"> & { className?: string }) {
+export function ListDetailFooter({
+  className,
+  ...props
+}: Omit<ComponentProps<"div">, "className"> & { className?: string }) {
   return <div className={cn("flex items-center gap-2 border-t border-border-default pt-3.5", className)} {...props} />;
 }

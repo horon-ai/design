@@ -24,6 +24,10 @@ type CommonProps = {
    * month and 32px round arrow buttons on the right.
    */
   variant?: "default" | "popover";
+  /** `glass` (default) layers the thick liquid glass; `flat` keeps the same 80% white fill without it (Paper Schedule mini calendar). */
+  surface?: "glass" | "flat";
+  /** Days drawn as subtle 40px circles (6% ink), e.g. the week the schedule shows; selection still draws on top. */
+  highlight?: Date[];
 };
 
 export type CalendarProps = CommonProps &
@@ -59,6 +63,8 @@ export function Calendar(props: CalendarProps) {
     weekStartsOn = 0,
     className,
     variant = "default",
+    surface = "glass",
+    highlight,
   } = props;
   const [now] = useState(() => new Date());
   const today = startOfDay(props.today ?? now);
@@ -134,7 +140,7 @@ export function Calendar(props: CalendarProps) {
         className,
       )}
     >
-      <LiquidGlass tier="thick" />
+      {surface === "glass" && <LiquidGlass tier="thick" />}
       {variant === "popover" ? (
         <div className="relative flex w-full items-center gap-1 pb-1 pl-1.5">
           <p aria-live="polite" className="min-w-0 flex-1 text-label-lg text-text-primary">
@@ -211,6 +217,7 @@ export function Calendar(props: CalendarProps) {
               const selected = isSelected(date);
               const between = inRange(date);
               const isToday = sameDay(date, today);
+              const marked = !selected && !between && (highlight?.some((day) => sameDay(day, date)) ?? false);
               return (
                 <button
                   key={date.toDateString()}
@@ -231,7 +238,9 @@ export function Calendar(props: CalendarProps) {
                       ? "bg-overlay-ink-8 text-body-md text-text-primary"
                       : selected
                         ? "rounded-full bg-interactive-primary text-label-lg text-text-inverse"
-                        : "rounded-full hover:not-disabled:bg-overlay-ink-5",
+                        : marked
+                          ? "rounded-full bg-overlay-ink-6"
+                          : "rounded-full hover:not-disabled:bg-overlay-ink-5",
                     !between &&
                       !selected &&
                       (disabled

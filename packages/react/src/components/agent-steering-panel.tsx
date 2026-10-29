@@ -100,7 +100,10 @@ export function AgentSteeringPanel({
         </div>
         <span
           aria-hidden
-          className={cn("size-1.75 shrink-0 rounded-full bg-status-live text-status-live", !paused && "animate-live-pulse")}
+          className={cn(
+            "size-1.75 shrink-0 rounded-full bg-status-live text-status-live",
+            !paused && "animate-live-pulse",
+          )}
         />
         {status && <span className="shrink-0 text-body-sm text-text-secondary">{status}</span>}
         <button
@@ -117,7 +120,7 @@ export function AgentSteeringPanel({
 
       <ol className="flex flex-col gap-3 px-4.5 py-3">
         {steps.map((step, index) => (
-          <li key={step.id} style={indexStyle(index)} className="motion-rise flex min-h-6.5 items-center gap-3">
+          <li key={step.id} style={indexStyle(index)} className="flex min-h-6.5 motion-rise items-center gap-3">
             <span className="relative flex h-6.5 w-5 shrink-0 items-center justify-center">
               <Marker key={step.status} status={step.status} />
               {index < steps.length - 1 && (
@@ -147,7 +150,7 @@ export function AgentSteeringPanel({
       <div className="flex flex-col gap-2.5 px-4.5 py-3.5">
         {notes.length > 0 && (
           <>
-            <p className="flex items-center gap-2 text-caption tracking-[0.4px] text-text-secondary uppercase">
+            <p className="flex items-center gap-2 text-caption text-text-secondary uppercase">
               Queued for the next step
               <Kbd>{queued.length}</Kbd>
             </p>
@@ -155,7 +158,7 @@ export function AgentSteeringPanel({
               {notes.map((note) => (
                 <li
                   key={note.id}
-                  className="motion-rise flex items-center gap-2.5 rounded-[10px] bg-overlay-ink-4 py-2 pr-2.5 pl-3.5"
+                  className="flex motion-rise items-center gap-2.5 rounded-[10px] bg-overlay-ink-4 py-2 pr-2.5 pl-3.5"
                 >
                   <span className="min-w-0 flex-1 text-body-sm text-text-primary">{note.text}</span>
                   {note.applied ? (

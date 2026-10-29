@@ -6,7 +6,7 @@ import { LiquidGlass } from "./liquid-glass";
 
 type WithClass<T> = Omit<T, "className"> & { className?: string };
 
-export type MenuSurface = "glass" | "solid";
+export type MenuSurface = "glass" | "solid" | "paper";
 
 const SurfaceContext = createContext<MenuSurface>("glass");
 
@@ -18,6 +18,8 @@ export type MenuContentProps = WithClass<ComponentProps<typeof BaseMenu.Popup>> 
    * `glass` is the Figma `Menu` (thick glass, 20px radius, 40px rows).
    * `solid` is the Account / Workspace menu that opens over glass chrome
    * (opaque fill, 18px radius, soft shadow, 36px rows).
+   * `paper` is the Paper workspace switcher: default fill, 1px default border, 14px radius,
+   * 0 12 32 shadow, 304px wide, 36px rows.
    */
   surface?: MenuSurface;
   side?: ComponentProps<typeof BaseMenu.Positioner>["side"];
@@ -29,6 +31,7 @@ export type MenuContentProps = WithClass<ComponentProps<typeof BaseMenu.Popup>> 
 export const menuPopupClass = {
   glass: "rounded-xl bg-glass-thick",
   solid: "rounded-[18px] bg-glass-fill-solid shadow-popover",
+  paper: "rounded-[14px] border border-border-default bg-bg-default shadow-[0_12px_32px_#0A142424]",
 } as const;
 
 /** Figma `Menus and popovers` (88:495): `Menu`, `Account menu` and `Workspace menu`. */
@@ -54,13 +57,13 @@ export function MenuContent({
         <BaseMenu.Popup
           className={cn(
             "relative flex motion-popup flex-col gap-0.5 overflow-clip p-1.5 outline-none",
-            surface === "glass" ? "w-55" : "w-64",
+            surface === "glass" ? "w-55" : surface === "paper" ? "w-76" : "w-64",
             menuPopupClass[surface],
             className,
           )}
           {...props}
         >
-          <LiquidGlass tier="thick" />
+          {surface === "paper" ? null : <LiquidGlass tier="thick" />}
           <SurfaceContext value={surface}>{children}</SurfaceContext>
         </BaseMenu.Popup>
       </BaseMenu.Positioner>
@@ -76,9 +79,20 @@ export type MenuItemProps = WithClass<ComponentProps<typeof BaseMenu.Item>> & {
   /** Right side: a shortcut such as "⌘C", or a check. */
   trailing?: ReactNode;
   danger?: boolean;
+  /** Current choice drawn on the brand tint (Paper workspace switcher). */
+  selected?: boolean;
 };
 
-export function MenuItem({ icon, description, trailing, danger, className, children, ...props }: MenuItemProps) {
+export function MenuItem({
+  icon,
+  description,
+  trailing,
+  danger,
+  selected,
+  className,
+  children,
+  ...props
+}: MenuItemProps) {
   const surface = useContext(SurfaceContext);
   return (
     <BaseMenu.Item
@@ -86,6 +100,7 @@ export function MenuItem({ icon, description, trailing, danger, className, child
         "relative flex w-full cursor-pointer items-center gap-2.5 motion-colors outline-none select-none data-disabled:cursor-not-allowed data-disabled:opacity-40 data-highlighted:bg-overlay-ink-6",
         surface === "glass" ? "rounded-md px-3" : "rounded-[10px] px-2.5",
         description ? "h-11.5 pl-2" : surface === "glass" ? "h-10" : "h-9",
+        selected && "bg-bg-brand data-highlighted:bg-bg-brand",
         className,
       )}
       {...props}

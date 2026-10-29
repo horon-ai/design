@@ -111,9 +111,12 @@ export function BotMemoryPanel({
           <div className="flex items-center gap-3 px-4.5 py-2.5">
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span className="text-label-md text-text-primary">{setting.label}</span>
-              {setting.description ? <span className="text-caption text-text-secondary">{setting.description}</span> : null}
+              {setting.description ? (
+                <span className="text-caption text-text-secondary">{setting.description}</span>
+              ) : null}
             </div>
             <Switch
+              size="compact"
               aria-label={setting.label}
               defaultChecked={setting.defaultChecked}
               onCheckedChange={(checked) => onSettingChange?.(setting.id, checked)}
@@ -133,7 +136,7 @@ export function BotMemoryPanel({
         <button
           type="button"
           aria-label="Search memories"
-          className="flex size-7.5 shrink-0 cursor-pointer items-center justify-center rounded-full text-text-secondary motion-press hover:bg-overlay-ink-8 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="flex size-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-8 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
         >
           <MagnifyingGlass aria-hidden className="size-4" />
         </button>
@@ -155,7 +158,9 @@ export function BotMemoryPanel({
           >
             <BookmarkSimple aria-hidden className="size-3.5 shrink-0 text-text-primary" />
             <span className="shrink-0 text-label-sm text-text-primary">{toast.title}</span>
-            {toast.message ? <span className="min-w-0 truncate text-caption text-text-secondary">{toast.message}</span> : null}
+            {toast.message ? (
+              <span className="min-w-0 truncate text-caption text-text-secondary">{toast.message}</span>
+            ) : null}
             <button
               type="button"
               aria-label="Dismiss"
@@ -180,7 +185,7 @@ export function BotMemoryPanel({
                 <div
                   key={memory.id}
                   className={cn(
-                    "motion-rise flex flex-col gap-0.5 px-4.5 py-2 motion-colors",
+                    "flex motion-rise flex-col gap-0.5 px-4.5 py-2 motion-colors",
                     memory.fresh && "bg-accent-sky-500-10",
                   )}
                   style={{ animationDelay: `${rowIndex++ * 30}ms` }}

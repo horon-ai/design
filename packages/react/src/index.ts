@@ -59,6 +59,7 @@ export * from "./components/schedule";
 export * from "./components/segmented-control";
 export * from "./components/select";
 export * from "./components/settings-list";
+export * from "./components/slider";
 export * from "./components/sidebar";
 export * from "./components/skeleton";
 export * from "./components/source-row";

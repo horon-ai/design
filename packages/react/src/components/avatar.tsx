@@ -17,6 +17,8 @@ export type AvatarProps = {
   children?: ReactNode;
   /** Shows the live status dot at the bottom right. */
   live?: boolean;
+  /** Initials colour: `neutral` (default) or `sky`, the Paper account profile avatar (sky-100 fill, sky-700 text). */
+  tone?: "neutral" | "sky";
   className?: string;
 };
 
@@ -49,7 +51,16 @@ const typeClass = {
 } as const;
 
 /** Figma `Avatar` (61:347): Initials, Bot and Image in four sizes, with an optional live dot. */
-export function Avatar({ type = "initials", size = "md", src, alt = "", children, live, className }: AvatarProps) {
+export function Avatar({
+  type = "initials",
+  size = "md",
+  src,
+  alt = "",
+  children,
+  live,
+  tone = "neutral",
+  className,
+}: AvatarProps) {
   return (
     <span className={cn("relative inline-flex shrink-0", className)}>
       <BaseAvatar.Root
@@ -57,13 +68,16 @@ export function Avatar({ type = "initials", size = "md", src, alt = "", children
           "inline-flex items-center justify-center overflow-clip rounded-full select-none",
           sizeClass[size],
           typeClass[type],
+          type === "initials" && tone === "sky" && "bg-sky-100 text-sky-700",
         )}
       >
         {type === "bot" ? (
           <Robot aria-hidden className={botIconClass[size]} />
         ) : (
           <>
-            {type === "image" && src && <BaseAvatar.Image src={src} alt={alt} className="size-full motion-fade object-cover" />}
+            {type === "image" && src && (
+              <BaseAvatar.Image src={src} alt={alt} className="size-full object-cover motion-fade" />
+            )}
             <BaseAvatar.Fallback>{children}</BaseAvatar.Fallback>
           </>
         )}

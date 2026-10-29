@@ -16,6 +16,13 @@ export type DialogContentProps = Omit<ComponentProps<typeof BaseDialog.Popup>, "
   closeLabel?: string | null;
   /** Slot marker on the close control, for a surface its own app selects the control by. */
   closeSlot?: string;
+  /** Tile or icon set before the title (Paper settings modals). */
+  leading?: ReactNode;
+  /**
+   * `glass` is the Figma frost dialog. `solid` is the Paper workspace modal: opaque default fill,
+   * 20px radius, 24px padding, 20px gap and a 0 24 64 shadow, no glass layer.
+   */
+  surface?: "glass" | "solid";
   className?: string;
 };
 
@@ -28,26 +35,35 @@ export function DialogContent({
   description,
   closeLabel = "Close",
   closeSlot,
+  leading,
+  surface = "glass",
   className,
   children,
   ...props
 }: DialogContentProps) {
+  const solid = surface === "solid";
   return (
     <BaseDialog.Portal>
-      <BaseDialog.Backdrop className="fixed inset-0 bg-bg-scrim motion-fade opacity-40" />
-      <BaseDialog.Viewport className="fixed inset-0 flex items-center justify-center px-4">
+      <BaseDialog.Backdrop className="fixed inset-0 z-50 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]" />
+      <BaseDialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <BaseDialog.Popup
           className={cn(
-            "relative flex w-105 outline-none max-w-[calc(100vw-2rem)] flex-col items-start gap-2 overflow-clip rounded-xl bg-glass-fill-frost p-6 backdrop-blur-[24px]",
-            "shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost),0_0_0_1px_var(--color-overlay-ink-3)]",
-            "dark:bg-glass-thick dark:backdrop-blur-none dark:shadow-none",
+            "relative flex w-105 max-w-[calc(100vw-2rem)] flex-col items-start overflow-clip p-6 outline-none",
+            solid
+              ? "gap-5 rounded-[20px] bg-bg-default shadow-[0_24px_64px_#0A142433]"
+              : cn(
+                  "gap-2 rounded-xl bg-glass-fill-frost backdrop-blur-[24px]",
+                  "shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost),0_0_0_1px_var(--color-overlay-ink-3)]",
+                  "dark:bg-glass-thick dark:shadow-none dark:backdrop-blur-none",
+                ),
             "motion-popup duration-240 data-starting-style:translate-y-2",
             className,
           )}
           {...props}
         >
-          <LiquidGlass tier="thick" />
-          <div className="relative flex w-full items-start gap-2">
+          {solid ? null : <LiquidGlass tier="thick" />}
+          <div className={cn("relative flex w-full items-start", leading ? "gap-3.5" : "gap-2")}>
+            {leading}
             <BaseDialog.Title className="min-w-0 flex-1 text-title-md text-text-primary">{title}</BaseDialog.Title>
             {closeLabel !== null && (
               <BaseDialog.Close
