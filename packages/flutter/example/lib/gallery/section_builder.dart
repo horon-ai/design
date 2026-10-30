@@ -19,6 +19,7 @@ import 'sections/breadcrumb_header.dart';
 import 'sections/button.dart';
 import 'sections/calendar.dart';
 import 'sections/card.dart';
+import 'sections/chat_bubble.dart';
 import 'sections/checkbox.dart';
 import 'sections/chip.dart';
 import 'sections/choice_card.dart';
@@ -42,6 +43,7 @@ import 'sections/list_detail.dart';
 import 'sections/marketplace_card.dart';
 import 'sections/mcp_server_row.dart';
 import 'sections/page_header.dart';
+import 'sections/plan_card.dart';
 import 'sections/plugin_row.dart';
 import 'sections/progress.dart';
 import 'sections/radio_group.dart';
@@ -81,6 +83,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'button': HoronButtonGallerySection.new,
   'calendar': HoronCalendarGallerySection.new,
   'card': HoronCardGallerySection.new,
+  'chat_bubble': HoronChatBubbleGallerySection.new,
   'checkbox': HoronCheckboxGallerySection.new,
   'chip': HoronChipGallerySection.new,
   'choice_card': HoronChoiceCardGallerySection.new,
@@ -104,6 +107,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'marketplace_card': HoronMarketplaceCardGallerySection.new,
   'mcp_server_row': HoronMcpServerRowGallerySection.new,
   'page_header': HoronPageHeaderGallerySection.new,
+  'plan_card': HoronPlanCardGallerySection.new,
   'plugin_row': HoronPluginRowGallerySection.new,
   'progress': HoronProgressGallerySection.new,
   'radio_group': HoronRadioGroupGallerySection.new,
