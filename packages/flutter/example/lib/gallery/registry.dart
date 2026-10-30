@@ -100,6 +100,7 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(slug: 'tabs', title: 'Tabs', group: 'navigation'),
   GallerySection(slug: 'tab_bar', title: 'Tab Bar', group: 'navigation'),
   GallerySection(slug: 'breadcrumb', title: 'Breadcrumb', group: 'navigation'),
+  GallerySection(slug: 'sidebar', title: 'Sidebar', group: 'navigation'),
   GallerySection(
     slug: 'page_header',
     title: 'Page Header',

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/sidebar.dart';
 
 /// 테스트가 쓰는 화면 폭입니다. `md`(768)보다 넓어야 폭 조절 손잡이가 보입니다.
 const double _desktopWidth = 1024;

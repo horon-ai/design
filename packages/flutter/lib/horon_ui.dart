@@ -49,6 +49,7 @@ export 'src/components/schedule.dart';
 export 'src/components/segmented_control.dart';
 export 'src/components/select.dart';
 export 'src/components/settings_list.dart';
+export 'src/components/sidebar.dart';
 export 'src/components/skeleton.dart';
 export 'src/components/slider.dart';
 export 'src/components/spinner.dart';

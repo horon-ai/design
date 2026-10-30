@@ -55,6 +55,7 @@ import 'sections/schedule.dart';
 import 'sections/segmented_control.dart';
 import 'sections/select.dart';
 import 'sections/settings_list.dart';
+import 'sections/sidebar.dart';
 import 'sections/skeleton.dart';
 import 'sections/slider.dart';
 import 'sections/spinner.dart';
@@ -124,6 +125,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'segmented_control': HoronSegmentedControlGallerySection.new,
   'select': HoronSelectGallerySection.new,
   'settings_list': HoronSettingsListGallerySection.new,
+  'sidebar': HoronSidebarGallerySection.new,
   'skeleton': HoronSkeletonGallerySection.new,
   'slider': HoronSliderGallerySection.new,
   'spinner': HoronSpinnerGallerySection.new,
