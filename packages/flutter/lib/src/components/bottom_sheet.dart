@@ -66,6 +66,9 @@ const double _rowCaretSize = 16;
 ///
 /// 시트를 띄우려면 [showHoronBottomSheet]를 씁니다. 스크림·화면 배치·올라오는
 /// 전환은 그 함수가 소유하고, 이 위젯은 표면만 그립니다.
+/// Paper 유리 시트의 배경 흐림 반경입니다.
+const double _frostBlur = 24;
+
 class HoronBottomSheet extends StatelessWidget {
   /// 시트의 내용을 받습니다.
   const HoronBottomSheet({
@@ -182,11 +185,18 @@ class HoronBottomSheet extends StatelessWidget {
             children: <Widget>[
               if (glass)
                 Positioned.fill(
-                  child: HoronLiquidGlass(
-                    tier: HoronGlassTier.thick,
-                    borderRadius: radius,
-                    child: const SizedBox.expand(),
-                  ),
+                  // Paper `VBH-1`(라이트)은 `--color-glass-fill-frost`(#FFFFFFE5, 90%)에
+                  // 24px 배경 흐림을 쓰고, 다크 `DKE-0`은 두꺼운 유리(#17181ACC, 80%)입니다.
+                  child: theme.brightness == Brightness.dark
+                      ? HoronLiquidGlass(
+                          tier: HoronGlassTier.thick,
+                          borderRadius: radius,
+                          child: const SizedBox.expand(),
+                        )
+                      : BackdropFilter(
+                          filter: ui.ImageFilter.blur(sigmaX: _frostBlur, sigmaY: _frostBlur),
+                          child: ColoredBox(color: colors.glassFillFrost),
+                        ),
                 ),
               if (solid) Positioned.fill(child: ColoredBox(color: colors.bgDefault)),
               if (rings)

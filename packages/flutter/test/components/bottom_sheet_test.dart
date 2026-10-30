@@ -44,7 +44,16 @@ void main() {
     await tester.pumpWidget(_host(const HoronBottomSheet(title: Text('알림 설정'))));
     final HoronSpaceSpec space = _theme(tester).space;
 
-    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'bg-glass-fill-frost는 유리 레이어가 그립니다');
+    // Paper `VBH-1`(라이트)은 `--color-glass-fill-frost`(#FFFFFFE5, 90%) + 24px 배경 흐림을,
+    // 다크 `DKE-0`은 두꺼운 유리(#17181ACC, 80%)를 씁니다. 라이트에서는 유리 엔진 대신
+    // 서리 채움과 흐림이 그 자리를 맡습니다.
+    final HoronThemeData light = _theme(tester);
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == light.colors.glassFillFrost),
+      findsOneWidget,
+      reason: 'glass-fill-frost #FFFFFFE5',
+    );
+    expect(find.byType(BackdropFilter), findsOneWidget, reason: '24px 배경 흐림');
     final BorderRadius radius = _panelClip(tester).borderRadius as BorderRadius;
     expect(radius.topLeft.x, 32, reason: 'rounded-t-[32px]');
     expect(radius.bottomLeft.x, 0, reason: '위쪽 모서리만 둥급니다');
@@ -291,5 +300,13 @@ void main() {
     await pointer.moveTo(tester.getCenter(find.byType(HoronBottomSheetAction)));
     await tester.pump();
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the dark sheet keeps the thick glass, not the frost fill', (WidgetTester tester) async {
+    // Paper `DKE-0`은 라이트 `VBH-1`의 서리 채움 대신 두꺼운 유리를 씁니다.
+    await tester.pumpWidget(_host(const HoronBottomSheet(title: Text('알림 설정')), brightness: Brightness.dark));
+    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '다크는 유리 엔진이 그립니다');
+    final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
+    expect(glass.tier, HoronGlassTier.thick, reason: '#17181ACC 80%');
   });
 }
