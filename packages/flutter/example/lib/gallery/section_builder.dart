@@ -12,6 +12,7 @@ import 'package:flutter/widgets.dart';
 import 'registry.dart';
 import 'sections/agent_activity.dart';
 import 'sections/agent_lane.dart';
+import 'sections/agent_panel.dart';
 import 'sections/approval_card.dart';
 import 'sections/avatar.dart';
 import 'sections/badge.dart';
@@ -91,6 +92,7 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
 const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'agent_activity': HoronAgentActivityGallerySection.new,
   'agent_lane': HoronAgentLaneGallerySection.new,
+  'agent_panel': HoronAgentPanelGallerySection.new,
   'approval_card': HoronApprovalCardGallerySection.new,
   'avatar': HoronAvatarGallerySection.new,
   'badge': HoronBadgeGallerySection.new,

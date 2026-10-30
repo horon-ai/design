@@ -6,6 +6,7 @@ library;
 
 export 'src/components/agent_activity.dart';
 export 'src/components/agent_lane.dart';
+export 'src/components/agent_panel.dart';
 export 'src/components/approval_card.dart';
 export 'src/components/avatar.dart';
 export 'src/components/badge.dart';
