@@ -184,41 +184,46 @@ class HoronSourceRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 4,
-            children: <Widget>[
-              for (final HoronSourceStage stage in _stages)
-                SizedBox(
-                  width: _barWidth,
-                  height: _barHeight,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(theme.radius.full),
-                    child: stage == HoronSourceStage.active
-                        ? Stack(
-                            children: <Widget>[
-                              Positioned.fill(child: ColoredBox(color: _barColor(theme, stage))),
-                              Align(
-                                alignment: AlignmentDirectional.centerStart,
-                                child: TweenAnimationBuilder<double>(
-                                  tween: Tween<double>(begin: progress / 100, end: progress / 100),
-                                  duration: HoronMotion.colorsDuration,
-                                  curve: HoronMotion.easeOutQuint,
-                                  builder: (BuildContext context, double t, Widget? child) => FractionallySizedBox(
-                                    widthFactor: t.clamp(0.0, 1.0),
-                                    heightFactor: 1,
-                                    child: child,
+          // 좁은 폭에서는 단계 막대를 감춥니다. 남은 폭이 520 미만이면 이름과
+          // 설명이 먼저 자리를 지켜야 하기 때문입니다.
+          if (MediaQuery.sizeOf(context).width < 520)
+            const SizedBox.shrink()
+          else
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 4,
+              children: <Widget>[
+                for (final HoronSourceStage stage in _stages)
+                  SizedBox(
+                    width: _barWidth,
+                    height: _barHeight,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(theme.radius.full),
+                      child: stage == HoronSourceStage.active
+                          ? Stack(
+                              children: <Widget>[
+                                Positioned.fill(child: ColoredBox(color: _barColor(theme, stage))),
+                                Align(
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(begin: progress / 100, end: progress / 100),
+                                    duration: HoronMotion.colorsDuration,
+                                    curve: HoronMotion.easeOutQuint,
+                                    builder: (BuildContext context, double t, Widget? child) => FractionallySizedBox(
+                                      widthFactor: t.clamp(0.0, 1.0),
+                                      heightFactor: 1,
+                                      child: child,
+                                    ),
+                                    child: ColoredBox(color: HoronPalette.sky500),
                                   ),
-                                  child: ColoredBox(color: HoronPalette.sky500),
                                 ),
-                              ),
-                            ],
-                          )
-                        : ColoredBox(color: _barColor(theme, stage)),
+                              ],
+                            )
+                          : ColoredBox(color: _barColor(theme, stage)),
+                    ),
                   ),
-                ),
-            ],
-          ),
+              ],
+            ),
           SizedBox(
             width: 72,
             height: 30,

@@ -13,8 +13,8 @@ class HoronToolCallsHeaderGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: SizedBox(
-        width: 460,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 460),
         child: HoronToolCallsHeader(
           toolIcons: const <Widget>[
             Icon(Icons.search),

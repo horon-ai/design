@@ -72,8 +72,17 @@ class _HoronToolCallsHeaderState extends State<HoronToolCallsHeader> {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final List<Widget> chips = widget.toolIcons.take(3).toList();
 
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        // 좁은 폭에서는 칩을 두 개로 줄이고 경과 시간을 감춥니다.
+        final bool narrow = constraints.maxWidth < 340;
+        return _body(theme, widget.toolIcons.take(narrow ? 2 : 3).toList(), narrow);
+      },
+    );
+  }
+
+  Widget _body(HoronThemeData theme, List<Widget> chips, bool narrow) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -117,7 +126,7 @@ class _HoronToolCallsHeaderState extends State<HoronToolCallsHeader> {
                     ),
                   if (chips.isNotEmpty) const SizedBox(width: _headerGap),
                   Text(widget.title, style: theme.text.labelMd.copyWith(color: theme.colors.textPrimary)),
-                  if (widget.elapsed != null) ...<Widget>[
+                  if (widget.elapsed != null && !narrow) ...<Widget>[
                     const SizedBox(width: _headerGap),
                     Text('· ${widget.elapsed}', style: theme.text.labelMd.copyWith(color: theme.colors.textSecondary)),
                   ],

@@ -13,8 +13,8 @@ class HoronSourceRowGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: SizedBox(
-        width: 620,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 620),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           spacing: theme.space.s3,
