@@ -13,7 +13,7 @@ import 'gate_sources.dart';
 /// call whose own argument list (not a nested call's) contains
 /// `scrollDirection: Axis.horizontal`. It reports file and line.
 ///
-/// Exactly two files are exempt, both because their content has to keep its
+/// Three files are exempt, each because its content has to keep its
 /// columns rather than reflow:
 ///
 ///  * `lib/src/components/data_table.dart` - a data table's body scrolls

@@ -15,6 +15,10 @@ AnimatedContainer _container(WidgetTester tester) => tester.widget<AnimatedConta
 
 BoxDecoration _decoration(WidgetTester tester) => _container(tester).decoration! as BoxDecoration;
 
+/// 유리 위에 얹히는 내용의 패딩입니다. React의 `px-3`와 체크 자리 당김을 담습니다.
+EdgeInsetsGeometry _contentPadding(WidgetTester tester) =>
+    tester.widget<Padding>(find.ancestor(of: find.byType(Row), matching: find.byType(Padding)).first).padding;
+
 void main() {
   testWidgets('default state renders in light and dark', (WidgetTester tester) async {
     for (final Brightness brightness in Brightness.values) {
@@ -29,12 +33,17 @@ void main() {
     final BoxDecoration decoration = _decoration(tester);
 
     expect(tester.getSize(_surface()).height, 32, reason: 'h-8');
-    expect(decoration.color, theme.colors.glassClear, reason: 'bg-glass-clear');
+    // 바탕은 유리 엔진이 그립니다. React `chip.tsx:30`의 `<LiquidGlass texture />`와 같습니다.
+    expect(decoration.color, isNull, reason: 'bg-glass-clear는 유리 채움 레이어가 그립니다');
+    final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
+    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '칩은 언제나 유리 레이어를 깝니다');
+    expect(glass.tier, HoronGlassTier.clear);
+    expect(glass.texture, isTrue, reason: 'Paper의 Texture 레이어를 그립니다');
     expect(decoration.border!.top.color, Colors.transparent, reason: 'border-transparent');
     expect(decoration.border!.top.width, 1, reason: 'border');
     expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.radius.full, reason: 'rounded-full');
     // 체크 자리가 `w-0 -mr-1.5`이라 라벨은 12px에서 6px 당겨진 자리에서 시작합니다.
-    expect(_container(tester).padding, EdgeInsets.only(left: theme.space.s3 - theme.space.s1_5, right: theme.space.s3));
+    expect(_contentPadding(tester), EdgeInsets.only(left: theme.space.s3 - theme.space.s1_5, right: theme.space.s3));
     expect(tester.widget<Text>(find.text('필터')).style!.fontSize, theme.text.labelMd.fontSize, reason: 'text-label-md');
     expect(find.byIcon(Icons.check), findsNothing, reason: '선택 전에는 체크가 숨습니다');
   });
@@ -52,7 +61,8 @@ void main() {
     expect(_decoration(tester).color, theme.colors.glassClearPressed, reason: 'data-pressed:bg-glass-clear-pressed');
     expect(_decoration(tester).border!.top.color, theme.colors.borderBrand, reason: 'data-pressed:border-border-brand');
     expect(tester.widget<Text>(find.text('필터')).style!.color, theme.colors.textBrand, reason: 'text-text-brand');
-    expect(_container(tester).padding, EdgeInsets.only(left: theme.space.s3, right: theme.space.s3));
+    expect(_container(tester).padding, isNull, reason: '패딩은 유리 위 내용으로 옮겼습니다');
+    expect(_contentPadding(tester), EdgeInsets.only(left: theme.space.s3, right: theme.space.s3));
 
     await tester.tap(find.byType(HoronChip));
     await tester.pumpAndSettle();

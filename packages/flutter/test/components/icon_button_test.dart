@@ -54,13 +54,25 @@ void main() {
         _host(HoronIconButton(icon: const Icon(Icons.add), label: '추가', variant: variant, onPressed: () {})),
       );
       final HoronColors colors = _theme(tester).colors;
-      final (Color background, Color foreground) expected = switch (variant) {
+      final (Color? background, Color foreground) expected = switch (variant) {
         HoronIconButtonVariant.primary => (colors.interactivePrimary, colors.interactiveOnPrimary),
         HoronIconButtonVariant.ghost => (Colors.transparent, colors.textPrimary),
-        HoronIconButtonVariant.glass => (colors.glassClear, colors.textPrimary),
+        // glass는 바탕을 유리 엔진이 그립니다. React `icon-button.tsx:50`이 `<LiquidGlass />`를
+        // 깔고 아이콘을 얹는 것과 같은 순서입니다. 쉬는 상태의 컨테이너 색은 비어 있고,
+        // 호버·누름에서만 토큰 색이 얇게 얹힙니다.
+        HoronIconButtonVariant.glass => (null, colors.textPrimary),
       };
       expect(_decoration(tester).color, expected.$1, reason: '$variant 배경색');
-      expect((_decoration(tester).shape), BoxShape.circle, reason: 'rounded-full');
+      if (variant == HoronIconButtonVariant.glass) {
+        expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'glass 변형은 유리 레이어를 깝니다');
+        expect(
+          (_decoration(tester).borderRadius! as BorderRadius).topLeft.x,
+          tester.getSize(_surface()).width / 2,
+          reason: 'rounded-full',
+        );
+      } else {
+        expect(_decoration(tester).shape, BoxShape.circle, reason: 'rounded-full');
+      }
       expect(_iconColor(tester), expected.$2, reason: '$variant 아이콘색');
     }
   });
@@ -81,6 +93,27 @@ void main() {
     await tester.tap(find.byType(HoronIconButton));
     await tester.pumpAndSettle();
     expect(taps, 1);
+  });
+
+  testWidgets('hover on glass lays the glass hover tint over the glass layer', (WidgetTester tester) async {
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: Offset.zero);
+    addTearDown(pointer.removePointer);
+
+    await tester.pumpWidget(
+      _host(
+        HoronIconButton(
+          icon: const Icon(Icons.add),
+          label: '추가',
+          variant: HoronIconButtonVariant.glass,
+          onPressed: () {},
+        ),
+      ),
+    );
+    await pointer.moveTo(tester.getCenter(find.byType(HoronIconButton)));
+    await tester.pump();
+    expect(_decoration(tester).color, _theme(tester).colors.glassClearHover, reason: 'hover:bg-glass-clear-hover');
+    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '호버에서도 유리 레이어는 남습니다');
   });
 
   testWidgets('the accessible name is the React aria-label, and a disabled button is inert', (

@@ -44,10 +44,12 @@ void main() {
     await tester.pumpWidget(_host(Brightness.light, const HoronComposer()));
 
     expect(tester.getSize(find.byKey(const Key('horon-composer'))).height, space.s2 + 40 + space.s2);
-    final ColoredBox fill = tester.widget<ColoredBox>(
-      find.descendant(of: find.byKey(const Key('horon-composer')), matching: find.byType(ColoredBox)).first,
-    );
-    expect(fill.color, colors.glassRegular);
+    // 바탕은 유리 엔진이 그립니다. React `composer.tsx`의 `<LiquidGlass tier="regular" />`와
+    // 같은 순서로, 알약 전체가 하나의 regular 유리 표면입니다.
+    final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
+    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '알약이 유리 표면을 깝니다');
+    expect(glass.tier, HoronGlassTier.regular);
+    expect(glass.texture, isFalse, reason: 'React 컴포저는 texture를 넘기지 않습니다');
 
     final Icon attach = tester.widget<Icon>(find.byIcon(Icons.add));
     expect(attach.size, 20);
