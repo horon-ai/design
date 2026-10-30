@@ -7,16 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
 /// 위젯을 라이트·다크 테마의 화면 가운데에 올립니다.
-Widget _host(Widget child, {Brightness brightness = Brightness.light, Color? iconColor}) => MaterialApp(
+Widget _host(Widget child, {Brightness brightness = Brightness.light}) => MaterialApp(
   theme: horonTheme(brightness),
-  home: Scaffold(
-    body: Center(
-      child: IconTheme(
-        data: IconThemeData(color: iconColor),
-        child: child,
-      ),
-    ),
-  ),
+  // MaterialApp은 테마를 200ms 동안 이어 그립니다. 한 프레임에서 밝기별 색을 읽으려면
+  // 그 애니메이션을 끄고 최종 테마로 바로 그리게 합니다.
+  themeAnimationDuration: Duration.zero,
+  home: Scaffold(body: Center(child: child)),
 );
 
 /// 화면에 실제로 칠해진 픽셀입니다.
@@ -87,7 +83,6 @@ Future<_Raster> _paintFalcon(
   required double size,
   Color? color,
   Brightness brightness = Brightness.light,
-  Color? iconColor,
 }) async {
   final GlobalKey key = GlobalKey();
   await tester.pumpWidget(
@@ -97,7 +92,6 @@ Future<_Raster> _paintFalcon(
         child: HoronIcon(size: size, color: color),
       ),
       brightness: brightness,
-      iconColor: iconColor,
     ),
   );
   expect(tester.takeException(), isNull);
@@ -143,17 +137,12 @@ void main() {
     expect(colors, <int>{_rgb(expected)}, reason: 'fill=currentColor 자리는 color 인자가 됩니다');
   });
 
-  testWidgets('the colour falls back to IconTheme, then to the text colour', (WidgetTester tester) async {
-    final HoronThemeData light = HoronThemeData.light;
-    final Set<int> themed = (await _paintFalcon(tester, size: 22, iconColor: light.colors.textSecondary)).opaqueRgb();
-    expect(themed, <int>{_rgb(light.colors.textSecondary)});
-
-    final Set<int> inherited = (await _paintFalcon(tester, size: 22)).opaqueRgb();
+  testWidgets('without a colour it paints the brightness\'s text colour', (WidgetTester tester) async {
+    final Set<int> light = (await _paintFalcon(tester, size: 22)).opaqueRgb();
     final Set<int> dark = (await _paintFalcon(tester, size: 22, brightness: Brightness.dark)).opaqueRgb();
-    expect(inherited, isNotEmpty);
-    expect(dark, isNotEmpty);
-    expect(inherited, isNot(<int>{_rgb(light.colors.textSecondary)}));
-    expect(dark, isNot(inherited), reason: '다크에서는 밝은 글자 색으로 그립니다');
+
+    expect(light, <int>{_rgb(HoronThemeData.light.colors.textPrimary)}, reason: 'fill=currentColor → text-primary');
+    expect(dark, <int>{_rgb(HoronThemeData.dark.colors.textPrimary)}, reason: '다크에서는 밝은 글자 색으로 그립니다');
   });
 
   testWidgets('the icon vocabulary is the 79 Paper names in React order', (WidgetTester tester) async {
@@ -192,17 +181,16 @@ void main() {
     expect(tester.getSize(find.byType(HoronIcon)), const Size(24, 24));
   });
 
-  testWidgets('glyph colour follows the colour argument and IconTheme', (WidgetTester tester) async {
+  testWidgets('glyph colour follows the colour argument and the theme', (WidgetTester tester) async {
     final HoronThemeData theme = HoronThemeData.light;
 
     await tester.pumpWidget(_host(const HoronGlyph(name: HoronIconName.check, color: Color(0xFF123456))));
     expect(tester.widget<Icon>(find.byType(Icon)).color, const Color(0xFF123456));
 
-    await tester.pumpWidget(_host(const HoronGlyph(name: HoronIconName.check), iconColor: theme.colors.textSecondary));
-    expect(tester.widget<Icon>(find.byType(Icon)).color, theme.colors.textSecondary);
+    await tester.pumpWidget(_host(const HoronGlyph(name: HoronIconName.check)));
+    expect(tester.widget<Icon>(find.byType(Icon)).color, theme.colors.textPrimary, reason: '인자를 주지 않으면 본문 글자 색입니다');
 
-    await tester.pumpWidget(_host(const HoronGlyph(name: HoronIconName.horon), iconColor: theme.colors.textBrand));
-    final Set<int> painted = (await _paintFalcon(tester, size: 22, iconColor: theme.colors.textBrand)).opaqueRgb();
+    final Set<int> painted = (await _paintFalcon(tester, size: 22, color: theme.colors.textBrand)).opaqueRgb();
     expect(painted, <int>{_rgb(theme.colors.textBrand)}, reason: 'HoronGlyph의 horon도 같은 색 규칙을 씁니다');
   });
 

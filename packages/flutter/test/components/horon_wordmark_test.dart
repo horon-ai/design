@@ -10,16 +10,12 @@ import 'package:horon_ui/horon_ui.dart';
 const double _aspect = 48.7038 / 11.5;
 
 /// 위젯을 라이트·다크 테마의 화면 가운데에 올립니다.
-Widget _host(Widget child, {Brightness brightness = Brightness.light, Color? iconColor}) => MaterialApp(
+Widget _host(Widget child, {Brightness brightness = Brightness.light}) => MaterialApp(
   theme: horonTheme(brightness),
-  home: Scaffold(
-    body: Center(
-      child: IconTheme(
-        data: IconThemeData(color: iconColor),
-        child: child,
-      ),
-    ),
-  ),
+  // MaterialApp은 테마를 200ms 동안 이어 그립니다. 한 프레임에서 밝기별 색을 읽으려면
+  // 그 애니메이션을 끄고 최종 테마로 바로 그리게 합니다.
+  themeAnimationDuration: Duration.zero,
+  home: Scaffold(body: Center(child: child)),
 );
 
 /// 화면에 실제로 칠해진 픽셀입니다.
@@ -90,7 +86,6 @@ Future<_Raster> _paintMark(
   double? height,
   Color? color,
   Brightness brightness = Brightness.light,
-  Color? iconColor,
 }) async {
   final GlobalKey key = GlobalKey();
   await tester.pumpWidget(
@@ -100,7 +95,6 @@ Future<_Raster> _paintMark(
         child: HoronWordmark(height: height ?? 11.5, color: color),
       ),
       brightness: brightness,
-      iconColor: iconColor,
     ),
   );
   expect(tester.takeException(), isNull);
@@ -148,14 +142,11 @@ void main() {
     expect(colors, <int>{_rgb(expected)}, reason: 'fill=currentColor 자리는 color 인자가 됩니다');
   });
 
-  testWidgets('the colour falls back to IconTheme, then to the text colour', (WidgetTester tester) async {
-    final HoronThemeData light = HoronThemeData.light;
-    final Set<int> themed = (await _paintMark(tester, height: 60, iconColor: light.colors.textSecondary)).opaqueRgb();
-    expect(themed, <int>{_rgb(light.colors.textSecondary)});
-
-    final Set<int> inherited = (await _paintMark(tester, height: 60)).opaqueRgb();
+  testWidgets('without a colour it paints the brightness\'s text colour', (WidgetTester tester) async {
+    final Set<int> light = (await _paintMark(tester, height: 60)).opaqueRgb();
     final Set<int> dark = (await _paintMark(tester, height: 60, brightness: Brightness.dark)).opaqueRgb();
-    expect(inherited, <int>{_rgb(light.colors.textPrimary)}, reason: '기본은 밝기의 본문 글자 색입니다');
+
+    expect(light, <int>{_rgb(HoronThemeData.light.colors.textPrimary)}, reason: '기본은 밝기의 본문 글자 색입니다');
     expect(dark, <int>{_rgb(HoronThemeData.dark.colors.textPrimary)}, reason: '다크에서는 밝은 글자 색입니다');
   });
 

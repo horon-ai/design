@@ -98,12 +98,11 @@ class HoronWordmark extends StatelessWidget {
 
 /// `currentColor`의 자리입니다.
 ///
-/// React 워드마크는 부모의 글자 색을 씁니다. Flutter에서 그 자리는 [color] 인자,
-/// [IconTheme], 본문 글자 색(`textPrimary`) 순서입니다. [DefaultTextStyle]을 끼우지 않는
-/// 이유는 Material이 본문에 넣는 기본 글자 색이 검정이라 다크 화면에서 표식만 검게 되어
-/// 버리기 때문입니다.
-Color _resolveMarkColor(BuildContext context, Color? color) =>
-    color ?? IconTheme.of(context).color ?? HoronTheme.of(context).colors.textPrimary;
+/// React 워드마크는 부모의 글자 색을 씁니다. Flutter에서 그 자리는 테마의 본문 글자 색
+/// (`textPrimary`)이고, [color]를 주면 그 색이 이깁니다. Material의 `IconTheme`을 기본값으로
+/// 쓰지 않는 이유는 이 Flutter 버전의 `IconThemeData`가 색을 주지 않으면 불투명 검정으로
+/// 채우기 때문입니다. 그러면 다크 화면에서 표식만 검게 그려집니다.
+Color _resolveMarkColor(BuildContext context, Color? color) => color ?? HoronTheme.of(context).colors.textPrimary;
 
 /// 여섯 경로를 viewBox 비율로 확대해 칠합니다.
 class _WordmarkPainter extends CustomPainter {
