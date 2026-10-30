@@ -162,6 +162,7 @@ const List<GallerySection> gallerySections = <GallerySection>[
     title: 'Agent Activity',
     group: 'agents',
   ),
+  GallerySection(slug: 'task_row', title: 'Task Row', group: 'agents'),
   GallerySection(slug: 'agent_lane', title: 'Agent Lane', group: 'agents'),
   GallerySection(slug: 'plan_step', title: 'Plan Step', group: 'agents'),
   GallerySection(slug: 'source_row', title: 'Source Row', group: 'agents'),

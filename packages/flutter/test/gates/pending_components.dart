@@ -10,7 +10,6 @@
 const List<String> pendingComponents = <String>[
   'data_table',
   'agent_panel',
-  'task_row',
   'tool_call',
   'orchestrator_panel',
   'knowledge_base_panel',

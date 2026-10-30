@@ -64,6 +64,7 @@ export 'src/components/split_button.dart';
 export 'src/components/switch.dart';
 export 'src/components/tab_bar.dart';
 export 'src/components/tabs.dart';
+export 'src/components/task_row.dart';
 export 'src/components/textarea.dart';
 export 'src/components/textarea_field.dart';
 export 'src/components/toast.dart';

@@ -70,6 +70,7 @@ import 'sections/split_button.dart';
 import 'sections/switch.dart';
 import 'sections/tab_bar.dart';
 import 'sections/tabs.dart';
+import 'sections/task_row.dart';
 import 'sections/textarea.dart';
 import 'sections/textarea_field.dart';
 import 'sections/toast.dart';
@@ -148,6 +149,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'switch': HoronSwitchGallerySection.new,
   'tab_bar': HoronTabBarGallerySection.new,
   'tabs': HoronTabsGallerySection.new,
+  'task_row': HoronTaskRowGallerySection.new,
   'textarea': HoronTextareaGallerySection.new,
   'textarea_field': HoronTextareaFieldGallerySection.new,
   'toast': HoronToastGallerySection.new,
