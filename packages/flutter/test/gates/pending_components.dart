@@ -14,8 +14,6 @@ const List<String> pendingComponents = <String>[
   'knowledge_base_panel',
   'agent_steering_panel',
   'agent_lanes_timeline',
-  'bot_instructions_panel',
-  'document_extract_panel',
   'bot_memory_panel',
   'research_run_panel',
 ];

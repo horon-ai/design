@@ -169,6 +169,16 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(slug: 'source_row', title: 'Source Row', group: 'agents'),
   GallerySection(slug: 'plan_card', title: 'Plan Card', group: 'agents'),
   GallerySection(
+    slug: 'bot_instructions_panel',
+    title: 'Bot Instructions Panel',
+    group: 'agents',
+  ),
+  GallerySection(
+    slug: 'document_extract_panel',
+    title: 'Document Extract Panel',
+    group: 'agents',
+  ),
+  GallerySection(
     slug: 'tool_calls_header',
     title: 'Tool Calls Header',
     group: 'agents',
