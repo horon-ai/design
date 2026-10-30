@@ -36,10 +36,16 @@ class HoronAgentLanesTimelineGallerySection extends StatelessWidget {
                     HoronAgentLanesTimeline(
                       statuses: const <HoronLaneStatus>[
                         HoronLaneStatus(id: 'live', label: '4 running'),
-                        HoronLaneStatus(id: 'ink', label: '2 idle', live: false),
+                        HoronLaneStatus(
+                          id: 'ink',
+                          label: '2 idle',
+                          live: false,
+                        ),
                       ],
                       bots: _withApproval,
-                      handoffs: const <HoronLaneHandoff>[HoronLaneHandoff(from: 'scan', to: 'draft')],
+                      handoffs: const <HoronLaneHandoff>[
+                        HoronLaneHandoff(from: 'scan', to: 'draft'),
+                      ],
                       cursor: 2,
                       approval: HoronAgentLanesTimelineApproval(
                         message: 'Writer가 배포를 기다립니다',
@@ -58,7 +64,10 @@ class HoronAgentLanesTimelineGallerySection extends StatelessWidget {
                   spacing: theme.space.s2,
                   children: <Widget>[
                     _Caption('작업 색 네 가지 · 봇 색 네 가지'),
-                    const HoronAgentLanesTimeline(bots: _withEveryTone, cursor: -4),
+                    const HoronAgentLanesTimeline(
+                      bots: _withEveryTone,
+                      cursor: -4,
+                    ),
                   ],
                 ),
               ),
@@ -79,7 +88,10 @@ class _Caption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    return Text(text, style: theme.text.caption.copyWith(color: theme.colors.textSecondary));
+    return Text(
+      text,
+      style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+    );
   }
 }
 
@@ -92,7 +104,13 @@ const List<HoronLaneBot> _withApproval = <HoronLaneBot>[
     tone: HoronLaneBotTone.sky,
     tools: 'Notion · Slack',
     tasks: <HoronLaneTask>[
-      HoronLaneTask(id: 'scan', label: '지표를 모읍니다', tone: HoronLaneTaskTone.done, start: -28, end: -16),
+      HoronLaneTask(
+        id: 'scan',
+        label: '지표를 모읍니다',
+        tone: HoronLaneTaskTone.done,
+        start: -28,
+        end: -16,
+      ),
       HoronLaneTask(
         id: 'chart',
         label: '대시보드를 엽니다',
@@ -111,7 +129,13 @@ const List<HoronLaneBot> _withApproval = <HoronLaneBot>[
     badge: 'Idle',
     badgeInk: true,
     tasks: <HoronLaneTask>[
-      HoronLaneTask(id: 'draft', label: '요약을 씁니다', tone: HoronLaneTaskTone.waiting, start: -4, end: 0),
+      HoronLaneTask(
+        id: 'draft',
+        label: '요약을 씁니다',
+        tone: HoronLaneTaskTone.waiting,
+        start: -4,
+        end: 0,
+      ),
     ],
   ),
 ];
@@ -125,7 +149,13 @@ const List<HoronLaneBot> _withEveryTone = <HoronLaneBot>[
     tone: HoronLaneBotTone.sky,
     badge: 'Done',
     tasks: <HoronLaneTask>[
-      HoronLaneTask(id: 'sky-done', label: 'done', tone: HoronLaneTaskTone.done, start: -26, end: -6),
+      HoronLaneTask(
+        id: 'sky-done',
+        label: 'done',
+        tone: HoronLaneTaskTone.done,
+        start: -26,
+        end: -6,
+      ),
     ],
   ),
   HoronLaneBot(
@@ -134,7 +164,13 @@ const List<HoronLaneBot> _withEveryTone = <HoronLaneBot>[
     initial: 'T',
     tone: HoronLaneBotTone.steel,
     tasks: <HoronLaneTask>[
-      HoronLaneTask(id: 'steel-running', label: 'running', tone: HoronLaneTaskTone.running, start: -20, end: -2),
+      HoronLaneTask(
+        id: 'steel-running',
+        label: 'running',
+        tone: HoronLaneTaskTone.running,
+        start: -20,
+        end: -2,
+      ),
     ],
   ),
   HoronLaneBot(
@@ -143,7 +179,13 @@ const List<HoronLaneBot> _withEveryTone = <HoronLaneBot>[
     initial: 'N',
     tone: HoronLaneBotTone.neutral,
     tasks: <HoronLaneTask>[
-      HoronLaneTask(id: 'neutral-failed', label: 'failed', tone: HoronLaneTaskTone.failed, start: -14, end: 0),
+      HoronLaneTask(
+        id: 'neutral-failed',
+        label: 'failed',
+        tone: HoronLaneTaskTone.failed,
+        start: -14,
+        end: 0,
+      ),
     ],
   ),
   HoronLaneBot(
@@ -152,7 +194,13 @@ const List<HoronLaneBot> _withEveryTone = <HoronLaneBot>[
     initial: 'I',
     tone: HoronLaneBotTone.ink,
     tasks: <HoronLaneTask>[
-      HoronLaneTask(id: 'ink-waiting', label: 'waiting', tone: HoronLaneTaskTone.waiting, start: -9, end: -1),
+      HoronLaneTask(
+        id: 'ink-waiting',
+        label: 'waiting',
+        tone: HoronLaneTaskTone.waiting,
+        start: -9,
+        end: -1,
+      ),
     ],
   ),
 ];

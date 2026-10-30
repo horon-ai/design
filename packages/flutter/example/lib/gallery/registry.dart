@@ -167,7 +167,27 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(slug: 'agent_lane', title: 'Agent Lane', group: 'agents'),
   GallerySection(slug: 'plan_step', title: 'Plan Step', group: 'agents'),
   GallerySection(slug: 'source_row', title: 'Source Row', group: 'agents'),
+  GallerySection(
+    slug: 'orchestrator_panel',
+    title: 'Orchestrator Panel',
+    group: 'agents',
+  ),
   GallerySection(slug: 'plan_card', title: 'Plan Card', group: 'agents'),
+  GallerySection(
+    slug: 'knowledge_base_panel',
+    title: 'Knowledge Base Panel',
+    group: 'agents',
+  ),
+  GallerySection(
+    slug: 'agent_steering_panel',
+    title: 'Agent Steering Panel',
+    group: 'agents',
+  ),
+  GallerySection(
+    slug: 'agent_lanes_timeline',
+    title: 'Agent Lanes Timeline',
+    group: 'agents',
+  ),
   GallerySection(
     slug: 'bot_instructions_panel',
     title: 'Bot Instructions Panel',
@@ -176,6 +196,11 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(
     slug: 'document_extract_panel',
     title: 'Document Extract Panel',
+    group: 'agents',
+  ),
+  GallerySection(
+    slug: 'bot_memory_panel',
+    title: 'Bot Memory Panel',
     group: 'agents',
   ),
   GallerySection(

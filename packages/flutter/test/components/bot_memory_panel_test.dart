@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/bot_memory_panel.dart';
 
 const List<HoronBotMemorySetting> _settings = <HoronBotMemorySetting>[
   HoronBotMemorySetting(id: 'remember', label: 'Remember this chat', description: 'Keeps facts from the conversation'),

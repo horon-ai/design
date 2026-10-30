@@ -83,15 +83,31 @@ class _Caption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    return Text(text, style: theme.text.caption.copyWith(color: theme.colors.textSecondary));
+    return Text(
+      text,
+      style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+    );
   }
 }
 
 /// 실행 중인 판의 단계입니다. 세 상태를 모두 보여 줍니다.
 const List<HoronSteeringStep> _steps = <HoronSteeringStep>[
-  HoronSteeringStep(id: 'read', label: '메일을 읽습니다', status: HoronSteeringStepStatus.done, time: '1.4s'),
-  HoronSteeringStep(id: 'plan', label: '답장을 계획합니다', status: HoronSteeringStepStatus.active),
-  HoronSteeringStep(id: 'send', label: '답장을 보냅니다', status: HoronSteeringStepStatus.todo),
+  HoronSteeringStep(
+    id: 'read',
+    label: '메일을 읽습니다',
+    status: HoronSteeringStepStatus.done,
+    time: '1.4s',
+  ),
+  HoronSteeringStep(
+    id: 'plan',
+    label: '답장을 계획합니다',
+    status: HoronSteeringStepStatus.active,
+  ),
+  HoronSteeringStep(
+    id: 'send',
+    label: '답장을 보냅니다',
+    status: HoronSteeringStepStatus.todo,
+  ),
 ];
 
 /// 대기 중인 쪽지 한 장과 이미 적용된 쪽지 한 장입니다.
@@ -102,6 +118,15 @@ const List<HoronSteeringNote> _notes = <HoronSteeringNote>[
 
 /// 멈춘 판의 단계입니다.
 const List<HoronSteeringStep> _pausedSteps = <HoronSteeringStep>[
-  HoronSteeringStep(id: 'read', label: '메일을 읽습니다', status: HoronSteeringStepStatus.done, time: '0.8s'),
-  HoronSteeringStep(id: 'summarise', label: '스레드를 요약합니다', status: HoronSteeringStepStatus.todo),
+  HoronSteeringStep(
+    id: 'read',
+    label: '메일을 읽습니다',
+    status: HoronSteeringStepStatus.done,
+    time: '0.8s',
+  ),
+  HoronSteeringStep(
+    id: 'summarise',
+    label: '스레드를 요약합니다',
+    status: HoronSteeringStepStatus.todo,
+  ),
 ];

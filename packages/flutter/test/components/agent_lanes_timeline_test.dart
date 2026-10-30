@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/agent_lanes_timeline.dart';
-import 'package:horon_ui/src/components/spinner.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 두 봇에 걸친 작업 다섯 개입니다. 시간은 창 끝(0)에서 거꾸로 센 분입니다.
 const List<HoronLaneBot> _bots = <HoronLaneBot>[

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/knowledge_base_panel.dart';
 
 /// `max-w-200` — 패널이 넘지 않는 폭 800입니다.
 const double _panelWidth = 800;
@@ -121,7 +120,12 @@ class _Labelled extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: theme.space.s2,
         children: <Widget>[
-          Text(caption, style: theme.text.caption.copyWith(color: theme.colors.textSecondary)),
+          Text(
+            caption,
+            style: theme.text.caption.copyWith(
+              color: theme.colors.textSecondary,
+            ),
+          ),
           child,
         ],
       ),

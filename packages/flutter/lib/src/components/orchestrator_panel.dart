@@ -221,10 +221,12 @@ class _HoronOrchestratorPanelState extends State<HoronOrchestratorPanel> {
               spacing: space.s3, // gap-3
               children: <Widget>[
                 Text(widget.title, style: theme.text.labelLg.copyWith(color: colors.textPrimary)),
-                Row(
-                  spacing: space.s2_5, // gap-2.5
-                  children: <Widget>[
-                    Flexible(
+                LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    // 좁은 폭에서는 중지 버튼을 다음 줄로 내립니다. 280px 아래에서
+                    // 라벨·선택기·버튼을 한 줄에 두면 8px씩 넘칩니다.
+                    final bool narrow = constraints.maxWidth < 320;
+                    final Widget label = Flexible(
                       child: Text(
                         widget.parallelLabel,
                         style: theme.text.bodySm.copyWith(color: colors.textSecondary),
@@ -232,17 +234,32 @@ class _HoronOrchestratorPanelState extends State<HoronOrchestratorPanel> {
                         softWrap: false,
                         overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    if (widget.parallelOptions != null && widget.parallelOptions!.isNotEmpty)
-                      _ParallelPicker(
-                        options: widget.parallelOptions!,
-                        value: widget.parallelValue,
-                        label: widget.parallelLabel,
-                        onChanged: widget.onParallelChange,
-                      ),
-                    const Spacer(), // min-w-0 flex-1
-                    if (widget.onStop != null) _StopButton(label: widget.stopLabel, onPressed: widget.onStop),
-                  ],
+                    );
+                    final Widget? picker = widget.parallelOptions != null && widget.parallelOptions!.isNotEmpty
+                        ? _ParallelPicker(
+                            options: widget.parallelOptions!,
+                            value: widget.parallelValue,
+                            label: widget.parallelLabel,
+                            onChanged: widget.onParallelChange,
+                          )
+                        : null;
+                    final Widget? stop = widget.onStop != null
+                        ? _StopButton(label: widget.stopLabel, onPressed: widget.onStop)
+                        : null;
+
+                    if (narrow) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: space.s2,
+                        children: <Widget>[
+                          Row(spacing: space.s2_5, children: <Widget>[label, ?picker]),
+                          ?stop,
+                        ],
+                      );
+                    }
+                    return Row(spacing: space.s2_5, children: <Widget>[label, ?picker, const Spacer(), ?stop]);
+                  },
                 ),
               ],
             ),

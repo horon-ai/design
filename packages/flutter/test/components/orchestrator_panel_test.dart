@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/orchestrator_panel.dart';
 
 const HoronOrchestratorLead _lead = HoronOrchestratorLead(
   initial: 'H',
@@ -72,8 +71,8 @@ void main() {
           onStop: _noop,
           lead: _lead,
           plan: _plan,
-          children: _lanes,
           summary: HoronOrchestratorSummary(title: 'Summary', count: '1 of 3 returned', body: '두 레인이 끝났습니다'),
+          children: _lanes,
         ),
         brightness: brightness,
         settle: false,
@@ -210,8 +209,8 @@ void main() {
       const HoronOrchestratorPanel(
         title: 'Research run',
         lead: _lead,
-        children: _lanes,
         summary: HoronOrchestratorSummary(count: '2 of 3 returned', body: '두 레인이 끝났습니다'),
+        children: _lanes,
       ),
     );
     final HoronThemeData theme = HoronTheme.of(tester.element(_panel));
@@ -237,8 +236,8 @@ void main() {
         onStop: _noop,
         lead: _lead,
         plan: _plan,
-        children: _lanes,
         summary: HoronOrchestratorSummary(body: '본문'),
+        children: _lanes,
       ),
       width: 320,
       settle: false,

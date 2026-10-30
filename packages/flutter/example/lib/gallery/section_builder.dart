@@ -12,13 +12,16 @@ import 'package:flutter/widgets.dart';
 import 'registry.dart';
 import 'sections/agent_activity.dart';
 import 'sections/agent_lane.dart';
+import 'sections/agent_lanes_timeline.dart';
 import 'sections/agent_panel.dart';
+import 'sections/agent_steering_panel.dart';
 import 'sections/approval_card.dart';
 import 'sections/avatar.dart';
 import 'sections/badge.dart';
 import 'sections/banner.dart';
 import 'sections/bot_instructions_panel.dart';
 import 'sections/bot_list_row.dart';
+import 'sections/bot_memory_panel.dart';
 import 'sections/bottom_sheet.dart';
 import 'sections/breadcrumb.dart';
 import 'sections/breadcrumb_header.dart';
@@ -48,6 +51,7 @@ import 'sections/input.dart';
 import 'sections/input_group.dart';
 import 'sections/integration_row.dart';
 import 'sections/kbd.dart';
+import 'sections/knowledge_base_panel.dart';
 import 'sections/liquid_glass.dart';
 import 'sections/list_detail.dart';
 import 'sections/marketplace_card.dart';
@@ -94,13 +98,16 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
 const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'agent_activity': HoronAgentActivityGallerySection.new,
   'agent_lane': HoronAgentLaneGallerySection.new,
+  'agent_lanes_timeline': HoronAgentLanesTimelineGallerySection.new,
   'agent_panel': HoronAgentPanelGallerySection.new,
+  'agent_steering_panel': HoronAgentSteeringPanelGallerySection.new,
   'approval_card': HoronApprovalCardGallerySection.new,
   'avatar': HoronAvatarGallerySection.new,
   'badge': HoronBadgeGallerySection.new,
   'banner': HoronBannerGallerySection.new,
   'bot_instructions_panel': HoronBotInstructionsPanelGallerySection.new,
   'bot_list_row': HoronBotListRowGallerySection.new,
+  'bot_memory_panel': HoronBotMemoryPanelGallerySection.new,
   'bottom_sheet': HoronBottomSheetGallerySection.new,
   'breadcrumb': HoronBreadcrumbGallerySection.new,
   'breadcrumb_header': HoronBreadcrumbHeaderGallerySection.new,
@@ -130,6 +137,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'input_group': HoronInputGroupGallerySection.new,
   'integration_row': HoronIntegrationRowGallerySection.new,
   'kbd': HoronKbdGallerySection.new,
+  'knowledge_base_panel': HoronKnowledgeBasePanelGallerySection.new,
   'liquid_glass': HoronLiquidGlassGallerySection.new,
   'list_detail': HoronListDetailGallerySection.new,
   'marketplace_card': HoronMarketplaceCardGallerySection.new,

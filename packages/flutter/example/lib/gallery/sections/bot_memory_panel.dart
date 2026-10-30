@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/bot_memory_panel.dart';
 
 /// `bot_memory_panel` 갤러리 섹션입니다.
 ///
@@ -25,7 +24,12 @@ class HoronBotMemoryPanelGallerySection extends StatelessWidget {
   ];
 
   static const List<HoronBotMemoryItem> _memories = <HoronBotMemoryItem>[
-    HoronBotMemoryItem(id: 'm1', text: '아침 보고서는 9시 전에 받는 편입니다', source: '채팅에서 · 10월 8일', group: 'Work'),
+    HoronBotMemoryItem(
+      id: 'm1',
+      text: '아침 보고서는 9시 전에 받는 편입니다',
+      source: '채팅에서 · 10월 8일',
+      group: 'Work',
+    ),
     HoronBotMemoryItem(
       id: 'm2',
       text: '표와 짧은 문단을 함께 쓰는 답을 좋아합니다',
@@ -33,7 +37,12 @@ class HoronBotMemoryPanelGallerySection extends StatelessWidget {
       group: 'Style',
       fresh: true,
     ),
-    HoronBotMemoryItem(id: 'm3', text: '디자인 팀은 네 명입니다', source: '설정에서 · 10월 2일', group: 'Facts'),
+    HoronBotMemoryItem(
+      id: 'm3',
+      text: '디자인 팀은 네 명입니다',
+      source: '설정에서 · 10월 2일',
+      group: 'Facts',
+    ),
   ];
 
   @override
@@ -53,19 +62,31 @@ class HoronBotMemoryPanelGallerySection extends StatelessWidget {
               subtitle: 'Learned from your chats',
               settings: _settings,
               memories: _memories,
-              toast: const HoronBotMemoryToast(title: 'Memory updated', message: '표와 짧은 문단을 함께 씁니다'),
+              toast: const HoronBotMemoryToast(
+                title: 'Memory updated',
+                message: '표와 짧은 문단을 함께 씁니다',
+              ),
             ),
           ),
           _Labelled(
             caption: 'settings only',
-            child: const HoronBotMemoryPanel(usage: 18, settings: _settings, memories: <HoronBotMemoryItem>[]),
+            child: const HoronBotMemoryPanel(
+              usage: 18,
+              settings: _settings,
+              memories: <HoronBotMemoryItem>[],
+            ),
           ),
           _Labelled(
             caption: 'full meter, one group',
             child: const HoronBotMemoryPanel(
               usage: 100,
               memories: <HoronBotMemoryItem>[
-                HoronBotMemoryItem(id: 'm3', text: '디자인 팀은 네 명입니다', source: '설정에서 · 10월 2일', group: 'Facts'),
+                HoronBotMemoryItem(
+                  id: 'm3',
+                  text: '디자인 팀은 네 명입니다',
+                  source: '설정에서 · 10월 2일',
+                  group: 'Facts',
+                ),
               ],
             ),
           ),
@@ -95,7 +116,12 @@ class _Labelled extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: theme.space.s2,
         children: <Widget>[
-          Text(caption, style: theme.text.caption.copyWith(color: theme.colors.textSecondary)),
+          Text(
+            caption,
+            style: theme.text.caption.copyWith(
+              color: theme.colors.textSecondary,
+            ),
+          ),
           child,
         ],
       ),

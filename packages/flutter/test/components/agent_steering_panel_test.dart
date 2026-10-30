@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/agent_steering_panel.dart';
-import 'package:horon_ui/src/components/spinner.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 세 단계와 쪽지 두 장입니다. 하나는 아직 대기열에 있고 하나는 적용되었습니다.
 const List<HoronSteeringStep> _steps = <HoronSteeringStep>[
