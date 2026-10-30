@@ -119,10 +119,16 @@ const List<GallerySection> gallerySections = <GallerySection>[
     group: 'conversation',
   ),
   GallerySection(
+    slug: 'approval_card',
+    title: 'Approval Card',
+    group: 'conversation',
+  ),
+  GallerySection(
     slug: 'bot_list_row',
     title: 'Bot List Row',
     group: 'conversation',
   ),
+  GallerySection(slug: 'plan_step', title: 'Plan Step', group: 'agents'),
   GallerySection(slug: 'plan_card', title: 'Plan Card', group: 'agents'),
   GallerySection(
     slug: 'tool_calls_header',

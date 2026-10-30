@@ -4,6 +4,7 @@
 /// 디렉터리 목록에서 만듭니다.
 library;
 
+export 'src/components/approval_card.dart';
 export 'src/components/avatar.dart';
 export 'src/components/badge.dart';
 export 'src/components/banner.dart';
@@ -38,6 +39,7 @@ export 'src/components/marketplace_card.dart';
 export 'src/components/mcp_server_row.dart';
 export 'src/components/page_header.dart';
 export 'src/components/plan_card.dart';
+export 'src/components/plan_step.dart';
 export 'src/components/plugin_row.dart';
 export 'src/components/progress.dart';
 export 'src/components/radio_group.dart';

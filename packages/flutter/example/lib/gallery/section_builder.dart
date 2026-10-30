@@ -10,6 +10,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'registry.dart';
+import 'sections/approval_card.dart';
 import 'sections/avatar.dart';
 import 'sections/badge.dart';
 import 'sections/banner.dart';
@@ -44,6 +45,7 @@ import 'sections/marketplace_card.dart';
 import 'sections/mcp_server_row.dart';
 import 'sections/page_header.dart';
 import 'sections/plan_card.dart';
+import 'sections/plan_step.dart';
 import 'sections/plugin_row.dart';
 import 'sections/progress.dart';
 import 'sections/radio_group.dart';
@@ -74,6 +76,7 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
 
 /// 슬러그별 섹션 생성자입니다.
 const Map<String, Widget Function()> _builders = <String, Widget Function()>{
+  'approval_card': HoronApprovalCardGallerySection.new,
   'avatar': HoronAvatarGallerySection.new,
   'badge': HoronBadgeGallerySection.new,
   'banner': HoronBannerGallerySection.new,
@@ -108,6 +111,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'mcp_server_row': HoronMcpServerRowGallerySection.new,
   'page_header': HoronPageHeaderGallerySection.new,
   'plan_card': HoronPlanCardGallerySection.new,
+  'plan_step': HoronPlanStepGallerySection.new,
   'plugin_row': HoronPluginRowGallerySection.new,
   'progress': HoronProgressGallerySection.new,
   'radio_group': HoronRadioGroupGallerySection.new,
