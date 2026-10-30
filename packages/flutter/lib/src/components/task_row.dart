@@ -165,11 +165,13 @@ class HoronTaskRow extends StatelessWidget {
                 child: Text(botInitial, style: theme.text.labelSm.copyWith(color: theme.colors.textInverse)),
               ),
               const SizedBox(width: 6),
-              Text(
-                botName,
-                maxLines: 1,
-                softWrap: false,
-                style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+              Flexible(
+                child: Text(
+                  botName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+                ),
               ),
               if (project != null) ...<Widget>[
                 const SizedBox(width: 6),
@@ -197,11 +199,13 @@ class HoronTaskRow extends StatelessWidget {
                 HoronTaskStatus.failed => Icon(Icons.error, size: 16, color: theme.colors.textDanger),
               },
               const SizedBox(width: 8),
-              Text(
-                message,
-                maxLines: 1,
-                softWrap: false,
-                style: theme.text.labelMd.copyWith(color: _messageColor(theme)),
+              Flexible(
+                child: Text(
+                  message,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.text.labelMd.copyWith(color: _messageColor(theme)),
+                ),
               ),
               if (detail != null) ...<Widget>[
                 const SizedBox(width: 8),

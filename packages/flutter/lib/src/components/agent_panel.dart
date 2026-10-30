@@ -187,14 +187,14 @@ class _HoronTaskComposerState extends State<HoronTaskComposer> {
             ),
             onSubmitted: (_) => widget.onStart?.call(),
           ),
-          Row(
+          Wrap(
+            spacing: 6,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
-              for (final Widget picker in widget.pickers) ...<Widget>[picker, const SizedBox(width: 6)],
-              const Spacer(),
+              ...widget.pickers,
               const HoronKbd(label: '⌘'),
-              const SizedBox(width: 4),
               const HoronKbd(label: '↵'),
-              const SizedBox(width: 8),
               Semantics(
                 button: true,
                 child: GestureDetector(

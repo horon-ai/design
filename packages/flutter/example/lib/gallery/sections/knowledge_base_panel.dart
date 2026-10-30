@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../board_frame.dart';
+
 /// `max-w-200` — 패널이 넘지 않는 폭 800입니다.
 const double _panelWidth = 800;
 
@@ -21,83 +23,86 @@ class HoronKnowledgeBasePanelGallerySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    return Padding(
-      padding: EdgeInsets.all(theme.space.s4),
-      child: Wrap(
-        spacing: theme.space.s4,
-        runSpacing: theme.space.s4,
-        crossAxisAlignment: WrapCrossAlignment.start,
-        children: <Widget>[
-          _Labelled(
-            caption: 'dropzone · indexing · list rows',
-            child: HoronKnowledgeBasePanel(
-              title: 'Knowledge base',
-              meta: '12 sources · 248 chunks · 3 bots',
-              tabs: _tabs,
-              indexing: 2,
-              onSettings: () {},
-              onAddSource: () {},
-              onFiles: (Object payload) {},
-              onBrowse: () {},
-              children: const <Widget>[
-                HoronSourceRow(
-                  status: HoronSourceStatus.ready,
-                  icon: Icon(Icons.description_outlined),
-                  name: 'Q3 metrics dashboard',
-                  detail: '12 pages · 44 chunks',
-                  card: false,
-                  stages: <HoronSourceStage>[
-                    HoronSourceStage.done,
-                    HoronSourceStage.done,
-                    HoronSourceStage.done,
-                    HoronSourceStage.done,
-                  ],
-                ),
-                HoronSourceRow(
-                  status: HoronSourceStatus.indexing,
-                  icon: Icon(Icons.article_outlined),
-                  name: 'Pricing research',
-                  detail: '6 pages · 18 chunks',
-                  progress: 62,
-                  card: false,
-                  last: true,
-                  stages: <HoronSourceStage>[
-                    HoronSourceStage.done,
-                    HoronSourceStage.done,
-                    HoronSourceStage.active,
-                    HoronSourceStage.todo,
-                  ],
-                ),
-              ],
+    return BoardFrame(
+      designWidth: 760,
+      child: Padding(
+        padding: EdgeInsets.all(theme.space.s4),
+        child: Wrap(
+          spacing: theme.space.s4,
+          runSpacing: theme.space.s4,
+          crossAxisAlignment: WrapCrossAlignment.start,
+          children: <Widget>[
+            _Labelled(
+              caption: 'dropzone · indexing · list rows',
+              child: HoronKnowledgeBasePanel(
+                title: 'Knowledge base',
+                meta: '12 sources · 248 chunks · 3 bots',
+                tabs: _tabs,
+                indexing: 2,
+                onSettings: () {},
+                onAddSource: () {},
+                onFiles: (Object payload) {},
+                onBrowse: () {},
+                children: const <Widget>[
+                  HoronSourceRow(
+                    status: HoronSourceStatus.ready,
+                    icon: Icon(Icons.description_outlined),
+                    name: 'Q3 metrics dashboard',
+                    detail: '12 pages · 44 chunks',
+                    card: false,
+                    stages: <HoronSourceStage>[
+                      HoronSourceStage.done,
+                      HoronSourceStage.done,
+                      HoronSourceStage.done,
+                      HoronSourceStage.done,
+                    ],
+                  ),
+                  HoronSourceRow(
+                    status: HoronSourceStatus.indexing,
+                    icon: Icon(Icons.article_outlined),
+                    name: 'Pricing research',
+                    detail: '6 pages · 18 chunks',
+                    progress: 62,
+                    card: false,
+                    last: true,
+                    stages: <HoronSourceStage>[
+                      HoronSourceStage.done,
+                      HoronSourceStage.done,
+                      HoronSourceStage.active,
+                      HoronSourceStage.todo,
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          _Labelled(
-            caption: 'no dropzone · second tab',
-            child: HoronKnowledgeBasePanel(
-              title: 'Team knowledge',
-              meta: '248 chunks · 3 bots',
-              tabs: _tabs,
-              defaultValue: 'chunks',
-              stages: const <String>['Parse', 'Chunk', 'Embed', 'Index'],
-              children: const <Widget>[
-                HoronSourceRow(
-                  status: HoronSourceStatus.failed,
-                  icon: Icon(Icons.link),
-                  name: 'Notion workspace',
-                  detail: '연결이 끊겼습니다',
-                  card: false,
-                  last: true,
-                  stages: <HoronSourceStage>[
-                    HoronSourceStage.done,
-                    HoronSourceStage.failed,
-                    HoronSourceStage.todo,
-                    HoronSourceStage.todo,
-                  ],
-                ),
-              ],
+            _Labelled(
+              caption: 'no dropzone · second tab',
+              child: HoronKnowledgeBasePanel(
+                title: 'Team knowledge',
+                meta: '248 chunks · 3 bots',
+                tabs: _tabs,
+                defaultValue: 'chunks',
+                stages: const <String>['Parse', 'Chunk', 'Embed', 'Index'],
+                children: const <Widget>[
+                  HoronSourceRow(
+                    status: HoronSourceStatus.failed,
+                    icon: Icon(Icons.link),
+                    name: 'Notion workspace',
+                    detail: '연결이 끊겼습니다',
+                    card: false,
+                    last: true,
+                    stages: <HoronSourceStage>[
+                      HoronSourceStage.done,
+                      HoronSourceStage.failed,
+                      HoronSourceStage.todo,
+                      HoronSourceStage.todo,
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

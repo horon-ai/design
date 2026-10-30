@@ -165,6 +165,7 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(slug: 'agent_panel', title: 'Agent Panel', group: 'agents'),
   GallerySection(slug: 'task_row', title: 'Task Row', group: 'agents'),
   GallerySection(slug: 'agent_lane', title: 'Agent Lane', group: 'agents'),
+  GallerySection(slug: 'tool_call', title: 'Tool Call', group: 'agents'),
   GallerySection(slug: 'plan_step', title: 'Plan Step', group: 'agents'),
   GallerySection(slug: 'source_row', title: 'Source Row', group: 'agents'),
   GallerySection(
@@ -201,6 +202,11 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(
     slug: 'bot_memory_panel',
     title: 'Bot Memory Panel',
+    group: 'agents',
+  ),
+  GallerySection(
+    slug: 'research_run_panel',
+    title: 'Research Run Panel',
     group: 'agents',
   ),
   GallerySection(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../board_frame.dart';
+
 /// `agent_steering_panel`의 갤러리 섹션입니다.
 ///
 /// 쪽지 대기열이 붙은 실행 중 판과, 쪽지 없이 멈춘 판을 나란히 보여 줍니다.
@@ -16,59 +18,62 @@ class HoronAgentSteeringPanelGallerySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
 
-    return Padding(
-      padding: EdgeInsets.all(theme.space.s4),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double width = constraints.maxWidth.clamp(0.0, _maxWidth);
-          return Wrap(
-            spacing: theme.space.s6,
-            runSpacing: theme.space.s6,
-            children: <Widget>[
-              SizedBox(
-                width: width,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: theme.space.s2,
-                  children: <Widget>[
-                    _Caption('대기열과 조타 상자'),
-                    HoronAgentSteeringPanel(
-                      title: 'Draft the reply',
-                      subtitle: 'Inbox · 3 threads',
-                      status: 'Running · 2m 10s',
-                      steps: _steps,
-                      notes: _notes,
-                      onApplyNow: (String id) {},
-                      onRemoveNote: (String id) {},
-                      onSteer: (String text, bool interrupt) {},
-                    ),
-                  ],
+    return BoardFrame(
+      designWidth: 560,
+      child: Padding(
+        padding: EdgeInsets.all(theme.space.s4),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double width = constraints.maxWidth.clamp(0.0, _maxWidth);
+            return Wrap(
+              spacing: theme.space.s6,
+              runSpacing: theme.space.s6,
+              children: <Widget>[
+                SizedBox(
+                  width: width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: theme.space.s2,
+                    children: <Widget>[
+                      _Caption('대기열과 조타 상자'),
+                      HoronAgentSteeringPanel(
+                        title: 'Draft the reply',
+                        subtitle: 'Inbox · 3 threads',
+                        status: 'Running · 2m 10s',
+                        steps: _steps,
+                        notes: _notes,
+                        onApplyNow: (String id) {},
+                        onRemoveNote: (String id) {},
+                        onSteer: (String text, bool interrupt) {},
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: width,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: theme.space.s2,
-                  children: <Widget>[
-                    _Caption('멈춘 판 · 쪽지 없음'),
-                    HoronAgentSteeringPanel(
-                      title: 'Summarise the thread',
-                      subtitle: 'Inbox · 1 thread',
-                      status: 'Paused · 0m 42s',
-                      paused: true,
-                      steps: _pausedSteps,
-                      onPausedChange: (bool paused) {},
-                      onSteer: (String text, bool interrupt) {},
-                    ),
-                  ],
+                SizedBox(
+                  width: width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: theme.space.s2,
+                    children: <Widget>[
+                      _Caption('멈춘 판 · 쪽지 없음'),
+                      HoronAgentSteeringPanel(
+                        title: 'Summarise the thread',
+                        subtitle: 'Inbox · 1 thread',
+                        status: 'Paused · 0m 42s',
+                        paused: true,
+                        steps: _pausedSteps,
+                        onPausedChange: (bool paused) {},
+                        onSteer: (String text, bool interrupt) {},
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

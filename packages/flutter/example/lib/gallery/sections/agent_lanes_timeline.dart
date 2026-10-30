@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../board_frame.dart';
+
 /// `agent_lanes_timeline`의 갤러리 섹션입니다.
 ///
 /// 승인 줄과 인계 곡선이 붙은 판, 작업 색 네 가지와 봇 색 네 가지를 한 판에 모은
@@ -16,64 +18,67 @@ class HoronAgentLanesTimelineGallerySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
 
-    return Padding(
-      padding: EdgeInsets.all(theme.space.s4),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double width = constraints.maxWidth.clamp(0.0, _maxWidth);
-          return Wrap(
-            spacing: theme.space.s6,
-            runSpacing: theme.space.s6,
-            children: <Widget>[
-              SizedBox(
-                width: width,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: theme.space.s2,
-                  children: <Widget>[
-                    _Caption('승인 줄과 인계 곡선'),
-                    HoronAgentLanesTimeline(
-                      statuses: const <HoronLaneStatus>[
-                        HoronLaneStatus(id: 'live', label: '4 running'),
-                        HoronLaneStatus(
-                          id: 'ink',
-                          label: '2 idle',
-                          live: false,
+    return BoardFrame(
+      designWidth: 900,
+      child: Padding(
+        padding: EdgeInsets.all(theme.space.s4),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double width = constraints.maxWidth.clamp(0.0, _maxWidth);
+            return Wrap(
+              spacing: theme.space.s6,
+              runSpacing: theme.space.s6,
+              children: <Widget>[
+                SizedBox(
+                  width: width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: theme.space.s2,
+                    children: <Widget>[
+                      _Caption('승인 줄과 인계 곡선'),
+                      HoronAgentLanesTimeline(
+                        statuses: const <HoronLaneStatus>[
+                          HoronLaneStatus(id: 'live', label: '4 running'),
+                          HoronLaneStatus(
+                            id: 'ink',
+                            label: '2 idle',
+                            live: false,
+                          ),
+                        ],
+                        bots: _withApproval,
+                        handoffs: const <HoronLaneHandoff>[
+                          HoronLaneHandoff(from: 'scan', to: 'draft'),
+                        ],
+                        cursor: 2,
+                        approval: HoronAgentLanesTimelineApproval(
+                          message: 'Writer가 배포를 기다립니다',
+                          onLater: () {},
+                          onApprove: () {},
                         ),
-                      ],
-                      bots: _withApproval,
-                      handoffs: const <HoronLaneHandoff>[
-                        HoronLaneHandoff(from: 'scan', to: 'draft'),
-                      ],
-                      cursor: 2,
-                      approval: HoronAgentLanesTimelineApproval(
-                        message: 'Writer가 배포를 기다립니다',
-                        onLater: () {},
-                        onApprove: () {},
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: width,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: theme.space.s2,
-                  children: <Widget>[
-                    _Caption('작업 색 네 가지 · 봇 색 네 가지'),
-                    const HoronAgentLanesTimeline(
-                      bots: _withEveryTone,
-                      cursor: -4,
-                    ),
-                  ],
+                SizedBox(
+                  width: width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: theme.space.s2,
+                    children: <Widget>[
+                      _Caption('작업 색 네 가지 · 봇 색 네 가지'),
+                      const HoronAgentLanesTimeline(
+                        bots: _withEveryTone,
+                        cursor: -4,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

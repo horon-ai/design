@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../board_frame.dart';
+
 /// `document_extract_panel`의 갤러리 섹션입니다.
 ///
 /// 필드·표·확인 대기가 섞인 문서 추출 패널과, 시트 위에서 쓰는 강조 상자 네 톤을
@@ -76,88 +78,91 @@ class HoronDocumentExtractPanelGallerySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    return Padding(
-      padding: EdgeInsets.all(theme.space.s4),
-      child: Wrap(
-        spacing: theme.space.s4,
-        runSpacing: theme.space.s4,
-        crossAxisAlignment: WrapCrossAlignment.start,
-        children: <Widget>[
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: theme.space.s2,
-            children: <Widget>[
-              Text(
-                '필드·표·확인 대기',
-                style: theme.text.caption.copyWith(
-                  color: theme.colors.textSecondary,
+    return BoardFrame(
+      designWidth: 900,
+      child: Padding(
+        padding: EdgeInsets.all(theme.space.s4),
+        child: Wrap(
+          spacing: theme.space.s4,
+          runSpacing: theme.space.s4,
+          crossAxisAlignment: WrapCrossAlignment.start,
+          children: <Widget>[
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: theme.space.s2,
+              children: <Widget>[
+                Text(
+                  '필드·표·확인 대기',
+                  style: theme.text.caption.copyWith(
+                    color: theme.colors.textSecondary,
+                  ),
                 ),
-              ),
-              HoronDocumentExtractPanel(
-                fileName: 'northwind-invoice.pdf',
-                pageLabel: '1 / 2',
-                defaultZoom: 70,
-                groups: _groups,
-                bot: const HoronExtractBot(
-                  initial: 'N',
-                  name: 'Extractor',
-                  elapsed: '8s',
+                HoronDocumentExtractPanel(
+                  fileName: 'northwind-invoice.pdf',
+                  pageLabel: '1 / 2',
+                  defaultZoom: 70,
+                  groups: _groups,
+                  bot: const HoronExtractBot(
+                    initial: 'N',
+                    name: 'Extractor',
+                    elapsed: '8s',
+                  ),
+                  onExtract: () {},
+                  onAcceptAll: () {},
+                  sheet: _sheet(theme),
                 ),
-                onExtract: () {},
-                onAcceptAll: () {},
-                sheet: _sheet(theme),
-              ),
-            ],
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: theme.space.s2,
-            children: <Widget>[
-              Text(
-                'ExtractHighlight 네 톤',
-                style: theme.text.caption.copyWith(
-                  color: theme.colors.textSecondary,
+              ],
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: theme.space.s2,
+              children: <Widget>[
+                Text(
+                  'ExtractHighlight 네 톤',
+                  style: theme.text.caption.copyWith(
+                    color: theme.colors.textSecondary,
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: theme.space.step(60),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: theme.space.s2,
-                  children: <Widget>[
-                    _tone(
-                      theme,
-                      'sky',
-                      HoronExtractHighlightTone.sky,
-                      'Northwind Supply Co.',
-                    ),
-                    _tone(
-                      theme,
-                      'brand',
-                      HoronExtractHighlightTone.brand,
-                      'INV-2043-118',
-                    ),
-                    _tone(
-                      theme,
-                      'neutral',
-                      HoronExtractHighlightTone.neutral,
-                      '2026-09-14',
-                    ),
-                    _tone(
-                      theme,
-                      'ink',
-                      HoronExtractHighlightTone.ink,
-                      '576.00',
-                    ),
-                  ],
+                SizedBox(
+                  width: theme.space.step(60),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: theme.space.s2,
+                    children: <Widget>[
+                      _tone(
+                        theme,
+                        'sky',
+                        HoronExtractHighlightTone.sky,
+                        'Northwind Supply Co.',
+                      ),
+                      _tone(
+                        theme,
+                        'brand',
+                        HoronExtractHighlightTone.brand,
+                        'INV-2043-118',
+                      ),
+                      _tone(
+                        theme,
+                        'neutral',
+                        HoronExtractHighlightTone.neutral,
+                        '2026-09-14',
+                      ),
+                      _tone(
+                        theme,
+                        'ink',
+                        HoronExtractHighlightTone.ink,
+                        '576.00',
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -179,11 +184,17 @@ class HoronDocumentExtractPanelGallerySection extends StatelessWidget {
             ),
           ),
         ),
-        HoronExtractHighlight(
-          tone: tone,
-          child: Text(
-            value,
-            style: theme.text.bodySm.copyWith(color: theme.colors.textPrimary),
+        Flexible(
+          child: HoronExtractHighlight(
+            tone: tone,
+            child: Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.text.bodySm.copyWith(
+                color: theme.colors.textPrimary,
+              ),
+            ),
           ),
         ),
       ],

@@ -58,12 +58,14 @@ import 'sections/marketplace_card.dart';
 import 'sections/mcp_server_row.dart';
 import 'sections/menu.dart';
 import 'sections/message_extras.dart';
+import 'sections/orchestrator_panel.dart';
 import 'sections/page_header.dart';
 import 'sections/plan_card.dart';
 import 'sections/plan_step.dart';
 import 'sections/plugin_row.dart';
 import 'sections/progress.dart';
 import 'sections/radio_group.dart';
+import 'sections/research_run_panel.dart';
 import 'sections/schedule.dart';
 import 'sections/segmented_control.dart';
 import 'sections/select.dart';
@@ -81,6 +83,7 @@ import 'sections/task_row.dart';
 import 'sections/textarea.dart';
 import 'sections/textarea_field.dart';
 import 'sections/toast.dart';
+import 'sections/tool_call.dart';
 import 'sections/tool_calls_header.dart';
 import 'sections/tool_permissions.dart';
 import 'sections/tooltip.dart';
@@ -144,12 +147,14 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'mcp_server_row': HoronMcpServerRowGallerySection.new,
   'menu': HoronMenuGallerySection.new,
   'message_extras': HoronMessageExtrasGallerySection.new,
+  'orchestrator_panel': HoronOrchestratorPanelGallerySection.new,
   'page_header': HoronPageHeaderGallerySection.new,
   'plan_card': HoronPlanCardGallerySection.new,
   'plan_step': HoronPlanStepGallerySection.new,
   'plugin_row': HoronPluginRowGallerySection.new,
   'progress': HoronProgressGallerySection.new,
   'radio_group': HoronRadioGroupGallerySection.new,
+  'research_run_panel': HoronResearchRunPanelGallerySection.new,
   'schedule': HoronScheduleGallerySection.new,
   'segmented_control': HoronSegmentedControlGallerySection.new,
   'select': HoronSelectGallerySection.new,
@@ -167,6 +172,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'textarea': HoronTextareaGallerySection.new,
   'textarea_field': HoronTextareaFieldGallerySection.new,
   'toast': HoronToastGallerySection.new,
+  'tool_call': HoronToolCallGallerySection.new,
   'tool_calls_header': HoronToolCallsHeaderGallerySection.new,
   'tool_permissions': HoronToolPermissionsGallerySection.new,
   'tooltip': HoronTooltipGallerySection.new,
