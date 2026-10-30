@@ -34,6 +34,24 @@ void main() {
     expect(find.byIcon(Icons.checklist), findsOneWidget);
   });
 
+  testWidgets('plan card: the steps stack without a gap', (WidgetTester tester) async {
+    await pumpPlan(
+      tester,
+      const HoronPlanCard(
+        title: '계획',
+        steps: <Widget>[
+          SizedBox(key: Key('step-a'), height: 40),
+          SizedBox(key: Key('step-b'), height: 40),
+        ],
+      ),
+    );
+    // Paper N3: PlanStep 을 구분선 없이 이어 붙입니다.
+    final double gap =
+        tester.getTopLeft(find.byKey(const Key('step-b'))).dy -
+        tester.getBottomLeft(find.byKey(const Key('step-a'))).dy;
+    expect(gap, 0);
+  });
+
   testWidgets('plan card: no status hides the footer and a status shows it', (WidgetTester tester) async {
     await pumpPlan(tester, const HoronPlanCard(title: '계획', statusLabel: 'Running · 1 of 2'));
     expect(find.text('Running · 1 of 2'), findsNothing);

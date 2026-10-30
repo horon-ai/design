@@ -106,8 +106,35 @@ void main() {
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronTaskRow)));
     final Container row = tester.widget<Container>(find.byType(Container).first);
     final BoxDecoration decoration = row.decoration! as BoxDecoration;
+    // Paper WM4-1: 목록 안 행은 배경 없이 아래 모서리만 r16입니다.
     expect(decoration.color, isNull);
-    expect((decoration.border! as Border).bottom.color, theme.colors.overlayInk8);
+    expect(decoration.borderRadius, const BorderRadius.vertical(bottom: Radius.circular(16)));
+
+    // Paper WM4-1: 목록 안 행은 배경 없이 1px 구분선으로 나뉘고, 구분선은 좌우 16을 들여씁니다.
+    final Finder divider = find.byKey(const Key('horon-task-row-divider'));
+    expect(divider, findsOneWidget);
+    expect(tester.widget<ColoredBox>(divider).color, theme.colors.overlayInk8);
+    expect(tester.getSize(divider).height, 1);
+
+    final Rect rowRect = tester.getRect(find.byType(HoronTaskRow));
+    final Rect dividerRect = tester.getRect(divider);
+    expect(dividerRect.left - rowRect.left, 16);
+    expect(rowRect.right - dividerRect.right, 16);
+    expect(rowRect.bottom - dividerRect.bottom, 0);
+
+    await pumpTask(
+      tester,
+      const HoronTaskRow(
+        status: HoronTaskStatus.done,
+        title: '마지막 행',
+        botInitial: 'D',
+        botName: 'Ops',
+        message: '완료',
+        card: false,
+        last: true,
+      ),
+    );
+    expect(find.byKey(const Key('horon-task-row-divider')), findsNothing);
   });
 
   testWidgets('task row: every status renders in both brightnesses', (WidgetTester tester) async {
