@@ -4,6 +4,7 @@
 /// 디렉터리 목록에서 만듭니다.
 library;
 
+export 'src/components/agent_activity.dart';
 export 'src/components/agent_lane.dart';
 export 'src/components/approval_card.dart';
 export 'src/components/avatar.dart';

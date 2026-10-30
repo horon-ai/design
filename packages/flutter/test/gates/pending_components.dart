@@ -9,7 +9,6 @@
 /// asserts this list is empty once the last component lands.
 const List<String> pendingComponents = <String>[
   'data_table',
-  'agent_activity',
   'agent_panel',
   'task_row',
   'tool_call',
