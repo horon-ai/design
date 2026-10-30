@@ -80,6 +80,12 @@ void main() {
     expect((clip.borderRadius as BorderRadius).topLeft.x, theme.radius.xl2);
 
     expect(_decoratedWith(theme.colors.bgInset), findsOneWidget);
+
+    final Column listColumn = tester.widget<Column>(
+      find.descendant(of: _decoratedWith(theme.colors.bgInset), matching: find.byType(Column)).first,
+    );
+    // Paper `1W6P-0`: 목록 팬의 gap 2
+    expect(listColumn.spacing, theme.space.s0_5);
   });
 
   testWidgets('tapping an item reports the id and swaps the detail pane', (WidgetTester tester) async {
@@ -192,6 +198,25 @@ void main() {
     theme = _themeOf(tester, find.byType(HoronListDetailMeta));
     final DecoratedBox dark = tester.widget<DecoratedBox>(_decoratedWith(HoronPalette.neutral800));
     expect((dark.decoration as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.md));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the meta box lays four cells on one row', (WidgetTester tester) async {
+    const HoronListDetailMeta meta = HoronListDetailMeta(
+      items: <HoronListDetailMetaItem>[
+        HoronListDetailMetaItem(id: 'model', label: 'Model', value: 'alpha'),
+        HoronListDetailMetaItem(id: 'trigger', label: 'Trigger', value: 'manual'),
+        HoronListDetailMetaItem(id: 'tools', label: 'Tools', value: '2'),
+        HoronListDetailMetaItem(id: 'scope', label: 'Scope', value: 'files.read'),
+      ],
+    );
+    await tester.pumpWidget(_host(meta, width: 556));
+
+    // Paper `1W6P-0` 메타 상자는 같은 폭의 네 칸을 한 줄에 놓습니다.
+    final double top = tester.getTopLeft(find.text('Model')).dy;
+    for (final String label in <String>['Trigger', 'Tools', 'Scope']) {
+      expect(tester.getTopLeft(find.text(label)).dy, top, reason: label);
+    }
     expect(tester.takeException(), isNull);
   });
 
