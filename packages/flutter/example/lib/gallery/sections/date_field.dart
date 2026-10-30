@@ -17,11 +17,21 @@ class HoronDateFieldGallerySection extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text('빈 필드', style: theme.text.caption.copyWith(color: theme.colors.textSecondary)),
+          Text(
+            '빈 필드',
+            style: theme.text.caption.copyWith(
+              color: theme.colors.textSecondary,
+            ),
+          ),
           SizedBox(height: theme.space.s2),
           const HoronDateField(placeholder: '날짜 선택'),
           SizedBox(height: theme.space.s4),
-          Text('값이 있는 필드', style: theme.text.caption.copyWith(color: theme.colors.textSecondary)),
+          Text(
+            '값이 있는 필드',
+            style: theme.text.caption.copyWith(
+              color: theme.colors.textSecondary,
+            ),
+          ),
           SizedBox(height: theme.space.s2),
           HoronDateField(
             value: DateTime(2026, 10, 29),
@@ -30,11 +40,21 @@ class HoronDateFieldGallerySection extends StatelessWidget {
             onValueChange: (_) {},
           ),
           SizedBox(height: theme.space.s4),
-          Text('잘못된 값', style: theme.text.caption.copyWith(color: theme.colors.textSecondary)),
+          Text(
+            '잘못된 값',
+            style: theme.text.caption.copyWith(
+              color: theme.colors.textSecondary,
+            ),
+          ),
           SizedBox(height: theme.space.s2),
           const HoronDateField(placeholder: '날짜 선택', invalid: true),
           SizedBox(height: theme.space.s4),
-          Text('비활성', style: theme.text.caption.copyWith(color: theme.colors.textSecondary)),
+          Text(
+            '비활성',
+            style: theme.text.caption.copyWith(
+              color: theme.colors.textSecondary,
+            ),
+          ),
           SizedBox(height: theme.space.s2),
           const HoronDateField(placeholder: '날짜 선택', disabled: true),
         ],

@@ -13,11 +13,13 @@ import 'registry.dart';
 import 'sections/avatar.dart';
 import 'sections/banner.dart';
 import 'sections/button.dart';
+import 'sections/calendar.dart';
 import 'sections/checkbox.dart';
 import 'sections/chip.dart';
 import 'sections/choice_card.dart';
 import 'sections/code_panel.dart';
 import 'sections/composer.dart';
+import 'sections/date_field.dart';
 import 'sections/directory_card.dart';
 import 'sections/empty_state.dart';
 import 'sections/file_drop.dart';
@@ -31,6 +33,7 @@ import 'sections/mcp_server_row.dart';
 import 'sections/plugin_row.dart';
 import 'sections/progress.dart';
 import 'sections/radio_group.dart';
+import 'sections/schedule.dart';
 import 'sections/skeleton.dart';
 import 'sections/slider.dart';
 import 'sections/spinner.dart';
@@ -50,11 +53,13 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'avatar': HoronAvatarGallerySection.new,
   'banner': HoronBannerGallerySection.new,
   'button': HoronButtonGallerySection.new,
+  'calendar': HoronCalendarGallerySection.new,
   'checkbox': HoronCheckboxGallerySection.new,
   'chip': HoronChipGallerySection.new,
   'choice_card': HoronChoiceCardGallerySection.new,
   'code_panel': HoronCodePanelGallerySection.new,
   'composer': HoronComposerGallerySection.new,
+  'date_field': HoronDateFieldGallerySection.new,
   'directory_card': HoronDirectoryCardGallerySection.new,
   'empty_state': HoronEmptyStateGallerySection.new,
   'file_drop': HoronFileDropGallerySection.new,
@@ -68,6 +73,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'plugin_row': HoronPluginRowGallerySection.new,
   'progress': HoronProgressGallerySection.new,
   'radio_group': HoronRadioGroupGallerySection.new,
+  'schedule': HoronScheduleGallerySection.new,
   'skeleton': HoronSkeletonGallerySection.new,
   'slider': HoronSliderGallerySection.new,
   'spinner': HoronSpinnerGallerySection.new,

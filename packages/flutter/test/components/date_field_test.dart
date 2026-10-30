@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
-Future<void> pumpField(
-  WidgetTester tester,
-  Widget child, {
-  Brightness brightness = Brightness.light,
-}) async {
+Future<void> pumpField(WidgetTester tester, Widget child, {Brightness brightness = Brightness.light}) async {
   await tester.pumpWidget(
     MaterialApp(
       theme: horonTheme(brightness),
-      home: Scaffold(body: Center(child: SizedBox(width: 360, child: child))),
+      home: Scaffold(
+        body: Center(child: SizedBox(width: 360, child: child)),
+      ),
     ),
   );
   await tester.pumpAndSettle();

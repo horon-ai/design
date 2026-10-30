@@ -144,86 +144,87 @@ class _HoronDateFieldState extends State<HoronDateField> {
         ? colors.textPrimary
         : colors.textPlaceholder;
 
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final double width = constraints.maxWidth.isFinite ? math.min(_width, constraints.maxWidth) : _width;
-        return MenuAnchor(
-          controller: _menu,
-          // `sideOffset={8}`.
-          alignmentOffset: Offset(0, space.s2),
-          style: MenuStyle(
-            // 달력이 자기 유리 판을 그리므로 팝업 상자는 아무것도 칠하지 않습니다.
-            backgroundColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-            surfaceTintColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-            shadowColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-            elevation: const WidgetStatePropertyAll<double>(0),
-            padding: const WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.zero),
-            shape: const WidgetStatePropertyAll<OutlinedBorder>(RoundedRectangleBorder()),
-          ),
-          menuChildren: <Widget>[
-            _MotionPopup(
-              child: SizedBox(
-                width: calendarWidth,
-                child: HoronCalendar(
-                  value: widget.value,
-                  onValueChange: widget.onValueChange,
-                  range: widget.range,
-                  onRangeChange: widget.onRangeChange,
-                  defaultMonth: widget.defaultMonth,
-                  month: widget.month,
-                  onMonthChange: widget.onMonthChange,
-                  isDateDisabled: widget.isDateDisabled,
-                  weekStartsOn: widget.weekStartsOn,
-                  today: widget.today,
-                  popover: widget.popover,
-                ),
-              ),
+    // 메뉴 패널은 앵커 자식에게 고유 폭을 묻습니다. LayoutBuilder 는 그 질문에 답하지
+    // 못하므로("LayoutBuilder does not support returning intrinsic dimensions"), 폭은
+    // 화면 폭에서 직접 계산합니다.
+    final double width = math.min(_width, MediaQuery.sizeOf(context).width - space.s4);
+
+    return MenuAnchor(
+      controller: _menu,
+      // `sideOffset={8}`.
+      alignmentOffset: Offset(0, space.s2),
+      style: MenuStyle(
+        // 달력이 자기 유리 판을 그리므로 팝업 상자는 아무것도 칠하지 않습니다.
+        backgroundColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
+        surfaceTintColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
+        shadowColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
+        elevation: const WidgetStatePropertyAll<double>(0),
+        padding: const WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.zero),
+        shape: const WidgetStatePropertyAll<OutlinedBorder>(RoundedRectangleBorder()),
+      ),
+      menuChildren: <Widget>[
+        _MotionPopup(
+          child: SizedBox(
+            width: calendarWidth,
+            child: HoronCalendar(
+              width: calendarWidth,
+              value: widget.value,
+              onValueChange: widget.onValueChange,
+              range: widget.range,
+              onRangeChange: widget.onRangeChange,
+              defaultMonth: widget.defaultMonth,
+              month: widget.month,
+              onMonthChange: widget.onMonthChange,
+              isDateDisabled: widget.isDateDisabled,
+              weekStartsOn: widget.weekStartsOn,
+              today: widget.today,
+              popover: widget.popover,
             ),
-          ],
-          builder: (BuildContext context, MenuController controller, Widget? child) => SizedBox(
-            width: width,
-            child: Semantics(
-              button: true,
-              enabled: !widget.disabled,
-              child: MouseRegion(
-                cursor: widget.disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
-                child: GestureDetector(
-                  key: const Key('horon-date-field-trigger'),
-                  behavior: HitTestBehavior.opaque,
-                  onTap: widget.disabled ? null : () => controller.isOpen ? controller.close() : controller.open(),
-                  child: HoronLiquidGlass(
-                    tier: HoronGlassTier.regular,
+          ),
+        ),
+      ],
+      builder: (BuildContext context, MenuController controller, Widget? child) => SizedBox(
+        width: width,
+        child: Semantics(
+          button: true,
+          enabled: !widget.disabled,
+          child: MouseRegion(
+            cursor: widget.disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
+            child: GestureDetector(
+              key: const Key('horon-date-field-trigger'),
+              behavior: HitTestBehavior.opaque,
+              onTap: widget.disabled ? null : () => controller.isOpen ? controller.close() : controller.open(),
+              child: HoronLiquidGlass(
+                tier: HoronGlassTier.regular,
+                borderRadius: radius,
+                child: DecoratedBox(
+                  key: const Key('horon-date-field-surface'),
+                  decoration: BoxDecoration(
                     borderRadius: radius,
-                    child: DecoratedBox(
-                      key: const Key('horon-date-field-surface'),
-                      decoration: BoxDecoration(
-                        borderRadius: radius,
-                        // `border-glass-rim-strong` / `data-invalid:border-border-danger`.
-                        border: Border.all(color: widget.invalid ? colors.borderDanger : colors.glassRimStrong),
-                      ),
-                      child: SizedBox(
-                        height: _height,
-                        // `items-center gap-2 px-3.5`.
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: space.s3_5),
-                          child: Row(
-                            spacing: space.s2,
-                            children: <Widget>[
-                              Icon(Icons.calendar_today_outlined, size: _iconSize, color: colors.textSecondary),
-                              Expanded(
-                                child: Text(
-                                  text.isEmpty ? widget.placeholder : text,
-                                  key: const Key('horon-date-field-value'),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.left,
-                                  // `text-body-md`.
-                                  style: theme.text.bodyMd.copyWith(color: textColor),
-                                ),
-                              ),
-                            ],
+                    // `border-glass-rim-strong` / `data-invalid:border-border-danger`.
+                    border: Border.all(color: widget.invalid ? colors.borderDanger : colors.glassRimStrong),
+                  ),
+                  child: SizedBox(
+                    height: _height,
+                    // `items-center gap-2 px-3.5`.
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: space.s3_5),
+                      child: Row(
+                        spacing: space.s2,
+                        children: <Widget>[
+                          Icon(Icons.calendar_today_outlined, size: _iconSize, color: colors.textSecondary),
+                          Expanded(
+                            child: Text(
+                              text.isEmpty ? widget.placeholder : text,
+                              key: const Key('horon-date-field-value'),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.left,
+                              // `text-body-md`.
+                              style: theme.text.bodyMd.copyWith(color: textColor),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
@@ -231,8 +232,8 @@ class _HoronDateFieldState extends State<HoronDateField> {
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

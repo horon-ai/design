@@ -52,6 +52,7 @@ class HoronCalendar extends StatefulWidget {
     this.weekStartsOn = 0,
     this.today,
     this.popover = false,
+    this.width,
   }) : assert(
          range == null && onRangeChange == null || value == null && onValueChange == null,
          'single 모드(value)와 range 모드(range)를 함께 넘길 수 없습니다.',
@@ -59,6 +60,12 @@ class HoronCalendar extends StatefulWidget {
 
   /// 고른 날짜입니다. React `value`(single 모드).
   final DateTime? value;
+
+  /// 달력의 고유 폭입니다. 넘기면 [LayoutBuilder] 없이 그 폭으로 그립니다.
+  ///
+  /// 팝업처럼 자식의 고유 크기를 묻는 부모 아래에서는 반드시 넘겨야 합니다.
+  /// `LayoutBuilder` 는 고유 크기 질문에 답하지 못해 예외가 나기 때문입니다.
+  final double? width;
 
   /// 날짜를 골랐을 때 호출됩니다. React `onValueChange`(single 모드).
   final ValueChanged<DateTime>? onValueChange;
@@ -216,7 +223,6 @@ class _HoronCalendarState extends State<HoronCalendar> {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
     final HoronStrings strings = theme.strings;
 
@@ -228,60 +234,104 @@ class _HoronCalendarState extends State<HoronCalendar> {
     final double gap = widget.popover ? space.s2 : space.s3;
     final DateTime today = _today;
 
+    // 폭을 호출자가 주면(팝업처럼 자식의 고유 크기를 묻는 부모 아래) LayoutBuilder 를
+    // 건너뜁니다. LayoutBuilder 는 고유 크기 질문에 답하지 못해 예외가 납니다.
+    if (widget.width != null) {
+      return _buildSurface(
+        theme: theme,
+        strings: strings,
+        days: days,
+        month: month,
+        title: title,
+        today: today,
+        radius: radius,
+        padding: padding,
+        gap: gap,
+        maxWidth: widget.width!,
+      );
+    }
+
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         // `w-fit` — 일곱 칸이 자연 폭이지만, 부모가 더 좁으면 칸을 줄여 맞춥니다.
         final double maxWidth = constraints.maxWidth.isFinite ? constraints.maxWidth : _cellSize * 7;
-        final double available = maxWidth - padding * 2;
-        final double cell = math.min(_cellSize, math.max(_minCellSize, available / 7));
+        return _buildSurface(
+          theme: theme,
+          strings: strings,
+          days: days,
+          month: month,
+          title: title,
+          today: today,
+          radius: radius,
+          padding: padding,
+          gap: gap,
+          maxWidth: maxWidth,
+        );
+      },
+    );
+  }
 
-        return Semantics(
-          container: true,
-          child: HoronLiquidGlass(
-            tier: HoronGlassTier.thick,
+  Widget _buildSurface({
+    required HoronThemeData theme,
+    required HoronStrings strings,
+    required List<DateTime> days,
+    required DateTime month,
+    required String title,
+    required DateTime today,
+    required BorderRadius radius,
+    required double padding,
+    required double gap,
+    required double maxWidth,
+  }) {
+    final HoronColors colors = theme.colors;
+    final double available = maxWidth - padding * 2;
+    final double cell = math.min(_cellSize, math.max(_minCellSize, available / 7));
+
+    return Semantics(
+      container: true,
+      child: HoronLiquidGlass(
+        tier: HoronGlassTier.thick,
+        borderRadius: radius,
+        child: DecoratedBox(
+          key: const Key('horon-calendar-surface'),
+          decoration: BoxDecoration(
             borderRadius: radius,
-            child: DecoratedBox(
-              key: const Key('horon-calendar-surface'),
-              decoration: BoxDecoration(
-                borderRadius: radius,
-                border: Border.all(color: colors.glassRimStrong),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(padding),
-                child: SizedBox(
-                  width: cell * 7,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    spacing: gap,
-                    children: <Widget>[
-                      if (widget.popover) _buildPopoverHeader(theme, title) else _buildDefaultHeader(theme, title),
-                      Focus(
-                        focusNode: _gridFocus,
-                        onKeyEvent: _handleKeyEvent,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            _buildWeekdays(theme, strings, days, cell),
-                            for (int week = 0; week < days.length ~/ 7; week++)
-                              _buildWeek(
-                                theme: theme,
-                                days: days.sublist(week * 7, week * 7 + 7),
-                                month: month,
-                                today: today,
-                                cell: cell,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
+            border: Border.all(color: colors.glassRimStrong),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(padding),
+            child: SizedBox(
+              width: cell * 7,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: gap,
+                children: <Widget>[
+                  if (widget.popover) _buildPopoverHeader(theme, title) else _buildDefaultHeader(theme, title),
+                  Focus(
+                    focusNode: _gridFocus,
+                    onKeyEvent: _handleKeyEvent,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        _buildWeekdays(theme, strings, days, cell),
+                        for (int week = 0; week < days.length ~/ 7; week++)
+                          _buildWeek(
+                            theme: theme,
+                            days: days.sublist(week * 7, week * 7 + 7),
+                            month: month,
+                            today: today,
+                            cell: cell,
+                          ),
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 

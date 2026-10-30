@@ -114,6 +114,11 @@ class HoronLiquidGlass extends StatefulWidget {
 }
 
 class _HoronLiquidGlassState extends State<HoronLiquidGlass> {
+  /// 호스트가 그려진 뒤에 잴 실제 크기입니다.
+  Size _hostSize = Size.zero;
+
+  /// 크기를 재기 위해 호스트 루트에 다는 키입니다.
+  final GlobalKey _hostKey = GlobalKey();
   ui.FragmentShader? _shader;
   bool _loadFailed = false;
   bool _requested = false;
@@ -166,32 +171,35 @@ class _HoronLiquidGlassState extends State<HoronLiquidGlass> {
     final HoronThemeData horon = HoronTheme.of(context);
     final BorderRadius radius = widget.borderRadius ?? BorderRadius.circular(horon.radius.md);
 
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final Size size = constraints.biggest;
-        final bool finite = size.width.isFinite && size.height.isFinite;
-        // 제한이 없는 자리(예: Row의 자식)에서도 그릴 수 있게, 기하는 유한한 크기로만
-        // 계산합니다. 레이어는 모두 `Positioned.fill`이라 실제 크기를 따릅니다.
-        final Size host = finite ? size : Size.zero;
-        final double height = host.height;
+    // 호스트 크기는 LayoutBuilder 대신 실제 레이아웃 뒤에 잽니다. 메뉴·팝업처럼 자식의
+    // 고유 크기를 묻는 부모 아래에서 LayoutBuilder 는 예외를 던지기 때문입니다. 첫
+    // 프레임은 크기 없이(Size.zero) 그리고, 크기가 잠히면 다시 그립니다.
+    _scheduleMeasure();
+    final Size size = _hostSize;
+    final bool finite = size.width.isFinite && size.height.isFinite && size.width > 0 && size.height > 0;
+    final Size host = finite ? size : Size.zero;
+    final double height = host.height;
 
-        final HoronGlassRung rung = horonGlassRungOf(
-          // 셰이더를 읽었는데 필터를 못 만들었으면 엔진이 "지원한다"고 답한 것과 같으므로
-          // 서리로 내려갑니다. 광택만 숨기고 굴절은 없는 표면을 남기지 않습니다.
-          shaderSupported: HoronGlassProbe.shaderFilterSupported() && !_loadFailed,
-          reducedTransparency: MediaQuery.disableAnimationsOf(context),
-          refraction: widget.refract,
-          opaque: widget.opaque,
-          areaAllowed:
-              finite &&
-              horonGlassAreaAllowed(
-                HoronGlassShape(width: size.width, height: size.height, radius: _topLeft(radius)),
-                coarsePointer: false,
-              ),
-          shaderReady: _shader != null,
-        );
+    final HoronGlassRung rung = horonGlassRungOf(
+      // 셰이더를 읽었는데 필터를 못 만들었으면 엔진이 "지원한다"고 답한 것과 같으므로
+      // 서리로 내려갑니다. 광택만 숨기고 굴절은 없는 표면을 남기지 않습니다.
+      shaderSupported: HoronGlassProbe.shaderFilterSupported() && !_loadFailed,
+      reducedTransparency: MediaQuery.disableAnimationsOf(context),
+      refraction: widget.refract,
+      opaque: widget.opaque,
+      areaAllowed:
+          finite &&
+          horonGlassAreaAllowed(
+            HoronGlassShape(width: size.width, height: size.height, radius: _topLeft(radius)),
+            coarsePointer: false,
+          ),
+      shaderReady: _shader != null,
+    );
 
-        return ClipRRect(
+    return SizeChangedLayoutNotifier(
+      child: KeyedSubtree(
+        key: _hostKey,
+        child: ClipRRect(
           borderRadius: radius,
           child: Stack(
             fit: StackFit.passthrough,
@@ -200,9 +208,19 @@ class _HoronLiquidGlassState extends State<HoronLiquidGlass> {
               widget.child,
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
+  }
+
+  /// 레이아웃이 끝난 뒤 호스트 크기를 읽어 상태에 적어 둡니다.
+  void _scheduleMeasure() {
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      if (!mounted) return;
+      final RenderObject? render = _hostKey.currentContext?.findRenderObject();
+      if (render is! RenderBox || !render.hasSize) return;
+      if (render.size != _hostSize) setState(() => _hostSize = render.size);
+    });
   }
 
   /// 반경의 왼쪽 위 값입니다. React가 `borderTopLeftRadius`를 읽는 자리입니다.

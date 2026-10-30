@@ -25,6 +25,9 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(slug: 'switch', title: 'Switch', group: 'inputs'),
   GallerySection(slug: 'slider', title: 'Slider', group: 'inputs'),
   GallerySection(slug: 'chip', title: 'Chip', group: 'inputs'),
+  GallerySection(slug: 'date_field', title: 'Date Field', group: 'inputs'),
+  GallerySection(slug: 'calendar', title: 'Calendar', group: 'inputs'),
+  GallerySection(slug: 'schedule', title: 'Schedule', group: 'inputs'),
   GallerySection(slug: 'composer', title: 'Composer', group: 'inputs'),
   GallerySection(slug: 'split_button', title: 'Split Button', group: 'inputs'),
   GallerySection(
