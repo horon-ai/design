@@ -36,6 +36,7 @@ import 'sections/choice_card.dart';
 import 'sections/code_panel.dart';
 import 'sections/command_palette.dart';
 import 'sections/composer.dart';
+import 'sections/data_table.dart';
 import 'sections/date_field.dart';
 import 'sections/dialog.dart';
 import 'sections/directory_card.dart';
@@ -125,6 +126,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'code_panel': HoronCodePanelGallerySection.new,
   'command_palette': HoronCommandPaletteGallerySection.new,
   'composer': HoronComposerGallerySection.new,
+  'data_table': HoronDataTableGallerySection.new,
   'date_field': HoronDateFieldGallerySection.new,
   'dialog': HoronDialogGallerySection.new,
   'directory_card': HoronDirectoryCardGallerySection.new,

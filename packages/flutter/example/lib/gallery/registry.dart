@@ -62,6 +62,7 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(slug: 'spinner', title: 'Spinner', group: 'display'),
   GallerySection(slug: 'skeleton', title: 'Skeleton', group: 'display'),
   GallerySection(slug: 'empty_state', title: 'Empty State', group: 'display'),
+  GallerySection(slug: 'data_table', title: 'Data Table', group: 'display'),
   GallerySection(
     slug: 'integration_row',
     title: 'Integration Row',

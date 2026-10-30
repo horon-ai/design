@@ -7,4 +7,4 @@
 /// rewrites it from the directory listing (a slug with a file comes out, a
 /// catalog slug without one goes in). `test/gates_final/pending_empty_test.dart`
 /// asserts this list is empty once the last component lands.
-const List<String> pendingComponents = <String>['data_table'];
+const List<String> pendingComponents = <String>[];

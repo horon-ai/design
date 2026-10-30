@@ -30,6 +30,7 @@ export 'src/components/choice_card.dart';
 export 'src/components/code_panel.dart';
 export 'src/components/command_palette.dart';
 export 'src/components/composer.dart';
+export 'src/components/data_table.dart';
 export 'src/components/date_field.dart';
 export 'src/components/dialog.dart';
 export 'src/components/directory_card.dart';
