@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/filter_bar.dart';
 
 /// 테마가 적용된 화면에 위젯 하나를 놓습니다.
 Widget _host(Widget child, {Brightness brightness = Brightness.light, double width = 1024}) => MaterialApp(

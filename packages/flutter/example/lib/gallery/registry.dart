@@ -68,6 +68,12 @@ const List<GallerySection> gallerySections = <GallerySection>[
     group: 'display',
   ),
   GallerySection(slug: 'liquid_glass', title: 'Liquid Glass', group: 'display'),
+  GallerySection(slug: 'horon_icon', title: 'Horon Icon', group: 'display'),
+  GallerySection(
+    slug: 'horon_wordmark',
+    title: 'Horon Wordmark',
+    group: 'display',
+  ),
   GallerySection(
     slug: 'settings_list',
     title: 'Settings List',
@@ -91,4 +97,19 @@ const List<GallerySection> gallerySections = <GallerySection>[
   ),
   GallerySection(slug: 'list_detail', title: 'List Detail', group: 'display'),
   GallerySection(slug: 'code_panel', title: 'Code Panel', group: 'display'),
+  GallerySection(slug: 'tabs', title: 'Tabs', group: 'navigation'),
+  GallerySection(slug: 'tab_bar', title: 'Tab Bar', group: 'navigation'),
+  GallerySection(slug: 'breadcrumb', title: 'Breadcrumb', group: 'navigation'),
+  GallerySection(
+    slug: 'page_header',
+    title: 'Page Header',
+    group: 'navigation',
+  ),
+  GallerySection(slug: 'top_bar', title: 'Top Bar', group: 'navigation'),
+  GallerySection(
+    slug: 'breadcrumb_header',
+    title: 'Breadcrumb Header',
+    group: 'navigation',
+  ),
+  GallerySection(slug: 'filter_bar', title: 'Filter Bar', group: 'navigation'),
 ];

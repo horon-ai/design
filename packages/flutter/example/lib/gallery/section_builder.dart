@@ -13,6 +13,8 @@ import 'registry.dart';
 import 'sections/avatar.dart';
 import 'sections/badge.dart';
 import 'sections/banner.dart';
+import 'sections/breadcrumb.dart';
+import 'sections/breadcrumb_header.dart';
 import 'sections/button.dart';
 import 'sections/calendar.dart';
 import 'sections/card.dart';
@@ -26,6 +28,9 @@ import 'sections/directory_card.dart';
 import 'sections/empty_state.dart';
 import 'sections/field.dart';
 import 'sections/file_drop.dart';
+import 'sections/filter_bar.dart';
+import 'sections/horon_icon.dart';
+import 'sections/horon_wordmark.dart';
 import 'sections/icon_button.dart';
 import 'sections/input.dart';
 import 'sections/input_group.dart';
@@ -35,6 +40,7 @@ import 'sections/liquid_glass.dart';
 import 'sections/list_detail.dart';
 import 'sections/marketplace_card.dart';
 import 'sections/mcp_server_row.dart';
+import 'sections/page_header.dart';
 import 'sections/plugin_row.dart';
 import 'sections/progress.dart';
 import 'sections/radio_group.dart';
@@ -47,9 +53,12 @@ import 'sections/slider.dart';
 import 'sections/spinner.dart';
 import 'sections/split_button.dart';
 import 'sections/switch.dart';
+import 'sections/tab_bar.dart';
+import 'sections/tabs.dart';
 import 'sections/textarea.dart';
 import 'sections/textarea_field.dart';
 import 'sections/tool_permissions.dart';
+import 'sections/top_bar.dart';
 import 'sections/usage_meter.dart';
 
 /// 섹션 위젯을 슬러그로 찾습니다.
@@ -63,6 +72,8 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'avatar': HoronAvatarGallerySection.new,
   'badge': HoronBadgeGallerySection.new,
   'banner': HoronBannerGallerySection.new,
+  'breadcrumb': HoronBreadcrumbGallerySection.new,
+  'breadcrumb_header': HoronBreadcrumbHeaderGallerySection.new,
   'button': HoronButtonGallerySection.new,
   'calendar': HoronCalendarGallerySection.new,
   'card': HoronCardGallerySection.new,
@@ -76,6 +87,9 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'empty_state': HoronEmptyStateGallerySection.new,
   'field': HoronFieldGallerySection.new,
   'file_drop': HoronFileDropGallerySection.new,
+  'filter_bar': HoronFilterBarGallerySection.new,
+  'horon_icon': HoronIconGallerySection.new,
+  'horon_wordmark': HoronWordmarkGallerySection.new,
   'icon_button': HoronIconButtonGallerySection.new,
   'input': HoronInputGallerySection.new,
   'input_group': HoronInputGroupGallerySection.new,
@@ -85,6 +99,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'list_detail': HoronListDetailGallerySection.new,
   'marketplace_card': HoronMarketplaceCardGallerySection.new,
   'mcp_server_row': HoronMcpServerRowGallerySection.new,
+  'page_header': HoronPageHeaderGallerySection.new,
   'plugin_row': HoronPluginRowGallerySection.new,
   'progress': HoronProgressGallerySection.new,
   'radio_group': HoronRadioGroupGallerySection.new,
@@ -97,9 +112,12 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'spinner': HoronSpinnerGallerySection.new,
   'split_button': HoronSplitButtonGallerySection.new,
   'switch': HoronSwitchGallerySection.new,
+  'tab_bar': HoronTabBarGallerySection.new,
+  'tabs': HoronTabsGallerySection.new,
   'textarea': HoronTextareaGallerySection.new,
   'textarea_field': HoronTextareaFieldGallerySection.new,
   'tool_permissions': HoronToolPermissionsGallerySection.new,
+  'top_bar': HoronTopBarGallerySection.new,
   'usage_meter': HoronUsageMeterGallerySection.new,
 };
 

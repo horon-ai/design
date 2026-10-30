@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
+
 // 통합 스크립트가 배럴에 이 컴포넌트를 넣으면 이 줄은 지워집니다.
 // ignore: implementation_imports
-import 'package:horon_ui/src/components/top_bar.dart';
 
 /// Top Bar 갤러리 섹션입니다.
 ///
