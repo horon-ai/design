@@ -35,13 +35,21 @@ const Map<HoronAvatarSize, double> _botIconSize = <HoronAvatarSize, double>{
   HoronAvatarSize.xl: 31,
 };
 
-/// `liveClass`의 값입니다. 상태 점의 지름입니다.
+/// `liveClass`의 값입니다. 상태 점의 바깥 지름입니다.
+///
+/// Paper `TU8-1`의 채움 8·9·11·16px에 중심 정렬한 2px 링을 더한 10·11·13·18px입니다.
 const Map<HoronAvatarSize, double> _liveDotSize = <HoronAvatarSize, double>{
   HoronAvatarSize.sm: 10,
   HoronAvatarSize.md: 11,
   HoronAvatarSize.lg: 13,
   HoronAvatarSize.xl: 18,
 };
+
+/// 상태 점이 아바타 밖으로 나가는 거리입니다.
+///
+/// Paper `TU5-1`은 점의 중심을 아바타 가장자리에서 바깥 지름의 절반보다 1px 안쪽에
+/// 두므로, 점은 1px만 밖으로 나갑니다.
+const double _liveDotProtrusion = 1;
 
 /// Figma `Avatar`(61:347): 이니셜·봇·이미지 세 모양을 네 크기로 그리고 상태 점을 붙일 수 있습니다.
 ///
@@ -177,8 +185,8 @@ class _HoronAvatarState extends State<HoronAvatar> with SingleTickerProviderStat
         children: <Widget>[
           face,
           Positioned(
-            right: -2,
-            bottom: -2,
+            right: -_liveDotProtrusion,
+            bottom: -_liveDotProtrusion,
             child: ScaleTransition(
               scale: _dot.drive(CurveTween(curve: HoronMotion.popInCurve)),
               child: Container(
@@ -187,7 +195,8 @@ class _HoronAvatarState extends State<HoronAvatar> with SingleTickerProviderStat
                 decoration: BoxDecoration(
                   color: theme.colors.statusLive,
                   shape: BoxShape.circle,
-                  border: Border.all(color: theme.colors.bgDefault, width: 2),
+                  // Paper `TU8-1`의 링색은 라이트 #FFFFFF·다크 #17181A인 `bg-surface`입니다.
+                  border: Border.all(color: theme.colors.bgSurface, width: 2),
                 ),
               ),
             ),
