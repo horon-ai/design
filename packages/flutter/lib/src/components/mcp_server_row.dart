@@ -136,7 +136,7 @@ class HoronMcpServerRow extends StatelessWidget {
             // text-[14px]/[20px] font-semibold text-interactive-on-primary
             style: theme.text.labelMd.copyWith(
               fontWeight: HoronFontWeight.semibold,
-              color: theme.colors.interactiveOnPrimary,
+              color: theme.colors.textInverse, // Paper `1VHS-0` 타일 글자 #F9FAFB
             ),
           ),
         ),
@@ -303,7 +303,7 @@ class _GlassButtonState extends State<_GlassButton> {
   }
 }
 
-/// `icon-button.tsx`의 `ghost`·`sm` 변형입니다. 32px 원, 16px 아이콘입니다.
+/// `icon-button.tsx`의 `ghost`·`sm` 변형입니다. 32px 상자에 8px 반경, 16px 아이콘입니다.
 class _GhostIconButton extends StatefulWidget {
   const _GhostIconButton({required this.label, required this.onPressed});
 
@@ -338,7 +338,7 @@ class _GhostIconButtonState extends State<_GhostIconButton> {
             height: theme.space.step(8),
             decoration: BoxDecoration(
               color: _hovered ? theme.colors.overlayInk6 : Colors.transparent, // hover:bg-overlay-ink-6
-              shape: BoxShape.circle, // rounded-full
+              borderRadius: BorderRadius.circular(theme.radius.sm), // Paper `1VHS-0`: 반경 8
             ),
             child: Center(
               child: Icon(

@@ -15,7 +15,7 @@ Future<void> pumpCard(WidgetTester tester, Widget child, {Brightness brightness 
 }
 
 void main() {
-  testWidgets('directory card: the tile is 40px, sky-500 at a 10px radius', (WidgetTester tester) async {
+  testWidgets('directory card: the tile is 40px ink at a 10px radius', (WidgetTester tester) async {
     await pumpCard(tester, const HoronDirectoryCard(icon: Icon(Icons.folder_outlined), name: 'Docs'));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronDirectoryCard)));
 
@@ -24,11 +24,12 @@ void main() {
     );
     final BoxDecoration decoration = tile.decoration! as BoxDecoration;
 
-    expect(decoration.color, HoronPalette.sky500);
+    // Paper `1VJJ-0`: 타일 채움 #17181A, 글리프 #F9FAFB
+    expect(decoration.color, HoronPalette.neutral900);
     expect((decoration.borderRadius! as BorderRadius).topLeft.x, closeTo(10, 0.01));
     expect(tester.getSize(find.byType(Container).first), const Size(40, 40));
     expect(find.byIcon(Icons.folder_outlined), findsOneWidget);
-    expect(theme.colors.textInverse, isNotNull);
+    expect(IconTheme.of(tester.element(find.byIcon(Icons.folder_outlined))).color, theme.colors.textInverse);
   });
 
   testWidgets('directory card: the name is label-md and the description clamps to one line', (
@@ -47,6 +48,8 @@ void main() {
     final Text description = tester.widget<Text>(find.text('아주 긴 설명이 들어와도 한 줄로 잘려서 카드 높이가 흔들리지 않습니다'));
 
     expect(nameStyle.fontSize, theme.text.labelMd.fontSize);
+    // Paper `1VJJ-0`: 이름 14/20 600
+    expect(nameStyle.fontWeight, HoronFontWeight.semibold);
     expect(description.maxLines, 1);
     expect(description.overflow, TextOverflow.ellipsis);
   });
