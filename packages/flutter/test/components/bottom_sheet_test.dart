@@ -48,6 +48,14 @@ void main() {
     final BorderRadius radius = _panelClip(tester).borderRadius as BorderRadius;
     expect(radius.topLeft.x, 32, reason: 'rounded-t-[32px]');
     expect(radius.bottomLeft.x, 0, reason: '위쪽 모서리만 둥급니다');
+    // `0 0 0 1px var(--color-overlay-ink-3)` — 바깐 1px 잉크 고리입니다.
+    final HoronThemeData theme = _theme(tester);
+    final DecoratedBox outer = tester.widget<DecoratedBox>(
+      find.descendant(of: find.byType(HoronBottomSheet), matching: find.byType(DecoratedBox)).first,
+    );
+    final BoxShadow ring = (outer.decoration as BoxDecoration).boxShadow!.single;
+    expect(ring.color, theme.colors.overlayInk3, reason: '0 0 0 1px overlay-ink-3');
+    expect(ring.spreadRadius, 1, reason: '1px 고리');
     expect(
       find.byWidgetPredicate(
         (Widget widget) =>

@@ -44,6 +44,9 @@ const Duration _enterDuration = Duration(milliseconds: 320);
 /// `data-ending-style:duration-220` — 시트가 내려가는 시간입니다.
 const Duration _exitDuration = Duration(milliseconds: 220);
 
+/// `0 0 0 1px` — 바깥 고리의 두께입니다.
+const double _outerRingWidth = 1;
+
 /// `icon size-5` — 행 아이콘 20입니다.
 const double _rowIconSize = 20;
 
@@ -171,7 +174,9 @@ class HoronBottomSheet extends StatelessWidget {
         // 높이 상한이 있는 자리(시트 라우트, 갤러리 미리보기)에서는 본문을 스크롤에
         // 넣어 화면보다 긴 내용도 잘리지 않게 합니다. 상한이 없으면 그냥 쌓습니다.
         final bool bounded = constraints.hasBoundedHeight;
-        return ClipRRect(
+        // `shadow-[inset_0_0_0_1px_…,0_0_0_1px_var(--color-overlay-ink-3)]` — 안쪽 고리는
+        // 아래 Stack이, 바깥 1px 잉크 고리는 이 상자가 그립니다.
+        final Widget surface = ClipRRect(
           borderRadius: radius,
           child: Stack(
             children: <Widget>[
@@ -229,6 +234,17 @@ class HoronBottomSheet extends StatelessWidget {
             ],
           ),
         );
+
+        return rings
+            ? DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: radius,
+                  // 바깥 `0 0 0 1px` 고리입니다(레이아웃을 밀지 않도록 그림자로 그립니다).
+                  boxShadow: <BoxShadow>[BoxShadow(color: colors.overlayInk3, spreadRadius: _outerRingWidth)],
+                ),
+                child: surface,
+              )
+            : surface;
       },
     );
   }

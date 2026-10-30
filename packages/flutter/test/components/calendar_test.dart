@@ -59,7 +59,7 @@ void main() {
     final BoxDecoration decoration = _surfaceDecoration(tester);
 
     expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.radius.xl, reason: 'rounded-xl');
-    expect(decoration.border!.top.color, theme.colors.glassRimStrong, reason: 'border-glass-rim-strong');
+    expect(decoration.border, isNull, reason: 'Paper는 호스트 테두리를 그리지 않습니다(가장자리는 유리 레이어가 맡습니다)');
     expect(
       tester.widget<Padding>(find.descendant(of: _surface(), matching: find.byType(Padding)).first).padding,
       EdgeInsets.all(theme.space.s4),
@@ -133,12 +133,8 @@ void main() {
       theme.colors.interactivePrimary,
       reason: 'rounded-full bg-interactive-primary',
     );
-    expect(
-      _dayStyle(tester, 2026, 10, 14).color,
-      theme.colors.interactiveOnPrimary,
-      reason: 'text-interactive-on-primary',
-    );
-    expect(_dayStyle(tester, 2026, 10, 14).fontSize, theme.text.labelLg.fontSize, reason: 'text-label-lg');
+    expect(_dayStyle(tester, 2026, 10, 14).color, theme.colors.textInverse, reason: 'text-text-inverse (#F9FAFB)');
+    expect(_dayStyle(tester, 2026, 10, 14).fontSize, theme.text.labelMd.fontSize, reason: 'text-label-md');
   });
 
   testWidgets('range mode fills the days between the two ends', (WidgetTester tester) async {
@@ -195,15 +191,16 @@ void main() {
     expect(_dayStyle(tester, 2026, 10, 14).color, _theme(tester).colors.textDisabled, reason: 'text-text-disabled');
   });
 
-  testWidgets('days outside the month use the placeholder colour and today gets the dot', (WidgetTester tester) async {
+  testWidgets('days outside the month use the disabled colour and today gets the dot', (WidgetTester tester) async {
     await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today)));
     final HoronThemeData theme = _theme(tester);
 
     // 2026년 10월 1일은 목요일이라 일요일 시작 격자는 9월 27일에서 시작합니다.
     expect(_dayOf(2026, 9, 27), findsOneWidget);
-    expect(_dayStyle(tester, 2026, 9, 27).color, theme.colors.textPlaceholder, reason: 'text-text-placeholder');
+    expect(_dayStyle(tester, 2026, 9, 27).color, theme.colors.textDisabled, reason: 'text-text-disabled (#B0B1B3)');
+    expect(_dayStyle(tester, 2026, 9, 27).fontSize, theme.text.labelMd.fontSize, reason: 'text-label-md');
     expect(_dayStyle(tester, 2026, 10, 19).color, theme.colors.textBrand, reason: 'text-text-brand (오늘)');
-    expect(_dayStyle(tester, 2026, 10, 19).fontSize, theme.text.labelLg.fontSize);
+    expect(_dayStyle(tester, 2026, 10, 19).fontSize, theme.text.labelMd.fontSize);
     expect(find.byKey(const Key('horon-calendar-today-dot-2026-10-19')), findsOneWidget);
     // 고른 날에는 오늘 점을 그리지 않습니다.
     await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today, value: DateTime(2026, 10, 19))));

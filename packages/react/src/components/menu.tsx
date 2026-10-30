@@ -153,7 +153,7 @@ export function MenuTile({ className, ...props }: WithClass<ComponentProps<"span
   return (
     <span
       className={cn(
-        "flex size-7 shrink-0 items-center justify-center rounded-sm bg-interactive-primary text-label-md text-text-inverse",
+        "flex size-7 shrink-0 items-center justify-center rounded-sm bg-interactive-primary text-label-sm text-text-inverse",
         className,
       )}
       {...props}
