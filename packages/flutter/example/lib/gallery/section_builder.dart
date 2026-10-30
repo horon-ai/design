@@ -49,6 +49,7 @@ import 'sections/list_detail.dart';
 import 'sections/marketplace_card.dart';
 import 'sections/mcp_server_row.dart';
 import 'sections/menu.dart';
+import 'sections/message_extras.dart';
 import 'sections/page_header.dart';
 import 'sections/plan_card.dart';
 import 'sections/plan_step.dart';
@@ -125,6 +126,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'marketplace_card': HoronMarketplaceCardGallerySection.new,
   'mcp_server_row': HoronMcpServerRowGallerySection.new,
   'menu': HoronMenuGallerySection.new,
+  'message_extras': HoronMessageExtrasGallerySection.new,
   'page_header': HoronPageHeaderGallerySection.new,
   'plan_card': HoronPlanCardGallerySection.new,
   'plan_step': HoronPlanStepGallerySection.new,

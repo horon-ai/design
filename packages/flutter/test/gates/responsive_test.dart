@@ -22,9 +22,11 @@ import 'gate_sources.dart';
 ///  * `lib/src/components/code_panel.dart` - a code block's lines are laid out
 ///    at a fixed pitch, so wrapping them would destroy the alignment; React
 ///    scrolls the `pre` instead.
+///  * `lib/src/components/message_extras.dart` - it carries the ink `CodeBlock`,
+///    which has the same fixed-pitch constraint.
 ///
 /// Every other component still fails.
-const Set<String> horizontalScrollExemptSlugs = <String>{'data_table', 'code_panel'};
+const Set<String> horizontalScrollExemptSlugs = <String>{'data_table', 'code_panel', 'message_extras'};
 
 void main() {
   test('responsive: no component scrolls a control horizontally', () {
@@ -64,8 +66,8 @@ final nested = SingleChildScrollView(
     expect(horizontalScrollViewLines(source), <int>[9]);
   });
 
-  test('responsive: only the data table and the code panel are exempt', () {
-    expect(horizontalScrollExemptSlugs, <String>{'data_table', 'code_panel'});
+  test('responsive: only the data table, the code panel and the message extras are exempt', () {
+    expect(horizontalScrollExemptSlugs, <String>{'data_table', 'code_panel', 'message_extras'});
   });
 
   test('responsive: the scan covers every file the component directory lists', () {

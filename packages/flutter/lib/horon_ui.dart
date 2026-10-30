@@ -43,6 +43,7 @@ export 'src/components/list_detail.dart';
 export 'src/components/marketplace_card.dart';
 export 'src/components/mcp_server_row.dart';
 export 'src/components/menu.dart';
+export 'src/components/message_extras.dart';
 export 'src/components/page_header.dart';
 export 'src/components/plan_card.dart';
 export 'src/components/plan_step.dart';
