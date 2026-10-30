@@ -16,6 +16,7 @@ export 'src/components/button.dart';
 export 'src/components/calendar.dart';
 export 'src/components/card.dart';
 export 'src/components/chat_bubble.dart';
+export 'src/components/chat_controls.dart';
 export 'src/components/checkbox.dart';
 export 'src/components/chip.dart';
 export 'src/components/choice_card.dart';

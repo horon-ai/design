@@ -22,6 +22,7 @@ import 'sections/button.dart';
 import 'sections/calendar.dart';
 import 'sections/card.dart';
 import 'sections/chat_bubble.dart';
+import 'sections/chat_controls.dart';
 import 'sections/checkbox.dart';
 import 'sections/chip.dart';
 import 'sections/choice_card.dart';
@@ -95,6 +96,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'calendar': HoronCalendarGallerySection.new,
   'card': HoronCardGallerySection.new,
   'chat_bubble': HoronChatBubbleGallerySection.new,
+  'chat_controls': HoronChatControlsGallerySection.new,
   'checkbox': HoronCheckboxGallerySection.new,
   'chip': HoronChipGallerySection.new,
   'choice_card': HoronChoiceCardGallerySection.new,
