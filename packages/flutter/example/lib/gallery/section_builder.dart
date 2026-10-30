@@ -26,6 +26,7 @@ import 'sections/checkbox.dart';
 import 'sections/chip.dart';
 import 'sections/choice_card.dart';
 import 'sections/code_panel.dart';
+import 'sections/command_palette.dart';
 import 'sections/composer.dart';
 import 'sections/date_field.dart';
 import 'sections/dialog.dart';
@@ -45,6 +46,7 @@ import 'sections/liquid_glass.dart';
 import 'sections/list_detail.dart';
 import 'sections/marketplace_card.dart';
 import 'sections/mcp_server_row.dart';
+import 'sections/menu.dart';
 import 'sections/page_header.dart';
 import 'sections/plan_card.dart';
 import 'sections/plan_step.dart';
@@ -71,6 +73,7 @@ import 'sections/tool_permissions.dart';
 import 'sections/tooltip.dart';
 import 'sections/top_bar.dart';
 import 'sections/usage_meter.dart';
+import 'sections/workspace_menu.dart';
 
 /// 섹션 위젯을 슬러그로 찾습니다.
 ///
@@ -96,6 +99,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'chip': HoronChipGallerySection.new,
   'choice_card': HoronChoiceCardGallerySection.new,
   'code_panel': HoronCodePanelGallerySection.new,
+  'command_palette': HoronCommandPaletteGallerySection.new,
   'composer': HoronComposerGallerySection.new,
   'date_field': HoronDateFieldGallerySection.new,
   'dialog': HoronDialogGallerySection.new,
@@ -115,6 +119,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'list_detail': HoronListDetailGallerySection.new,
   'marketplace_card': HoronMarketplaceCardGallerySection.new,
   'mcp_server_row': HoronMcpServerRowGallerySection.new,
+  'menu': HoronMenuGallerySection.new,
   'page_header': HoronPageHeaderGallerySection.new,
   'plan_card': HoronPlanCardGallerySection.new,
   'plan_step': HoronPlanStepGallerySection.new,
@@ -141,6 +146,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'tooltip': HoronTooltipGallerySection.new,
   'top_bar': HoronTopBarGallerySection.new,
   'usage_meter': HoronUsageMeterGallerySection.new,
+  'workspace_menu': HoronWorkspaceMenuGallerySection.new,
 };
 
 /// 이 표가 알고 있는 슬러그입니다.
