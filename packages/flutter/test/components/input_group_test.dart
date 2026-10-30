@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/input_group.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// `HoronInputGroup`의 칸·구분선·상태·반응형 계약을 검사합니다.
 void main() {

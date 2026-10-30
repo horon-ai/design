@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/input.dart';
-import 'package:horon_ui/src/glass/glass_geometry.dart';
-import 'package:horon_ui/src/glass/horon_glass.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// `HoronInput`의 표면·크기·상태·반응형 계약을 검사합니다.
 void main() {

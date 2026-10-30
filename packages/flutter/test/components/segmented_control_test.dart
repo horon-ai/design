@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/segmented_control.dart';
-import 'package:horon_ui/src/glass/glass_geometry.dart';
-import 'package:horon_ui/src/glass/horon_glass.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// `HoronSegmentedControl`의 크기·표면·선택·비활성·채움 계약을 검사합니다.
 void main() {

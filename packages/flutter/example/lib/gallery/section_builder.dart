@@ -22,8 +22,11 @@ import 'sections/composer.dart';
 import 'sections/date_field.dart';
 import 'sections/directory_card.dart';
 import 'sections/empty_state.dart';
+import 'sections/field.dart';
 import 'sections/file_drop.dart';
 import 'sections/icon_button.dart';
+import 'sections/input.dart';
+import 'sections/input_group.dart';
 import 'sections/integration_row.dart';
 import 'sections/kbd.dart';
 import 'sections/liquid_glass.dart';
@@ -34,11 +37,15 @@ import 'sections/plugin_row.dart';
 import 'sections/progress.dart';
 import 'sections/radio_group.dart';
 import 'sections/schedule.dart';
+import 'sections/segmented_control.dart';
+import 'sections/select.dart';
 import 'sections/skeleton.dart';
 import 'sections/slider.dart';
 import 'sections/spinner.dart';
 import 'sections/split_button.dart';
 import 'sections/switch.dart';
+import 'sections/textarea.dart';
+import 'sections/textarea_field.dart';
 import 'sections/tool_permissions.dart';
 import 'sections/usage_meter.dart';
 
@@ -62,8 +69,11 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'date_field': HoronDateFieldGallerySection.new,
   'directory_card': HoronDirectoryCardGallerySection.new,
   'empty_state': HoronEmptyStateGallerySection.new,
+  'field': HoronFieldGallerySection.new,
   'file_drop': HoronFileDropGallerySection.new,
   'icon_button': HoronIconButtonGallerySection.new,
+  'input': HoronInputGallerySection.new,
+  'input_group': HoronInputGroupGallerySection.new,
   'integration_row': HoronIntegrationRowGallerySection.new,
   'kbd': HoronKbdGallerySection.new,
   'liquid_glass': HoronLiquidGlassGallerySection.new,
@@ -74,11 +84,15 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'progress': HoronProgressGallerySection.new,
   'radio_group': HoronRadioGroupGallerySection.new,
   'schedule': HoronScheduleGallerySection.new,
+  'segmented_control': HoronSegmentedControlGallerySection.new,
+  'select': HoronSelectGallerySection.new,
   'skeleton': HoronSkeletonGallerySection.new,
   'slider': HoronSliderGallerySection.new,
   'spinner': HoronSpinnerGallerySection.new,
   'split_button': HoronSplitButtonGallerySection.new,
   'switch': HoronSwitchGallerySection.new,
+  'textarea': HoronTextareaGallerySection.new,
+  'textarea_field': HoronTextareaFieldGallerySection.new,
   'tool_permissions': HoronToolPermissionsGallerySection.new,
   'usage_meter': HoronUsageMeterGallerySection.new,
 };

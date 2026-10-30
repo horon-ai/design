@@ -8,13 +8,6 @@
 /// catalog slug without one goes in). `test/gates_final/pending_empty_test.dart`
 /// asserts this list is empty once the last component lands.
 const List<String> pendingComponents = <String>[
-  'input',
-  'textarea',
-  'field',
-  'textarea_field',
-  'input_group',
-  'select',
-  'segmented_control',
   'badge',
   'card',
   'data_table',

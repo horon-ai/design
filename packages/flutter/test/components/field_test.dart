@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/field.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// `HoronField` 묶음의 간격·색·비활성 문맥·오류 진입 애니메이션을 검사합니다.
 void main() {

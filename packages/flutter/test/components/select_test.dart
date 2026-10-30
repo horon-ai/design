@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/components/input.dart';
-import 'package:horon_ui/src/components/select.dart';
-import 'package:horon_ui/src/glass/glass_geometry.dart';
-import 'package:horon_ui/src/glass/horon_glass.dart';
-import 'package:horon_ui/src/theme/horon_theme.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// `HoronSelect`의 트리거·목록·선택·칩·상태를 검사합니다.
 void main() {
