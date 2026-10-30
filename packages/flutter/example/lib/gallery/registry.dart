@@ -52,6 +52,7 @@ const List<GallerySection> gallerySections = <GallerySection>[
   ),
   GallerySection(slug: 'file_drop', title: 'File Drop', group: 'inputs'),
   GallerySection(slug: 'choice_card', title: 'Choice Card', group: 'inputs'),
+  GallerySection(slug: 'badge', title: 'Badge', group: 'display'),
   GallerySection(slug: 'avatar', title: 'Avatar', group: 'display'),
   GallerySection(slug: 'card', title: 'Card', group: 'display'),
   GallerySection(slug: 'banner', title: 'Banner', group: 'display'),

@@ -5,6 +5,7 @@
 library;
 
 export 'src/components/avatar.dart';
+export 'src/components/badge.dart';
 export 'src/components/banner.dart';
 export 'src/components/button.dart';
 export 'src/components/calendar.dart';

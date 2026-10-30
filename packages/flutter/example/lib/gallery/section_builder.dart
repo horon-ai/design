@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 
 import 'registry.dart';
 import 'sections/avatar.dart';
+import 'sections/badge.dart';
 import 'sections/banner.dart';
 import 'sections/button.dart';
 import 'sections/calendar.dart';
@@ -60,6 +61,7 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
 /// 슬러그별 섹션 생성자입니다.
 const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'avatar': HoronAvatarGallerySection.new,
+  'badge': HoronBadgeGallerySection.new,
   'banner': HoronBannerGallerySection.new,
   'button': HoronButtonGallerySection.new,
   'calendar': HoronCalendarGallerySection.new,

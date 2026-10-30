@@ -8,7 +8,6 @@
 /// catalog slug without one goes in). `test/gates_final/pending_empty_test.dart`
 /// asserts this list is empty once the last component lands.
 const List<String> pendingComponents = <String>[
-  'badge',
   'data_table',
   'horon_icon',
   'horon_wordmark',
