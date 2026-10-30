@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../glass/glass_geometry.dart';
+import '../glass/horon_glass.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -101,73 +103,84 @@ class _HoronComposerState extends State<HoronComposer> {
     return ClipRRect(
       key: const Key('horon-composer'),
       borderRadius: BorderRadius.circular(theme.radius.full),
-      child: ColoredBox(
-        // `bg-glass-regular` — 유리 레이어 엔진이 없어 토큰 색으로 채웁니다.
-        color: colors.glassRegular,
-        child: Padding(
-          // `p-2`.
-          padding: EdgeInsets.all(space.s2),
-          child: Row(
-            children: <Widget>[
-              _ComposerIconButton(icon: Icons.add, label: 'Attach', onPressed: disabled ? null : widget.onAttach),
-              SizedBox(width: space.s2),
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  enabled: !disabled,
-                  maxLines: 1,
-                  style: theme.text.bodyMd.copyWith(color: colors.textPrimary),
-                  cursorColor: colors.textPrimary,
-                  textInputAction: TextInputAction.send,
-                  onChanged: widget.onValueChange,
-                  onSubmitted: (String value) => _submit(),
-                  decoration: InputDecoration(
-                    hintText: widget.placeholder,
-                    hintStyle: theme.text.bodyMd.copyWith(color: colors.textPlaceholder),
-                    // `bg-transparent outline-none` — 테마의 채운 배경과 테두리를 끕니다.
-                    filled: false,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                  ),
-                ),
-              ),
-              SizedBox(width: space.s2),
-              AnimatedSwitcher(
-                duration: animate ? HoronMotion.popInDuration : Duration.zero,
-                switchInCurve: HoronMotion.popInCurve,
-                switchOutCurve: HoronMotion.popOutCurve,
-                transitionBuilder: (Widget child, Animation<double> animation) => ScaleTransition(
-                  scale: animation.drive(
-                    Tween<double>(
-                      begin: HoronMotion.popInScale,
-                      end: 1,
-                    ).chain(CurveTween(curve: HoronMotion.popInCurve)),
-                  ),
-                  child: child,
-                ),
-                child: hasText
-                    ? _ComposerIconButton(
-                        key: const ValueKey<String>('horon-composer-send'),
-                        icon: Icons.arrow_upward,
-                        label: 'Send',
-                        primary: true,
-                        onPressed: disabled ? null : _submit,
-                      )
-                    : _ComposerIconButton(
-                        key: const ValueKey<String>('horon-composer-voice'),
-                        icon: Icons.mic_none,
-                        label: 'Voice input',
-                        iconColor: colors.textSecondary,
-                        onPressed: disabled ? null : widget.onVoice,
-                      ),
-              ),
-            ],
+      // React `composer.tsx`는 호스트에 `bg-glass-regular`를 깔고 그 위에
+      // `<LiquidGlass tier="regular" />`를 얹습니다. Flutter는 채움까지 유리 위젯이
+      // 그리므로 바탕은 유리에 맡기고 패딩은 내용에만 걺니다.
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          Positioned.fill(
+            child: HoronLiquidGlass(
+              tier: HoronGlassTier.regular,
+              borderRadius: BorderRadius.circular(theme.radius.full),
+              child: const SizedBox.expand(),
+            ),
           ),
-        ),
+          Padding(
+            // `p-2`.
+            padding: EdgeInsets.all(space.s2),
+            child: Row(
+              children: <Widget>[
+                _ComposerIconButton(icon: Icons.add, label: 'Attach', onPressed: disabled ? null : widget.onAttach),
+                SizedBox(width: space.s2),
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    enabled: !disabled,
+                    maxLines: 1,
+                    style: theme.text.bodyMd.copyWith(color: colors.textPrimary),
+                    cursorColor: colors.textPrimary,
+                    textInputAction: TextInputAction.send,
+                    onChanged: widget.onValueChange,
+                    onSubmitted: (String value) => _submit(),
+                    decoration: InputDecoration(
+                      hintText: widget.placeholder,
+                      hintStyle: theme.text.bodyMd.copyWith(color: colors.textPlaceholder),
+                      // `bg-transparent outline-none` — 테마의 채운 배경과 테두리를 끕니다.
+                      filled: false,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                    ),
+                  ),
+                ),
+                SizedBox(width: space.s2),
+                AnimatedSwitcher(
+                  duration: animate ? HoronMotion.popInDuration : Duration.zero,
+                  switchInCurve: HoronMotion.popInCurve,
+                  switchOutCurve: HoronMotion.popOutCurve,
+                  transitionBuilder: (Widget child, Animation<double> animation) => ScaleTransition(
+                    scale: animation.drive(
+                      Tween<double>(
+                        begin: HoronMotion.popInScale,
+                        end: 1,
+                      ).chain(CurveTween(curve: HoronMotion.popInCurve)),
+                    ),
+                    child: child,
+                  ),
+                  child: hasText
+                      ? _ComposerIconButton(
+                          key: const ValueKey<String>('horon-composer-send'),
+                          icon: Icons.arrow_upward,
+                          label: 'Send',
+                          primary: true,
+                          onPressed: disabled ? null : _submit,
+                        )
+                      : _ComposerIconButton(
+                          key: const ValueKey<String>('horon-composer-voice'),
+                          icon: Icons.mic_none,
+                          label: 'Voice input',
+                          iconColor: colors.textSecondary,
+                          onPressed: disabled ? null : widget.onVoice,
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

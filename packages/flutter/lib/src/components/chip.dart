@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../glass/glass_geometry.dart';
+import '../glass/horon_glass.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -62,9 +64,12 @@ class _HoronChipState extends State<HoronChip> {
     final bool pressed = _pressed;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    final Color background = pressed
+    // React는 칩을 clear 유리로 그리고(`chip.tsx:30`의 `<LiquidGlass texture />`),
+    // 호버·선택 동안에만 토큰 색을 얇게 덧칩니다. 쉬는 상태의 컨테이너 색은 비어 있고,
+    // 바탕은 유리 엔진이 그립니다.
+    final Color? surfaceTint = pressed
         ? colors.glassClearPressed
-        : (_hovered && interactive ? colors.glassClearHover : colors.glassClear);
+        : (_hovered && interactive ? colors.glassClearHover : null);
     final Color foreground = pressed ? colors.textBrand : colors.textPrimary;
     final Color border = pressed ? colors.borderBrand : Colors.transparent;
 
@@ -122,22 +127,38 @@ class _HoronChipState extends State<HoronChip> {
                 duration: reduceMotion ? Duration.zero : _revealDuration,
                 curve: Curves.easeOut,
                 height: space.step(8),
-                padding: padding,
                 decoration: BoxDecoration(
-                  color: background,
+                  color: surfaceTint,
                   borderRadius: BorderRadius.circular(theme.radius.full),
                   border: Border.all(color: border),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Stack(
+                  alignment: Alignment.center,
                   children: <Widget>[
-                    if (pressed) check,
-                    Flexible(
-                      child: Text(
-                        widget.label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.text.labelMd.copyWith(color: foreground),
+                    Positioned.fill(
+                      child: HoronLiquidGlass(
+                        tier: HoronGlassTier.clear,
+                        texture: true,
+                        borderRadius: BorderRadius.circular(theme.radius.full),
+                        child: const SizedBox.expand(),
+                      ),
+                    ),
+                    // 패딩은 내용에만 걸어 유리가 알약 전체를 채우게 합니다.
+                    Padding(
+                      padding: padding,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          if (pressed) check,
+                          Flexible(
+                            child: Text(
+                              widget.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.text.labelMd.copyWith(color: foreground),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
