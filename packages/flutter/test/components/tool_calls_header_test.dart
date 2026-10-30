@@ -33,6 +33,12 @@ void main() {
     }
     // 세 칩이 6px 씩 겹칩니다: 28 + 2 * 22.
     expect(tester.getSize(find.byType(Stack).first).width, 72);
+
+    // Paper N11: 칩은 28x28 r8 표면 타일입니다.
+    final Container chip = tester.widget<Container>(
+      find.ancestor(of: find.byIcon(Icons.search), matching: find.byType(Container)).first,
+    );
+    expect((chip.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(8));
   });
 
   testWidgets('tool calls header: it folds and unfolds its children', (WidgetTester tester) async {

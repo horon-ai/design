@@ -37,6 +37,9 @@ const double _botTileRadius = 5;
 /// `task-row.tsx`의 `h-7.5`입니다. 동작 알약 높이입니다.
 const double _pillHeight = 30;
 
+/// `task-row.tsx`의 `after:h-px`입니다. 목록 변형의 행 구분선 두께입니다.
+const double _dividerHeight = 1;
+
 /// Figma `Task row`(Agent tasks 112:939): 16 반경의 평평한 행에 네 상태가 살아 움직이는 작업 카드입니다.
 ///
 /// `task-row.tsx`를 옮긴 것입니다. `card`는 옅은 표면, `list`는 아래 1px 구분선만
@@ -121,125 +124,145 @@ class HoronTaskRow extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: _rowPaddingX, vertical: _rowPaddingY),
       decoration: card
           ? BoxDecoration(color: theme.colors.bgSubtle, borderRadius: BorderRadius.circular(_rowRadius))
-          : BoxDecoration(
-              border: last ? null : Border(bottom: BorderSide(color: theme.colors.overlayInk8)),
-            ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 8,
+          // `variant="list"`의 `rounded-b-[16px]` — 배경 없이 아래 모서리만 둥급니다.
+          : BoxDecoration(borderRadius: BorderRadius.vertical(bottom: Radius.circular(_rowRadius))),
+      child: Stack(
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.text.labelLg.copyWith(color: theme.colors.textPrimary),
-                ),
-              ),
-              if (elapsed != null) ...<Widget>[
-                const SizedBox(width: 8),
-                Text(
-                  elapsed!,
-                  maxLines: 1,
-                  softWrap: false,
-                  style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
-                ),
-              ],
-              const SizedBox(width: 8),
-              Icon(Icons.expand_more, size: 14, color: theme.colors.textSecondary),
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              Container(
-                width: _botTile,
-                height: _botTile,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: _tile(theme), borderRadius: BorderRadius.circular(_botTileRadius)),
-                child: Text(botInitial, style: theme.text.labelSm.copyWith(color: theme.colors.textInverse)),
-              ),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  botName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
-                ),
-              ),
-              if (project != null) ...<Widget>[
-                const SizedBox(width: 6),
-                Text('·', style: theme.text.caption.copyWith(color: theme.colors.textSecondary)),
-                const SizedBox(width: 6),
-                Icon(Icons.folder_outlined, size: 13, color: theme.colors.textSecondary),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    project!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
-                  ),
-                ),
-              ],
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              switch (status) {
-                HoronTaskStatus.running => const HoronSpinner(pixelSize: 15),
-                HoronTaskStatus.review => Icon(Icons.check_circle, size: 16, color: theme.colors.textPrimary),
-                HoronTaskStatus.done => Icon(Icons.check_circle, size: 16, color: theme.colors.textSecondary),
-                HoronTaskStatus.failed => Icon(Icons.error, size: 16, color: theme.colors.textDanger),
-              },
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  message,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.text.labelMd.copyWith(color: _messageColor(theme)),
-                ),
-              ),
-              if (detail != null) ...<Widget>[
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    detail!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
-                  ),
-                ),
-              ],
-              const Spacer(),
-              if (status == HoronTaskStatus.running) _RowPill(label: 'Cancel', icon: Icons.stop, onPressed: onCancel),
-              if (status == HoronTaskStatus.failed) _RowPill(label: 'Retry', icon: Icons.refresh, onPressed: onRetry),
-              if (status == HoronTaskStatus.review)
-                _RowPill(label: 'Review', icon: Icons.check, primary: true, onPressed: onReview),
-              if (status == HoronTaskStatus.review || status == HoronTaskStatus.done) ...<Widget>[
-                const SizedBox(width: 4),
-                Semantics(
-                  button: true,
-                  label: 'Archive',
-                  child: GestureDetector(
-                    onTap: onArchive,
-                    child: SizedBox(
-                      width: _pillHeight,
-                      height: _pillHeight,
-                      child: Icon(Icons.archive_outlined, size: 16, color: theme.colors.textSecondary),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: _rowPaddingX, vertical: _rowPaddingY),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.text.labelLg.copyWith(color: theme.colors.textPrimary),
+                      ),
                     ),
-                  ),
+                    if (elapsed != null) ...<Widget>[
+                      const SizedBox(width: 8),
+                      Text(
+                        elapsed!,
+                        maxLines: 1,
+                        softWrap: false,
+                        style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+                      ),
+                    ],
+                    const SizedBox(width: 8),
+                    Icon(Icons.expand_more, size: 14, color: theme.colors.textSecondary),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: _botTile,
+                      height: _botTile,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: _tile(theme),
+                        borderRadius: BorderRadius.circular(_botTileRadius),
+                      ),
+                      child: Text(botInitial, style: theme.text.labelSm.copyWith(color: theme.colors.textInverse)),
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        botName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+                      ),
+                    ),
+                    if (project != null) ...<Widget>[
+                      const SizedBox(width: 6),
+                      Text('·', style: theme.text.caption.copyWith(color: theme.colors.textSecondary)),
+                      const SizedBox(width: 6),
+                      Icon(Icons.folder_outlined, size: 13, color: theme.colors.textSecondary),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          project!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    switch (status) {
+                      HoronTaskStatus.running => const HoronSpinner(pixelSize: 15),
+                      HoronTaskStatus.review => Icon(Icons.check_circle, size: 16, color: theme.colors.textPrimary),
+                      HoronTaskStatus.done => Icon(Icons.check_circle, size: 16, color: theme.colors.textSecondary),
+                      HoronTaskStatus.failed => Icon(Icons.error, size: 16, color: theme.colors.textDanger),
+                    },
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        message,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.text.labelMd.copyWith(color: _messageColor(theme)),
+                      ),
+                    ),
+                    if (detail != null) ...<Widget>[
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          detail!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+                        ),
+                      ),
+                    ],
+                    const Spacer(),
+                    if (status == HoronTaskStatus.running)
+                      _RowPill(label: 'Cancel', icon: Icons.stop, onPressed: onCancel),
+                    if (status == HoronTaskStatus.failed)
+                      _RowPill(label: 'Retry', icon: Icons.refresh, onPressed: onRetry),
+                    if (status == HoronTaskStatus.review)
+                      _RowPill(label: 'Review', icon: Icons.check, primary: true, onPressed: onReview),
+                    if (status == HoronTaskStatus.review || status == HoronTaskStatus.done) ...<Widget>[
+                      const SizedBox(width: 4),
+                      Semantics(
+                        button: true,
+                        label: 'Archive',
+                        child: GestureDetector(
+                          onTap: onArchive,
+                          child: SizedBox(
+                            width: _pillHeight,
+                            height: _pillHeight,
+                            child: Icon(Icons.archive_outlined, size: 16, color: theme.colors.textSecondary),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ],
-            ],
+            ),
           ),
+          // `after:inset-x-4 after:bottom-0 after:h-px` — 목록 변형은 행 아래 모서리에
+          // 좌우 16을 들여쓴 1px 구분선을 긋습니다.
+          if (!card && !last)
+            Positioned(
+              left: _rowPaddingX,
+              right: _rowPaddingX,
+              bottom: 0,
+              height: _dividerHeight,
+              child: ColoredBox(key: const Key('horon-task-row-divider'), color: theme.colors.overlayInk8),
+            ),
         ],
       ),
     );
