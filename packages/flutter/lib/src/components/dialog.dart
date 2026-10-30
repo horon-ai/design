@@ -29,11 +29,14 @@ const Duration _enterDuration = Duration(milliseconds: 240);
 /// `data-starting-style:translate-y-2` — 나타날 때 아래에서 올라오는 거리 8입니다.
 const double _enterOffset = 8;
 
-/// `bg-bg-scrim/32` — 스크림 불투명도입니다.
-const double _scrimOpacity = 0.32;
+/// Paper `UE8-1`의 스크림 불투명도입니다(0.4).
+const double _scrimOpacity = 0.4;
 
 /// `backdrop-blur-[6px]` — 스크림 뒤 배경 흐림 반경입니다.
 const double _scrimBlur = 6;
+
+/// Paper `UBN-1` 호스트의 `blur(24px)` — 서리 표면의 배경 흐림 반경입니다.
+const double _frostBlur = 24;
 
 /// Figma `Dialog on scrim`(63:329)의 다이얼로그 표면입니다.
 ///
@@ -97,6 +100,10 @@ class HoronDialog extends StatelessWidget {
     final BorderRadius radius = BorderRadius.circular(theme.radius.xl); // rounded-xl / rounded-[20px]
     // dark:shadow-none — 다크에서는 테두리 고리와 그림자를 모두 끕니다.
     final bool rings = !solid && theme.brightness != Brightness.dark;
+    // Paper는 라이트 다이얼로그만 `--color-glass-fill-frost`(#FFFFFFE5, 90%)와
+    // 호스트 24px 배경 흐림을 씁니다(`UBN-1`). 다크 보드 `CLU-0`은 두꺼운 유리
+    // `#17181ACC`에 흐림·고리가 없습니다.
+    final bool frost = !solid && theme.brightness == Brightness.light;
 
     // shadow-[0_24_64_#0A142433] — React의 색은 푸른 기가 도는 검정 20%입니다.
     // 토큰에 그 색이 없어 같은 불투명도의 overlay-ink-20으로 옮겼습니다.
@@ -147,7 +154,12 @@ class HoronDialog extends StatelessWidget {
         children: <Widget>[
           if (!solid)
             Positioned.fill(
-              child: HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: const SizedBox.expand()),
+              child: frost
+                  ? BackdropFilter(
+                      filter: ui.ImageFilter.blur(sigmaX: _frostBlur, sigmaY: _frostBlur),
+                      child: ColoredBox(color: colors.glassFillFrost),
+                    )
+                  : HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: const SizedBox.expand()),
             ),
           Padding(
             padding: EdgeInsets.all(space.s6), // p-6
