@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../glass/glass_geometry.dart';
+import '../glass/horon_glass.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -127,84 +129,105 @@ class HoronChoiceCard extends StatelessWidget {
                       key: const Key('horon-choice-card-surface'),
                       duration: animate ? HoronMotion.colorsDuration : Duration.zero,
                       curve: HoronMotion.colorsCurve,
-                      // `p-3.5 rounded-2xl border` — 켜지면 `border-border-brand bg-glass-thick`.
-                      padding: EdgeInsets.all(space.s3_5),
+                      // `p-3.5 rounded-2xl border` — 켜지면 `border-border-brand`.
+                      // 바탕은 유리 엔진이 그립니다. React는 호스트에 `bg-glass-clear`를
+                      // 깔고 그 위에 `<LiquidGlass tier="clear" />`를 얹으며(`choice-card.tsx:34`),
+                      // 선택되면 둘 다 thick으로 바뀝니다. Flutter는 채움까지 유리 위젯이
+                      // 그리므로 컨테이너에는 테두리만 남깁니다.
                       decoration: BoxDecoration(
-                        color: checked ? colors.glassThick : colors.glassClear,
                         borderRadius: BorderRadius.circular(theme.radius.xl2),
                         border: Border.all(color: checked ? colors.borderBrand : Colors.transparent),
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: space.s3,
+                      child: Stack(
+                        alignment: Alignment.center,
                         children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(top: HoronChoiceCard._radioTopOffset),
-                            child: AnimatedContainer(
-                              key: const Key('horon-choice-card-ring'),
-                              duration: animate ? HoronMotion.colorsDuration : Duration.zero,
-                              curve: HoronMotion.colorsCurve,
-                              width: HoronChoiceCard._radioSize,
-                              height: HoronChoiceCard._radioSize,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  width: checked ? HoronChoiceCard._ringOn : HoronChoiceCard._ringOff,
-                                  color: checked ? colors.interactivePrimary : colors.borderDashed,
-                                ),
-                              ),
-                              child: AnimatedScale(
-                                scale: checked ? 1 : 0,
-                                duration: animate ? HoronMotion.popInDuration : Duration.zero,
-                                curve: HoronMotion.popInCurve,
-                                child: Container(
-                                  key: const Key('horon-choice-card-dot'),
-                                  width: HoronChoiceCard._dotSize,
-                                  height: HoronChoiceCard._dotSize,
-                                  decoration: BoxDecoration(shape: BoxShape.circle, color: colors.interactiveOnPrimary),
-                                ),
-                              ),
+                          Positioned.fill(
+                            child: HoronLiquidGlass(
+                              tier: checked ? HoronGlassTier.thick : HoronGlassTier.clear,
+                              borderRadius: BorderRadius.circular(theme.radius.xl2),
+                              child: const SizedBox.expand(),
                             ),
                           ),
-                          Expanded(
-                            child: Column(
+                          // 패딩은 내용에만 걸어 유리가 카드 전체를 채우게 합니다.
+                          Padding(
+                            padding: EdgeInsets.all(space.s3_5),
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              // `gap-[3px]`.
-                              spacing: space.step(0.75),
+                              spacing: space.s3,
                               children: <Widget>[
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  // `gap-2.5`.
-                                  spacing: space.s2_5,
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: DefaultTextStyle.merge(style: titleStyle, child: title),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: HoronChoiceCard._radioTopOffset),
+                                  child: AnimatedContainer(
+                                    key: const Key('horon-choice-card-ring'),
+                                    duration: animate ? HoronMotion.colorsDuration : Duration.zero,
+                                    curve: HoronMotion.colorsCurve,
+                                    width: HoronChoiceCard._radioSize,
+                                    height: HoronChoiceCard._radioSize,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        width: checked ? HoronChoiceCard._ringOn : HoronChoiceCard._ringOff,
+                                        color: checked ? colors.interactivePrimary : colors.borderDashed,
+                                      ),
                                     ),
-                                    if (badge != null)
-                                      ConstrainedBox(
-                                        constraints: BoxConstraints(maxWidth: badgeMaxWidth),
-                                        child: Container(
-                                          height: HoronChoiceCard._badgeHeight,
-                                          padding: EdgeInsets.symmetric(horizontal: space.s2),
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            color: neutralBadge ? colors.overlayInk6 : colors.accentSky500_18,
-                                            borderRadius: BorderRadius.circular(theme.radius.full),
-                                          ),
-                                          child: DefaultTextStyle.merge(
-                                            style: badgeStyle,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            child: badge!,
-                                          ),
+                                    child: AnimatedScale(
+                                      scale: checked ? 1 : 0,
+                                      duration: animate ? HoronMotion.popInDuration : Duration.zero,
+                                      curve: HoronMotion.popInCurve,
+                                      child: Container(
+                                        key: const Key('horon-choice-card-dot'),
+                                        width: HoronChoiceCard._dotSize,
+                                        height: HoronChoiceCard._dotSize,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: colors.interactiveOnPrimary,
                                         ),
                                       ),
-                                  ],
+                                    ),
+                                  ),
                                 ),
-                                if (description != null)
-                                  DefaultTextStyle.merge(style: descriptionStyle, child: description!),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    // `gap-[3px]`.
+                                    spacing: space.step(0.75),
+                                    children: <Widget>[
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        // `gap-2.5`.
+                                        spacing: space.s2_5,
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: DefaultTextStyle.merge(style: titleStyle, child: title),
+                                          ),
+                                          if (badge != null)
+                                            ConstrainedBox(
+                                              constraints: BoxConstraints(maxWidth: badgeMaxWidth),
+                                              child: Container(
+                                                height: HoronChoiceCard._badgeHeight,
+                                                padding: EdgeInsets.symmetric(horizontal: space.s2),
+                                                alignment: Alignment.center,
+                                                decoration: BoxDecoration(
+                                                  color: neutralBadge ? colors.overlayInk6 : colors.accentSky500_18,
+                                                  borderRadius: BorderRadius.circular(theme.radius.full),
+                                                ),
+                                                child: DefaultTextStyle.merge(
+                                                  style: badgeStyle,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  child: badge!,
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                      if (description != null)
+                                        DefaultTextStyle.merge(style: descriptionStyle, child: description!),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
