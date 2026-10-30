@@ -21,7 +21,7 @@ import '../tokens/horon_tokens.g.dart';
 /// `max-w-201.5` — 목록과 상세를 합친 최대 폭 806px입니다.
 const double _maxWidth = 806;
 
-/// `1W6P-0` 메타 상자의 칸 수입니다. Paper는 같은 폭의 네 칸을 한 줄에 놓습니다.
+/// `1VMZ-0` 메타 상자의 칸 수입니다. Paper는 같은 폭의 네 칸을 한 줄에 놓습니다.
 const int _metaColumns = 4;
 
 /// 목록 항목 하나입니다. React `ListDetailItem`입니다.
@@ -179,7 +179,7 @@ class _HoronListDetailState extends State<HoronListDetail> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: theme.space.s0_5, // Paper `1W6P-0`: 목록 팬의 gap 2
+          spacing: theme.space.s0_5, // Paper `1W94-0`: 목록 팬의 gap 2
           children: <Widget>[
             for (final HoronListDetailGroup group in widget.groups)
               Column(

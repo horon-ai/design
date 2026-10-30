@@ -84,7 +84,7 @@ void main() {
     final Column listColumn = tester.widget<Column>(
       find.descendant(of: _decoratedWith(theme.colors.bgInset), matching: find.byType(Column)).first,
     );
-    // Paper `1W6P-0`: 목록 팬의 gap 2
+    // Paper `1W94-0`: 목록 팬의 gap 2
     expect(listColumn.spacing, theme.space.s0_5);
   });
 
@@ -212,7 +212,7 @@ void main() {
     );
     await tester.pumpWidget(_host(meta, width: 556));
 
-    // Paper `1W6P-0` 메타 상자는 같은 폭의 네 칸을 한 줄에 놓습니다.
+    // Paper `1VMZ-0` 메타 상자는 같은 폭의 네 칸을 한 줄에 놓습니다.
     final double top = tester.getTopLeft(find.text('Model')).dy;
     for (final String label in <String>['Trigger', 'Tools', 'Scope']) {
       expect(tester.getTopLeft(find.text(label)).dy, top, reason: label);

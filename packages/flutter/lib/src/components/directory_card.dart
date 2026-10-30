@@ -81,7 +81,7 @@ class HoronDirectoryCard extends StatelessWidget {
                   height: _tileSide,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: HoronPalette.neutral900, // Paper `1VJJ-0` 타일 채움 #17181A
+                    color: HoronPalette.neutral900, // Paper `1VJR-0` 타일: 40×40, radius 10, #17181A
                     borderRadius: BorderRadius.circular(_tileRadius),
                   ),
                   child: IconTheme.merge(
