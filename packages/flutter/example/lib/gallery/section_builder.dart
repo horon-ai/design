@@ -13,6 +13,7 @@ import 'registry.dart';
 import 'sections/avatar.dart';
 import 'sections/badge.dart';
 import 'sections/banner.dart';
+import 'sections/bot_list_row.dart';
 import 'sections/breadcrumb.dart';
 import 'sections/breadcrumb_header.dart';
 import 'sections/button.dart';
@@ -57,7 +58,9 @@ import 'sections/tab_bar.dart';
 import 'sections/tabs.dart';
 import 'sections/textarea.dart';
 import 'sections/textarea_field.dart';
+import 'sections/tool_calls_header.dart';
 import 'sections/tool_permissions.dart';
+import 'sections/tooltip.dart';
 import 'sections/top_bar.dart';
 import 'sections/usage_meter.dart';
 
@@ -72,6 +75,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'avatar': HoronAvatarGallerySection.new,
   'badge': HoronBadgeGallerySection.new,
   'banner': HoronBannerGallerySection.new,
+  'bot_list_row': HoronBotListRowGallerySection.new,
   'breadcrumb': HoronBreadcrumbGallerySection.new,
   'breadcrumb_header': HoronBreadcrumbHeaderGallerySection.new,
   'button': HoronButtonGallerySection.new,
@@ -116,7 +120,9 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'tabs': HoronTabsGallerySection.new,
   'textarea': HoronTextareaGallerySection.new,
   'textarea_field': HoronTextareaFieldGallerySection.new,
+  'tool_calls_header': HoronToolCallsHeaderGallerySection.new,
   'tool_permissions': HoronToolPermissionsGallerySection.new,
+  'tooltip': HoronTooltipGallerySection.new,
   'top_bar': HoronTopBarGallerySection.new,
   'usage_meter': HoronUsageMeterGallerySection.new,
 };

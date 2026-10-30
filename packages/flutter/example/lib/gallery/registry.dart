@@ -112,4 +112,15 @@ const List<GallerySection> gallerySections = <GallerySection>[
     group: 'navigation',
   ),
   GallerySection(slug: 'filter_bar', title: 'Filter Bar', group: 'navigation'),
+  GallerySection(slug: 'tooltip', title: 'Tooltip', group: 'overlays'),
+  GallerySection(
+    slug: 'bot_list_row',
+    title: 'Bot List Row',
+    group: 'conversation',
+  ),
+  GallerySection(
+    slug: 'tool_calls_header',
+    title: 'Tool Calls Header',
+    group: 'agents',
+  ),
 ];
