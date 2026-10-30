@@ -15,6 +15,7 @@ import 'sections/approval_card.dart';
 import 'sections/avatar.dart';
 import 'sections/badge.dart';
 import 'sections/banner.dart';
+import 'sections/bot_instructions_panel.dart';
 import 'sections/bot_list_row.dart';
 import 'sections/bottom_sheet.dart';
 import 'sections/breadcrumb.dart';
@@ -33,6 +34,7 @@ import 'sections/composer.dart';
 import 'sections/date_field.dart';
 import 'sections/dialog.dart';
 import 'sections/directory_card.dart';
+import 'sections/document_extract_panel.dart';
 import 'sections/empty_state.dart';
 import 'sections/field.dart';
 import 'sections/file_drop.dart';
@@ -91,6 +93,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'avatar': HoronAvatarGallerySection.new,
   'badge': HoronBadgeGallerySection.new,
   'banner': HoronBannerGallerySection.new,
+  'bot_instructions_panel': HoronBotInstructionsPanelGallerySection.new,
   'bot_list_row': HoronBotListRowGallerySection.new,
   'bottom_sheet': HoronBottomSheetGallerySection.new,
   'breadcrumb': HoronBreadcrumbGallerySection.new,
@@ -109,6 +112,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'date_field': HoronDateFieldGallerySection.new,
   'dialog': HoronDialogGallerySection.new,
   'directory_card': HoronDirectoryCardGallerySection.new,
+  'document_extract_panel': HoronDocumentExtractPanelGallerySection.new,
   'empty_state': HoronEmptyStateGallerySection.new,
   'field': HoronFieldGallerySection.new,
   'file_drop': HoronFileDropGallerySection.new,
