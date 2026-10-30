@@ -90,6 +90,34 @@ void main() {
     }
   });
 
+  testWidgets('the glass pill takes the Paper fill of each brightness', (WidgetTester tester) async {
+    // Paper U4K-1의 선택 채움이 라이트 #FFFFFFCC(glass-thick), 다크 보드 CEV-0이 #FFFFFF1A입니다.
+    for (final ({Brightness brightness, Color Function(HoronThemeData) fill}) row
+        in <({Brightness brightness, Color Function(HoronThemeData) fill})>[
+          (brightness: Brightness.light, fill: (HoronThemeData h) => h.colors.glassThick),
+          (brightness: Brightness.dark, fill: (HoronThemeData h) => h.colors.overlayInk10),
+        ]) {
+      await pumpControl(tester, brightness: row.brightness, value: 'a');
+      // `MaterialApp`은 테마 변경을 200ms 동안 이어 그리므로 밝기가 자리를 잡을 때까지 기다립니다.
+      await tester.pumpAndSettle();
+      final Finder pill = find.byWidgetPredicate(
+        (Widget widget) => widget is HoronLiquidGlass && widget.tier == HoronGlassTier.clear,
+      );
+      expect(pill, findsOneWidget, reason: '${row.brightness}');
+
+      final AnimatedContainer fill = tester.widget<AnimatedContainer>(
+        find.descendant(of: pill, matching: find.byType(AnimatedContainer)),
+      );
+      expect((fill.decoration! as BoxDecoration).color, row.fill(themeOf(tester)), reason: '${row.brightness}');
+
+      // Paper U4K-1·CEV-0의 1px 림입니다.
+      final DecoratedBox rim = tester.widget<DecoratedBox>(
+        find.ancestor(of: pill, matching: find.byType(DecoratedBox)).first,
+      );
+      expect((rim.decoration as BoxDecoration).border!.top.color, themeOf(tester).colors.glassRimStrong);
+    }
+  });
+
   testWidgets('the chosen segment takes the primary text colour', (WidgetTester tester) async {
     await pumpControl(tester, value: 'b');
     expect(tester.widget<Text>(find.text('B')).style!.color, themeOf(tester).colors.textPrimary);
