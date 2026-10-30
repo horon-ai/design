@@ -42,6 +42,8 @@ void main() {
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronChatBubble)));
 
     expect(_bubbleDecoration(tester).color, theme.colors.bgSubtle);
+    // 이름과 달리 왼쪽 정렬을 확인하지 않던 자리입니다. 봇 쪽은 왼쪽에 붙습니다.
+    expect(tester.widget<Align>(find.byType(Align).first).alignment, Alignment.centerLeft);
     final RichText painted = tester.widget<RichText>(
       find.descendant(of: find.text('무엇을 도와드릴까요?'), matching: find.byType(RichText)),
     );
