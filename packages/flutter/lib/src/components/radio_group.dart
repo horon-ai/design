@@ -1,238 +1,174 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
-/// `radio-group.tsx`의 라디오 그룹입니다.
+/// `border-[1.5px]` — 선택 전 원의 테두리 두께입니다.
+const double _borderWidth = 1.5;
+
+/// `size-2` — 선택된 원 안의 점 8px입니다.
+const double _dotUnits = 2;
+
+/// `has-[[data-disabled]]:opacity-40`입니다.
+const double _disabledOpacity = 0.4;
+
+/// 라디오 그룹입니다.
 ///
-/// React의 `grid w-full gap-2`를 [Column]으로 옮깁니다. 선택은 호출자가 소유하고
-/// ([value]와 [onChanged]), 이 위젯은 그 값을 항목에 스코프로 내려보냅니다. 항목은
-/// 자기를 그릴 때 그 값을 읽으므로 같은 그룹 안에서 선택은 언제나 하나입니다.
-///
-/// React 소스에 `variants:` 블록이 없으므로 공개 변형 enum을 두지 않습니다.
-class HoronRadioGroup<T> extends StatelessWidget {
+/// React의 `RadioGroup`처럼 `flex flex-col gap-3`으로 자식을 세로로 쌓고, 선택
+/// 값과 콜백을 자식 [HoronRadio]에 전달합니다. 그룹 밖의 라디오는 선택되지 않은
+/// 모습으로 그려지고 눌러도 아무 일도 하지 않습니다(React도 그룹이 있어야 선택을
+/// 옮깁니다).
+class HoronRadioGroup extends StatelessWidget {
   /// 라디오 그룹을 만듭니다.
-  const HoronRadioGroup({
-    super.key,
-    required this.value,
-    required this.children,
-    this.onChanged,
-    this.invalid = false,
-    this.enabled = true,
-    this.semanticsLabel,
-  });
+  const HoronRadioGroup({super.key, required this.value, this.onValueChange, required this.children});
 
-  /// 지금 선택된 값입니다. 없으면 `null`입니다.
-  final T? value;
+  /// 지금 선택된 라디오의 값입니다.
+  final String? value;
 
-  /// 그룹 안에 세로로 쌓을 항목입니다.
+  /// 다른 라디오를 골랐을 때 부를 콜백입니다.
+  final ValueChanged<String>? onValueChange;
+
+  /// 그룹에 넣을 [HoronRadio] 목록입니다.
   final List<Widget> children;
 
-  /// 다른 항목을 골랐을 때 부릅니다. 넘기는 값은 새로 선택된 항목의 값입니다.
-  ///
-  /// `null`이면 그룹 전체가 비활성입니다. React의 `disabled`에 대응합니다.
-  final ValueChanged<T>? onChanged;
-
-  /// 그룹 전체의 오류 상태입니다. React의 `aria-invalid`에 대응합니다.
-  ///
-  /// 항목이 자기 [HoronRadioGroupItem.invalid]를 넘기지 않으면 이 값을 따릅니다.
-  final bool invalid;
-
-  /// 그룹이 누름과 포커스를 받을지 여부입니다.
-  ///
-  /// 항목이 자기 [HoronRadioGroupItem.enabled]를 넘기지 않으면 이 값을 따릅니다.
-  final bool enabled;
-
-  /// 보조 기술이 읽을 그룹 이름입니다. 호스트가 넘깁니다.
-  final String? semanticsLabel;
-
   @override
   Widget build(BuildContext context) {
-    final ValueChanged<T>? onChanged = this.onChanged;
-    return Semantics(
-      container: true,
-      inMutuallyExclusiveGroup: true,
-      label: semanticsLabel,
-      child: _HoronRadioGroupScope<T>(
-        value: value,
-        invalid: invalid,
-        enabled: enabled && onChanged != null,
-        onSelected: onChanged,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: HoronSpace.s2,
-          children: children,
-        ),
+    final HoronSpaceSpec space = HoronTheme.of(context).space;
+    return _HoronRadioScope(
+      value: value,
+      onValueChange: onValueChange,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: space.s3,
+        children: children,
       ),
     );
   }
 }
 
-/// `radio-group.tsx`의 `RadioGroupItem`입니다.
+/// Figma `Radio`(58:239)입니다.
 ///
-/// React는 18px 원(`size-[18px] rounded-full border-2 border-input`)을 그리고,
-/// 선택되면 그 안에 10px 점(`size-2.5 rounded-full bg-primary`)을 가운데에
-/// 얹습니다. 이 위젯은 링과 점을 **서로 다른 두 위젯과 두 페인터로** 그립니다.
-/// 링은 [HoronRadioRingPainter]가 지름 [diameter]의 원을 두께 [ringWidth]의
-/// 테두리로 그리고, 점은 [HoronRadioDotPainter]가 지름 [dotDiameter]의 채운 원을
-/// 그립니다. 링을 채워 점을 대신하지 않으므로 선택 상태에서도 링의 테두리와 점
-/// 사이에 틈이 남습니다.
-///
-/// 상태별 모양은 React 클래스와 같습니다.
-/// - 선택: 링 `primary`, 점 `primary`
-/// - 미선택: 링 `input`, 점 없음
-/// - 오류: 링 `destructive`. 선택된 항목은 `primary`가 이깁니다
-///   (React `aria-invalid:aria-checked:border-primary`)
-/// - 비활성: 불투명도 50%(React `disabled:opacity-50`)
-/// - 포커스: 링 `ring`과 바깥 링(React `focus-visible:ring-3 ring-ring/50`)
-class HoronRadioGroupItem<T> extends StatefulWidget {
-  /// 라디오 항목을 만듭니다.
-  ///
-  /// [HoronRadioGroup] 안에서만 씁니다. 그룹이 없으면 선택도 누름도 없는
-  /// 미선택 항목으로 그려집니다.
-  const HoronRadioGroupItem({
-    super.key,
-    required this.value,
-    this.label,
-    this.invalid,
-    this.enabled,
-    this.semanticsLabel,
-  });
+/// 20px 원이고, 선택되면 잉크색으로 채워지며 8px 점이 나타납니다. [value]는
+/// [HoronRadioGroup]의 [HoronRadioGroup.value]와 같은 타입의 값입니다.
+class HoronRadio extends StatefulWidget {
+  /// 라디오를 만듭니다.
+  const HoronRadio({super.key, required this.value, this.label, this.enabled = true});
 
-  /// 이 항목이 나타내는 값입니다. 그룹의 값과 이 값이 같으면 선택으로 그립니다.
-  final T value;
+  /// 이 라디오의 값입니다.
+  final String value;
 
-  /// 원 오른쪽에 붙는 문구입니다. 호스트가 넘깁니다.
+  /// 원 오른쪽 라벨입니다.
   final String? label;
 
-  /// 명시한 오류 상태입니다. null이면 그룹을 따릅니다.
-  final bool? invalid;
-
-  /// 명시한 활성 상태입니다. null이면 그룹을 따릅니다.
-  final bool? enabled;
-
-  /// 보조 기술이 읽을 이름입니다. 없으면 [label]을 씁니다.
-  final String? semanticsLabel;
-
-  /// React `size-[18px]`입니다. 링의 바깥 지름입니다.
-  static const double diameter = _ringDiameter;
-
-  /// React `border-2`입니다. 링의 선 두께입니다.
-  static const double ringWidth = _ringWidth;
-
-  /// React `size-2.5`입니다. 가운데 점의 지름입니다.
-  static const double dotDiameter = _dotDiameter;
-
-  /// 테스트가 링을 찾는 키입니다.
-  static const Key ringKey = ValueKey<String>('horon-radio-ring');
-
-  /// 테스트가 가운데 점을 찾는 키입니다.
-  static const Key dotKey = ValueKey<String>('horon-radio-dot');
+  /// 거짓이면 줄 전체가 `opacity-40`으로 흐려지고 선택되지 않습니다.
+  final bool enabled;
 
   @override
-  State<HoronRadioGroupItem<T>> createState() => _HoronRadioGroupItemState<T>();
+  State<HoronRadio> createState() => _HoronRadioState();
 }
 
-class _HoronRadioGroupItemState<T> extends State<HoronRadioGroupItem<T>> {
+class _HoronRadioState extends State<HoronRadio> {
+  bool _hovered = false;
   bool _focused = false;
-
-  void _select() {
-    final _HoronRadioGroupScope<T>? scope = _HoronRadioGroupScope.maybeOf<T>(context);
-    scope?.onSelected?.call(widget.value);
-  }
-
-  KeyEventResult _handleKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent) return KeyEventResult.ignored;
-    final LogicalKeyboardKey key = event.logicalKey;
-    if (key != LogicalKeyboardKey.space && key != LogicalKeyboardKey.enter) return KeyEventResult.ignored;
-    _select();
-    return KeyEventResult.handled;
-  }
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme scheme = theme.colorScheme;
-    final HoronThemeData horon = HoronTheme.of(context);
-    final _HoronRadioGroupScope<T>? scope = _HoronRadioGroupScope.maybeOf<T>(context);
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final HoronSpaceSpec space = theme.space;
+    final _HoronRadioScope? scope = context.dependOnInheritedWidgetOfExactType<_HoronRadioScope>();
+    final bool selected = scope?.value == widget.value;
+    final bool interactive = widget.enabled && scope?.onValueChange != null;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    final bool selected = scope != null && scope.value == widget.value;
-    final bool invalid = widget.invalid ?? (scope?.invalid ?? false);
-    final bool enabled = (widget.enabled ?? true) && (scope?.enabled ?? false);
-    final bool focused = _focused && enabled;
+    final double side = space.step(5);
+    final Color fill = selected
+        ? (_hovered && interactive ? colors.interactivePrimaryHover : colors.interactivePrimary)
+        : colors.bgSurface;
+    final Color borderColor = selected
+        ? Colors.transparent
+        : (_hovered && interactive ? colors.textSecondary : colors.borderStrong);
 
-    final Color ringColor = focused
-        ? horon.ring
-        : (selected ? scheme.primary : (invalid ? scheme.error : scheme.outline));
-
-    final Widget circle = SizedBox.square(
-      dimension: HoronRadioGroupItem.diameter,
-      child: Stack(
-        alignment: Alignment.center,
-        children: <Widget>[
-          CustomPaint(
-            key: HoronRadioGroupItem.ringKey,
-            size: const Size.square(HoronRadioGroupItem.diameter),
-            painter: HoronRadioRingPainter(
-              color: ringColor,
-              diameter: HoronRadioGroupItem.diameter,
-              ringWidth: HoronRadioGroupItem.ringWidth,
-              haloColor: focused ? horon.ring.withValues(alpha: _focusRingAlpha) : null,
-            ),
-          ),
-          if (selected)
-            CustomPaint(
-              key: HoronRadioGroupItem.dotKey,
-              size: const Size.square(HoronRadioGroupItem.dotDiameter),
-              painter: HoronRadioDotPainter(color: scheme.primary, diameter: HoronRadioGroupItem.dotDiameter),
-            ),
-        ],
+    final Widget circle = AnimatedContainer(
+      duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+      curve: HoronMotion.colorsCurve,
+      width: side,
+      height: side,
+      decoration: BoxDecoration(
+        color: fill,
+        shape: BoxShape.circle,
+        // data-checked:border-0 — 선택되면 테두리가 사라집니다.
+        border: Border.all(color: borderColor, width: selected ? 0 : _borderWidth),
       ),
+      child: selected
+          ? Center(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
+                duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
+                curve: HoronMotion.popInCurve,
+                builder: (BuildContext context, double scale, Widget? child) =>
+                    Transform.scale(scale: scale, child: child),
+                child: Container(
+                  width: space.step(_dotUnits),
+                  height: space.step(_dotUnits),
+                  decoration: BoxDecoration(color: colors.interactiveOnPrimary, shape: BoxShape.circle),
+                ),
+              ),
+            )
+          : null,
     );
 
-    final String? label = widget.label;
-    final Widget body = Row(
+    final Widget content = Row(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: space.s2_5,
       children: <Widget>[
-        circle,
-        if (label != null) ...<Widget>[
-          const SizedBox(width: HoronSpace.s2),
+        _FocusOutline(
+          visible: _focused && interactive,
+          radius: theme.radius.full,
+          gap: space.s0_5,
+          width: space.s0_5,
+          color: colors.textBrand,
+          child: circle,
+        ),
+        if (widget.label != null)
           Flexible(
-            child: Text(
-              label,
-              style: (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
-                color: scheme.onSurface,
-                fontSize: HoronText.body,
-                height: HoronLineHeight.none,
-              ),
-            ),
+            child: Text(widget.label!, style: theme.text.bodyMd.copyWith(color: colors.textPrimary)),
           ),
-        ],
       ],
     );
 
-    return Semantics(
-      container: true,
-      inMutuallyExclusiveGroup: true,
-      checked: selected,
-      enabled: enabled,
-      label: widget.semanticsLabel ?? label,
-      onTap: enabled ? _select : null,
-      child: Opacity(
-        opacity: enabled ? 1 : _disabledOpacity,
-        child: Focus(
-          onFocusChange: (bool value) {
-            if (_focused == value) return;
-            setState(() => _focused = value);
-          },
-          onKeyEvent: _handleKey,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: enabled ? _select : null,
-            child: MouseRegion(cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic, child: body),
+    return Opacity(
+      opacity: widget.enabled ? 1 : _disabledOpacity,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: interactive ? () => scope?.onValueChange?.call(widget.value) : null,
+        child: MergeSemantics(
+          child: Semantics(
+            inMutuallyExclusiveGroup: true,
+            checked: selected,
+            enabled: interactive,
+            child: FocusableActionDetector(
+              enabled: interactive,
+              mouseCursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+              onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
+              onShowFocusHighlight: (bool value) => setState(() => _focused = value),
+              shortcuts: const <ShortcutActivator, Intent>{
+                SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+                SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+              },
+              actions: <Type, Action<Intent>>{
+                ActivateIntent: CallbackAction<ActivateIntent>(
+                  onInvoke: (ActivateIntent intent) {
+                    scope?.onValueChange?.call(widget.value);
+                    return null;
+                  },
+                ),
+              },
+              child: content,
+            ),
           ),
         ),
       ),
@@ -240,115 +176,58 @@ class _HoronRadioGroupItemState<T> extends State<HoronRadioGroupItem<T>> {
   }
 }
 
-/// 라디오의 링을 그립니다.
-///
-/// 지름 [diameter]의 원을 두께 [ringWidth]의 테두리로 그립니다. 반지름은
-/// `(diameter - ringWidth) / 2`라서 선의 바깥 가장자리가 정확히 [diameter] 안에
-/// 들어옵니다. 이 페인터는 링을 언제나 테두리(`PaintingStyle.stroke`)로만
-/// 그리므로 안쪽은 비어 있습니다. 가운데 점은 [HoronRadioDotPainter]가 따로
-/// 그립니다.
-class HoronRadioRingPainter extends CustomPainter {
-  /// 링을 그리는 페인터를 만듭니다.
-  const HoronRadioRingPainter({required this.color, required this.diameter, required this.ringWidth, this.haloColor});
+/// 그룹의 선택 값과 콜백을 자식 라디오에 내려 줍니다.
+class _HoronRadioScope extends InheritedWidget {
+  const _HoronRadioScope({required this.value, required this.onValueChange, required super.child});
 
-  /// 링의 색입니다.
-  final Color color;
-
-  /// 링의 바깥 지름입니다.
-  final double diameter;
-
-  /// 링의 선 두께입니다.
-  final double ringWidth;
-
-  /// 포커스 링 색입니다. 없으면 그리지 않습니다.
-  final Color? haloColor;
+  final String? value;
+  final ValueChanged<String>? onValueChange;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final Offset center = size.center(Offset.zero);
-    final Color? halo = haloColor;
-    if (halo != null) {
-      canvas.drawCircle(center, diameter / 2 + _focusRingWidth, Paint()..color = halo);
-    }
-    canvas.drawCircle(
-      center,
-      (diameter - ringWidth) / 2,
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = ringWidth,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant HoronRadioRingPainter oldDelegate) =>
-      oldDelegate.color != color ||
-      oldDelegate.diameter != diameter ||
-      oldDelegate.ringWidth != ringWidth ||
-      oldDelegate.haloColor != haloColor;
+  bool updateShouldNotify(_HoronRadioScope oldWidget) =>
+      value != oldWidget.value || onValueChange != oldWidget.onValueChange;
 }
 
-/// 라디오의 가운데 점을 그립니다.
-///
-/// 지름 [diameter]의 채운 원 하나만 그립니다. 링과 별개의 도형이므로 선택
-/// 상태에서도 링의 테두리와 이 점 사이에 틈이 남습니다.
-class HoronRadioDotPainter extends CustomPainter {
-  /// 점을 그리는 페인터를 만듭니다.
-  const HoronRadioDotPainter({required this.color, required this.diameter});
-
-  /// 점의 색입니다.
-  final Color color;
-
-  /// 점의 지름입니다.
-  final double diameter;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawCircle(size.center(Offset.zero), diameter / 2, Paint()..color = color);
-  }
-
-  @override
-  bool shouldRepaint(covariant HoronRadioDotPainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.diameter != diameter;
-}
-
-/// 그룹의 값·오류·활성 상태를 항목에 내려보내는 스코프입니다.
-class _HoronRadioGroupScope<T> extends InheritedWidget {
-  const _HoronRadioGroupScope({
-    required this.value,
-    required this.invalid,
-    required this.enabled,
-    required this.onSelected,
-    required super.child,
+/// `focus-visible:outline-2 outline-offset-2 outline-text-brand`을 그립니다.
+class _FocusOutline extends StatelessWidget {
+  const _FocusOutline({
+    required this.visible,
+    required this.radius,
+    required this.gap,
+    required this.width,
+    required this.color,
+    required this.child,
   });
 
-  final T? value;
-  final bool invalid;
-  final bool enabled;
-  final ValueChanged<T>? onSelected;
-
-  static _HoronRadioGroupScope<T>? maybeOf<T>(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_HoronRadioGroupScope<T>>();
+  final bool visible;
+  final double radius;
+  final double gap;
+  final double width;
+  final Color color;
+  final Widget child;
 
   @override
-  bool updateShouldNotify(_HoronRadioGroupScope<T> oldWidget) =>
-      oldWidget.value != value || oldWidget.invalid != invalid || oldWidget.enabled != enabled;
+  Widget build(BuildContext context) {
+    if (!visible) return child;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        Positioned(
+          left: -gap,
+          top: -gap,
+          right: -gap,
+          bottom: -gap,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(radius + gap),
+                border: Border.all(color: color, width: width),
+              ),
+            ),
+          ),
+        ),
+        child,
+      ],
+    );
+  }
 }
-
-/// React `size-[18px]`입니다. 4px 눈금에 없는 값이라 상수로 둡니다.
-const double _ringDiameter = 18;
-
-/// React `border-2`입니다.
-const double _ringWidth = 2;
-
-/// React `size-2.5`입니다. 4px 눈금에 없는 값이라 상수로 둡니다.
-const double _dotDiameter = 10;
-
-/// React `focus-visible:ring-3`의 링 두께입니다.
-const double _focusRingWidth = 3;
-
-/// React `ring-ring/50`의 투명도입니다.
-const double _focusRingAlpha = 0.5;
-
-/// React `disabled:opacity-50`입니다.
-const double _disabledOpacity = 0.5;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show RenderProxyBox;
 import 'package:flutter/scheduler.dart' show SchedulerBinding, SchedulerPhase;
 
+import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
@@ -269,16 +270,16 @@ class HoronOverlayPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final BorderRadius radius = BorderRadius.circular(HoronRadiusRole.panel);
+    final BorderRadius radius = BorderRadius.circular(theme.radius.xl);
 
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth ?? double.infinity, maxHeight: maxHeight ?? double.infinity),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: theme.glassFillStrong,
+          color: theme.colors.glassFillStrong,
           borderRadius: radius,
-          border: Border.all(color: theme.glassBorder),
-          boxShadow: HoronShadow.lg,
+          border: Border.all(color: theme.colors.glassBorder),
+          boxShadow: theme.shadows.palette,
         ),
         child: ClipRRect(
           borderRadius: radius,
@@ -562,7 +563,7 @@ class _RenderMeasureSize extends RenderProxyBox {
   }
 }
 
-/// 등장 애니메이션입니다. `HoronDuration.fast`로 짧게 나타납니다.
+/// 등장 애니메이션입니다. `HoronMotion.popupEnterDuration`으로 짧게 나타납니다.
 class _FadeIn extends StatefulWidget {
   const _FadeIn({required this.child});
 
@@ -575,7 +576,7 @@ class _FadeIn extends StatefulWidget {
 class _FadeInState extends State<_FadeIn> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: HoronDuration.fast),
+    duration: HoronMotion.popupEnterDuration,
   )..forward();
 
   @override
@@ -587,7 +588,7 @@ class _FadeInState extends State<_FadeIn> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
-      opacity: CurvedAnimation(parent: _controller, curve: HoronEasing.out),
+      opacity: CurvedAnimation(parent: _controller, curve: HoronMotion.easeOutQuint),
       child: widget.child,
     );
   }

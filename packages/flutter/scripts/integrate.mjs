@@ -7,8 +7,13 @@
 //   node scripts/integrate.mjs          # 쓰기
 //   node scripts/integrate.mjs --check  # 쓰지 않고 누락만 보고 (있으면 exit 1)
 //
-// `chart`만 예외입니다. `fl_chart`가 모든 앱 번들에 실리지 않도록 배럴에서 빼고
-// `package:horon_ui/chart.dart` 하위 경로로만 엽니다.
+// 카탈로그(`apps/site/src/data/components.ts`)는 81개 항목이 여섯 그룹에 나뉘어 있고,
+// 항목 하나가 여러 줄에 걸칩니다. 컴포넌트가 하나도 없는 상태(재작성 직전)도
+// 정상입니다. 그때는 배럴에 컴포넌트 export가 없고, 등록부와 섹션 표가 비며,
+// 미구현 원장에 81개 슬러그가 전부 들어갑니다.
+//
+// 원장은 디렉터리 목록에서 다시 씁니다. 파일이 있는 슬러그는 빠지고, 파일이 없는
+// 카탈로그 슬러그는 들어갑니다.
 
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -24,20 +29,27 @@ const REGISTRY = join(PKG, "example/lib/gallery/registry.dart");
 const SECTION_BUILDER = join(PKG, "example/lib/gallery/section_builder.dart");
 
 const CHECK = process.argv.includes("--check");
-const GROUP_ORDER = ["inputs", "display", "navigation", "overlays", "layout"];
-const BARREL_EXCEPTIONS = new Set(["chart"]);
+const GROUP_ORDER = ["inputs", "display", "navigation", "overlays", "conversation", "agents"];
+const CATALOG_SIZE = 81;
+const COMPONENTS_DIR = join(PKG, "lib/src/components");
+const SECTIONS_DIR = join(PKG, "example/lib/gallery/sections");
+const OVERLAY_DIR = join(PKG, "lib/src/overlay");
+
+/** 디렉터리가 없으면 빈 목록입니다. 재작성 직전에는 디렉터리가 비어 있습니다. */
+const listDart = async (dir) => (existsSync(dir) ? (await readdir(dir)).filter((f) => f.endsWith(".dart")) : []);
 
 const catalogSource = await readFile(CATALOG, "utf8");
 const catalog = new Map();
-for (const m of catalogSource.matchAll(/\{ slug: "([^"]+)", title: "([^"]+)", group: "([a-z]+)"/g)) {
+// 항목은 여러 줄에 걸쳐 `slug`, `title`, `group` 키를 차례로 씁니다.
+// `componentGroups`의 항목은 `id` 키로 시작하므로 겹치지 않습니다.
+for (const m of catalogSource.matchAll(/\{\s*slug:\s*"([^"]+)",\s*title:\s*"([^"]+)",\s*group:\s*"([a-z]+)"/g)) {
   catalog.set(m[1].replaceAll("-", "_"), { title: m[2], group: m[3], order: catalog.size });
 }
-if (catalog.size !== 75) throw new Error(`catalog has ${catalog.size} entries, expected 75`);
+if (catalog.size !== CATALOG_SIZE) throw new Error(`catalog has ${catalog.size} entries, expected ${CATALOG_SIZE}`);
+const badGroups = [...catalog].filter(([, c]) => !GROUP_ORDER.includes(c.group)).map(([slug, c]) => `${slug}:${c.group}`);
+if (badGroups.length) throw new Error(`catalog entries in unknown groups: ${badGroups.join(",")}`);
 
-const implemented = (await readdir(join(PKG, "lib/src/components")))
-  .filter((f) => f.endsWith(".dart"))
-  .map((f) => f.replace(/\.dart$/, ""))
-  .sort();
+const implemented = (await listDart(COMPONENTS_DIR)).map((f) => f.replace(/\.dart$/, "")).sort();
 
 const unknown = implemented.filter((s) => !catalog.has(s));
 if (unknown.length) throw new Error(`components not in the React catalog: ${unknown.join(",")}`);
@@ -45,8 +57,7 @@ if (unknown.length) throw new Error(`components not in the React catalog: ${unkn
 const missing = [];
 for (const slug of implemented) {
   if (!existsSync(join(PKG, `test/components/${slug}_test.dart`))) missing.push(`test/components/${slug}_test.dart`);
-  if (!existsSync(join(PKG, `example/lib/gallery/sections/${slug}.dart`)))
-    missing.push(`example/lib/gallery/sections/${slug}.dart`);
+  if (!existsSync(join(SECTIONS_DIR, `${slug}.dart`))) missing.push(`example/lib/gallery/sections/${slug}.dart`);
 }
 if (missing.length) {
   console.error(`MISSING FILES (${missing.length}):\n  ${missing.join("\n  ")}`);
@@ -56,7 +67,7 @@ if (missing.length) {
 // 섹션 클래스 이름은 파일에서 직접 읽습니다. 규칙을 스크립트에 복제하지 않습니다.
 const sectionClass = new Map();
 for (const slug of implemented) {
-  const file = join(PKG, `example/lib/gallery/sections/${slug}.dart`);
+  const file = join(SECTIONS_DIR, `${slug}.dart`);
   if (!existsSync(file)) continue;
   const m = /class (Horon[A-Za-z0-9]*GallerySection) extends/.exec(await readFile(file, "utf8"));
   if (!m) {
@@ -67,7 +78,7 @@ for (const slug of implemented) {
   sectionClass.set(slug, m[1]);
 }
 
-// 배럴: 컴포넌트 export를 정렬해 넣고 chart는 뺍니다.
+// 배럴: 컴포넌트 export를 정렬해 넣습니다. 컴포넌트가 없으면 그 목록이 빕니다.
 {
   const source = await readFile(BARREL, "utf8");
   // 헤더는 첫 `export 'src/` 줄 앞까지입니다. 예전에는 `contracts` 줄을 표식으로
@@ -76,14 +87,11 @@ for (const slug of implemented) {
   const firstExport = source.search(/^export 'src\//m);
   if (firstExport < 0) throw new Error("barrel has no `export 'src/` line");
   const header = source.slice(0, firstExport);
-  const componentExports = implemented
-    .filter((s) => !BARREL_EXCEPTIONS.has(s))
-    .map((s) => `export 'src/components/${s}.dart';`);
+  const componentExports = implemented.map((s) => `export 'src/components/${s}.dart';`);
   // `src/overlay/`는 컴포넌트가 아니지만 앱이 직접 쓰는 표면입니다
   // (`showHoronModal`, `HoronModalSurface`, 오버레이 위치 계산). 그래서 배럴에
   // 넣습니다.
-  const overlayExports = (await readdir(join(PKG, "lib/src/overlay")))
-    .filter((f) => f.endsWith(".dart"))
+  const overlayExports = (await listDart(OVERLAY_DIR))
     .map((f) => `export 'src/overlay/${f}';`);
   const rest = source
     .split("\n")
@@ -100,12 +108,11 @@ for (const slug of implemented) {
   if (!CHECK) await writeFile(BARREL, next.endsWith("\n") ? next : `${next}\n`);
 }
 
-// 미구현 원장: 구현된 슬러그를 지웁니다.
+// 미구현 원장: 디렉터리 목록에서 다시 씁니다. 파일이 없는 카탈로그 슬러그는 카탈로그
+// 순서로 들어가고, 파일이 있는 슬러그는 빠집니다.
 {
   const source = await readFile(PENDING, "utf8");
-  const kept = [...source.matchAll(/'([a-z0-9_]+)'/g)]
-    .map((m) => m[1])
-    .filter((slug) => !implemented.includes(slug));
+  const kept = [...catalog.keys()].filter((slug) => !implemented.includes(slug));
   const head = source.slice(0, source.indexOf("const List<String> pendingComponents"));
   const body =
     kept.length === 0
@@ -144,6 +151,7 @@ for (const slug of implemented) {
   const slugs = implemented.filter((s) => sectionClass.has(s));
   const imports = slugs.map((s) => `import 'sections/${s}.dart';`);
   const entries = slugs.map((s) => `  '${s}': ${sectionClass.get(s)}.new,`);
+  const builders = entries.length === 0 ? "" : `${entries.join("\n")}\n`;
   const body = `// 슬러그를 갤러리 섹션 위젯으로 바꾸는 표입니다.
 //
 // 셸은 \`sectionBuilder\`가 없으면 \`notImplemented\` 자리표시자를 그립니다. 그래서
@@ -156,8 +164,7 @@ for (const slug of implemented) {
 import 'package:flutter/widgets.dart';
 
 import 'registry.dart';
-${imports.join("\n")}
-
+${imports.length === 0 ? "" : `${imports.join("\n")}\n`}
 /// 섹션 위젯을 슬러그로 찾습니다.
 ///
 /// 등록되지 않은 슬러그면 \`null\`을 돌려주고, 셸이 자리표시자를 그립니다.
@@ -166,8 +173,7 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
 
 /// 슬러그별 섹션 생성자입니다.
 const Map<String, Widget Function()> _builders = <String, Widget Function()>{
-${entries.join("\n")}
-};
+${builders}};
 
 /// 이 표가 알고 있는 슬러그입니다.
 ///
@@ -180,7 +186,7 @@ Set<String> get gallerySectionBuilderSlugs => _builders.keys.toSet();
 
 const counts = GROUP_ORDER.map((g) => `${g}=${implemented.filter((s) => catalog.get(s).group === g).length}`);
 console.log(
-  `implemented=${implemented.length} pending=${75 - implemented.length} section_widgets=${sectionClass.size} ${counts.join(" ")}`,
+  `catalog=${catalog.size} implemented=${implemented.length} pending=${catalog.size - implemented.length} section_widgets=${sectionClass.size} ${counts.join(" ")}`,
 );
 if (CHECK) console.log("(--check: 아무것도 쓰지 않았습니다)");
 

@@ -69,10 +69,8 @@ class _GalleryBlockLabel extends StatelessWidget {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     return Text(
       label.toUpperCase(),
-      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-        color: scheme.onSurfaceVariant,
-        letterSpacing: HoronLetterSpacing.wider,
-      ),
+      style: Theme.of(context).textTheme.labelSmall
+          ?.copyWith(color: scheme.onSurfaceVariant, letterSpacing: 0.6),
     );
   }
 }
@@ -95,7 +93,7 @@ class _GalleryBlock extends StatelessWidget {
         DecoratedBox(
           decoration: BoxDecoration(
             color: scheme.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(HoronRadiusRole.card),
+            borderRadius: BorderRadius.circular(HoronRadius.xl),
             border: Border.all(color: scheme.outline),
           ),
           child: SizedBox(
@@ -103,7 +101,7 @@ class _GalleryBlock extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(HoronSpace.s4),
               child: children.isEmpty
-                  ? const SizedBox(height: HoronSpace.s12)
+                  ? const SizedBox(height: 48)
                   : Wrap(
                       spacing: HoronSpace.s4,
                       runSpacing: HoronSpace.s4,

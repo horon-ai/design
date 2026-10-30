@@ -6,12 +6,11 @@ import 'dart:io';
 /// React sources from the file system rather than depending on the package: a
 /// Dart package cannot depend on a TypeScript workspace.
 ///
-/// Until the Flutter layer is rebuilt against the web components that were
-/// rebuilt from Figma on 2026-10-26, the gates read the frozen copy of the
-/// earlier 75 components in `reference/react-components/` (see its README).
-/// Paths resolve from the package root, which is `flutter test`'s working
-/// directory.
-const String reactComponentsPath = 'reference/react-components';
+/// The gates read `packages/react/src/components` directly: the rebuilt React
+/// set (81 files) is the single source of truth, and the frozen copy that used
+/// to live under `reference/` is gone. Paths resolve from the package root,
+/// which is `flutter test`'s working directory.
+const String reactComponentsPath = '../react/src/components';
 const String flutterComponentsPath = 'lib/src/components';
 const String galleryRegistryPath = 'example/lib/gallery/registry.dart';
 
@@ -65,8 +64,11 @@ String galleryRegistrySource() {
 }
 
 /// Slugs registered in `example/lib/gallery/registry.dart`.
-Set<String> gallerySectionSlugs() {
-  final source = stripComments(galleryRegistrySource());
+Set<String> gallerySectionSlugs() => gallerySectionSlugsIn(galleryRegistrySource());
+
+/// [gallerySectionSlugs] over a source string, so a self-check can feed it text.
+Set<String> gallerySectionSlugsIn(String registrySource) {
+  final source = stripComments(registrySource);
   final slugs = <String>{};
   for (final call in RegExp(r'GallerySection\(').allMatches(source)) {
     final close = _matchingDelimiter(source, call.end - 1, '(', ')');
@@ -135,6 +137,43 @@ Map<String, Set<String>> reactVariantGroups(String source) {
   }
   return groups;
 }
+
+/// Literal vocabularies of one React component file, keyed by declaration name
+/// and normalized with [normalizeVariantKey].
+///
+/// Two shapes count, and nothing else does:
+///
+///  * a union of string literals, `export type ButtonSize = "sm" | "md" | "lg";`
+///  * a string-literal array, `export const iconNames = ["plus", ...] as const;`
+///
+/// `Omit<ComponentProps<"button">, "className">`, `Record<K, string>` and object
+/// types are ignored: they are not closed vocabularies a Dart enum can mirror.
+/// Comments are stripped first, so a union quoted in a doc comment is not read.
+Map<String, Set<String>> reactUnionTypes(String slug) =>
+    parseReactUnionTypes(reactComponentFile(slug).readAsStringSync());
+
+/// [reactUnionTypes] over a source string, so a self-check can feed it text.
+Map<String, Set<String>> parseReactUnionTypes(String source) {
+  final code = stripComments(source);
+  final result = <String, Set<String>>{};
+  const literal = r'''(?:"[^"\n]*"|'[^'\n]*')''';
+  final union = RegExp('export\\s+type\\s+([A-Za-z_]\\w*)\\s*=\\s*((?:\\|\\s*)?$literal(?:\\s*\\|\\s*$literal)*)\\s*;');
+  for (final match in union.allMatches(code)) {
+    result[match.group(1)!] = _literalValues(match.group(2)!);
+  }
+  final array = RegExp(
+    'export\\s+const\\s+([A-Za-z_]\\w*)\\s*(?::[^=]+)?=\\s*\\[\\s*($literal(?:\\s*,\\s*$literal)*)\\s*,?\\s*\\]\\s*as\\s+const\\s*;',
+  );
+  for (final match in array.allMatches(code)) {
+    result[match.group(1)!] = _literalValues(match.group(2)!);
+  }
+  return result;
+}
+
+Set<String> _literalValues(String text) => <String>{
+  for (final match in RegExp('"([^"]*)"|\'([^\']*)\'').allMatches(text))
+    normalizeVariantKey(match.group(1) ?? match.group(2)!),
+};
 
 /// Enum values declared in a Dart source, keyed by enum name.
 ///

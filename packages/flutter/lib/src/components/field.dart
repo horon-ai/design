@@ -1,262 +1,122 @@
 import 'package:flutter/material.dart';
 
-import '../tokens/horon_tokens.g.dart';
+import '../theme/horon_motion.dart';
+import '../theme/horon_theme.dart';
 
-/// 필드 하나의 오류·비활성 상태를 그 안의 라벨·설명·오류·컨트롤이 함께 읽는
-/// 스코프입니다.
+/// React `Field`(Figma 58:163)를 옮긴 라벨·컨트롤·도움말 묶음입니다.
 ///
-/// React는 Base UI의 `Field.Root`가 `data-disabled`·`data-invalid`를 자손에게
-/// 내려보내고, 라벨과 컨트롤이 그 속성을 보고 모양을 바꿉니다. Flutter에는 그
-/// 속성이 없으므로 이 [InheritedWidget]이 같은 역할을 합니다. 스코프가 없으면 각
-/// 위젯의 명시 인자가 그대로 쓰입니다.
-class HoronFieldScope extends InheritedWidget {
-  /// 스코프를 만듭니다.
-  const HoronFieldScope({super.key, required this.invalid, required this.disabled, required super.child});
-
-  /// 필드가 오류 상태인지 여부입니다.
-  final bool invalid;
-
-  /// 필드가 비활성 상태인지 여부입니다.
-  final bool disabled;
-
-  /// 가장 가까운 스코프입니다. 필드 밖이면 null입니다.
-  static HoronFieldScope? maybeOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<HoronFieldScope>();
-
-  @override
-  bool updateShouldNotify(HoronFieldScope oldWidget) => oldWidget.invalid != invalid || oldWidget.disabled != disabled;
-}
-
-/// `field.tsx`의 `Field`입니다.
-///
-/// React의 `flex w-full flex-col gap-2`를 그대로 옮깁니다. 안에 넣은
-/// [HoronFieldLabel]·[HoronFieldDescription]·[HoronFieldError]와 `HoronInput`은
-/// 상태를 따로 받지 않아도 [HoronFieldScope]를 통해 같은 오류·비활성을 그립니다.
-///
-/// React 소스에 `variants:` 블록이 없으므로 공개 변형 enum을 두지 않습니다.
+/// 세로로 쌓고 사이를 8px(`gap-2`) 띄웁니다. [disabled]가 참이면 안쪽 라벨이
+/// `text-disabled`로 흐려집니다. React는 `Field.Root`의 문맥으로 그 값을 내려 주고,
+/// 여기서는 비공개 상속 위젯이 같은 일을 합니다.
 class HoronField extends StatelessWidget {
-  /// 필드를 만듭니다.
-  const HoronField({
-    super.key,
-    required this.children,
-    this.invalid = false,
-    this.disabled = false,
-    this.crossAxisAlignment = CrossAxisAlignment.start,
-  });
+  /// 필드 묶음을 만듭니다.
+  const HoronField({super.key, this.disabled = false, required this.children});
 
-  /// 세로로 쌓을 자식입니다.
-  final List<Widget> children;
-
-  /// 필드가 오류 상태인지 여부입니다.
-  final bool invalid;
-
-  /// 필드가 비활성 상태인지 여부입니다.
+  /// 비활성 상태입니다. 라벨 색을 흐리게 만듭니다.
   final bool disabled;
 
-  /// 가로 정렬입니다.
-  final CrossAxisAlignment crossAxisAlignment;
+  /// 라벨·컨트롤·설명을 순서대로 담습니다.
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
-    return HoronFieldScope(
-      invalid: invalid,
+    final HoronThemeData horon = HoronTheme.of(context);
+    return _HoronFieldScope(
       disabled: disabled,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: crossAxisAlignment,
-        spacing: HoronSpace.s2,
+        spacing: horon.space.s2,
         children: children,
       ),
     );
   }
 }
 
-/// `field.tsx`의 `FieldLabel`입니다.
+/// React `FieldLabel`을 옮긴 라벨입니다.
 ///
-/// React의 `flex w-fit items-center gap-2 text-sm leading-none font-medium
-/// select-none data-disabled:pointer-events-none data-disabled:opacity-50`에
-/// 대응합니다. [HoronFieldScope]가 비활성이면 글자를 흐리게 그리고, 오류면
-/// destructive 색으로 바꿉니다.
+/// `label-md`에 `text-primary`를 입히고, 비활성 필드 안에서는 `text-disabled`가 됩니다.
 class HoronFieldLabel extends StatelessWidget {
-  /// 필드 라벨을 만듭니다.
-  const HoronFieldLabel({
-    super.key,
-    required this.label,
-    this.icon,
-    this.child,
-    this.disabled,
-    this.invalid,
-    this.style,
-  });
+  /// 라벨을 만듭니다.
+  const HoronFieldLabel(this.label, {super.key});
 
-  /// 화면에 쓰는 문구입니다. 호스트가 넘깁니다.
+  /// 라벨 문구입니다.
   final String label;
 
-  /// 문구 앞에 붙는 아이콘 슬롯입니다.
-  final Widget? icon;
-
-  /// 문구 뒤에 붙는 위젯 슬롯입니다.
-  final Widget? child;
-
-  /// 명시한 비활성 상태입니다. null이면 스코프를 따릅니다.
-  final bool? disabled;
-
-  /// 명시한 오류 상태입니다. null이면 스코프를 따릅니다.
-  final bool? invalid;
-
-  /// 문구 스타일을 덮어쓸 때 씁니다.
-  final TextStyle? style;
-
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme scheme = theme.colorScheme;
-    final HoronFieldScope? scope = HoronFieldScope.maybeOf(context);
-    final bool isDisabled = disabled ?? (scope?.disabled ?? false);
-    final bool isInvalid = invalid ?? (scope?.invalid ?? false);
-    final Color color = isDisabled
-        ? scheme.onSurface.withValues(alpha: _disabledOpacity)
-        : (isInvalid ? scheme.error : scheme.onSurface);
-    final TextStyle resolved = (style ?? theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
-      color: color,
-      fontSize: HoronText.body,
-      fontWeight: HoronFontWeight.medium,
-      height: HoronLineHeight.none,
-    );
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      spacing: HoronSpace.s2,
-      children: <Widget>[
-        ?icon,
-        Flexible(child: Text(label, style: resolved)),
-        ?child,
-      ],
+    final HoronThemeData horon = HoronTheme.of(context);
+    final bool disabled = _HoronFieldScope.disabledOf(context);
+    return Text(
+      label,
+      style: horon.text.labelMd.copyWith(color: disabled ? horon.colors.textDisabled : horon.colors.textPrimary),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }
 
-/// `field.tsx`의 `FieldDescription`입니다.
-///
-/// React의 `text-xs text-muted-foreground`에 대응합니다.
+/// React `FieldDescription`를 옮긴 도움말입니다.
 class HoronFieldDescription extends StatelessWidget {
-  /// 설명을 만듭니다.
-  const HoronFieldDescription({super.key, required this.description, this.style, this.maxLines});
+  /// 도움말을 만듭니다.
+  const HoronFieldDescription(this.description, {super.key});
 
-  /// 화면에 쓰는 문구입니다. 호스트가 넘깁니다.
+  /// 도움말 문구입니다.
   final String description;
 
-  /// 문구 스타일을 덮어쓸 때 씁니다.
-  final TextStyle? style;
-
-  /// 표시할 최대 줄 수입니다.
-  final int? maxLines;
-
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme scheme = theme.colorScheme;
-    final TextStyle resolved = (style ?? theme.textTheme.bodySmall ?? const TextStyle()).copyWith(
-      color: scheme.onSurfaceVariant,
-      fontSize: HoronText.caption,
-      height: HoronLineHeight.normal,
-    );
-    return Text(description, style: resolved, maxLines: maxLines);
+    final HoronThemeData horon = HoronTheme.of(context);
+    return Text(description, style: horon.text.caption.copyWith(color: horon.colors.textSecondary));
   }
 }
 
-/// `field.tsx`의 `FieldError`입니다.
+/// React `FieldError`를 옮긴 오류 문구입니다.
 ///
-/// React에서는 오류가 없으면 Base UI가 이 자리를 비웁니다. 같은 규칙으로
-/// [message]가 비었고 [child]도 없으면 아무것도 그리지 않습니다. 그래서 빈 필수
-/// 필드를 제출했을 때만 오류 줄이 나타납니다.
+/// 웹의 `animate-[tab-panel-in_160ms_var(--ease-out-quint)]`와 같이 투명도 0과
+/// 4px 아래에서 들어옵니다. 애니메이션을 줄이는 설정에서는 한 번에 나타납니다.
 class HoronFieldError extends StatelessWidget {
   /// 오류 문구를 만듭니다.
-  const HoronFieldError({super.key, this.message, this.child, this.style});
+  const HoronFieldError(this.error, {super.key});
 
-  /// 화면에 쓰는 문구입니다. 호스트나 검증기가 넘깁니다.
-  final String? message;
-
-  /// 문구 대신 그릴 위젯입니다.
-  final Widget? child;
-
-  /// 문구 스타일을 덮어쓸 때 씁니다.
-  final TextStyle? style;
+  /// 오류 문구입니다.
+  final String error;
 
   @override
   Widget build(BuildContext context) {
-    final String? text = message;
-    final bool hasText = text != null && text.isNotEmpty;
-    final Widget? replacement = child;
-    if (!hasText && replacement == null) return const SizedBox.shrink();
-
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme scheme = theme.colorScheme;
-    final TextStyle resolved = (style ?? theme.textTheme.bodySmall ?? const TextStyle()).copyWith(
-      color: scheme.error,
-      fontSize: HoronText.caption,
-      height: HoronLineHeight.normal,
-    );
-    return Semantics(liveRegion: true, child: hasText ? Text(text, style: resolved) : replacement);
-  }
-}
-
-/// `field.tsx`의 `FieldGroup`입니다.
-///
-/// React의 `flex w-full flex-col gap-4`에 대응합니다.
-class HoronFieldGroup extends StatelessWidget {
-  /// 필드 묶음을 만듭니다.
-  const HoronFieldGroup({super.key, required this.children, this.crossAxisAlignment = CrossAxisAlignment.stretch});
-
-  /// 세로로 쌓을 자식입니다.
-  final List<Widget> children;
-
-  /// 가로 정렬입니다.
-  final CrossAxisAlignment crossAxisAlignment;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: crossAxisAlignment,
-      spacing: HoronSpace.s4,
-      children: children,
+    final HoronThemeData horon = HoronTheme.of(context);
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: reduceMotion ? Duration.zero : _enterDuration,
+      curve: HoronMotion.easeOutQuint,
+      builder: (BuildContext context, double value, Widget? child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(offset: Offset(0, (1 - value) * _enterOffset), child: child),
+        );
+      },
+      child: Text(error, style: horon.text.caption.copyWith(color: horon.colors.textDanger)),
     );
   }
 }
 
-/// `field.tsx`의 `FieldSet`입니다.
-///
-/// React의 `flex w-full flex-col gap-4 border-0 p-0`에 대응합니다. 테두리와 여백이
-/// 없으므로 [HoronFieldGroup]과 배치는 같고, 묶음의 의미만 다릅니다.
-class HoronFieldSet extends StatelessWidget {
-  /// 필드 집합을 만듭니다.
-  const HoronFieldSet({
-    super.key,
-    required this.children,
-    this.legend,
-    this.crossAxisAlignment = CrossAxisAlignment.stretch,
-  });
+/// `tab-panel-in`의 160ms입니다.
+const Duration _enterDuration = Duration(milliseconds: 160);
 
-  /// 세로로 쌓을 자식입니다.
-  final List<Widget> children;
+/// `translate: 0 4px`입니다.
+const double _enterOffset = 4;
 
-  /// 집합 전체의 제목입니다. 없으면 그리지 않습니다.
-  final Widget? legend;
+/// [HoronField]가 비활성 상태를 안쪽 라벨로 내려 주는 문맥입니다.
+class _HoronFieldScope extends InheritedWidget {
+  const _HoronFieldScope({required this.disabled, required super.child});
 
-  /// 가로 정렬입니다.
-  final CrossAxisAlignment crossAxisAlignment;
+  final bool disabled;
+
+  static bool disabledOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_HoronFieldScope>()?.disabled ?? false;
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: crossAxisAlignment,
-      spacing: HoronSpace.s4,
-      children: <Widget>[?legend, ...children],
-    );
-  }
+  bool updateShouldNotify(_HoronFieldScope oldWidget) => disabled != oldWidget.disabled;
 }
-
-/// React의 `data-disabled:opacity-50`과 같은 값입니다.
-const double _disabledOpacity = 0.5;

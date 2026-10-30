@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:horon_ui/src/overlay/horon_overlay.dart';
+import 'package:horon_ui/horon_ui.dart';
 
 /// 오버레이 배치를 확인합니다.
 ///

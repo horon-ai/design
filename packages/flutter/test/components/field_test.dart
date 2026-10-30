@@ -2,115 +2,86 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
-/// `field`의 부품·간격·상태를 확인합니다.
+/// `HoronField` 묶음의 간격·색·비활성 문맥·오류 진입 애니메이션을 검사합니다.
 void main() {
-  Future<void> pumpField(WidgetTester tester, Widget child, {Brightness brightness = Brightness.light}) {
-    return tester.pumpWidget(
+  Future<void> pumpField(
+    WidgetTester tester, {
+    Brightness brightness = Brightness.light,
+    bool disabled = false,
+    bool withError = false,
+  }) async {
+    await tester.pumpWidget(
       MaterialApp(
         theme: horonTheme(brightness),
         home: Scaffold(
-          body: Center(child: SizedBox(width: 320, child: child)),
+          body: Center(
+            child: SizedBox(
+              width: 320,
+              child: HoronField(
+                disabled: disabled,
+                children: <Widget>[
+                  const HoronFieldLabel('이름'),
+                  const HoronFieldDescription('도움말'),
+                  if (withError) const HoronFieldError('값이 필요합니다'),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
+    await tester.pump();
   }
 
-  for (final Brightness brightness in Brightness.values) {
-    final String name = brightness == Brightness.light ? '라이트' : '다크';
+  HoronThemeData themeOf(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronField)));
 
-    testWidgets('$name: 라벨·컨트롤·설명을 세로로 쌓는다', (WidgetTester tester) async {
-      await pumpField(
-        tester,
-        HoronField(
-          children: <Widget>[
-            const HoronFieldLabel(label: '이메일'),
-            const HoronInput(hintText: 'name@horon.ai'),
-            const HoronFieldDescription(description: '로그인에 쓰는 주소입니다'),
-          ],
-        ),
-        brightness: brightness,
-      );
+  Color textColorOf(WidgetTester tester, String text) => tester.widget<Text>(find.text(text)).style!.color!;
 
-      expect(find.text('이메일'), findsOneWidget);
-      expect(find.byType(HoronInput), findsOneWidget);
-      expect(find.text('로그인에 쓰는 주소입니다'), findsOneWidget);
-
-      // 세로 순서: 라벨 → 입력 → 설명
-      final double labelY = tester.getTopLeft(find.text('이메일')).dy;
-      final double inputY = tester.getTopLeft(find.byType(HoronInput)).dy;
-      final double descriptionY = tester.getTopLeft(find.text('로그인에 쓰는 주소입니다')).dy;
-      expect(labelY, lessThan(inputY));
-      expect(inputY, lessThan(descriptionY));
-    });
-
-    testWidgets('$name: 오류가 있으면 FieldError가 error 색으로 그려진다', (WidgetTester tester) async {
-      await pumpField(
-        tester,
-        HoronField(
-          invalid: true,
-          children: <Widget>[
-            const HoronFieldLabel(label: '이메일'),
-            const HoronInput(hintText: 'name@horon.ai'),
-            const HoronFieldError(message: '이메일을 입력해 주세요'),
-          ],
-        ),
-        brightness: brightness,
-      );
-
-      final ColorScheme scheme = Theme.of(tester.element(find.byType(HoronField))).colorScheme;
-      final Text error = tester.widget<Text>(find.text('이메일을 입력해 주세요'));
-      expect(error.style!.color, scheme.error);
-      expect(find.byType(HoronFieldError), findsOneWidget);
-    });
-
-    testWidgets('$name: 비활성 필드의 라벨은 흐려지고 컨트롤도 비활성이다', (WidgetTester tester) async {
-      await pumpField(
-        tester,
-        HoronField(
-          disabled: true,
-          children: <Widget>[
-            const HoronFieldLabel(label: '이메일'),
-            const HoronInput(hintText: '메일'),
-          ],
-        ),
-        brightness: brightness,
-      );
-
-      final ColorScheme scheme = Theme.of(tester.element(find.byType(HoronField))).colorScheme;
-      final Text label = tester.widget<Text>(find.text('이메일'));
-      expect(label.style!.color, scheme.onSurface.withValues(alpha: 0.5));
-      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
-    });
-  }
-
-  testWidgets('오류 문구가 없으면 FieldError는 높이를 차지하지 않는다', (WidgetTester tester) async {
-    await pumpField(tester, const HoronFieldError());
-
-    expect(find.byType(HoronFieldError), findsOneWidget);
-    expect(tester.getSize(find.byType(HoronFieldError)).height, 0);
+  testWidgets('renders in light and dark without an exception', (WidgetTester tester) async {
+    for (final Brightness brightness in Brightness.values) {
+      await pumpField(tester, brightness: brightness);
+      expect(tester.takeException(), isNull, reason: 'brightness $brightness');
+    }
   });
 
-  testWidgets('FieldGroup과 FieldSet은 자식을 간격을 두고 쌓는다', (WidgetTester tester) async {
-    await pumpField(
-      tester,
-      HoronFieldGroup(
-        children: <Widget>[
-          const HoronField(children: <Widget>[HoronFieldLabel(label: '하나')]),
-          HoronFieldSet(
-            legend: const HoronFieldLabel(label: '묶음'),
-            children: <Widget>[
-              const HoronField(children: <Widget>[HoronFieldLabel(label: '둘')]),
-            ],
-          ),
-        ],
-      ),
+  testWidgets('stacks its children 8px apart', (WidgetTester tester) async {
+    await pumpField(tester);
+    final Column column = tester.widget<Column>(
+      find.descendant(of: find.byType(HoronField), matching: find.byType(Column)).first,
     );
+    expect(column.spacing, themeOf(tester).space.s2);
+    expect(column.crossAxisAlignment, CrossAxisAlignment.start);
+  });
 
-    final double first = tester.getTopLeft(find.text('하나')).dy;
-    final double legend = tester.getTopLeft(find.text('묶음')).dy;
-    final double second = tester.getTopLeft(find.text('둘')).dy;
-    expect(first, lessThan(legend));
-    expect(legend, lessThan(second));
-    expect(second - legend, greaterThan(HoronSpace.s2));
+  testWidgets('label, description and error take their token colours', (WidgetTester tester) async {
+    await pumpField(tester, withError: true);
+    final HoronThemeData horon = themeOf(tester);
+    expect(textColorOf(tester, '이름'), horon.colors.textPrimary);
+    expect(textColorOf(tester, '도움말'), horon.colors.textSecondary);
+    expect(textColorOf(tester, '값이 필요합니다'), horon.colors.textDanger);
+    expect(tester.widget<Text>(find.text('도움말')).style!.fontSize, horon.text.caption.fontSize);
+  });
+
+  testWidgets('a disabled field greys the label', (WidgetTester tester) async {
+    await pumpField(tester, disabled: true);
+    expect(textColorOf(tester, '이름'), themeOf(tester).colors.textDisabled);
+  });
+
+  testWidgets('the error slides in: transparent first, opaque once settled', (WidgetTester tester) async {
+    await pumpField(tester, withError: true);
+    double opacityOf() {
+      final Finder wrapper = find.ancestor(of: find.text('값이 필요합니다'), matching: find.byType(Opacity)).first;
+      return tester.widget<Opacity>(wrapper).opacity;
+    }
+
+    expect(opacityOf(), 0);
+    await tester.pumpAndSettle();
+    expect(opacityOf(), 1);
+  });
+
+  testWidgets('at 320 wide the label and help text still fit', (WidgetTester tester) async {
+    await pumpField(tester, withError: true);
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.byType(HoronField)).width, 320);
   });
 }

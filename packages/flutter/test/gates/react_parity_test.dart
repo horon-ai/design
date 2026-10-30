@@ -7,26 +7,29 @@ import 'pending_components.dart';
 
 /// The React package is the source of truth for which components exist. This
 /// gate keeps the Flutter port honest while it is being built: the React slug
-/// set must equal the implemented component files plus the pending ledger.
+/// set (`packages/react/src/components`, 81 files) must equal the implemented
+/// component files plus the pending ledger.
 ///
-/// It is incremental on purpose. Every component todo deletes its own slug from
-/// `pending_components.dart` in the same change that adds
-/// `lib/src/components/<slug>.dart`, so the gate is green after every todo and
-/// cannot silently drift from React. `test/gates_final/pending_empty_test.dart`
-/// asserts the ledger is empty once the last component lands; it lives outside
-/// `test/gates` because the ledger is legitimately non-empty until then.
+/// The ledger is seeded with every slug and shrinks as components land. During
+/// the parallel waves each lane lands a file whose slug stays in the ledger
+/// until the integrator runs, so this suite deliberately does NOT assert that a
+/// ledger slug has no file. `scripts/integrate.mjs` rewrites the ledger from
+/// the directory listing (a slug with a file comes out, a catalog slug without
+/// one goes in), and `test/gates_final/pending_empty_test.dart` still enforces
+/// an empty ledger at the end. It lives outside `test/gates` because the ledger
+/// is legitimately non-empty until then.
 ///
-/// Barrel exception: `chart` is exported from the package's `chart.dart`
-/// subpath only, never from `lib/horon_ui.dart`. `fl_chart` would otherwise be
-/// part of every app bundle that imports the design system, the same reason the
-/// React package keeps `chart` off its entry point. This gate still requires a
-/// `chart` component file and a gallery section for it; only the barrel export
-/// differs.
+/// Because the ledger is the only list of missing components, an empty
+/// component directory is legitimate here: parity still fails if a React
+/// component is neither a file nor a ledger entry.
 void main() {
   test('parity: every React component has a Flutter file', () {
     final reactSlugs = reactComponentSlugs();
     final implemented = implementedComponentSlugs();
     final covered = <String>{...implemented, ...pendingComponents};
+    // The numbers the evidence file quotes; `flutter test -r expanded` prints them.
+    // ignore: avoid_print
+    print('parity: react=${reactSlugs.length} implemented=${implemented.length} pending=${pendingComponents.length}');
 
     final missing = (reactSlugs.difference(covered).toList()..sort());
     final extra = (covered.difference(reactSlugs).toList()..sort());
@@ -54,18 +57,6 @@ void main() {
       if (!seen.add(slug)) duplicates.add(slug);
     }
     expect(duplicates, isEmpty, reason: 'pendingComponents repeats: ${duplicates.toList()..sort()}');
-  });
-
-  test('parity: the pending ledger lists only unimplemented components', () {
-    final implemented = implementedComponentSlugs();
-    final stale = (pendingComponents.where(implemented.contains).toList()..sort());
-    expect(
-      stale,
-      isEmpty,
-      reason:
-          'These slugs have a component file and are still listed as pending: $stale. '
-          'Delete them from pendingComponents in the change that adds the file.',
-    );
   });
 
   test('parity: the React component source is readable', () {

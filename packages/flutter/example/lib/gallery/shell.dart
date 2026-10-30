@@ -245,7 +245,7 @@ class _GalleryControls extends StatelessWidget {
                   style: text.titleSmall?.copyWith(
                     color: scheme.onSurface,
                     fontWeight: HoronFontWeight.semibold,
-                    letterSpacing: HoronLetterSpacing.tight,
+                    letterSpacing: -0.2,
                   ),
                 ),
               ),
@@ -348,10 +348,8 @@ class _GalleryControlGroup extends StatelessWidget {
           ),
           child: Text(
             label.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: scheme.onSurfaceVariant,
-              letterSpacing: HoronLetterSpacing.wider,
-            ),
+            style: Theme.of(context).textTheme.labelSmall
+                ?.copyWith(color: scheme.onSurfaceVariant, letterSpacing: 0.6),
           ),
         ),
         child,
@@ -456,7 +454,7 @@ class _GalleryRail extends StatelessWidget {
                             style: text.labelSmall?.copyWith(
                               color: scheme.onSurfaceVariant,
                               fontWeight: HoronFontWeight.semibold,
-                              letterSpacing: HoronLetterSpacing.wide,
+                              letterSpacing: 0.4,
                             ),
                           ),
                         );
@@ -552,9 +550,9 @@ class _GalleryPreview extends StatelessWidget {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: scheme.surface,
-                borderRadius: BorderRadius.circular(HoronRadiusRole.panel),
+                borderRadius: BorderRadius.circular(HoronRadius.xl),
                 border: Border.all(color: scheme.outline),
-                boxShadow: HoronShadow.sm,
+                boxShadow: HoronShadow.popover,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

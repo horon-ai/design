@@ -2,200 +2,100 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
-/// 슬라이더의 범위·눈금·방향·비활성을 확인합니다.
-///
-/// 값은 호출자가 소유하므로, 넘어오는 값이 언제나 [HoronSlider.min]과
-/// [HoronSlider.max] 사이인지, [HoronSlider.divisions]가 있으면 눈금에 맞는지를
-/// 여기서 확인합니다. 범위를 벗어난 값이 썸을 트랙 밖으로 밀지 않는지도 봅니다.
-void main() {
-  Widget harness(Widget child, {Brightness brightness = Brightness.light}) => MaterialApp(
+Widget _host(Widget child, {Brightness brightness = Brightness.light, double? width}) {
+  final Widget sized = width == null ? child : SizedBox(width: width, child: child);
+  return MaterialApp(
     theme: horonTheme(brightness),
-    home: Scaffold(
-      body: Center(child: SizedBox(width: 200, child: child)),
-    ),
+    home: Scaffold(body: Center(child: sized)),
   );
+}
 
-  /// 트랙에서 [fraction] 위치의 전역 좌표입니다.
-  Offset pointAt(WidgetTester tester, double fraction) {
-    final Rect track = tester.getRect(find.byKey(HoronSlider.trackKey));
-    const double inset = HoronSlider.thumbDiameter / 2;
-    final double travel = track.width - HoronSlider.thumbDiameter;
-    return Offset(track.left + inset + travel * fraction, track.center.dy);
-  }
+HoronThemeData _theme(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronSlider)));
 
-  HoronSliderPainter probe(WidgetTester tester) =>
-      tester.widget<CustomPaint>(find.byKey(HoronSlider.trackKey)).painter! as HoronSliderPainter;
+Finder _track() => find.descendant(of: find.byType(HoronSlider), matching: find.byType(DecoratedBox)).first;
 
-  group('모양', () {
-    testWidgets('트랙은 두께 6이고 썸은 지름 16에 테두리 2다', (WidgetTester tester) async {
-      await tester.pumpWidget(harness(HoronSlider(value: 50, onChanged: (_) {})));
+Finder _thumb() => find.descendant(of: find.byType(HoronSlider), matching: find.byType(Container));
 
-      expect(HoronSlider.trackThickness, 6);
-      expect(HoronSlider.thumbDiameter, 16);
-      expect(HoronSlider.thumbBorderWidth, 2);
-      expect(tester.getSize(find.byKey(HoronSlider.trackKey)).height, HoronSlider.thumbDiameter);
-    });
-
-    testWidgets('값 표시는 정수를 소수점 없이 쓴다', (WidgetTester tester) async {
-      expect(formatSliderValue(40), '40');
-      expect(formatSliderValue(2.5), '2.5');
-      expect(formatSliderValue(0.30000000000000004), '0.3');
-
-      await tester.pumpWidget(harness(HoronSlider(value: 40, showValue: true, onChanged: (_) {})));
-      expect(find.text('40'), findsOneWidget);
-    });
-
-    testWidgets('라이트와 다크 모두 그려진다', (WidgetTester tester) async {
-      for (final Brightness brightness in Brightness.values) {
-        await tester.pumpWidget(harness(HoronSlider(value: 50, onChanged: (_) {}), brightness: brightness));
-        await tester.pumpAndSettle();
-        expect(tester.takeException(), isNull);
-        expect(find.byKey(HoronSlider.trackKey), findsOneWidget);
-      }
-    });
-  });
-
-  group('값과 범위', () {
-    testWidgets('범위를 벗어난 값은 양 끝에 붙는다', (WidgetTester tester) async {
-      await tester.pumpWidget(harness(HoronSlider(value: -50, min: 0, max: 100, onChanged: (_) {})));
-      expect(probe(tester).fraction, 0, reason: 'min보다 작은 값이 트랙 안에 그려졌습니다');
-
-      await tester.pumpWidget(harness(HoronSlider(value: 150, min: 0, max: 100, onChanged: (_) {})));
-      expect(probe(tester).fraction, 1, reason: 'max보다 큰 값이 트랙 안에 그려졌습니다');
-    });
-
-    testWidgets('트랙 왼쪽을 누르면 min, 오른쪽을 누르면 max를 넘긴다', (WidgetTester tester) async {
-      final List<double> seen = <double>[];
-      await tester.pumpWidget(harness(HoronSlider(value: 50, onChanged: seen.add)));
-
-      await tester.tapAt(pointAt(tester, 0));
-      await tester.pump();
-      expect(seen.last, 0, reason: '왼쪽 끝이 min이 아닙니다');
-
-      await tester.tapAt(pointAt(tester, 1));
-      await tester.pump();
-      expect(seen.last, 100, reason: '오른쪽 끝이 max가 아닙니다');
-    });
-
-    testWidgets('끌어서 범위를 넘어가도 값은 min과 max 사이에 머문다', (WidgetTester tester) async {
-      final List<double> seen = <double>[];
-      await tester.pumpWidget(harness(HoronSlider(value: 50, min: 0, max: 100, onChanged: seen.add)));
-
-      final TestGesture right = await tester.startGesture(pointAt(tester, 0.5));
-      await right.moveTo(pointAt(tester, 0.5) + const Offset(400, 0));
-      await right.up();
-      await tester.pump();
-
-      expect(seen, isNotEmpty);
-      expect(seen.every((double value) => value >= 0 && value <= 100), isTrue, reason: '범위를 벗어난 값: $seen');
-      expect(seen.last, 100);
-
-      final TestGesture left = await tester.startGesture(pointAt(tester, 0.5));
-      await left.moveTo(pointAt(tester, 0.5) - const Offset(400, 0));
-      await left.up();
-      await tester.pump();
-      expect(seen.last, 0);
-    });
-
-    testWidgets('눈금이 있으면 가장 가까운 눈금으로 반올림한다', (WidgetTester tester) async {
-      final List<double> seen = <double>[];
-      await tester.pumpWidget(harness(HoronSlider(value: 0, min: 0, max: 100, divisions: 4, onChanged: seen.add)));
-
-      await tester.tapAt(pointAt(tester, 0.4));
-      await tester.pump();
-
-      expect(seen.last, 50, reason: '25 단위 눈금의 가운데는 50입니다');
-      expect(seen.last % 25, 0);
-    });
-
-    testWidgets('min과 max가 같으면 그 값만 넘긴다', (WidgetTester tester) async {
-      await tester.pumpWidget(harness(HoronSlider(value: 5, min: 5, max: 5, onChanged: (_) {})));
+void main() {
+  testWidgets('default state renders in light and dark', (WidgetTester tester) async {
+    for (final Brightness brightness in Brightness.values) {
+      await tester.pumpWidget(_host(HoronSlider(value: 40, onChanged: (_) {}), brightness: brightness));
       expect(tester.takeException(), isNull);
-
-      final List<double> seen = <double>[];
-      await tester.pumpWidget(harness(HoronSlider(value: 5, min: 5, max: 5, onChanged: seen.add)));
-      await tester.tapAt(pointAt(tester, 0.7));
-      await tester.pump();
-      expect(seen, <double>[5]);
-    });
+    }
   });
 
-  group('방향', () {
-    testWidgets('세로는 아래가 min, 위가 max다', (WidgetTester tester) async {
-      final List<double> seen = <double>[];
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: horonTheme(Brightness.light),
-          home: Scaffold(
-            body: Center(
-              child: SizedBox(
-                height: 200,
-                child: HoronSlider(value: 50, orientation: Axis.vertical, onChanged: seen.add),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      final Rect track = tester.getRect(find.byKey(HoronSlider.trackKey));
-      expect(track.width, HoronSlider.thumbDiameter);
-
-      await tester.tapAt(Offset(track.center.dx, track.bottom - HoronSlider.thumbDiameter / 2));
-      await tester.pump();
-      expect(seen.last, 0, reason: '세로 슬라이더의 아래 끝이 min이 아닙니다');
-
-      await tester.tapAt(Offset(track.center.dx, track.top + HoronSlider.thumbDiameter / 2));
-      await tester.pump();
-      expect(seen.last, 100, reason: '세로 슬라이더의 위 끝이 max가 아닙니다');
-    });
+  testWidgets('the React slider is 220 wide, 20 tall, with a 6px track and 18px thumb', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronSlider(value: 40, onChanged: (_) {})));
+    expect(tester.getSize(find.byType(HoronSlider)), const Size(220, 20), reason: 'w-55 h-5');
+    expect(tester.getSize(_track()).height, 6, reason: 'h-1.5');
+    expect(tester.getSize(_thumb()), const Size(18, 18), reason: 'size-[18px]');
   });
 
-  group('동작', () {
-    testWidgets('비활성은 끌어도 값을 넘기지 않는다', (WidgetTester tester) async {
-      final List<double> seen = <double>[];
-      await tester.pumpWidget(harness(HoronSlider(value: 50, enabled: false, onChanged: seen.add)));
+  testWidgets('the fill follows the value and the thumb carries the hairline and shadow', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronSlider(value: 25, onChanged: (_) {})));
+    final HoronColors colors = _theme(tester).colors;
 
-      final TestGesture gesture = await tester.startGesture(pointAt(tester, 0.5));
-      await gesture.moveTo(pointAt(tester, 0.9));
-      await gesture.up();
-      await tester.pump();
+    expect(
+      tester.widget<FractionallySizedBox>(find.byType(FractionallySizedBox)).widthFactor,
+      0.25,
+      reason: '25 / 100',
+    );
+    final BoxDecoration track = tester.widget<DecoratedBox>(_track()).decoration as BoxDecoration;
+    expect(track.color, colors.overlayInk8, reason: 'bg-overlay-ink-8');
 
-      expect(seen, isEmpty, reason: '비활성 슬라이더가 값을 바꿨습니다');
-    });
+    final Container thumb = tester.widget<Container>(_thumb());
+    final BoxDecoration thumbDecoration = thumb.decoration! as BoxDecoration;
+    expect(thumbDecoration.color, colors.bgDefault, reason: 'bg-bg-default');
+    expect(thumbDecoration.border!.top.color, colors.borderDefault, reason: 'border-border-default');
+    expect(thumbDecoration.boxShadow!.single.color, colors.overlayInk12, reason: 'shadow-[0_1px_3px_#0000001f]');
+  });
 
-    testWidgets('콜백이 없으면 비활성이고 불투명도 50%다', (WidgetTester tester) async {
-      await tester.pumpWidget(harness(const HoronSlider(value: 50)));
+  testWidgets('tapping and dragging report the new value within min and max', (WidgetTester tester) async {
+    final List<double> changes = <double>[];
+    await tester.pumpWidget(_host(HoronSlider(value: 0, onChanged: changes.add)));
 
-      expect(
-        tester
-            .widget<Opacity>(find.descendant(of: find.byType(HoronSlider), matching: find.byType(Opacity)).first)
-            .opacity,
-        0.5,
-      );
-      expect(
-        find.byWidgetPredicate((Widget widget) => widget is Semantics && widget.properties.enabled == false),
-        findsOneWidget,
-      );
-    });
+    final Rect rect = tester.getRect(find.byType(HoronSlider));
+    await tester.tapAt(Offset(rect.right - 20, rect.center.dy));
+    await tester.pumpAndSettle();
+    expect(changes.single, greaterThan(90), reason: '오른쪽 끝을 누르면 최댓값에 가까워집니다');
+    expect(changes.single, lessThanOrEqualTo(100));
 
-    testWidgets('보조 기술이 값과 증감 동작을 알린다', (WidgetTester tester) async {
-      final List<double> seen = <double>[];
-      await tester.pumpWidget(harness(HoronSlider(value: 50, divisions: 4, semanticsLabel: '볼륨', onChanged: seen.add)));
+    changes.clear();
+    await tester.drag(find.byType(HoronSlider), const Offset(40, 0));
+    await tester.pumpAndSettle();
+    expect(changes, isNotEmpty, reason: '끌면 계속 새 값을 올립니다');
+    expect(changes.first, lessThan(changes.last));
+    expect(changes.every((double value) => value >= 0 && value <= 100), isTrue);
+  });
 
-      expect(
-        find.byWidgetPredicate(
-          (Widget widget) =>
-              widget is Semantics &&
-              widget.properties.slider == true &&
-              widget.properties.label == '볼륨' &&
-              widget.properties.value == '50',
-        ),
-        findsOneWidget,
-      );
+  testWidgets('the slider shrinks below its desktop width instead of overflowing', (WidgetTester tester) async {
+    for (final (double hostWidth, double expected) in <(double, double)>[(200, 200), (1024, 220)]) {
+      await tester.pumpWidget(_host(HoronSlider(value: 100, onChanged: (_) {}), width: hostWidth));
+      expect(tester.takeException(), isNull, reason: '폭 $hostWidth에서 예외가 없어야 합니다');
+      // 부모가 폭을 꽉 잡으면 위젯 상자는 부모 폭이고, 트랙만 220에서 멈춥니다.
+      expect(tester.getSize(_track()).width, expected, reason: '폭 $hostWidth에서의 트랙 폭');
+    }
+  });
 
-      await tester.tapAt(pointAt(tester, 0.75));
-      await tester.pump();
-      expect(seen.last, 75);
-    });
+  testWidgets('a disabled slider dims and reports nothing', (WidgetTester tester) async {
+    final List<double> changes = <double>[];
+    await tester.pumpWidget(_host(HoronSlider(value: 30, enabled: false, onChanged: changes.add)));
+
+    await tester.tapAt(tester.getRect(find.byType(HoronSlider)).center);
+    await tester.pumpAndSettle();
+
+    expect(changes, isEmpty);
+    expect(
+      tester.widget<Opacity>(find.descendant(of: find.byType(HoronSlider), matching: find.byType(Opacity))).opacity,
+      0.4,
+      reason: 'data-disabled:opacity-40',
+    );
+  });
+
+  testWidgets('the accessible name is the React aria-label', (WidgetTester tester) async {
+    final SemanticsHandle handle = tester.ensureSemantics();
+    await tester.pumpWidget(_host(HoronSlider(value: 30, semanticLabel: '볼륨', onChanged: (_) {})));
+    expect(find.bySemanticsLabel('볼륨'), findsOneWidget);
+    handle.dispose();
   });
 }

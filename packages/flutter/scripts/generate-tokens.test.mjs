@@ -1,122 +1,252 @@
 /**
- * Drift guard for `lib/src/tokens/horon_tokens.g.dart`.
+ * `lib/src/tokens/horon_tokens.g.dart`의 드리프트 가드입니다.
  *
- * The Dart token file is committed because a Flutter app cannot run a Node
- * build step, so nothing stops a hand edit from silently diverging from the web
- * tokens. This test regenerates the file in memory and compares it byte for
- * byte with what is on disk.
- *
- * The expected string is built from the frozen token snapshot in
- * `legacy-tokens/` (the Flutter layer's source until it is migrated to the
- * rebuilt `@horon-ai/tokens`). Bun resolves the sibling `.ts` imports directly.
+ * Dart 토큰 파일은 Flutter 앱이 Node 빌드 단계를 실행할 수 없어서 저장소에 커밋합니다.
+ * 그래서 손으로 고친 값이 웹 토큰과 어긋나도 조용히 지나갈 수 있습니다. 이 테스트는
+ * TypeScript 토큰 소스에서 같은 문자열을 다시 만들어 저장된 파일과 바이트로 비교합니다.
+ * 중간 JSON을 거치지 않고 `packages/tokens/src/*.ts`를 Bun이 직접 읽습니다.
  */
 
-import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { describe, expect, test } from 'bun:test';
+import { existsSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
-import { buildDartTokens } from "./generate-tokens.mjs";
-import { oklchToHex } from "./legacy-tokens/color.ts";
-import { PALETTE } from "./legacy-tokens/palette.ts";
-import { buildTokensJson } from "./legacy-tokens/tokens-json.ts";
-import { colorTokens } from "./legacy-tokens/tokens.ts";
+import { darkColors, lightColors, primitives } from '../../tokens/src/color.ts';
+import { glass } from '../../tokens/src/glass.ts';
+import { radius, shadow, spacing } from '../../tokens/src/scale.ts';
+import { fontFamily, fontWeight, textStyles } from '../../tokens/src/typography.ts';
+import { buildDartTokens, memberName, spaceName } from './generate-tokens.mjs';
 
-const DART_PATH = fileURLToPath(new URL("../lib/src/tokens/horon_tokens.g.dart", import.meta.url));
+const DART_PATH = fileURLToPath(new URL('../lib/src/tokens/horon_tokens.g.dart', import.meta.url));
+const LEGACY_DIR = fileURLToPath(new URL('./legacy-tokens', import.meta.url));
 
-/**
- * Every class `mobile/lib/src/theme/tokens.dart` defines, plus the metric
- * classes this package adds.
- *
- * The migration in the mobile repository replaces that file with this one, so a
- * missing class is a compile error there rather than a cosmetic gap. The list is
- * pinned here because the mobile repository is not checked out in design CI, so
- * the superset comparison against its source cannot run there.
- */
-const REQUIRED_CLASSES = [
-  "HoronPalette",
-  "HoronLightColors",
-  "HoronDarkColors",
-  "HoronSpace",
-  "HoronRadius",
-  "HoronRadiusRole",
-  "HoronDuration",
-  "HoronEasing",
-  "HoronFontSize",
-  "HoronText",
-  "HoronFontWeight",
-  "HoronLineHeight",
-  "HoronLetterSpacing",
-  "HoronShadow",
-  "HoronBreakpoint",
-  "HoronZIndex",
-  "HoronButtonMetrics",
-  "HoronCheckboxMetrics",
-  "HoronTextareaMetrics",
-  "HoronMenuMetrics",
-  "HoronSidebarMetrics",
-];
+const committed = readFileSync(DART_PATH, 'utf8');
+const expected = buildDartTokens();
 
-const committed = readFileSync(DART_PATH, "utf8");
-const expected = buildDartTokens(buildTokensJson());
-
-/** The first differing line, so a failure names the drift instead of dumping 400 lines. */
+/** 처음 어긋난 줄만 돌려줍니다. 1300줄 전체를 쏟아 내지 않기 위해서입니다. */
 function firstDifference(actual, wanted) {
-  const actualLines = actual.split("\n");
-  const wantedLines = wanted.split("\n");
+  const actualLines = actual.split('\n');
+  const wantedLines = wanted.split('\n');
   for (let index = 0; index < Math.max(actualLines.length, wantedLines.length); index += 1) {
     if (actualLines[index] !== wantedLines[index]) {
       return [
         `line ${index + 1}`,
         `  committed:   ${JSON.stringify(actualLines[index])}`,
         `  regenerated: ${JSON.stringify(wantedLines[index])}`,
-      ].join("\n");
+      ].join('\n');
     }
   }
-  return "the files differ only in length";
+  return 'the files differ only in length';
 }
 
-describe("horon_tokens.g.dart drift guard", () => {
-  test("the committed token file is byte-identical to a fresh generation", () => {
+/** `HoronLightColors` 같은 클래스 하나의 `static const` 멤버 이름을 꺼냅니다. */
+function membersOf(source, className) {
+  const start = source.indexOf(`abstract final class ${className} {`);
+  if (start < 0) return [];
+  const end = source.indexOf('\n}', start);
+  const body = source.slice(start, end);
+  return [...body.matchAll(/^ {2}static const \S+ ([A-Za-z0-9_]+) =/gm)].map((match) => match[1]);
+}
+
+/** `HoronColors`의 생성자·상수·보간 인자에 쓰인 필드 이름을 꺼냅니다. */
+function colorFields(source) {
+  const start = source.indexOf('final class HoronColors {');
+  const end = source.indexOf('\n}\n\n/// `scale.ts`', start);
+  const body = source.slice(start, end);
+  const names = [...body.matchAll(/^ {2}final Color ([A-Za-z0-9_]+);$/gm)].map((match) => match[1]);
+  const lightEntries = [...body.matchAll(/HoronLightColors\.([A-Za-z0-9_]+)/g)].map((match) => match[1]);
+  const darkEntries = [...body.matchAll(/HoronDarkColors\.([A-Za-z0-9_]+)/g)].map((match) => match[1]);
+  return { names, lightEntries, darkEntries };
+}
+
+describe('horon_tokens.g.dart 드리프트 가드', () => {
+  test('커밋된 토큰 파일은 방금 생성한 결과와 바이트로 같다', () => {
     expect(committed).toContain(
-      "// AUTO-GENERATED by design/packages/flutter/scripts/generate-tokens.mjs - do not edit.",
+      '// AUTO-GENERATED by design/packages/flutter/scripts/generate-tokens.mjs - do not edit.',
     );
-    expect(committed).toContain(
-      "// Source: design/packages/flutter/scripts/legacy-tokens/*.ts",
-    );
-    expect(expected.length).toBeGreaterThan(8000);
+    expect(committed).toContain('// Source: design/packages/tokens/src/{color,scale,typography,glass}.ts');
+    expect(expected.length).toBeGreaterThan(20000);
 
     if (committed !== expected) {
       throw new Error(
-        `horon_tokens.g.dart is out of date: run \`bun run tokens\` from design/ and commit the result.\n${firstDifference(committed, expected)}`,
+        `horon_tokens.g.dart가 오래됐습니다: design/에서 \`bun run tokens\`를 실행하고 결과를 커밋합니다.\n${firstDifference(committed, expected)}`,
       );
     }
   });
 
-  test("the generated values come from the TypeScript token source", () => {
-    expect(colorTokens.light.background).toBe(PALETTE.sand[100]);
-    expect(oklchToHex(colorTokens.light.background)).toBe("#fafafa");
-    expect(oklchToHex(PALETTE.gold[500])).toBe("#c98f2b");
-    expect(committed).toContain("static const background = Color(0xFFFAFAFA)");
-    expect(committed).toContain("static const gold500 = Color(0xFFC98F2B)");
+  test('생성기는 두 번 돌려도 같은 문자열을 만든다', () => {
+    expect(buildDartTokens()).toBe(expected);
   });
 
-  test("the six component radii and the required class names are present", () => {
-    expect(committed).toContain("class HoronLightColors");
-    expect(committed).toContain("class HoronDarkColors");
-    expect(committed).not.toContain("HoronColorsLight");
-    expect(committed).not.toContain("HoronColorsDark");
-    expect(committed).toContain("static const control = 12.0");
-    expect(committed).toContain("static const input = 8.0");
-    expect(committed).toContain("static const card = 12.0");
-    expect(committed).toContain("static const panel = 14.0");
-    expect(committed).toContain("static const bubble = 14.0");
-    expect(committed).toContain("static const pill = HoronRadius.full");
+  test('동결 스냅샷은 저장소에 남아 있지 않다', () => {
+    expect(existsSync(LEGACY_DIR)).toBe(false);
+    expect(committed).not.toContain('legacy-tokens');
+  });
+});
+
+describe('접근자 이름 규칙', () => {
+  test('문서화한 다섯 가지 예가 그대로 나온다', () => {
+    expect(memberName('bg-surface-70')).toBe('bgSurface70');
+    expect(memberName('overlay-ink-6')).toBe('overlayInk6');
+    expect(memberName('accent-sky-500-18')).toBe('accentSky500_18');
+    expect(memberName('glass-clear-hover')).toBe('glassClearHover');
+    expect(memberName('interactive-on-primary')).toBe('interactiveOnPrimary');
   });
 
-  test("every class the mobile token file defines is generated", () => {
-    const declared = new Set(
-      [...committed.matchAll(/^abstract final class ([A-Za-z0-9_]+)/gm)].map((match) => match[1]),
+  test('숫자로 시작하는 조각은 뒤로 옮기고 간격 키의 점은 밑줄이 된다', () => {
+    expect(memberName('2xl')).toBe('xl2');
+    expect(memberName('red-500')).toBe('red500');
+    expect(spaceName('1')).toBe('s1');
+    expect(spaceName('1.5')).toBe('s1_5');
+    expect(spaceName('0.5')).toBe('s0_5');
+  });
+
+  test('머리말이 이름 규칙을 설명한다', () => {
+    expect(committed).toContain('// 이름 규칙:');
+    expect(committed).toContain('//   accent-sky-500-18   -> accentSky500_18');
+  });
+});
+
+describe('색 토큰', () => {
+  test('라이트·다크 의미 색이 color.ts의 키를 모두 담는다', () => {
+    const light = membersOf(committed, 'HoronLightColors');
+    const dark = membersOf(committed, 'HoronDarkColors');
+    expect(light).toHaveLength(Object.keys(lightColors).length);
+    expect(dark).toHaveLength(Object.keys(darkColors).length);
+    expect(light).toEqual(Object.keys(lightColors).map(memberName));
+    expect(dark).toEqual(Object.keys(darkColors).map(memberName));
+  });
+
+  test('원시 팔레트가 primitives의 키를 모두 담는다', () => {
+    const palette = membersOf(committed, 'HoronPalette');
+    expect(palette).toEqual(Object.keys(primitives).map(memberName));
+  });
+
+  test('HoronColors가 두 밝기의 색을 같은 이름으로 감싼다', () => {
+    const { names, lightEntries, darkEntries } = colorFields(committed);
+    const light = membersOf(committed, 'HoronLightColors');
+    const dark = membersOf(committed, 'HoronDarkColors');
+    expect(names).toEqual(light);
+    expect(lightEntries).toEqual(light);
+    expect(darkEntries).toEqual(dark);
+  });
+
+  test('알파가 있는 토큰은 알파 바이트를 그대로 유지한다', () => {
+    expect(lightColors['bg-surface-6']).toBe('#ffffff0f');
+    expect(committed).toContain('static const Color bgSurface6 = Color(0x0FFFFFFF);');
+    expect(committed).toContain('static const Color overlayInk6 = Color(0x0F000000);');
+    expect(committed).toContain('static const Color accentSky500_18 = Color(0x2E7199B6);');
+    expect(committed).toContain('static const Color glassTint = Color(0x0A0B0C0E);');
+    expect(darkColors['bg-surface-6']).toBe('#17181a0f');
+    expect(committed).toContain('static const Color bgSurface6 = Color(0x0F17181A);');
+  });
+
+  test('모든 의미 색 값이 color.ts와 같다', () => {
+    // 표본이 아니라 색 전체를, 생성된 파일의 문자열로 확인합니다.
+    const dartColor = (hex) => {
+      const value = hex.replace('#', '').toUpperCase();
+      if (value.length === 6) return `Color(0xFF${value})`;
+      return `Color(0x${value.slice(6, 8)}${value.slice(0, 6)})`;
+    };
+    const missing = [];
+    for (const [token, hex] of Object.entries(lightColors)) {
+      if (!committed.includes(`static const Color ${memberName(token)} = ${dartColor(hex)};`)) {
+        missing.push(`light ${token}`);
+      }
+    }
+    for (const [token, hex] of Object.entries(darkColors)) {
+      const darkLine = `static const Color ${memberName(token)} = ${dartColor(hex)};`;
+      if (!committed.includes(darkLine)) missing.push(`dark ${token}`);
+    }
+    expect(missing).toEqual([]);
+  });
+});
+
+describe('반경·간격·그림자·브레이크포인트', () => {
+  test('반경 단계가 scale.ts와 같다', () => {
+    for (const [key, value] of Object.entries(radius)) {
+      const rendered = Number.isInteger(value) ? `${value}.0` : `${value}`;
+      expect(committed).toContain(`static const double ${memberName(key)} = ${rendered};`);
+    }
+    expect(committed).not.toContain('HoronRadiusRole');
+  });
+
+  test('간격 단계가 scale.ts와 같다', () => {
+    for (const [key, value] of Object.entries(spacing)) {
+      expect(committed).toContain(`static const double ${spaceName(key)} = ${value}.0;`);
+    }
+  });
+
+  test('그림자가 scale.ts의 CSS 그림자를 BoxShadow로 옮긴다', () => {
+    expect(committed).toContain('static const List<BoxShadow> popover = <BoxShadow>[');
+    expect(committed).toContain(
+      'BoxShadow(color: Color(0x1A0A0D0F), offset: Offset(0.0, 8.0), blurRadius: 24.0)',
     );
-    expect(REQUIRED_CLASSES.filter((name) => !declared.has(name))).toEqual([]);
+    expect(committed).toContain(
+      `BoxShadow(color: Color(0x1F0A0D0F), offset: Offset(0.0, 16.0), blurRadius: 40.0)`,
+    );
+    expect(Object.keys(shadow)).toEqual(['popover', 'palette']);
+  });
+
+  test('브레이크포인트가 md 768, lg 1024를 담는다', () => {
+    expect(committed).toContain('static const double md = 768.0;');
+    expect(committed).toContain('static const double lg = 1024.0;');
+  });
+});
+
+describe('타이포와 글래스', () => {
+  test('13가지 스타일이 모바일 크기·굵기·자간으로 생성된다', () => {
+    expect(Object.keys(textStyles)).toHaveLength(13);
+    const missing = [];
+    for (const [name, style] of Object.entries(textStyles)) {
+      const size = style.size.mobile;
+      const tracking = Number((size * style.tracking).toFixed(4));
+      const rendered = Number.isInteger(tracking) ? `${tracking}.0` : `${tracking}`;
+      const placeholders = [
+        `final TextStyle ${memberName(name)};`,
+        `fontSize: ${size}.0,`,
+        `fontWeight: HoronFontWeight.${style.weight},`,
+        `letterSpacing: ${rendered},`,
+        `fontFamily: '${fontFamily[style.family][0]}',`,
+      ];
+      for (const placeholder of placeholders) {
+        if (!committed.includes(placeholder)) missing.push(`${name}: ${placeholder}`);
+      }
+    }
+    expect(missing).toEqual([]);
+    expect(Object.values(fontWeight)).toEqual([400, 500, 600, 700]);
+    expect(memberName('label-sm')).toBe('labelSm');
+  });
+
+  test('글래스 값이 glass.ts와 같다', () => {
+    const ratio = (value) => Number(value.toFixed(6));
+    const expectations = [
+      `this.layerOpacity = ${glass.layerOpacity},`,
+      `this.tintBlur = ${glass.tint.blur}.0,`,
+      `this.tintColor = const Color(0x1A545454),`,
+      `this.innerShadeColor = const Color(0x1A000000),`,
+      `this.innerShadeBlur = ${glass.innerShade.blur}.0,`,
+      `this.innerInsetPerPx = ${ratio(glass.innerShade.insetPerPx)},`,
+      `this.innerInsetMaxY = ${glass.innerShade.maxInsetY}.0,`,
+      `this.innerInsetMaxX = ${glass.innerShade.maxInsetX}.0,`,
+      `this.edgeDarkColor = const Color(0xCC000000),`,
+      `this.edgeDarkBlurPerPx = ${ratio(glass.edgeDark.blurPerPx)},`,
+      `this.edgeDarkMaxBlur = ${glass.edgeDark.maxBlur}.0,`,
+      `this.edgeLightColor = const Color(0xCCFFFFFF),`,
+      `this.edgeLightBlurPerPx = ${ratio(glass.edgeLight.blurPerPx)},`,
+      `this.edgeLightMinBlur = ${glass.edgeLight.minBlur},`,
+      `this.edgeLightMaxBlur = ${glass.edgeLight.maxBlur},`,
+      `this.edgeLightSoftColor = const Color(0x33FFFFFF),`,
+    ];
+    const missing = expectations.filter((line) => !committed.includes(line));
+    expect(missing).toEqual([]);
+  });
+
+  test('글래스의 호스트 높이 규칙이 함수로 있다', () => {
+    expect(committed).toContain('double edgeDarkBlurFor(double hostHeight)');
+    expect(committed).toContain('double edgeLightBlurFor(double hostHeight)');
+    expect(committed).toContain('double innerInsetYFor(double hostHeight)');
+    expect(committed).toContain('double innerInsetXFor(double hostHeight)');
+    expect(committed).toContain('math.min(edgeDarkMaxBlur, hostHeight * edgeDarkBlurPerPx)');
   });
 });

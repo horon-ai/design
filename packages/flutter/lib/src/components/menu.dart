@@ -1,156 +1,392 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import '../theme/horon_fonts.dart';
+import '../glass/glass_geometry.dart';
+import '../glass/horon_glass.dart';
+import '../theme/horon_motion.dart';
+import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
-import 'glass_surface.dart';
 
-/// `menu.tsx`의 `gap-px`입니다. 항목 사이를 1px 띄웁니다.
-const double _menuGap = 1.0;
+/// `w-55` — 유리 메뉴의 220px 폭입니다.
+const double _glassWidth = 220;
 
-/// `menu.tsx`의 `p-1`입니다.
-const double _menuPadding = HoronSpace.s1;
+/// `w-64` — 단색 메뉴의 256px 폭입니다.
+const double _solidWidth = 256;
 
-/// `menu.tsx` 항목의 `px-2.5`입니다.
-const double _itemPaddingHorizontal = HoronSpace.s2_5;
+/// `w-76` — Paper 메뉴의 304px 폭입니다.
+const double _paperWidth = 304;
 
-/// `menu.tsx` 항목의 `py-[7px]`입니다. 4px 눈금에 없는 값이라 이름을 붙여 둡니다.
-const double _itemPaddingVertical = 7.0;
+/// `rounded-[18px]` — 토큰 반경 단계에 없는 단색 메뉴의 반경입니다.
+const double _solidRadius = 18;
 
-/// `menu.tsx` 항목의 `gap-2`입니다.
-const double _itemGap = HoronSpace.s2;
+/// `rounded-[10px]` — 토큰 반경 단계에 없는 단색 메뉴 항목의 반경입니다.
+const double _itemRadius = 10;
 
-/// `menu.tsx` 항목의 `rounded-[5px]`입니다. 4px 눈금에 없는 값입니다.
-const double _itemRadius = 5.0;
+/// `[&>svg]:size-4.5` — 항목 앞 아이콘 18px입니다.
+const double _menuIconSize = 18;
 
-/// `menu.tsx` 항목의 `text-xs`입니다.
-const double _itemFontSize = HoronText.caption;
+/// `[&>svg]:size-4` — 항목 뒤 아이콘 16px입니다.
+const double _trailingIconSize = 16;
 
-/// `text-xs`의 줄 높이 1rem(16px)을 12px 글자로 나눈 값입니다.
-const double _itemLineHeight = 16 / 12;
+/// `data-disabled:opacity-40` — 비활성 항목의 불투명도입니다.
+const double _disabledOpacity = 0.4;
 
-/// `menu.tsx` 라벨의 `text-[11px]`입니다. 생성 스케일의 12보다 작은 값입니다.
-const double _labelFontSize = 11.0;
+/// `h-px` — 구분선 두께입니다.
+const double _hairline = 1;
 
-/// `menu.tsx` 라벨의 `py-1`입니다.
-const double _labelPaddingVertical = HoronSpace.s1;
+/// `shadow-[0_12px_32px_#0A142424]`의 세로 이동입니다.
+const double _paperShadowOffset = 12;
 
-/// `menu.tsx` 구분선의 `my-1`입니다.
-const double _separatorMargin = HoronSpace.s1;
+/// `shadow-[0_12px_32px_#0A142424]`의 번짐입니다.
+const double _paperShadowBlur = 32;
 
-/// 구분선 두께입니다. CSS `h-px`입니다.
-const double _separatorThickness = 1.0;
+/// `shadow-[0_12px_32px_#0A142424]`의 알파입니다.
+const double _paperShadowAlpha = 0.14;
 
-/// 항목의 `hover:bg-foreground/5`·`focus-visible:bg-foreground/5` 투명도입니다.
-const double _hoverAlpha = 0.05;
+/// 메뉴 표면입니다. React `MenuSurface`입니다.
+enum HoronMenuSurface {
+  /// Figma `Menu` — 두꺼운 유리, 20px 반경, 40px 줄입니다.
+  glass,
 
-/// `data-disabled:opacity-50`입니다.
-const double _disabledOpacity = 0.5;
+  /// 계정·워크스페이스 메뉴 — 불투명 채움, 18px 반경, 36px 줄입니다.
+  solid,
 
-/// 항목 안 아이콘의 `size-4`입니다.
-const double _iconSize = HoronSpace.s4;
+  /// Paper 워크스페이스 전환기 — 기본 채움, 1px 테두리, 14px 반경, 304px 폭입니다.
+  paper,
+}
 
-/// 고정 폭 유리 메뉴 패널입니다.
+/// 메뉴 안쪽에서 표면을 알려 주는 스코프입니다. React `SurfaceContext`입니다.
+class _MenuSurfaceScope extends InheritedWidget {
+  const _MenuSurfaceScope({required this.surface, required super.child});
+
+  final HoronMenuSurface surface;
+
+  static HoronMenuSurface of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_MenuSurfaceScope>()?.surface ?? HoronMenuSurface.glass;
+
+  @override
+  bool updateShouldNotify(_MenuSurfaceScope oldWidget) => oldWidget.surface != surface;
+}
+
+/// 항목이 골라졌을 때 메뉴를 닫게 해 주는 스코프입니다.
+class _MenuDismissScope extends InheritedWidget {
+  const _MenuDismissScope({required this.dismiss, required super.child});
+
+  final VoidCallback dismiss;
+
+  static VoidCallback? maybeOf(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<_MenuDismissScope>()?.dismiss;
+
+  @override
+  bool updateShouldNotify(_MenuDismissScope oldWidget) => oldWidget.dismiss != dismiss;
+}
+
+/// Figma `Menus and popovers`(88:495)의 메뉴 뿌리입니다. React `Menu`입니다.
 ///
-/// `menu.tsx`의 `Menu`를 옮긴 것입니다. `.glass-strong` 표면에 `w-[200px]`,
-/// `flex-col`, `gap-px`, `rounded-md`, `p-1`을 그대로 씁니다. 폭은 생성 토큰
-/// [HoronMenuMetrics.width]가 들고 있으므로 호스트가 바꾸려면 [width]를 넘깁니다.
-///
-/// ```dart
-/// HoronMenu(
-///   children: <Widget>[
-///     const HoronMenuLabel(label: '계정'),
-///     HoronMenuItem(label: '프로필', onSelected: openProfile),
-///     const HoronMenuSeparator(),
-///     HoronMenuItem(label: '로그아웃', onSelected: signOut),
-///   ],
-/// );
-/// ```
-///
-/// 이 위젯은 패널 자체입니다. 트리거에 붙여 열고 닫으려면 `dropdown_menu`의
-/// `HoronDropdownMenu`처럼 오버레이를 소유한 위젯을 쓰십시오.
-class HoronMenu extends StatelessWidget {
-  /// 메뉴 패널을 만듭니다.
-  const HoronMenu({super.key, required this.children, this.width = HoronMenuMetrics.width, this.semanticLabel});
+/// [trigger]를 누르면 [content]를 그 아래에 띄우고, 바깥을 누르거나 Escape를 누르거나
+/// 항목을 고르면 닫습니다. React는 `MenuTrigger`에 `render`로 요소를 넘기지만
+/// Flutter에서는 [trigger]가 위젯 자체입니다. 트리거의 유일한 동작이 메뉴 열기이므로
+/// 그 안의 터지는 흡수합니다(`AbsorbPointer`).
+class HoronMenu extends StatefulWidget {
+  /// 메뉴를 만듭니다.
+  const HoronMenu({super.key, required this.trigger, required this.content, this.onOpenChange});
 
-  /// 패널의 바깥 상자를 찾는 키입니다. 테스트가 폭을 재는 자리입니다.
-  static const Key panelKey = ValueKey<String>('horon-menu');
+  /// 메뉴를 여는 요소입니다(React `MenuTrigger`).
+  final Widget trigger;
 
-  /// 패널 안에 세로로 쌓을 항목입니다.
-  final List<Widget> children;
+  /// 열릴 때 그리는 메뉴입니다(React `MenuContent`).
+  final HoronMenuContent content;
 
-  /// 패널 폭입니다. React의 `w-[200px]`가 기본값입니다.
-  final double width;
+  /// 열림이 바뀔 때 부를 콜백입니다.
+  final ValueChanged<bool>? onOpenChange;
 
-  /// 스크린리더가 읽을 메뉴 이름입니다.
-  final String? semanticLabel;
+  @override
+  State<HoronMenu> createState() => _HoronMenuState();
+}
+
+class _HoronMenuState extends State<HoronMenu> {
+  final LayerLink _link = LayerLink();
+  final OverlayPortalController _portal = OverlayPortalController();
+  bool _open = false;
+
+  void _setOpen(bool value) {
+    if (_open == value) return;
+    setState(() => _open = value);
+    if (value) {
+      _portal.show();
+    } else {
+      _portal.hide();
+    }
+    widget.onOpenChange?.call(value);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      key: panelKey,
-      width: width,
-      child: HoronGlassSurface.strong(
-        padding: const EdgeInsets.all(_menuPadding),
-        borderRadius: BorderRadius.circular(HoronRadiusRole.card),
-        child: Semantics(
-          container: true,
-          explicitChildNodes: true,
-          label: semanticLabel,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              for (int index = 0; index < children.length; index++) ...<Widget>[
-                if (index > 0) const SizedBox(height: _menuGap),
-                children[index],
-              ],
-            ],
+    return CompositedTransformTarget(
+      link: _link,
+      child: OverlayPortal(
+        controller: _portal,
+        overlayChildBuilder: _buildOverlay,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => _setOpen(!_open),
+          child: AbsorbPointer(child: widget.trigger),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOverlay(BuildContext context) {
+    final HoronMenuContent content = widget.content;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+
+    // 바깥을 누르면 닫는 자리입니다. 투명한 전체 화면 막을 팝업 아래에 깔아, 팝업
+    // 밖의 포인터를 모두 메뉴가 받습니다(`TapRegion`은 팝업 위젯의 상자가 오버레이
+    // 전체로 늘어나 바깥 판정이 어긋납니다).
+    return Stack(
+      children: <Widget>[
+        Positioned.fill(
+          child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () => _setOpen(false)),
+        ),
+        CompositedTransformFollower(
+          link: _link,
+          showWhenUnlinked: false,
+          targetAnchor: content._targetAnchor,
+          followerAnchor: content._followerAnchor,
+          offset: content._offset,
+          child: Focus(
+            autofocus: true,
+            onKeyEvent: (FocusNode node, KeyEvent event) {
+              if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+                _setOpen(false);
+                return KeyEventResult.handled;
+              }
+              return KeyEventResult.ignored;
+            },
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0, end: 1),
+              duration: reduceMotion ? Duration.zero : HoronMotion.popupEnterDuration,
+              curve: HoronMotion.easeEmphasized,
+              // `motion-popup` — 0.95배에서 1배로 자라며 나타납니다.
+              builder: (BuildContext context, double t, Widget? child) => Opacity(
+                opacity: t,
+                child: Transform.scale(
+                  scale: HoronMotion.popupEnterScale + (1 - HoronMotion.popupEnterScale) * t,
+                  child: child,
+                ),
+              ),
+              child: _MenuDismissScope(dismiss: () => _setOpen(false), child: content),
+            ),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+/// 메뉴의 팝업 상자입니다. React `MenuContent`입니다.
+///
+/// [surface]에 따라 폭·반경·채움·그림자가 달라집니다. 폭은 React의 고정값을 상한으로
+/// 두고 화면이 좁으면 줄어듭니다.
+class HoronMenuContent extends StatelessWidget {
+  /// 팝업을 만듭니다.
+  const HoronMenuContent({
+    super.key,
+    this.surface = HoronMenuSurface.glass,
+    this.side = AxisDirection.down,
+    this.align = Alignment.centerLeft,
+    this.sideOffset = 8,
+    this.alignOffset = 0,
+    required this.children,
+  });
+
+  /// 표면입니다(React `surface`). 기본값은 `glass`입니다.
+  final HoronMenuSurface surface;
+
+  /// 트리거 기준 어느 쪽에 열지입니다(React `side`). 기본값은 아래입니다.
+  final AxisDirection side;
+
+  /// 트리거의 어느 모서리에 맞출지입니다(React `align`). 기본값은 시작(`start`)입니다.
+  final Alignment align;
+
+  /// 트리거와의 거리입니다(React `sideOffset`, 기본 8).
+  final double sideOffset;
+
+  /// 맞춤 축의 이동입니다(React `alignOffset`).
+  final double alignOffset;
+
+  /// 메뉴 내용입니다(React `children`).
+  final List<Widget> children;
+
+  /// 트리거 쪽 맞춤점입니다.
+  Alignment get _targetAnchor => switch (side) {
+    AxisDirection.down => Alignment(align.x, 1),
+    AxisDirection.up => Alignment(align.x, -1),
+    AxisDirection.right => Alignment(1, align.y),
+    AxisDirection.left => Alignment(-1, align.y),
+  };
+
+  /// 팝업 쪽 맞춤점입니다.
+  Alignment get _followerAnchor => switch (side) {
+    AxisDirection.down => Alignment(align.x, -1),
+    AxisDirection.up => Alignment(align.x, 1),
+    AxisDirection.right => Alignment(-1, align.y),
+    AxisDirection.left => Alignment(1, align.y),
+  };
+
+  /// 맞춤점 사이의 이동입니다.
+  Offset get _offset => switch (side) {
+    AxisDirection.up => Offset(alignOffset, -sideOffset),
+    AxisDirection.right => Offset(sideOffset, alignOffset),
+    AxisDirection.left => Offset(-sideOffset, alignOffset),
+    AxisDirection.down => Offset(alignOffset, sideOffset),
+  };
+
+  double get _fixedWidth => switch (surface) {
+    HoronMenuSurface.glass => _glassWidth,
+    HoronMenuSurface.solid => _solidWidth,
+    HoronMenuSurface.paper => _paperWidth,
+  };
+
+  /// 오버레이 상자 안에서 팝업을 어디에 둘지입니다.
+  ///
+  /// 오버레이 자식은 화면 크기의 tight 제약을 받으므로 팝업 상자는 그보다 작아질 수
+  /// 없습니다. 그래서 `Align`이 트리거 기준 가장자리에 팝업을 붙입니다.
+  Alignment get _childAlignment => switch (side) {
+    AxisDirection.down => Alignment(align.x, -1),
+    AxisDirection.up => Alignment(align.x, 1),
+    AxisDirection.right => Alignment(-1, align.y),
+    AxisDirection.left => Alignment(1, align.y),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final BorderRadius radius = BorderRadius.circular(switch (surface) {
+      HoronMenuSurface.glass => theme.radius.xl, // rounded-xl = 20
+      HoronMenuSurface.solid => _solidRadius, // rounded-[18px]
+      HoronMenuSurface.paper => theme.radius.lg, // rounded-[14px] = radius.lg
+    });
+
+    // 팝업은 트리거에 매달린 떠 있는 요소라 크기 기준이 자기 상자가 아니라 화면입니다
+    // (Base UI 포지셔너도 `window.innerWidth`로 충돌을 피합니다). 화면 가장자리에는
+    // 좌우 각각 `space.s4`만큼 여백을 남기고, React의 고정 폭은 상한으로만 씁니다.
+    final double width = math.min(_fixedWidth, math.max(0, MediaQuery.sizeOf(context).width - theme.space.s4 * 2));
+    return Align(
+      alignment: _childAlignment,
+      child: SizedBox(width: width, child: _chrome(theme, colors, radius)),
+    );
+  }
+
+  Widget _chrome(HoronThemeData theme, HoronColors colors, BorderRadius radius) {
+    final BoxDecoration decoration = switch (surface) {
+      // `rounded-xl bg-glass-thick` — 채움은 유리 레이어가 그립니다.
+      HoronMenuSurface.glass => BoxDecoration(borderRadius: radius),
+      // `rounded-[18px] bg-glass-fill-solid shadow-popover`.
+      HoronMenuSurface.solid => BoxDecoration(
+        borderRadius: radius,
+        color: colors.glassFillSolid,
+        boxShadow: theme.shadows.popover,
+      ),
+      // `rounded-[14px] border border-border-default bg-bg-default shadow-[0_12px_32px_#0A142424]`.
+      HoronMenuSurface.paper => BoxDecoration(
+        borderRadius: radius,
+        color: colors.bgDefault,
+        border: Border.all(color: colors.borderDefault),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: colors.bgScrim.withValues(alpha: _paperShadowAlpha),
+            offset: const Offset(0, _paperShadowOffset),
+            blurRadius: _paperShadowBlur,
+          ),
+        ],
+      ),
+    };
+
+    return DecoratedBox(
+      decoration: decoration,
+      child: ClipRRect(
+        borderRadius: radius,
+        child: Stack(
+          children: <Widget>[
+            // Paper는 유리 레이어를 그리지 않습니다(`surface === "paper" ? null`).
+            if (surface != HoronMenuSurface.paper)
+              Positioned.fill(
+                child: HoronLiquidGlass(
+                  tier: HoronGlassTier.thick,
+                  borderRadius: radius,
+                  child: const SizedBox.expand(),
+                ),
+              ),
+            // `flex flex-col gap-0.5 p-1.5`.
+            Padding(
+              padding: EdgeInsets.all(theme.space.s1_5),
+              child: _MenuSurfaceScope(
+                surface: surface,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  spacing: theme.space.s0_5,
+                  children: children,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-/// 메뉴 안의 항목 하나입니다.
-///
-/// `menu.tsx`의 `MenuItem`입니다. `text-xs`·`px-2.5`·`py-[7px]`·`gap-2`·
-/// `rounded-[5px]`에, 마우스를 올리거나 키보드로 포커스를 받으면
-/// `bg-foreground/5`를 칠합니다. 비활성이면 `opacity-50`에 눌러도 반응하지
-/// 않습니다.
+/// 메뉴 항목입니다. React `MenuItem`입니다.
 class HoronMenuItem extends StatefulWidget {
   /// 항목을 만듭니다.
   const HoronMenuItem({
     super.key,
-    this.label,
-    this.child,
+    required this.label,
     this.icon,
+    this.description,
     this.trailing,
-    this.onSelected,
+    this.danger = false,
+    this.selected = false,
+    this.background,
     this.enabled = true,
-    this.semanticLabel,
-  }) : assert(label != null || child != null, 'HoronMenuItem needs a label or a child.');
+    this.onTap,
+  });
 
-  /// 항목 글자입니다.
-  final String? label;
+  /// 항목의 문구입니다(React `children`).
+  final String label;
 
-  /// 글자 대신 넣는 내용입니다.
-  final Widget? child;
-
-  /// 글자 앞 아이콘 슬롯입니다. React의 `[&_svg]:size-4` 자리입니다.
+  /// 앞쪽 아이콘(18px)이나 28px 워크스페이스 타일입니다(React `icon`).
   final Widget? icon;
 
-  /// 글자 뒤 오른쪽 끝에 붙는 내용입니다. 보통 [HoronMenuShortcut]입니다.
+  /// 라벨 아래 설명입니다(React `description`). 있으면 줄 높이가 46px이 됩니다.
+  final String? description;
+
+  /// 오른쪽 단축키나 체크 표시입니다(React `trailing`).
   final Widget? trailing;
 
-  /// 항목을 골랐을 때 부릅니다. `null`이면 눌러도 아무 일도 없습니다.
-  final VoidCallback? onSelected;
+  /// 참이면 라벨과 아이콘이 `textDanger`가 됩니다(React `danger`).
+  final bool danger;
 
-  /// 고를 수 있는 상태인지입니다. React의 `data-disabled`에 대응합니다.
+  /// 현재 선택을 브랜드 바탕으로 그립니다(React `selected`).
+  final bool selected;
+
+  /// 이 항목의 바탕색입니다.
+  ///
+  /// React는 `className`으로 임의의 바탕을 칠합니다. 워크스페이스 메뉴의 현재 행처럼
+  /// 강조색을 직접 지정해야 하는 자리를 위해 열어 둡니다. 강조(hover)는 이 값보다
+  /// 우선합니다.
+  final Color? background;
+
+  /// 거짓이면 `opacity-40`으로 흐려지고 눌리지 않습니다(React `disabled`).
   final bool enabled;
 
-  /// 스크린리더가 읽을 이름입니다.
-  final String? semanticLabel;
+  /// 항목을 골랐을 때 부를 콜백입니다(React `onClick`).
+  final VoidCallback? onTap;
 
   @override
   State<HoronMenuItem> createState() => _HoronMenuItemState();
@@ -158,193 +394,187 @@ class HoronMenuItem extends StatefulWidget {
 
 class _HoronMenuItemState extends State<HoronMenuItem> {
   bool _hovered = false;
-  bool _focused = false;
+
+  void _handleTap() {
+    if (!widget.enabled) return;
+    widget.onTap?.call();
+    _MenuDismissScope.maybeOf(context)?.call();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final bool enabled = widget.enabled;
-    final bool highlighted = enabled && (_hovered || _focused);
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final HoronSpaceSpec space = theme.space;
+    final HoronMenuSurface surface = _MenuSurfaceScope.of(context);
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final bool hasDescription = widget.description != null;
 
-    final TextStyle textStyle = TextStyle(
-      fontFamily: HoronFont.body,
-      fontFamilyFallback: HoronFont.fontFamilyFallback,
-      fontSize: _itemFontSize,
-      height: _itemLineHeight,
-      color: scheme.onSurface,
-      decoration: TextDecoration.none,
-    );
+    // 유리는 `rounded-md px-3`, 단색·Paper는 `rounded-[10px] px-2.5`.
+    final bool glass = surface == HoronMenuSurface.glass;
+    final BorderRadius radius = BorderRadius.circular(glass ? theme.radius.md : _itemRadius);
+    final double horizontal = glass ? space.s3 : space.s2_5;
+    final EdgeInsets padding = hasDescription
+        ? EdgeInsets.only(left: space.s2, right: horizontal) // `pl-2`
+        : EdgeInsets.symmetric(horizontal: horizontal);
+    // `description ? h-11.5 : glass ? h-10 : h-9`.
+    final double height = space.step(hasDescription ? 11.5 : (glass ? 10 : 9));
 
-    final Widget body = Container(
-      padding: const EdgeInsets.symmetric(horizontal: _itemPaddingHorizontal, vertical: _itemPaddingVertical),
-      decoration: BoxDecoration(
-        color: highlighted ? scheme.onSurface.withValues(alpha: _hoverAlpha) : Colors.transparent,
-        borderRadius: BorderRadius.circular(_itemRadius),
-      ),
-      child: Row(
-        children: <Widget>[
-          if (widget.icon != null) ...<Widget>[
-            IconTheme.merge(
-              data: IconThemeData(size: _iconSize, color: scheme.onSurfaceVariant),
-              child: widget.icon!,
-            ),
-            const SizedBox(width: _itemGap),
-          ],
-          Expanded(
-            child: DefaultTextStyle(
-              style: textStyle,
-              child: widget.label != null
-                  ? Text(widget.label!, maxLines: 1, overflow: TextOverflow.ellipsis, softWrap: false, style: textStyle)
-                  : widget.child!,
-            ),
-          ),
-          if (widget.trailing != null) ...<Widget>[const SizedBox(width: _itemGap), widget.trailing!],
-        ],
-      ),
-    );
+    final Color base = widget.background ?? (widget.selected ? colors.bgBrand : Colors.transparent);
+    // `data-highlighted:bg-overlay-ink-6`, 선택 행은 강조에서도 브랜드를 유지합니다.
+    final Color fill = _hovered ? (widget.selected ? colors.bgBrand : colors.overlayInk6) : base;
 
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: widget.semanticLabel ?? widget.label,
+    final Color labelColor = widget.danger ? colors.textDanger : colors.textPrimary;
+
+    return Opacity(
+      opacity: widget.enabled ? 1 : _disabledOpacity,
       child: MouseRegion(
-        cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        cursor: widget.enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
-        child: FocusableActionDetector(
-          enabled: enabled,
-          onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-          actions: <Type, Action<Intent>>{
-            ActivateIntent: CallbackAction<ActivateIntent>(
-              onInvoke: (ActivateIntent intent) {
-                if (enabled) widget.onSelected?.call();
-                return null;
-              },
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.enabled ? _handleTap : null,
+          child: AnimatedContainer(
+            duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+            curve: HoronMotion.colorsCurve,
+            height: height,
+            padding: padding,
+            decoration: BoxDecoration(color: fill, borderRadius: radius),
+            child: Row(
+              spacing: space.s2_5,
+              children: <Widget>[
+                ?_icon(theme, surface),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        widget.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.text.labelMd.copyWith(color: labelColor),
+                      ),
+                      if (widget.description != null)
+                        Text(
+                          widget.description!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.text.caption.copyWith(color: colors.textSecondary),
+                        ),
+                    ],
+                  ),
+                ),
+                ?_trailing(theme),
+              ],
             ),
-          },
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: enabled ? widget.onSelected : null,
-            child: Opacity(opacity: enabled ? 1 : _disabledOpacity, child: body),
           ),
         ),
       ),
     );
   }
-}
 
-/// 메뉴 안의 그룹 라벨입니다.
-///
-/// `menu.tsx`의 `MenuLabel`입니다. `px-2.5 py-1 text-[11px]`에
-/// `text-muted-foreground`를 씁니다.
-class HoronMenuLabel extends StatelessWidget {
-  /// 라벨을 만듭니다.
-  const HoronMenuLabel({super.key, required this.label});
+  Widget? _icon(HoronThemeData theme, HoronMenuSurface surface) {
+    final Widget? icon = widget.icon;
+    if (icon == null) return null;
+    final Color color = widget.danger
+        ? theme.colors.textDanger
+        : (surface == HoronMenuSurface.glass ? theme.colors.textSecondary : theme.colors.textPrimary);
+    return IconTheme.merge(
+      data: IconThemeData(size: _menuIconSize, color: color),
+      child: icon,
+    );
+  }
 
-  /// 라벨 글자입니다. 호스트가 넘깁니다.
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: _itemPaddingHorizontal, vertical: _labelPaddingVertical),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontFamily: HoronFont.body,
-          fontFamilyFallback: HoronFont.fontFamilyFallback,
-          fontSize: _labelFontSize,
-          height: HoronLineHeight.normal,
-          color: scheme.onSurfaceVariant,
-          decoration: TextDecoration.none,
-        ),
+  Widget? _trailing(HoronThemeData theme) {
+    final Widget? trailing = widget.trailing;
+    if (trailing == null) return null;
+    return IconTheme.merge(
+      data: IconThemeData(size: _trailingIconSize, color: theme.colors.textPrimary),
+      child: DefaultTextStyle.merge(
+        style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+        child: trailing,
       ),
     );
   }
 }
 
-/// 메뉴 안의 구분선입니다.
-///
-/// `menu.tsx`의 `MenuSeparator`입니다. `my-1 h-px bg-border`를 그대로 옮겨,
-/// 위아래 4를 띄우고 1px 선을 긋습니다.
+/// 메뉴 구분선입니다. React `MenuSeparator`입니다.
 class HoronMenuSeparator extends StatelessWidget {
   /// 구분선을 만듭니다.
   const HoronMenuSeparator({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronMenuSurface surface = _MenuSurfaceScope.of(context);
+    // `py-1`, 유리는 `px-1.5`, 나머지는 `px-2.5`.
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: _separatorMargin),
+      padding: EdgeInsets.symmetric(
+        vertical: theme.space.s1,
+        horizontal: surface == HoronMenuSurface.glass ? theme.space.s1_5 : theme.space.s2_5,
+      ),
       child: SizedBox(
-        height: _separatorThickness,
-        child: ColoredBox(color: scheme.outline),
+        height: _hairline,
+        width: double.infinity,
+        child: ColoredBox(color: theme.colors.overlayInk8),
       ),
     );
   }
 }
 
-/// 항목 오른쪽 끝의 단축키 힌트입니다.
-///
-/// 계획이 `menu`의 부품으로 이름을 지정한 위젯입니다. React의 `menu.tsx`에는 이
-/// 부품이 없고, 같은 자리를 호스트가 `kbd`로 채웁니다. 그래서 여기서는 `kbd`와
-/// 같은 고정폭 11px·`text-muted-foreground`로 그려, 웹에서 키캡을 넣은 메뉴와 같은
-/// 인상을 냅니다. [HoronMenuItem.trailing]에 넣어 씁니다.
-class HoronMenuShortcut extends StatelessWidget {
-  /// 단축키 힌트를 만듭니다.
-  const HoronMenuShortcut({super.key, required this.label});
+/// 메뉴 묶음 제목입니다. React `MenuLabel`입니다.
+class HoronMenuLabel extends StatelessWidget {
+  /// 제목을 만듭니다.
+  const HoronMenuLabel({super.key, required this.label});
 
-  /// 키 조합 글자입니다. 예: `⌘K`.
+  /// 제목 문구입니다(React `children`).
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Text(
-      label,
-      maxLines: 1,
-      softWrap: false,
-      style: TextStyle(
-        fontFamily: HoronFont.mono,
-        fontFamilyFallback: HoronFont.fontFamilyFallback,
-        fontSize: _labelFontSize,
-        height: HoronLineHeight.none,
-        color: scheme.onSurfaceVariant,
-        decoration: TextDecoration.none,
+    final HoronThemeData theme = HoronTheme.of(context);
+    // `px-2.5 pt-2 pb-1 text-caption text-text-secondary`.
+    return Padding(
+      padding: EdgeInsets.only(
+        left: theme.space.s2_5,
+        right: theme.space.s2_5,
+        top: theme.space.s2,
+        bottom: theme.space.s1,
+      ),
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
       ),
     );
   }
 }
 
-/// 메뉴 항목을 묶는 그룹입니다.
-///
-/// 계획이 `menu`의 부품으로 이름을 지정한 위젯입니다. React의 `menu.tsx`는 항목을
-/// 그룹으로 묶지 않고 호스트가 라벨과 구분선을 직접 늘어놓습니다. 이 위젯은 그
-/// 반복을 줄이려고 [label]과 항목들을 한 덩어리로 묶습니다. 그룹 안쪽 간격은
-/// 패널의 `gap-px`와 같은 1px입니다.
-class HoronMenuGroup extends StatelessWidget {
-  /// 그룹을 만듭니다.
-  const HoronMenuGroup({super.key, required this.children, this.label});
+/// 워크스페이스 이니셜을 담는 28px 타일입니다. React `MenuTile`입니다.
+class HoronMenuTile extends StatelessWidget {
+  /// 타일을 만듭니다.
+  const HoronMenuTile({super.key, required this.label});
 
-  /// 그룹에 넣을 항목입니다.
-  final List<Widget> children;
-
-  /// 그룹 위에 붙는 라벨입니다. 없으면 항목만 쌓습니다.
-  final String? label;
+  /// 타일에 그릴 이니셜입니다(React `children`).
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        if (label != null) HoronMenuLabel(label: label!),
-        for (int index = 0; index < children.length; index++) ...<Widget>[
-          if (index > 0) const SizedBox(height: _menuGap),
-          children[index],
-        ],
-      ],
+    final HoronThemeData theme = HoronTheme.of(context);
+    final double size = theme.space.step(7);
+    return Container(
+      // `size-7 rounded-sm bg-interactive-primary text-label-md text-text-inverse`.
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: theme.colors.interactivePrimary,
+        borderRadius: BorderRadius.circular(theme.radius.sm),
+      ),
+      child: Text(label, maxLines: 1, style: theme.text.labelMd.copyWith(color: theme.colors.textInverse)),
     );
   }
 }

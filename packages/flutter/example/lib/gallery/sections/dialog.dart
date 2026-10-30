@@ -1,82 +1,135 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
-// 배럴은 통합 스크립트가 채웁니다. 그 전에는 하위 경로로 가져옵니다.
 
-import '../section_scaffold.dart';
+/// 미리보기 상자의 최대 폭입니다. 좁은 화면에서는 남는 폭에 맞춰 줄입니다.
+const double _previewMaxWidth = 380;
 
-/// `dialog` 갤러리 섹션입니다.
+/// Dialog 갤러리 섹션입니다.
+///
+/// 유리 다이얼로그와 Paper의 불투명 모달을 나란히 놓고, 실제로 열리는 다이얼로그
+/// 하나를 둡니다.
 class HoronDialogGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronDialogGallerySection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GallerySectionScaffold(
-      title: 'Dialog',
-      variants: <Widget>[
-        HoronDialog(
-          trigger: const _Trigger(label: '열기'),
-          title: '변경 사항을 저장할까요?',
-          description: '저장하지 않고 닫으면 편집한 내용이 사라집니다.',
-          footer: HoronDialogFooter(
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Padding(
+      padding: EdgeInsets.all(theme.space.s4),
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final double width = constraints.maxWidth < _previewMaxWidth
+              ? constraints.maxWidth
+              : _previewMaxWidth;
+          return Wrap(
+            spacing: theme.space.s4,
+            runSpacing: theme.space.s4,
+            crossAxisAlignment: WrapCrossAlignment.start,
             children: <Widget>[
-              HoronDialogClose(label: '나중에'),
-              HoronButton(label: '저장', onPressed: () {}),
+              _Sample(
+                label: 'glass',
+                child: SizedBox(
+                  width: width,
+                  child: HoronDialog(
+                    title: const Text('워크스페이스 삭제'),
+                    description: const Text(
+                      '이 작업은 되돌릴 수 없습니다. 멤버와 봇이 모두 접근을 잃습니다.',
+                    ),
+                    onClose: () {},
+                    child: HoronDialogFooter(
+                      children: <Widget>[
+                        HoronButton(label: '취소', onPressed: () {}),
+                        HoronButton(
+                          label: '삭제',
+                          variant: HoronButtonVariant.danger,
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              _Sample(
+                label: 'solid · leading',
+                child: SizedBox(
+                  width: width,
+                  child: HoronDialog(
+                    title: const Text('봇 설정'),
+                    description: const Text('이 봇의 이름과 설명을 바꿉니다.'),
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: theme.colors.bgSubtle,
+                        borderRadius: BorderRadius.circular(theme.radius.md),
+                      ),
+                      child: Icon(
+                        Icons.smart_toy_outlined,
+                        color: theme.colors.textSecondary,
+                      ),
+                    ),
+                    solid: true,
+                    onClose: () {},
+                    child: HoronDialogFooter(
+                      children: <Widget>[
+                        HoronButton(label: '취소', onPressed: () {}),
+                        HoronButton(label: '저장', onPressed: () {}),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              _Sample(
+                label: 'live · 스크림 위에 가운데로 뜹니다',
+                child: HoronButton(
+                  label: '다이얼로그 열기',
+                  onPressed: () => showHoronDialog(
+                    context,
+                    title: const Text('워크스페이스 삭제'),
+                    description: const Text('이 작업은 되돌릴 수 없습니다.'),
+                    child: HoronDialogFooter(
+                      children: <Widget>[
+                        HoronButton(label: '취소', onPressed: () {}),
+                        HoronButton(
+                          label: '삭제',
+                          variant: HoronButtonVariant.danger,
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
-          ),
-        ),
-        HoronAlertDialog(
-          trigger: const _Trigger(label: '삭제'),
-          title: '정말 삭제할까요?',
-          description: '이 작업은 되돌릴 수 없습니다.',
-          cancelLabel: '취소',
-          confirmLabel: '삭제',
-          destructive: true,
-          onConfirm: () {},
-        ),
-      ],
-      states: <Widget>[
-        HoronDialog(
-          trigger: const _Trigger(label: '닫기 버튼 없음'),
-          title: '닫기 버튼이 없는 대화상자',
-          showCloseButton: false,
-        ),
-        HoronAlertDialog(
-          trigger: const _Trigger(label: '일반 확인'),
-          title: '계속할까요?',
-          cancelLabel: '취소',
-          confirmLabel: '계속',
-        ),
-      ],
-      notes:
-          'React `dialog.tsx`와 `alert-dialog.tsx`를 옮긴 것입니다. 배경은 토큰 '
-          '스크림이고, Material의 showDialog나 showModalBottomSheet은 쓰지 않습니다.',
+          );
+        },
+      ),
     );
   }
 }
 
-class _Trigger extends StatelessWidget {
-  const _Trigger({required this.label});
+/// 캡션과 위젯 하나입니다.
+class _Sample extends StatelessWidget {
+  const _Sample({required this.label, required this.child});
 
   final String label;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final TextTheme text = Theme.of(context).textTheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: HoronSpace.s3,
-        vertical: HoronSpace.s2,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(HoronRadiusRole.control),
-        border: Border.all(color: scheme.outline),
-      ),
-      child: Text(
-        label,
-        style: text.bodyMedium?.copyWith(color: scheme.onSurface),
-      ),
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: theme.space.s1,
+      children: <Widget>[
+        Text(
+          label,
+          style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+        ),
+        child,
+      ],
     );
   }
 }

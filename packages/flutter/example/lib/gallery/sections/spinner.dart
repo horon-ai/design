@@ -1,46 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
-import '../section_scaffold.dart';
-
-/// `spinner` 갤러리 섹션입니다.
+/// `spinner`의 갤러리 섹션입니다.
+///
+/// 네 이름 붙은 크기와 픽셀 크기 하나를 나란히 보여 줍니다.
 class HoronSpinnerGallerySection extends StatelessWidget {
-  /// 기본 생성자입니다.
+  /// 섹션을 만듭니다.
   const HoronSpinnerGallerySection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    return GallerySectionScaffold(
-      title: 'Spinner',
-      variants: <Widget>[
-        const HoronSpinner(),
-        const HoronSpinner(size: 24),
-        const HoronSpinner(size: 32),
-        HoronSpinner(color: scheme.onSurfaceVariant),
-        HoronSpinner(color: scheme.primary),
-      ],
-      states: <Widget>[
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const HoronSpinner(),
-            const SizedBox(width: 8),
-            Text('불러오는 중', style: TextStyle(color: scheme.onSurface)),
-          ],
-        ),
-        const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            HoronSpinner(semanticsLabel: '불러오는 중'),
-            SizedBox(width: 8),
-            Text('접근성 이름 있음'),
-          ],
-        ),
-      ],
-      notes:
-          'React `spinner.tsx`의 18px·2px 링입니다. 위쪽 4분의 1만 투명하고 1초에 한 바퀴 '
-          '돕니다. `disableAnimations`에서는 회전을 멈춥니다.',
+    final HoronThemeData theme = HoronTheme.of(context);
+    const List<(HoronSpinnerSize, String)> cases = <(HoronSpinnerSize, String)>[
+      (HoronSpinnerSize.xs, 'xs · 14'),
+      (HoronSpinnerSize.sm, 'sm · 16'),
+      (HoronSpinnerSize.md, 'md · 24'),
+      (HoronSpinnerSize.lg, 'lg · 32'),
+    ];
+
+    return Padding(
+      padding: EdgeInsets.all(theme.space.s4),
+      child: Wrap(
+        spacing: theme.space.s6,
+        runSpacing: theme.space.s4,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: <Widget>[
+          for (final (HoronSpinnerSize size, String label) in cases)
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                HoronSpinner(size: size),
+                SizedBox(height: theme.space.s1),
+                Text(
+                  label,
+                  style: theme.text.caption.copyWith(
+                    color: theme.colors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const HoronSpinner(pixelSize: 15),
+              SizedBox(height: theme.space.s1),
+              Text(
+                '픽셀 15',
+                style: theme.text.caption.copyWith(
+                  color: theme.colors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

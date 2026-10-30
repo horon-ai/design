@@ -1,306 +1,282 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
-/// `calendar`의 그리드 배치·선택 강조·월 이동을 확인합니다.
-///
-/// 칸은 [ValueKey]로 찾습니다. React의 `data-day` 속성과 같은 자리이고, 글자로 찾으면
-/// 이웃 달의 같은 숫자(예: 10월 1일과 11월 1일)가 섞입니다.
+/// 달력을 테마가 적용된 화면 가운데에 놓습니다. [width]를 주면 그 폭만큼만 자리를 냅니다.
+Widget _host(Widget child, {Brightness brightness = Brightness.light, double? width}) {
+  final Widget sized = width == null ? child : SizedBox(width: width, child: child);
+  return MaterialApp(
+    theme: horonTheme(brightness),
+    home: Scaffold(body: Center(child: sized)),
+  );
+}
+
+HoronThemeData _theme(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronCalendar)));
+
+Key _dayKey(int year, int month, int day) => ValueKey<String>('horon-calendar-day-$year-$month-$day');
+
+Finder _surface() => find.byKey(const Key('horon-calendar-surface'));
+
+BoxDecoration _surfaceDecoration(WidgetTester tester) =>
+    tester.widget<DecoratedBox>(_surface()).decoration as BoxDecoration;
+
+Finder _dayOf(int year, int month, int day) => find.byKey(_dayKey(year, month, day));
+
+BoxDecoration _dayDecoration(WidgetTester tester, int year, int month, int day) {
+  final Finder cell = _dayOf(year, month, day);
+  return tester
+          .widget<AnimatedContainer>(find.descendant(of: cell, matching: find.byType(AnimatedContainer)))
+          .decoration!
+      as BoxDecoration;
+}
+
+TextStyle _dayStyle(WidgetTester tester, int year, int month, int day) =>
+    tester.widget<Text>(find.descendant(of: _dayOf(year, month, day), matching: find.text('$day'))).style!;
+
+final DateTime _month = DateTime(2026, 10);
+final DateTime _today = DateTime(2026, 10, 19);
+
 void main() {
-  Future<void> pumpCalendar(WidgetTester tester, Widget child, {Brightness brightness = Brightness.light}) {
-    return tester.pumpWidget(
-      MaterialApp(
-        theme: horonTheme(brightness),
-        home: Scaffold(
-          body: Center(child: SingleChildScrollView(child: child)),
+  testWidgets('default state renders in light and dark', (WidgetTester tester) async {
+    for (final Brightness brightness in Brightness.values) {
+      await tester.pumpWidget(
+        _host(
+          HoronCalendar(defaultMonth: _month, today: _today),
+          brightness: brightness,
+        ),
+      );
+      expect(tester.takeException(), isNull, reason: '$brightness에서 예외가 없어야 합니다');
+      expect(find.byKey(const Key('horon-calendar-title')), findsOneWidget);
+    }
+  });
+
+  testWidgets('the default calendar is a thick-glass plate with the 20 radius and 16 padding', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today)));
+    final HoronThemeData theme = _theme(tester);
+    final BoxDecoration decoration = _surfaceDecoration(tester);
+
+    expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.radius.xl, reason: 'rounded-xl');
+    expect(decoration.border!.top.color, theme.colors.glassRimStrong, reason: 'border-glass-rim-strong');
+    expect(
+      tester.widget<Padding>(find.descendant(of: _surface(), matching: find.byType(Padding)).first).padding,
+      EdgeInsets.all(theme.space.s4),
+      reason: 'p-4',
+    );
+    // `size-10` — 날짜 칸은 40px 정사각형입니다.
+    expect(tester.getSize(_dayOf(2026, 10, 5)), Size(theme.space.step(10), theme.space.step(10)));
+    // `h-6 w-10` — 요일 줄.
+    expect(tester.getSize(find.byType(Center).at(0)), isNotNull, reason: '요일 줄이 그려져야 합니다');
+    // `text-title-sm text-text-primary` — 기본 변형의 월 제목.
+    final Text title = tester.widget<Text>(find.byKey(const Key('horon-calendar-title')));
+    expect(title.style!.fontSize, theme.text.titleSm.fontSize);
+    expect(title.style!.color, theme.colors.textPrimary);
+    expect(title.data, 'October 2026');
+  });
+
+  testWidgets('the popover variant swaps the 24 radius, the label-lg title and 32px arrows', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today, popover: true)));
+    final HoronThemeData theme = _theme(tester);
+
+    expect((_surfaceDecoration(tester).borderRadius! as BorderRadius).topLeft.x, 24, reason: 'rounded-[24px]');
+    expect(
+      tester.widget<Padding>(find.descendant(of: _surface(), matching: find.byType(Padding)).first).padding,
+      EdgeInsets.all(theme.space.s3_5),
+      reason: 'p-3.5',
+    );
+    final Text title = tester.widget<Text>(find.byKey(const Key('horon-calendar-title')));
+    expect(title.style!.fontSize, theme.text.labelLg.fontSize, reason: 'text-label-lg');
+    expect(title.style!.color, theme.colors.textPrimary);
+    // `size-8` 화살표 버튼과 18px 아이콘.
+    expect(
+      tester.getSize(find.byKey(const Key('horon-calendar-next'))),
+      Size(theme.space.step(8), theme.space.step(8)),
+    );
+    expect(
+      tester
+          .widget<Icon>(find.descendant(of: find.byKey(const Key('horon-calendar-next')), matching: find.byType(Icon)))
+          .size,
+      theme.space.step(4.5),
+      reason: 'size-4.5',
+    );
+  });
+
+  testWidgets('both variants render, so a shape cannot be added without a decision', (WidgetTester tester) async {
+    for (final bool popover in <bool>[false, true]) {
+      await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today, popover: popover)));
+      expect(tester.takeException(), isNull);
+      expect(_dayOf(2026, 10, 15), findsOneWidget);
+    }
+  });
+
+  testWidgets('tapping a day reports it and paints the selected pill', (WidgetTester tester) async {
+    final List<DateTime> changes = <DateTime>[];
+    await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today, onValueChange: changes.add)));
+
+    await tester.tap(_dayOf(2026, 10, 14));
+    await tester.pumpAndSettle();
+    expect(changes, <DateTime>[DateTime(2026, 10, 14)]);
+
+    await tester.pumpWidget(
+      _host(
+        HoronCalendar(defaultMonth: _month, today: _today, value: DateTime(2026, 10, 14), onValueChange: changes.add),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final HoronThemeData theme = _theme(tester);
+    expect(
+      _dayDecoration(tester, 2026, 10, 14).color,
+      theme.colors.interactivePrimary,
+      reason: 'rounded-full bg-interactive-primary',
+    );
+    expect(
+      _dayStyle(tester, 2026, 10, 14).color,
+      theme.colors.interactiveOnPrimary,
+      reason: 'text-interactive-on-primary',
+    );
+    expect(_dayStyle(tester, 2026, 10, 14).fontSize, theme.text.labelLg.fontSize, reason: 'text-label-lg');
+  });
+
+  testWidgets('range mode fills the days between the two ends', (WidgetTester tester) async {
+    final List<HoronDateRange> changes = <HoronDateRange>[];
+    await tester.pumpWidget(
+      _host(
+        HoronCalendar(
+          defaultMonth: _month,
+          today: _today,
+          range: HoronDateRange(start: DateTime(2026, 10, 12)),
+          onRangeChange: changes.add,
         ),
       ),
     );
-  }
 
-  /// 달력 안에서 `calendar-`로 시작하는 키를 트리 순서대로 모읍니다.
-  ///
-  /// 트리 순서는 화면 순서와 같으므로, 이 목록에서 날짜 칸의 위치가 곧 그리드에서의
-  /// 위치입니다.
-  List<String> calendarKeys(WidgetTester tester) {
-    return tester
-        .widgetList<Widget>(
-          find.descendant(
-            of: find.byType(HoronCalendar),
-            matching: find.byWidgetPredicate(
-              (Widget widget) =>
-                  widget.key is ValueKey<String> && (widget.key! as ValueKey<String>).value.startsWith('calendar-'),
-            ),
-          ),
-        )
-        .map((Widget widget) => (widget.key! as ValueKey<String>).value)
-        .toList();
-  }
+    await tester.tap(_dayOf(2026, 10, 16));
+    await tester.pumpAndSettle();
+    expect(changes.single.start, DateTime(2026, 10, 12));
+    expect(changes.single.end, DateTime(2026, 10, 16));
 
-  /// 이번 달 날짜 칸의 키에서 일(day) 번호만 뽑습니다.
-  List<int> dayNumbers(WidgetTester tester) {
-    return <int>[
-      for (final String key in calendarKeys(tester))
-        if (key.startsWith('calendar-day-')) int.parse(key.split('-').last),
-    ];
-  }
-
-  /// 앞·뒤 빈 칸(이웃 달 포함)의 수입니다.
-  ({int leading, int trailing}) blankCounts(WidgetTester tester) {
-    final List<String> keys = calendarKeys(tester);
-    final int first = keys.indexWhere((String key) => key.startsWith('calendar-day-'));
-    final int last = keys.lastIndexWhere((String key) => key.startsWith('calendar-day-'));
-    return (leading: first, trailing: keys.length - 1 - last);
-  }
-
-  /// 하루 칸이 그린 배경색입니다.
-  Color dayBackground(WidgetTester tester, String key) {
-    final DecoratedBox box = tester.widget<DecoratedBox>(
-      find.descendant(of: find.byKey(ValueKey<String>(key)), matching: find.byType(DecoratedBox)).first,
+    await tester.pumpWidget(
+      _host(HoronCalendar(defaultMonth: _month, today: _today, range: changes.single, onRangeChange: changes.add)),
     );
-    return (box.decoration as BoxDecoration).color ?? const Color(0x00000000);
-  }
+    await tester.pumpAndSettle();
+    final HoronThemeData theme = _theme(tester);
+    expect(_dayDecoration(tester, 2026, 10, 14).color, theme.colors.overlayInk8, reason: 'bg-overlay-ink-8');
+    expect(_dayDecoration(tester, 2026, 10, 14).borderRadius, BorderRadius.zero, reason: '범위 안의 날은 둥글지 않은 띠입니다');
+    expect(_dayDecoration(tester, 2026, 10, 12).color, theme.colors.interactivePrimary);
+    expect(_dayDecoration(tester, 2026, 10, 16).color, theme.colors.interactivePrimary);
 
-  /// 하루 칸의 모서리입니다.
-  BorderRadius dayRadius(WidgetTester tester, String key) {
-    final DecoratedBox box = tester.widget<DecoratedBox>(
-      find.descendant(of: find.byKey(ValueKey<String>(key)), matching: find.byType(DecoratedBox)).first,
-    );
-    return (box.decoration as BoxDecoration).borderRadius! as BorderRadius;
-  }
-
-  group('그리드 배치', () {
-    test('2026년 10월은 1일부터 31일까지, 앞 3칸·뒤 1칸을 그린다', () {
-      // 2026-10-01은 목요일입니다. 월요일 시작이면 앞에 월·화·수 3칸이 비고,
-      // 31일 뒤에 11월 1일(일요일) 한 칸이 남습니다. 3 + 31 + 1 = 35 = 5주.
-      final HoronCalendarGrid grid = HoronCalendarGrid.of(DateTime(2026, 10));
-
-      expect(grid.month, DateTime(2026, 10));
-      expect(grid.daysInMonth, 31);
-      expect(grid.leadingBlanks, 3);
-      expect(grid.trailingBlanks, 1);
-      expect(grid.weekCount, 5);
-      expect(grid.cellCount, 35);
-
-      // 칸이 가리키는 날짜도 확인합니다. 첫 칸은 9월 28일, 마지막 칸은 11월 1일입니다.
-      expect(grid.dateAt(0), DateTime(2026, 9, 28));
-      expect(grid.dateAt(3), DateTime(2026, 10, 1));
-      expect(grid.dateAt(33), DateTime(2026, 10, 31));
-      expect(grid.dateAt(34), DateTime(2026, 11, 1));
-    });
-
-    testWidgets('2026년 10월 그리드가 1..31을 그리고 앞·뒤 칸 수가 맞다', (WidgetTester tester) async {
-      await pumpCalendar(tester, HoronCalendar(initialMonth: DateTime(2026, 10), today: DateTime(2026, 10, 15)));
-
-      expect(dayNumbers(tester), <int>[for (int day = 1; day <= 31; day++) day]);
-      expect(blankCounts(tester), (leading: 3, trailing: 1));
-      expect(calendarKeys(tester).where((String key) => key.startsWith('calendar-outside-')).length, 4);
-      expect(find.text('October 2026'), findsOneWidget);
-    });
-
-    testWidgets('주 시작일을 일요일로 바꾸면 앞 칸 수가 달라진다', (WidgetTester tester) async {
-      await pumpCalendar(
-        tester,
-        HoronCalendar(initialMonth: DateTime(2026, 10), today: DateTime(2026, 10, 15), firstDayOfWeek: DateTime.sunday),
-      );
-
-      expect(dayNumbers(tester), <int>[for (int day = 1; day <= 31; day++) day]);
-      expect(blankCounts(tester), (leading: 4, trailing: 0));
-      // 요일 머리글도 일요일부터 시작합니다.
-      expect(find.text('Su'), findsOneWidget);
-    });
-
-    testWidgets('showOutsideDays가 거짓이면 이웃 달 칸이 빈 칸이 된다', (WidgetTester tester) async {
-      await pumpCalendar(
-        tester,
-        HoronCalendar(initialMonth: DateTime(2026, 10), today: DateTime(2026, 10, 15), showOutsideDays: false),
-      );
-
-      final List<String> keys = calendarKeys(tester);
-      expect(keys.where((String key) => key.startsWith('calendar-outside-')), isEmpty);
-      expect(keys.where((String key) => key.startsWith('calendar-blank-')).length, 4);
-      expect(dayNumbers(tester), <int>[for (int day = 1; day <= 31; day++) day]);
-    });
-
-    test('한 칸의 폭이 React의 --cell-size(32)이다', () {
-      // 생성 토큰의 8px 눈금 한 단계입니다.
-      expect(HoronSpace.s8, 32);
-    });
+    // 끝이 찬 범위에서 새 날을 누르면 범위를 다시 시작합니다.
+    await tester.tap(_dayOf(2026, 10, 20));
+    await tester.pumpAndSettle();
+    expect(changes.last.start, DateTime(2026, 10, 20));
+    expect(changes.last.end, isNull);
   });
 
-  group('실패 경로', () {
-    testWidgets('윤년 2월(2028)이 29일로 그려지고 그리드가 깨지지 않는다', (WidgetTester tester) async {
-      await pumpCalendar(tester, HoronCalendar(initialMonth: DateTime(2028, 2), today: DateTime(2028, 2, 10)));
-
-      expect(tester.takeException(), isNull);
-      expect(dayNumbers(tester), <int>[for (int day = 1; day <= 29; day++) day]);
-      // 2028-02-01은 화요일이라 월요일 시작이면 앞 1칸, 29일 뒤 5칸입니다.
-      expect(blankCounts(tester), (leading: 1, trailing: 5));
-      expect(HoronCalendarGrid.of(DateTime(2028, 2)).daysInMonth, 29);
-    });
-
-    testWidgets('31일이 없는 달(2026년 4월)이 30일로 그려진다', (WidgetTester tester) async {
-      await pumpCalendar(tester, HoronCalendar(initialMonth: DateTime(2026, 4), today: DateTime(2026, 4, 10)));
-
-      expect(tester.takeException(), isNull);
-      expect(dayNumbers(tester), <int>[for (int day = 1; day <= 30; day++) day]);
-      expect(HoronCalendarGrid.of(DateTime(2026, 4)).daysInMonth, 30);
-      expect(find.text('April 2026'), findsOneWidget);
-    });
-
-    testWidgets('12월에서 다음 달로 넘기면 다음 해 1월이 된다', (WidgetTester tester) async {
-      await pumpCalendar(tester, HoronCalendar(initialMonth: DateTime(2026, 12), today: DateTime(2026, 12, 10)));
-
-      await tester.tap(find.byKey(HoronCalendar.nextMonthKey));
-      await tester.pumpAndSettle();
-
-      expect(find.text('January 2027'), findsOneWidget);
-      expect(dayNumbers(tester).first, 1);
-    });
-
-    test('잘못된 주 시작일은 단언에서 멈춘다', () {
-      expect(() => HoronCalendarGrid.of(DateTime(2026, 10), firstDayOfWeek: 0), throwsAssertionError);
-      expect(() => HoronCalendarGrid.of(DateTime(2026, 10), firstDayOfWeek: 8), throwsAssertionError);
-    });
-  });
-
-  group('선택과 강조', () {
-    testWidgets('단일 선택이 primary로 칠해지고 다시 누르면 풀린다', (WidgetTester tester) async {
-      DateTime? picked;
-      await pumpCalendar(
-        tester,
+  testWidgets('a disabled day does not report and dims to text-disabled', (WidgetTester tester) async {
+    final List<DateTime> changes = <DateTime>[];
+    await tester.pumpWidget(
+      _host(
         HoronCalendar(
-          initialMonth: DateTime(2026, 10),
-          today: DateTime(2026, 10, 15),
-          onSelected: (DateTime? date) => picked = date,
+          defaultMonth: _month,
+          today: _today,
+          isDateDisabled: (DateTime date) => date.day == 14,
+          onValueChange: changes.add,
         ),
-      );
+      ),
+    );
 
-      const String key = 'calendar-day-0-2026-10-08';
-      await tester.tap(find.byKey(const ValueKey<String>(key)));
-      await tester.pumpAndSettle();
-
-      expect(picked, DateTime(2026, 10, 8));
-      final ColorScheme scheme = Theme.of(tester.element(find.byType(HoronCalendar))).colorScheme;
-      expect(dayBackground(tester, key), scheme.primary);
-
-      await tester.tap(find.byKey(const ValueKey<String>(key)));
-      await tester.pumpAndSettle();
-      expect(picked, isNull);
-    });
-
-    testWidgets('오늘 칸이 accent 배경으로 강조된다', (WidgetTester tester) async {
-      await pumpCalendar(tester, HoronCalendar(initialMonth: DateTime(2026, 10), today: DateTime(2026, 10, 15)));
-
-      final ColorScheme scheme = Theme.of(tester.element(find.byType(HoronCalendar))).colorScheme;
-      expect(dayBackground(tester, 'calendar-day-0-2026-10-15'), scheme.surfaceContainerHighest);
-      expect(dayBackground(tester, 'calendar-day-0-2026-10-16'), isNot(scheme.surfaceContainerHighest));
-    });
-
-    testWidgets('범위 선택이 시작·끝을 primary, 사이를 accent로 칠한다', (WidgetTester tester) async {
-      await pumpCalendar(
-        tester,
-        HoronCalendar.range(
-          initialMonth: DateTime(2026, 10),
-          today: DateTime(2026, 10, 15),
-          range: HoronDateRange(from: DateTime(2026, 10, 5), to: DateTime(2026, 10, 9)),
-        ),
-      );
-
-      final ColorScheme scheme = Theme.of(tester.element(find.byType(HoronCalendar))).colorScheme;
-      expect(dayBackground(tester, 'calendar-day-0-2026-10-05'), scheme.primary);
-      expect(dayBackground(tester, 'calendar-day-0-2026-10-09'), scheme.primary);
-      expect(dayBackground(tester, 'calendar-day-0-2026-10-07'), scheme.surfaceContainerHighest);
-
-      // 시작 칸은 왼쪽 모서리만, 끝 칸은 오른쪽 모서리만 둥급니다.
-      expect(dayRadius(tester, 'calendar-day-0-2026-10-05').topLeft.x, HoronRadius.md);
-      expect(dayRadius(tester, 'calendar-day-0-2026-10-05').topRight.x, 0);
-      expect(dayRadius(tester, 'calendar-day-0-2026-10-09').topRight.x, HoronRadius.md);
-      expect(dayRadius(tester, 'calendar-day-0-2026-10-09').topLeft.x, 0);
-      expect(dayRadius(tester, 'calendar-day-0-2026-10-07'), BorderRadius.zero);
-    });
-
-    testWidgets('범위를 두 번 눌러 고르면 시작과 끝이 채워진다', (WidgetTester tester) async {
-      final List<HoronDateRange?> picked = <HoronDateRange?>[];
-      await pumpCalendar(
-        tester,
-        HoronCalendar.range(
-          initialMonth: DateTime(2026, 10),
-          today: DateTime(2026, 10, 15),
-          onRangeSelected: picked.add,
-        ),
-      );
-
-      await tester.tap(find.byKey(const ValueKey<String>('calendar-day-0-2026-10-12')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey<String>('calendar-day-0-2026-10-19')));
-      await tester.pumpAndSettle();
-
-      expect(picked.first, HoronDateRange(from: DateTime(2026, 10, 12)));
-      expect(picked.last, HoronDateRange(from: DateTime(2026, 10, 12), to: DateTime(2026, 10, 19)));
-    });
-
-    testWidgets('두 번째로 고른 날이 앞서면 새 시작이 된다', (WidgetTester tester) async {
-      final List<HoronDateRange?> picked = <HoronDateRange?>[];
-      await pumpCalendar(
-        tester,
-        HoronCalendar.range(
-          initialMonth: DateTime(2026, 10),
-          today: DateTime(2026, 10, 15),
-          range: HoronDateRange(from: DateTime(2026, 10, 20)),
-          onRangeSelected: picked.add,
-        ),
-      );
-
-      await tester.tap(find.byKey(const ValueKey<String>('calendar-day-0-2026-10-06')));
-      await tester.pumpAndSettle();
-
-      expect(picked.single, HoronDateRange(from: DateTime(2026, 10, 6)));
-    });
+    await tester.tap(_dayOf(2026, 10, 14));
+    await tester.pumpAndSettle();
+    expect(changes, isEmpty, reason: 'disabled 날짜는 콜백을 부르지 않습니다');
+    expect(_dayStyle(tester, 2026, 10, 14).color, _theme(tester).colors.textDisabled, reason: 'text-text-disabled');
   });
 
-  group('월 이동', () {
-    testWidgets('이전·다음 버튼이 달을 넘긴다', (WidgetTester tester) async {
-      final List<DateTime> months = <DateTime>[];
-      await pumpCalendar(
-        tester,
-        HoronCalendar(initialMonth: DateTime(2026, 10), today: DateTime(2026, 10, 15), onMonthChanged: months.add),
-      );
+  testWidgets('days outside the month use the placeholder colour and today gets the dot', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today)));
+    final HoronThemeData theme = _theme(tester);
 
-      await tester.tap(find.byKey(HoronCalendar.nextMonthKey));
-      await tester.pumpAndSettle();
-      expect(find.text('November 2026'), findsOneWidget);
-
-      await tester.tap(find.byKey(HoronCalendar.previousMonthKey));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(HoronCalendar.previousMonthKey));
-      await tester.pumpAndSettle();
-      expect(find.text('September 2026'), findsOneWidget);
-      expect(months, <DateTime>[DateTime(2026, 11), DateTime(2026, 10), DateTime(2026, 9)]);
-    });
-
-    testWidgets('두 달을 나란히 그리면 달마다 그리드가 하나씩 있다', (WidgetTester tester) async {
-      await pumpCalendar(
-        tester,
-        HoronCalendar.range(initialMonth: DateTime(2026, 10), today: DateTime(2026, 10, 15), months: 2),
-      );
-
-      expect(find.text('October 2026 – November 2026'), findsOneWidget);
-      expect(dayNumbers(tester).where((int day) => day == 1).length, 2);
-      expect(calendarKeys(tester).where((String key) => key.startsWith('calendar-day-1-')).length, 30);
-    });
+    // 2026년 10월 1일은 목요일이라 일요일 시작 격자는 9월 27일에서 시작합니다.
+    expect(_dayOf(2026, 9, 27), findsOneWidget);
+    expect(_dayStyle(tester, 2026, 9, 27).color, theme.colors.textPlaceholder, reason: 'text-text-placeholder');
+    expect(_dayStyle(tester, 2026, 10, 19).color, theme.colors.textBrand, reason: 'text-text-brand (오늘)');
+    expect(_dayStyle(tester, 2026, 10, 19).fontSize, theme.text.labelLg.fontSize);
+    expect(find.byKey(const Key('horon-calendar-today-dot-2026-10-19')), findsOneWidget);
+    // 고른 날에는 오늘 점을 그리지 않습니다.
+    await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today, value: DateTime(2026, 10, 19))));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('horon-calendar-today-dot-2026-10-19')), findsNothing);
   });
 
-  for (final Brightness brightness in Brightness.values) {
-    testWidgets('${brightness.name}: 두 밝기에서 예외 없이 그려진다', (WidgetTester tester) async {
-      await pumpCalendar(
-        tester,
-        HoronCalendar(initialMonth: DateTime(2026, 10), today: DateTime(2026, 10, 15), selected: DateTime(2026, 10, 3)),
-        brightness: brightness,
-      );
+  testWidgets('weekStartsOn moves the grid start', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today, weekStartsOn: 1)));
+    expect(_dayOf(2026, 9, 28), findsOneWidget, reason: '월요일 시작이면 9월 28일부터입니다');
+    expect(_dayOf(2026, 9, 27), findsNothing);
+  });
 
-      expect(tester.takeException(), isNull);
-      expect(dayNumbers(tester), hasLength(31));
-    });
-  }
+  testWidgets('the arrows report the new month and a controlled month ignores the tap', (WidgetTester tester) async {
+    final List<DateTime> months = <DateTime>[];
+    await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today, onMonthChange: months.add)));
+
+    await tester.tap(find.byKey(const Key('horon-calendar-next')));
+    await tester.pumpAndSettle();
+    expect(months, <DateTime>[DateTime(2026, 11)]);
+    expect(tester.widget<Text>(find.byKey(const Key('horon-calendar-title'))).data, 'November 2026');
+
+    await tester.tap(find.byKey(const Key('horon-calendar-prev')));
+    await tester.pumpAndSettle();
+    expect(months.last, DateTime(2026, 10));
+
+    months.clear();
+    await tester.pumpWidget(_host(HoronCalendar(month: _month, today: _today, onMonthChange: months.add)));
+    await tester.tap(find.byKey(const Key('horon-calendar-next')));
+    await tester.pumpAndSettle();
+    expect(months.single, DateTime(2026, 11));
+    expect(
+      tester.widget<Text>(find.byKey(const Key('horon-calendar-title'))).data,
+      'October 2026',
+      reason: 'month를 바깥에서 정하면 스스로 넘어가지 않습니다',
+    );
+  });
+
+  testWidgets('arrow keys move the focused day and cross the month boundary', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today)));
+
+    await tester.tap(_dayOf(2026, 10, 31));
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<Text>(find.byKey(const Key('horon-calendar-title'))).data,
+      'November 2026',
+      reason: '10월 31일에서 오른쪽은 11월 1일입니다',
+    );
+  });
+
+  testWidgets('a narrow box shrinks the day cells instead of overflowing', (WidgetTester tester) async {
+    for (final double width in <double>[1024, 390, 320]) {
+      await tester.pumpWidget(
+        _host(
+          HoronCalendar(defaultMonth: _month, today: _today),
+          width: width,
+        ),
+      );
+      expect(tester.takeException(), isNull, reason: '폭 $width에서 예외가 없어야 합니다');
+      expect(
+        tester.getSize(_dayOf(2026, 10, 5)).width,
+        _theme(tester).space.step(10),
+        reason: '폭 $width에서는 40px 칸이 들어갑니다',
+      );
+    }
+
+    // 240처럼 칸 일곱 개가 들어가지 않는 폭에서는 칸이 줄어듭니다.
+    await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today), width: 240));
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(_dayOf(2026, 10, 5)).width, lessThan(_theme(tester).space.step(10)));
+    expect(tester.getSize(_surface()).width, lessThanOrEqualTo(240), reason: '유리 판도 부모 폭 안에 머뭅니다');
+  });
 }

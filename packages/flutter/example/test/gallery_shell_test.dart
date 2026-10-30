@@ -10,7 +10,7 @@ import 'package:horon_ui_example/gallery/shell.dart';
 const List<GallerySection> _sections = <GallerySection>[
   GallerySection(slug: 'button', title: 'Button', group: 'inputs'),
   GallerySection(slug: 'badge', title: 'Badge', group: 'display'),
-  GallerySection(slug: 'card', title: 'Card', group: 'layout'),
+  GallerySection(slug: 'dialog', title: 'Dialog', group: 'overlays'),
 ];
 
 /// Gives the shell a desktop-sized window. The default 800x600 test surface is
@@ -130,10 +130,9 @@ void main() {
     final GalleryStrings strings = const GalleryStrings.ko();
     expect(find.text(strings.groupInputs), findsOneWidget);
     expect(find.text(strings.groupDisplay), findsOneWidget);
-    expect(find.text(strings.groupLayout), findsOneWidget);
+    expect(find.text(strings.groupOverlays), findsOneWidget);
 
     // 섹션 셋이 서로 다른 그룹이므로 헤더도 셋입니다.
-    expect(find.text(strings.groupLayout), findsOneWidget);
 
     // 영어로 바꿔도 헤더가 따라옵니다.
     await tester.tap(find.byKey(galleryLanguageKey(GalleryLanguage.en)));

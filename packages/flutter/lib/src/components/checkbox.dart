@@ -1,234 +1,159 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
-/// `checkbox.tsx`의 체크박스입니다.
+/// `border-[1.5px]` — 선택 전 상자의 테두리 두께입니다.
+const double _borderWidth = 1.5;
+
+/// `[&_svg]:size-3.5` — 체크·빼기 아이콘 14px입니다.
+const double _indicatorSize = 14;
+
+/// `rounded-[5px]` — `size="sm"` 상자의 반경입니다. 토큰 단계에 없는 값이라 간격 단위로 계산합니다.
+const double _smallRadiusUnits = 1.25;
+
+/// `has-[[data-disabled]]:opacity-40`입니다.
+const double _disabledOpacity = 0.4;
+
+/// Figma `Checkbox`(58:217)입니다.
 ///
-/// React의 `size-[18px]`·`rounded-[5px]`·`border border-input`·
-/// `data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground`를
-/// 그대로 옮깁니다. 18px 상자의 테두리·채움은 [Container]가 그리고, 체크 표시와
-/// 불확정 대시는 [HoronCheckMarkPainter]가 직접 그립니다. 글자 글리프도 Material
-/// 아이콘도 쓰지 않는 이유는 이 패키지가 아이콘 폰트를 번들하지 않기 때문입니다.
-/// `Icon`을 쓰면 호스트가 폰트를 등록하지 않은 화면에서 빈 네모가 그려집니다.
-///
-/// [value]가 `null`이면 불확정 상태입니다. React는 `checked`에 `'indeterminate'`를
-/// 넘기지만, Flutter의 체크박스 관례와 맞추려고 `bool?`의 `null`로 같은 상태를
-/// 표현합니다. 불확정은 선택과 같은 채움에 가운데 대시를 그립니다. React의 클래스는
-/// `data-checked`만 보고 칠하기 때문에 불확정이 미선택처럼 보이는데, 여기서는 대시가
-/// 읽히도록 선택과 같은 채움을 씁니다.
-///
-/// 상태별 모양은 React 클래스와 같습니다.
-/// - 선택: 테두리·채움 `primary`, 표시 `primary-foreground`
-/// - 미선택: 테두리 `input`, 채움 없음
-/// - 오류([invalid], React `aria-invalid`): 미선택이면 테두리 `destructive`,
-///   선택이면 `primary`가 이깁니다(React `aria-invalid:aria-checked:border-primary`)
-/// - 비활성: 불투명도 50%(React `disabled:opacity-50`)
-/// - 포커스: 테두리 `ring`과 바깥 링(React `focus-visible:ring-3 ring-ring/50`)
-///
-/// `border`와 `input`은 생성 토큰에서 같은 값이라 [ColorScheme.outline]이 그 자리를
-/// 맡습니다. 그래서 이 위젯은 밝기별 색을 직접 고르지 않고 테마에서만 읽습니다.
+/// 20px 상자에 6px 반경, 라벨과 10px 간격입니다. [value]가 null이면 React의
+/// `indeterminate`와 같은 상태로 빼기 표시를 그립니다. `size="sm"`은 데이터 표가
+/// 쓰는 18px 상자(192:9046)입니다.
 class HoronCheckbox extends StatefulWidget {
   /// 체크박스를 만듭니다.
-  const HoronCheckbox({
-    super.key,
-    required this.value,
-    this.onChanged,
-    this.invalid = false,
-    this.enabled = true,
-    this.autofocus = false,
-    this.focusNode,
-    this.label,
-    this.semanticsLabel,
-  });
+  const HoronCheckbox({super.key, this.value, this.onChanged, this.label, this.small = false, this.enabled = true});
 
-  /// 현재 값입니다. `null`이면 불확정 상태입니다.
+  /// 선택 여부입니다. null이면 부분 선택(indeterminate)입니다.
   final bool? value;
 
-  /// 값이 바뀔 때 부릅니다. `null`이면 눌러도 값이 바뀌지 않습니다.
-  ///
-  /// 넘기는 값은 다음 상태의 `bool`입니다. 불확정이나 미선택에서 누르면 선택으로,
-  /// 선택에서 누르면 해제로 갑니다. Base UI의 체크박스와 같은 규칙입니다.
-  final ValueChanged<bool>? onChanged;
+  /// 값이 바뀔 때 부를 콜백입니다. 부분 선택에서 누르면 true가 됩니다.
+  final ValueChanged<bool?>? onChanged;
 
-  /// 오류 상태입니다. React의 `aria-invalid`에 대응합니다.
-  final bool invalid;
-
-  /// 누름과 포커스를 받을지 여부입니다.
-  final bool enabled;
-
-  /// 화면이 열릴 때 포커스를 받을지 여부입니다.
-  final bool autofocus;
-
-  /// 포커스를 관리하는 노드입니다. 넘기지 않으면 이 위젯이 소유합니다.
-  final FocusNode? focusNode;
-
-  /// 상자 오른쪽에 붙는 문구입니다. 호스트가 넘깁니다.
-  ///
-  /// 이 패키지는 화면 문구를 창작하지 않습니다. 보이는 이름은 언제나 호출자가
-  /// 정하고, 선택 상태는 [Semantics]의 checked·mixed 플래그로 알려서 플랫폼의
-  /// 음성 안내가 그대로 쓰이게 합니다.
+  /// 상자 오른쪽 라벨입니다.
   final String? label;
 
-  /// 보조 기술이 읽을 이름입니다. 없으면 [label]을 씁니다.
-  final String? semanticsLabel;
+  /// React `size="sm"`(18px 상자)에 대응합니다. 기본값은 `size="md"`(20px)입니다.
+  final bool small;
 
-  /// React `size-[18px]`입니다.
-  static const double size = HoronCheckboxMetrics.size;
-
-  /// React `rounded-[5px]`입니다.
-  static const double radius = HoronCheckboxMetrics.radius;
-
-  /// React `[&>svg]:size-3.5`입니다. 표시가 차지하는 정사각형입니다.
-  static const double markSize = HoronSpace.s3_5;
-
-  /// 테스트가 상자를 찾는 키입니다.
-  static const Key boxKey = ValueKey<String>('horon-checkbox-box');
-
-  /// 테스트가 체크 표시를 찾는 키입니다.
-  static const Key markKey = ValueKey<String>('horon-checkbox-mark');
+  /// 거짓이면 줄 전체가 `opacity-40`으로 흐려지고 바뀌지 않습니다.
+  final bool enabled;
 
   @override
   State<HoronCheckbox> createState() => _HoronCheckboxState();
 }
 
 class _HoronCheckboxState extends State<HoronCheckbox> {
-  FocusNode? _ownedFocusNode;
+  bool _hovered = false;
   bool _focused = false;
 
-  FocusNode get _focusNode => widget.focusNode ?? (_ownedFocusNode ??= FocusNode(debugLabel: 'HoronCheckbox'));
-
-  bool get _disabled => !widget.enabled || widget.onChanged == null;
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(_handleFocusChange);
-  }
-
-  @override
-  void didUpdateWidget(covariant HoronCheckbox oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.focusNode != widget.focusNode) {
-      (oldWidget.focusNode ?? _ownedFocusNode)?.removeListener(_handleFocusChange);
-      _focusNode.addListener(_handleFocusChange);
-      _focused = _focusNode.hasFocus;
-    }
-  }
-
-  @override
-  void dispose() {
-    _focusNode.removeListener(_handleFocusChange);
-    _ownedFocusNode?.dispose();
-    super.dispose();
-  }
-
-  void _handleFocusChange() {
-    if (_focused == _focusNode.hasFocus) return;
-    setState(() => _focused = _focusNode.hasFocus);
-  }
+  /// 선택도 부분 선택도 아닉 꺼짐 상태입니다.
+  ///
+  /// `value`가 null이면 부분 선택(`indeterminate`)이므로 선택된 것으로 그립니다.
+  bool get _marked => widget.value ?? true;
 
   void _toggle() {
-    if (_disabled) return;
-    widget.onChanged?.call(widget.value != true);
-  }
-
-  KeyEventResult _handleKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent) return KeyEventResult.ignored;
-    final LogicalKeyboardKey key = event.logicalKey;
-    if (key != LogicalKeyboardKey.space && key != LogicalKeyboardKey.enter) return KeyEventResult.ignored;
-    _toggle();
-    return KeyEventResult.handled;
+    widget.onChanged?.call(widget.value == true ? false : true);
   }
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme scheme = theme.colorScheme;
-    final HoronThemeData horon = HoronTheme.of(context);
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final HoronSpaceSpec space = theme.space;
+    final bool interactive = widget.enabled && widget.onChanged != null;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    final bool filled = widget.value != false;
-    final bool indeterminate = widget.value == null;
-    final bool focused = _focused && !_disabled;
+    // size-5 rounded-xs(6) / size-4.5 rounded-[5px].
+    final double side = widget.small ? space.step(4.5) : space.step(5);
+    final double radius = widget.small ? space.step(_smallRadiusUnits) : theme.radius.xs;
 
-    final Color border = focused
-        ? horon.ring
-        : (filled ? scheme.primary : (widget.invalid ? scheme.error : scheme.outline));
+    final Color fill = _marked
+        ? (_hovered && interactive ? colors.interactivePrimaryHover : colors.interactivePrimary)
+        : colors.bgSurface;
+    final Color borderColor = _marked
+        ? Colors.transparent
+        : (_hovered && interactive ? colors.textSecondary : colors.borderStrong);
 
-    final Widget box = Container(
-      key: HoronCheckbox.boxKey,
-      width: HoronCheckbox.size,
-      height: HoronCheckbox.size,
+    final Widget box = AnimatedContainer(
+      duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+      curve: HoronMotion.colorsCurve,
+      width: side,
+      height: side,
       decoration: BoxDecoration(
-        color: filled ? scheme.primary : Colors.transparent,
-        borderRadius: BorderRadius.circular(HoronCheckbox.radius),
-        border: Border.all(color: border),
-        boxShadow: focused
-            ? <BoxShadow>[
-                BoxShadow(
-                  color: horon.ring.withValues(alpha: _focusRingAlpha),
-                  spreadRadius: _focusRingSpread,
-                ),
-              ]
-            : null,
+        color: fill,
+        borderRadius: BorderRadius.circular(radius),
+        // data-checked:border-0 data-indeterminate:border-0 — 선택되면 테두리가 사라집니다.
+        border: Border.all(color: borderColor, width: _marked ? 0 : _borderWidth),
       ),
-      child: filled
+      child: _marked
           ? Center(
-              child: SizedBox.square(
-                dimension: HoronCheckbox.markSize,
-                child: CustomPaint(
-                  key: HoronCheckbox.markKey,
-                  painter: HoronCheckMarkPainter(
-                    color: scheme.onPrimary,
-                    indeterminate: indeterminate,
-                    strokeWidth: HoronSpace.s0_5,
-                  ),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
+                duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
+                curve: HoronMotion.popInCurve,
+                builder: (BuildContext context, double scale, Widget? child) =>
+                    Transform.scale(scale: scale, child: child),
+                child: Icon(
+                  widget.value == null ? Icons.remove : Icons.check,
+                  size: _indicatorSize,
+                  color: colors.interactiveOnPrimary,
                 ),
               ),
             )
           : null,
     );
 
-    final String? label = widget.label;
-    final Widget body = Row(
+    final Widget content = Row(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: space.s2_5,
       children: <Widget>[
-        box,
-        if (label != null) ...<Widget>[
-          const SizedBox(width: HoronSpace.s2),
+        _FocusOutline(
+          visible: _focused && interactive,
+          radius: radius,
+          gap: space.s0_5,
+          width: space.s0_5,
+          color: colors.textBrand,
+          child: box,
+        ),
+        if (widget.label != null)
           Flexible(
-            child: Text(
-              label,
-              style: (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
-                color: scheme.onSurface,
-                fontSize: HoronText.body,
-                height: HoronLineHeight.none,
-              ),
-            ),
+            child: Text(widget.label!, style: theme.text.bodyMd.copyWith(color: colors.textPrimary)),
           ),
-        ],
       ],
     );
 
-    return Semantics(
-      container: true,
-      checked: widget.value,
-      mixed: indeterminate,
-      enabled: !_disabled,
-      label: widget.semanticsLabel ?? label,
-      onTap: _disabled ? null : _toggle,
-      child: Opacity(
-        opacity: _disabled ? _disabledOpacity : 1,
-        child: Focus(
-          focusNode: _focusNode,
-          autofocus: widget.autofocus,
-          onKeyEvent: _handleKey,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: _disabled ? null : _toggle,
-            child: MouseRegion(cursor: _disabled ? SystemMouseCursors.basic : SystemMouseCursors.click, child: body),
+    return Opacity(
+      opacity: widget.enabled ? 1 : _disabledOpacity,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: interactive ? _toggle : null,
+        child: MergeSemantics(
+          child: Semantics(
+            checked: widget.value,
+            mixed: widget.value == null,
+            enabled: interactive,
+            child: FocusableActionDetector(
+              enabled: interactive,
+              mouseCursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+              onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
+              onShowFocusHighlight: (bool value) => setState(() => _focused = value),
+              shortcuts: const <ShortcutActivator, Intent>{
+                SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+                SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+              },
+              actions: <Type, Action<Intent>>{
+                ActivateIntent: CallbackAction<ActivateIntent>(
+                  onInvoke: (ActivateIntent intent) {
+                    _toggle();
+                    return null;
+                  },
+                ),
+              },
+              child: content,
+            ),
           ),
         ),
       ),
@@ -236,85 +161,46 @@ class _HoronCheckboxState extends State<HoronCheckbox> {
   }
 }
 
-/// 체크 표시와 불확정 대시를 그립니다.
-///
-/// 좌표는 React가 렌더하는 lucide 아이콘을 24 단위 상자에서 0~1 비율로 옮긴
-/// 값입니다. `Check`는 `M20 6 9 17l-5-5`이고, 이 페인터는 그 선분을
-/// (0.167, 0.5) → (0.375, 0.708) → (0.833, 0.25)로 그립니다. `Minus`는
-/// `M5 12h14`이고, 이 페인터는 0.208~0.792를 가로지르는 대시로 그립니다. 상자
-/// 크기가 바뀌어도 같은 비율을 유지하므로 [HoronCheckbox.markSize]를 바꿔도
-/// 모양이 무너지지 않습니다.
-class HoronCheckMarkPainter extends CustomPainter {
-  /// 표시를 그리는 페인터를 만듭니다.
-  const HoronCheckMarkPainter({required this.color, required this.indeterminate, required this.strokeWidth});
+/// `focus-visible:outline-2 outline-offset-2 outline-text-brand`을 그립니다.
+class _FocusOutline extends StatelessWidget {
+  const _FocusOutline({
+    required this.visible,
+    required this.radius,
+    required this.gap,
+    required this.width,
+    required this.color,
+    required this.child,
+  });
 
-  /// 선 색입니다.
+  final bool visible;
+  final double radius;
+  final double gap;
+  final double width;
   final Color color;
-
-  /// 참이면 가운데 대시를, 거짓이면 체크 표시를 그립니다.
-  final bool indeterminate;
-
-  /// 선 두께입니다.
-  final double strokeWidth;
+  final Widget child;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    if (indeterminate) {
-      final double y = size.height / 2;
-      canvas.drawLine(Offset(size.width * _dashStart, y), Offset(size.width * _dashEnd, y), paint);
-      return;
-    }
-
-    final Path path = Path()
-      ..moveTo(size.width * _checkStartX, size.height * _checkStartY)
-      ..lineTo(size.width * _checkMidX, size.height * _checkMidY)
-      ..lineTo(size.width * _checkEndX, size.height * _checkEndY);
-    canvas.drawPath(path, paint);
+  Widget build(BuildContext context) {
+    if (!visible) return child;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        Positioned(
+          left: -gap,
+          top: -gap,
+          right: -gap,
+          bottom: -gap,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(radius + gap),
+                border: Border.all(color: color, width: width),
+              ),
+            ),
+          ),
+        ),
+        child,
+      ],
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant HoronCheckMarkPainter oldDelegate) =>
-      oldDelegate.color != color ||
-      oldDelegate.indeterminate != indeterminate ||
-      oldDelegate.strokeWidth != strokeWidth;
 }
-
-/// React `ring-ring/50`의 투명도입니다.
-const double _focusRingAlpha = 0.5;
-
-/// 바깥 링이 번지는 거리입니다. React `ring-3`을 4px 눈금의 2px 단계로 옮겼습니다.
-const double _focusRingSpread = HoronSpace.s0_5;
-
-/// React `disabled:opacity-50`입니다.
-const double _disabledOpacity = 0.5;
-
-/// lucide `Check`의 시작점 x입니다. 24 단위 중 4입니다.
-const double _checkStartX = 0.167;
-
-/// lucide `Check`의 시작점 y입니다. 24 단위 중 12입니다.
-const double _checkStartY = 0.5;
-
-/// lucide `Check`의 꺾이는 점 x입니다. 24 단위 중 9입니다.
-const double _checkMidX = 0.375;
-
-/// lucide `Check`의 꺾이는 점 y입니다. 24 단위 중 17입니다.
-const double _checkMidY = 0.708;
-
-/// lucide `Check`의 끝점 x입니다. 24 단위 중 20입니다.
-const double _checkEndX = 0.833;
-
-/// lucide `Check`의 끝점 y입니다. 24 단위 중 6입니다.
-const double _checkEndY = 0.25;
-
-/// lucide `Minus`의 시작점 비율입니다. 24 단위 중 5입니다.
-const double _dashStart = 0.208;
-
-/// lucide `Minus`의 끝점 비율입니다. 24 단위 중 19입니다.
-const double _dashEnd = 0.792;

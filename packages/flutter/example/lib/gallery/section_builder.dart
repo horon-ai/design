@@ -10,81 +10,87 @@
 import 'package:flutter/widgets.dart';
 
 import 'registry.dart';
-import 'sections/accordion.dart';
-import 'sections/alert.dart';
-import 'sections/alert_dialog.dart';
-import 'sections/aspect_ratio.dart';
-import 'sections/attachment.dart';
-import 'sections/autocomplete.dart';
+import 'sections/agent_activity.dart';
+import 'sections/agent_lane.dart';
+import 'sections/agent_lanes_timeline.dart';
+import 'sections/agent_panel.dart';
+import 'sections/agent_steering_panel.dart';
+import 'sections/approval_card.dart';
 import 'sections/avatar.dart';
 import 'sections/badge.dart';
+import 'sections/banner.dart';
+import 'sections/bot_instructions_panel.dart';
+import 'sections/bot_list_row.dart';
+import 'sections/bot_memory_panel.dart';
+import 'sections/bottom_sheet.dart';
 import 'sections/breadcrumb.dart';
-import 'sections/bubble.dart';
+import 'sections/breadcrumb_header.dart';
 import 'sections/button.dart';
-import 'sections/button_group.dart';
 import 'sections/calendar.dart';
 import 'sections/card.dart';
-import 'sections/carousel.dart';
-import 'sections/chart.dart';
+import 'sections/chat_bubble.dart';
+import 'sections/chat_controls.dart';
 import 'sections/checkbox.dart';
 import 'sections/chip.dart';
-import 'sections/code_block.dart';
-import 'sections/collapsible.dart';
-import 'sections/combobox.dart';
-import 'sections/command.dart';
-import 'sections/context_menu.dart';
+import 'sections/choice_card.dart';
+import 'sections/code_panel.dart';
+import 'sections/command_palette.dart';
+import 'sections/composer.dart';
 import 'sections/data_table.dart';
-import 'sections/date_picker.dart';
+import 'sections/date_field.dart';
 import 'sections/dialog.dart';
-import 'sections/direction.dart';
-import 'sections/drawer.dart';
-import 'sections/dropdown_menu.dart';
-import 'sections/empty.dart';
+import 'sections/directory_card.dart';
+import 'sections/document_extract_panel.dart';
+import 'sections/empty_state.dart';
 import 'sections/field.dart';
-import 'sections/file_upload.dart';
-import 'sections/form.dart';
-import 'sections/glass_surface.dart';
-import 'sections/hover_card.dart';
+import 'sections/file_drop.dart';
+import 'sections/filter_bar.dart';
+import 'sections/horon_icon.dart';
+import 'sections/horon_wordmark.dart';
+import 'sections/icon_button.dart';
 import 'sections/input.dart';
 import 'sections/input_group.dart';
-import 'sections/input_otp.dart';
-import 'sections/item.dart';
+import 'sections/integration_row.dart';
 import 'sections/kbd.dart';
-import 'sections/label.dart';
+import 'sections/knowledge_base_panel.dart';
 import 'sections/liquid_glass.dart';
-import 'sections/list.dart';
-import 'sections/marker.dart';
+import 'sections/list_detail.dart';
+import 'sections/marketplace_card.dart';
+import 'sections/mcp_server_row.dart';
 import 'sections/menu.dart';
-import 'sections/menubar.dart';
-import 'sections/message.dart';
-import 'sections/message_scroller.dart';
-import 'sections/native_select.dart';
-import 'sections/navigation_menu.dart';
-import 'sections/pagination.dart';
-import 'sections/popover.dart';
+import 'sections/message_extras.dart';
+import 'sections/orchestrator_panel.dart';
+import 'sections/page_header.dart';
+import 'sections/plan_card.dart';
+import 'sections/plan_step.dart';
+import 'sections/plugin_row.dart';
 import 'sections/progress.dart';
-import 'sections/questionnaire.dart';
 import 'sections/radio_group.dart';
-import 'sections/resizable.dart';
-import 'sections/scroll_area.dart';
+import 'sections/research_run_panel.dart';
+import 'sections/schedule.dart';
+import 'sections/segmented_control.dart';
 import 'sections/select.dart';
-import 'sections/separator.dart';
-import 'sections/sheet.dart';
+import 'sections/settings_list.dart';
 import 'sections/sidebar.dart';
 import 'sections/skeleton.dart';
 import 'sections/slider.dart';
-import 'sections/sonner.dart';
+import 'sections/source_row.dart';
 import 'sections/spinner.dart';
-import 'sections/stepper.dart';
+import 'sections/split_button.dart';
 import 'sections/switch.dart';
-import 'sections/table.dart';
+import 'sections/tab_bar.dart';
 import 'sections/tabs.dart';
+import 'sections/task_row.dart';
 import 'sections/textarea.dart';
+import 'sections/textarea_field.dart';
 import 'sections/toast.dart';
-import 'sections/toggle.dart';
-import 'sections/toggle_group.dart';
+import 'sections/tool_call.dart';
+import 'sections/tool_calls_header.dart';
+import 'sections/tool_permissions.dart';
 import 'sections/tooltip.dart';
-import 'sections/typography.dart';
+import 'sections/top_bar.dart';
+import 'sections/usage_meter.dart';
+import 'sections/workspace_menu.dart';
 
 /// 섹션 위젯을 슬러그로 찾습니다.
 ///
@@ -94,81 +100,87 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
 
 /// 슬러그별 섹션 생성자입니다.
 const Map<String, Widget Function()> _builders = <String, Widget Function()>{
-  'accordion': HoronAccordionGallerySection.new,
-  'alert': HoronAlertGallerySection.new,
-  'alert_dialog': HoronAlertDialogGallerySection.new,
-  'aspect_ratio': HoronAspectRatioGallerySection.new,
-  'attachment': HoronAttachmentGallerySection.new,
-  'autocomplete': HoronAutocompleteGallerySection.new,
+  'agent_activity': HoronAgentActivityGallerySection.new,
+  'agent_lane': HoronAgentLaneGallerySection.new,
+  'agent_lanes_timeline': HoronAgentLanesTimelineGallerySection.new,
+  'agent_panel': HoronAgentPanelGallerySection.new,
+  'agent_steering_panel': HoronAgentSteeringPanelGallerySection.new,
+  'approval_card': HoronApprovalCardGallerySection.new,
   'avatar': HoronAvatarGallerySection.new,
   'badge': HoronBadgeGallerySection.new,
+  'banner': HoronBannerGallerySection.new,
+  'bot_instructions_panel': HoronBotInstructionsPanelGallerySection.new,
+  'bot_list_row': HoronBotListRowGallerySection.new,
+  'bot_memory_panel': HoronBotMemoryPanelGallerySection.new,
+  'bottom_sheet': HoronBottomSheetGallerySection.new,
   'breadcrumb': HoronBreadcrumbGallerySection.new,
-  'bubble': HoronBubbleGallerySection.new,
+  'breadcrumb_header': HoronBreadcrumbHeaderGallerySection.new,
   'button': HoronButtonGallerySection.new,
-  'button_group': HoronButtonGroupGallerySection.new,
   'calendar': HoronCalendarGallerySection.new,
   'card': HoronCardGallerySection.new,
-  'carousel': HoronCarouselGallerySection.new,
-  'chart': HoronChartGallerySection.new,
+  'chat_bubble': HoronChatBubbleGallerySection.new,
+  'chat_controls': HoronChatControlsGallerySection.new,
   'checkbox': HoronCheckboxGallerySection.new,
   'chip': HoronChipGallerySection.new,
-  'code_block': HoronCodeBlockGallerySection.new,
-  'collapsible': HoronCollapsibleGallerySection.new,
-  'combobox': HoronComboboxGallerySection.new,
-  'command': HoronCommandGallerySection.new,
-  'context_menu': HoronContextMenuGallerySection.new,
+  'choice_card': HoronChoiceCardGallerySection.new,
+  'code_panel': HoronCodePanelGallerySection.new,
+  'command_palette': HoronCommandPaletteGallerySection.new,
+  'composer': HoronComposerGallerySection.new,
   'data_table': HoronDataTableGallerySection.new,
-  'date_picker': HoronDatePickerGallerySection.new,
+  'date_field': HoronDateFieldGallerySection.new,
   'dialog': HoronDialogGallerySection.new,
-  'direction': HoronDirectionGallerySection.new,
-  'drawer': HoronDrawerGallerySection.new,
-  'dropdown_menu': HoronDropdownMenuGallerySection.new,
-  'empty': HoronEmptyGallerySection.new,
+  'directory_card': HoronDirectoryCardGallerySection.new,
+  'document_extract_panel': HoronDocumentExtractPanelGallerySection.new,
+  'empty_state': HoronEmptyStateGallerySection.new,
   'field': HoronFieldGallerySection.new,
-  'file_upload': HoronFileUploadGallerySection.new,
-  'form': HoronFormGallerySection.new,
-  'glass_surface': HoronGlassSurfaceGallerySection.new,
-  'hover_card': HoronHoverCardGallerySection.new,
+  'file_drop': HoronFileDropGallerySection.new,
+  'filter_bar': HoronFilterBarGallerySection.new,
+  'horon_icon': HoronIconGallerySection.new,
+  'horon_wordmark': HoronWordmarkGallerySection.new,
+  'icon_button': HoronIconButtonGallerySection.new,
   'input': HoronInputGallerySection.new,
   'input_group': HoronInputGroupGallerySection.new,
-  'input_otp': HoronInputOtpGallerySection.new,
-  'item': HoronItemGallerySection.new,
+  'integration_row': HoronIntegrationRowGallerySection.new,
   'kbd': HoronKbdGallerySection.new,
-  'label': HoronLabelGallerySection.new,
+  'knowledge_base_panel': HoronKnowledgeBasePanelGallerySection.new,
   'liquid_glass': HoronLiquidGlassGallerySection.new,
-  'list': HoronListGallerySection.new,
-  'marker': HoronMarkerGallerySection.new,
+  'list_detail': HoronListDetailGallerySection.new,
+  'marketplace_card': HoronMarketplaceCardGallerySection.new,
+  'mcp_server_row': HoronMcpServerRowGallerySection.new,
   'menu': HoronMenuGallerySection.new,
-  'menubar': HoronMenubarGallerySection.new,
-  'message': HoronMessageGallerySection.new,
-  'message_scroller': HoronMessageScrollerGallerySection.new,
-  'native_select': HoronNativeSelectGallerySection.new,
-  'navigation_menu': HoronNavigationMenuGallerySection.new,
-  'pagination': HoronPaginationGallerySection.new,
-  'popover': HoronPopoverGallerySection.new,
+  'message_extras': HoronMessageExtrasGallerySection.new,
+  'orchestrator_panel': HoronOrchestratorPanelGallerySection.new,
+  'page_header': HoronPageHeaderGallerySection.new,
+  'plan_card': HoronPlanCardGallerySection.new,
+  'plan_step': HoronPlanStepGallerySection.new,
+  'plugin_row': HoronPluginRowGallerySection.new,
   'progress': HoronProgressGallerySection.new,
-  'questionnaire': HoronQuestionnaireGallerySection.new,
   'radio_group': HoronRadioGroupGallerySection.new,
-  'resizable': HoronResizableGallerySection.new,
-  'scroll_area': HoronScrollAreaGallerySection.new,
+  'research_run_panel': HoronResearchRunPanelGallerySection.new,
+  'schedule': HoronScheduleGallerySection.new,
+  'segmented_control': HoronSegmentedControlGallerySection.new,
   'select': HoronSelectGallerySection.new,
-  'separator': HoronSeparatorGallerySection.new,
-  'sheet': HoronSheetGallerySection.new,
+  'settings_list': HoronSettingsListGallerySection.new,
   'sidebar': HoronSidebarGallerySection.new,
   'skeleton': HoronSkeletonGallerySection.new,
   'slider': HoronSliderGallerySection.new,
-  'sonner': HoronSonnerGallerySection.new,
+  'source_row': HoronSourceRowGallerySection.new,
   'spinner': HoronSpinnerGallerySection.new,
-  'stepper': HoronStepperGallerySection.new,
+  'split_button': HoronSplitButtonGallerySection.new,
   'switch': HoronSwitchGallerySection.new,
-  'table': HoronTableGallerySection.new,
+  'tab_bar': HoronTabBarGallerySection.new,
   'tabs': HoronTabsGallerySection.new,
+  'task_row': HoronTaskRowGallerySection.new,
   'textarea': HoronTextareaGallerySection.new,
+  'textarea_field': HoronTextareaFieldGallerySection.new,
   'toast': HoronToastGallerySection.new,
-  'toggle': HoronToggleGallerySection.new,
-  'toggle_group': HoronToggleGroupGallerySection.new,
+  'tool_call': HoronToolCallGallerySection.new,
+  'tool_calls_header': HoronToolCallsHeaderGallerySection.new,
+  'tool_permissions': HoronToolPermissionsGallerySection.new,
   'tooltip': HoronTooltipGallerySection.new,
-  'typography': HoronTypographyGallerySection.new,
+  'top_bar': HoronTopBarGallerySection.new,
+  'usage_meter': HoronUsageMeterGallerySection.new,
+  'workspace_menu': HoronWorkspaceMenuGallerySection.new,
 };
 
 /// 이 표가 알고 있는 슬러그입니다.

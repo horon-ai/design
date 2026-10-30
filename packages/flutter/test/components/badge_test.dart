@@ -12,100 +12,57 @@ Future<void> pumpBadge(WidgetTester tester, Widget child, {Brightness brightness
   await tester.pumpAndSettle();
 }
 
-BoxDecoration _decoration(WidgetTester tester) {
-  final DecoratedBox box = tester.widget<DecoratedBox>(
-    find
-        .descendant(
-          of: find.byType(HoronBadge),
-          matching: find.byWidgetPredicate(
-            (Widget widget) => widget is DecoratedBox && widget.decoration is BoxDecoration,
-          ),
-        )
-        .first,
-  );
-  return box.decoration as BoxDecoration;
+BoxDecoration _chip(WidgetTester tester) {
+  final Container box = tester.widget<Container>(find.byType(Container).first);
+  return box.decoration! as BoxDecoration;
 }
 
-TextStyle _labelStyle(WidgetTester tester) => tester.widget<Text>(find.text('Label')).style!;
-
 void main() {
-  testWidgets('badge: the six variants paint their own colours', (WidgetTester tester) async {
-    for (final HoronBadgeVariant variant in HoronBadgeVariant.values) {
-      await pumpBadge(tester, HoronBadge(label: 'Label', variant: variant));
-      final ColorScheme scheme = Theme.of(tester.element(find.byType(HoronBadge))).colorScheme;
+  testWidgets('badge: the chip is 22 tall at the pill radius', (WidgetTester tester) async {
+    await pumpBadge(tester, const HoronBadge(label: '신규'));
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronBadge)));
+    expect(tester.getSize(find.byType(HoronBadge)).height, 22);
+    expect((_chip(tester).borderRadius! as BorderRadius).topLeft.x, closeTo(theme.radius.full, 0.01));
+  });
 
-      final Color expected = switch (variant) {
-        HoronBadgeVariant.defaultValue => scheme.primary,
-        HoronBadgeVariant.secondary => scheme.secondary,
-        HoronBadgeVariant.destructive => scheme.error.withValues(alpha: 0.1),
-        HoronBadgeVariant.outline => Colors.transparent,
-        HoronBadgeVariant.ghost => Colors.transparent,
-        HoronBadgeVariant.link => Colors.transparent,
+  testWidgets('badge: every tone paints its own pair', (WidgetTester tester) async {
+    for (final HoronBadgeTone tone in HoronBadgeTone.values) {
+      await pumpBadge(tester, HoronBadge(label: 'Label', tone: tone));
+      final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronBadge)));
+      final (Color expected, Color text) = switch (tone) {
+        HoronBadgeTone.neutral => (theme.colors.overlayInk6, theme.colors.textSecondary),
+        HoronBadgeTone.brand => (theme.colors.accentSky500_18, theme.colors.textBrand),
+        HoronBadgeTone.danger => (theme.colors.accentRed500_14, theme.colors.textDanger),
+        HoronBadgeTone.solid => (theme.colors.interactivePrimary, theme.colors.interactiveOnPrimary),
       };
-      expect(_decoration(tester).color, expected, reason: variant.name);
+      expect(_chip(tester).color, expected, reason: tone.name);
+      expect(tester.widget<Text>(find.text('Label')).style!.color, text, reason: tone.name);
     }
   });
 
-  testWidgets('badge: the destructive fill deepens in dark', (WidgetTester tester) async {
-    await pumpBadge(
-      tester,
-      const HoronBadge(label: 'Label', variant: HoronBadgeVariant.destructive),
-      brightness: Brightness.dark,
-    );
-    final ColorScheme scheme = Theme.of(tester.element(find.byType(HoronBadge))).colorScheme;
-    expect(_decoration(tester).color, scheme.error.withValues(alpha: 0.2));
+  testWidgets('badge: the dot adds a 6px status circle', (WidgetTester tester) async {
+    await pumpBadge(tester, const HoronBadge(label: 'Live', tone: HoronBadgeTone.brand, dot: true));
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronBadge)));
+    final Iterable<Container> dots = tester.widgetList<Container>(find.byType(Container)).where((Container c) {
+      final Decoration? decoration = c.decoration;
+      return decoration is BoxDecoration &&
+          decoration.shape == BoxShape.circle &&
+          decoration.color == theme.colors.statusLive;
+    });
+    expect(dots, isNotEmpty);
+    expect(tester.getSize(find.byWidget(dots.first)), const Size(6, 6));
   });
 
-  testWidgets('badge: the surface is a pill and only the outline variant draws a border', (WidgetTester tester) async {
-    await pumpBadge(tester, const HoronBadge(label: 'Label', variant: HoronBadgeVariant.outline));
-    final BoxDecoration outline = _decoration(tester);
-    final ColorScheme scheme = Theme.of(tester.element(find.byType(HoronBadge))).colorScheme;
-
-    expect((outline.borderRadius! as BorderRadius).topLeft.x, closeTo(HoronRadiusRole.pill, 0.01));
-    expect((outline.border! as Border).top.color, scheme.outline);
-
-    await pumpBadge(tester, const HoronBadge(label: 'Label'));
-    expect((_decoration(tester).border! as Border).top.color, Colors.transparent);
-  });
-
-  testWidgets('badge: the icon slots shrink the padding they sit on', (WidgetTester tester) async {
-    await pumpBadge(
-      tester,
-      const HoronBadge(label: 'Label', icon: Icon(Icons.star), trailingIcon: Icon(Icons.chevron_right)),
-    );
-    final Padding padding = tester.widget<Padding>(
-      find.descendant(of: find.byType(HoronBadge), matching: find.byType(Padding)).first,
-    );
-    final EdgeInsets inset = padding.padding as EdgeInsets;
-
-    expect(find.byIcon(Icons.star), findsOneWidget);
-    expect(find.byIcon(Icons.chevron_right), findsOneWidget);
-    // React shortens the inner padding to px-1.5 when an icon sits in that slot.
-    expect(inset.left, HoronSpace.s1_5);
-    expect(inset.right, HoronSpace.s1_5);
-    expect(_labelStyle(tester).fontSize, 11);
-  });
-
-  testWidgets('badge: an invalid badge draws the destructive border', (WidgetTester tester) async {
-    await pumpBadge(tester, const HoronBadge(label: 'Label', variant: HoronBadgeVariant.outline, invalid: true));
-    final ColorScheme scheme = Theme.of(tester.element(find.byType(HoronBadge))).colorScheme;
-    expect((_decoration(tester).border! as Border).top.color, scheme.error);
-  });
-
-  testWidgets('badge: both brightnesses render every variant', (WidgetTester tester) async {
+  testWidgets('badge: both brightnesses render every tone', (WidgetTester tester) async {
     for (final Brightness brightness in Brightness.values) {
-      for (final HoronBadgeVariant variant in HoronBadgeVariant.values) {
+      for (final HoronBadgeTone tone in HoronBadgeTone.values) {
         await pumpBadge(
           tester,
-          HoronBadge(label: 'Label', variant: variant),
+          HoronBadge(label: 'Label', tone: tone, dot: true),
           brightness: brightness,
         );
-        expect(tester.takeException(), isNull, reason: '${brightness.name} ${variant.name}');
+        expect(tester.takeException(), isNull, reason: '${brightness.name} ${tone.name}');
       }
     }
-  });
-
-  testWidgets('badge: a missing label and child asserts', (WidgetTester tester) async {
-    expect(() => HoronBadge(), throwsA(isA<AssertionError>()));
   });
 }
