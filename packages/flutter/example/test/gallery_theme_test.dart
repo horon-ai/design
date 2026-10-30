@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-// 배럴은 아직 컴포넌트를 내보내지 않습니다(통합 담당자가 채웁니다).
-// 이 테스트는 테마 슬롯을 읽는 컴포넌트 하나만 필요로 합니다.
 import 'package:horon_ui_example/gallery/gallery_theme.dart';
 
 /// 갤러리 테마가 실제 테마 브리지를 쓰는지 고정합니다.
@@ -31,13 +29,22 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: galleryTheme(brightness),
-          home: const Center(child: HoronBadge(label: 'gallery')),
+          home: Builder(
+            builder: (BuildContext context) => Center(
+              child: Text(
+                'gallery',
+                style: TextStyle(
+                  color: HoronTheme.of(context).colors.textPrimary,
+                ),
+              ),
+            ),
+          ),
         ),
       );
       expect(
         tester.takeException(),
         isNull,
-        reason: '$brightness 갤러리 테마에서 HoronBadge가 예외를 던졌습니다',
+        reason: '$brightness 갤러리 테마에서 테마를 읽는 위젯이 예외를 던졌습니다',
       );
       expect(find.text('gallery'), findsOneWidget);
     }
@@ -59,6 +66,6 @@ void main() {
       ),
     );
     expect(resolved, isNotNull);
-    expect(resolved!.glassFill, isNotNull);
+    expect(resolved!.colors.glassRegular, isNotNull);
   });
 }

@@ -2,224 +2,174 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
-/// 토스트의 자동 닫힘·액션 취소·닫기·스택·위아래 배치를 확인합니다.
-///
-/// 계획이 이름으로 지정한 두 단언이 여기 있습니다.
-/// 1. 자동 닫힘 시간이 지나면 위젯이 사라진다.
-/// 2. 액션 버튼을 누르면 자동 닫힘이 취소된다.
-///
-/// 시간은 `tester.pump(Duration(...))`으로만 흘립니다. `Future.delayed`나 실제
-/// 시계를 쓰지 않습니다.
-void main() {
-  /// 화면 전체를 덮는 `Stack` 위에 뷰포트를 얹은 하네스입니다.
-  Widget harness(
-    HoronToastController controller, {
-    Brightness brightness = Brightness.light,
-    bool top = false,
-    Widget? child,
-    Key? appKey,
-  }) => MaterialApp(
-    key: appKey,
+Widget _host(Widget child, {Brightness brightness = Brightness.light, double width = 400}) {
+  return MaterialApp(
     theme: horonTheme(brightness),
     home: Scaffold(
-      body: HoronToastProvider(
-        controller: controller,
-        child: Stack(
-          children: <Widget>[
-            const SizedBox.expand(),
-            Positioned.fill(child: top ? const HoronToastViewport.top() : const HoronToastViewport()),
-            ?child,
-          ],
-        ),
+      body: Center(
+        child: SizedBox(width: width, child: child),
       ),
     ),
   );
+}
 
-  test('toast: the default auto-dismiss duration is not zero', () {
-    expect(horonToastDefaultDuration, const Duration(milliseconds: 5000));
-    expect(horonToastDefaultDuration, greaterThan(Duration.zero));
-    expect(const HoronToastData().duration, horonToastDefaultDuration);
-  });
+HoronThemeData _theme(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronToast)));
 
-  test('toast: a zero duration is rejected instead of meaning "never close"', () {
-    final HoronToastController controller = HoronToastController();
-    addTearDown(controller.dispose);
-    expect(() => controller.show(const HoronToastData(title: '즉시', duration: Duration.zero)), throwsAssertionError);
-  });
-
-  testWidgets('toast: a card renders its title and description', (WidgetTester tester) async {
-    final HoronToastController controller = HoronToastController();
-    addTearDown(controller.dispose);
-
-    await tester.pumpWidget(harness(controller));
-    controller.show(const HoronToastData(title: '일정을 저장했습니다', description: '오후 3시에 알려 드립니다.'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: HoronDuration.slower));
-
-    expect(find.text('일정을 저장했습니다'), findsOneWidget);
-    expect(find.text('오후 3시에 알려 드립니다.'), findsOneWidget);
-    expect(find.byType(HoronToastRoot), findsOneWidget);
-    expect(find.byType(HoronToastTitle), findsOneWidget);
-    expect(find.byType(HoronToastDescription), findsOneWidget);
-  });
-
-  testWidgets('toast: the card disappears after its auto-dismiss duration', (WidgetTester tester) async {
-    final HoronToastController controller = HoronToastController();
-    addTearDown(controller.dispose);
-
-    await tester.pumpWidget(harness(controller));
-    controller.show(const HoronToastData(title: '곧 사라집니다', duration: Duration(milliseconds: 1000)));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-
-    expect(find.text('곧 사라집니다'), findsOneWidget, reason: '닫힘 시간 전에 사라졌습니다');
-
-    await tester.pump(const Duration(milliseconds: 600));
-
-    expect(find.text('곧 사라집니다'), findsNothing, reason: '자동 닫힘 시간이 지났는데 위젯이 남아 있습니다');
-    expect(find.byType(HoronToastRoot), findsNothing);
-    expect(controller.toasts, isEmpty);
-  });
-
-  testWidgets('toast: pressing the action cancels the auto-dismiss', (WidgetTester tester) async {
-    final HoronToastController controller = HoronToastController();
-    addTearDown(controller.dispose);
-    int actions = 0;
-
-    await tester.pumpWidget(harness(controller));
-    controller.show(
-      HoronToastData(
-        title: '삭제했습니다',
-        actionLabel: '되돌리기',
-        duration: const Duration(milliseconds: 1000),
-        onAction: () => actions++,
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
-
-    await tester.tap(find.byKey(HoronToastRoot.actionKey));
-    await tester.pump();
-
-    expect(actions, 1, reason: '액션 콜백이 한 번 불려야 합니다');
-
-    // 원래 닫힘 시간(1000ms)을 훌쩍 넘겨도 카드가 남아 있어야 합니다.
-    await tester.pump(const Duration(milliseconds: 3000));
-
-    expect(find.text('삭제했습니다'), findsOneWidget, reason: '액션을 눌렀는데 자동 닫힘이 계속 살아 있습니다');
-    expect(controller.toasts, hasLength(1));
-  });
-
-  testWidgets('toast: pressing close dismisses immediately', (WidgetTester tester) async {
-    final HoronToastController controller = HoronToastController();
-    addTearDown(controller.dispose);
-
-    await tester.pumpWidget(harness(controller));
-    controller.show(const HoronToastData(title: '닫아 보세요', duration: Duration(seconds: 30)));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: HoronDuration.slower));
-
-    await tester.tap(find.byKey(HoronToastRoot.closeKey));
-    await tester.pump();
-
-    expect(find.text('닫아 보세요'), findsNothing);
-    expect(controller.toasts, isEmpty);
-  });
-
-  testWidgets('toast: a null duration never closes on its own', (WidgetTester tester) async {
-    final HoronToastController controller = HoronToastController();
-    addTearDown(controller.dispose);
-
-    await tester.pumpWidget(harness(controller));
-    controller.show(const HoronToastData(title: '계속 남습니다', duration: null));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 10));
-
-    expect(find.text('계속 남습니다'), findsOneWidget);
-  });
-
-  testWidgets('toast: the stack peeks the cards behind the newest one', (WidgetTester tester) async {
-    final HoronToastController controller = HoronToastController();
-    addTearDown(controller.dispose);
-
-    await tester.pumpWidget(harness(controller));
-    controller.show(const HoronToastData(title: '첫째', duration: Duration(seconds: 30)));
-    controller.show(const HoronToastData(title: '둘째', duration: Duration(seconds: 30)));
-    controller.show(const HoronToastData(title: '셋째', duration: Duration(seconds: 30)));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: HoronDuration.slower));
-
-    expect(find.byType(HoronToastRoot), findsNWidgets(3));
-
-    // 아래쪽 정렬이므로 뒤 카드는 위로 비켜나고, 작게 그려집니다. React의
-    // `translateY(-index*peek - shrink*height) scale(...)`과 같은 기하입니다.
-    final double newestTop = tester.getTopLeft(find.byKey(HoronToastRoot.keyFor(controller.toasts[2].id))).dy;
-    final double secondTop = tester.getTopLeft(find.byKey(HoronToastRoot.keyFor(controller.toasts[1].id))).dy;
-    final double oldestTop = tester.getTopLeft(find.byKey(HoronToastRoot.keyFor(controller.toasts[0].id))).dy;
-
-    expect(newestTop - secondTop, closeTo(HoronSpace.s3, 0.5), reason: '둘째 카드의 가장자리가 12px 드러나야 합니다');
-    expect(newestTop - oldestTop, closeTo(HoronSpace.s3 * 2, 0.5), reason: '셋째 카드의 가장자리가 24px 드러나야 합니다');
-  });
-
-  testWidgets('toast: the default viewport hugs the bottom edge', (WidgetTester tester) async {
-    final HoronToastController controller = HoronToastController();
-    addTearDown(controller.dispose);
-
-    await tester.pumpWidget(harness(controller));
-    controller.show(const HoronToastData(title: '아래', duration: Duration(seconds: 30)));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: HoronDuration.slower));
-
-    final Rect card = tester.getRect(find.byType(HoronToastRoot));
-    final Size screen = tester.view.physicalSize / tester.view.devicePixelRatio;
-    expect(card.bottom, closeTo(screen.height - HoronSpace.s4, 1.0), reason: '카드가 아래 가장자리에서 16 떨어져야 합니다');
-  });
-
-  testWidgets('toast: the top viewport hugs the top edge', (WidgetTester tester) async {
-    final HoronToastController controller = HoronToastController();
-    addTearDown(controller.dispose);
-
-    await tester.pumpWidget(harness(controller, top: true));
-    controller.show(const HoronToastData(title: '위', duration: Duration(seconds: 30)));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: HoronDuration.slower));
-
-    final Rect card = tester.getRect(find.byType(HoronToastRoot));
-    expect(card.top, closeTo(HoronSpace.s4, 1.0), reason: '카드가 위 가장자리에서 16 떨어져야 합니다');
-  });
-
-  testWidgets('toast: both brightnesses render the card', (WidgetTester tester) async {
+void main() {
+  testWidgets('default state renders in light and dark', (WidgetTester tester) async {
     for (final Brightness brightness in Brightness.values) {
-      final HoronToastController controller = HoronToastController();
-      addTearDown(controller.dispose);
-
-      await tester.pumpWidget(harness(controller, brightness: brightness, appKey: ValueKey<Brightness>(brightness)));
-      controller.show(const HoronToastData(title: '밝기', description: '두 밝기 모두', duration: Duration(seconds: 30)));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: HoronDuration.slower));
-
-      expect(tester.takeException(), isNull, reason: brightness.name);
-      final BuildContext context = tester.element(find.byType(HoronToastRoot));
-      expect(Theme.of(context).brightness, brightness, reason: brightness.name);
-      expect(HoronTheme.of(context).glassFillStrong, isNotNull);
-      expect(find.text('밝기'), findsOneWidget, reason: brightness.name);
+      await tester.pumpWidget(
+        _host(
+          HoronToast(title: '저장했습니다', description: '변경 사항이 반영되었습니다.'),
+          brightness: brightness,
+        ),
+      );
+      expect(tester.takeException(), isNull, reason: '$brightness에서 예외가 없어야 합니다');
     }
   });
 
-  testWidgets('toast: the controller refuses to dismiss an unknown id', (WidgetTester tester) async {
+  testWidgets('every tone paints its own icon and colour', (WidgetTester tester) async {
+    for (final HoronToastTone tone in HoronToastTone.values) {
+      await tester.pumpWidget(_host(HoronToast(title: '알림', tone: tone)));
+      final HoronColors colors = _theme(tester).colors;
+      final (IconData expectedIcon, Color expectedColor) = switch (tone) {
+        HoronToastTone.neutral => (Icons.info_outline, colors.textSecondary),
+        HoronToastTone.success => (Icons.check_circle_outline, colors.textBrand),
+        HoronToastTone.danger => (Icons.error_outline, colors.textDanger),
+      };
+      final Icon icon = tester.widget<Icon>(find.byIcon(expectedIcon));
+      expect(icon.size, 20, reason: '[&_svg]:size-5');
+      expect(icon.color, expectedColor, reason: '$tone 아이콘 색');
+    }
+  });
+
+  testWidgets('the card is a 14px regular glass box with 16/14 padding and two text roles', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(_host(const HoronToast(title: '저장했습니다', description: '반영되었습니다')));
+    final HoronThemeData theme = _theme(tester);
+
+    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'bg-glass-regular');
+    expect(
+      tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier,
+      HoronGlassTier.regular,
+      reason: 'LiquidGlass tier="regular"',
+    );
+    expect(
+      find.byWidgetPredicate(
+        (Widget widget) => widget is Padding && widget.padding == EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      findsOneWidget,
+      reason: 'px-4 py-3.5',
+    );
+
+    final Text title = tester.widget<Text>(find.text('저장했습니다'));
+    expect(title.style!.fontSize, theme.text.labelLg.fontSize, reason: 'text-label-lg');
+    expect(title.style!.color, theme.colors.textPrimary);
+
+    final Text description = tester.widget<Text>(find.text('반영되었습니다'));
+    expect(description.style!.fontSize, theme.text.bodySm.fontSize, reason: 'text-body-sm');
+    expect(description.style!.color, theme.colors.textSecondary);
+    expect(
+      tester.getRect(find.text('반영되었습니다')).top - tester.getRect(find.text('저장했습니다')).bottom,
+      theme.space.s0_5,
+      reason: 'gap-0.5',
+    );
+  });
+
+  testWidgets('the close button is a 16px glyph that calls onDismiss', (WidgetTester tester) async {
+    int dismissed = 0;
+    await tester.pumpWidget(_host(HoronToast(title: '알림', onDismiss: () => dismissed += 1)));
+    final HoronThemeData theme = _theme(tester);
+
+    final Icon close = tester.widget<Icon>(find.byIcon(Icons.close));
+    expect(close.size, 16, reason: '[&_svg]:size-4');
+    expect(close.color, theme.colors.textSecondary);
+
+    await tester.tap(find.byIcon(Icons.close));
+    expect(dismissed, 1);
+  });
+
+  testWidgets('the toaster shows, dismisses and clears toasts through the controller', (WidgetTester tester) async {
     final HoronToastController controller = HoronToastController();
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(harness(controller));
-    final String id = controller.show(const HoronToastData(title: '하나', duration: Duration(seconds: 30)));
-    await tester.pump();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: HoronToaster(controller: controller, child: const SizedBox.expand()),
+        ),
+      ),
+    );
 
-    controller.dismiss('horon-toast-does-not-exist');
-    await tester.pump();
-    expect(controller.toasts, hasLength(1), reason: '없는 식별자를 닫으려 하면 목록이 그대로여야 합니다');
+    controller.show(title: '첫 번째');
+    controller.show(title: '두 번째', tone: HoronToastTone.danger);
+    await tester.pumpAndSettle();
+    expect(find.byType(HoronToast), findsNWidgets(2));
+    expect(controller.toasts.length, 2);
 
-    controller.dismiss(id);
-    await tester.pump();
+    // 카드마다 붙은 닫기 버튼 중 첫 번째를 누릅니다.
+    await tester.tap(find.byIcon(Icons.close).first);
+    await tester.pumpAndSettle();
+    expect(find.byType(HoronToast), findsOneWidget);
+    expect(controller.toasts.single.title, '두 번째');
+
+    controller.clear();
+    await tester.pumpAndSettle();
+    expect(find.byType(HoronToast), findsNothing);
     expect(controller.toasts, isEmpty);
+  });
+
+  testWidgets('the scope hands the controller to descendants and refuses to invent one', (WidgetTester tester) async {
+    final HoronToastController controller = HoronToastController();
+    addTearDown(controller.dispose);
+    late HoronToastController seen;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: HoronToaster(
+          controller: controller,
+          child: Builder(
+            builder: (BuildContext context) {
+              seen = HoronToastScope.of(context);
+              return const SizedBox.expand();
+            },
+          ),
+        ),
+      ),
+    );
+    expect(identical(seen, controller), isTrue);
+
+    // 토스터 밖에서는 컨트롤러가 없으므로 of는 던집니다.
+    await tester.pumpWidget(_host(const HoronToast(title: '알림')));
+    expect(() => HoronToastScope.of(tester.element(find.byType(HoronToast))), throwsStateError);
+  });
+
+  testWidgets('a toast shrinks to the viewport instead of overflowing at 320', (WidgetTester tester) async {
+    final HoronToastController controller = HoronToastController();
+    addTearDown(controller.dispose);
+
+    await tester.binding.setSurfaceSize(const Size(320, 600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: HoronToaster(controller: controller, child: const SizedBox.expand()),
+        ),
+      ),
+    );
+    // 레이아웃만 보는 테스트라 자동 닫힘 타이머를 만들지 않습니다(duration: zero).
+    controller.show(
+      title: '아주 긴 제목이 들어와도 카드는 화면을 넘지 않습니다',
+      description: '설명도 여러 줄로 접힙니다. 토스트는 360px 상한을 넘지 않습니다.',
+      duration: Duration.zero,
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.byType(HoronToast)).width, lessThanOrEqualTo(320 - 48));
   });
 }

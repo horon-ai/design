@@ -1,46 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
-import '../section_scaffold.dart';
-
-/// `kbd` 갤러리 섹션입니다.
+/// `kbd`의 갤러리 섹션입니다.
+///
+/// 단축키 칩 세 가지(글자만, 아이콘 + 글자, 여러 키 조합)를 나란히 보여 줍니다.
 class HoronKbdGallerySection extends StatelessWidget {
-  /// 기본 생성자입니다.
+  /// 섹션을 만듭니다.
   const HoronKbdGallerySection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GallerySectionScaffold(
-      title: 'Kbd',
-      variants: <Widget>[
-        const HoronKbd(label: 'K'),
-        const HoronKbd(label: 'Esc'),
-        const HoronKbd(label: 'Enter'),
-        const HoronKbd(label: 'Shift'),
-        const HoronKbd(label: '⌘'),
-        const HoronKbd(label: '⌥'),
-      ],
-      states: <Widget>[
-        const HoronKbdGroup(
-          children: <Widget>[
-            HoronKbd(label: '⌘'),
-            HoronKbd(label: 'K'),
-          ],
-        ),
-        const HoronKbdGroup(
-          children: <Widget>[
-            HoronKbd(label: 'Ctrl'),
-            HoronKbd(label: 'Shift'),
-            HoronKbd(label: 'P'),
-          ],
-        ),
-        const HoronKbd(label: 'With icon', icon: Icon(Icons.keyboard)),
-        const HoronKbd(label: 'A long key name'),
-      ],
-      notes:
-          'React `kbd.tsx`의 키캡입니다. `h-5 min-w-5 rounded-sm border-border bg-muted '
-          'text-[11px] font-mono`를 옮겼고, 바탕과 글자를 모두 테마 슬롯에서 읽으므로 '
-          '다크에서 밝은 바탕/어두운 글자가 어두운 바탕/밝은 글자로 뒤집힙니다.',
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Padding(
+      padding: EdgeInsets.all(theme.space.s4),
+      child: Wrap(
+        spacing: theme.space.s3,
+        runSpacing: theme.space.s2,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: <Widget>[
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                '글자만',
+                style: theme.text.caption.copyWith(
+                  color: theme.colors.textSecondary,
+                ),
+              ),
+              SizedBox(height: theme.space.s1),
+              const HoronKbd(label: 'K'),
+            ],
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                '아이콘 + 글자',
+                style: theme.text.caption.copyWith(
+                  color: theme.colors.textSecondary,
+                ),
+              ),
+              SizedBox(height: theme.space.s1),
+              const HoronKbd(
+                label: 'K',
+                icon: Icon(Icons.keyboard_command_key),
+              ),
+            ],
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                '키 조합',
+                style: theme.text.caption.copyWith(
+                  color: theme.colors.textSecondary,
+                ),
+              ),
+              SizedBox(height: theme.space.s1),
+              const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  HoronKbd(label: '⌘'),
+                  SizedBox(width: 4),
+                  HoronKbd(label: 'Esc'),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

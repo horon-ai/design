@@ -1,89 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
-import '../section_scaffold.dart';
-
-/// `skeleton` 갤러리 섹션입니다.
+/// `skeleton`의 갤러리 섹션입니다.
+///
+/// 블록·알약 자리표시자와 카드 세 모양을 함께 보여 줍니다.
 class HoronSkeletonGallerySection extends StatelessWidget {
-  /// 기본 생성자입니다.
+  /// 섹션을 만듭니다.
   const HoronSkeletonGallerySection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GallerySectionScaffold(
-      title: 'Skeleton',
-      variants: <Widget>[
-        const SizedBox(
-          width: 240,
-          child: HoronSkeleton(width: 240, height: 12),
-        ),
-        const SizedBox(
-          width: 240,
-          child: HoronSkeleton(width: 180, height: 12),
-        ),
-        const SizedBox(
-          width: 240,
-          child: HoronSkeleton(width: 240, height: 24),
-        ),
-        const SizedBox(
-          width: 48,
-          height: 48,
-          child: HoronSkeleton(
-            width: 48,
-            height: 48,
-            borderRadius: BorderRadius.all(Radius.circular(HoronRadius.full)),
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Padding(
+      padding: EdgeInsets.all(theme.space.s4),
+      child: Wrap(
+        spacing: theme.space.s6,
+        runSpacing: theme.space.s4,
+        crossAxisAlignment: WrapCrossAlignment.start,
+        children: <Widget>[
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                '블록 / 알약',
+                style: theme.text.caption.copyWith(
+                  color: theme.colors.textSecondary,
+                ),
+              ),
+              SizedBox(height: theme.space.s2),
+              const HoronSkeleton(width: 200, height: 10),
+              SizedBox(height: theme.space.s2),
+              const HoronSkeleton(width: 120, height: 8),
+              SizedBox(height: theme.space.s2),
+              const HoronSkeleton(width: 36, height: 36, pill: true),
+            ],
           ),
-        ),
-        const SizedBox(
-          width: 48,
-          height: 48,
-          child: HoronSkeleton(width: 48, height: 48),
-        ),
-      ],
-      states: <Widget>[
-        const SizedBox(
-          width: 240,
-          child: HoronSkeleton(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                HoronSkeletonBar(width: 200, height: 12),
-                SizedBox(height: 8),
-                HoronSkeletonBar(width: 240, height: 12),
-                SizedBox(height: 8),
-                HoronSkeletonBar(width: 160, height: 12),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(
-          width: 240,
-          height: 72,
-          child: HoronSkeletonReveal(
-            loading: true,
-            skeleton: HoronSkeleton(width: 240, height: 72),
-            content: Text('내용'),
-          ),
-        ),
-        const SizedBox(
-          width: 240,
-          height: 72,
-          child: HoronSkeletonReveal(
-            loading: false,
-            skeleton: HoronSkeleton(width: 240, height: 72),
-            content: Text('드러난 내용'),
-          ),
-        ),
-        const SizedBox(
-          width: 240,
-          child: HoronSkeleton(width: 240, height: 12, shimmer: false),
-        ),
-      ],
-      notes:
-          '동작 정본은 `mobile/lib/src/widgets/skeleton.dart`입니다. 2000ms 주기, 바닥 불투명도 '
-          '0.1, 하이라이트 0.5, 400ms 드러내기 크로스페이드(플레이스홀더는 흐려지고 내용은 '
-          '선명해짐)를 그대로 옮겼습니다. Buzz `Radii.sm` 대신 `HoronRadius.sm`을 씁니다. '
-          '`disableAnimations`에서는 멈춥니다.',
+          const HoronSkeletonCard.row(),
+          const HoronSkeletonCard.card(),
+          const HoronSkeletonCard.text(),
+        ],
+      ),
     );
   }
 }

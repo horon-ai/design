@@ -1,92 +1,98 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
-// 배럴 export는 통합 담당자가 소유합니다. 이 파일은 자기 컴포넌트만 하위 경로로 읽어,
-// 배럴에 export가 추가된 뒤에도 `unnecessary_import`가 생기지 않게 합니다.
 
-import '../section_scaffold.dart';
-
-/// `switch` 갤러리 섹션입니다.
+/// Switch 갤러리 섹션입니다.
 ///
-/// 두 크기(`default`·`sm`)와 켜짐·꺼짐·오류·비활성을 모두 그립니다. 켜진 트랙이
-/// `primary`인지, 썸이 오른쪽 끝으로 갔는지 이 화면에서 확인할 수 있습니다.
-class HoronSwitchGallerySection extends StatefulWidget {
+/// 세 크기를 실제로 토글할 수 있게 두고, 라벨이 붙은 형태와 비활성 상태를 함께
+/// 보여 줍니다.
+class HoronSwitchGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronSwitchGallerySection({super.key});
 
   @override
-  State<HoronSwitchGallerySection> createState() =>
-      _HoronSwitchGallerySectionState();
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Padding(
+      padding: EdgeInsets.all(theme.space.s4),
+      child: const _SwitchSamples(),
+    );
+  }
 }
 
-class _HoronSwitchGallerySectionState extends State<HoronSwitchGallerySection> {
-  bool _defaultOn = true;
-  bool _defaultOff = false;
-  bool _smOn = true;
-  bool _smOff = false;
+/// 토글 상태를 들고 있는 샘플 묶음입니다.
+class _SwitchSamples extends StatefulWidget {
+  const _SwitchSamples();
+
+  @override
+  State<_SwitchSamples> createState() => _SwitchSamplesState();
+}
+
+class _SwitchSamplesState extends State<_SwitchSamples> {
+  final Map<HoronSwitchSize, bool> _values = <HoronSwitchSize, bool>{
+    for (final HoronSwitchSize size in HoronSwitchSize.values) size: false,
+  };
+
+  void _set(HoronSwitchSize size, bool value) =>
+      setState(() => _values[size] = value);
 
   @override
   Widget build(BuildContext context) {
-    return GallerySectionScaffold(
-      title: 'Switch',
-      variants: <Widget>[
-        HoronSwitch(
-          value: _defaultOn,
-          label: 'Default on',
-          onChanged: (bool value) => setState(() => _defaultOn = value),
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Wrap(
+      spacing: theme.space.s4,
+      runSpacing: theme.space.s4,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: <Widget>[
+        for (final HoronSwitchSize size in HoronSwitchSize.values)
+          _Sample(
+            label: size.name,
+            child: HoronSwitch(
+              value: _values[size]!,
+              size: size,
+              onChanged: (bool value) => _set(size, value),
+            ),
+          ),
+        _Sample(
+          label: 'label',
+          child: SizedBox(
+            width: 240,
+            child: HoronSwitch(
+              value: _values[HoronSwitchSize.md]!,
+              label: '알림 받기',
+              onChanged: (bool value) => _set(HoronSwitchSize.md, value),
+            ),
+          ),
         ),
-        HoronSwitch(
-          value: _defaultOff,
-          label: 'Default off',
-          onChanged: (bool value) => setState(() => _defaultOff = value),
-        ),
-        HoronSwitch(
-          value: _smOn,
-          size: HoronSwitchSize.sm,
-          label: 'sm on',
-          onChanged: (bool value) => setState(() => _smOn = value),
-        ),
-        HoronSwitch(
-          value: _smOff,
-          size: HoronSwitchSize.sm,
-          label: 'sm off',
-          onChanged: (bool value) => setState(() => _smOff = value),
-        ),
-      ],
-      states: <Widget>[
-        HoronSwitch(
-          value: true,
-          invalid: true,
-          label: 'Invalid on',
-          onChanged: (_) {},
-        ),
-        HoronSwitch(
-          value: false,
-          invalid: true,
-          label: 'Invalid off',
-          onChanged: (_) {},
-        ),
-        HoronSwitch(
-          value: true,
-          enabled: false,
-          label: 'Disabled on',
-          onChanged: (_) {},
-        ),
-        HoronSwitch(
-          value: false,
-          enabled: false,
-          label: 'Disabled off',
-          onChanged: (_) {},
-        ),
-        const HoronSwitch(
-          value: false,
-          size: HoronSwitchSize.sm,
-          label: 'No callback',
+        _Sample(
+          label: 'disabled',
+          child: HoronSwitch(value: true, enabled: false, onChanged: (_) {}),
         ),
       ],
-      notes:
-          'React `switch.tsx`의 `data-[size=default]:h-6 data-[size=default]:w-10`(24×40, 썸 20)과 '
-          '`data-[size=sm]:h-[18px] data-[size=sm]:w-[30px]`(18×30, 썸 14)를 그대로 씁니다. '
-          '켜진 트랙은 primary이고, 썸은 테두리 안쪽에서 오른쪽 끝으로 붙습니다.',
+    );
+  }
+}
+
+/// 변형 하나와 그 이름입니다.
+class _Sample extends StatelessWidget {
+  const _Sample({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: theme.space.s1,
+      children: <Widget>[
+        Text(
+          label,
+          style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+        ),
+        child,
+      ],
     );
   }
 }

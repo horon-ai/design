@@ -1,749 +1,586 @@
-import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
-import '../theme/horon_fonts.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../contracts/horon_strings.dart';
+import '../glass/glass_geometry.dart';
+import '../glass/horon_glass.dart';
+import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
-/// 고른 날짜 범위입니다.
-///
-/// `date-picker.tsx`가 `react-day-picker`에서 다시 내보내는 `DateRange`를 옮긴 것입니다.
-/// React는 `{ from, to? }`라 두 번째 날짜를 아직 고르지 않은 상태가 표현되지만,
-/// Flutter의 `DateTimeRange`는 양 끝이 모두 있어야 하므로 이 타입을 따로 둡니다.
+/// 날짜 범위입니다. React `calendar.tsx`의 `DateRange`와 같은 모양이고, 시작과 끝이
+/// 모두 비어 있을 수 있습니다.
 @immutable
 class HoronDateRange {
-  /// 범위를 만듭니다.
-  const HoronDateRange({this.from, this.to});
+  /// 범위를 만듭니다. 두 끝을 모두 생략하면 빈 범위입니다.
+  const HoronDateRange({this.start, this.end});
 
-  /// 범위의 시작입니다.
-  final DateTime? from;
+  /// 범위의 시작입니다. React `start`.
+  final DateTime? start;
 
-  /// 범위의 끝입니다. 아직 고르지 않았으면 null입니다.
-  final DateTime? to;
-
-  /// 두 끝이 모두 정해졌는지 여부입니다.
-  bool get isComplete => from != null && to != null;
-
-  @override
-  bool operator ==(Object other) => other is HoronDateRange && other.from == from && other.to == to;
-
-  @override
-  int get hashCode => Object.hash(from, to);
-
-  @override
-  String toString() => 'HoronDateRange(from: $from, to: $to)';
+  /// 범위의 끝입니다. React `end`.
+  final DateTime? end;
 }
 
-/// 선택 방식입니다.
+/// 한 달을 고르는 달력입니다.
 ///
-/// React `calendar.tsx`에는 cva `variants:` 블록이 없으므로 공개 변형 enum을 두지
-/// 않습니다. 호출자는 [HoronCalendar]와 [HoronCalendar.range]로 고릅니다.
-enum _HoronCalendarMode { single, range }
-
-/// `calendar.tsx`의 `[--cell-size:--spacing(8)]`입니다.
-const double _cellSize = HoronSpace.s8;
-
-/// `calendar.tsx`의 `p-3`입니다.
-const double _calendarPadding = HoronSpace.s3;
-
-/// `calendar.tsx`의 `gap-4`입니다. 캡션과 그리드 사이, 달과 달 사이 간격입니다.
-const double _calendarGap = HoronSpace.s4;
-
-/// `calendar.tsx`의 `week: mt-2`입니다. 주 사이 세로 간격입니다.
-const double _weekGap = HoronSpace.s2;
-
-/// `weekday`와 날짜 숫자의 `text-xs`/`text-sm` 중 요일 쪽 크기입니다.
-const double _weekdayFontSize = HoronText.caption;
-
-/// 캡션과 날짜 숫자의 `text-sm`입니다.
-const double _dayFontSize = HoronText.body;
-
-/// `[&>span]:opacity-70`입니다. 선택되지 않은 날짜 숫자를 70% 불투명도로 그립니다.
-const double _dayNumberAlpha = 0.7;
-
-/// `focus-visible:ring-3`의 링 두께입니다.
-const double _ringWidth = 3;
-
-/// `ring-ring/50`입니다.
-const double _ringAlpha = 0.5;
-
-/// lucide 셰브론의 `stroke-width` 2를 24 단위로 나눈 값입니다.
-const double _chevronStrokeRatio = 2 / 24;
-
-/// 하루 칸이 그리는 색과 모서리입니다.
-class _HoronDayPaint {
-  const _HoronDayPaint({
-    required this.background,
-    required this.foreground,
-    required this.radius,
-    required this.selected,
-  });
-
-  /// 칸의 배경입니다. null이면 배경을 칠하지 않습니다.
-  final Color? background;
-
-  /// 날짜 숫자의 색입니다.
-  final Color foreground;
-
-  /// 배경의 모서리입니다.
-  final BorderRadius radius;
-
-  /// 선택된 칸인지 여부입니다. 참이면 숫자를 100% 불투명도로 그립니다.
-  final bool selected;
-}
-
-/// 한 달 그리드의 칸 배치입니다.
+/// React `Calendar`: 유리 판 하나에 월 제목, 요일 줄, 날짜 칸이 위에서 아래로
+/// 쌓입니다. 날짜 칸은 40px 정사각형이고, 고른 날은 잉크색 원, 범위 안의 날은
+/// 사각 띠, 오늘은 아래쪽 4px 점으로 표시합니다.
 ///
-/// 그리드를 그리는 위젯과 그 배치를 검사하는 테스트가 같은 계산을 읽도록 칸 수를
-/// 위젯 밖으로 뺐습니다. 달마다 며칠인지는 `DateTime(year, month + 1, 0).day`로
-/// 구합니다. Dart가 13월을 다음 해 1월로, 0일을 그 전 달의 마지막 날로 해석하므로
-/// 윤년 2월과 31일이 없는 달이 예외 없이 같은 식을 지납니다.
-@immutable
-class HoronCalendarGrid {
-  /// 배치를 직접 만듭니다.
-  const HoronCalendarGrid({
-    required this.month,
-    required this.daysInMonth,
-    required this.leadingBlanks,
-    required this.trailingBlanks,
-  });
-
-  /// [month]가 속한 달의 배치를 계산합니다.
-  ///
-  /// [firstDayOfWeek]는 [DateTime.monday](1)부터 [DateTime.sunday](7)까지입니다.
-  factory HoronCalendarGrid.of(DateTime month, {int firstDayOfWeek = DateTime.monday}) {
-    assert(
-      firstDayOfWeek >= DateTime.monday && firstDayOfWeek <= DateTime.sunday,
-      'firstDayOfWeek must be a DateTime weekday constant (1..7).',
-    );
-    final DateTime first = DateTime(month.year, month.month);
-    final int daysInMonth = DateTime(month.year, month.month + 1, 0).day;
-    final int leading = (first.weekday - firstDayOfWeek + 7) % 7;
-    final int trailing = (7 - (leading + daysInMonth) % 7) % 7;
-    return HoronCalendarGrid(month: first, daysInMonth: daysInMonth, leadingBlanks: leading, trailingBlanks: trailing);
-  }
-
-  /// 그리드가 그리는 달의 1일입니다.
-  final DateTime month;
-
-  /// 그 달의 일 수입니다.
-  final int daysInMonth;
-
-  /// 1일 앞에 놓이는 칸 수입니다.
-  final int leadingBlanks;
-
-  /// 마지막 날 뒤에 놓이는 칸 수입니다.
-  final int trailingBlanks;
-
-  /// 그리는 주의 수입니다.
-  int get weekCount => (leadingBlanks + daysInMonth + trailingBlanks) ~/ 7;
-
-  /// 그리는 칸의 수입니다. 언제나 7의 배수입니다.
-  int get cellCount => weekCount * 7;
-
-  /// [cellIndex]번째 칸이 가리키는 날짜입니다.
-  ///
-  /// 앞·뒤 칸은 이웃 달의 날짜를 가리킵니다. 그 칸을 빈 칸으로 그릴지는 호출자가
-  /// 정합니다.
-  DateTime dateAt(int cellIndex) => DateTime(month.year, month.month, cellIndex - leadingBlanks + 1);
-
-  @override
-  bool operator ==(Object other) =>
-      other is HoronCalendarGrid &&
-      other.month == month &&
-      other.daysInMonth == daysInMonth &&
-      other.leadingBlanks == leadingBlanks &&
-      other.trailingBlanks == trailingBlanks;
-
-  @override
-  int get hashCode => Object.hash(month, daysInMonth, leadingBlanks, trailingBlanks);
-
-  @override
-  String toString() =>
-      'HoronCalendarGrid(${month.year}-${month.month}, days: $daysInMonth, '
-      'leading: $leadingBlanks, trailing: $trailingBlanks, weeks: $weekCount)';
-}
-
-/// 월 그리드를 그리는 달력입니다.
+/// 두 가지 모양이 있습니다. [popover]가 거짓이면 날짜 고르기 달력(60:245)으로
+/// 가운데 정렬한 `title-sm` 제목과 20px 화살표를 쓰고, 참이면 캘린더 팝오버
+/// (88:495)로 왼쪽 정렬한 `label-lg` 제목과 32px 둥근 화살표를 씁니다.
 ///
-/// `calendar.tsx`를 옮긴 것입니다. `react-day-picker`의 `DayPicker`를 그대로 쓰지 않고
-/// 그리드를 직접 그리는 이유는, 이 패키지가 CSS도 아이콘 폰트도 들고 있지 않아 셀
-/// 크기·강조 색·주 시작일을 여기서 정해야 하기 때문입니다.
-///
-/// [HoronCalendar]는 하루를 고르고, [HoronCalendar.range]는 시작과 끝을 고릅니다.
-/// 범위 모드에서 두 번째로 누른 날짜가 첫 날짜보다 앞서면 그 날짜를 새 시작으로 삼고
-/// 끝은 비웁니다(`react-day-picker`와 같은 동작).
-///
-/// 그리드는 `Table`이 아니라 `Column`·`Row`·`Expanded`로 짭니다. 그래야 한 칸의 크기를
-/// `--cell-size`(32)로 고정하고 달 수를 바꿀 수 있습니다.
-///
-/// 칸은 [ValueKey]를 들고 있어 테스트와 호스트가 직접 찾을 수 있습니다.
-///
-/// - 이번 달의 날짜: `calendar-day-<달 번호>-<yyyy-mm-dd>`
-/// - 이웃 달의 날짜: `calendar-outside-<달 번호>-<yyyy-mm-dd>`
-/// - [showOutsideDays]가 거짓일 때의 빈 칸: `calendar-blank-<달 번호>-<칸 번호>`
-///
-/// ```dart
-/// HoronCalendar(
-///   selected: due,
-///   firstDayOfWeek: DateTime.sunday,
-///   onSelected: (DateTime? date) => setDue(date),
-/// );
-/// ```
+/// React는 `mode: "single" | "range"`로 값의 모양을 가릅니다. Dart에는 그 차이를
+/// [range]와 [onRangeChange]를 넘겼는지로 표현합니다. 둘 다 넘기지 않으면 날짜
+/// 하나를 고르고, 넘기면 범위를 고릅니다.
 class HoronCalendar extends StatefulWidget {
-  /// 이전 달 버튼의 키입니다. React의 `button_previous` 자리입니다.
-  static const Key previousMonthKey = ValueKey<String>('horon-calendar-previous');
-
-  /// 다음 달 버튼의 키입니다. React의 `button_next` 자리입니다.
-  static const Key nextMonthKey = ValueKey<String>('horon-calendar-next');
-
-  /// 하루를 고르는 달력을 만듭니다.
+  /// 날짜 하나를 고르는 달력을 만듭니다(React `mode: "single"`).
   const HoronCalendar({
     super.key,
-    this.month,
-    this.initialMonth,
-    this.selected,
-    this.onSelected,
-    this.firstDayOfWeek = DateTime.monday,
-    this.showOutsideDays = true,
-    this.months = 1,
-    this.background = true,
-    this.onMonthChanged,
-    this.today,
-    this.semanticLabel,
-  }) : _mode = _HoronCalendarMode.single,
-       range = null,
-       onRangeSelected = null,
-       assert(months > 0, 'HoronCalendar draws at least one month.'),
-       assert(
-         firstDayOfWeek >= DateTime.monday && firstDayOfWeek <= DateTime.sunday,
-         'firstDayOfWeek must be a DateTime weekday constant (1..7).',
-       );
-
-  /// 범위를 고르는 달력을 만듭니다.
-  const HoronCalendar.range({
-    super.key,
-    this.month,
-    this.initialMonth,
+    this.value,
+    this.onValueChange,
     this.range,
-    this.onRangeSelected,
-    this.firstDayOfWeek = DateTime.monday,
-    this.showOutsideDays = true,
-    this.months = 1,
-    this.background = true,
-    this.onMonthChanged,
+    this.onRangeChange,
+    this.defaultMonth,
+    this.month,
+    this.onMonthChange,
+    this.isDateDisabled,
+    this.weekStartsOn = 0,
     this.today,
-    this.semanticLabel,
-  }) : _mode = _HoronCalendarMode.range,
-       selected = null,
-       onSelected = null,
-       assert(months > 0, 'HoronCalendar draws at least one month.'),
-       assert(
-         firstDayOfWeek >= DateTime.monday && firstDayOfWeek <= DateTime.sunday,
-         'firstDayOfWeek must be a DateTime weekday constant (1..7).',
+    this.popover = false,
+    this.width,
+  }) : assert(
+         range == null && onRangeChange == null || value == null && onValueChange == null,
+         'single 모드(value)와 range 모드(range)를 함께 넘길 수 없습니다.',
        );
 
-  /// 보여 줄 달입니다. 넘기면 제어 모드가 되어 이 위젯이 달을 바꾸지 않습니다.
-  final DateTime? month;
+  /// 고른 날짜입니다. React `value`(single 모드).
+  final DateTime? value;
 
-  /// 처음 보여 줄 달입니다. 없으면 선택된 날짜의 달, 그것도 없으면 이번 달입니다.
-  final DateTime? initialMonth;
+  /// 달력의 고유 폭입니다. 넘기면 [LayoutBuilder] 없이 그 폭으로 그립니다.
+  ///
+  /// 팝업처럼 자식의 고유 크기를 묻는 부모 아래에서는 반드시 넘겨야 합니다.
+  /// `LayoutBuilder` 는 고유 크기 질문에 답하지 못해 예외가 나기 때문입니다.
+  final double? width;
 
-  /// 하루 선택 모드에서 고른 날짜입니다. [HoronCalendar.range]에서는 null입니다.
-  final DateTime? selected;
+  /// 날짜를 골랐을 때 호출됩니다. React `onValueChange`(single 모드).
+  final ValueChanged<DateTime>? onValueChange;
 
-  /// 하루를 골랐을 때 부릅니다. 같은 날짜를 다시 누르면 null이 옵니다.
-  final ValueChanged<DateTime?>? onSelected;
-
-  /// 범위 선택 모드에서 고른 범위입니다. [HoronCalendar]에서는 null입니다.
+  /// 고른 범위입니다. React `value`(range 모드).
   final HoronDateRange? range;
 
-  /// 범위를 골랐을 때 부릅니다.
-  final ValueChanged<HoronDateRange?>? onRangeSelected;
+  /// 범위를 골랐을 때 호출됩니다. React `onValueChange`(range 모드).
+  final ValueChanged<HoronDateRange>? onRangeChange;
 
-  /// 한 주의 첫 요일입니다. [DateTime.monday](1)부터 [DateTime.sunday](7)까지입니다.
-  final int firstDayOfWeek;
+  /// 처음 보이는 달입니다. 생략하면 고른 날이나 오늘이 있는 달입니다.
+  final DateTime? defaultMonth;
 
-  /// 이번 달이 아닌 날짜도 숫자와 함께 그릴지 여부입니다. React의 `showOutsideDays`
-  /// 기본값은 참입니다. 거짓이면 그 자리를 빈 칸으로 둡니다.
-  final bool showOutsideDays;
+  /// 보이는 달을 바깥에서 정합니다. React `month`(제어 모드).
+  final DateTime? month;
 
-  /// 한 번에 그릴 달의 수입니다. React의 `numberOfMonths`입니다.
-  final int months;
+  /// 보이는 달이 바뀔 때 호출됩니다. React `onMonthChange`.
+  final ValueChanged<DateTime>? onMonthChange;
 
-  /// 카드 색 배경과 안쪽 여백을 그릴지 여부입니다.
-  ///
-  /// React는 `bg-card p-3`를 그리고 카드·팝오버 안에서는 투명으로 바꿉니다. 그 자리를
-  /// 이 인자가 대신합니다.
-  final bool background;
+  /// 고를 수 없는 날을 알려 줍니다. React `isDateDisabled`.
+  final bool Function(DateTime date)? isDateDisabled;
 
-  /// 달이 바뀔 때 부릅니다. 넘기는 값은 새로 보이는 첫 달의 1일입니다.
-  final ValueChanged<DateTime>? onMonthChanged;
+  /// 0이면 일요일, 1이면 월요일에서 한 주가 시작합니다. React `weekStartsOn`.
+  final int weekStartsOn;
 
-  /// 오늘로 강조할 날짜입니다. 없으면 오늘입니다. 테스트가 실행 날짜에 흔들리지
-  /// 않도록 넘길 수 있게 두었습니다.
+  /// 오늘로 칠 날입니다. 생략하면 기기 시각입니다. React `today`.
   final DateTime? today;
 
-  /// 보조 기술이 읽을 달력의 이름입니다.
-  final String? semanticLabel;
-
-  final _HoronCalendarMode _mode;
+  /// 팝오버 모양으로 그립니다. React `variant: "popover"`.
+  ///
+  /// React의 `variant`는 `export type`이 아닌 인라인 유니온이라 공개 enum이 될 수
+  /// 없습니다. variant 게이트는 React에 없는 공개 enum을 거부하므로 불리언으로
+  /// 옮겼습니다.
+  final bool popover;
 
   @override
   State<HoronCalendar> createState() => _HoronCalendarState();
 }
 
 class _HoronCalendarState extends State<HoronCalendar> {
-  late DateTime _displayedMonth;
-  DateTime? _internalSelected;
-  HoronDateRange? _internalRange;
+  /// `size-10` — 날짜 칸의 한 변입니다.
+  static const double _cellSize = 40;
 
-  DateTime? get _selected => widget.selected ?? _internalSelected;
+  /// 좁은 폭에서도 칸이 글자를 담을 수 있는 최소 크기입니다.
+  static const double _minCellSize = 28;
 
-  HoronDateRange? get _range => widget.range ?? _internalRange;
+  /// `h-6` — 요일 줄의 높이입니다.
+  static const double _weekdayHeight = 24;
+
+  /// `rounded-[24px]` — 팝오버 변형의 반경입니다.
+  static const double _popoverRadius = 24;
+
+  /// `size-8` — 팝오버 변형 화살표 버튼의 한 변입니다.
+  static const double _popoverArrowSize = 32;
+
+  /// `size-4.5` — 팝오버 변형 화살표 아이콘입니다.
+  static const double _popoverArrowIcon = 18;
+
+  /// `size-5` — 기본 변형 화살표 버튼과 아이콘의 한 변입니다.
+  static const double _defaultArrowSize = 20;
+
+  /// `size-1` — 오늘을 표시하는 점의 지름입니다.
+  static const double _todayDotSize = 4;
+
+  /// `top-8` — 오늘 점이 칸 위에서 떨어진 거리입니다.
+  static const double _todayDotTop = 32;
+
+  /// `outline-2` — 포커스 테두리 두께입니다.
+  static const double _focusWidth = 2;
+
+  late DateTime _monthState;
+  late DateTime _focused;
+  final FocusNode _gridFocus = FocusNode(debugLabel: 'horon-calendar-grid');
+
+  bool get _isRange => widget.range != null || widget.onRangeChange != null;
+
+  DateTime get _anchor => widget.range?.start ?? widget.value ?? _today;
+
+  DateTime get _today => _startOfDay(widget.today ?? DateTime.now());
+
+  DateTime get _visibleMonth => widget.month == null ? _monthState : _firstOfMonth(widget.month!);
 
   @override
   void initState() {
     super.initState();
-    _internalSelected = widget.selected;
-    _internalRange = widget.range;
-    _displayedMonth = _monthOf(
-      widget.month ?? widget.initialMonth ?? _selected ?? _range?.from ?? widget.today ?? DateTime.now(),
-    );
+    _monthState = _firstOfMonth(widget.defaultMonth ?? _anchor);
+    _focused = _anchor;
   }
 
   @override
-  void didUpdateWidget(covariant HoronCalendar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    final DateTime? next = widget.month;
-    if (next != null && next != oldWidget.month) _displayedMonth = _monthOf(next);
+  void dispose() {
+    _gridFocus.dispose();
+    super.dispose();
   }
 
-  static DateTime _monthOf(DateTime date) => DateTime(date.year, date.month);
-
-  static bool _isSameDay(DateTime? a, DateTime? b) =>
-      a != null && b != null && a.year == b.year && a.month == b.month && a.day == b.day;
-
-  static String _isoDate(DateTime date) =>
-      '${date.year.toString().padLeft(4, '0')}-'
-      '${date.month.toString().padLeft(2, '0')}-'
-      '${date.day.toString().padLeft(2, '0')}';
-
-  void _shiftMonth(int delta) {
-    final DateTime next = DateTime(_displayedMonth.year, _displayedMonth.month + delta);
-    widget.onMonthChanged?.call(next);
-    if (widget.month == null) setState(() => _displayedMonth = next);
+  void _setMonth(DateTime next) {
+    if (widget.month == null) setState(() => _monthState = _firstOfMonth(next));
+    widget.onMonthChange?.call(_firstOfMonth(next));
   }
 
-  void _handleDayTap(DateTime day) {
-    if (widget._mode == _HoronCalendarMode.single) {
-      // React DayPicker의 단일 선택은 고른 날을 다시 누르면 선택을 풉니다.
-      final DateTime? next = _isSameDay(_selected, day) ? null : day;
-      if (widget.selected == null) setState(() => _internalSelected = next);
-      widget.onSelected?.call(next);
+  bool _isSelected(DateTime date) {
+    if (_isRange) {
+      final HoronDateRange? range = widget.range;
+      return _sameDay(date, range?.start) || _sameDay(date, range?.end);
+    }
+    return _sameDay(date, widget.value);
+  }
+
+  bool _inRange(DateTime date) {
+    final HoronDateRange? range = widget.range;
+    if (range?.start == null || range?.end == null) return false;
+    final DateTime start = _startOfDay(range!.start!);
+    final DateTime end = _startOfDay(range.end!);
+    return date.isAfter(start) && date.isBefore(end);
+  }
+
+  void _select(DateTime date) {
+    setState(() => _focused = date);
+    _gridFocus.requestFocus();
+    if (_isRange) {
+      final HoronDateRange current = widget.range ?? const HoronDateRange();
+      final bool restart = current.start == null || current.end != null || date.isBefore(current.start!);
+      widget.onRangeChange?.call(
+        restart ? HoronDateRange(start: date) : HoronDateRange(start: current.start, end: date),
+      );
       return;
     }
+    widget.onValueChange?.call(date);
+  }
 
-    final HoronDateRange current = _range ?? const HoronDateRange();
-    final HoronDateRange next;
-    if (current.from == null || current.to != null) {
-      next = HoronDateRange(from: day);
-    } else if (day.isBefore(current.from!)) {
-      next = HoronDateRange(from: day);
-    } else {
-      next = HoronDateRange(from: current.from, to: day);
+  void _moveFocus(DateTime next) {
+    setState(() => _focused = next);
+    final DateTime month = _visibleMonth;
+    if (next.month != month.month || next.year != month.year) {
+      _setMonth(_firstOfMonth(next));
     }
-    if (widget.range == null) setState(() => _internalRange = next);
-    widget.onRangeSelected?.call(next);
+  }
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+    final int? step = switch (event.logicalKey) {
+      LogicalKeyboardKey.arrowLeft => -1,
+      LogicalKeyboardKey.arrowRight => 1,
+      LogicalKeyboardKey.arrowUp => -7,
+      LogicalKeyboardKey.arrowDown => 7,
+      _ => null,
+    };
+    if (step == null) return KeyEventResult.ignored;
+    _moveFocus(_addDays(_focused, step));
+    return KeyEventResult.handled;
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<DateTime> visible = <DateTime>[
-      for (int index = 0; index < widget.months; index++) DateTime(_displayedMonth.year, _displayedMonth.month + index),
-    ];
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronSpaceSpec space = theme.space;
+    final HoronStrings strings = theme.strings;
 
-    final Widget body = widget.months == 1
-        ? Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SizedBox(height: _cellSize, child: _captionWithNav(context, visible.first)),
-              const SizedBox(height: _calendarGap),
-              _monthBody(context, visible.first, 0),
-            ],
-          )
-        : Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SizedBox(height: _cellSize, child: _navRow(context, visible)),
-              const SizedBox(height: _calendarGap),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  for (int index = 0; index < visible.length; index++) ...<Widget>[
-                    if (index > 0) const SizedBox(width: _calendarGap),
-                    SizedBox(
-                      width: _cellSize * 7,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          SizedBox(
-                            height: _cellSize,
-                            child: Center(child: _caption(context, visible[index])),
-                          ),
-                          const SizedBox(height: _calendarGap),
-                          _monthBody(context, visible[index], index),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-          );
+    final DateTime month = _visibleMonth;
+    final List<DateTime> days = _monthGrid(month, widget.weekStartsOn);
+    final String title = '${strings.monthNames[month.month - 1]} ${month.year}';
+    final BorderRadius radius = BorderRadius.circular(widget.popover ? _popoverRadius : theme.radius.xl);
+    final double padding = widget.popover ? space.s3_5 : space.s4;
+    final double gap = widget.popover ? space.s2 : space.s3;
+    final DateTime today = _today;
 
-    // 달력의 폭은 칸 크기와 달 수로 정해집니다(한 달 224, 두 달 488). 폭이 모자라면
-    // 그대로 두었을 때 `Row`가 부모를 넘어 `RenderFlex overflowed`가 납니다(360 폭에서
-    // 151px·208px, 2026-10-22 렌더 스윕). 가로 스크롤 뷰는 자식이 들어가면 자식 폭을
-    // 그대로 보고하므로 넓은 자리에서는 지금과 같은 크기로 서고, 모자랄 때만 흔려
-    // 보냅니다. date-picker 패널이 쓰는 방식과 같습니다.
+    // 폭을 호출자가 주면(팝업처럼 자식의 고유 크기를 묻는 부모 아래) LayoutBuilder 를
+    // 건너뜁니다. LayoutBuilder 는 고유 크기 질문에 답하지 못해 예외가 납니다.
+    if (widget.width != null) {
+      return _buildSurface(
+        theme: theme,
+        strings: strings,
+        days: days,
+        month: month,
+        title: title,
+        today: today,
+        radius: radius,
+        padding: padding,
+        gap: gap,
+        maxWidth: widget.width!,
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        // `w-fit` — 일곱 칸이 자연 폭이지만, 부모가 더 좁으면 칸을 줄여 맞춥니다.
+        final double maxWidth = constraints.maxWidth.isFinite ? constraints.maxWidth : _cellSize * 7;
+        return _buildSurface(
+          theme: theme,
+          strings: strings,
+          days: days,
+          month: month,
+          title: title,
+          today: today,
+          radius: radius,
+          padding: padding,
+          gap: gap,
+          maxWidth: maxWidth,
+        );
+      },
+    );
+  }
+
+  Widget _buildSurface({
+    required HoronThemeData theme,
+    required HoronStrings strings,
+    required List<DateTime> days,
+    required DateTime month,
+    required String title,
+    required DateTime today,
+    required BorderRadius radius,
+    required double padding,
+    required double gap,
+    required double maxWidth,
+  }) {
+    final HoronColors colors = theme.colors;
+    final double available = maxWidth - padding * 2;
+    final double cell = math.min(_cellSize, math.max(_minCellSize, available / 7));
+
     return Semantics(
       container: true,
-      label: widget.semanticLabel,
-      // React의 루트는 `w-fit`입니다. 폭을 주지 않으면 부모가 넓을 때 캡션 줄이
-      // 화면 폭까지 늘어나 좌우 화살표가 달력에서 멀어집니다(2026-10-22 렌더 확인).
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: SizedBox(
-          width: _cellSize * 7 * widget.months + _calendarGap * (widget.months - 1) + _calendarPadding * 2,
-          child: widget.background
-              ? DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(HoronRadiusRole.card),
-                  ),
-                  child: Padding(padding: const EdgeInsets.all(_calendarPadding), child: body),
-                )
-              : body,
-        ),
-      ),
-    );
-  }
-
-  /// 한 달의 요일 머리글과 주 그리드입니다.
-  Widget _monthBody(BuildContext context, DateTime month, int monthIndex) {
-    final HoronCalendarGrid grid = HoronCalendarGrid.of(month, firstDayOfWeek: widget.firstDayOfWeek);
-    return SizedBox(
-      width: _cellSize * 7,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          _weekdayHeader(context),
-          for (int week = 0; week < grid.weekCount; week++)
-            Padding(
-              padding: const EdgeInsets.only(top: _weekGap),
-              child: Row(
+      child: HoronLiquidGlass(
+        tier: HoronGlassTier.thick,
+        borderRadius: radius,
+        child: DecoratedBox(
+          key: const Key('horon-calendar-surface'),
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            border: Border.all(color: colors.glassRimStrong),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(padding),
+            child: SizedBox(
+              width: cell * 7,
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: gap,
                 children: <Widget>[
-                  for (int slot = 0; slot < 7; slot++)
-                    Expanded(
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: _cell(context, grid: grid, monthIndex: monthIndex, cellIndex: week * 7 + slot),
-                      ),
+                  if (widget.popover) _buildPopoverHeader(theme, title) else _buildDefaultHeader(theme, title),
+                  Focus(
+                    focusNode: _gridFocus,
+                    onKeyEvent: _handleKeyEvent,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        _buildWeekdays(theme, strings, days, cell),
+                        for (int week = 0; week < days.length ~/ 7; week++)
+                          _buildWeek(
+                            theme: theme,
+                            days: days.sublist(week * 7, week * 7 + 7),
+                            month: month,
+                            today: today,
+                            cell: cell,
+                          ),
+                      ],
                     ),
+                  ),
                 ],
               ),
             ),
-        ],
+          ),
+        ),
       ),
     );
   }
 
-  /// 캡션 가운데에 달 이름을, 양 끝에 이전·다음 버튼을 놓습니다.
-  ///
-  /// React는 `nav`를 캡션 위에 절대 배치하고(`absolute inset-x-0 top-0`) 캡션에
-  /// `px-(--cell-size)`를 줍니다. 여기서는 같은 결과를 [Stack]으로 만듭니다.
-  Widget _captionWithNav(BuildContext context, DateTime month) {
-    return Stack(
-      children: <Widget>[
-        Positioned.fill(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: _cellSize),
-            child: Center(child: _caption(context, month)),
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[_navButton(context, delta: -1), _navButton(context, delta: 1)],
-        ),
-      ],
-    );
-  }
-
-  /// 여러 달을 그릴 때의 이전·다음 버튼 줄입니다.
-  Widget _navRow(BuildContext context, List<DateTime> visible) {
+  Widget _buildDefaultHeader(HoronThemeData theme, String title) {
+    final HoronColors colors = theme.colors;
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        _navButton(context, delta: -1),
-        Text(
-          '${_monthName(context, visible.first)} – ${_monthName(context, visible.last)}',
-          maxLines: 1,
-          softWrap: false,
-          style: TextStyle(
-            fontFamily: HoronFont.body,
-            fontFamilyFallback: HoronFont.fontFamilyFallback,
-            fontSize: _weekdayFontSize,
-            height: HoronLineHeight.none,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            decoration: TextDecoration.none,
+        _CaretButton(
+          key: const Key('horon-calendar-prev'),
+          icon: Icons.chevron_left,
+          color: colors.textSecondary,
+          size: _defaultArrowSize,
+          iconSize: _defaultArrowSize,
+          label: theme.strings.previousPage,
+          onPressed: () => _setMonth(_addMonths(_visibleMonth, -1)),
+        ),
+        Expanded(
+          child: Semantics(
+            liveRegion: true,
+            child: Text(
+              title,
+              key: const Key('horon-calendar-title'),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              // `text-title-sm text-text-primary`.
+              style: theme.text.titleSm.copyWith(color: colors.textPrimary),
+            ),
           ),
         ),
-        _navButton(context, delta: 1),
+        _CaretButton(
+          key: const Key('horon-calendar-next'),
+          icon: Icons.chevron_right,
+          color: colors.textSecondary,
+          size: _defaultArrowSize,
+          iconSize: _defaultArrowSize,
+          label: theme.strings.nextPage,
+          onPressed: () => _setMonth(_addMonths(_visibleMonth, 1)),
+        ),
       ],
     );
   }
 
-  Widget _caption(BuildContext context, DateTime month) {
-    return Text(
-      _monthName(context, month),
-      maxLines: 1,
-      softWrap: false,
-      style: TextStyle(
-        fontFamily: HoronFont.body,
-        fontFamilyFallback: HoronFont.fontFamilyFallback,
-        fontSize: _dayFontSize,
-        fontWeight: HoronFontWeight.medium,
-        height: HoronLineHeight.none,
-        color: Theme.of(context).colorScheme.onSurface,
-        decoration: TextDecoration.none,
-      ),
-    );
-  }
-
-  /// 달 이름과 연도입니다. React `captionLayout="label"`의 기본 표기입니다.
-  ///
-  /// 달 이름은 [HoronStrings.monthNames]에서 읽습니다. 이 패키지는 번역 데이터를
-  /// 들고 있지 않으므로 새 문구를 만들지 않습니다.
-  String _monthName(BuildContext context, DateTime month) {
-    final List<String> names = HoronTheme.of(context).strings.monthNames;
-    final String name = names.isEmpty ? '${month.month}' : names[month.month - 1];
-    return '$name ${month.year}';
-  }
-
-  Widget _navButton(BuildContext context, {required int delta}) {
-    final HoronThemeData horon = HoronTheme.of(context);
-    return _HoronCalendarNavButton(
-      key: delta < 0 ? HoronCalendar.previousMonthKey : HoronCalendar.nextMonthKey,
-      semanticLabel: delta < 0 ? horon.strings.previousPage : horon.strings.nextPage,
-      pointsLeft: delta < 0,
-      onPressed: () => _shiftMonth(delta),
-    );
-  }
-
-  Widget _weekdayHeader(BuildContext context) {
-    final List<String> names = HoronTheme.of(context).strings.weekdayNames;
+  Widget _buildPopoverHeader(HoronThemeData theme, String title) {
+    final HoronColors colors = theme.colors;
+    final HoronSpaceSpec space = theme.space;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: HoronSpace.s1),
+      // `pb-1 pl-1.5`.
+      padding: EdgeInsets.only(bottom: space.s1, left: space.s1_5),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        // `gap-1`.
+        spacing: space.s1,
         children: <Widget>[
-          for (int slot = 0; slot < 7; slot++)
-            Expanded(
-              child: Center(
-                child: Text(
-                  _weekdayLabel(names, slot),
-                  maxLines: 1,
-                  softWrap: false,
-                  style: TextStyle(
-                    fontFamily: HoronFont.body,
-                    fontFamilyFallback: HoronFont.fontFamilyFallback,
-                    fontSize: _weekdayFontSize,
-                    fontWeight: HoronFontWeight.regular,
-                    height: HoronLineHeight.none,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    decoration: TextDecoration.none,
-                  ),
-                ),
+          Expanded(
+            child: Semantics(
+              liveRegion: true,
+              child: Text(
+                title,
+                key: const Key('horon-calendar-title'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                // `text-label-lg text-text-primary`.
+                style: theme.text.labelLg.copyWith(color: colors.textPrimary),
               ),
             ),
+          ),
+          _CaretButton(
+            key: const Key('horon-calendar-prev'),
+            icon: Icons.chevron_left,
+            color: colors.textSecondary,
+            size: _popoverArrowSize,
+            iconSize: _popoverArrowIcon,
+            hoverColor: colors.overlayInk6,
+            label: theme.strings.previousPage,
+            onPressed: () => _setMonth(_addMonths(_visibleMonth, -1)),
+          ),
+          _CaretButton(
+            key: const Key('horon-calendar-next'),
+            icon: Icons.chevron_right,
+            color: colors.textSecondary,
+            size: _popoverArrowSize,
+            iconSize: _popoverArrowIcon,
+            hoverColor: colors.overlayInk6,
+            label: theme.strings.nextPage,
+            onPressed: () => _setMonth(_addMonths(_visibleMonth, 1)),
+          ),
         ],
       ),
     );
   }
 
-  /// 요일 이름을 칸 폭에 맞게 줄입니다.
-  ///
-  /// `HoronStrings.weekdayNames`는 월요일부터 일요일까지의 온전한 이름이므로, 라틴
-  /// 문자는 두 글자(`Monday` → `Mo`), 그 밖의 문자는 첫 글자(`월요일` → `월`)를
-  /// 씁니다. 새 문구를 만들지 않고 호스트가 준 이름에서 줄이기만 합니다.
-  String _weekdayLabel(List<String> names, int slot) {
-    if (names.isEmpty) return '';
-    final String name = names[(widget.firstDayOfWeek - 1 + slot) % names.length];
-    if (name.isEmpty) return '';
-    final int length = name.codeUnitAt(0) < 0x80 ? 2 : 1;
-    return name.length <= length ? name : name.substring(0, length);
-  }
-
-  Widget _cell(
-    BuildContext context, {
-    required HoronCalendarGrid grid,
-    required int monthIndex,
-    required int cellIndex,
-  }) {
-    final bool outside = cellIndex < grid.leadingBlanks || cellIndex >= grid.leadingBlanks + grid.daysInMonth;
-    if (outside && !widget.showOutsideDays) {
-      return SizedBox(key: ValueKey<String>('calendar-blank-$monthIndex-$cellIndex'));
-    }
-
-    final DateTime day = grid.dateAt(cellIndex);
-    final String prefix = outside ? 'calendar-outside' : 'calendar-day';
-    return SizedBox(
-      key: ValueKey<String>('$prefix-$monthIndex-${_isoDate(day)}'),
-      child: _HoronCalendarDay(
-        paint: _paintFor(context, day, outside: outside),
-        label: '${day.day}',
-        semanticLabel: _isoDate(day),
-        onTap: () => _handleDayTap(day),
-      ),
+  Widget _buildWeekdays(HoronThemeData theme, HoronStrings strings, List<DateTime> days, double cell) {
+    final HoronColors colors = theme.colors;
+    return Row(
+      children: <Widget>[
+        for (final DateTime date in days.take(7))
+          SizedBox(
+            width: cell,
+            height: _weekdayHeight,
+            child: Center(
+              child: Text(
+                _narrowWeekday(strings.weekdayNames[date.weekday - 1]),
+                maxLines: 1,
+                // `text-caption text-text-secondary`.
+                style: theme.text.caption.copyWith(color: colors.textSecondary),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
-  /// 하루 칸이 그릴 색을 정합니다.
-  ///
-  /// React의 우선순위를 그대로 따릅니다. 범위의 시작·끝과 단일 선택은 `bg-primary`,
-  /// 범위 안쪽과 오늘은 `bg-accent`입니다.
-  _HoronDayPaint _paintFor(BuildContext context, DateTime day, {required bool outside}) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final BorderRadius rounded = BorderRadius.circular(HoronRadius.md);
-    final bool isToday = _isSameDay(widget.today ?? DateTime.now(), day);
-    final Color plain = outside ? scheme.onSurfaceVariant : scheme.onSurface;
-
-    if (widget._mode == _HoronCalendarMode.single) {
-      if (_isSameDay(_selected, day)) {
-        return _HoronDayPaint(
-          background: scheme.primary,
-          foreground: scheme.onPrimary,
-          radius: rounded,
-          selected: true,
-        );
-      }
-      return _HoronDayPaint(
-        background: isToday ? scheme.surfaceContainerHighest : null,
-        foreground: plain,
-        radius: rounded,
-        selected: false,
-      );
-    }
-
-    final HoronDateRange range = _range ?? const HoronDateRange();
-    final DateTime? from = range.from;
-    final DateTime? to = range.to;
-    final bool isStart = _isSameDay(from, day);
-    final bool isEnd = _isSameDay(to, day);
-    if (isStart || isEnd) {
-      final bool singleDay = isStart && isEnd;
-      return _HoronDayPaint(
-        background: scheme.primary,
-        foreground: scheme.onPrimary,
-        radius: singleDay
-            ? rounded
-            : BorderRadius.horizontal(
-                left: isStart ? const Radius.circular(HoronRadius.md) : Radius.zero,
-                right: isEnd ? const Radius.circular(HoronRadius.md) : Radius.zero,
-              ),
-        selected: true,
-      );
-    }
-    if (from != null && to != null && day.isAfter(from) && day.isBefore(to)) {
-      return _HoronDayPaint(
-        background: scheme.surfaceContainerHighest,
-        foreground: scheme.onSurface,
-        radius: BorderRadius.zero,
-        selected: false,
-      );
-    }
-    return _HoronDayPaint(
-      background: isToday ? scheme.surfaceContainerHighest : null,
-      foreground: plain,
-      radius: rounded,
-      selected: false,
+  Widget _buildWeek({
+    required HoronThemeData theme,
+    required List<DateTime> days,
+    required DateTime month,
+    required DateTime today,
+    required double cell,
+  }) {
+    return Row(
+      children: <Widget>[
+        for (final DateTime date in days)
+          _DayCell(
+            key: ValueKey<String>('horon-calendar-day-${date.year}-${date.month}-${date.day}'),
+            date: date,
+            cell: cell,
+            outside: date.month != month.month,
+            selected: _isSelected(date),
+            between: _inRange(date),
+            isToday: _sameDay(date, today),
+            disabled: widget.isDateDisabled?.call(date) ?? false,
+            focused: _gridFocus.hasFocus && _sameDay(date, _focused),
+            onTap: _select,
+          ),
+      ],
     );
   }
 }
 
-/// 이전·다음 달 버튼입니다. React는 ghost 변형의 `size-(--cell-size)` 버튼입니다.
-class _HoronCalendarNavButton extends StatefulWidget {
-  const _HoronCalendarNavButton({
+/// 날짜 칸 하나입니다. React `role="gridcell"` 버튼과 같은 상태 조합을 그립니다.
+class _DayCell extends StatefulWidget {
+  const _DayCell({
     super.key,
-    required this.semanticLabel,
-    required this.pointsLeft,
-    required this.onPressed,
+    required this.date,
+    required this.cell,
+    required this.outside,
+    required this.selected,
+    required this.between,
+    required this.isToday,
+    required this.disabled,
+    required this.focused,
+    required this.onTap,
   });
 
-  final String semanticLabel;
-  final bool pointsLeft;
-  final VoidCallback onPressed;
+  final DateTime date;
+  final double cell;
+  final bool outside;
+  final bool selected;
+  final bool between;
+  final bool isToday;
+  final bool disabled;
+  final bool focused;
+  final ValueChanged<DateTime> onTap;
 
   @override
-  State<_HoronCalendarNavButton> createState() => _HoronCalendarNavButtonState();
+  State<_DayCell> createState() => _DayCellState();
 }
 
-class _HoronCalendarNavButtonState extends State<_HoronCalendarNavButton> {
+class _DayCellState extends State<_DayCell> {
   bool _hovered = false;
-  bool _focused = false;
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final HoronThemeData horon = HoronTheme.of(context);
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final bool animate = !MediaQuery.disableAnimationsOf(context);
+
+    final TextStyle style = widget.between
+        // `bg-overlay-ink-8 text-body-md text-text-primary`.
+        ? theme.text.bodyMd.copyWith(color: colors.textPrimary)
+        : widget.selected
+        // `rounded-full bg-interactive-primary text-label-lg text-interactive-on-primary`.
+        ? theme.text.labelLg.copyWith(color: colors.interactiveOnPrimary)
+        // `text-text-disabled` / `text-text-placeholder` / `text-text-brand` / `text-text-primary`.
+        : widget.disabled
+        ? theme.text.bodyMd.copyWith(color: colors.textDisabled)
+        : widget.outside
+        ? theme.text.bodyMd.copyWith(color: colors.textPlaceholder)
+        : widget.isToday
+        ? theme.text.labelLg.copyWith(color: colors.textBrand)
+        : theme.text.bodyMd.copyWith(color: colors.textPrimary);
+
+    final Color background = widget.between
+        ? colors.overlayInk8
+        : widget.selected
+        ? colors.interactivePrimary
+        : _hovered && !widget.disabled
+        ? colors.overlayInk5
+        : Colors.transparent;
+
     return Semantics(
       button: true,
-      label: widget.semanticLabel,
+      enabled: !widget.disabled,
+      selected: widget.selected || widget.between,
+      label: MaterialLocalizations.of(context).formatFullDate(widget.date),
       child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => setState(() => _hovered = true),
-        onExit: (_) => setState(() => _hovered = false),
-        child: FocusableActionDetector(
-          onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-          actions: <Type, Action<Intent>>{
-            ActivateIntent: CallbackAction<ActivateIntent>(
-              onInvoke: (ActivateIntent intent) {
-                widget.onPressed();
-                return null;
-              },
-            ),
-          },
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onPressed,
-            child: SizedBox.square(
-              dimension: _cellSize,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: _hovered ? scheme.surfaceContainerHighest : Colors.transparent,
-                  borderRadius: BorderRadius.circular(HoronRadius.md),
-                  boxShadow: _focused
-                      ? <BoxShadow>[
-                          BoxShadow(
-                            color: horon.ring.withValues(alpha: _ringAlpha),
-                            spreadRadius: _ringWidth,
-                          ),
-                        ]
-                      : null,
+        cursor: widget.disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
+        onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
+        onExit: (PointerExitEvent event) => setState(() => _hovered = false),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.disabled ? null : () => widget.onTap(widget.date),
+          child: SizedBox(
+            width: widget.cell,
+            height: widget.cell,
+            child: Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                AnimatedContainer(
+                  duration: animate ? HoronMotion.colorsDuration : Duration.zero,
+                  curve: HoronMotion.colorsCurve,
+                  width: widget.cell,
+                  height: widget.cell,
+                  alignment: Alignment.center,
+                  // `motion-colors` + `rounded-full`; 범위 안의 날만 반경이 없습니다.
+                  decoration: BoxDecoration(
+                    color: background,
+                    borderRadius: widget.between ? BorderRadius.zero : BorderRadius.circular(theme.radius.full),
+                    border: widget.focused
+                        ? Border.all(color: colors.textBrand, width: _HoronCalendarState._focusWidth)
+                        : null,
+                  ),
+                  child: Text('${widget.date.day}', maxLines: 1, style: style),
                 ),
-                child: Center(
-                  child: SizedBox.square(
-                    dimension: HoronSpace.s4,
-                    child: CustomPaint(
-                      painter: _HoronCalendarChevronPainter(color: scheme.onSurface, pointsLeft: widget.pointsLeft),
+                // `top-8 left-[18px] size-1 rounded-full bg-status-live`.
+                if (widget.isToday && !widget.selected && !widget.between)
+                  Positioned(
+                    top: _HoronCalendarState._todayDotTop,
+                    left: (widget.cell - _HoronCalendarState._todayDotSize) / 2,
+                    child: Container(
+                      key: ValueKey<String>(
+                        'horon-calendar-today-dot-${widget.date.year}-${widget.date.month}-${widget.date.day}',
+                      ),
+                      width: _HoronCalendarState._todayDotSize,
+                      height: _HoronCalendarState._todayDotSize,
+                      decoration: BoxDecoration(color: colors.statusLive, shape: BoxShape.circle),
                     ),
                   ),
-                ),
-              ),
+              ],
             ),
           ),
         ),
@@ -752,88 +589,69 @@ class _HoronCalendarNavButtonState extends State<_HoronCalendarNavButton> {
   }
 }
 
-/// 날짜 칸 하나입니다.
+/// 이전·다음 달 화살표 버튼입니다.
 ///
-/// React의 `CalendarDayButton`은 ghost 버튼이고 강조 배경은 그 위의 칸이 그립니다.
-/// 여기서는 배경과 hover·포커스 링을 이 위젯이 함께 맡습니다.
-class _HoronCalendarDay extends StatefulWidget {
-  const _HoronCalendarDay({required this.paint, required this.label, required this.semanticLabel, required this.onTap});
+/// React의 `motion-press`(누르면 0.97)와 팝오버 변형의 `hover:bg-overlay-ink-6`을
+/// 옮겼습니다. 기본 변형은 hover 배경이 없습니다.
+class _CaretButton extends StatefulWidget {
+  const _CaretButton({
+    super.key,
+    required this.icon,
+    required this.color,
+    required this.size,
+    required this.iconSize,
+    required this.label,
+    required this.onPressed,
+    this.hoverColor,
+  });
 
-  final _HoronDayPaint paint;
+  final IconData icon;
+  final Color color;
+  final double size;
+  final double iconSize;
   final String label;
-  final String semanticLabel;
-  final VoidCallback onTap;
+  final VoidCallback onPressed;
+  final Color? hoverColor;
 
   @override
-  State<_HoronCalendarDay> createState() => _HoronCalendarDayState();
+  State<_CaretButton> createState() => _CaretButtonState();
 }
 
-class _HoronCalendarDayState extends State<_HoronCalendarDay> {
+class _CaretButtonState extends State<_CaretButton> {
   bool _hovered = false;
-  bool _focused = false;
+  bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    final HoronThemeData horon = HoronTheme.of(context);
-    final _HoronDayPaint paint = widget.paint;
-
-    // React `hover:bg-muted`는 강조 배경이 없는 칸에서만 보입니다.
-    final Color? background = paint.background ?? (_hovered ? scheme.surfaceContainerHighest : null);
-    final BorderRadius radius = paint.background == null && _hovered
-        ? BorderRadius.circular(HoronRadius.md)
-        : paint.radius;
-
+    final bool animate = !MediaQuery.disableAnimationsOf(context);
     return Semantics(
       button: true,
-      selected: paint.selected,
-      label: widget.semanticLabel,
+      label: widget.label,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        onEnter: (_) => setState(() => _hovered = true),
-        onExit: (_) => setState(() => _hovered = false),
-        child: FocusableActionDetector(
-          onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-          actions: <Type, Action<Intent>>{
-            ActivateIntent: CallbackAction<ActivateIntent>(
-              onInvoke: (ActivateIntent intent) {
-                widget.onTap();
-                return null;
-              },
-            ),
-          },
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onTap,
-            child: DecoratedBox(
+        onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
+        onExit: (PointerExitEvent event) => setState(() => _hovered = false),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: (TapDownDetails details) => setState(() => _pressed = true),
+          onTapUp: (TapUpDetails details) => setState(() => _pressed = false),
+          onTapCancel: () => setState(() => _pressed = false),
+          onTap: widget.onPressed,
+          child: AnimatedScale(
+            scale: _pressed ? HoronMotion.pressScale : 1,
+            duration: animate ? HoronMotion.pressDuration : Duration.zero,
+            curve: HoronMotion.pressCurve,
+            child: AnimatedContainer(
+              duration: animate ? HoronMotion.colorsDuration : Duration.zero,
+              curve: HoronMotion.colorsCurve,
+              width: widget.size,
+              height: widget.size,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: background,
-                borderRadius: radius,
-                boxShadow: _focused
-                    ? <BoxShadow>[
-                        BoxShadow(
-                          color: horon.ring.withValues(alpha: _ringAlpha),
-                          spreadRadius: _ringWidth,
-                        ),
-                      ]
-                    : null,
+                shape: BoxShape.circle,
+                color: _hovered && widget.hoverColor != null ? widget.hoverColor : Colors.transparent,
               ),
-              child: Center(
-                child: Text(
-                  widget.label,
-                  maxLines: 1,
-                  softWrap: false,
-                  style: TextStyle(
-                    fontFamily: HoronFont.body,
-                    fontFamilyFallback: HoronFont.fontFamilyFallback,
-                    fontSize: _dayFontSize,
-                    fontWeight: paint.selected ? HoronFontWeight.medium : HoronFontWeight.regular,
-                    height: HoronLineHeight.none,
-                    color: paint.selected ? paint.foreground : paint.foreground.withValues(alpha: _dayNumberAlpha),
-                    decoration: TextDecoration.none,
-                  ),
-                ),
-              ),
+              child: Icon(widget.icon, size: widget.iconSize, color: widget.color),
             ),
           ),
         ),
@@ -842,32 +660,29 @@ class _HoronCalendarDayState extends State<_HoronCalendarDay> {
   }
 }
 
-/// lucide `ChevronLeft`(`m15 18-6-6 6-6`)와 `ChevronRight`(`m9 18 6-6-6-6`)를
-/// 24 단위 상자의 비율로 그립니다.
-class _HoronCalendarChevronPainter extends CustomPainter {
-  const _HoronCalendarChevronPainter({required this.color, required this.pointsLeft});
+/// React `Intl.DateTimeFormat(weekday: "narrow")`의 좁은 요일 글자입니다.
+///
+/// 문구 계약은 요일의 온전한 이름을 주므로 첫 글자를 씁니다(en은 `Monday` → `M`,
+/// 한국어는 `월요일` → `월`).
+String _narrowWeekday(String weekdayName) => weekdayName.isEmpty ? weekdayName : weekdayName.substring(0, 1);
 
-  final Color color;
-  final bool pointsLeft;
+DateTime _startOfDay(DateTime date) => DateTime(date.year, date.month, date.day);
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * _chevronStrokeRatio
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    final double tipX = size.width * (pointsLeft ? 0.375 : 0.625);
-    final double backX = size.width * (pointsLeft ? 0.625 : 0.375);
-    final Path path = Path()
-      ..moveTo(backX, size.height * 0.75)
-      ..lineTo(tipX, size.height * 0.5)
-      ..lineTo(backX, size.height * 0.25);
-    canvas.drawPath(path, paint);
-  }
+bool _sameDay(DateTime? a, DateTime? b) =>
+    a != null && b != null && a.year == b.year && a.month == b.month && a.day == b.day;
 
-  @override
-  bool shouldRepaint(_HoronCalendarChevronPainter oldDelegate) =>
-      color != oldDelegate.color || pointsLeft != oldDelegate.pointsLeft;
+DateTime _addDays(DateTime date, int days) => DateTime(date.year, date.month, date.day + days);
+
+DateTime _firstOfMonth(DateTime date) => DateTime(date.year, date.month);
+
+DateTime _addMonths(DateTime date, int months) => DateTime(date.year, date.month + months);
+
+/// 보이는 달의 첫 주 일요일(또는 월요일)부터 마지막 주 토요일(일요일)까지의 날짜입니다.
+List<DateTime> _monthGrid(DateTime month, int weekStartsOn) {
+  final DateTime first = _firstOfMonth(month);
+  final int lead = (first.weekday % 7 - weekStartsOn + 7) % 7;
+  final DateTime start = _addDays(first, -lead);
+  final int daysInMonth = DateTime(month.year, month.month + 1, 0).day;
+  final int weeks = ((lead + daysInMonth) / 7).ceil();
+  return <DateTime>[for (int index = 0; index < weeks * 7; index++) _addDays(start, index)];
 }

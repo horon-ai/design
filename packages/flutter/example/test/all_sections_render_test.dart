@@ -26,6 +26,7 @@ void main() {
       <({String name, double width})>[
         (name: 'phone', width: 360),
         (name: 'tablet', width: 834),
+        (name: 'desktop', width: 1280),
       ];
 
   for (final GallerySection section in gallerySections) {

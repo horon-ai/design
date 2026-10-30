@@ -1,105 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
-// 배럴 export는 통합 담당자가 소유합니다. 이 파일은 자기 컴포넌트만 하위 경로로 읽어,
-// 배럴에 export가 추가된 뒤에도 `unnecessary_import`가 생기지 않게 합니다.
 
-import '../section_scaffold.dart';
+// 통합 스크립트가 배럴에 이 컴포넌트를 넣으면 이 줄은 지워집니다.
+// ignore: implementation_imports
 
-/// `tabs` 갤러리 섹션입니다.
+/// Tabs 갤러리 섹션입니다.
 ///
-/// React `tabs.tsx`의 목록 변형 두 개(`default`·`line`)를 수평·수직 방향으로
-/// 늘어놓고, 상태 칸에 선택 위치·비활성·아이콘 탭을 놓습니다.
+/// 아이콘·개수가 붙은 탭과 글자만 있는 탭을 나란히 놓습니다. 탭을 누르면 선택 표시자가
+/// 옮겨 가고 아래 패널이 바뀝니다.
 class HoronTabsGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronTabsGallerySection({super.key});
 
-  /// 이름표를 붙인 탭 묶음 하나입니다.
-  Widget _cell(
-    BuildContext context, {
-    required String label,
-    HoronTabsVariant variant = HoronTabsVariant.defaultValue,
-    bool vertical = false,
-    String initialValue = 'account',
-    bool disableSecond = false,
-    bool withIcons = false,
-  }) {
-    return SizedBox(
-      width: vertical ? 320 : 300,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Padding(
+      padding: EdgeInsets.all(theme.space.s4),
+      child: Wrap(
+        spacing: theme.space.s6,
+        runSpacing: theme.space.s6,
+        crossAxisAlignment: WrapCrossAlignment.start,
         children: <Widget>[
-          Text(label, style: Theme.of(context).textTheme.labelSmall),
-          const SizedBox(height: HoronSpace.s2),
-          HoronTabs(
-            initialValue: initialValue,
-            vertical: vertical,
-            children: <Widget>[
-              HoronTabsList(
-                variant: variant,
-                children: <Widget>[
-                  HoronTabsTrigger(
-                    value: 'account',
-                    label: '계정',
-                    icon: withIcons ? const Icon(Icons.person_outline) : null,
-                  ),
-                  HoronTabsTrigger(
-                    value: 'password',
-                    label: '비밀번호',
-                    disabled: disableSecond,
-                  ),
-                  const HoronTabsTrigger(value: 'notifications', label: '알림'),
-                ],
-              ),
-              const HoronTabsContent(value: 'account', child: Text('계정 설정')),
-              const HoronTabsContent(value: 'password', child: Text('비밀번호 설정')),
-              const HoronTabsContent(
-                value: 'notifications',
-                child: Text('알림 설정'),
-              ),
-            ],
+          _Sample(
+            label: '아이콘과 개수',
+            child: HoronTabs(
+              children: <Widget>[
+                HoronTabsList(
+                  children: <Widget>[
+                    const HoronTabsTab(
+                      value: 'overview',
+                      label: '개요',
+                      icon: Icon(Icons.dashboard_outlined),
+                      count: 4,
+                    ),
+                    const HoronTabsTab(
+                      value: 'members',
+                      label: '멤버',
+                      icon: Icon(Icons.group_outlined),
+                    ),
+                    const HoronTabsTab(
+                      value: 'logs',
+                      label: '로그',
+                      icon: Icon(Icons.receipt_long_outlined),
+                      count: 12,
+                    ),
+                  ],
+                ),
+                const HoronTabsPanel(value: 'overview', child: Text('개요 패널')),
+                const HoronTabsPanel(value: 'members', child: Text('멤버 패널')),
+                const HoronTabsPanel(value: 'logs', child: Text('로그 패널')),
+              ],
+            ),
+          ),
+          _Sample(
+            label: '글자만',
+            child: HoronTabs(
+              children: <Widget>[
+                HoronTabsList(
+                  children: <Widget>[
+                    const HoronTabsTab(value: 'all', label: '전체'),
+                    const HoronTabsTab(value: 'active', label: '활성'),
+                    const HoronTabsTab(
+                      value: 'archived',
+                      label: '보관됨',
+                      enabled: false,
+                    ),
+                  ],
+                ),
+                const HoronTabsPanel(value: 'all', child: Text('전체 패널')),
+                const HoronTabsPanel(value: 'active', child: Text('활성 패널')),
+                const HoronTabsPanel(value: 'archived', child: Text('보관 패널')),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+/// 변형 하나와 그 이름입니다.
+class _Sample extends StatelessWidget {
+  const _Sample({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return GallerySectionScaffold(
-      title: 'Tabs',
-      variants: <Widget>[
-        _cell(context, label: 'default · horizontal'),
-        _cell(
-          context,
-          label: 'line · horizontal',
-          variant: HoronTabsVariant.line,
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: theme.space.s2,
+      children: <Widget>[
+        Text(
+          label,
+          style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
         ),
-        _cell(context, label: 'default · vertical', vertical: true),
-        _cell(
-          context,
-          label: 'line · vertical',
-          variant: HoronTabsVariant.line,
-          vertical: true,
-        ),
+        child,
       ],
-      states: <Widget>[
-        _cell(context, label: 'active first'),
-        _cell(context, label: 'active last', initialValue: 'notifications'),
-        _cell(
-          context,
-          label: 'line · active last',
-          variant: HoronTabsVariant.line,
-          initialValue: 'notifications',
-        ),
-        _cell(context, label: 'disabled trigger', disableSecond: true),
-        _cell(context, label: 'with icon', withIcons: true),
-      ],
-      notes:
-          'React `tabs.tsx`의 목록 변형 2개(default `bg-muted`, line `bg-transparent`)와 '
-          '수평·수직 방향입니다. line 목록의 선택된 탭 바깥에 2px 인디케이터'
-          '(`after:h-0.5`, 수직은 `after:w-0.5`)가 그려지고, 선택되지 않은 탭은 '
-          '`text-foreground/60`으로 흐립니다.',
     );
   }
 }

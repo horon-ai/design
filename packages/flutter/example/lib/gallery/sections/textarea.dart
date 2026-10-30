@@ -5,8 +5,7 @@ import '../section_scaffold.dart';
 
 /// `textarea` 갤러리 섹션입니다.
 ///
-/// React `textarea.tsx`에는 cva 변형이 없으므로 나열할 변형은 줄 수 설정이고,
-/// 상태는 default·invalid·disabled·read-only 넷입니다.
+/// 기본 유리 상자와 오류·비활성 상태를 나란히 보여 줍니다.
 class HoronTextareaGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronTextareaGallerySection({super.key});
@@ -17,40 +16,33 @@ class HoronTextareaGallerySection extends StatelessWidget {
       title: 'Textarea',
       variants: <Widget>[
         const _TextareaCell(
-          label: 'Auto grow',
-          child: HoronTextarea(hintText: 'Write a message'),
+          label: '기본 (112px 유리 상자)',
+          child: HoronTextarea(hintText: '메모를 남겨 주세요'),
         ),
         const _TextareaCell(
-          label: 'Capped at 4 lines',
-          child: HoronTextarea(hintText: 'Write a message', maxLines: 4),
+          label: 'Invalid',
+          child: HoronTextarea(invalid: true, hintText: '메모를 남겨 주세요'),
         ),
       ],
       states: <Widget>[
         const _TextareaCell(
-          label: 'Default',
-          child: HoronTextarea(hintText: 'Default'),
-        ),
-        const _TextareaCell(
-          label: 'Invalid',
-          child: HoronTextarea(hintText: 'Invalid', invalid: true),
-        ),
-        const _TextareaCell(
           label: 'Disabled',
-          child: HoronTextarea(hintText: 'Disabled', disabled: true),
+          child: HoronTextarea(enabled: false, hintText: '메모를 남겨 주세요'),
         ),
         const _TextareaCell(
-          label: 'Read only',
-          child: HoronTextarea(hintText: 'Read only', readOnly: true),
+          label: '최대 120자',
+          child: HoronTextarea(maxLength: 120, hintText: '메모를 남겨 주세요'),
         ),
       ],
       notes:
-          '최소 높이는 생성 토큰 `HoronTextareaMetrics.minHeight`(88)입니다. '
-          'React의 `field-sizing-content`는 `minLines`·`maxLines`로 옮겼습니다.',
+          'Figma `Textarea`(58:137)입니다. 상자는 `min-h-28`(112)에서 시작해 입력이 늘면 '
+          '함께 자라고, 여백은 좌우 14·위아래 12입니다. 글자는 `body-md`, 안내 문구는 '
+          '`text-placeholder`, 오류 테두리는 `border-danger`입니다.',
     );
   }
 }
 
-/// 한 변형을 이름과 함께 보여 주는 칸입니다.
+/// 여러 줄 입력 하나를 캡션과 함께 보여 주는 칸입니다.
 class _TextareaCell extends StatelessWidget {
   const _TextareaCell({required this.label, required this.child});
 
@@ -59,14 +51,20 @@ class _TextareaCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final HoronThemeData horon = HoronTheme.of(context);
     return SizedBox(
       width: 280,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text(label, style: Theme.of(context).textTheme.labelSmall),
-          const SizedBox(height: HoronSpace.s1),
+          Text(
+            label,
+            style: horon.text.caption.copyWith(
+              color: horon.colors.textSecondary,
+            ),
+          ),
+          SizedBox(height: horon.space.s1_5),
           child,
         ],
       ),

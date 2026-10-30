@@ -2,67 +2,200 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
-/// 다이얼로그를 확인합니다.
-///
-/// 계획의 금지 사항(showDialog 미사용, 스크림은 토큰)과 기본 동작을 고정합니다.
-void main() {
-  Widget host(Widget child, {Brightness brightness = Brightness.light}) => MaterialApp(
+Widget _host(Widget child, {Brightness brightness = Brightness.light, double width = 390}) {
+  return MaterialApp(
     theme: horonTheme(brightness),
-    home: Scaffold(body: Center(child: child)),
+    home: Scaffold(
+      body: Center(
+        child: SizedBox(width: width, child: child),
+      ),
+    ),
   );
+}
 
-  group('dialog', () {
-    testWidgets('a tap opens the dialog and shows title and description', (WidgetTester tester) async {
-      await tester.pumpWidget(host(const HoronDialog(trigger: Text('열기'), title: '제목입니다', description: '설명입니다')));
-      expect(find.text('제목입니다'), findsNothing);
+HoronThemeData _theme(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronDialog)));
 
+void main() {
+  testWidgets('default state renders in light and dark', (WidgetTester tester) async {
+    for (final Brightness brightness in Brightness.values) {
+      await tester.pumpWidget(
+        _host(
+          HoronDialog(
+            title: const Text('워크스페이스 삭제'),
+            description: const Text('이 작업은 되돌릴 수 없습니다.'),
+            child: HoronDialogFooter(
+              children: <Widget>[TextButton(onPressed: () {}, child: const Text('삭제'))],
+            ),
+          ),
+          brightness: brightness,
+        ),
+      );
+      expect(tester.takeException(), isNull, reason: '$brightness에서 예외가 없어야 합니다');
+    }
+  });
+
+  testWidgets('the glass dialog draws the liquid layer, 20px radius and 24px padding', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(const HoronDialog(title: Text('제목'), description: Text('설명'))));
+    final HoronThemeData theme = _theme(tester);
+
+    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'bg-glass-fill-frost는 유리 레이어가 그립니다');
+    final Container panel = tester.widget<Container>(
+      find.ancestor(of: find.byType(HoronLiquidGlass), matching: find.byType(Container)).first,
+    );
+    expect((panel.decoration! as BoxDecoration).borderRadius! as BorderRadius, BorderRadius.circular(theme.radius.xl));
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is Padding && widget.padding == EdgeInsets.all(theme.space.s6)),
+      findsOneWidget,
+      reason: 'p-6',
+    );
+  });
+
+  testWidgets('glass keeps an 8px rhythm where solid uses 20px and a 0/24/64 shadow', (WidgetTester tester) async {
+    final HoronSpaceSpec space = HoronThemeData.light.space;
+
+    await tester.pumpWidget(_host(const HoronDialog(title: Text('제목'), description: Text('설명'))));
+    expect(
+      tester.getRect(find.text('설명')).top - tester.getRect(find.text('제목')).bottom,
+      space.s2,
+      reason: 'glass: gap-2',
+    );
+
+    await tester.pumpWidget(_host(const HoronDialog(title: Text('제목'), description: Text('설명'), solid: true)));
+    final HoronThemeData theme = _theme(tester);
+    expect(
+      tester.getRect(find.text('설명')).top - tester.getRect(find.text('제목')).bottom,
+      space.s5,
+      reason: 'solid: gap-5',
+    );
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'surface="solid"에는 유리를 깔지 않습니다');
+
+    final Container panel = tester.widget<Container>(
+      find.ancestor(of: find.text('제목'), matching: find.byType(Container)).first,
+    );
+    final BoxDecoration decoration = panel.decoration! as BoxDecoration;
+    expect(decoration.color, theme.colors.bgDefault, reason: 'bg-bg-default');
+    final BoxShadow shadow = decoration.boxShadow!.single;
+    expect(shadow.offset, const Offset(0, 24), reason: 'shadow-[0_24_64]');
+    expect(shadow.blurRadius, 64);
+  });
+
+  testWidgets('title uses title-md, description body-md in text-secondary and close is 20px', (
+    WidgetTester tester,
+  ) async {
+    int closed = 0;
+    await tester.pumpWidget(
+      _host(HoronDialog(title: const Text('제목'), description: const Text('설명'), onClose: () => closed += 1)),
+    );
+    final HoronThemeData theme = _theme(tester);
+
+    final TextStyle titleStyle = DefaultTextStyle.of(tester.element(find.text('제목'))).style;
+    expect(titleStyle.fontSize, theme.text.titleMd.fontSize);
+    expect(titleStyle.color, theme.colors.textPrimary);
+
+    final TextStyle bodyStyle = DefaultTextStyle.of(tester.element(find.text('설명'))).style;
+    expect(bodyStyle.fontSize, theme.text.bodyMd.fontSize);
+    expect(bodyStyle.color, theme.colors.textSecondary);
+
+    final Icon close = tester.widget<Icon>(find.byIcon(Icons.close));
+    expect(close.size, 20, reason: '[&_svg]:size-5');
+    expect(close.color, theme.colors.textSecondary);
+
+    await tester.tap(find.byIcon(Icons.close));
+    expect(closed, 1);
+
+    await tester.pumpWidget(_host(const HoronDialog(title: Text('숨김'), closeLabel: null)));
+    expect(find.byIcon(Icons.close), findsNothing, reason: 'closeLabel이 null이면 닫기를 숨깁니다');
+  });
+
+  testWidgets('leading sits 14px before the title', (WidgetTester tester) async {
+    final HoronSpaceSpec space = HoronThemeData.light.space;
+    await tester.pumpWidget(
+      _host(
+        HoronDialog(
+          title: const Text('제목'),
+          leading: const SizedBox(key: Key('leading'), width: 40, height: 40),
+        ),
+      ),
+    );
+    final double gap = tester.getRect(find.text('제목')).left - tester.getRect(find.byKey(const Key('leading'))).right;
+    expect(gap, space.s3_5, reason: 'leading이 있으면 gap-3.5');
+  });
+
+  testWidgets('the footer right-aligns and wraps instead of overflowing at 320', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      _host(
+        HoronDialogFooter(
+          children: <Widget>[
+            for (int index = 0; index < 4; index += 1) SizedBox(width: 100, height: 40, child: Text('동작 $index')),
+          ],
+        ),
+        width: 320,
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    final Rect footer = tester.getRect(find.byType(HoronDialogFooter));
+    final Rect last = tester.getRect(find.text('동작 3'));
+    expect(footer.height, greaterThan(40), reason: '한 줄에 들어가지 않으면 줄을 바꿉니다');
+    expect(last.right, closeTo(footer.right, 0.5), reason: 'justify-end');
+  });
+
+  testWidgets('the dialog opens centred and closes by close and scrim', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: Builder(
+            builder: (BuildContext context) => TextButton(
+              onPressed: () => showHoronDialog(context, title: const Text('다이얼로그 제목'), description: const Text('본문')),
+              child: const Text('열기'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('열기'));
+    await tester.pumpAndSettle();
+    expect(find.text('다이얼로그 제목'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+    expect(find.text('다이얼로그 제목'), findsNothing);
+
+    await tester.tap(find.text('열기'));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(5, 5));
+    await tester.pumpAndSettle();
+    expect(find.text('다이얼로그 제목'), findsNothing);
+  });
+
+  testWidgets('the dialog is 420 wide at desktop and the viewport minus 32 at 320', (WidgetTester tester) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    Future<double> openWidth(double screen) async {
+      await tester.binding.setSurfaceSize(Size(screen, 800));
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: horonTheme(Brightness.light),
+          home: Scaffold(
+            body: Builder(
+              builder: (BuildContext context) => TextButton(
+                onPressed: () => showHoronDialog(context, title: const Text('다이얼로그 제목')),
+                child: const Text('열기'),
+              ),
+            ),
+          ),
+        ),
+      );
       await tester.tap(find.text('열기'));
       await tester.pumpAndSettle();
-
-      expect(find.text('제목입니다'), findsOneWidget);
-      expect(find.text('설명입니다'), findsOneWidget);
-    });
-
-    testWidgets('the scrim is the token scrim, not Colors.black54', (WidgetTester tester) async {
-      await tester.pumpWidget(host(const HoronDialog(trigger: Text('열기'), title: '제목')));
-      await tester.tap(find.text('열기'));
+      final double width = tester.getSize(find.byType(HoronDialog)).width;
+      await tester.tap(find.byIcon(Icons.close));
       await tester.pumpAndSettle();
+      return width;
+    }
 
-      // `barrierColor`는 토큰 스크림입니다. `Colors.black54`(0x8A000000)가 아닙니다.
-      final ThemeData theme = Theme.of(tester.element(find.text('제목')));
-      expect(theme.colorScheme.scrim, isNot(const Color(0x8A000000)));
-    });
-
-    testWidgets('tapping the scrim dismisses when dismissible', (WidgetTester tester) async {
-      await tester.pumpWidget(host(const HoronDialog(trigger: Text('열기'), title: '제목')));
-      await tester.tap(find.text('열기'));
-      await tester.pumpAndSettle();
-      expect(find.text('제목'), findsOneWidget);
-
-      // 왼쪽 위 모서리는 스크림입니다.
-      await tester.tapAt(const Offset(4, 4));
-      await tester.pumpAndSettle();
-      expect(find.text('제목'), findsNothing);
-    });
-
-    testWidgets('dismissible: false keeps the dialog open on a scrim tap', (WidgetTester tester) async {
-      await tester.pumpWidget(host(const HoronDialog(trigger: Text('열기'), title: '제목', dismissible: false)));
-      await tester.tap(find.text('열기'));
-      await tester.pumpAndSettle();
-
-      await tester.tapAt(const Offset(4, 4));
-      await tester.pumpAndSettle();
-      expect(find.text('제목'), findsOneWidget);
-    });
-
-    testWidgets('does not expose Material showDialog or showModalBottomSheet', (WidgetTester tester) async {
-      await tester.pumpWidget(host(const HoronDialog(trigger: Text('열기'), title: '제목')));
-      await tester.tap(find.text('열기'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(Dialog), findsNothing);
-      expect(find.byType(AlertDialog), findsNothing);
-      expect(find.byType(BottomSheet), findsNothing);
-    });
+    expect(await openWidth(1440), 420, reason: 'w-105');
+    expect(await openWidth(320), 320 - 32, reason: 'max-w-[calc(100vw-2rem)]');
   });
 }

@@ -19,7 +19,8 @@ final class GalleryStrings {
       groupDisplay = '표시',
       groupNavigation = '내비게이션',
       groupOverlays = '오버레이',
-      groupLayout = '레이아웃';
+      groupConversation = '대화',
+      groupAgents = '에이전트';
 
   /// 영어 문구입니다.
   const GalleryStrings.en()
@@ -37,7 +38,8 @@ final class GalleryStrings {
       groupDisplay = 'Display',
       groupNavigation = 'Navigation',
       groupOverlays = 'Overlays',
-      groupLayout = 'Layout';
+      groupConversation = 'Conversation',
+      groupAgents = 'Agents';
 
   /// 갤러리 이름입니다.
   final String title;
@@ -81,19 +83,23 @@ final class GalleryStrings {
   /// `overlays` 그룹의 이름입니다.
   final String groupOverlays;
 
-  /// `layout` 그룹의 이름입니다.
-  final String groupLayout;
+  /// `conversation` 그룹의 이름입니다.
+  final String groupConversation;
+
+  /// `agents` 그룹의 이름입니다.
+  final String groupAgents;
 
   /// 그룹 id를 사람이 읽는 이름으로 바꿉니다.
   ///
-  /// React의 `componentGroups`가 정한 다섯 그룹이고, 등록부의 `group` 값이
+  /// React 카탈로그의 `componentGroups`가 정한 여섯 그룹이고, 등록부의 `group` 값이
   /// 그 id입니다. 모르는 값은 그대로 돌려줍니다.
   String groupLabel(String group) => switch (group) {
     'inputs' => groupInputs,
     'display' => groupDisplay,
     'navigation' => groupNavigation,
     'overlays' => groupOverlays,
-    'layout' => groupLayout,
+    'conversation' => groupConversation,
+    'agents' => groupAgents,
     _ => group,
   };
 }

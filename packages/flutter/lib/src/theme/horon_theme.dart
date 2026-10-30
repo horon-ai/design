@@ -1,378 +1,283 @@
 // 생성된 토큰과 Material 테마 사이의 다리입니다.
 //
-// 색은 전부 `horon_tokens.g.dart`에서 옵니다. `ColorScheme.fromSeed`는 쓰지 않습니다.
-// 시드에서 파생한 슬롯은 디자인 토큰에 없는 값을 만들어 내고, 그러면 웹과 Flutter가
-// 같은 화면에서 다른 색을 그립니다. `ColorScheme`이 담지 못하는 슬롯(상태색, 차트,
-// 사이드바, 유리 표면, 브랜드, 포커스 링)은 [HoronThemeData]가 소유합니다.
+// 색, 타이포, 글래스, 반경, 간격, 그림자, 브레이크포인트, 문구를 하나의 확장
+// ([HoronThemeData])에 묶음으로 들고 있습니다. 컴포넌트는
+// `HoronTheme.of(context).colors.textPrimary`처럼 묶음에서 값을 읽고, 원시 상수나
+// 색 리터럴을 직접 쓰지 않습니다. 값은 전부 `horon_tokens.g.dart`에서 옵니다.
 //
-// `ColorScheme.background`는 Flutter 3.18에서 폐기됐고 `surface`가 그 자리를
-// 대신합니다. 이 파일은 `surface`/`onSurface`만 씁니다. 폐기 멤버를 쓰면
-// `flutter analyze --fatal-infos`가 실패합니다.
+// `ColorScheme.fromSeed`는 쓰지 않습니다. 시드에서 파생한 슬롯은 디자인 토큰에 없는
+// 색을 만들어 내고, 그러면 웹과 Flutter가 같은 화면에서 다른 색을 그립니다.
+//
+// `ColorScheme.background`·`onBackground`·`surfaceVariant`는 Flutter 3.18에서 폐기됐고
+// `surface`·`onSurface`·`surfaceContainerHighest`가 그 자리를 대신합니다. 이 파일은
+// 폐기 슬롯을 쓰지 않습니다. 폐기 멤버를 쓰면 `dart analyze --fatal-infos`가 실패합니다.
 
 import 'package:flutter/material.dart';
 
 import '../contracts/horon_strings.dart';
 import '../tokens/horon_tokens.g.dart';
-import 'horon_fonts.dart';
 
-/// [ColorScheme]이 담지 못하는 horon 슬롯입니다.
+/// 반경 값 묶음입니다.
 ///
-/// 상태색(success·warning·info), 차트 계열, 사이드바 세트, 유리 표면 세트,
-/// 브랜드 세트, 포커스 링, 그리고 화면 문구([strings])를 한 객체에 모읍니다.
-/// 컴포넌트는 원시 상수 대신 [HoronTheme.of]로 이 객체를 읽습니다.
+/// `scale.ts` `radius`의 단계 이름을 그대로 씁니다. 그래서 React의 `rounded-md`는
+/// `HoronTheme.of(context).radius.md`가 됩니다. v1의 역할 상수(control, input, card,
+/// panel, bubble, pill)는 두지 않았습니다. 다시 만든 React 세트에서 버튼은
+/// `rounded-full`, 입력은 `rounded-md`, 카드는 `rounded-xl`을 쓰므로 그 역할 이름이
+/// 더는 실제 컴포넌트를 가리키지 않기 때문입니다.
+final class HoronRadiusSpec {
+  /// 단계별 값을 받는 생성자입니다. 생략하면 토큰 값입니다.
+  const HoronRadiusSpec({
+    this.none = HoronRadius.none,
+    this.xs = HoronRadius.xs,
+    this.sm = HoronRadius.sm,
+    this.md = HoronRadius.md,
+    this.lg = HoronRadius.lg,
+    this.xl = HoronRadius.xl,
+    this.xl2 = HoronRadius.xl2,
+    this.full = HoronRadius.full,
+  });
+
+  /// `rounded-none`에 대응하는 0입니다.
+  final double none;
+
+  /// `rounded-xs` — 6.
+  final double xs;
+
+  /// `rounded-sm` — 8.
+  final double sm;
+
+  /// `rounded-md` — 12. 입력 필드와 대부분의 인라인 컨트롤이 씁니다.
+  final double md;
+
+  /// `rounded-lg` — 14.
+  final double lg;
+
+  /// `rounded-xl` — 20. 카드와 다이얼로그가 씁니다.
+  final double xl;
+
+  /// `rounded-2xl` — 16. 토큰에서 20보다 작은 값입니다.
+  final double xl2;
+
+  /// `rounded-full` — 9999. 버튼과 칩처럼 완전히 둥근 표면이 씁니다.
+  final double full;
+}
+
+/// 간격 값 묶음입니다.
+///
+/// 이름은 Tailwind 간격 단위입니다. 단위 1은 4px이므로 `gap-1.5`는 [s1_5](6px),
+/// `px-4`는 [s4](16px)입니다.
+final class HoronSpaceSpec {
+  /// 단계별 값을 받는 생성자입니다. 생략하면 토큰 값입니다.
+  const HoronSpaceSpec({
+    this.s0_5 = HoronSpace.s0_5,
+    this.s1 = HoronSpace.s1,
+    this.s1_5 = HoronSpace.s1_5,
+    this.s2 = HoronSpace.s2,
+    this.s2_5 = HoronSpace.s2_5,
+    this.s3 = HoronSpace.s3,
+    this.s3_5 = HoronSpace.s3_5,
+    this.s4 = HoronSpace.s4,
+    this.s5 = HoronSpace.s5,
+    this.s6 = HoronSpace.s6,
+    this.s8 = HoronSpace.s8,
+  });
+
+  /// `gap-0.5` — 2.
+  final double s0_5;
+
+  /// `gap-1` — 4. Tailwind 간격 단위 하나의 크기입니다.
+  final double s1;
+
+  /// `gap-1.5` — 6.
+  final double s1_5;
+
+  /// `gap-2` — 8.
+  final double s2;
+
+  /// `gap-2.5` — 10.
+  final double s2_5;
+
+  /// `gap-3` — 12.
+  final double s3;
+
+  /// `gap-3.5` — 14.
+  final double s3_5;
+
+  /// `gap-4`, `p-4` — 16.
+  final double s4;
+
+  /// `gap-5` — 20.
+  final double s5;
+
+  /// `gap-6` — 24.
+  final double s6;
+
+  /// `gap-8` — 32.
+  final double s8;
+
+  /// Tailwind 간격 단위 [units]를 논리 픽셀로 바꿉니다.
+  ///
+  /// 단위 1은 [s1](4px)입니다. 토큰 단계에 없는 값은 이 함수로 계산하고, 계산한
+  /// 이유(reinterpreted React 클래스)를 컴포넌트 파일의 주석으로 남깁니다.
+  /// 예: `h-5.5` = `space.step(5.5)` = 22, `size-4.5` = `space.step(4.5)` = 18.
+  double step(double units) => units * s1;
+}
+
+/// 그림자 값 묶음입니다.
+final class HoronShadowSpec {
+  /// 그림자를 받는 생성자입니다. 생략하면 토큰 값입니다.
+  const HoronShadowSpec({this.popover = HoronShadow.popover, this.palette = HoronShadow.palette});
+
+  /// `shadow-popover` — 메뉴, 셀렉트, 팝오버가 쓰는 그림자입니다.
+  final List<BoxShadow> popover;
+
+  /// `shadow-palette` — 커맨드 팔레트가 쓰는 더 깊은 그림자입니다.
+  final List<BoxShadow> palette;
+}
+
+/// 레이아웃 브레이크포인트 묶음입니다.
+///
+/// `scale.ts`에는 브레이크포인트가 없습니다. React 세트가 컴파일되는 Tailwind v4
+/// 기본값이므로, 컴포넌트가 `md:`·`lg:`로 바뀌는 지점과 같은 값을 씁니다.
+final class HoronBreakpoints {
+  /// 단계별 값을 받는 생성자입니다. 생략하면 토큰 값입니다.
+  const HoronBreakpoints({
+    this.sm = HoronBreakpoint.sm,
+    this.md = HoronBreakpoint.md,
+    this.lg = HoronBreakpoint.lg,
+    this.xl = HoronBreakpoint.xl,
+    this.xl2 = HoronBreakpoint.xl2,
+  });
+
+  /// `sm:` — 640.
+  final double sm;
+
+  /// `md:` — 768. 폰 가로와 태블릿 세로를 가르는 지점입니다.
+  final double md;
+
+  /// `lg:` — 1024. 태블릿 가로와 데스크톱을 가르는 지점입니다.
+  final double lg;
+
+  /// `xl:` — 1280.
+  final double xl;
+
+  /// `2xl:` — 1536.
+  final double xl2;
+}
+
+/// [ColorScheme]이 담지 못하는 horon 토큰 묶음입니다.
+///
+/// 색은 [colors], 타이포는 [text], 글래스 레시피는 [glass], 반경·간격·그림자·브레이크포인트는
+/// 각각의 묶음에서 읽습니다. 컴포넌트는 원시 상수 대신 `HoronTheme.of(context)`로 이 객체를
+/// 읽습니다.
 class HoronThemeData extends ThemeExtension<HoronThemeData> {
-  /// 슬롯을 모두 받는 생성자입니다.
+  /// 묶음을 모두 받는 생성자입니다.
   const HoronThemeData({
-    required this.success,
-    required this.successForeground,
-    required this.warning,
-    required this.warningForeground,
-    required this.info,
-    required this.infoForeground,
-    required this.chart1,
-    required this.chart2,
-    required this.chart3,
-    required this.chart4,
-    required this.chart5,
-    required this.sidebar,
-    required this.sidebarForeground,
-    required this.sidebarPrimary,
-    required this.sidebarPrimaryForeground,
-    required this.sidebarAccent,
-    required this.sidebarAccentForeground,
-    required this.sidebarBorder,
-    required this.sidebarRing,
-    required this.glassFill,
-    required this.glassFillStrong,
-    required this.glassFillFrost,
-    required this.glassFillSolid,
-    required this.glassBorder,
-    required this.glassTint,
-    required this.glassForeground,
-    required this.brandInk,
-    required this.brandInk2,
-    required this.brandInkForeground,
-    required this.brandInkMuted,
-    required this.brandInkFaint,
-    required this.brandGold,
-    required this.brandGoldText,
-    required this.brandGoldSoft,
-    required this.ring,
+    required this.brightness,
+    required this.colors,
+    required this.text,
+    required this.glass,
+    required this.radius,
+    required this.space,
+    required this.shadows,
+    required this.breakpoints,
     required this.strings,
   });
 
-  /// 라이트 밝기의 슬롯입니다.
+  /// 라이트 밝기의 토큰 묶음입니다.
   static const HoronThemeData light = HoronThemeData(
-    success: HoronLightColors.success,
-    successForeground: HoronLightColors.successForeground,
-    warning: HoronLightColors.warning,
-    warningForeground: HoronLightColors.warningForeground,
-    info: HoronLightColors.info,
-    infoForeground: HoronLightColors.infoForeground,
-    chart1: HoronLightColors.chart1,
-    chart2: HoronLightColors.chart2,
-    chart3: HoronLightColors.chart3,
-    chart4: HoronLightColors.chart4,
-    chart5: HoronLightColors.chart5,
-    sidebar: HoronLightColors.sidebar,
-    sidebarForeground: HoronLightColors.sidebarForeground,
-    sidebarPrimary: HoronLightColors.sidebarPrimary,
-    sidebarPrimaryForeground: HoronLightColors.sidebarPrimaryForeground,
-    sidebarAccent: HoronLightColors.sidebarAccent,
-    sidebarAccentForeground: HoronLightColors.sidebarAccentForeground,
-    sidebarBorder: HoronLightColors.sidebarBorder,
-    sidebarRing: HoronLightColors.sidebarRing,
-    glassFill: HoronLightColors.glassFill,
-    glassFillStrong: HoronLightColors.glassFillStrong,
-    glassFillFrost: HoronLightColors.glassFillFrost,
-    glassFillSolid: HoronLightColors.glassFillSolid,
-    glassBorder: HoronLightColors.glassBorder,
-    glassTint: HoronLightColors.glassTint,
-    glassForeground: HoronLightColors.glassForeground,
-    brandInk: HoronLightColors.brandInk,
-    brandInk2: HoronLightColors.brandInk2,
-    brandInkForeground: HoronLightColors.brandInkForeground,
-    brandInkMuted: HoronLightColors.brandInkMuted,
-    brandInkFaint: HoronLightColors.brandInkFaint,
-    brandGold: HoronLightColors.brandGold,
-    brandGoldText: HoronLightColors.brandGoldText,
-    brandGoldSoft: HoronLightColors.brandGoldSoft,
-    ring: HoronLightColors.ring,
+    brightness: Brightness.light,
+    colors: HoronColors.light,
+    text: HoronTextStyles(),
+    glass: HoronGlassTokens(),
+    radius: HoronRadiusSpec(),
+    space: HoronSpaceSpec(),
+    shadows: HoronShadowSpec(),
+    breakpoints: HoronBreakpoints(),
     strings: HoronStringsEn(),
   );
 
-  /// 다크 밝기의 슬롯입니다.
+  /// 다크 밝기의 토큰 묶음입니다.
   static const HoronThemeData dark = HoronThemeData(
-    success: HoronDarkColors.success,
-    successForeground: HoronDarkColors.successForeground,
-    warning: HoronDarkColors.warning,
-    warningForeground: HoronDarkColors.warningForeground,
-    info: HoronDarkColors.info,
-    infoForeground: HoronDarkColors.infoForeground,
-    chart1: HoronDarkColors.chart1,
-    chart2: HoronDarkColors.chart2,
-    chart3: HoronDarkColors.chart3,
-    chart4: HoronDarkColors.chart4,
-    chart5: HoronDarkColors.chart5,
-    sidebar: HoronDarkColors.sidebar,
-    sidebarForeground: HoronDarkColors.sidebarForeground,
-    sidebarPrimary: HoronDarkColors.sidebarPrimary,
-    sidebarPrimaryForeground: HoronDarkColors.sidebarPrimaryForeground,
-    sidebarAccent: HoronDarkColors.sidebarAccent,
-    sidebarAccentForeground: HoronDarkColors.sidebarAccentForeground,
-    sidebarBorder: HoronDarkColors.sidebarBorder,
-    sidebarRing: HoronDarkColors.sidebarRing,
-    glassFill: HoronDarkColors.glassFill,
-    glassFillStrong: HoronDarkColors.glassFillStrong,
-    glassFillFrost: HoronDarkColors.glassFillFrost,
-    glassFillSolid: HoronDarkColors.glassFillSolid,
-    glassBorder: HoronDarkColors.glassBorder,
-    glassTint: HoronDarkColors.glassTint,
-    glassForeground: HoronDarkColors.glassForeground,
-    brandInk: HoronDarkColors.brandInk,
-    brandInk2: HoronDarkColors.brandInk2,
-    brandInkForeground: HoronDarkColors.brandInkForeground,
-    brandInkMuted: HoronDarkColors.brandInkMuted,
-    brandInkFaint: HoronDarkColors.brandInkFaint,
-    brandGold: HoronDarkColors.brandGold,
-    brandGoldText: HoronDarkColors.brandGoldText,
-    brandGoldSoft: HoronDarkColors.brandGoldSoft,
-    ring: HoronDarkColors.ring,
+    brightness: Brightness.dark,
+    colors: HoronColors.dark,
+    text: HoronTextStyles(),
+    glass: HoronGlassTokens(),
+    radius: HoronRadiusSpec(),
+    space: HoronSpaceSpec(),
+    shadows: HoronShadowSpec(),
+    breakpoints: HoronBreakpoints(),
     strings: HoronStringsEn(),
   );
 
-  /// 상태 성공 색입니다.
-  final Color success;
+  /// 이 묶음이 그리는 밝기입니다.
+  final Brightness brightness;
 
-  /// 상태 성공 색 위에 얹는 전경 색입니다.
-  final Color successForeground;
+  /// 의미 색 전체입니다. 이름은 `color.ts`의 토큰 이름을 카멜 표기로 옮긴 것입니다.
+  final HoronColors colors;
 
-  /// 상태 경고 색입니다.
-  final Color warning;
+  /// 13가지 타이포 스타일입니다. 값은 모바일 플랫폼 크기입니다.
+  final HoronTextStyles text;
 
-  /// 상태 경고 색 위에 얹는 전경 색입니다.
-  final Color warningForeground;
+  /// 리퀴드 글래스 레시피입니다. 호스트 높이에 따른 블러·여백은 토큰의 함수가 계산합니다.
+  final HoronGlassTokens glass;
 
-  /// 상태 정보 색입니다.
-  final Color info;
+  /// 반경 단계입니다.
+  final HoronRadiusSpec radius;
 
-  /// 상태 정보 색 위에 얹는 전경 색입니다.
-  final Color infoForeground;
+  /// 간격 단계입니다.
+  final HoronSpaceSpec space;
 
-  /// 차트 계열 1번 색입니다.
-  final Color chart1;
+  /// 그림자입니다.
+  final HoronShadowSpec shadows;
 
-  /// 차트 계열 2번 색입니다.
-  final Color chart2;
+  /// 레이아웃 브레이크포인트입니다.
+  final HoronBreakpoints breakpoints;
 
-  /// 차트 계열 3번 색입니다.
-  final Color chart3;
-
-  /// 차트 계열 4번 색입니다.
-  final Color chart4;
-
-  /// 차트 계열 5번 색입니다.
-  final Color chart5;
-
-  /// 사이드바 표면 색입니다.
-  final Color sidebar;
-
-  /// 사이드바 표면 위의 전경 색입니다.
-  final Color sidebarForeground;
-
-  /// 사이드바에서 선택된 항목의 강조 색입니다.
-  final Color sidebarPrimary;
-
-  /// 사이드바에서 선택된 항목의 강조 위 전경 색입니다.
-  final Color sidebarPrimaryForeground;
-
-  /// 사이드바의 hover 강조 색입니다.
-  final Color sidebarAccent;
-
-  /// 사이드바의 hover 강조 위 전경 색입니다.
-  final Color sidebarAccentForeground;
-
-  /// 사이드바의 테두리 색입니다.
-  final Color sidebarBorder;
-
-  /// 사이드바 안에서 포커스를 그리는 색입니다.
-  final Color sidebarRing;
-
-  /// 유리 표면의 기본 채움 색입니다.
-  final Color glassFill;
-
-  /// 유리 표면의 진한 채움 색입니다.
-  final Color glassFillStrong;
-
-  /// 유리 표면의 서리 낀 채움 색입니다.
-  final Color glassFillFrost;
-
-  /// 유리 표면의 불투명 채움 색입니다.
-  final Color glassFillSolid;
-
-  /// 유리 표면의 테두리 색입니다.
-  final Color glassBorder;
-
-  /// 유리 표면 위에 얹는 색조입니다.
-  final Color glassTint;
-
-  /// 유리 표면 위의 전경 색입니다.
-  final Color glassForeground;
-
-  /// 브랜드 잉크 표면 색입니다.
-  final Color brandInk;
-
-  /// 브랜드 잉크 표면의 두 번째 단계 색입니다.
-  final Color brandInk2;
-
-  /// 브랜드 잉크 표면 위의 전경 색입니다.
-  final Color brandInkForeground;
-
-  /// 브랜드 잉크 표면 위의 보조 전경 색입니다.
-  final Color brandInkMuted;
-
-  /// 브랜드 잉크 표면 위의 흐린 전경 색입니다.
-  final Color brandInkFaint;
-
-  /// 브랜드 금색입니다.
-  final Color brandGold;
-
-  /// 금색을 글자로 쓸 때의 색입니다. 대비를 맞춘 값이라 [brandGold]와 다릅니다.
-  final Color brandGoldText;
-
-  /// 브랜드 금색의 부드러운 단계입니다.
-  final Color brandGoldSoft;
-
-  /// 포커스 링 색입니다.
-  ///
-  /// `ColorScheme`에는 ring 슬롯이 없습니다. 입력 필드의 포커스 테두리와
-  /// 포커스 가능한 컨트롤은 이 값을 읽습니다.
-  final Color ring;
-
-  /// 컴포넌트가 화면에 쓰는 문구입니다.
-  ///
-  /// 호스트 앱이 [HoronStrings] 구현을 골라 넘깁니다. 이 패키지는 번역 데이터를
-  /// 들고 있지 않습니다.
+  /// 컴포넌트가 화면에 쓰는 문구입니다. 호스트 앱이 [HoronStrings] 구현을 골라 넘깁니다.
   final HoronStrings strings;
 
   @override
   HoronThemeData copyWith({
-    Color? success,
-    Color? successForeground,
-    Color? warning,
-    Color? warningForeground,
-    Color? info,
-    Color? infoForeground,
-    Color? chart1,
-    Color? chart2,
-    Color? chart3,
-    Color? chart4,
-    Color? chart5,
-    Color? sidebar,
-    Color? sidebarForeground,
-    Color? sidebarPrimary,
-    Color? sidebarPrimaryForeground,
-    Color? sidebarAccent,
-    Color? sidebarAccentForeground,
-    Color? sidebarBorder,
-    Color? sidebarRing,
-    Color? glassFill,
-    Color? glassFillStrong,
-    Color? glassFillFrost,
-    Color? glassFillSolid,
-    Color? glassBorder,
-    Color? glassTint,
-    Color? glassForeground,
-    Color? brandInk,
-    Color? brandInk2,
-    Color? brandInkForeground,
-    Color? brandInkMuted,
-    Color? brandInkFaint,
-    Color? brandGold,
-    Color? brandGoldText,
-    Color? brandGoldSoft,
-    Color? ring,
+    Brightness? brightness,
+    HoronColors? colors,
+    HoronTextStyles? text,
+    HoronGlassTokens? glass,
+    HoronRadiusSpec? radius,
+    HoronSpaceSpec? space,
+    HoronShadowSpec? shadows,
+    HoronBreakpoints? breakpoints,
     HoronStrings? strings,
   }) {
     return HoronThemeData(
-      success: success ?? this.success,
-      successForeground: successForeground ?? this.successForeground,
-      warning: warning ?? this.warning,
-      warningForeground: warningForeground ?? this.warningForeground,
-      info: info ?? this.info,
-      infoForeground: infoForeground ?? this.infoForeground,
-      chart1: chart1 ?? this.chart1,
-      chart2: chart2 ?? this.chart2,
-      chart3: chart3 ?? this.chart3,
-      chart4: chart4 ?? this.chart4,
-      chart5: chart5 ?? this.chart5,
-      sidebar: sidebar ?? this.sidebar,
-      sidebarForeground: sidebarForeground ?? this.sidebarForeground,
-      sidebarPrimary: sidebarPrimary ?? this.sidebarPrimary,
-      sidebarPrimaryForeground: sidebarPrimaryForeground ?? this.sidebarPrimaryForeground,
-      sidebarAccent: sidebarAccent ?? this.sidebarAccent,
-      sidebarAccentForeground: sidebarAccentForeground ?? this.sidebarAccentForeground,
-      sidebarBorder: sidebarBorder ?? this.sidebarBorder,
-      sidebarRing: sidebarRing ?? this.sidebarRing,
-      glassFill: glassFill ?? this.glassFill,
-      glassFillStrong: glassFillStrong ?? this.glassFillStrong,
-      glassFillFrost: glassFillFrost ?? this.glassFillFrost,
-      glassFillSolid: glassFillSolid ?? this.glassFillSolid,
-      glassBorder: glassBorder ?? this.glassBorder,
-      glassTint: glassTint ?? this.glassTint,
-      glassForeground: glassForeground ?? this.glassForeground,
-      brandInk: brandInk ?? this.brandInk,
-      brandInk2: brandInk2 ?? this.brandInk2,
-      brandInkForeground: brandInkForeground ?? this.brandInkForeground,
-      brandInkMuted: brandInkMuted ?? this.brandInkMuted,
-      brandInkFaint: brandInkFaint ?? this.brandInkFaint,
-      brandGold: brandGold ?? this.brandGold,
-      brandGoldText: brandGoldText ?? this.brandGoldText,
-      brandGoldSoft: brandGoldSoft ?? this.brandGoldSoft,
-      ring: ring ?? this.ring,
+      brightness: brightness ?? this.brightness,
+      colors: colors ?? this.colors,
+      text: text ?? this.text,
+      glass: glass ?? this.glass,
+      radius: radius ?? this.radius,
+      space: space ?? this.space,
+      shadows: shadows ?? this.shadows,
+      breakpoints: breakpoints ?? this.breakpoints,
       strings: strings ?? this.strings,
     );
   }
 
+  /// 밝기 사이를 잇는 애니메이션 값입니다.
+  ///
+  /// 색은 [HoronColors.lerp]로 보간하고, 나머지 묶음은 값이 밝기와 무관하므로
+  /// 중간 지점에서 한쪽을 그대로 씁니다.
   @override
   HoronThemeData lerp(covariant HoronThemeData? other, double t) {
     if (other == null) return this;
     return HoronThemeData(
-      success: Color.lerp(success, other.success, t)!,
-      successForeground: Color.lerp(successForeground, other.successForeground, t)!,
-      warning: Color.lerp(warning, other.warning, t)!,
-      warningForeground: Color.lerp(warningForeground, other.warningForeground, t)!,
-      info: Color.lerp(info, other.info, t)!,
-      infoForeground: Color.lerp(infoForeground, other.infoForeground, t)!,
-      chart1: Color.lerp(chart1, other.chart1, t)!,
-      chart2: Color.lerp(chart2, other.chart2, t)!,
-      chart3: Color.lerp(chart3, other.chart3, t)!,
-      chart4: Color.lerp(chart4, other.chart4, t)!,
-      chart5: Color.lerp(chart5, other.chart5, t)!,
-      sidebar: Color.lerp(sidebar, other.sidebar, t)!,
-      sidebarForeground: Color.lerp(sidebarForeground, other.sidebarForeground, t)!,
-      sidebarPrimary: Color.lerp(sidebarPrimary, other.sidebarPrimary, t)!,
-      sidebarPrimaryForeground: Color.lerp(sidebarPrimaryForeground, other.sidebarPrimaryForeground, t)!,
-      sidebarAccent: Color.lerp(sidebarAccent, other.sidebarAccent, t)!,
-      sidebarAccentForeground: Color.lerp(sidebarAccentForeground, other.sidebarAccentForeground, t)!,
-      sidebarBorder: Color.lerp(sidebarBorder, other.sidebarBorder, t)!,
-      sidebarRing: Color.lerp(sidebarRing, other.sidebarRing, t)!,
-      glassFill: Color.lerp(glassFill, other.glassFill, t)!,
-      glassFillStrong: Color.lerp(glassFillStrong, other.glassFillStrong, t)!,
-      glassFillFrost: Color.lerp(glassFillFrost, other.glassFillFrost, t)!,
-      glassFillSolid: Color.lerp(glassFillSolid, other.glassFillSolid, t)!,
-      glassBorder: Color.lerp(glassBorder, other.glassBorder, t)!,
-      glassTint: Color.lerp(glassTint, other.glassTint, t)!,
-      glassForeground: Color.lerp(glassForeground, other.glassForeground, t)!,
-      brandInk: Color.lerp(brandInk, other.brandInk, t)!,
-      brandInk2: Color.lerp(brandInk2, other.brandInk2, t)!,
-      brandInkForeground: Color.lerp(brandInkForeground, other.brandInkForeground, t)!,
-      brandInkMuted: Color.lerp(brandInkMuted, other.brandInkMuted, t)!,
-      brandInkFaint: Color.lerp(brandInkFaint, other.brandInkFaint, t)!,
-      brandGold: Color.lerp(brandGold, other.brandGold, t)!,
-      brandGoldText: Color.lerp(brandGoldText, other.brandGoldText, t)!,
-      brandGoldSoft: Color.lerp(brandGoldSoft, other.brandGoldSoft, t)!,
-      ring: Color.lerp(ring, other.ring, t)!,
+      brightness: t < 0.5 ? brightness : other.brightness,
+      colors: HoronColors.lerp(colors, other.colors, t),
+      text: t < 0.5 ? text : other.text,
+      glass: t < 0.5 ? glass : other.glass,
+      radius: t < 0.5 ? radius : other.radius,
+      space: t < 0.5 ? space : other.space,
+      shadows: t < 0.5 ? shadows : other.shadows,
+      breakpoints: t < 0.5 ? breakpoints : other.breakpoints,
       strings: t < 0.5 ? strings : other.strings,
     );
   }
@@ -380,252 +285,134 @@ class HoronThemeData extends ThemeExtension<HoronThemeData> {
 
 /// 라이트 밝기의 horon [ColorScheme]입니다.
 ///
-/// 시드에서 파생하지 않고 생성 토큰을 슬롯마다 직접 대응합니다. 슬롯 매핑은
-/// `mobile/lib/src/theme/color_schemes.dart`와 같은 값입니다.
+/// 슬롯마다 토큰 하나를 직접 대응합니다. 그래서 Material 위젯(다이얼로그, 툴팁, 스낵바)도
+/// 웹과 같은 색을 그립니다. `surfaceTint`는 투명입니다. horon은 그림자로 깊이를 만들고
+/// elevation 틴트를 쓰지 않기 때문입니다.
 const ColorScheme horonLightColorScheme = ColorScheme(
   brightness: Brightness.light,
-  primary: HoronLightColors.primary,
-  onPrimary: HoronLightColors.primaryForeground,
-  primaryContainer: HoronLightColors.secondary,
-  onPrimaryContainer: HoronLightColors.secondaryForeground,
-  primaryFixed: HoronLightColors.secondary,
-  primaryFixedDim: HoronLightColors.muted,
-  onPrimaryFixed: HoronLightColors.secondaryForeground,
-  onPrimaryFixedVariant: HoronLightColors.secondaryForeground,
-  secondary: HoronLightColors.secondary,
-  onSecondary: HoronLightColors.secondaryForeground,
-  secondaryContainer: HoronLightColors.secondary,
-  onSecondaryContainer: HoronLightColors.secondaryForeground,
-  secondaryFixed: HoronLightColors.secondary,
-  secondaryFixedDim: HoronLightColors.muted,
-  onSecondaryFixed: HoronLightColors.secondaryForeground,
-  onSecondaryFixedVariant: HoronLightColors.secondaryForeground,
-  tertiary: HoronLightColors.secondary,
-  onTertiary: HoronLightColors.secondaryForeground,
-  tertiaryContainer: HoronLightColors.secondary,
-  onTertiaryContainer: HoronLightColors.secondaryForeground,
-  tertiaryFixed: HoronLightColors.secondary,
-  tertiaryFixedDim: HoronLightColors.muted,
-  onTertiaryFixed: HoronLightColors.secondaryForeground,
-  onTertiaryFixedVariant: HoronLightColors.secondaryForeground,
-  error: HoronLightColors.destructive,
-  onError: HoronLightColors.destructiveForeground,
-  errorContainer: HoronLightColors.destructive,
-  onErrorContainer: HoronLightColors.destructiveForeground,
-  surface: HoronLightColors.background,
-  onSurface: HoronLightColors.foreground,
-  surfaceDim: HoronLightColors.muted,
-  surfaceBright: HoronLightColors.card,
-  surfaceContainerLowest: HoronPalette.sand100,
-  surfaceContainerLow: HoronLightColors.card,
-  surfaceContainer: HoronLightColors.secondary,
-  surfaceContainerHigh: HoronLightColors.popover,
-  surfaceContainerHighest: HoronLightColors.muted,
-  onSurfaceVariant: HoronLightColors.mutedForeground,
-  outline: HoronLightColors.border,
-  outlineVariant: HoronLightColors.border,
-  shadow: HoronPalette.sand1200Shadow,
-  scrim: HoronPalette.sand1200Scrim,
-  inverseSurface: HoronPalette.sand1200,
-  onInverseSurface: HoronPalette.sand100,
-  inversePrimary: HoronPalette.accentLight,
-  surfaceTint: HoronLightColors.primary,
+  primary: HoronLightColors.interactivePrimary,
+  onPrimary: HoronLightColors.interactiveOnPrimary,
+  primaryContainer: HoronLightColors.bgSubtle,
+  onPrimaryContainer: HoronLightColors.textPrimary,
+  secondary: HoronLightColors.bgSubtle,
+  onSecondary: HoronLightColors.textPrimary,
+  secondaryContainer: HoronLightColors.bgSubtle,
+  onSecondaryContainer: HoronLightColors.textPrimary,
+  error: HoronLightColors.interactiveDanger,
+  onError: HoronLightColors.interactiveOnDanger,
+  errorContainer: HoronLightColors.bgDanger,
+  onErrorContainer: HoronLightColors.textDanger,
+  surface: HoronLightColors.bgSurface,
+  onSurface: HoronLightColors.textPrimary,
+  surfaceDim: HoronLightColors.bgSubtle,
+  surfaceBright: HoronLightColors.bgDefault,
+  surfaceContainerLowest: HoronLightColors.bgDefault,
+  surfaceContainerLow: HoronLightColors.bgSurface,
+  surfaceContainer: HoronLightColors.bgSubtle,
+  surfaceContainerHigh: HoronLightColors.bgSubtle,
+  surfaceContainerHighest: HoronLightColors.bgSubtle,
+  onSurfaceVariant: HoronLightColors.textSecondary,
+  outline: HoronLightColors.borderDefault,
+  outlineVariant: HoronLightColors.borderStrong,
+  shadow: HoronLightColors.bgScrim,
+  scrim: HoronLightColors.bgScrim,
+  inverseSurface: HoronLightColors.surfaceInk,
+  onInverseSurface: HoronLightColors.textOnInk,
+  inversePrimary: HoronLightColors.textInverse,
+  surfaceTint: Colors.transparent,
 );
 
 /// 다크 밝기의 horon [ColorScheme]입니다.
 const ColorScheme horonDarkColorScheme = ColorScheme(
   brightness: Brightness.dark,
-  primary: HoronDarkColors.primary,
-  onPrimary: HoronDarkColors.primaryForeground,
-  primaryContainer: HoronDarkColors.secondary,
-  onPrimaryContainer: HoronDarkColors.secondaryForeground,
-  primaryFixed: HoronDarkColors.secondary,
-  primaryFixedDim: HoronDarkColors.muted,
-  onPrimaryFixed: HoronDarkColors.secondaryForeground,
-  onPrimaryFixedVariant: HoronDarkColors.secondaryForeground,
-  secondary: HoronDarkColors.secondary,
-  onSecondary: HoronDarkColors.secondaryForeground,
-  secondaryContainer: HoronDarkColors.secondary,
-  onSecondaryContainer: HoronDarkColors.secondaryForeground,
-  secondaryFixed: HoronDarkColors.secondary,
-  secondaryFixedDim: HoronDarkColors.muted,
-  onSecondaryFixed: HoronDarkColors.secondaryForeground,
-  onSecondaryFixedVariant: HoronDarkColors.secondaryForeground,
-  tertiary: HoronDarkColors.secondary,
-  onTertiary: HoronDarkColors.secondaryForeground,
-  tertiaryContainer: HoronDarkColors.secondary,
-  onTertiaryContainer: HoronDarkColors.secondaryForeground,
-  tertiaryFixed: HoronDarkColors.secondary,
-  tertiaryFixedDim: HoronDarkColors.muted,
-  onTertiaryFixed: HoronDarkColors.secondaryForeground,
-  onTertiaryFixedVariant: HoronDarkColors.secondaryForeground,
-  error: HoronDarkColors.destructive,
-  onError: HoronDarkColors.destructiveForeground,
-  errorContainer: HoronDarkColors.destructive,
-  onErrorContainer: HoronDarkColors.destructiveForeground,
-  surface: HoronDarkColors.background,
-  onSurface: HoronDarkColors.foreground,
-  surfaceDim: HoronDarkColors.muted,
-  surfaceBright: HoronDarkColors.card,
-  surfaceContainerLowest: HoronPalette.sand1200,
-  surfaceContainerLow: HoronDarkColors.card,
-  surfaceContainer: HoronDarkColors.secondary,
-  surfaceContainerHigh: HoronDarkColors.popover,
-  surfaceContainerHighest: HoronDarkColors.muted,
-  onSurfaceVariant: HoronDarkColors.mutedForeground,
-  outline: HoronDarkColors.border,
-  outlineVariant: HoronDarkColors.border,
-  shadow: HoronPalette.sand1200Shadow,
-  scrim: HoronPalette.sand1200Scrim,
-  inverseSurface: HoronPalette.sand100,
-  onInverseSurface: HoronPalette.sand1200,
-  inversePrimary: HoronPalette.accentDark,
-  surfaceTint: HoronDarkColors.primary,
+  primary: HoronDarkColors.interactivePrimary,
+  onPrimary: HoronDarkColors.interactiveOnPrimary,
+  primaryContainer: HoronDarkColors.bgSubtle,
+  onPrimaryContainer: HoronDarkColors.textPrimary,
+  secondary: HoronDarkColors.bgSubtle,
+  onSecondary: HoronDarkColors.textPrimary,
+  secondaryContainer: HoronDarkColors.bgSubtle,
+  onSecondaryContainer: HoronDarkColors.textPrimary,
+  error: HoronDarkColors.interactiveDanger,
+  onError: HoronDarkColors.interactiveOnDanger,
+  errorContainer: HoronDarkColors.bgDanger,
+  onErrorContainer: HoronDarkColors.textDanger,
+  surface: HoronDarkColors.bgSurface,
+  onSurface: HoronDarkColors.textPrimary,
+  surfaceDim: HoronDarkColors.bgDefault,
+  surfaceBright: HoronDarkColors.bgSubtle,
+  surfaceContainerLowest: HoronDarkColors.bgDefault,
+  surfaceContainerLow: HoronDarkColors.bgSurface,
+  surfaceContainer: HoronDarkColors.bgSubtle,
+  surfaceContainerHigh: HoronDarkColors.bgSubtle,
+  surfaceContainerHighest: HoronDarkColors.bgSubtle,
+  onSurfaceVariant: HoronDarkColors.textSecondary,
+  outline: HoronDarkColors.borderDefault,
+  outlineVariant: HoronDarkColors.borderStrong,
+  shadow: HoronDarkColors.bgScrim,
+  scrim: HoronDarkColors.bgScrim,
+  inverseSurface: HoronDarkColors.surfaceInk,
+  onInverseSurface: HoronDarkColors.textOnInk,
+  inversePrimary: HoronDarkColors.textInverse,
+  surfaceTint: Colors.transparent,
 );
 
-/// 생성된 타입 스케일로 조립한 horon [TextTheme]입니다.
+/// 토큰 타이포에서 Material [TextTheme]을 만듭니다.
 ///
-/// 색은 비워 둡니다. 그러면 [ThemeData]가 활성 밝기의 `onSurface`를 적용하므로
-/// 이 테마는 밝기와 무관하게 하나로 유지됩니다. 15개 슬롯의 크기·무게·줄 높이는
-/// `mobile/lib/src/theme/text_theme.dart`와 같은 값입니다.
-const TextTheme horonTextTheme = TextTheme(
-  displayLarge: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.hero,
-    fontWeight: HoronFontWeight.bold,
-    height: HoronLineHeight.tight,
-  ),
-  displayMedium: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.display,
-    fontWeight: HoronFontWeight.bold,
-    height: HoronLineHeight.tight,
-  ),
-  displaySmall: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.display,
-    fontWeight: HoronFontWeight.semibold,
-    height: HoronLineHeight.tight,
-  ),
-  headlineLarge: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.heading,
-    fontWeight: HoronFontWeight.semibold,
-    height: HoronLineHeight.tight,
-  ),
-  headlineMedium: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.heading,
-    fontWeight: HoronFontWeight.semibold,
-    height: HoronLineHeight.snug,
-  ),
-  headlineSmall: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.subtitle,
-    fontWeight: HoronFontWeight.semibold,
-    height: HoronLineHeight.snug,
-  ),
-  titleLarge: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.subtitle,
-    fontWeight: HoronFontWeight.medium,
-    height: HoronLineHeight.snug,
-  ),
-  titleMedium: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.lead,
-    fontWeight: HoronFontWeight.medium,
-    height: HoronLineHeight.normal,
-  ),
-  titleSmall: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.body,
-    fontWeight: HoronFontWeight.medium,
-    height: HoronLineHeight.normal,
-  ),
-  bodyLarge: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.lead,
-    fontWeight: HoronFontWeight.regular,
-    height: HoronLineHeight.normal,
-  ),
-  bodyMedium: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.body,
-    fontWeight: HoronFontWeight.regular,
-    height: HoronLineHeight.normal,
-  ),
-  bodySmall: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.caption,
-    fontWeight: HoronFontWeight.regular,
-    height: HoronLineHeight.normal,
-  ),
-  labelLarge: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.body,
-    fontWeight: HoronFontWeight.semibold,
-    height: HoronLineHeight.normal,
-  ),
-  labelMedium: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.caption,
-    fontWeight: HoronFontWeight.medium,
-    height: HoronLineHeight.normal,
-  ),
-  labelSmall: TextStyle(
-    fontFamily: HoronFont.body,
-    fontFamilyFallback: HoronFont.fontFamilyFallback,
-    fontSize: HoronText.caption,
-    fontWeight: HoronFontWeight.regular,
-    height: HoronLineHeight.snug,
-  ),
-);
+/// 13가지 스타일을 Material의 15개 슬롯에 가까운 뜻으로 배치합니다. 색은 비워 두므로
+/// [ThemeData]가 활성 밝기의 `onSurface`를 적용합니다.
+TextTheme horonTextTheme(HoronTextStyles text) {
+  return TextTheme(
+    displayLarge: text.displayLg,
+    displayMedium: text.displayMd,
+    displaySmall: text.titleLg,
+    headlineLarge: text.titleLg,
+    headlineMedium: text.titleMd,
+    headlineSmall: text.titleSm,
+    titleLarge: text.titleMd,
+    titleMedium: text.labelLg,
+    titleSmall: text.labelMd,
+    bodyLarge: text.bodyLg,
+    bodyMedium: text.bodyMd,
+    bodySmall: text.bodySm,
+    labelLarge: text.labelLg,
+    labelMedium: text.labelMd,
+    labelSmall: text.labelSm,
+  );
+}
 
 /// [brightness]의 horon [ThemeData]입니다.
 ///
-/// 라이트와 다크는 서로 독립한 토큰 집합입니다. 색, [ColorScheme],
-/// [HoronThemeData]가 함께 바뀌므로 다크가 라이트 값을 빌려 쓰지 않습니다.
-/// 표면 반경은 숫자 대신 [HoronRadiusRole]을 읽습니다. 그래야 버튼, 카드, 패널이
-/// 각자 대응하는 디자인 컴포넌트의 반경을 유지합니다.
+/// 라이트와 다크는 서로 독립한 토큰 묶음입니다. [ColorScheme], [HoronThemeData],
+/// Material 하위 테마가 모두 같은 묶음에서 값을 읽으므로 다크가 라이트 값을 빌려 쓰지
+/// 않습니다. 반경과 간격은 토큰 단계를 읽습니다. 그래야 이후 컴포넌트 웨이브가 같은
+/// 숫자를 두 번 적지 않습니다.
 ThemeData horonTheme(Brightness brightness) {
   final bool isDark = brightness == Brightness.dark;
   final ColorScheme scheme = isDark ? horonDarkColorScheme : horonLightColorScheme;
   final HoronThemeData data = isDark ? HoronThemeData.dark : HoronThemeData.light;
+  final HoronColors colors = data.colors;
+  final HoronRadiusSpec radius = data.radius;
+  final HoronSpaceSpec space = data.space;
 
-  final BorderRadius controlRadius = BorderRadius.circular(HoronRadiusRole.control);
-  final BorderRadius cardRadius = BorderRadius.circular(HoronRadiusRole.card);
-  final BorderRadius fieldRadius = BorderRadius.circular(HoronRadiusRole.input);
-  final BorderRadius panelRadius = BorderRadius.circular(HoronRadiusRole.panel);
+  final BorderRadius controlRadius = BorderRadius.circular(radius.full);
+  final BorderRadius fieldRadius = BorderRadius.circular(radius.md);
+  final BorderRadius surfaceRadius = BorderRadius.circular(radius.xl);
 
   return ThemeData(
     brightness: brightness,
     colorScheme: scheme,
-    textTheme: horonTextTheme,
+    textTheme: horonTextTheme(data.text),
     extensions: <ThemeExtension<dynamic>>[data],
-    scaffoldBackgroundColor: scheme.surface,
+    scaffoldBackgroundColor: colors.bgDefault,
     appBarTheme: AppBarThemeData(
-      backgroundColor: scheme.surface,
-      foregroundColor: scheme.onSurface,
+      backgroundColor: colors.bgDefault,
+      foregroundColor: colors.textPrimary,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
       centerTitle: false,
-      titleTextStyle: horonTextTheme.titleLarge?.copyWith(color: scheme.onSurface),
+      titleTextStyle: data.text.titleMd.copyWith(color: colors.textPrimary),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: controlRadius)),
@@ -637,92 +424,72 @@ ThemeData horonTheme(Brightness brightness) {
       style: TextButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: controlRadius)),
     ),
     cardTheme: CardThemeData(
-      color: scheme.surfaceContainerLow,
+      color: colors.bgSurface,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: cardRadius,
-        side: BorderSide(color: scheme.outline),
+        borderRadius: surfaceRadius,
+        side: BorderSide(color: colors.borderDefault),
       ),
     ),
     dialogTheme: DialogThemeData(
-      backgroundColor: scheme.surfaceContainerHigh,
+      backgroundColor: colors.bgSurface,
       surfaceTintColor: Colors.transparent,
-      elevation: HoronShadow.lgElevation.toDouble(),
-      shape: RoundedRectangleBorder(borderRadius: panelRadius),
-      titleTextStyle: horonTextTheme.headlineSmall?.copyWith(color: scheme.onSurface),
-      contentTextStyle: horonTextTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+      shape: RoundedRectangleBorder(borderRadius: surfaceRadius),
+      titleTextStyle: data.text.titleMd.copyWith(color: colors.textPrimary),
+      contentTextStyle: data.text.bodyMd.copyWith(color: colors.textSecondary),
     ),
-    navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: scheme.surfaceContainer,
-      surfaceTintColor: Colors.transparent,
-      indicatorColor: scheme.secondaryContainer,
-      elevation: 0,
-      labelTextStyle: WidgetStatePropertyAll<TextStyle?>(horonTextTheme.labelMedium),
-    ),
-    navigationRailTheme: NavigationRailThemeData(
-      backgroundColor: scheme.surfaceContainer,
-      indicatorColor: scheme.secondaryContainer,
-      selectedIconTheme: IconThemeData(color: scheme.onSecondaryContainer),
-      unselectedIconTheme: IconThemeData(color: scheme.onSurfaceVariant),
-      selectedLabelTextStyle: horonTextTheme.labelMedium?.copyWith(color: scheme.onSurface),
-      unselectedLabelTextStyle: horonTextTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
-    ),
+    dividerTheme: DividerThemeData(color: colors.borderDefault, thickness: 1, space: 1),
     inputDecorationTheme: InputDecorationThemeData(
       filled: true,
-      fillColor: scheme.surfaceContainer,
-      contentPadding: const EdgeInsets.symmetric(horizontal: HoronSpace.s4, vertical: HoronSpace.s3),
+      fillColor: colors.bgSurface,
+      contentPadding: EdgeInsets.symmetric(horizontal: space.s3_5, vertical: space.s2_5),
       border: OutlineInputBorder(
         borderRadius: fieldRadius,
-        borderSide: BorderSide(color: scheme.outline),
+        borderSide: BorderSide(color: colors.borderDefault),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: fieldRadius,
-        borderSide: BorderSide(color: scheme.outline),
+        borderSide: BorderSide(color: colors.borderDefault),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: fieldRadius,
-        borderSide: BorderSide(color: data.ring, width: 1.5),
+        borderSide: BorderSide(color: colors.borderFocus, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: fieldRadius,
-        borderSide: BorderSide(color: scheme.error),
+        borderSide: BorderSide(color: colors.borderDanger),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: fieldRadius,
-        borderSide: BorderSide(color: scheme.error, width: 2),
+        borderSide: BorderSide(color: colors.borderDanger, width: 2),
       ),
     ),
-    bottomSheetTheme: BottomSheetThemeData(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(HoronRadiusRole.panel))),
-    ),
     listTileTheme: ListTileThemeData(
-      iconColor: scheme.onSurfaceVariant,
-      textColor: scheme.onSurface,
-      selectedTileColor: scheme.secondaryContainer,
-      selectedColor: scheme.onSecondaryContainer,
-      // 목록 항목이 쓰는 `radius.md`를 `control` 역할이 같은 값으로 가리킵니다.
-      shape: RoundedRectangleBorder(borderRadius: controlRadius),
+      iconColor: colors.textSecondary,
+      textColor: colors.textPrimary,
+      selectedTileColor: colors.bgSubtle,
+      selectedColor: colors.textPrimary,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius.md)),
     ),
-    dividerTheme: DividerThemeData(color: scheme.outline, thickness: 1, space: 1),
   );
 }
 
-/// 테마에서 horon 슬롯을 읽는 접근자입니다.
+/// 테마에서 horon 토큰 묶음을 읽는 접근자입니다.
 abstract final class HoronTheme {
   /// [context]의 [HoronThemeData]를 돌려줍니다.
   ///
-  /// 없으면 [StateError]를 던집니다. 라이트 값으로 조용히 떨어지지 않는 이유는
-  /// 그런 fallback이 다크 화면에 라이트 금색을 칠하고도 테스트를 통과시키기
-  /// 때문입니다. 테마는 [horonTheme]로 조립해야 합니다.
+  /// 없으면 [StateError]를 던집니다. 라이트 값으로 조용히 떨어지지 않는 이유는 그런
+  /// fallback이 다크 화면에 라이트 색을 칠하고도 테스트를 통과시키기 때문입니다.
+  /// 테마는 [horonTheme]로 조립해야 합니다.
   static HoronThemeData of(BuildContext context) {
     final HoronThemeData? data = Theme.of(context).extension<HoronThemeData>();
     if (data == null) {
       throw StateError(
         'No HoronThemeData in the ambient Theme. Build the app theme with '
         'horonTheme(brightness) so the extension is registered; components read '
-        'ring, glass, chart and sidebar colours from it and there is no fallback.',
+        'colors, text, glass, radius, space and shadows from it and there is no fallback.',
       );
     }
     return data;

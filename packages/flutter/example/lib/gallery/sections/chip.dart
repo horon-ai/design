@@ -1,48 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
-import '../section_scaffold.dart';
-
-/// `chip` 갤러리 섹션입니다.
+/// Chip 갤러리 섹션입니다.
+///
+/// 칩은 선택 상태만 갖습니다. 여러 개를 실제로 눌러 체크와 브랜드 테두리가
+/// 나타나는지, 다시 누르면 사라지는지 확인할 수 있게 두었습니다.
 class HoronChipGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronChipGallerySection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GallerySectionScaffold(
-      title: 'Chip',
-      variants: <Widget>[
-        for (final HoronChipVariant variant in HoronChipVariant.values)
-          HoronChip(label: variant.name, variant: variant),
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Padding(
+      padding: EdgeInsets.all(theme.space.s4),
+      child: const _ChipSamples(),
+    );
+  }
+}
+
+/// 선택 상태를 들고 있는 칩 묶음입니다.
+class _ChipSamples extends StatefulWidget {
+  const _ChipSamples();
+
+  @override
+  State<_ChipSamples> createState() => _ChipSamplesState();
+}
+
+class _ChipSamplesState extends State<_ChipSamples> {
+  static const List<String> _labels = <String>['전체', '읽지 않음', '첨부', '나에게 보낸'];
+
+  final Set<String> _pressed = <String>{'전체'};
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Wrap(
+      spacing: theme.space.s2,
+      runSpacing: theme.space.s2,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: <Widget>[
+        for (final String label in _labels)
+          HoronChip(
+            label: label,
+            pressed: _pressed.contains(label),
+            onPressedChange: (bool pressed) => setState(() {
+              if (pressed) {
+                _pressed.add(label);
+              } else {
+                _pressed.remove(label);
+              }
+            }),
+          ),
+        HoronChip(label: '비활성', enabled: false),
+        const HoronChip(label: '스스로 토글'),
       ],
-      states: <Widget>[
-        HoronChip(label: 'Removable', onRemove: () {}),
-        HoronChip(
-          label: 'Accent removable',
-          variant: HoronChipVariant.accent,
-          onRemove: () {},
-        ),
-        HoronChip(
-          label: 'Outline removable',
-          variant: HoronChipVariant.outline,
-          onRemove: () {},
-        ),
-        HoronChip(
-          label: 'With icon',
-          icon: const Icon(Icons.tag),
-          onRemove: () {},
-        ),
-        const HoronChip(label: 'Read only'),
-        HoronChip(
-          label: 'Long label that stays on one line',
-          variant: HoronChipVariant.secondary,
-          onRemove: () {},
-        ),
-      ],
-      notes:
-          'React `chip.tsx`의 변형 7개입니다. `rounded-full`이라 반경은 pill 역할(9999)이고, '
-          '제거 버튼의 접근성 이름은 `strings.remove`에서 옵니다.',
     );
   }
 }

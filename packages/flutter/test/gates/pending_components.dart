@@ -2,8 +2,9 @@
 /// `lib/src/components/<slug>.dart` file yet.
 ///
 /// The parity gate asserts `reactSlugs == implementedSlugs ∪ pendingComponents`,
-/// so this list is a ledger, not an exemption: every component todo deletes its
-/// own slug from here in the same change that adds the component file, its
-/// barrel export and its gallery section. `test/gates_final/pending_empty_test.dart`
+/// so this list is a ledger, not an exemption. Lanes do not edit it: while the
+/// waves run, a landed file may still be listed here. `scripts/integrate.mjs`
+/// rewrites it from the directory listing (a slug with a file comes out, a
+/// catalog slug without one goes in). `test/gates_final/pending_empty_test.dart`
 /// asserts this list is empty once the last component lands.
 const List<String> pendingComponents = <String>[];

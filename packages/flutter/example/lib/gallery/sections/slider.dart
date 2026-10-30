@@ -1,84 +1,95 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
-// 배럴 export는 통합 담당자가 소유합니다. 이 파일은 자기 컴포넌트만 하위 경로로 읽어,
-// 배럴에 export가 추가된 뒤에도 `unnecessary_import`가 생기지 않게 합니다.
 
-import '../section_scaffold.dart';
-
-/// `slider` 갤러리 섹션입니다.
+/// Slider 갤러리 섹션입니다.
 ///
-/// 수평·수직, 값 표시, 눈금, 범위와 비활성을 모두 그립니다. 트랙·채움·썸이 한
-/// 페인터에서 그려지므로 이 화면에서 채움의 끝과 썸의 중심이 맞는지 확인할 수
-/// 있습니다.
-class HoronSliderGallerySection extends StatefulWidget {
+/// Paper 설정 화면의 두 슬라이더(Voice·Speed)를 실제로 움직일 수 있게 두고,
+/// 비활성 상태를 함께 놓았습니다.
+class HoronSliderGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronSliderGallerySection({super.key});
 
   @override
-  State<HoronSliderGallerySection> createState() =>
-      _HoronSliderGallerySectionState();
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Padding(
+      padding: EdgeInsets.all(theme.space.s4),
+      child: const _SliderSamples(),
+    );
+  }
 }
 
-class _HoronSliderGallerySectionState extends State<HoronSliderGallerySection> {
-  double _plain = 40;
-  double _withValue = 65;
-  double _stepped = 50;
-  double _vertical = 30;
+/// 두 값을 들고 있는 슬라이더 묶음입니다.
+class _SliderSamples extends StatefulWidget {
+  const _SliderSamples();
+
+  @override
+  State<_SliderSamples> createState() => _SliderSamplesState();
+}
+
+class _SliderSamplesState extends State<_SliderSamples> {
+  double _voice = 60;
+  double _speed = 35;
 
   @override
   Widget build(BuildContext context) {
-    return GallerySectionScaffold(
-      title: 'Slider',
-      variants: <Widget>[
-        SizedBox(
-          width: 260,
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Wrap(
+      spacing: theme.space.s8,
+      runSpacing: theme.space.s4,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: <Widget>[
+        _Sample(
+          label: 'voice',
           child: HoronSlider(
-            value: _plain,
-            onChanged: (double value) => setState(() => _plain = value),
+            value: _voice,
+            semanticLabel: '음성 크기',
+            onChanged: (double value) => setState(() => _voice = value),
           ),
         ),
-        SizedBox(
-          width: 260,
+        _Sample(
+          label: 'speed',
           child: HoronSlider(
-            value: _withValue,
-            showValue: true,
-            onChanged: (double value) => setState(() => _withValue = value),
+            value: _speed,
+            semanticLabel: '속도',
+            onChanged: (double value) => setState(() => _speed = value),
           ),
         ),
-        SizedBox(
-          width: 260,
+        _Sample(
+          label: 'disabled',
           child: HoronSlider(
-            value: _stepped,
-            divisions: 4,
-            showValue: true,
-            onChanged: (double value) => setState(() => _stepped = value),
-          ),
-        ),
-        SizedBox(
-          height: 160,
-          child: HoronSlider(
-            value: _vertical,
-            orientation: Axis.vertical,
-            onChanged: (double value) => setState(() => _vertical = value),
+            value: 20,
+            semanticLabel: '비활성',
+            enabled: false,
+            onChanged: (_) {},
           ),
         ),
       ],
-      states: <Widget>[
-        SizedBox(width: 260, child: HoronSlider(value: 0, onChanged: (_) {})),
-        SizedBox(
-          width: 260,
-          child: HoronSlider(value: 100, showValue: true, onChanged: (_) {}),
+    );
+  }
+}
+
+/// 변형 하나와 그 이름입니다.
+class _Sample extends StatelessWidget {
+  const _Sample({required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: theme.space.s1,
+      children: <Widget>[
+        Text(
+          label,
+          style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
         ),
-        const SizedBox(
-          width: 260,
-          child: HoronSlider(value: 50, enabled: false, showValue: true),
-        ),
-        const SizedBox(width: 260, child: HoronSlider(value: 50)),
+        child,
       ],
-      notes:
-          'React `slider.tsx`의 `h-1.5` 트랙, `bg-primary` 범위, `size-4 border-2` 썸을 '
-          '한 페인터에서 그립니다. 값은 min/max로 잘리고, `divisions`가 있으면 가장 가까운 '
-          '눈금으로 반올림됩니다. 세로는 아래가 min입니다.',
     );
   }
 }

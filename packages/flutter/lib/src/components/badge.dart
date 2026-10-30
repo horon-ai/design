@@ -1,223 +1,91 @@
 import 'package:flutter/material.dart';
 
-import '../theme/horon_fonts.dart';
 import '../theme/horon_theme.dart';
-import '../tokens/horon_tokens.g.dart';
 
-/// `badge.tsx`의 `variant` 옵션입니다.
-enum HoronBadgeVariant {
-  /// `bg-primary text-primary-foreground`
-  defaultValue,
+/// `badge.tsx`의 `BadgeTone`입니다.
+enum HoronBadgeTone {
+  /// `tone="neutral"` — 6% 잉크 바탕에 보조 글자색입니다.
+  neutral,
 
-  /// `bg-secondary text-secondary-foreground`
-  secondary,
+  /// `tone="brand"` — 하늘색 18% 바탕에 브랜드 글자색입니다.
+  brand,
 
-  /// `bg-destructive/10 text-destructive` (다크에서는 `/20`)
-  destructive,
+  /// `tone="danger"` — 위험색 14% 바탕에 위험 글자색입니다.
+  danger,
 
-  /// `border-border text-foreground` - 테두리만 있는 변형입니다.
-  outline,
-
-  /// 채움 없이 hover에서만 배경이 붙는 변형입니다.
-  ghost,
-
-  /// `text-primary` - hover에서 밑줄이 붙는 링크 변형입니다.
-  link,
+  /// `tone="solid"` — 잉크 바탕에 반대색 글자입니다.
+  solid,
 }
 
-/// `badge.tsx`의 `text-[11px]`입니다. 생성 스케일의 12보다 작은 값이라 이름을 붙입니다.
-const double _badgeFontSize = 11.0;
+/// `badge.tsx`의 `h-5.5`입니다.
+const double _badgeHeight = 22;
 
-/// `badge.tsx`의 `py-[3px]`입니다. 4px 스케일의 단계가 아닙니다.
-const double _badgeVerticalPadding = 3.0;
+/// `badge.tsx`의 `px-2`입니다.
+const double _badgePaddingX = 8;
 
-/// `badge.tsx`의 `[&>svg]:size-3`입니다.
-const double _badgeIconSize = 12.0;
+/// `badge.tsx`의 `gap-1.5`입니다.
+const double _badgeGap = 6;
 
-/// `badge.tsx`의 `focus-visible:ring-[3px]`입니다.
-const double _badgeFocusRingWidth = 3.0;
+/// `badge.tsx`의 `size-1.5`입니다. 앞 상태 점의 지름입니다.
+const double _dotSize = 6;
 
-/// 짧은 상태 표시를 알약 모양으로 그리는 배지입니다.
+/// Figma `Badge`(61:283): 22px 반투명 알약에 `label-sm` 글자를 얹은 상태 표시입니다.
 ///
-/// `badge.tsx`를 옮긴 것입니다. 반경은 `rounded-full`이라 [HoronRadiusRole.pill]이고,
-/// 아이콘은 [icon](앞)과 [trailingIcon](뒤) 슬롯으로 받습니다. React는 아이콘이 앞에
-/// 있으면 왼쪽 패딩을, 뒤에 있으면 오른쪽 패딩을 `px-1.5`로 줄입니다.
-///
-/// ```dart
-/// HoronBadge(label: '신규', variant: HoronBadgeVariant.secondary);
-/// ```
-class HoronBadge extends StatefulWidget {
+/// `badge.tsx`를 옮긴 것입니다. 네 톤이 각각 바탕과 글자색을 정하고, [dot]을 켜면
+/// 앞에 6px 상태 점이 붙습니다. 반경은 `rounded-full`입니다.
+class HoronBadge extends StatelessWidget {
   /// 배지를 만듭니다.
-  const HoronBadge({
-    super.key,
-    this.label,
-    this.child,
-    this.icon,
-    this.trailingIcon,
-    this.variant = HoronBadgeVariant.defaultValue,
-    this.invalid = false,
-    this.onTap,
-  }) : assert(label != null || child != null, 'HoronBadge needs a label or a child.');
+  const HoronBadge({super.key, required this.label, this.tone = HoronBadgeTone.neutral, this.dot = false});
 
-  /// 배지 글자입니다.
-  final String? label;
+  /// 표시할 글자입니다.
+  final String label;
 
-  /// 글자 대신 넣는 내용입니다.
-  final Widget? child;
+  /// 색조입니다.
+  final HoronBadgeTone tone;
 
-  /// 글자 앞 아이콘입니다.
-  final Widget? icon;
-
-  /// 글자 뒤 아이콘입니다.
-  final Widget? trailingIcon;
-
-  /// 변형입니다.
-  final HoronBadgeVariant variant;
-
-  /// `aria-invalid` 상태입니다. 참이면 테두리와 포커스 링이 파괴 색이 됩니다.
-  final bool invalid;
-
-  /// 누르는 동작입니다. 넘기면 hover·focus 반응이 붙습니다(React의 `[a]:hover`).
-  final VoidCallback? onTap;
-
-  @override
-  State<HoronBadge> createState() => _HoronBadgeState();
-}
-
-class _HoronBadgeState extends State<HoronBadge> {
-  bool _hovered = false;
-  bool _focused = false;
+  /// 앞에 6px 상태 점을 붙입니다.
+  final bool dot;
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme scheme = theme.colorScheme;
-    final HoronThemeData horon = HoronTheme.of(context);
-    final bool isDark = theme.brightness == Brightness.dark;
-    final bool interactive = widget.onTap != null;
+    final HoronThemeData theme = HoronTheme.of(context);
 
-    final (Color background, Color foreground) = switch (widget.variant) {
-      HoronBadgeVariant.defaultValue => (scheme.primary, scheme.onPrimary),
-      HoronBadgeVariant.secondary => (scheme.secondary, scheme.onSecondary),
-      HoronBadgeVariant.destructive => (scheme.error.withValues(alpha: isDark ? 0.2 : 0.1), scheme.error),
-      HoronBadgeVariant.outline => (Colors.transparent, scheme.onSurface),
-      HoronBadgeVariant.ghost => (Colors.transparent, scheme.onSurface),
-      HoronBadgeVariant.link => (Colors.transparent, scheme.primary),
+    final (Color background, Color foreground) = switch (tone) {
+      HoronBadgeTone.neutral => (theme.colors.overlayInk6, theme.colors.textSecondary),
+      HoronBadgeTone.brand => (theme.colors.accentSky500_18, theme.colors.textBrand),
+      HoronBadgeTone.danger => (theme.colors.accentRed500_14, theme.colors.textDanger),
+      HoronBadgeTone.solid => (theme.colors.interactivePrimary, theme.colors.interactiveOnPrimary),
+    };
+    final Color dotColor = switch (tone) {
+      HoronBadgeTone.neutral => theme.colors.textSecondary,
+      HoronBadgeTone.brand => theme.colors.statusLive,
+      HoronBadgeTone.danger => theme.colors.textDanger,
+      HoronBadgeTone.solid => theme.colors.interactiveOnPrimary,
     };
 
-    // `[a]:hover` 클래스가 고르는 쌍입니다. 누를 수 없는 배지는 hover에서 변하지 않습니다.
-    final (Color hoveredBackground, Color hoveredForeground) = switch (widget.variant) {
-      HoronBadgeVariant.defaultValue => (scheme.primary.withValues(alpha: 0.8), scheme.onPrimary),
-      HoronBadgeVariant.secondary => (scheme.secondary.withValues(alpha: 0.8), scheme.onSecondary),
-      HoronBadgeVariant.destructive => (scheme.error.withValues(alpha: 0.2), scheme.error),
-      // `hover:bg-muted hover:text-muted-foreground`
-      HoronBadgeVariant.outline => (scheme.surfaceContainerHighest, scheme.onSurfaceVariant),
-      HoronBadgeVariant.ghost => (scheme.surfaceContainerHighest, scheme.onSurfaceVariant),
-      HoronBadgeVariant.link => (Colors.transparent, scheme.primary),
-    };
-
-    final bool showHover = interactive && _hovered;
-    final Color effectiveBackground = showHover ? hoveredBackground : background;
-    final Color effectiveForeground = showHover ? hoveredForeground : foreground;
-
-    final Color borderColor = widget.invalid
-        ? scheme.error
-        : switch (widget.variant) {
-            HoronBadgeVariant.outline => scheme.outline,
-            _ => Colors.transparent,
-          };
-
-    final Color ringColor = widget.invalid
-        ? scheme.error.withValues(alpha: isDark ? 0.4 : 0.2)
-        : horon.ring.withValues(alpha: 0.5);
-
-    final TextStyle textStyle = TextStyle(
-      fontFamily: HoronFont.body,
-      fontFamilyFallback: HoronFont.fontFamilyFallback,
-      fontSize: _badgeFontSize,
-      fontWeight: HoronFontWeight.semibold,
-      height: HoronLineHeight.none,
-      color: effectiveForeground,
-      decoration: widget.variant == HoronBadgeVariant.link && showHover
-          ? TextDecoration.underline
-          : TextDecoration.none,
-      decorationColor: effectiveForeground,
-    );
-
-    final Widget content = DecoratedBox(
-      decoration: BoxDecoration(
-        color: effectiveBackground,
-        borderRadius: BorderRadius.circular(HoronRadiusRole.pill),
-        border: Border.all(color: borderColor),
-        boxShadow: _focused ? <BoxShadow>[BoxShadow(color: ringColor, spreadRadius: _badgeFocusRingWidth)] : null,
-      ),
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: widget.icon == null ? HoronSpace.s2_5 : HoronSpace.s1_5,
-          right: widget.trailingIcon == null ? HoronSpace.s2_5 : HoronSpace.s1_5,
-          top: _badgeVerticalPadding,
-          bottom: _badgeVerticalPadding,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            if (widget.icon != null) ...<Widget>[
-              IconTheme.merge(
-                data: IconThemeData(size: _badgeIconSize, color: effectiveForeground),
-                child: widget.icon!,
-              ),
-              const SizedBox(width: HoronSpace.s1),
-            ],
-            // React는 `whitespace-nowrap overflow-hidden`이라 넘치는 글자를 자릅니다.
-            // Flutter에서 같은 자리를 [Flexible] 없이 두면 이 Row가 부모를 넘칩니다
-            // (360 폭에서 168px, 2026-10-22 렌더 스윕). 자리가 모자랄 때만 줄어들고
-            // 남을 때는 제 폭을 그대로 쓰므로 평상시 모양은 같습니다.
-            if (widget.label != null)
-              Flexible(
-                child: Text(
-                  widget.label!,
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.ellipsis,
-                  style: textStyle,
-                ),
-              )
-            else
-              Flexible(
-                child: DefaultTextStyle(style: textStyle, child: widget.child!),
-              ),
-            if (widget.trailingIcon != null) ...<Widget>[
-              const SizedBox(width: HoronSpace.s1),
-              IconTheme.merge(
-                data: IconThemeData(size: _badgeIconSize, color: effectiveForeground),
-                child: widget.trailingIcon!,
-              ),
-            ],
+    return Container(
+      height: _badgeHeight,
+      padding: const EdgeInsets.symmetric(horizontal: _badgePaddingX),
+      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(theme.radius.full)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (dot) ...<Widget>[
+            Container(
+              width: _dotSize,
+              height: _dotSize,
+              decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+            ),
+            const SizedBox(width: _badgeGap),
           ],
-        ),
-      ),
-    );
-
-    if (!interactive) return content;
-
-    return FocusableActionDetector(
-      onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
-      onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-      actions: <Type, Action<Intent>>{
-        ActivateIntent: CallbackAction<ActivateIntent>(
-          onInvoke: (ActivateIntent intent) {
-            widget.onTap!();
-            return null;
-          },
-        ),
-      },
-      child: Semantics(
-        button: true,
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: widget.onTap, child: content),
-        ),
+          Text(
+            label,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            style: theme.text.labelSm.copyWith(color: foreground),
+          ),
+        ],
       ),
     );
   }
