@@ -22,8 +22,9 @@ class BoardFrame extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         if (!constraints.maxWidth.isFinite ||
-            constraints.maxWidth >= designWidth)
+            constraints.maxWidth >= designWidth) {
           return child;
+        }
         return FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.topLeft,

@@ -53,6 +53,11 @@ class HoronOrchestratorPanelGallerySection extends StatelessWidget {
           onStop: () {},
           lead: _lead,
           plan: _plan(theme),
+          summary: const HoronOrchestratorSummary(
+            title: 'Summary',
+            count: '2 of 3 returned',
+            body: '두 레인이 근거 21건을 모았고, 반대 근거는 아직 확인 중입니다.',
+          ),
           children: <Widget>[
             _Lane(
               theme: theme,
@@ -68,11 +73,6 @@ class HoronOrchestratorPanelGallerySection extends StatelessWidget {
             ),
             _Lane(theme: theme, name: 'skeptic', detail: '대조 중', running: true),
           ],
-          summary: const HoronOrchestratorSummary(
-            title: 'Summary',
-            count: '2 of 3 returned',
-            body: '두 레인이 근거 21건을 모았고, 반대 근거는 아직 확인 중입니다.',
-          ),
         ),
       ),
     );
