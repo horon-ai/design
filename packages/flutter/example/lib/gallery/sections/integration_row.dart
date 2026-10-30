@@ -22,7 +22,8 @@ class HoronIntegrationRowGallerySection extends StatelessWidget {
           final double available = constraints.maxWidth.isFinite
               ? constraints.maxWidth
               : 640;
-          final double wide = math.min(available, 640);
+          // Paper `UFQ-1` 등 세 행은 440px 폭입니다.
+          final double wide = math.min(available, 440);
           final double narrow = math.min(available, 360);
           return Wrap(
             spacing: theme.space.s4,

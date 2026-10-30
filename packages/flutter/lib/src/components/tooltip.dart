@@ -4,6 +4,18 @@ import '../theme/horon_theme.dart';
 
 enum _TooltipSide { top, bottom, left, right }
 
+/// 화살표 상자의 긴 변입니다. Paper `TVV-1`의 10입니다.
+const double _arrowLength = 10;
+
+/// 화살표 상자의 짧은 변입니다. Paper `TVV-1`의 6입니다.
+const double _arrowDepth = 6;
+
+/// 화살표 삼각형의 밑변 폭입니다. Paper `TVV-1`의 8.66입니다.
+const double _arrowBase = 8.66;
+
+/// 삼각형 밑변과 말풍선 사이의 거리입니다. Paper `TVV-1`의 1.5입니다.
+const double _arrowGap = 1.5;
+
 /// Figma `Tooltip`(62:282): 잉크 말풍선에 10/6 여백, 8 반경, 10x6 화살표를 붙인 안내입니다.
 ///
 /// `tooltip.tsx`의 `side`는 props 안의 인라인 유니온이라 variant 어휘가 아니므로,
@@ -63,11 +75,30 @@ class _HoronTooltipState extends State<HoronTooltip> {
           ),
         );
 
-        final (Alignment target, Alignment follower, Offset offset) = switch (widget._side) {
-          _TooltipSide.top => (Alignment.topCenter, Alignment.bottomCenter, const Offset(0, -6)),
-          _TooltipSide.bottom => (Alignment.bottomCenter, Alignment.topCenter, const Offset(0, 6)),
-          _TooltipSide.left => (Alignment.centerLeft, Alignment.centerRight, const Offset(-6, 0)),
-          _TooltipSide.right => (Alignment.centerRight, Alignment.centerLeft, const Offset(6, 0)),
+        final (Alignment target, Alignment follower) = switch (widget._side) {
+          _TooltipSide.top => (Alignment.topCenter, Alignment.bottomCenter),
+          _TooltipSide.bottom => (Alignment.bottomCenter, Alignment.topCenter),
+          _TooltipSide.left => (Alignment.centerLeft, Alignment.centerRight),
+          _TooltipSide.right => (Alignment.centerRight, Alignment.centerLeft),
+        };
+
+        // Paper `TVV-1`은 6px 화살표 상자를 말풍선과 트리거 사이에 둡니다. 두 변이
+        // 모두 같아서(6) 맞닿은 변이 트리거 끝에 바로 붙고, 사이의 1.5px은 삼각형
+        // 안쪽 여백이 만듭니다.
+        final bool vertical = widget._side == _TooltipSide.top || widget._side == _TooltipSide.bottom;
+        final Widget arrow = SizedBox(
+          width: vertical ? _arrowLength : _arrowDepth,
+          height: vertical ? _arrowDepth : _arrowLength,
+          child: ClipPath(
+            clipper: _TooltipArrowClipper(widget._side),
+            child: ColoredBox(color: theme.colors.interactivePrimary),
+          ),
+        );
+        final Widget content = switch (widget._side) {
+          _TooltipSide.top => Column(mainAxisSize: MainAxisSize.min, children: <Widget>[bubble, arrow]),
+          _TooltipSide.bottom => Column(mainAxisSize: MainAxisSize.min, children: <Widget>[arrow, bubble]),
+          _TooltipSide.left => Row(mainAxisSize: MainAxisSize.min, children: <Widget>[bubble, arrow]),
+          _TooltipSide.right => Row(mainAxisSize: MainAxisSize.min, children: <Widget>[arrow, bubble]),
         };
 
         return CompositedTransformFollower(
@@ -75,8 +106,7 @@ class _HoronTooltipState extends State<HoronTooltip> {
           showWhenUnlinked: false,
           targetAnchor: target,
           followerAnchor: follower,
-          offset: offset,
-          child: Align(alignment: Alignment.topLeft, child: bubble),
+          child: Align(alignment: Alignment.topLeft, child: content),
         );
       },
       child: CompositedTransformTarget(
@@ -89,4 +119,49 @@ class _HoronTooltipState extends State<HoronTooltip> {
       ),
     );
   }
+}
+
+/// 말풍선 화살표를 삼각형으로 오려 낼니다.
+///
+/// Paper `TVV-1`은 6px 상자 안에 밑변 8.66px·높이 4.5px 삼각형을 그립니다. 밑변을
+/// 말풍선에서 1.5px 띄우고 꼭짓점을 상자의 바깥 변에 두어, 화살표가 트리거에 닿습니다.
+class _TooltipArrowClipper extends CustomClipper<Path> {
+  const _TooltipArrowClipper(this.side);
+
+  final _TooltipSide side;
+
+  @override
+  Path getClip(Size size) {
+    final double midX = size.width / 2;
+    final double midY = size.height / 2;
+    return switch (side) {
+      _TooltipSide.top =>
+        Path()
+          ..moveTo(midX - _arrowBase / 2, _arrowGap)
+          ..lineTo(midX + _arrowBase / 2, _arrowGap)
+          ..lineTo(midX, size.height)
+          ..close(),
+      _TooltipSide.bottom =>
+        Path()
+          ..moveTo(midX - _arrowBase / 2, size.height - _arrowGap)
+          ..lineTo(midX + _arrowBase / 2, size.height - _arrowGap)
+          ..lineTo(midX, 0)
+          ..close(),
+      _TooltipSide.left =>
+        Path()
+          ..moveTo(_arrowGap, midY - _arrowBase / 2)
+          ..lineTo(_arrowGap, midY + _arrowBase / 2)
+          ..lineTo(size.width, midY)
+          ..close(),
+      _TooltipSide.right =>
+        Path()
+          ..moveTo(size.width - _arrowGap, midY - _arrowBase / 2)
+          ..lineTo(size.width - _arrowGap, midY + _arrowBase / 2)
+          ..lineTo(0, midY)
+          ..close(),
+    };
+  }
+
+  @override
+  bool shouldReclip(_TooltipArrowClipper oldClipper) => oldClipper.side != side;
 }

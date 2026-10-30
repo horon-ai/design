@@ -20,7 +20,7 @@ export function Tooltip({ children, label, side = "top", delay }: TooltipProps) 
             {label}
             <BaseTooltip.Arrow className="flex data-[side=bottom]:-top-1.5 data-[side=bottom]:rotate-180 data-[side=left]:-right-2 data-[side=left]:-rotate-90 data-[side=right]:-left-2 data-[side=right]:rotate-90 data-[side=top]:-bottom-1.5">
               <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden className="fill-interactive-primary">
-                <path d="M0.67 0h8.66L5 4.5z" />
+                <path d="M0.67 1.5h8.66L5 6z" />
               </svg>
             </BaseTooltip.Arrow>
           </BaseTooltip.Popup>

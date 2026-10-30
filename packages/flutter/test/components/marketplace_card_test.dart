@@ -61,6 +61,8 @@ void main() {
     final Text initials = tester.widget<Text>(find.text('WB'));
     expect(initials.style?.color, HoronPalette.neutral50);
     expect(initials.style?.fontSize, theme.text.labelMd.fontSize);
+    // Paper `1VMY-0`: 타일 글자 14/20 600
+    expect(initials.style?.fontWeight, HoronFontWeight.semibold);
   });
 
   testWidgets('name and author truncate on one line', (WidgetTester tester) async {
@@ -71,6 +73,8 @@ void main() {
     expect(name.maxLines, 1);
     expect(name.overflow, TextOverflow.ellipsis);
     expect(name.style?.color, theme.colors.textPrimary);
+    // Paper `1VMY-0`: 이름 14/20 600
+    expect(name.style?.fontWeight, HoronFontWeight.semibold);
 
     final Text author = tester.widget<Text>(find.text('horon'));
     expect(author.maxLines, 1);

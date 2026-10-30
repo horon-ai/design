@@ -83,10 +83,10 @@ export function Avatar({
         )}
       </BaseAvatar.Root>
       {live && (
-        <span aria-hidden className="absolute -right-0.5 -bottom-0.5 flex animate-pop-in">
+        <span aria-hidden className="absolute -right-px -bottom-px flex animate-pop-in">
           <span
             className={cn(
-              "animate-live-pulse rounded-full border-2 border-bg-default bg-status-live text-status-live",
+              "animate-live-pulse rounded-full border-2 border-bg-surface bg-status-live text-status-live",
               liveClass[size],
             )}
           />

@@ -157,8 +157,8 @@ class HoronPluginRow extends StatelessWidget {
           child: Text(
             initials,
             maxLines: 1,
-            // text-label-md text-neutral-50
-            style: theme.text.labelMd.copyWith(color: HoronPalette.neutral50),
+            // text-label-md text-neutral-50 — Paper `1VKS-0`: 14/20 600
+            style: theme.text.labelMd.copyWith(fontWeight: HoronFontWeight.semibold, color: HoronPalette.neutral50),
           ),
         ),
       ),
@@ -179,7 +179,11 @@ class HoronPluginRow extends StatelessWidget {
                 name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis, // truncate
-                style: theme.text.labelMd.copyWith(color: theme.colors.textPrimary),
+                // Paper `1VKS-0`: 이름 14/20 600 text-primary
+                style: theme.text.labelMd.copyWith(
+                  fontWeight: HoronFontWeight.semibold,
+                  color: theme.colors.textPrimary,
+                ),
               ),
             ),
             if (version != null)
@@ -425,7 +429,7 @@ class _ToggleSwitch extends StatelessWidget {
   }
 }
 
-/// `icon-button.tsx`의 `ghost`·`sm` 변형입니다. 32px 상자, 14px 반경, 20px 아이콘입니다.
+/// `icon-button.tsx`의 `ghost`·`sm` 변형입니다. 32px 상자, 8px 반경, 16px 아이콘입니다.
 class _OverflowButton extends StatefulWidget {
   const _OverflowButton({required this.label, required this.onPressed});
 
@@ -460,10 +464,14 @@ class _OverflowButtonState extends State<_OverflowButton> {
             height: theme.space.step(8),
             decoration: BoxDecoration(
               color: _hovered ? theme.colors.overlayInk6 : Colors.transparent, // hover:bg-overlay-ink-6
-              borderRadius: BorderRadius.circular(theme.radius.lg), // rounded-lg = 14
+              borderRadius: BorderRadius.circular(theme.radius.sm), // Paper `1VKS-0`: 반경 8
             ),
             child: Center(
-              child: Icon(Icons.more_horiz, size: theme.space.step(5), color: theme.colors.textPrimary), // size-5 = 20
+              child: Icon(
+                Icons.more_horiz,
+                size: theme.space.s4, // Paper `1VKS-0`: 16px 아이콘
+                color: theme.colors.textPrimary,
+              ),
             ),
           ),
         ),
