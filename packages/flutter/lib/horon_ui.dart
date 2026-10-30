@@ -10,6 +10,8 @@ export 'src/components/chip.dart';
 export 'src/components/choice_card.dart';
 export 'src/components/composer.dart';
 export 'src/components/file_drop.dart';
+export 'src/components/horon_icon.dart';
+export 'src/components/horon_wordmark.dart';
 export 'src/components/icon_button.dart';
 export 'src/components/liquid_glass.dart';
 export 'src/components/radio_group.dart';
