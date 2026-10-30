@@ -566,7 +566,7 @@ class HoronMenuTile extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     final double size = theme.space.step(7);
     return Container(
-      // `size-7 rounded-sm bg-interactive-primary text-label-md text-text-inverse`.
+      // `size-7 rounded-sm bg-interactive-primary text-label-sm text-text-inverse`.
       width: size,
       height: size,
       alignment: Alignment.center,
@@ -574,7 +574,7 @@ class HoronMenuTile extends StatelessWidget {
         color: theme.colors.interactivePrimary,
         borderRadius: BorderRadius.circular(theme.radius.sm),
       ),
-      child: Text(label, maxLines: 1, style: theme.text.labelMd.copyWith(color: theme.colors.textInverse)),
+      child: Text(label, maxLines: 1, style: theme.text.labelSm.copyWith(color: theme.colors.textInverse)),
     );
   }
 }

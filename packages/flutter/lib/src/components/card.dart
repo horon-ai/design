@@ -77,6 +77,7 @@ class _HoronCardState extends State<HoronCard> {
         children: <Widget>[
           if (widget.title != null || widget.interactive)
             Row(
+              spacing: _cardGap, // gap-2 — Paper UAP-1의 제목 행 간격입니다.
               children: <Widget>[
                 Expanded(
                   child: Text(widget.title ?? '', style: theme.text.titleSm.copyWith(color: theme.colors.textPrimary)),

@@ -105,7 +105,11 @@ class HoronMarketplaceCard extends StatelessWidget {
                         name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis, // truncate
-                        style: theme.text.labelMd.copyWith(color: theme.colors.textPrimary),
+                        // Paper `1VMY-0`: 이름 14/20 600 text-primary
+                        style: theme.text.labelMd.copyWith(
+                          fontWeight: HoronFontWeight.semibold,
+                          color: theme.colors.textPrimary,
+                        ),
                       ),
                       if (author != null)
                         Text(
@@ -152,8 +156,8 @@ class HoronMarketplaceCard extends StatelessWidget {
           child: Text(
             initials,
             maxLines: 1,
-            // text-label-md text-neutral-50
-            style: theme.text.labelMd.copyWith(color: HoronPalette.neutral50),
+            // text-label-md text-neutral-50 — Paper `1VMY-0`: 14/20 600
+            style: theme.text.labelMd.copyWith(fontWeight: HoronFontWeight.semibold, color: HoronPalette.neutral50),
           ),
         ),
       ),

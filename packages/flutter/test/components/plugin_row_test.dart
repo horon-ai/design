@@ -73,7 +73,12 @@ void main() {
     expect(_decoratedWith(HoronPalette.sky500), findsWidgets);
     final Text initials = tester.widget<Text>(find.text('PL'));
     expect(initials.style?.fontSize, theme.text.labelMd.fontSize);
+    // Paper `1VKS-0`: 타일 글자 14/20 600
+    expect(initials.style?.fontWeight, HoronFontWeight.semibold);
     expect(initials.style?.color, HoronPalette.neutral50);
+
+    // Paper `1VKS-0`: 이름 14/20 600
+    expect(tester.widget<Text>(find.text('filesystem')).style?.fontWeight, HoronFontWeight.semibold);
 
     final Text version = tester.widget<Text>(find.text('v1.4.0'));
     expect(version.style?.fontSize, 12);
@@ -131,9 +136,10 @@ void main() {
       find.ancestor(of: find.byIcon(Icons.more_horiz), matching: find.byType(AnimatedContainer)).first,
     );
     expect(overflow.constraints?.maxHeight, theme.space.step(8), reason: '오버플로 size-8');
-    expect((overflow.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.lg));
+    // Paper `1VKS-0`: 오버플로 반경 8, 아이콘 16
+    expect((overflow.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.sm));
     final Icon dots = tester.widget<Icon>(find.byIcon(Icons.more_horiz));
-    expect(dots.size, theme.space.step(5));
+    expect(dots.size, theme.space.s4);
     expect(dots.color, theme.colors.textPrimary);
   });
 

@@ -283,7 +283,6 @@ class _HoronCalendarState extends State<HoronCalendar> {
     required double gap,
     required double maxWidth,
   }) {
-    final HoronColors colors = theme.colors;
     final double available = maxWidth - padding * 2;
     final double cell = math.min(_cellSize, math.max(_minCellSize, available / 7));
 
@@ -294,10 +293,8 @@ class _HoronCalendarState extends State<HoronCalendar> {
         borderRadius: radius,
         child: DecoratedBox(
           key: const Key('horon-calendar-surface'),
-          decoration: BoxDecoration(
-            borderRadius: radius,
-            border: Border.all(color: colors.glassRimStrong),
-          ),
+          // Paper는 유리 가장자리를 액체 레이어 안에서만 그립니다. 호스트 테두리는 없습니다.
+          decoration: BoxDecoration(borderRadius: radius),
           child: Padding(
             padding: EdgeInsets.all(padding),
             child: SizedBox(
@@ -509,20 +506,23 @@ class _DayCellState extends State<_DayCell> {
     final HoronColors colors = theme.colors;
     final bool animate = !MediaQuery.disableAnimationsOf(context);
 
+    // Paper의 팝오버는 모든 날짜 글자를 `text-label-md`(14/20 500)로 그립니다.
+    // 상태는 색만 바꿉니다.
     final TextStyle style = widget.between
-        // `bg-overlay-ink-8 text-body-md text-text-primary`.
-        ? theme.text.bodyMd.copyWith(color: colors.textPrimary)
+        // `bg-overlay-ink-8 text-label-md text-text-primary`.
+        ? theme.text.labelMd.copyWith(color: colors.textPrimary)
         : widget.selected
-        // `rounded-full bg-interactive-primary text-label-lg text-interactive-on-primary`.
-        ? theme.text.labelLg.copyWith(color: colors.interactiveOnPrimary)
-        // `text-text-disabled` / `text-text-placeholder` / `text-text-brand` / `text-text-primary`.
+        // `rounded-full bg-interactive-primary text-text-inverse`.
+        ? theme.text.labelMd.copyWith(color: colors.textInverse)
+        // `text-text-disabled`(비활성) · `text-text-disabled`(이번 달 밖) · `text-text-brand`(오늘) ·
+        // `text-text-primary`(그 밖).
         : widget.disabled
-        ? theme.text.bodyMd.copyWith(color: colors.textDisabled)
+        ? theme.text.labelMd.copyWith(color: colors.textDisabled)
         : widget.outside
-        ? theme.text.bodyMd.copyWith(color: colors.textPlaceholder)
+        ? theme.text.labelMd.copyWith(color: colors.textDisabled)
         : widget.isToday
-        ? theme.text.labelLg.copyWith(color: colors.textBrand)
-        : theme.text.bodyMd.copyWith(color: colors.textPrimary);
+        ? theme.text.labelMd.copyWith(color: colors.textBrand)
+        : theme.text.labelMd.copyWith(color: colors.textPrimary);
 
     final Color background = widget.between
         ? colors.overlayInk8

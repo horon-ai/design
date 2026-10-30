@@ -46,7 +46,19 @@ void main() {
     final RichText painted = tester.widget<RichText>(
       find.descendant(of: find.byKey(const Key('action')), matching: find.byType(RichText)),
     );
-    expect(painted.text.style!.decoration, TextDecoration.underline);
+    final TextStyle style = painted.text.style!;
+    expect(style.decoration, TextDecoration.underline);
+    // Paper `TYN-1`의 액션은 16px / 20px, 자간 -0.04px, 굵기 500입니다.
+    expect(style.fontSize, 16);
+    expect(style.fontSize! * style.height!, moreOrLessEquals(20));
+    expect(style.letterSpacing, moreOrLessEquals(-0.04));
+    expect(style.fontWeight, HoronFontWeight.medium);
+  });
+
+  testWidgets('banner: a one-line message makes the 52px strip', (WidgetTester tester) async {
+    await pumpBanner(tester, const HoronBanner(message: '새 버전이 있습니다.'));
+    // Paper `TY7-1`: 위아래 여백 12 + `body-md` 줄 높이 26 + 테두리 1씩 = 52.
+    expect(tester.getSize(find.byType(HoronBanner)).height, 52);
   });
 
   testWidgets('banner: every tone renders in both brightnesses without exceptions', (WidgetTester tester) async {

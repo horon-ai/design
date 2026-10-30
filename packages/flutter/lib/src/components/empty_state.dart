@@ -12,8 +12,11 @@ const double _illustrationSize = 140;
 /// `empty-state.tsx`의 `gap-3`입니다.
 const double _emptyGap = 12;
 
-/// `empty-state.tsx`의 `mt-4`입니다.
-const double _actionGap = 16;
+/// `empty-state.tsx`의 `mt-4` 자리입니다.
+///
+/// Paper 보드는 `WG8-1` 4px `Spacer`를 `gap-3` 사이에 두어 본문에서 버튼까지
+/// 12 + 4 + 12 = 28을 그립니다. React 코드의 `mt-4`(16)보다 12px 더 멉니다.
+const double _actionGap = 28;
 
 /// Figma `Empty state`(64:485): 140px 일러스트, `title-md` 제목, `body-md` 설명, 동작 버튼입니다.
 ///
@@ -63,10 +66,14 @@ class HoronEmptyState extends StatelessWidget {
             ),
             if (description != null) ...<Widget>[
               const SizedBox(height: _emptyGap),
-              Text(
-                description!,
-                textAlign: TextAlign.center,
-                style: theme.text.bodyMd.copyWith(color: theme.colors.textSecondary),
+              // Paper `WG7-1`은 폭 312(`alignSelf: stretch`, 360 − 24×2) 상자를 씁니다.
+              SizedBox(
+                width: double.infinity,
+                child: Text(
+                  description!,
+                  textAlign: TextAlign.center,
+                  style: theme.text.bodyMd.copyWith(color: theme.colors.textSecondary),
+                ),
               ),
             ],
             if (action != null) ...<Widget>[const SizedBox(height: _actionGap), action!],

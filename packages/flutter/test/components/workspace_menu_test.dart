@@ -78,6 +78,8 @@ void main() {
     expect(find.byIcon(Icons.check), findsOneWidget, reason: '현재 워크스페이스에만 체크가 붙습니다');
     expect(find.text('4 members'), findsOneWidget, reason: 'meta는 설명 줄입니다');
     expect(find.text('P'), findsOneWidget, reason: '이니셜이 없으면 이름의 첫 글자를 씁니다');
+    // `size-7 rounded-sm … text-label-sm text-text-inverse` — 타일 이니셜은 12/16 500입니다.
+    expect(tester.widget<Text>(find.text('H')).style!.fontSize, theme.text.labelSm.fontSize, reason: 'text-label-sm');
 
     // 단색 표면과 `sideOffset={7}`입니다.
     expect(tester.getSize(_clipInside()).width, 256, reason: 'solid w-64');

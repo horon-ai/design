@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
@@ -34,19 +36,82 @@ void main() {
     }
   });
 
-  testWidgets('the glass dialog draws the liquid layer, 20px radius and 24px padding', (WidgetTester tester) async {
+  testWidgets('the light glass dialog is the frost surface: 90% fill, 24px blur, 20px radius, 24px padding', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(_host(const HoronDialog(title: Text('제목'), description: Text('설명'))));
     final HoronThemeData theme = _theme(tester);
 
-    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'bg-glass-fill-frost는 유리 레이어가 그립니다');
-    final Container panel = tester.widget<Container>(
-      find.ancestor(of: find.byType(HoronLiquidGlass), matching: find.byType(Container)).first,
+    final Finder frost = find.byWidgetPredicate(
+      (Widget widget) => widget is ColoredBox && widget.color == theme.colors.glassFillFrost,
     );
-    expect((panel.decoration! as BoxDecoration).borderRadius! as BorderRadius, BorderRadius.circular(theme.radius.xl));
+    expect(frost, findsOneWidget, reason: 'Paper UBN-1: fill #FFFFFFE5');
+    expect(
+      tester
+          .widget<BackdropFilter>(find.ancestor(of: frost, matching: find.byType(BackdropFilter)).first)
+          .filter
+          .toString(),
+      ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24).toString(),
+      reason: 'Paper UBN-1: 호스트 blur(24px)',
+    );
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: '라이트는 유리 티어가 아니라 서리 채움입니다');
+
+    final Container panel = tester.widget<Container>(find.ancestor(of: frost, matching: find.byType(Container)).first);
+    final BoxDecoration decoration = panel.decoration! as BoxDecoration;
+    expect(decoration.borderRadius! as BorderRadius, BorderRadius.circular(theme.radius.xl));
+    expect((decoration.border! as Border).top.color, theme.colors.glassRimFrost, reason: 'Paper UBN-1: rim #FFFFFFB3');
+    expect(decoration.boxShadow!.single.color, theme.colors.overlayInk3, reason: '0 0 0 1px #00000008');
     expect(
       find.byWidgetPredicate((Widget widget) => widget is Padding && widget.padding == EdgeInsets.all(theme.space.s6)),
       findsOneWidget,
       reason: 'p-6',
+    );
+  });
+
+  testWidgets('the dark glass dialog keeps the thick tier and draws no rim', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      _host(
+        const HoronDialog(title: Text('제목'), description: Text('설명')),
+        brightness: Brightness.dark,
+      ),
+    );
+    expect(
+      tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier,
+      HoronGlassTier.thick,
+      reason: 'Paper CLU-0: #17181ACC',
+    );
+    final Container panel = tester.widget<Container>(
+      find.ancestor(of: find.byType(HoronLiquidGlass), matching: find.byType(Container)).first,
+    );
+    final BoxDecoration decoration = panel.decoration! as BoxDecoration;
+    expect(decoration.border, isNull, reason: 'CLU-0에는 고리가 없습니다');
+    expect(decoration.boxShadow, isEmpty, reason: 'dark:shadow-none');
+  });
+
+  testWidgets('the scrim is #0B0C0E at 40% opacity', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: Builder(
+            builder: (BuildContext context) => TextButton(
+              onPressed: () => showHoronDialog(context, title: const Text('다이얼로그 제목')),
+              child: const Text('열기'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('열기'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is ColoredBox && widget.color == HoronThemeData.light.colors.bgScrim.withValues(alpha: 0.4),
+      ),
+      findsOneWidget,
+      reason: 'Paper UE8-1: #0B0C0E, opacity 0.4',
     );
   });
 

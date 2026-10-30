@@ -51,9 +51,12 @@ void main() {
     );
     expect(fill.color, colors.interactivePrimary);
 
+    // Paper `1VGK-0`: 라벨은 `text-label-lg`(16px / 22px / 500)입니다.
     final Text label = tester.widget<Text>(find.text('Run'));
-    expect(label.style!.fontSize, 14);
-    expect(label.style!.fontWeight, HoronFontWeight.medium);
+    final TextStyle paper = HoronThemeData.light.text.labelLg;
+    expect(label.style!.fontSize, paper.fontSize, reason: 'Paper 라벨 16px');
+    expect(label.style!.height, paper.height, reason: 'Paper 줄 높이 22px');
+    expect(label.style!.fontWeight, paper.fontWeight);
     expect(label.style!.color, colors.interactiveOnPrimary);
   });
 

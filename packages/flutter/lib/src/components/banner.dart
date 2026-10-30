@@ -26,6 +26,12 @@ const double _bannerPaddingY = 12;
 /// `banner.tsx`의 `[&_svg]:size-4.5`입니다.
 const double _bannerIconSize = 18;
 
+/// Paper `TYN-1`의 액션 줄 높이입니다. `label-lg`의 22px보다 2px 낮은 20px입니다.
+const double _bannerActionLineHeight = 20;
+
+/// Paper `TYN-1`의 액션 자간입니다. `label-lg`의 -0.08px보다 좁은 -0.04px입니다.
+const double _bannerActionLetterSpacing = -0.04;
+
 /// Figma `Banner`(62:318): 색이 밴 띠를 두른 regular 유리 띠에 18px 아이콘과 밑줄 동작을 얹습니다.
 ///
 /// `banner.tsx`를 옮긴 것입니다. 표면은 `bg-glass-regular`라 [HoronLiquidGlass]가
@@ -94,6 +100,8 @@ class HoronBanner extends StatelessWidget {
                     DefaultTextStyle.merge(
                       style: theme.text.labelLg.copyWith(
                         color: accent,
+                        height: _bannerActionLineHeight / theme.text.labelLg.fontSize!,
+                        letterSpacing: _bannerActionLetterSpacing,
                         decoration: TextDecoration.underline,
                         decorationColor: accent,
                       ),

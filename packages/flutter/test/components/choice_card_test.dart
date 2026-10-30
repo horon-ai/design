@@ -49,7 +49,7 @@ void main() {
     }
   });
 
-  testWidgets('기본 카드는 clear 유리, 투명 테두리, 252 폭, 16 반경이다', (WidgetTester tester) async {
+  testWidgets('기본 카드는 clear 유리, 흰 70% 림, 252 폭, 16 반경이다', (WidgetTester tester) async {
     await tester.pumpWidget(_host(Brightness.light, _card));
 
     final BoxDecoration surface = _surface(tester).decoration! as BoxDecoration;
@@ -59,7 +59,7 @@ void main() {
     final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
     expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '카드가 유리 표면을 깝니다');
     expect(glass.tier, HoronGlassTier.clear);
-    expect((surface.border! as Border).top.color, Colors.transparent);
+    expect((surface.border! as Border).top.color, colors.glassRimFrost, reason: 'Paper 1VXR-0은 흰 70% 림을 그립니다');
     expect(surface.borderRadius, BorderRadius.circular(radius.xl2));
     expect(tester.getSize(find.byKey(const Key('horon-choice-card-surface'))).width, 252);
 

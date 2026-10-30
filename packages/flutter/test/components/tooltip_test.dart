@@ -59,6 +59,40 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  testWidgets('tooltip: the arrow is a 10x6 ink triangle 1.5px off the bubble', (WidgetTester tester) async {
+    await pumpTooltip(
+      tester,
+      const HoronTooltip.top(
+        label: '복사',
+        child: SizedBox(key: Key('trigger'), width: 40, height: 40),
+      ),
+    );
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: tester.getCenter(find.byKey(const Key('trigger'))));
+    await tester.pumpAndSettle();
+
+    final Finder clip = find.descendant(of: find.byType(CompositedTransformFollower), matching: find.byType(ClipPath));
+    expect(clip, findsOneWidget);
+    expect(tester.getSize(clip), const Size(10, 6));
+
+    final CustomClipper<Path> clipper = tester.widget<ClipPath>(clip).clipper!;
+    final Rect triangle = clipper.getClip(const Size(10, 6)).getBounds();
+    expect(triangle.width, moreOrLessEquals(8.66, epsilon: 0.01), reason: 'TVV-1 밑변 폭');
+    expect(triangle.height, moreOrLessEquals(4.5, epsilon: 0.01), reason: 'TVV-1 삼각형 높이');
+    expect(triangle.top, moreOrLessEquals(1.5, epsilon: 0.01), reason: 'TVV-1 밑변과 말풍선 사이');
+
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronTooltip)));
+    final ColoredBox fill = tester.widget<ColoredBox>(find.descendant(of: clip, matching: find.byType(ColoredBox)));
+    expect(fill.color, theme.colors.interactivePrimary, reason: 'TVV-1 채움색');
+
+    // 화살표 상자는 말풍선 아래 여백(6)에 바로 붙습니다. 둘 다 같은 오버레이 좌표계라
+    // 차이만 재며, 6px 안쪽 여백이 말풍선과 화살표 사이를 만듭니다.
+    expect(tester.getRect(clip).top - tester.getRect(find.text('복사')).bottom, moreOrLessEquals(6), reason: '말풍선 아래 여백');
+
+    await pointer.removePointer();
+    await tester.pumpAndSettle();
+  });
+
   testWidgets('tooltip: holding on a touch screen opens it without an exception', (WidgetTester tester) async {
     await pumpTooltip(tester, const HoronTooltip.top(label: '길게', child: SizedBox(width: 40, height: 40)));
     final TestGesture hold = await holdOpen(tester);

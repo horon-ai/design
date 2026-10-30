@@ -57,7 +57,8 @@ void main() {
     expect(_decoratedWith(theme.colors.interactivePrimary), findsOneWidget);
     final Text initials = tester.widget<Text>(find.text('NO'));
     expect(initials.style?.fontWeight, HoronFontWeight.semibold);
-    expect(initials.style?.color, theme.colors.interactiveOnPrimary);
+    // Paper `1VHS-0`: 타일 글자 #F9FAFB
+    expect(initials.style?.color, theme.colors.textInverse);
 
     await tester.pumpWidget(_host(const HoronMcpServerRow(name: 'notion', initials: 'NT'), width: 720));
     expect(find.text('NT'), findsOneWidget);
@@ -115,6 +116,11 @@ void main() {
     expect(tester.getSize(find.byIcon(Icons.more_horiz)).width, greaterThanOrEqualTo(theme.space.s4));
     final Icon dots = tester.widget<Icon>(find.byIcon(Icons.more_horiz));
     expect(dots.size, theme.space.s4, reason: 'IconButton sm [&_svg]:size-4');
+    final AnimatedContainer overflow = tester.widget<AnimatedContainer>(
+      find.ancestor(of: find.byIcon(Icons.more_horiz), matching: find.byType(AnimatedContainer)).first,
+    );
+    // Paper `1VHS-0`: 오버플로 버튼 반경 8
+    expect((overflow.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.sm));
   });
 
   testWidgets('the actions call back', (WidgetTester tester) async {

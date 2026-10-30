@@ -60,20 +60,28 @@ class _DataTableSampleState extends State<_DataTableSample> {
     const _Member(name: 'Dune Works', seats: 7, active: true),
   ];
 
-  late final HoronDataTableController<_Member> _controller =
-      HoronDataTableController<_Member>(
-        columns: <HoronDataTableColumn<_Member>>[
-          HoronDataTableColumn<_Member>(
-            id: 'name',
-            label: 'Team',
-            sortable: true,
-            sortValue: (_Member member) => member.name,
-            searchValue: (_Member member) => member.name,
-            cell: (_Member member) => HoronDataTableItem(
-              logo: Text(member.name[0]),
-              label: member.name,
-            ),
+  late final HoronDataTableController<_Member> _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Paper 모바일 보드 `UOD-1`은 체크박스·Tool·Category 세 열만 그리고 숫자 열은
+    // 없앱니다(데스크톱 `UI3-1`·태블릿 `UL8-1`은 다섯 열). 그래서 모바일 카드는 숫자
+    // 열을 빌더에서 빼고 같은 세 열을 그립니다.
+    _controller = HoronDataTableController<_Member>(
+      columns: <HoronDataTableColumn<_Member>>[
+        HoronDataTableColumn<_Member>(
+          id: 'name',
+          label: 'Team',
+          sortable: true,
+          sortValue: (_Member member) => member.name,
+          searchValue: (_Member member) => member.name,
+          cell: (_Member member) => HoronDataTableItem(
+            logo: Text(member.name[0]),
+            label: member.name,
           ),
+        ),
+        if (widget.device != HoronDataTableDevice.mobile)
           HoronDataTableColumn<_Member>(
             id: 'seats',
             label: 'Seats',
@@ -82,22 +90,22 @@ class _DataTableSampleState extends State<_DataTableSample> {
             sortValue: (_Member member) => member.seats,
             cell: (_Member member) => Text('${member.seats}'),
           ),
-          HoronDataTableColumn<_Member>(
-            id: 'status',
-            label: 'Status',
-            searchValue: (_Member member) =>
-                member.active ? 'Active' : 'Invited',
-            cell: (_Member member) => HoronDataTableTag(
-              label: member.active ? 'Active' : 'Invited',
-              brand: member.active,
-            ),
+        HoronDataTableColumn<_Member>(
+          id: 'status',
+          label: 'Status',
+          searchValue: (_Member member) => member.active ? 'Active' : 'Invited',
+          cell: (_Member member) => HoronDataTableTag(
+            label: member.active ? 'Active' : 'Invited',
+            brand: member.active,
           ),
-        ],
-        rows: _members,
-        selectable: true,
-        paginated: true,
-        pageSize: 3,
-      );
+        ),
+      ],
+      rows: _members,
+      selectable: true,
+      paginated: true,
+      pageSize: 3,
+    );
+  }
 
   @override
   void dispose() {
@@ -149,7 +157,9 @@ class _DataTableSampleState extends State<_DataTableSample> {
               ),
               HoronDataTablePagination<_Member>(controller: _controller),
               HoronDataTableFooter(
-                hint: '${_members.length} teams',
+                hint: widget.device == HoronDataTableDevice.mobile
+                    ? 'Scroll for more'
+                    : '${_members.length} teams',
                 onAdd: () {
                   setState(() {
                     _members.add(

@@ -257,8 +257,7 @@ class _HoronSegmentedControlState extends State<HoronSegmentedControl> {
           borderRadius: pill,
           border: Border.all(color: horon.colors.glassRimStrong),
           boxShadow: <BoxShadow>[
-            // React `shadow-[0_1px_3px_rgba(0,0,0,0.08)]`입니다. 어두운 밝기에서는
-            // `dark:bg-overlay-ink-10`으로 채움이 바뀝니다.
+            // React `shadow-[0_1px_3px_rgba(0,0,0,0.08)]`입니다.
             BoxShadow(
               color: horon.colors.bgScrim.withValues(alpha: 0.08),
               offset: const Offset(0, _shadowOffsetY),
@@ -273,7 +272,9 @@ class _HoronSegmentedControlState extends State<HoronSegmentedControl> {
             duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
             curve: HoronMotion.colorsCurve,
             decoration: BoxDecoration(
-              color: horon.brightness == Brightness.dark ? horon.colors.overlayInk10 : Colors.transparent,
+              // React `bg-glass-thick`과 `dark:bg-overlay-ink-10`입니다. Paper U4K-1이
+              // 라이트에서 `#FFFFFFCC`, 다크 보드 CEV-0이 `#FFFFFF1A`를 적습니다.
+              color: horon.brightness == Brightness.dark ? horon.colors.overlayInk10 : horon.colors.glassThick,
               borderRadius: pill,
             ),
           ),

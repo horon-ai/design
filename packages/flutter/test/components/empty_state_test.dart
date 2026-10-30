@@ -38,6 +38,26 @@ void main() {
     expect(find.byKey(const Key('action')), findsOneWidget);
   });
 
+  testWidgets('empty state: the description box is 312 wide and the action sits 28 below', (WidgetTester tester) async {
+    const String description = '봇을 하나 추가하면 여기에 나타납니다.';
+    await pumpEmpty(
+      tester,
+      const HoronEmptyState(
+        title: '연결된 봇이 없습니다',
+        description: description,
+        action: SizedBox(key: Key('action'), width: 100, height: 40),
+      ),
+    );
+    final HoronSpaceSpec space = HoronThemeData.light.space;
+
+    expect(tester.getSize(find.text(description)).width, 312, reason: 'Paper WG7-1: 폭 312 상자');
+    expect(
+      tester.getRect(find.byKey(const Key('action'))).top - tester.getRect(find.text(description)).bottom,
+      space.s3 + space.s1 + space.s3,
+      reason: 'Paper WG8-1: gap 12 + spacer 4 + gap 12',
+    );
+  });
+
   testWidgets('empty state: the illustration box is 140 square', (WidgetTester tester) async {
     await pumpEmpty(
       tester,
