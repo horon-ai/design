@@ -10,6 +10,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'registry.dart';
+import 'sections/agent_lane.dart';
 import 'sections/approval_card.dart';
 import 'sections/avatar.dart';
 import 'sections/badge.dart';
@@ -61,6 +62,7 @@ import 'sections/settings_list.dart';
 import 'sections/sidebar.dart';
 import 'sections/skeleton.dart';
 import 'sections/slider.dart';
+import 'sections/source_row.dart';
 import 'sections/spinner.dart';
 import 'sections/split_button.dart';
 import 'sections/switch.dart';
@@ -84,6 +86,7 @@ Widget? gallerySectionFor(BuildContext context, GallerySection section) =>
 
 /// 슬러그별 섹션 생성자입니다.
 const Map<String, Widget Function()> _builders = <String, Widget Function()>{
+  'agent_lane': HoronAgentLaneGallerySection.new,
   'approval_card': HoronApprovalCardGallerySection.new,
   'avatar': HoronAvatarGallerySection.new,
   'badge': HoronBadgeGallerySection.new,
@@ -135,6 +138,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'sidebar': HoronSidebarGallerySection.new,
   'skeleton': HoronSkeletonGallerySection.new,
   'slider': HoronSliderGallerySection.new,
+  'source_row': HoronSourceRowGallerySection.new,
   'spinner': HoronSpinnerGallerySection.new,
   'split_button': HoronSplitButtonGallerySection.new,
   'switch': HoronSwitchGallerySection.new,

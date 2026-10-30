@@ -152,7 +152,9 @@ const List<GallerySection> gallerySections = <GallerySection>[
     title: 'Chat Controls',
     group: 'conversation',
   ),
+  GallerySection(slug: 'agent_lane', title: 'Agent Lane', group: 'agents'),
   GallerySection(slug: 'plan_step', title: 'Plan Step', group: 'agents'),
+  GallerySection(slug: 'source_row', title: 'Source Row', group: 'agents'),
   GallerySection(slug: 'plan_card', title: 'Plan Card', group: 'agents'),
   GallerySection(
     slug: 'tool_calls_header',
