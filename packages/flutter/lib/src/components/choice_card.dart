@@ -129,14 +129,15 @@ class HoronChoiceCard extends StatelessWidget {
                       key: const Key('horon-choice-card-surface'),
                       duration: animate ? HoronMotion.colorsDuration : Duration.zero,
                       curve: HoronMotion.colorsCurve,
-                      // `p-3.5 rounded-2xl border` — 켜지면 `border-border-brand`.
+                      // `p-3.5 rounded-2xl border` — 켜지면 `border-border-brand`, 꺼지면
+                      // Paper `1VXR-0`의 흰 70% 림(`glass-rim-frost`)입니다.
                       // 바탕은 유리 엔진이 그립니다. React는 호스트에 `bg-glass-clear`를
                       // 깔고 그 위에 `<LiquidGlass tier="clear" />`를 얹으며(`choice-card.tsx:34`),
                       // 선택되면 둘 다 thick으로 바뀝니다. Flutter는 채움까지 유리 위젯이
                       // 그리므로 컨테이너에는 테두리만 남깁니다.
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(theme.radius.xl2),
-                        border: Border.all(color: checked ? colors.borderBrand : Colors.transparent),
+                        border: Border.all(color: checked ? colors.borderBrand : colors.glassRimFrost),
                       ),
                       child: Stack(
                         alignment: Alignment.center,

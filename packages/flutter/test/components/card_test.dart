@@ -45,6 +45,15 @@ void main() {
     expect(taps, 1);
   });
 
+  testWidgets('card: the title row keeps the 8px gap', (WidgetTester tester) async {
+    await pumpCard(tester, HoronCard(title: '열기', interactive: true, onTap: () {}));
+    final HoronThemeData theme = HoronThemeData.light;
+    final Row titleRow = tester.widget<Row>(
+      find.descendant(of: find.byType(HoronCard), matching: find.byType(Row)).first,
+    );
+    expect(titleRow.spacing, theme.space.s2, reason: 'Paper UAP-1: 제목 행 gap 8');
+  });
+
   testWidgets('card: the selected card adds the brand border', (WidgetTester tester) async {
     await pumpCard(tester, const HoronCard(title: '선택됨', selected: true));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronCard)));
