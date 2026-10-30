@@ -14,6 +14,7 @@ import 'sections/avatar.dart';
 import 'sections/banner.dart';
 import 'sections/button.dart';
 import 'sections/calendar.dart';
+import 'sections/card.dart';
 import 'sections/checkbox.dart';
 import 'sections/chip.dart';
 import 'sections/choice_card.dart';
@@ -39,6 +40,7 @@ import 'sections/radio_group.dart';
 import 'sections/schedule.dart';
 import 'sections/segmented_control.dart';
 import 'sections/select.dart';
+import 'sections/settings_list.dart';
 import 'sections/skeleton.dart';
 import 'sections/slider.dart';
 import 'sections/spinner.dart';
@@ -61,6 +63,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'banner': HoronBannerGallerySection.new,
   'button': HoronButtonGallerySection.new,
   'calendar': HoronCalendarGallerySection.new,
+  'card': HoronCardGallerySection.new,
   'checkbox': HoronCheckboxGallerySection.new,
   'chip': HoronChipGallerySection.new,
   'choice_card': HoronChoiceCardGallerySection.new,
@@ -86,6 +89,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'schedule': HoronScheduleGallerySection.new,
   'segmented_control': HoronSegmentedControlGallerySection.new,
   'select': HoronSelectGallerySection.new,
+  'settings_list': HoronSettingsListGallerySection.new,
   'skeleton': HoronSkeletonGallerySection.new,
   'slider': HoronSliderGallerySection.new,
   'spinner': HoronSpinnerGallerySection.new,

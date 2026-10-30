@@ -53,6 +53,7 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(slug: 'file_drop', title: 'File Drop', group: 'inputs'),
   GallerySection(slug: 'choice_card', title: 'Choice Card', group: 'inputs'),
   GallerySection(slug: 'avatar', title: 'Avatar', group: 'display'),
+  GallerySection(slug: 'card', title: 'Card', group: 'display'),
   GallerySection(slug: 'banner', title: 'Banner', group: 'display'),
   GallerySection(slug: 'kbd', title: 'Kbd', group: 'display'),
   GallerySection(slug: 'progress', title: 'Progress', group: 'display'),
@@ -66,6 +67,11 @@ const List<GallerySection> gallerySections = <GallerySection>[
     group: 'display',
   ),
   GallerySection(slug: 'liquid_glass', title: 'Liquid Glass', group: 'display'),
+  GallerySection(
+    slug: 'settings_list',
+    title: 'Settings List',
+    group: 'display',
+  ),
   GallerySection(
     slug: 'mcp_server_row',
     title: 'MCP Server Row',

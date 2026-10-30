@@ -9,11 +9,9 @@
 /// asserts this list is empty once the last component lands.
 const List<String> pendingComponents = <String>[
   'badge',
-  'card',
   'data_table',
   'horon_icon',
   'horon_wordmark',
-  'settings_list',
   'tabs',
   'tab_bar',
   'breadcrumb',
