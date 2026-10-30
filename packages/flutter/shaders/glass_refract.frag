@@ -31,8 +31,11 @@ void main() {
 #endif
 
   float aspect = uSize.x / uSize.y;
+  // uv는 축마다 0~1이라 폭이 넓은 도형에서는 x가 눌린 채 비교됩니다. x만 aspect로
+  // 늘려 정사각형 좌표계로 옮겨야 오른쪽 가장자리도 같은 거리로 판정됩니다.
+  vec2 point = vec2(uv.x * aspect, uv.y);
   vec2 halfSize = vec2(0.5 * aspect, 0.5);
-  vec2 p = uv - halfSize;
+  vec2 p = point - halfSize;
   // 모서리 중심에서 잰 상자 거리입니다. 음수는 도형 안쪽입니다.
   vec2 d = abs(p) - (halfSize - vec2(uRadius));
   float outside = length(max(d, vec2(0.0))) + min(max(d.x, d.y), 0.0);

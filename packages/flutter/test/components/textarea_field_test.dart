@@ -47,6 +47,21 @@ void main() {
     return (box.decoration as BoxDecoration).border!.top.color;
   }
 
+  /// 상자의 채움이 글래스 엔진 한 겹인지 확인합니다.
+  ///
+  /// React `textarea-field.tsx:53`은 `fieldBoxClass.glass` 위에 `<LiquidGlass tier="regular" />`를
+  /// 얹습니다. 이 위젯은 [HoronTextarea]를 합성하지 않고 자기 [TextField]를 [HoronFieldBox]에
+  /// 넣으므로, 유리가 두 겹으로 겹칠 자리가 없습니다.
+  void expectGlassSurface(WidgetTester tester) {
+    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '유리 레이어는 한 겹입니다');
+    expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier, HoronGlassTier.regular);
+    expect(
+      find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(AnimatedContainer)),
+      findsNothing,
+      reason: '유리 상자는 토큰 색 채움을 그리지 않습니다',
+    );
+  }
+
   testWidgets('renders in light and dark without an exception', (WidgetTester tester) async {
     for (final Brightness brightness in Brightness.values) {
       await pumpField(tester, brightness: brightness, description: 'help', maxLength: 20);
@@ -60,6 +75,13 @@ void main() {
     expect(find.text('Optional'), findsOneWidget);
     expect(find.text('help'), findsOneWidget);
     expect(tester.getSize(find.byType(HoronFieldBox)).height, 120);
+  });
+
+  testWidgets('the 120 box paints the regular glass layer', (WidgetTester tester) async {
+    await pumpField(tester);
+    expect(tester.getSize(find.byType(HoronFieldBox)).height, 120);
+    expectGlassSurface(tester);
+    expect(borderOf(tester), Colors.transparent);
   });
 
   testWidgets('the counter follows the field text', (WidgetTester tester) async {

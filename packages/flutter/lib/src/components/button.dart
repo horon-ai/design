@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../glass/glass_geometry.dart';
+import '../glass/horon_glass.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -167,35 +169,61 @@ class _HoronButtonState extends State<HoronButton> {
         : palette.$1;
     final Color labelColor = palette.$4;
 
+    // React는 glass 변형에서 `<LiquidGlass />`를 깔고 그 위에 라벨을 얹습니다
+    // (`button.tsx:54`). Flutter도 같은 순서로, 바탕은 유리 엔진이 그리고
+    // 호버·누름 동안만 토큰 색을 얇게 덧칩니다.
+    final bool isGlass = widget.variant == HoronButtonVariant.glass;
+    final double surfaceRadius = isLink ? theme.radius.sm : theme.radius.full;
+
+    final Widget label = Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: metrics.gap,
+      children: <Widget>[
+        if (widget.icon != null)
+          IconTheme.merge(
+            data: IconThemeData(size: metrics.iconSize, color: labelColor),
+            child: widget.icon!,
+          ),
+        Flexible(
+          child: Text(
+            widget.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: metrics.label.copyWith(color: labelColor),
+          ),
+        ),
+      ],
+    );
+
+    final Widget paddedLabel = Padding(
+      padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
+      child: label,
+    );
+
     final Widget surface = AnimatedContainer(
       duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
       curve: HoronMotion.colorsCurve,
       height: metrics.height,
-      padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
+      padding: isGlass ? null : EdgeInsets.symmetric(horizontal: metrics.paddingX),
       decoration: BoxDecoration(
-        color: surfaceColor,
-        // rounded-full, link만 rounded-sm입니다.
-        borderRadius: BorderRadius.circular(isLink ? theme.radius.sm : theme.radius.full),
+        color: isGlass ? (interactive && (_pressed || _hovered) ? surfaceColor : null) : surfaceColor,
+        borderRadius: BorderRadius.circular(surfaceRadius),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: metrics.gap,
-        children: <Widget>[
-          if (widget.icon != null)
-            IconTheme.merge(
-              data: IconThemeData(size: metrics.iconSize, color: labelColor),
-              child: widget.icon!,
-            ),
-          Flexible(
-            child: Text(
-              widget.label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: metrics.label.copyWith(color: labelColor),
-            ),
-          ),
-        ],
-      ),
+      child: isGlass
+          ? Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                Positioned.fill(
+                  child: HoronLiquidGlass(
+                    tier: HoronGlassTier.clear,
+                    borderRadius: BorderRadius.circular(surfaceRadius),
+                    child: const SizedBox.expand(),
+                  ),
+                ),
+                paddedLabel,
+              ],
+            )
+          : label,
     );
 
     // React는 sm·md의 primary·danger에만 `after:min-h-11 after:min-w-11`로 44px

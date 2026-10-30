@@ -46,6 +46,29 @@ void main() {
     ),
   );
 
+  /// 상자의 테두리 색입니다. 유리 상자는 앞쪽 장식을 읽습니다.
+  Color borderOf(WidgetTester tester) {
+    final DecoratedBox box = tester
+        .widgetList<DecoratedBox>(find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(DecoratedBox)))
+        .firstWhere((DecoratedBox box) => box.position == DecorationPosition.foreground);
+    return (box.decoration as BoxDecoration).border!.top.color;
+  }
+
+  /// 대상 상자의 채움이 글래스 엔진 한 겹인지 확인합니다.
+  ///
+  /// React `input-group.tsx:33`은 `fieldBoxClass.glass` 위에 `<LiquidGlass tier="regular" />`를
+  /// 깔고 그 위에 앞·뒤 칸과 1px 구분선을 얹습니다. 칸의 `bg-overlay-ink-4`는 유리 위에
+  /// 놓이는 별도 레이어이므로, 채움을 맡는 `AnimatedContainer`가 상자 안에 있으면 안 됩니다.
+  void expectGlassSurface(WidgetTester tester) {
+    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '유리 레이어는 한 겹입니다');
+    expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier, HoronGlassTier.regular);
+    expect(
+      find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(AnimatedContainer)),
+      findsNothing,
+      reason: '유리 상자는 토큰 색 채움을 그리지 않습니다',
+    );
+  }
+
   testWidgets('renders in light and dark without an exception', (WidgetTester tester) async {
     for (final Brightness brightness in Brightness.values) {
       await pumpGroup(tester, brightness: brightness, prefix: true, suffix: true);
@@ -59,6 +82,13 @@ void main() {
     expect(find.text('+82'), findsOneWidget);
     expect(find.byIcon(Icons.attach_money), findsOneWidget);
     expect(dividerBoxes(tester).length, 2);
+  });
+
+  testWidgets('the 40px group paints the regular glass layer', (WidgetTester tester) async {
+    await pumpGroup(tester, prefix: true, suffix: true);
+    expect(tester.getSize(find.byType(HoronFieldBox)).height, 40);
+    expectGlassSurface(tester);
+    expect(borderOf(tester), Colors.transparent);
   });
 
   testWidgets('segment sits on overlay-ink-4 with a 14px icon', (WidgetTester tester) async {

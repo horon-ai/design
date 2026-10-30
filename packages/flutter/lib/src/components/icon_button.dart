@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../glass/glass_geometry.dart';
+import '../glass/horon_glass.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -122,18 +124,45 @@ class _HoronIconButtonState extends State<HoronIconButton> {
         ? palette.$2
         : palette.$1;
 
+    // React는 glass 변형에서 `<LiquidGlass />`(기본 clear)를 깔고 그 위에 아이콘을
+    // 얹습니다(`icon-button.tsx:50`). Flutter도 같은 순서로, 바탕은 유리 엔진이
+    // 그리고 호버·누름 동안만 토큰 색을 얇게 덧칩니다.
+    final bool isGlass = widget.variant == HoronIconButtonVariant.glass;
+    // `rounded-full` — 보이는 상자가 정사각형이라 반지름은 한 변의 절반입니다.
+    final double surfaceRadius = side / 2;
+
+    final Widget iconContent = Center(
+      child: IconTheme.merge(
+        data: IconThemeData(size: iconSize, color: palette.$4),
+        child: widget.icon,
+      ),
+    );
+
     final Widget surface = AnimatedContainer(
       duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
       curve: HoronMotion.colorsCurve,
       width: side,
       height: side,
-      decoration: BoxDecoration(color: surfaceColor, shape: BoxShape.circle),
-      child: Center(
-        child: IconTheme.merge(
-          data: IconThemeData(size: iconSize, color: palette.$4),
-          child: widget.icon,
-        ),
+      decoration: BoxDecoration(
+        color: isGlass ? (interactive && (_pressed || _hovered) ? surfaceColor : null) : surfaceColor,
+        shape: isGlass ? BoxShape.rectangle : BoxShape.circle,
+        borderRadius: isGlass ? BorderRadius.circular(surfaceRadius) : null,
       ),
+      child: isGlass
+          ? Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                Positioned.fill(
+                  child: HoronLiquidGlass(
+                    tier: HoronGlassTier.clear,
+                    borderRadius: BorderRadius.circular(surfaceRadius),
+                    child: const SizedBox.expand(),
+                  ),
+                ),
+                iconContent,
+              ],
+            )
+          : iconContent,
     );
 
     // 아이콘 버튼은 크기와 무관하게 44px 터치 영역을 그립니다.

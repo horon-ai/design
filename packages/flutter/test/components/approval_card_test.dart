@@ -18,7 +18,7 @@ void main() {
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronApprovalCard)));
 
     expect(tester.getSize(find.byType(HoronApprovalCard)).width, 360);
-    expect(find.byType(HoronLiquidGlass), findsOneWidget);
+    expect(find.byType(HoronLiquidGlass), findsAtLeastNWidgets(1));
     expect(find.text('Needs your yes'), findsOneWidget);
     expect(find.text('Approve'), findsOneWidget);
     expect(find.text('Later'), findsOneWidget);

@@ -53,7 +53,12 @@ void main() {
     await tester.pumpWidget(_host(Brightness.light, _card));
 
     final BoxDecoration surface = _surface(tester).decoration! as BoxDecoration;
-    expect(surface.color, colors.glassClear);
+    // 바탕은 유리 엔진이 그립니다. React `choice-card.tsx:34`의 `<LiquidGlass tier="clear" />`와
+    // 같은 순서로, 컨테이너에는 반경과 테두리만 남습니다.
+    expect(surface.color, isNull, reason: 'bg-glass-clear는 유리 채움 레이어가 그립니다');
+    final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
+    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '카드가 유리 표면을 깝니다');
+    expect(glass.tier, HoronGlassTier.clear);
     expect((surface.border! as Border).top.color, Colors.transparent);
     expect(surface.borderRadius, BorderRadius.circular(radius.xl2));
     expect(tester.getSize(find.byKey(const Key('horon-choice-card-surface'))).width, 252);
@@ -79,7 +84,8 @@ void main() {
     expect(tester.takeException(), isNull);
 
     final BoxDecoration surface = _surface(tester).decoration! as BoxDecoration;
-    expect(surface.color, colors.glassThick);
+    expect(surface.color, isNull, reason: 'bg-glass-thick도 유리 채움 레이어가 그립니다');
+    expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier, HoronGlassTier.thick);
     expect((surface.border! as Border).top.color, colors.borderBrand);
 
     final Border ring = (_ring(tester).decoration! as BoxDecoration).border! as Border;

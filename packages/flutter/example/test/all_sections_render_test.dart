@@ -47,9 +47,21 @@ void main() {
                     width: surface.width,
                     child: SingleChildScrollView(
                       child: Builder(
-                        builder: (BuildContext context) =>
-                            gallerySectionFor(context, section) ??
-                            const SizedBox.shrink(),
+                        builder: (BuildContext context) {
+                          final Widget? built = gallerySectionFor(
+                            context,
+                            section,
+                          );
+                          // 등록부에 있는데 위젯이 없는 섹션은 예전에 빈 상자로 그려져
+                          // 통과했습니다. 그 구멍을 막으려고 여기서 바로 실패시킵니다.
+                          expect(
+                            built,
+                            isNotNull,
+                            reason:
+                                '${section.slug} 섹션이 등록부에는 있는데 위젯으로 풀리지 않습니다',
+                          );
+                          return built ?? const SizedBox.shrink();
+                        },
                       ),
                     ),
                   ),

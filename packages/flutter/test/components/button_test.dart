@@ -41,13 +41,19 @@ void main() {
     for (final HoronButtonVariant variant in HoronButtonVariant.values) {
       await tester.pumpWidget(_host(HoronButton(label: '저장', variant: variant, onPressed: () {})));
       final HoronColors colors = _theme(tester).colors;
-      final (Color background, Color foreground) expected = switch (variant) {
+      final (Color? background, Color foreground) expected = switch (variant) {
         HoronButtonVariant.primary => (colors.interactivePrimary, colors.interactiveOnPrimary),
-        HoronButtonVariant.glass => (colors.glassClear, colors.textPrimary),
+        // glass는 바탕을 유리 엔진이 그립니다. React `button.tsx:54`가 `<LiquidGlass />`를
+        // 깔고 라벨을 얹는 것과 같은 순서입니다. 쉬는 상태의 컨테이너 색은 비어 있고,
+        // 호버·누름에서만 토큰 색이 얇게 얹힙니다.
+        HoronButtonVariant.glass => (null, colors.textPrimary),
         HoronButtonVariant.danger => (colors.interactiveDanger, colors.interactiveOnDanger),
         HoronButtonVariant.link => (Colors.transparent, colors.textSecondary),
       };
       expect(_decoration(tester).color, expected.$1, reason: '$variant 배경색');
+      if (variant == HoronButtonVariant.glass) {
+        expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'glass 변형은 유리 레이어를 깝니다');
+      }
       expect(_labelStyle(tester).color, expected.$2, reason: '$variant 라벨색');
     }
   });
