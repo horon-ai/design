@@ -17,7 +17,8 @@ Widget _host(Widget child, {Brightness brightness = Brightness.light, double wid
   );
 }
 
-HoronThemeData _theme(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronBottomSheet)));
+// 시트 없이 행만 띄우는 테스트도 있으므로, 테마는 Scaffold(테마 아래)에서 읽습니다.
+HoronThemeData _theme(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(Scaffold).first));
 
 ClipRRect _panelClip(WidgetTester tester) => tester.widget<ClipRRect>(
   find.descendant(of: find.byType(HoronBottomSheet), matching: find.byType(ClipRRect)).first,
@@ -44,7 +45,7 @@ void main() {
     final HoronSpaceSpec space = _theme(tester).space;
 
     expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'bg-glass-fill-frost는 유리 레이어가 그립니다');
-    final BorderRadius radius = _panelClip(tester).borderRadius! as BorderRadius;
+    final BorderRadius radius = _panelClip(tester).borderRadius as BorderRadius;
     expect(radius.topLeft.x, 32, reason: 'rounded-t-[32px]');
     expect(radius.bottomLeft.x, 0, reason: '위쪽 모서리만 둥급니다');
     expect(
@@ -70,7 +71,7 @@ void main() {
       find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == theme.colors.bgDefault),
       findsOneWidget,
     );
-    expect((_panelClip(tester).borderRadius! as BorderRadius).topLeft.x, theme.radius.xl, reason: 'rounded-t-[20px]');
+    expect((_panelClip(tester).borderRadius as BorderRadius).topLeft.x, theme.radius.xl, reason: 'rounded-t-[20px]');
     expect(
       find.byWidgetPredicate(
         (Widget widget) =>
@@ -116,12 +117,18 @@ void main() {
   testWidgets('a row is 48px with a 20px icon, a truncated label and a 16px caret', (WidgetTester tester) async {
     int taps = 0;
     await tester.pumpWidget(
+      // _host 는 높이를 고정하므로, 행 자체의 높이를 재려면 min 높이 열로 감쌉니다.
       _host(
-        HoronBottomSheetRow(
-          label: '아주 긴 설정 이름이 들어와도 한 줄로 잘립니다',
-          icon: const Icon(Icons.wifi),
-          value: const Text('Weekdays'),
-          onTap: () => taps += 1,
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            HoronBottomSheetRow(
+              label: '아주 긴 설정 이름이 들어와도 한 줄로 잘립니다',
+              icon: const Icon(Icons.wifi),
+              value: const Text('Weekdays'),
+              onTap: () => taps += 1,
+            ),
+          ],
         ),
       ),
     );
@@ -136,7 +143,10 @@ void main() {
     expect(label.overflow, TextOverflow.ellipsis);
     expect(label.style!.color, theme.colors.textPrimary);
     expect(label.style!.fontSize, theme.text.labelMd.fontSize);
-    expect(tester.widget<Text>(find.text('Weekdays')).style!.color, theme.colors.textSecondary);
+    final RichText value = tester.widget<RichText>(
+      find.descendant(of: find.text('Weekdays'), matching: find.byType(RichText)),
+    );
+    expect(value.text.style!.color, theme.colors.textSecondary);
 
     await tester.tap(find.byType(HoronBottomSheetRow));
     expect(taps, 1);
@@ -168,7 +178,7 @@ void main() {
     expect((primary.decoration! as BoxDecoration).color, theme.colors.interactivePrimary);
     expect(tester.widget<Text>(find.text('저장')).style!.color, theme.colors.textInverse, reason: 'text-text-inverse');
     expect(
-      (primary.decoration! as BoxDecoration).borderRadius! as BorderRadius,
+      (primary.decoration! as BoxDecoration).borderRadius as BorderRadius,
       BorderRadius.circular(theme.radius.full),
     );
 

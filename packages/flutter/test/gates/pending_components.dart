@@ -10,10 +10,7 @@
 const List<String> pendingComponents = <String>[
   'data_table',
   'sidebar',
-  'dialog',
-  'bottom_sheet',
   'menu',
-  'toast',
   'command_palette',
   'workspace_menu',
   'chat_controls',

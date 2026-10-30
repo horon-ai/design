@@ -162,7 +162,12 @@ void main() {
         ),
       ),
     );
-    controller.show(title: '아주 긴 제목이 들어와도 카드는 화면을 넘지 않습니다', description: '설명도 여러 줄로 접힙니다. 토스트는 360px 상한을 넘지 않습니다.');
+    // 레이아웃만 보는 테스트라 자동 닫힘 타이머를 만들지 않습니다(duration: zero).
+    controller.show(
+      title: '아주 긴 제목이 들어와도 카드는 화면을 넘지 않습니다',
+      description: '설명도 여러 줄로 접힙니다. 토스트는 360px 상한을 넘지 않습니다.',
+      duration: Duration.zero,
+    );
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
     expect(tester.getSize(find.byType(HoronToast)).width, lessThanOrEqualTo(320 - 48));

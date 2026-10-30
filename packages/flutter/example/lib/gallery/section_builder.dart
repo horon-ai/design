@@ -15,6 +15,7 @@ import 'sections/avatar.dart';
 import 'sections/badge.dart';
 import 'sections/banner.dart';
 import 'sections/bot_list_row.dart';
+import 'sections/bottom_sheet.dart';
 import 'sections/breadcrumb.dart';
 import 'sections/breadcrumb_header.dart';
 import 'sections/button.dart';
@@ -27,6 +28,7 @@ import 'sections/choice_card.dart';
 import 'sections/code_panel.dart';
 import 'sections/composer.dart';
 import 'sections/date_field.dart';
+import 'sections/dialog.dart';
 import 'sections/directory_card.dart';
 import 'sections/empty_state.dart';
 import 'sections/field.dart';
@@ -62,6 +64,7 @@ import 'sections/tab_bar.dart';
 import 'sections/tabs.dart';
 import 'sections/textarea.dart';
 import 'sections/textarea_field.dart';
+import 'sections/toast.dart';
 import 'sections/tool_calls_header.dart';
 import 'sections/tool_permissions.dart';
 import 'sections/tooltip.dart';
@@ -81,6 +84,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'badge': HoronBadgeGallerySection.new,
   'banner': HoronBannerGallerySection.new,
   'bot_list_row': HoronBotListRowGallerySection.new,
+  'bottom_sheet': HoronBottomSheetGallerySection.new,
   'breadcrumb': HoronBreadcrumbGallerySection.new,
   'breadcrumb_header': HoronBreadcrumbHeaderGallerySection.new,
   'button': HoronButtonGallerySection.new,
@@ -93,6 +97,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'code_panel': HoronCodePanelGallerySection.new,
   'composer': HoronComposerGallerySection.new,
   'date_field': HoronDateFieldGallerySection.new,
+  'dialog': HoronDialogGallerySection.new,
   'directory_card': HoronDirectoryCardGallerySection.new,
   'empty_state': HoronEmptyStateGallerySection.new,
   'field': HoronFieldGallerySection.new,
@@ -128,6 +133,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'tabs': HoronTabsGallerySection.new,
   'textarea': HoronTextareaGallerySection.new,
   'textarea_field': HoronTextareaFieldGallerySection.new,
+  'toast': HoronToastGallerySection.new,
   'tool_calls_header': HoronToolCallsHeaderGallerySection.new,
   'tool_permissions': HoronToolPermissionsGallerySection.new,
   'tooltip': HoronTooltipGallerySection.new,
