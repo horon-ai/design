@@ -17,7 +17,7 @@ const double _headerGap = 10;
 
 /// 도구 호출 묶음의 머리입니다. 겹친 도구 칩, 제목, 경과 시간, 아래 카드를 접는 캐럿입니다.
 ///
-/// `tool-calls-header.tsx`를 옮긴 것입니다. 칩은 최대 세 개까지 28px 원형 타일에
+/// `tool-calls-header.tsx`를 옮긴 것입니다. 칩은 최대 세 개까지 28px 표면 타일(r8)에
 /// 14px 아이콘으로 그리고 6px씩 겹쳐 놓습니다. 캐럿은 열림 상태에서 180도 돌고,
 /// 패널은 React의 `motion-collapse`와 같은 240ms로 펼쳐집니다.
 class HoronToolCallsHeader extends StatefulWidget {
@@ -112,7 +112,8 @@ class _HoronToolCallsHeaderState extends State<HoronToolCallsHeader> {
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   color: theme.colors.bgSurface,
-                                  shape: BoxShape.circle,
+                                  // `rounded-sm` — 28px 칩의 반경 8입니다.
+                                  borderRadius: BorderRadius.circular(theme.radius.sm),
                                   border: Border.all(color: theme.colors.borderDefault),
                                 ),
                                 child: IconTheme.merge(
