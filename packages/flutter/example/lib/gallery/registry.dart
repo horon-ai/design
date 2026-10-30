@@ -42,11 +42,28 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(slug: 'spinner', title: 'Spinner', group: 'display'),
   GallerySection(slug: 'skeleton', title: 'Skeleton', group: 'display'),
   GallerySection(slug: 'empty_state', title: 'Empty State', group: 'display'),
+  GallerySection(
+    slug: 'integration_row',
+    title: 'Integration Row',
+    group: 'display',
+  ),
   GallerySection(slug: 'liquid_glass', title: 'Liquid Glass', group: 'display'),
+  GallerySection(
+    slug: 'mcp_server_row',
+    title: 'MCP Server Row',
+    group: 'display',
+  ),
   GallerySection(
     slug: 'directory_card',
     title: 'Directory Card',
     group: 'display',
   ),
+  GallerySection(slug: 'plugin_row', title: 'Plugin Row', group: 'display'),
+  GallerySection(
+    slug: 'marketplace_card',
+    title: 'Marketplace Card',
+    group: 'display',
+  ),
+  GallerySection(slug: 'list_detail', title: 'List Detail', group: 'display'),
   GallerySection(slug: 'code_panel', title: 'Code Panel', group: 'display'),
 ];

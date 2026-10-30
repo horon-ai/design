@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/list_detail.dart';
 
 /// `list_detail` 갤러리 섹션입니다.
 ///

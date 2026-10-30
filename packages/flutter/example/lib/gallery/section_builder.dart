@@ -22,8 +22,13 @@ import 'sections/directory_card.dart';
 import 'sections/empty_state.dart';
 import 'sections/file_drop.dart';
 import 'sections/icon_button.dart';
+import 'sections/integration_row.dart';
 import 'sections/kbd.dart';
 import 'sections/liquid_glass.dart';
+import 'sections/list_detail.dart';
+import 'sections/marketplace_card.dart';
+import 'sections/mcp_server_row.dart';
+import 'sections/plugin_row.dart';
 import 'sections/progress.dart';
 import 'sections/radio_group.dart';
 import 'sections/skeleton.dart';
@@ -54,8 +59,13 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'empty_state': HoronEmptyStateGallerySection.new,
   'file_drop': HoronFileDropGallerySection.new,
   'icon_button': HoronIconButtonGallerySection.new,
+  'integration_row': HoronIntegrationRowGallerySection.new,
   'kbd': HoronKbdGallerySection.new,
   'liquid_glass': HoronLiquidGlassGallerySection.new,
+  'list_detail': HoronListDetailGallerySection.new,
+  'marketplace_card': HoronMarketplaceCardGallerySection.new,
+  'mcp_server_row': HoronMcpServerRowGallerySection.new,
+  'plugin_row': HoronPluginRowGallerySection.new,
   'progress': HoronProgressGallerySection.new,
   'radio_group': HoronRadioGroupGallerySection.new,
   'skeleton': HoronSkeletonGallerySection.new,

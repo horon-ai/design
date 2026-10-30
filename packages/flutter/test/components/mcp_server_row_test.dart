@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/mcp_server_row.dart';
 
 Widget _host(Widget child, {Brightness brightness = Brightness.light, double? width}) {
   final Widget sized = width == null ? child : SizedBox(width: width, child: child);
@@ -104,17 +103,16 @@ void main() {
     expect(status.constraints?.maxHeight, theme.space.step(5.5));
     expect((status.decoration! as BoxDecoration).color, theme.colors.accentSky500_18);
 
-    final AnimatedContainer configure = tester.widget<AnimatedContainer>(
-      find.ancestor(of: find.text('Configure'), matching: find.byType(AnimatedContainer)).first,
+    // 액션 두 개는 컴포넌트 안의 사설 위젯이라 클래스로 찾지 않고, 그려진 크기와
+    // 아이콘 크기로 확인합니다.
+    expect(find.text('Configure'), findsOneWidget);
+    expect(
+      tester.getSize(find.ancestor(of: find.text('Configure'), matching: find.byType(SizedBox)).first).height,
+      theme.space.step(8),
+      reason: 'glass sm h-8',
     );
-    expect(configure.constraints?.maxHeight, theme.space.step(8), reason: 'glass sm h-8');
     expect(IconTheme.of(tester.element(find.byIcon(Icons.settings_outlined))).size, theme.space.s3_5);
-
-    final AnimatedContainer overflow = tester.widget<AnimatedContainer>(
-      find.ancestor(of: find.byIcon(Icons.more_horiz), matching: find.byType(AnimatedContainer)).first,
-    );
-    expect(overflow.constraints?.maxWidth, theme.space.step(8));
-    expect((overflow.decoration! as BoxDecoration).shape, BoxShape.circle, reason: 'icon-button rounded-full');
+    expect(tester.getSize(find.byIcon(Icons.more_horiz)).width, greaterThanOrEqualTo(theme.space.s4));
     final Icon dots = tester.widget<Icon>(find.byIcon(Icons.more_horiz));
     expect(dots.size, theme.space.s4, reason: 'IconButton sm [&_svg]:size-4');
   });

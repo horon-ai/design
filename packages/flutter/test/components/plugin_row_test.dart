@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/plugin_row.dart';
 
 Widget _host(Widget child, {Brightness brightness = Brightness.light, double? width}) {
   final Widget sized = width == null ? child : SizedBox(width: width, child: child);

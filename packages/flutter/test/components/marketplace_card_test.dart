@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
-import 'package:horon_ui/src/components/marketplace_card.dart';
 
 Widget _host(Widget child, {Brightness brightness = Brightness.light, double? width}) {
   final Widget sized = width == null ? child : SizedBox(width: width, child: child);
@@ -99,15 +98,13 @@ void main() {
     await tester.pumpWidget(_host(_card(onInstall: () {}), width: 320));
     final HoronThemeData theme = _themeOf(tester);
 
-    final DecoratedBox rule = tester.widget<DecoratedBox>(
-      find.byWidgetPredicate(
-        (Widget widget) =>
-            widget is DecoratedBox &&
-            widget.decoration is BoxDecoration &&
-            (widget.decoration as BoxDecoration).border != null,
-      ),
-    );
-    expect(((rule.decoration as BoxDecoration).border! as Border).top.color, theme.colors.borderDefault);
+    // 괘선은 여러 DecoratedBox 중 하나이므로, 그중 기본 테두리를 가진 상자가 있는지 봅니다.
+    final bool hasRule = tester.widgetList<DecoratedBox>(find.byType(DecoratedBox)).any((DecoratedBox box) {
+      final Decoration decoration = box.decoration;
+      if (decoration is! BoxDecoration || decoration.border is! Border) return false;
+      return (decoration.border! as Border).top.color == theme.colors.borderDefault;
+    });
+    expect(hasRule, isTrue, reason: 'the footer keeps a default-colour rule');
 
     final Icon star = tester.widget<Icon>(find.byIcon(Icons.star));
     expect(star.size, theme.space.step(3.25));
@@ -115,10 +112,12 @@ void main() {
     expect(tester.widget<Text>(find.text('4.8')).style?.color, theme.colors.textPrimary);
     expect(find.text('· 12k'), findsOneWidget);
 
-    final AnimatedContainer install = tester.widget<AnimatedContainer>(
-      find.ancestor(of: find.text('Install'), matching: find.byType(AnimatedContainer)).first,
+    expect(find.text('Install'), findsOneWidget);
+    expect(
+      tester.getSize(find.ancestor(of: find.text('Install'), matching: find.byType(SizedBox)).first).height,
+      theme.space.step(8),
+      reason: 'glass sm h-8',
     );
-    expect(install.constraints?.maxHeight, theme.space.step(8), reason: 'glass sm h-8');
     expect(tester.takeException(), isNull);
   });
 
