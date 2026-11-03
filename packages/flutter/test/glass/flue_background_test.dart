@@ -29,7 +29,7 @@ void main() {
 
   Future<void> pumpFlue(
     WidgetTester tester, {
-    FlueConfig config = FlueConfig.sky,
+    HoronFlueConfig config = HoronFlueConfig.sky,
     Color? tint,
     bool animations = true,
     bool tickerMode = true,
@@ -60,9 +60,9 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   }
 
-  group('FlueConfig', () {
+  group('HoronFlueConfig', () {
     test('mirrors FLUE_SKY field for field', () {
-      const FlueConfig sky = FlueConfig.sky;
+      const HoronFlueConfig sky = HoronFlueConfig.sky;
       expect(sky.bgColor, const Color(0xFFEEF3F8));
       expect(sky.colorA, const Color(0xFFE3ECF6));
       expect(sky.colorB, const Color(0xFFC3D7EA));
@@ -101,7 +101,7 @@ void main() {
 
   group('damping loop', () {
     test('aim normalizes like the JS aim()', () {
-      final FlueDamping damping = FlueDamping();
+      final HoronFlueDamping damping = HoronFlueDamping();
       // 화면 한가운데 → (0, 0).
       damping.aim(localPosition: const Offset(160, 100), size: hostSize);
       expect(damping.targetX, closeTo(0, 1e-12));
@@ -119,27 +119,27 @@ void main() {
     });
 
     test('aim ignores a host with no area', () {
-      final FlueDamping damping = FlueDamping();
+      final HoronFlueDamping damping = HoronFlueDamping();
       damping.aim(localPosition: const Offset(10, 10), size: Size.zero);
       expect(damping.targetX, 0);
       expect(damping.targetY, 0);
     });
 
     test('the first frame advances the clock by the clamped delta', () {
-      final FlueDamping damping = FlueDamping()..advance(16.7);
+      final HoronFlueDamping damping = HoronFlueDamping()..advance(16.7);
       expect(damping.time, closeTo(0.0167, 1e-9));
 
       // 4.167ms보다 짧은 간격은 4.167로 올립니다.
-      final FlueDamping fast = FlueDamping()..advance(1);
+      final HoronFlueDamping fast = HoronFlueDamping()..advance(1);
       expect(fast.time, closeTo(0.004167, 1e-9));
 
       // 50ms보다 긴 간격은 50으로 자릅니다.
-      final FlueDamping slow = FlueDamping()..advance(500);
+      final HoronFlueDamping slow = HoronFlueDamping()..advance(500);
       expect(slow.time, closeTo(0.05, 1e-9));
     });
 
     test('lead follows the target with kLead = 0.105 * step', () {
-      final FlueDamping damping = FlueDamping()
+      final HoronFlueDamping damping = HoronFlueDamping()
         ..aim(localPosition: const Offset(320, 0), size: hostSize)
         ..advance(16.7);
       // step = 16.7 * 0.06 = 1.002, kLead = 0.105 * 1.002.
@@ -150,7 +150,7 @@ void main() {
     });
 
     test('a dropped frame pins step at 2.2', () {
-      final FlueDamping damping = FlueDamping()
+      final HoronFlueDamping damping = HoronFlueDamping()
         ..aim(localPosition: const Offset(320, 0), size: hostSize)
         ..advance(40);
       // ms 40 > 36.7이므로 step은 2.2, kLead = 0.105 * 2.2 = 0.231.
@@ -158,16 +158,16 @@ void main() {
     });
 
     test('no pointer keeps the JS initial state', () {
-      final FlueDamping damping = FlueDamping();
+      final HoronFlueDamping damping = HoronFlueDamping();
       damping.advance(16.7);
-      final FlueFrame frame = damping.toFrame();
+      final HoronFlueFrame frame = damping.toFrame();
       expect(frame.mouse, Offset.zero);
       expect(frame.mouseVelocity, Offset.zero);
       expect(frame.mouseWake, Offset.zero);
     });
 
     test('the three layers converge on the target', () {
-      final FlueDamping damping = FlueDamping()..aim(localPosition: const Offset(320, 0), size: hostSize);
+      final HoronFlueDamping damping = HoronFlueDamping()..aim(localPosition: const Offset(320, 0), size: hostSize);
       for (int i = 0; i < 400; i++) {
         damping.advance(16.7);
       }
@@ -183,7 +183,7 @@ void main() {
 
       final HoronThemeData horon = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
       expect(
-        find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == FlueConfig.sky.bgColor),
+        find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == HoronFlueConfig.sky.bgColor),
         findsOneWidget,
       );
       expect(

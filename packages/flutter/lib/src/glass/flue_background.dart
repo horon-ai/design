@@ -23,14 +23,13 @@ import '../theme/horon_theme.dart';
 import 'glass_shader.dart';
 
 /// Flue의 팔레트와 파라미터입니다.
-/// Flue의 팔레트와 파라미터입니다.
 ///
-/// `flue-background.tsx`의 `FlueConfig`와 이름과 기본값이 같습니다. 색은 hex 문자열 대신
+/// `flue-background.tsx`의 `FlueConfig`와 필드 이름과 기본값이 같습니다. 색은 hex 문자열 대신
 /// [Color]이고 값은 같습니다. 팔레트를 바꿀 때는 셰이더가 아니라 이 값만 고칩니다.
 @immutable
-class FlueConfig {
-  /// 값을 그대로 받는 생성자입니다. 기본값이 곧 [FlueConfig.sky]입니다.
-  const FlueConfig({
+class HoronFlueConfig {
+  /// 값을 그대로 받는 생성자입니다. 기본값이 곧 [HoronFlueConfig.sky]입니다.
+  const HoronFlueConfig({
     this.bgColor = const Color(0xFFEEF3F8),
     this.colorA = const Color(0xFFE3ECF6),
     this.colorB = const Color(0xFFC3D7EA),
@@ -67,7 +66,7 @@ class FlueConfig {
   });
 
   /// Horon 하늘 팔레트입니다. 원본의 `FLUE_SKY`입니다.
-  static const FlueConfig sky = FlueConfig();
+  static const HoronFlueConfig sky = HoronFlueConfig();
 
   /// 셰이더를 못 쓸 때 남는 바탕색입니다.
   final Color bgColor;
@@ -176,9 +175,9 @@ const Key horonFlueCanvasKey = Key('horon-flue-canvas');
 
 /// Flue의 한 프레임 상태입니다. 셰이더 유니폼과 1:1입니다.
 @immutable
-class FlueFrame {
+class HoronFlueFrame {
   /// 값을 그대로 받는 생성자입니다.
-  const FlueFrame({
+  const HoronFlueFrame({
     this.time = 0,
     this.mouse = Offset.zero,
     this.mouseVelocity = Offset.zero,
@@ -202,7 +201,7 @@ class FlueFrame {
 ///
 /// `aim()`은 포인터를 목표로 옮기고, `advance()`는 한 프레임만큼 세 겹(lead·body·wake)을
 /// 따라가게 합니다. 원본 `frame()`과 같은 상수를 씁니다.
-class FlueDamping {
+class HoronFlueDamping {
   /// 목표 위치입니다. JS의 `tx`·`ty`입니다.
   double targetX = 0;
   double targetY = 0;
@@ -252,7 +251,7 @@ class FlueDamping {
   }
 
   /// 지금 상태를 프레임 값으로 읽습니다.
-  FlueFrame toFrame() => FlueFrame(
+  HoronFlueFrame toFrame() => HoronFlueFrame(
     time: time,
     mouse: Offset(x, y),
     mouseVelocity: Offset(leadX - x, leadY - y),
@@ -274,13 +273,13 @@ class FlueDamping {
 /// )
 /// ```
 ///
-/// 셰이더를 못 쓰면 [FlueConfig.bgColor] 단색에 색조 한 겹만 남습니다.
+/// 셰이더를 못 쓰면 [HoronFlueConfig.bgColor] 단색에 색조 한 겹만 남습니다.
 class HoronFlueBackground extends StatefulWidget {
   /// 배경을 만듭니다.
-  const HoronFlueBackground({super.key, this.config = FlueConfig.sky, this.tint});
+  const HoronFlueBackground({super.key, this.config = HoronFlueConfig.sky, this.tint});
 
   /// 팔레트와 파라미터입니다.
-  final FlueConfig config;
+  final HoronFlueConfig config;
 
   /// 연기 위에 얹는 색조입니다. 없으면 테마의 `glass-regular`입니다(React의
   /// `bg-glass-regular`).
@@ -296,8 +295,8 @@ class HoronFlueBackground extends StatefulWidget {
 class HoronFlueBackgroundState extends State<HoronFlueBackground>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late final Ticker _ticker;
-  final FlueDamping _damping = FlueDamping();
-  final ValueNotifier<FlueFrame> _frame = ValueNotifier<FlueFrame>(const FlueFrame());
+  final HoronFlueDamping _damping = HoronFlueDamping();
+  final ValueNotifier<HoronFlueFrame> _frame = ValueNotifier<HoronFlueFrame>(const HoronFlueFrame());
 
   ui.FragmentShader? _shader;
   bool _requested = false;
@@ -310,11 +309,11 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
 
   /// 지금의 감쇠 상태입니다.
   @visibleForTesting
-  FlueDamping get damping => _damping;
+  HoronFlueDamping get damping => _damping;
 
   /// 지금 그리는 프레임입니다.
   @visibleForTesting
-  FlueFrame get frame => _frame.value;
+  HoronFlueFrame get frame => _frame.value;
 
   @override
   void initState() {
@@ -343,7 +342,7 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   /// 티커를 켜고 끕니다.
   ///
   /// 세 조건이 모두 참일 때만 돕니다: `TickerMode` 켜짐, 앱이 앞에 있음, 모션 축소 아님.
-  /// 모션 축소일 때는 [FlueDamping.time]을 12로 둔 한 프레임을 그립니다(원본과 같은 값).
+  /// 모션 축소일 때는 [HoronFlueDamping.time]을 12로 둔 한 프레임을 그립니다(원본과 같은 값).
   void _syncTicker() {
     if (!mounted) return;
     final bool animated = TickerMode.valuesOf(context).enabled && _resumed && !MediaQuery.disableAnimationsOf(context);
@@ -435,13 +434,13 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
 
 /// `shaders/flue.frag`를 칠하는 페인터입니다.
 class _HoronFluePainter extends CustomPainter {
-  _HoronFluePainter({required this.shader, required this.config, required ValueNotifier<FlueFrame> repaint})
+  _HoronFluePainter({required this.shader, required this.config, required ValueNotifier<HoronFlueFrame> repaint})
     : _frame = repaint,
       super(repaint: repaint);
 
   final ui.FragmentShader shader;
-  final FlueConfig config;
-  final ValueNotifier<FlueFrame> _frame;
+  final HoronFlueConfig config;
+  final ValueNotifier<HoronFlueFrame> _frame;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -451,7 +450,7 @@ class _HoronFluePainter extends CustomPainter {
   }
 
   /// 셰이더의 유니폼을 채웁니다. 슬롯 색인은 [horonFlueUniforms]에서 계산됩니다.
-  void _applyUniforms(Size size, FlueFrame frame) {
+  void _applyUniforms(Size size, HoronFlueFrame frame) {
     final Map<String, int> slots = horonFlueSlots;
 
     void scalar(String name, double value) => shader.setFloat(slots[name]!, value);
