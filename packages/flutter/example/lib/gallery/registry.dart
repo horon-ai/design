@@ -69,6 +69,11 @@ const List<GallerySection> gallerySections = <GallerySection>[
     group: 'display',
   ),
   GallerySection(slug: 'liquid_glass', title: 'Liquid Glass', group: 'display'),
+  GallerySection(
+    slug: 'flue_background',
+    title: 'Flue Background',
+    group: 'display',
+  ),
   GallerySection(slug: 'horon_icon', title: 'Horon Icon', group: 'display'),
   GallerySection(
     slug: 'horon_wordmark',

@@ -7,7 +7,7 @@ import 'dart:io';
 /// Dart package cannot depend on a TypeScript workspace.
 ///
 /// The gates read `packages/react/src/components` directly: the rebuilt React
-/// set (81 files) is the single source of truth, and the frozen copy that used
+/// set (82 files) is the single source of truth, and the frozen copy that used
 /// to live under `reference/` is gone. Paths resolve from the package root,
 /// which is `flutter test`'s working directory.
 const String reactComponentsPath = '../react/src/components';

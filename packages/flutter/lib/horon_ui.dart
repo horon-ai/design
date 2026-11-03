@@ -39,6 +39,7 @@ export 'src/components/empty_state.dart';
 export 'src/components/field.dart';
 export 'src/components/file_drop.dart';
 export 'src/components/filter_bar.dart';
+export 'src/components/flue_background.dart';
 export 'src/components/horon_icon.dart';
 export 'src/components/horon_wordmark.dart';
 export 'src/components/icon_button.dart';

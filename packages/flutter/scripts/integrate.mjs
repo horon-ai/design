@@ -7,10 +7,10 @@
 //   node scripts/integrate.mjs          # 쓰기
 //   node scripts/integrate.mjs --check  # 쓰지 않고 누락만 보고 (있으면 exit 1)
 //
-// 카탈로그(`apps/site/src/data/components.ts`)는 81개 항목이 여섯 그룹에 나뉘어 있고,
+// 카탈로그(`apps/site/src/data/components.ts`)는 82개 항목이 여섯 그룹에 나뉘어 있고,
 // 항목 하나가 여러 줄에 걸칩니다. 컴포넌트가 하나도 없는 상태(재작성 직전)도
 // 정상입니다. 그때는 배럴에 컴포넌트 export가 없고, 등록부와 섹션 표가 비며,
-// 미구현 원장에 81개 슬러그가 전부 들어갑니다.
+// 미구현 원장에 82개 슬러그가 전부 들어갑니다.
 //
 // 원장은 디렉터리 목록에서 다시 씁니다. 파일이 있는 슬러그는 빠지고, 파일이 없는
 // 카탈로그 슬러그는 들어갑니다.
@@ -30,7 +30,7 @@ const SECTION_BUILDER = join(PKG, "example/lib/gallery/section_builder.dart");
 
 const CHECK = process.argv.includes("--check");
 const GROUP_ORDER = ["inputs", "display", "navigation", "overlays", "conversation", "agents"];
-const CATALOG_SIZE = 81;
+const CATALOG_SIZE = 82;
 const COMPONENTS_DIR = join(PKG, "lib/src/components");
 const SECTIONS_DIR = join(PKG, "example/lib/gallery/sections");
 const OVERLAY_DIR = join(PKG, "lib/src/overlay");
