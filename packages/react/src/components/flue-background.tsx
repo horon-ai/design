@@ -183,7 +183,7 @@ export function FlueBackground({ className, style, config, tintClassName = "bg-g
     };
     for (const [name, value] of Object.entries(cfg)) {
       if (ENGINE_KEYS.has(name)) continue;
-      const uniform = `u${name[0].toUpperCase()}${name.slice(1)}`;
+      const uniform = `u${name.charAt(0).toUpperCase()}${name.slice(1)}`;
       if (typeof value === "string") gl.uniform3f(loc(uniform), ...hexToVec3(value));
       else gl.uniform1f(loc(uniform), value);
     }
