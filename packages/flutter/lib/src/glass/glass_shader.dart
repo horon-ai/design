@@ -87,7 +87,7 @@ const List<HoronShaderUniform> horonGlassRefractUniforms = <HoronShaderUniform>[
   HoronShaderUniform('uSaturation', HoronShaderUniformType.scalar),
 ];
 
-/// `shaders/flue.frag`의 유니폼 순서입니다. `FlueConfig` 필드 순서와 같습니다.
+/// `shaders/flue.frag`의 유니폼 순서입니다. `HoronFlueConfig` 필드 순서와 같습니다.
 const List<HoronShaderUniform> horonFlueUniforms = <HoronShaderUniform>[
   HoronShaderUniform('iResolution', HoronShaderUniformType.vec2),
   HoronShaderUniform('iTime', HoronShaderUniformType.scalar),

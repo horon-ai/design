@@ -237,6 +237,12 @@ export const components: ComponentEntry[] = [
     description: "모든 유리 표면 아래 깔리는 색조, 안쪽 음영, 빛 테두리 레이어입니다.",
   },
   {
+    slug: "flue-background",
+    title: "Flue Background",
+    group: "display",
+    description: "사이드바 뒤에서 천천히 피어오르는 하늘색 연기 그라데이션입니다. 커서를 따라 휘어집니다.",
+  },
+  {
     slug: "horon-icon",
     title: "Horon Icon",
     group: "display",
