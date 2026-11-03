@@ -45,6 +45,7 @@ import 'sections/empty_state.dart';
 import 'sections/field.dart';
 import 'sections/file_drop.dart';
 import 'sections/filter_bar.dart';
+import 'sections/flue_background.dart';
 import 'sections/horon_icon.dart';
 import 'sections/horon_wordmark.dart';
 import 'sections/icon_button.dart';
@@ -135,6 +136,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'field': HoronFieldGallerySection.new,
   'file_drop': HoronFileDropGallerySection.new,
   'filter_bar': HoronFilterBarGallerySection.new,
+  'flue_background': HoronFlueBackgroundGallerySection.new,
   'horon_icon': HoronIconGallerySection.new,
   'horon_wordmark': HoronWordmarkGallerySection.new,
   'icon_button': HoronIconButtonGallerySection.new,

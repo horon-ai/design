@@ -7,7 +7,7 @@ import 'pending_components.dart';
 
 /// The React package is the source of truth for which components exist. This
 /// gate keeps the Flutter port honest while it is being built: the React slug
-/// set (`packages/react/src/components`, 81 files) must equal the implemented
+/// set (`packages/react/src/components`, 82 files) must equal the implemented
 /// component files plus the pending ledger.
 ///
 /// The ledger is seeded with every slug and shrinks as components land. During
