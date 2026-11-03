@@ -33,6 +33,7 @@ export * from "./components/empty-state";
 export * from "./components/field";
 export * from "./components/file-drop";
 export * from "./components/filter-bar";
+export * from "./components/flue-background";
 export * from "./components/horon-icon";
 export * from "./components/horon-wordmark";
 export * from "./components/icon-button";
