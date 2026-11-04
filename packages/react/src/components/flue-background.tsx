@@ -30,6 +30,7 @@ export type FlueConfig = {
   grainAnim: number;
   dither: number;
   vignette: number;
+  /** 1 lets the smoke follow the real pointer; 0 (default) ignores it and a slow virtual pointer sways the smoke. */
   cursor: number;
   pointerRadius: number;
   draft: number;
@@ -67,7 +68,7 @@ export const FLUE_SKY: FlueConfig = {
   grainAnim: 0,
   dither: 1.1,
   vignette: 0.26,
-  cursor: 1,
+  cursor: 0,
   pointerRadius: 0.84,
   draft: 1.85,
   pointerStrength: 0.16,
@@ -84,6 +85,48 @@ export const FLUE_NIGHT: FlueConfig = {
   colorC: "#1f4a78",
   colorD: "#4f8fd0",
   glow: 0.35,
+};
+
+/** Where the smoke is drawn; each place tunes the motion and colour on top of `FLUE_SKY` / `FLUE_NIGHT`. */
+export type FlueVariant = "default" | "sidebar" | "auth";
+
+type FlueTuning = { light: Partial<FlueConfig>; dark: Partial<FlueConfig>; tint: string };
+
+/**
+ * - `sidebar`: a narrow, tall column under the sidebar's glass. The glass blurs the detail away, so the smoke
+ *   is calmer and larger, kept low in the column so the nav labels at the top sit on the quiet part. The sidebar
+ *   glass supplies the fill, so the variant lays no tint of its own.
+ * - `auth`: the whole sign-in screen behind a centred card. The plume is wider and rises from the bottom
+ *   centre so it frames the card, with a vignette that holds the corners in the ground colour. No tint.
+ */
+const FLUE_VARIANTS: Record<FlueVariant, FlueTuning> = {
+  default: { light: {}, dark: {}, tint: "bg-glass-regular dark:bg-transparent" },
+  sidebar: {
+    light: {
+      speed: 0.22,
+      smokeScale: 1.9,
+      density: 1.85,
+      contrast: 1.45,
+      midpoint: 0.8,
+      glow: 0.3,
+      vignette: 0,
+    },
+    dark: {
+      speed: 0.22,
+      smokeScale: 1.9,
+      density: 1.85,
+      contrast: 1.5,
+      midpoint: 0.8,
+      glow: 0.22,
+      vignette: 0,
+    },
+    tint: "",
+  },
+  auth: {
+    light: { width: 1.9, spread: 1.3, density: 2.0, midpoint: 0.74, glow: 0.45, vignette: 0.18 },
+    dark: { width: 1.9, spread: 1.3, density: 2.0, midpoint: 0.76, glow: 0.45, vignette: 0.45 },
+    tint: "",
+  },
 };
 
 /** Follows the `.dark` class on <html>, the switch the theme uses. */
@@ -158,9 +201,11 @@ function activate(gl: WebGL2RenderingContext, program: WebGLProgram): void {
 export type FlueBackgroundProps = {
   className?: string;
   style?: CSSProperties;
-  /** Overrides on top of `FLUE_SKY`, or `FLUE_NIGHT` in dark mode. */
+  /** `sidebar` under the sidebar glass, `auth` behind the sign-in screen, `default` otherwise. */
+  variant?: FlueVariant;
+  /** Overrides on top of the variant's `FLUE_SKY` (light) or `FLUE_NIGHT` (dark) tuning. */
   config?: Partial<FlueConfig>;
-  /** Classes for the tint laid over the smoke. */
+  /** Classes for the tint laid over the smoke; defaults to the variant's tint. */
   tintClassName?: string;
 };
 
@@ -170,15 +215,11 @@ export type FlueBackgroundProps = {
  * back to the flat `bgColor` when WebGL2 is missing. Reduced motion draws a single still frame.
  * Light mode paints the white-and-sky `FLUE_SKY`; dark mode paints the black-and-blue `FLUE_NIGHT`.
  */
-export function FlueBackground({
-  className,
-  style,
-  config,
-  tintClassName = "bg-glass-regular dark:bg-transparent",
-}: FlueBackgroundProps) {
+export function FlueBackground({ className, style, variant = "default", config, tintClassName }: FlueBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dark = useDarkScheme();
-  const settings = { ...(dark ? FLUE_NIGHT : FLUE_SKY), ...config };
+  const tuning = FLUE_VARIANTS[variant];
+  const settings = { ...(dark ? FLUE_NIGHT : FLUE_SKY), ...(dark ? tuning.dark : tuning.light), ...config };
   const key = JSON.stringify(settings);
 
   useEffect(() => {
@@ -281,6 +322,13 @@ export function FlueBackground({
       const ms = Math.min(50, Math.max(4.167, raw));
       const step = ms > 36.7 ? 2.2 : ms * 0.06;
       clock += ms * 0.001;
+      // Without the real pointer, a slow virtual one wanders across the canvas on two incommensurate
+      // sines, so the plume leans, sways and trails on its own the way it does under a moving cursor.
+      if (!cfg.cursor) {
+        const aspect = canvas.clientWidth / Math.max(1, canvas.clientHeight);
+        mouse.tx = aspect * (0.3 * Math.sin(clock * 0.23) + 0.12 * Math.sin(clock * 0.57 + 0.8));
+        mouse.ty = 0.22 * Math.sin(clock * 0.19 + 1.3) + 0.08 * Math.sin(clock * 0.41);
+      }
       const kLead = 0.105 * step;
       const kBody = 0.043 * step;
       const kWake = 0.017 * step;
@@ -293,8 +341,10 @@ export function FlueBackground({
       draw();
     };
     if (!still) {
-      window.addEventListener("pointermove", aim, { passive: true });
-      window.addEventListener("pointerdown", aim, { passive: true });
+      if (cfg.cursor) {
+        window.addEventListener("pointermove", aim, { passive: true });
+        window.addEventListener("pointerdown", aim, { passive: true });
+      }
       raf = requestAnimationFrame(frame);
     }
 
@@ -322,7 +372,7 @@ export function FlueBackground({
       style={{ backgroundColor: settings.bgColor, ...style }}
     >
       <canvas ref={canvasRef} className="block size-full" />
-      <div className={cn("absolute inset-0", tintClassName)} />
+      <div className={cn("absolute inset-0", tintClassName ?? tuning.tint)} />
     </div>
   );
 }
