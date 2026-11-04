@@ -94,8 +94,10 @@ type FlueTuning = { light: Partial<FlueConfig>; dark: Partial<FlueConfig>; tint:
 
 /**
  * - `sidebar`: a narrow, tall column under the sidebar's glass. The glass blurs the detail away, so the smoke
- *   is calmer and larger, kept low in the column so the nav labels at the top sit on the quiet part. The sidebar
- *   glass supplies the fill, so the variant lays no tint of its own.
+ *   is calmer and larger, kept low in the column so the nav labels at the top sit on the quiet part. The canvas
+ *   paints above the sidebar's own fill, so in light mode the variant lays the thick glass (80% white) over the
+ *   smoke itself: its dense blue band would otherwise drop secondary labels to 2:1. Dark smoke is already dark
+ *   enough behind light text, so dark lays nothing.
  * - `auth`: the whole sign-in screen behind a centred card. The plume is wider and rises from the bottom
  *   centre so it frames the card, with a vignette that holds the corners in the ground colour. No tint.
  */
@@ -120,7 +122,7 @@ const FLUE_VARIANTS: Record<FlueVariant, FlueTuning> = {
       glow: 0.22,
       vignette: 0,
     },
-    tint: "",
+    tint: "bg-glass-thick dark:bg-transparent",
   },
   auth: {
     light: { width: 1.9, spread: 1.3, density: 2.0, midpoint: 0.74, glow: 0.45, vignette: 0.18 },

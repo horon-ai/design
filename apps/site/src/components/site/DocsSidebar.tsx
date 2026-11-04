@@ -10,7 +10,7 @@
  * It is an island because the group labels and the open/closed state need
  * `useLocale()` and the library Collapsible's client behaviour.
  */
-import { Fragment } from "react";
+import { Fragment, useLayoutEffect, useRef } from "react";
 
 import { Sidebar, SidebarGroup, SidebarItem } from "@horon-ai/react";
 
@@ -55,8 +55,7 @@ export function docsSidebarBlocks(section: string, currentPath: string): DocsSid
         entries: foundationsNav.map((item) => ({
           label: item.label,
           href: item.href,
-          current:
-            item.href === "/foundations" ? currentPath === "/foundations" : isActive(currentPath, item.href),
+          current: item.href === "/foundations" ? currentPath === "/foundations" : isActive(currentPath, item.href),
         })),
       },
     ];
@@ -66,9 +65,7 @@ export function docsSidebarBlocks(section: string, currentPath: string): DocsSid
     return [
       {
         key: "overview",
-        entries: [
-          { label: docsMessages.overview, href: "/components", current: currentPath === "/components" },
-        ],
+        entries: [{ label: docsMessages.overview, href: "/components", current: currentPath === "/components" }],
       },
       ...componentGroups.map((group) => ({
         key: group.id,
@@ -95,10 +92,35 @@ export function docsSidebarBlocks(section: string, currentPath: string): DocsSid
   ];
 }
 
+/** Where the desktop sidebar's scroll offset is kept between page loads, one value per section. */
+const scrollKey = (section: string) => `docs-sidebar-scroll:${section}`;
+
 export default function DocsSidebar({ section, currentPath }: DocsSidebarProps) {
   const locale: Locale = useLocale();
   const blocks = docsSidebarBlocks(section, currentPath);
   const label = pick(docsMessages.sectionNav, locale);
+  const scroller = useRef<HTMLDivElement>(null);
+
+  // Every docs link is a full page load, so the sidebar remounts at the top. Put it back where the
+  // reader left it; on a first visit to the section, bring the current entry into view instead.
+  useLayoutEffect(() => {
+    const element = scroller.current;
+    if (!element) return undefined;
+    const saved = sessionStorage.getItem(scrollKey(section));
+    if (saved !== null) {
+      element.scrollTop = Number(saved);
+    } else {
+      // Scroll only this column, never the page, so the entry sits mid-column.
+      const current = element.querySelector<HTMLElement>("[aria-current='page']");
+      if (current) {
+        const offset = current.getBoundingClientRect().top - element.getBoundingClientRect().top;
+        element.scrollTop += offset - (element.clientHeight - current.offsetHeight) / 2;
+      }
+    }
+    const save = () => sessionStorage.setItem(scrollKey(section), String(element.scrollTop));
+    element.addEventListener("scroll", save, { passive: true });
+    return () => element.removeEventListener("scroll", save);
+  }, [section]);
 
   const renderEntries = (block: DocsSidebarBlock) =>
     block.entries.map((entry) => (
@@ -118,7 +140,10 @@ export default function DocsSidebar({ section, currentPath }: DocsSidebarProps) 
 
   return (
     <>
-      <div className="hidden lg:fixed lg:top-19 lg:bottom-0 lg:left-0 lg:z-10 lg:block lg:w-60 lg:overflow-y-auto">
+      <div
+        ref={scroller}
+        className="hidden lg:fixed lg:top-19 lg:bottom-0 lg:left-0 lg:z-10 lg:block lg:w-60 lg:overflow-y-auto"
+      >
         <Sidebar aria-label={label} surface="plain" className="min-h-full w-full">
           {blocks.map((block) => renderBlock(block, true))}
         </Sidebar>
@@ -127,7 +152,10 @@ export default function DocsSidebar({ section, currentPath }: DocsSidebarProps) 
       <nav aria-label={label} className="px-4 pt-3 pb-1 md:px-6 lg:hidden">
         <SidebarGroup label={pick(docsMessages.tocLabel, locale)} defaultOpen={false}>
           {blocks.map((block) =>
-            renderBlock(block, block.entries.some((entry) => entry.current)),
+            renderBlock(
+              block,
+              block.entries.some((entry) => entry.current),
+            ),
           )}
         </SidebarGroup>
       </nav>

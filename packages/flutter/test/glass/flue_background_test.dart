@@ -196,7 +196,9 @@ void main() {
   });
 
   group('variants', () {
-    testWidgets('the sidebar variant tunes the sky palette and lays no tint', (WidgetTester tester) async {
+    testWidgets('the sidebar variant tunes the sky palette and veils it with thick glass in light', (
+      WidgetTester tester,
+    ) async {
       await pumpFlue(tester, variant: HoronFlueVariant.sidebar);
       final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
       final HoronFlueConfig config = state.resolvedConfig;
@@ -213,10 +215,10 @@ void main() {
         find.byWidgetPredicate(
           (Widget widget) =>
               widget is ColoredBox &&
-              widget.color == HoronTheme.of(tester.element(find.byType(HoronFlueBackground))).colors.glassRegular,
+              widget.color == HoronTheme.of(tester.element(find.byType(HoronFlueBackground))).colors.glassThick,
         ),
-        findsNothing,
-        reason: '사이드바 유리가 바탕을 채우므로 색조를 얹지 않습니다',
+        findsOneWidget,
+        reason: '연기가 사이드바 유리 채움보다 위에 그려지므로 라이트에서는 80% 유리를 직접 얹습니다',
       );
       await drain(tester);
     });
