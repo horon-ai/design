@@ -1,8 +1,9 @@
 /**
  * The docs section sidebar.
  *
- * Desktop (`lg` and up) is the library `Sidebar` as a sticky, self-scrolling
- * column: one `SidebarGroup` per block, one `SidebarItem` per entry. Below `lg`
+ * Desktop (`lg` and up) is the library `Sidebar` (plain surface, the layout's own
+ * color) fixed to the left edge under the header and scrolling on its own: one
+ * `SidebarGroup` per block, one `SidebarItem` per entry. Below `lg`
  * the same blocks collapse under a single `SidebarGroup` disclosure so the
  * navigation does not push the page title down.
  *
@@ -117,8 +118,8 @@ export default function DocsSidebar({ section, currentPath }: DocsSidebarProps) 
 
   return (
     <>
-      <div className="hidden lg:sticky lg:top-19 lg:block lg:h-dvh lg:shrink-0 lg:overflow-y-auto lg:pb-19">
-        <Sidebar aria-label={label} className="min-h-full lg:w-60">
+      <div className="hidden lg:fixed lg:top-19 lg:bottom-0 lg:left-0 lg:z-10 lg:block lg:w-60 lg:overflow-y-auto">
+        <Sidebar aria-label={label} surface="plain" className="min-h-full w-full">
           {blocks.map((block) => renderBlock(block, true))}
         </Sidebar>
       </div>
