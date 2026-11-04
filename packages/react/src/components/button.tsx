@@ -4,7 +4,7 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
-export type ButtonVariant = "primary" | "glass" | "danger" | "link";
+export type ButtonVariant = "primary" | "glass" | "solid" | "danger" | "link";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export type ButtonProps = Omit<ComponentProps<typeof BaseButton>, "className"> & {
@@ -26,12 +26,14 @@ const variantClass: Record<ButtonVariant, string> = {
     "bg-interactive-primary text-interactive-on-primary hover:not-data-disabled:bg-interactive-primary-hover active:not-data-disabled:bg-interactive-primary-pressed",
   glass:
     "overflow-clip bg-glass-clear text-text-primary hover:not-data-disabled:bg-glass-clear-hover active:not-data-disabled:bg-glass-clear-pressed",
+  solid:
+    "border border-border-default bg-bg-surface text-text-primary hover:not-data-disabled:bg-bg-subtle active:not-data-disabled:bg-interactive-secondary-hover",
   danger:
     "bg-interactive-danger text-interactive-on-danger hover:not-data-disabled:bg-interactive-danger-hover active:not-data-disabled:bg-interactive-danger-hover",
   link: "h-auto gap-1.5 rounded-sm px-1 text-label-sm text-text-secondary motion-colors hover:not-data-disabled:text-text-primary [&_svg]:size-3.5",
 };
 
-/** Figma `Button` (55:339): Primary, Glass and Danger in three sizes, plus a text-only `link` variant (size-independent). */
+/** Figma `Button` (55:339): Primary, Glass, Solid and Danger in three sizes, plus a text-only `link` variant (size-independent). */
 export function Button({ variant = "primary", size = "md", icon, className, children, ...props }: ButtonProps) {
   return (
     <BaseButton

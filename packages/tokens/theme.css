@@ -212,22 +212,13 @@
 }
 
 :root {
-  --glass-layer-opacity: 0.5;
-  --glass-tint: rgba(84, 84, 84, 0.1);
-  --glass-tint-blur: 45px;
-  --glass-inner-shade: rgba(0, 0, 0, 0.1);
-  --glass-inner-shade-blur: 4px;
-  --glass-inner-inset-ratio: 0.071429;
-  --glass-inner-inset-max-y: 6px;
-  --glass-inner-inset-max-x: 5px;
-  --glass-edge-dark: rgba(0, 0, 0, 0.8);
-  --glass-edge-dark-ratio: 0.047619;
-  --glass-edge-dark-max: 4px;
-  --glass-edge-light: rgba(255, 255, 255, 0.8);
-  --glass-edge-light-ratio: 0.017857;
-  --glass-edge-light-min: 0.75px;
-  --glass-edge-light-max: 1.5px;
-  --glass-edge-light-soft: rgba(255, 255, 255, 0.2);
+  --glass-blur: 20px;
+  --glass-saturate: 1.8;
+  --glass-rim-width: 1px;
+  --glass-rim-mid-stop: 50%;
+  --glass-rim-top: rgba(255, 255, 255, 0.7);
+  --glass-rim-mid: rgba(255, 255, 255, 0.12);
+  --glass-rim-bottom: rgba(255, 255, 255, 0.3);
   --paragraph-body-lg: 0.75em;
   --paragraph-body-md: 0.75em;
   --paragraph-body-sm: 0.75em;
@@ -334,15 +325,15 @@
   --color-interactive-primary-pressed: #d3d4d6;
   --color-interactive-secondary-hover: #434547;
   --color-status-live: #95b6ce;
-  --color-glass-clear: #17181a4d;
-  --color-glass-clear-hover: #17181a66;
-  --color-glass-clear-pressed: #17181a80;
+  --color-glass-clear: #ffffff1a;
+  --color-glass-clear-hover: #ffffff24;
+  --color-glass-clear-pressed: #ffffff2e;
   --color-glass-fill-frost: #17181ae5;
   --color-glass-fill-solid: #17181a;
-  --color-glass-regular: #17181a99;
+  --color-glass-regular: #ffffff24;
   --color-glass-rim: #ffffff14;
   --color-glass-rim-strong: #ffffff24;
-  --color-glass-thick: #17181acc;
+  --color-glass-thick: #ffffff33;
   --color-overlay-ink-10: #ffffff1a;
   --color-overlay-ink-12: #ffffff1f;
   --color-overlay-ink-14: #ffffff24;
@@ -384,4 +375,7 @@
   --color-glass-rim-frost: #ffffff1f;
   --color-bg-inset: #141518;
   --color-border-dashed: #4a4c4f;
+  --glass-rim-top: rgba(255, 255, 255, 0.22);
+  --glass-rim-mid: rgba(255, 255, 255, 0.04);
+  --glass-rim-bottom: rgba(255, 255, 255, 0.1);
 }

@@ -2,11 +2,20 @@ import { Popover } from "@base-ui/react/popover";
 import { CalendarBlank } from "@phosphor-icons/react";
 
 import { cn } from "../lib/cn";
+import type { ControlSize } from "../lib/size";
 import { Calendar, type CalendarProps, type DateRange } from "./calendar";
-import { fieldBoxClass } from "./input";
+import { fieldBoxClass, fieldSizeClass, fieldTextClass, type InputSurface } from "./input";
 import { LiquidGlass } from "./liquid-glass";
 
-export type DateFieldProps = CalendarProps & {
+export type DateFieldSize = ControlSize;
+export type DateFieldSurface = InputSurface;
+
+type WithoutCalendarSurface<T> = T extends unknown ? Omit<T, "size" | "surface"> : never;
+
+export type DateFieldProps = WithoutCalendarSurface<CalendarProps> & {
+  size?: DateFieldSize;
+  /** `solid` (default) on raised surfaces, `glass` over imagery and glass panels, `solid-on-page` directly on the page background. */
+  surface?: DateFieldSurface;
   placeholder?: string;
   invalid?: boolean;
   disabled?: boolean;
@@ -27,8 +36,10 @@ function defaultFormat(value: Date | DateRange, locale?: string): string {
   return `${start} – ${withYear.format(value.end)}`;
 }
 
-/** Figma `Date field` (60:244): a 280px glass field that opens the calendar. */
+/** Figma `Date field` (60:244): a 280px field that opens the calendar, in three sizes and two surfaces. */
 export function DateField({
+  size = "md",
+  surface = "solid",
   placeholder = "Pick a date",
   invalid,
   disabled,
@@ -45,19 +56,21 @@ export function DateField({
         aria-invalid={invalid || undefined}
         className={cn(
           fieldBoxClass.base,
-          fieldBoxClass.glass,
-          "h-10 w-70 cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed",
+          fieldBoxClass[surface],
+          fieldSizeClass[size],
+          "w-70 cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed",
           triggerClassName,
         )}
         data-invalid={invalid ? "" : undefined}
       >
-        <LiquidGlass tier="regular" />
-        <span className="relative flex shrink-0 text-text-secondary [&_svg]:size-4">
+        {surface === "glass" && <LiquidGlass />}
+        <span className="relative flex shrink-0 text-text-secondary">
           <CalendarBlank />
         </span>
         <span
           className={cn(
-            "relative min-w-0 flex-1 truncate text-body-md",
+            "relative min-w-0 flex-1 truncate",
+            fieldTextClass[size],
             disabled ? "text-text-disabled" : text ? "text-text-primary" : "text-text-placeholder",
           )}
         >
@@ -67,7 +80,7 @@ export function DateField({
       <Popover.Portal>
         <Popover.Positioner sideOffset={8} align="start">
           <Popover.Popup className="motion-popup">
-            <Calendar {...calendar} />
+            <Calendar {...calendar} size={size} surface={surface === "glass" ? "glass" : "solid"} />
           </Popover.Popup>
         </Popover.Positioner>
       </Popover.Portal>

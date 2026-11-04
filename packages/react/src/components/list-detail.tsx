@@ -24,12 +24,14 @@ export type ListDetailProps = Omit<ComponentProps<"div">, "className" | "childre
   onValueChange?: (id: string) => void;
   /** Renders the detail pane for the selected item. */
   children: (item: ListDetailItem) => ReactNode;
+  /** `solid` (default) is an opaque surface shell with a default border; `glass` is the thick glass shell. */
+  surface?: "solid" | "glass";
   className?: string;
 };
 
 /**
- * Paper `List and detail` (1W6P-0): a 16px-radius thick-glass shell with a 250px list on an inset surface
- * and a detail pane. Selecting a row fills it in 150ms and swaps the detail with a short rise.
+ * Paper `List and detail` (1W6P-0): a 16px-radius shell, solid or thick glass, with a 250px list on an inset
+ * surface and a detail pane. Selecting a row fills it in 150ms and swaps the detail with a short rise.
  */
 export function ListDetail({
   groups,
@@ -37,6 +39,7 @@ export function ListDetail({
   defaultValue,
   onValueChange,
   children,
+  surface = "solid",
   className,
   ...props
 }: ListDetailProps) {
@@ -46,10 +49,14 @@ export function ListDetail({
   const selected = all.find((item) => item.id === selectedId) ?? all[0];
   return (
     <div
-      className={cn("relative flex w-full max-w-201.5 overflow-clip rounded-2xl bg-glass-thick", className)}
+      className={cn(
+        "relative flex w-full max-w-201.5 overflow-clip rounded-2xl",
+        surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
+        className,
+      )}
       {...props}
     >
-      <LiquidGlass tier="thick" />
+      {surface === "glass" && <LiquidGlass />}
       <div
         role="listbox"
         aria-label="Items"

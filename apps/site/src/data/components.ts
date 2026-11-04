@@ -28,13 +28,13 @@ export const components: ComponentEntry[] = [
     slug: "button",
     title: "Button",
     group: "inputs",
-    description: "동작을 실행하는 버튼입니다. Primary, Glass, Danger, Link 변형과 세 크기가 있습니다.",
+    description: "동작을 실행하는 버튼입니다. Primary, Glass, Solid, Danger, Link 변형과 세 크기가 있습니다.",
   },
   {
     slug: "icon-button",
     title: "Icon Button",
     group: "inputs",
-    description: "아이콘 하나로 동작을 실행하는 원형 버튼입니다.",
+    description: "아이콘 하나로 동작을 실행하는 원형 버튼입니다. Glass와 Solid 표면이 있습니다.",
   },
   {
     slug: "input",
@@ -46,7 +46,7 @@ export const components: ComponentEntry[] = [
     slug: "textarea",
     title: "Textarea",
     group: "inputs",
-    description: "여러 줄 텍스트를 입력받습니다.",
+    description: "여러 줄 텍스트를 입력받습니다. 유리(Glass)와 불투명(Solid) 표면을 고릅니다.",
   },
   {
     slug: "field",
@@ -64,7 +64,7 @@ export const components: ComponentEntry[] = [
     slug: "input-group",
     title: "Input Group",
     group: "inputs",
-    description: "입력 앞뒤에 선택 영역과 아이콘을 붙여 하나로 묶습니다.",
+    description: "입력 앞뒤에 국가 코드, 통화 같은 선택 칸(Select 또는 Combobox)을 붙여 하나로 묶습니다.",
   },
   {
     slug: "select",
@@ -72,6 +72,12 @@ export const components: ComponentEntry[] = [
     group: "inputs",
     description: "목록에서 하나를 고르는 드롭다운입니다.",
     overlay: true,
+  },
+  {
+    slug: "combobox",
+    title: "Combobox",
+    group: "inputs",
+    description: "입력해서 목록을 좁힌 뒤 고르는 검색 선택입니다. 하나만 또는 여러 개를 고를 수 있습니다.",
   },
   {
     slug: "checkbox",
@@ -101,7 +107,7 @@ export const components: ComponentEntry[] = [
     slug: "chip",
     title: "Chip",
     group: "inputs",
-    description: "필터처럼 눌러서 켜고 끄는 유리 칩입니다.",
+    description: "필터처럼 눌러서 켜고 끄는 불투명 칩입니다.",
   },
   {
     slug: "segmented-control",

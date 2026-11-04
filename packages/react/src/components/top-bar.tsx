@@ -15,10 +15,12 @@ export type TopBarProps = Omit<ComponentProps<"header">, "className" | "title"> 
   onMore?: () => void;
   backLabel?: string;
   moreLabel?: string;
+  /** `solid` (default) is an opaque surface bar with a default border; `glass` is the regular glass bar. */
+  surface?: "solid" | "glass";
   className?: string;
 };
 
-/** Paper `Top bar`: back button, bot avatar with a flush live dot, title and subtitle, more button on regular glass. */
+/** Paper `Top bar`: back button, bot avatar with a flush live dot, title and subtitle, on solid surface or regular glass. */
 export function TopBar({
   title,
   subtitle,
@@ -27,15 +29,20 @@ export function TopBar({
   onMore,
   backLabel = "Back",
   moreLabel = "More",
+  surface = "solid",
   className,
   ...props
 }: TopBarProps) {
   return (
     <header
-      className={cn("relative z-10 flex items-center gap-2 overflow-clip rounded-full bg-glass-regular p-2", className)}
+      className={cn(
+        "relative z-10 flex items-center gap-2 overflow-clip rounded-full p-2",
+        surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
+        className,
+      )}
       {...props}
     >
-      <LiquidGlass tier="regular" />
+      {surface === "glass" && <LiquidGlass />}
       <IconButton icon={<CaretLeft />} label={backLabel} onClick={onBack} />
       <span className="relative inline-flex shrink-0">
         <Avatar type="bot" size="md" />

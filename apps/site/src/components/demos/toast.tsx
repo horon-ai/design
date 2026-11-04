@@ -1,5 +1,7 @@
 import { Button, Toaster, useToast } from "@horon-ai/react";
 
+const copy = { title: "Saved", description: "The routine runs every morning at 8." };
+
 function Triggers() {
   const toast = useToast();
   return (
@@ -34,10 +36,32 @@ function Triggers() {
   );
 }
 
+function SizeTrigger({ label }: { label: string }) {
+  const toast = useToast();
+  return (
+    <Button variant="glass" onClick={() => toast.add(copy)}>
+      {label}
+    </Button>
+  );
+}
+
 export default function ToastDemo() {
   return (
-    <Toaster>
-      <Triggers />
-    </Toaster>
+    <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <Toaster size="sm" surface="glass">
+          <SizeTrigger label="Small glass toast" />
+        </Toaster>
+        <Toaster size="md" surface="glass">
+          <SizeTrigger label="Default glass toast" />
+        </Toaster>
+        <Toaster size="lg" surface="glass">
+          <SizeTrigger label="Large glass toast" />
+        </Toaster>
+      </div>
+      <Toaster>
+        <Triggers />
+      </Toaster>
+    </div>
   );
 }
