@@ -28,7 +28,7 @@ export type ApprovalCardProps = {
 const statusClass: Record<ApprovalState, { dot: string; text: string; label: string }> = {
   pending: { dot: "bg-status-live", text: "text-text-brand", label: "Needs your yes" },
   approved: { dot: "bg-text-secondary", text: "text-text-secondary", label: "Approved" },
-  declined: { dot: "bg-text-danger", text: "text-text-danger", label: "Declined" },
+  declined: { dot: "bg-accent-red-500-90", text: "text-text-danger", label: "Declined" },
 };
 
 /**
@@ -51,7 +51,7 @@ export function ApprovalCard({
   return (
     <div
       className={cn(
-        "relative flex w-90 flex-col items-start gap-3 overflow-clip rounded-xl p-4 motion-colors",
+        "relative flex w-90 flex-col items-start overflow-clip rounded-xl p-4 motion-colors",
         surface === "glass"
           ? cn("bg-glass-thick", state === "pending" && "[--glass-edge:var(--color-border-brand)]")
           : cn("border border-border-default bg-bg-surface", state === "pending" && "border-border-brand"),
@@ -59,27 +59,31 @@ export function ApprovalCard({
       )}
     >
       {surface === "glass" && <LiquidGlass />}
-      <div className={cn("relative flex items-center gap-1.5 text-label-sm", tone.text)}>
-        <span aria-hidden className={cn("size-2 rounded-full", tone.dot)} />
-        {status ?? tone.label}
+      <div className={cn("relative flex items-center gap-1.5 text-label-sm motion-colors", tone.text)}>
+        <span aria-hidden className={cn("size-2 rounded-full motion-colors", tone.dot)} />
+        <span key={state} className="animate-fade-in">
+          {status ?? tone.label}
+        </span>
       </div>
-      <p className="relative text-label-lg text-text-primary">{title}</p>
+      <p className="relative mt-3 text-label-lg text-text-primary">{title}</p>
       {attachment && (
-        <div className="relative flex items-center gap-2 rounded-md bg-overlay-ink-5 px-3 py-2 text-body-sm text-text-primary">
+        <div className="relative mt-3 flex items-center gap-2 rounded-md bg-overlay-ink-5 px-3 py-2 text-body-sm text-text-primary">
           <Paperclip aria-hidden className="size-3.5 text-text-secondary" />
           {attachment}
         </div>
       )}
-      {state === "pending" && (
-        <div className="relative flex w-full justify-end gap-2">
-          <Button size="sm" variant={surface === "glass" ? "glass" : "solid"} onClick={onLater}>
-            {laterLabel}
-          </Button>
-          <Button size="sm" onClick={onApprove}>
-            {approveLabel}
-          </Button>
+      <div className="motion-reveal w-full" data-collapsed={state !== "pending" || undefined}>
+        <div>
+          <div className="flex w-full justify-end gap-2 pt-3" inert={state !== "pending"}>
+            <Button size="sm" variant={surface === "glass" ? "glass" : "solid"} onClick={onLater}>
+              {laterLabel}
+            </Button>
+            <Button size="sm" onClick={onApprove}>
+              {approveLabel}
+            </Button>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
