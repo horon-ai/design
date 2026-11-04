@@ -35,77 +35,73 @@ const groups = [
   { id: "paused", label: "PAUSED", items: [{ id: "digest", title: "Inbox digest", meta: "Paused" }] },
 ];
 
+function Detail({ surface }: { surface: "solid" | "glass" }) {
+  const buttonVariant = surface === "glass" ? "glass" : "solid";
+  return (
+    <ListDetail surface={surface} defaultValue="weekly" groups={groups}>
+      {(item) => (
+        <>
+          <ListDetailHeader
+            icon={<Sparkle weight="fill" />}
+            title={item.title}
+            description="Runs on a schedule and reports back in chat."
+            actions={
+              <>
+                <span className="text-[13px]/[18px] font-medium text-text-secondary">Enabled</span>
+                <Switch aria-label="Enabled" defaultChecked />
+                <IconButton size="sm" variant="ghost" label="More" icon={<DotsThree weight="bold" />} />
+              </>
+            }
+          />
+          <ListDetailMeta
+            items={[
+              { id: "trigger", label: "Trigger", value: "Schedule" },
+              { id: "last", label: "Last run", value: "2 days ago" },
+              { id: "runs", label: "Runs", value: "48" },
+              { id: "owner", label: "Owner", value: "You" },
+            ]}
+          />
+          <ListDetailInstructions tag="SKILL.md" defaultValue={instructions} />
+          <ListDetailFiles>
+            <Button variant={buttonVariant} size="sm" icon={<FileText />}>
+              template.md
+            </Button>
+            <Button variant={buttonVariant} size="sm" icon={<FileText />}>
+              projects.json
+            </Button>
+          </ListDetailFiles>
+          <ListDetailFooter>
+            <Button variant={buttonVariant} size="sm">
+              Duplicate
+            </Button>
+            <Button variant={buttonVariant} size="sm">
+              Export
+            </Button>
+            <span className="flex-1" />
+            <Button variant={buttonVariant} size="sm" icon={<Trash className="text-interactive-danger" />}>
+              Delete
+            </Button>
+          </ListDetailFooter>
+        </>
+      )}
+    </ListDetail>
+  );
+}
+
 export default function ListDetailDemo() {
   return (
-    <div className="flex w-full flex-col items-center gap-6">
-      <Backdrop>
-        <ListDetail surface="glass" defaultValue="weekly" groups={groups}>
-          {(item) => (
-            <>
-              <ListDetailHeader
-                icon={<Sparkle weight="fill" />}
-                title={item.title}
-                description="Runs on a schedule and reports back in chat."
-                actions={
-                  <>
-                    <span className="text-[13px]/[18px] font-medium text-text-secondary">Enabled</span>
-                    <Switch aria-label="Enabled" defaultChecked />
-                    <IconButton size="sm" variant="ghost" label="More" icon={<DotsThree weight="bold" />} />
-                  </>
-                }
-              />
-              <ListDetailMeta
-                items={[
-                  { id: "trigger", label: "Trigger", value: "Schedule" },
-                  { id: "last", label: "Last run", value: "2 days ago" },
-                  { id: "runs", label: "Runs", value: "48" },
-                  { id: "owner", label: "Owner", value: "You" },
-                ]}
-              />
-              <ListDetailInstructions tag="SKILL.md" defaultValue={instructions} />
-              <ListDetailFiles>
-                <Button variant="glass" size="sm" icon={<FileText />}>
-                  template.md
-                </Button>
-                <Button variant="glass" size="sm" icon={<FileText />}>
-                  projects.json
-                </Button>
-              </ListDetailFiles>
-              <ListDetailFooter>
-                <Button variant="glass" size="sm">
-                  Duplicate
-                </Button>
-                <Button variant="glass" size="sm">
-                  Export
-                </Button>
-                <span className="flex-1" />
-                <Button variant="glass" size="sm" icon={<Trash className="text-interactive-danger" />}>
-                  Delete
-                </Button>
-              </ListDetailFooter>
-            </>
-          )}
-        </ListDetail>
-      </Backdrop>
-      <div className="w-full max-w-201.5 rounded-2xl bg-bg-default p-4">
-        <ListDetail defaultValue="weekly" groups={groups}>
-          {(item) => (
-            <>
-              <ListDetailHeader
-                icon={<Sparkle weight="fill" />}
-                title={item.title}
-                description="Runs on a schedule and reports back in chat."
-                actions={<Switch aria-label="Enabled" defaultChecked />}
-              />
-              <ListDetailMeta
-                items={[
-                  { id: "trigger", label: "Trigger", value: "Schedule" },
-                  { id: "last", label: "Last run", value: "2 days ago" },
-                ]}
-              />
-            </>
-          )}
-        </ListDetail>
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex flex-col gap-3">
+        <p className="text-caption text-text-secondary">Solid</p>
+        <div className="flex w-full justify-center">
+          <Detail surface="solid" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <p className="text-caption text-text-secondary">Glass</p>
+        <Backdrop>
+          <Detail surface="glass" />
+        </Backdrop>
       </div>
     </div>
   );

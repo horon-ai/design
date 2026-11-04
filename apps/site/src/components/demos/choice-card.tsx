@@ -1,28 +1,21 @@
 import { ChoiceCard, RadioGroup } from "@horon-ai/react";
 
-import { Backdrop } from "../demo-backdrop";
-
 export default function ChoiceCardDemo() {
   return (
-    <Backdrop>
-      <RadioGroup aria-label="Plan" defaultValue="auto" className="flex-row flex-wrap gap-4">
-        <ChoiceCard
-          surface="glass"
-          value="auto"
-          title="Automatic"
-          description="Horon drafts and sends within your rules."
-        />
-        <ChoiceCard
-          surface="glass"
-          value="review"
-          title="Review first"
-          description="Every draft waits for your approval."
-        />
-      </RadioGroup>
-      <RadioGroup aria-label="Plan, solid" defaultValue="auto" className="flex-row flex-wrap gap-4">
-        <ChoiceCard value="auto" title="Automatic" description="Horon drafts and sends within your rules." />
-        <ChoiceCard value="review" title="Review first" description="Every draft waits for your approval." />
-      </RadioGroup>
-    </Backdrop>
+    <RadioGroup aria-label="Plan" defaultValue="auto" className="flex-row flex-wrap justify-center gap-4">
+      <ChoiceCard
+        value="auto"
+        title="Automatic"
+        description="Horon drafts and sends within your rules."
+        badge="Recommended"
+      />
+      <ChoiceCard value="review" title="Review first" description="Every draft waits for your approval." />
+      <ChoiceCard
+        value="manual"
+        title="Manual only"
+        description="Nothing leaves until you send it yourself."
+        disabled
+      />
+    </RadioGroup>
   );
 }

@@ -11,18 +11,40 @@ const bots: ComboboxItemData[] = [
   { value: "recruiter", label: "Recruiter", disabled: true },
 ];
 
+function Examples({ surface }: { surface: "solid" | "glass" }) {
+  return (
+    <div className="flex w-full flex-col items-center gap-3">
+      <div className="flex flex-wrap items-end justify-center gap-3">
+        <Combobox aria-label="Bot" items={bots} surface={surface} size="sm" placeholder="Small" />
+        <Combobox aria-label="Bot" items={bots} surface={surface} placeholder="Medium" />
+        <Combobox aria-label="Bot" items={bots} surface={surface} size="lg" placeholder="Large" />
+      </div>
+      <Combobox aria-label="Bot" items={bots} surface={surface} placeholder="Search a bot" defaultValue="writer" />
+      <Combobox
+        aria-label="Bots"
+        items={bots}
+        surface={surface}
+        multiple
+        placeholder="Add bots"
+        defaultValue={["chief", "triage"]}
+      />
+      <Combobox aria-label="Bots" items={bots} surface={surface} multiple placeholder="Add bots" />
+      <Combobox aria-label="Bot" items={bots} surface={surface} invalid placeholder="Search a bot" />
+    </div>
+  );
+}
+
 export default function ComboboxDemo() {
   return (
-    <Backdrop className="flex-col">
-      <div className="flex flex-wrap items-end justify-center gap-3">
-        <Combobox aria-label="Bot" items={bots} size="sm" placeholder="Small" />
-        <Combobox aria-label="Bot" items={bots} placeholder="Medium" />
-        <Combobox aria-label="Bot" items={bots} size="lg" placeholder="Large" />
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex w-full flex-col gap-4">
+        <p className="text-caption text-text-secondary">Solid</p>
+        <Examples surface="solid" />
       </div>
-      <Combobox aria-label="Bot" items={bots} placeholder="Search a bot" defaultValue="writer" />
-      <Combobox aria-label="Bots" items={bots} multiple placeholder="Add bots" defaultValue={["chief", "triage"]} />
-      <Combobox aria-label="Bots" items={bots} multiple surface="glass" placeholder="Add bots" />
-      <Combobox aria-label="Bot" items={bots} invalid placeholder="Search a bot" />
-    </Backdrop>
+      <Backdrop className="flex-col">
+        <p className="text-caption text-text-secondary">Glass</p>
+        <Examples surface="glass" />
+      </Backdrop>
+    </div>
   );
 }
