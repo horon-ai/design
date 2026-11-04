@@ -1,4 +1,8 @@
+import 'dart:ui' show CheckedState;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
@@ -25,6 +29,15 @@ List<Size> _containerSizes(WidgetTester tester, int index) => <Size>[
       in find.descendant(of: find.byType(HoronRadio).at(index), matching: find.byType(Container)).evaluate())
     (element.renderObject! as RenderBox).size,
 ];
+
+/// 라디오 하나가 키보드 포커스를 가졌는지 봅니다.
+///
+/// `HoronRadio`는 포커스 노드를 직접 들고 있으므로 가장 바깥 `Focus`의 노드를
+/// 봅니다.
+bool _hasFocus(WidgetTester tester, int index) => tester
+    .widget<Focus>(find.descendant(of: find.byType(HoronRadio).at(index), matching: find.byType(Focus)).first)
+    .focusNode!
+    .hasFocus;
 
 Widget _group({required String? value, ValueChanged<String>? onValueChange, bool secondEnabled = true}) {
   return HoronRadioGroup(
@@ -83,7 +96,7 @@ void main() {
     await tester.tap(find.byType(HoronRadio).at(0));
     await tester.pumpAndSettle();
 
-    expect(changes, <String>['yearly', 'monthly'], reason: '각 라디오는 자기 값을 올립니다');
+    expect(changes, <String>['yearly'], reason: '이미 선택된 라디오를 다시 눌러도 콜백을 부르지 않습니다');
   });
 
   testWidgets('a disabled radio dims and does not report', (WidgetTester tester) async {
@@ -130,5 +143,81 @@ void main() {
       expect(tester.takeException(), isNull, reason: '폭 $width에서 예외가 없어야 합니다');
       expect(tester.getSize(_circle(0)).width, 20, reason: '원은 라벨 길이에 영향받지 않습니다');
     }
+  });
+
+  testWidgets('Tab enters only the selected radio', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(_group(value: 'yearly', onValueChange: (_) {})));
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+
+    expect(_hasFocus(tester, 1), isTrue, reason: 'Tab은 선택된 라디오 하나에만 들어갑니다');
+    expect(_hasFocus(tester, 0), isFalse, reason: '선택되지 않은 라디오는 탭 순서에서 건너뜁니다');
+  });
+
+  testWidgets('arrow keys move selection and focus and wrap', (WidgetTester tester) async {
+    final List<String> changes = <String>[];
+    await tester.pumpWidget(_host(_group(value: 'monthly', onValueChange: changes.add)));
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+    expect(_hasFocus(tester, 0), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(changes, <String>['yearly'], reason: '아래 화살표는 다음 라디오를 고릅니다');
+    expect(_hasFocus(tester, 1), isTrue, reason: '선택과 포커스가 함께 움직입니다');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(changes, <String>['yearly', 'monthly'], reason: '마지막 다음은 처음으로 돌아옵니다');
+    expect(_hasFocus(tester, 0), isTrue, reason: '순환이 포커스에도 적용됩니다');
+  });
+
+  testWidgets('Space selects the focused radio', (WidgetTester tester) async {
+    final List<String> changes = <String>[];
+    await tester.pumpWidget(_host(_group(value: 'monthly', onValueChange: changes.add)));
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(changes, <String>['yearly']);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.pumpAndSettle();
+    expect(changes, <String>['yearly', 'yearly'], reason: 'Space는 포커스된 라디오의 값을 올립니다');
+  });
+
+  testWidgets('re-tapping the selected radio does not report again', (WidgetTester tester) async {
+    final List<String> changes = <String>[];
+    await tester.pumpWidget(_host(_group(value: 'monthly', onValueChange: changes.add)));
+
+    await tester.tap(find.byType(HoronRadio).at(0));
+    await tester.pumpAndSettle();
+
+    expect(changes, isEmpty, reason: '이미 선택된 라디오를 다시 눌러도 콜백을 부르지 않습니다');
+  });
+
+  testWidgets('a group without onValueChange ignores arrow keys', (WidgetTester tester) async {
+    final HoronColors colors = HoronThemeData.light.colors;
+    await tester.pumpWidget(_host(_group(value: 'monthly')));
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(_hasFocus(tester, 0), isFalse, reason: '콜백이 없는 그룹의 라디오는 활성 상태가 아닙니다');
+    expect(_circleDecoration(tester, 0).color, colors.interactivePrimary, reason: '콜백 없는 그룹은 선택을 옮기지 않습니다');
+    expect(_circleDecoration(tester, 1).color, colors.bgSurface, reason: '화살표가 값을 바꾸지 않습니다');
+  });
+
+  testWidgets('the label is the accessible name of the checked radio', (WidgetTester tester) async {
+    final SemanticsHandle handle = tester.ensureSemantics();
+    await tester.pumpWidget(_host(_group(value: 'yearly', onValueChange: (_) {})));
+
+    final SemanticsNode node = tester.getSemantics(find.byType(HoronRadio).at(1));
+    expect(node.label, contains('연간 결제'));
+    expect(node.flagsCollection.isChecked, CheckedState.isTrue, reason: '선택된 라디오는 checked 상태로 읽힙니다');
+    handle.dispose();
   });
 }

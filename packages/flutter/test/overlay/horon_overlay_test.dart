@@ -223,4 +223,76 @@ void main() {
       expect(find.byKey(panelKey), findsNothing);
     });
   });
+
+  group('a flipped panel mirrors the main-axis offset', () {
+    testWidgets('a bottom request that flips above keeps the requested distance', (WidgetTester tester) async {
+      await pumpOverlay(
+        tester,
+        position: const HoronOverlayPosition(offset: Offset(0, 40)),
+        triggerTopLeft: const Offset(150, 740),
+        size: const Size(120, 200),
+      );
+
+      final Rect trigger = tester.getRect(find.byKey(triggerKey));
+      final Rect panel = tester.getRect(find.byKey(panelKey));
+
+      expect(panel.bottom, lessThanOrEqualTo(trigger.top + 0.01));
+      expect(panel.bottom, closeTo(trigger.top - HoronOverlayPosition.gap - 40, 0.51));
+    });
+
+    testWidgets('a right request that flips left keeps the requested distance', (WidgetTester tester) async {
+      await pumpOverlay(
+        tester,
+        position: const HoronOverlayPosition(side: HoronOverlaySide.right, offset: Offset(40, 0)),
+        triggerTopLeft: const Offset(290, 350),
+        size: const Size(200, 60),
+      );
+
+      final Rect trigger = tester.getRect(find.byKey(triggerKey));
+      final Rect panel = tester.getRect(find.byKey(panelKey));
+
+      expect(panel.right, lessThanOrEqualTo(trigger.left + 0.01));
+      expect(panel.right, closeTo(trigger.left - HoronOverlayPosition.gap - 40, 0.51));
+    });
+  });
+
+  group('HoronOverlayBody', () {
+    testWidgets('places a panel from an anchor rect', (WidgetTester tester) async {
+      const Key bodyPanelKey = Key('body-panel');
+      final LayerLink link = LayerLink();
+      const Rect anchor = Rect.fromLTWH(100, 200, 80, 40);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Stack(
+              children: <Widget>[
+                Positioned(
+                  left: anchor.left,
+                  top: anchor.top,
+                  child: CompositedTransformTarget(link: link, child: const SizedBox(width: 80, height: 40)),
+                ),
+                HoronOverlayBody(
+                  link: link,
+                  anchor: anchor,
+                  screen: const Size(400, 800),
+                  safeArea: EdgeInsets.zero,
+                  position: const HoronOverlayPosition(),
+                  panelBuilder: (BuildContext context, HoronOverlayPlacement placement) =>
+                      const SizedBox(key: bodyPanelKey, width: 60, height: 30),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      // 첫 프레임에 패널 크기를 재고, 다음 프레임에 그 크기로 배치를 다시 계산합니다.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+
+      final Rect panel = tester.getRect(find.byKey(bodyPanelKey));
+      expect(panel.left, closeTo(anchor.left, 0.01));
+      expect(panel.top, closeTo(anchor.bottom + HoronOverlayPosition.gap, 0.51));
+    });
+  });
 }

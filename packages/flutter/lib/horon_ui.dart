@@ -96,6 +96,7 @@ export 'src/glass/glass_geometry.dart';
 export 'src/glass/glass_shader.dart';
 export 'src/glass/horon_glass.dart';
 export 'src/glass/horon_surface.dart';
+export 'src/overlay/horon_menu_anchor.dart';
 export 'src/overlay/horon_modal.dart';
 export 'src/overlay/horon_overlay.dart';
 export 'src/theme/horon_fonts.dart';
