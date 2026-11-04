@@ -14,10 +14,15 @@ Widget _host(Widget child, {Brightness brightness = Brightness.light, double wid
 
 HoronThemeData _theme(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronTabs)));
 
-Widget _tabs({ValueChanged<String>? onChanged, bool logsEnabled = true}) => HoronTabs(
+Widget _tabs({
+  ValueChanged<String>? onChanged,
+  bool logsEnabled = true,
+  HoronTabsListVariant variant = HoronTabsListVariant.pill,
+}) => HoronTabs(
   onChanged: onChanged,
   children: <Widget>[
     HoronTabsList(
+      variant: variant,
       children: <Widget>[
         const HoronTabsTab(value: 'overview', label: '개요와 통계', icon: Icon(Icons.dashboard_outlined), count: 4),
         const HoronTabsTab(value: 'members', label: '멤버 관리'),
@@ -144,6 +149,45 @@ void main() {
     await tester.pump();
     expect(changes, isEmpty);
     expect(find.text('개요 패널'), findsOneWidget);
+  });
+
+  testWidgets('the underline variant drops the tray and draws a 2px primary bar', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(_tabs(variant: HoronTabsListVariant.underline)));
+    await tester.pump();
+    await tester.pump();
+    final HoronThemeData theme = _theme(tester);
+
+    Finder bar() => find.descendant(
+      of: find.byType(HoronTabsList),
+      matching: find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is DecoratedBox &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration as BoxDecoration).color == theme.colors.textPrimary &&
+            (widget.decoration as BoxDecoration).borderRadius == null,
+      ),
+    );
+    expect(bar(), findsOneWidget, reason: '선택 탭 아래 2px 표시자');
+    expect(tester.getSize(bar()).height, 2, reason: 'h-0.5');
+    expect(
+      find.descendant(
+        of: find.byType(HoronTabsList),
+        matching: find.byWidgetPredicate(
+          (Widget widget) =>
+              widget is DecoratedBox &&
+              widget.decoration is BoxDecoration &&
+              (widget.decoration as BoxDecoration).border?.bottom.color == theme.colors.borderDefault,
+        ),
+      ),
+      findsOneWidget,
+      reason: 'border-b border-border-default',
+    );
+    expect(_indicator(theme.colors), findsNothing, reason: '쟁반과 알약 표시자는 쓰지 않습니다');
+
+    final AnimatedContainer tab = tester.widget<AnimatedContainer>(
+      find.ancestor(of: find.text('개요와 통계'), matching: find.byType(AnimatedContainer)).first,
+    );
+    expect(tab.padding, EdgeInsets.symmetric(horizontal: 0, vertical: theme.space.s2_5), reason: 'underline은 px-0');
   });
 
   testWidgets('narrow widths wrap the tab strip instead of clipping it', (WidgetTester tester) async {

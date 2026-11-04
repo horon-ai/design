@@ -5,9 +5,9 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `mcp_server_row` 갤러리 섹션입니다.
 ///
-/// 변형 어휘가 없으므로 상태를 늘어놓습니다. 태그와 메타가 있는 기본형, 브랜드 태그와
-/// 두 액션이 있는 행, 설명이 없는 최소형, 그리고 폭이 좁을 때 액션이 아래로 내려가는
-/// 모습입니다.
+/// 변형 어휘가 상태 색뿐이므로 상태를 늘어놓습니다. 태그와 메타가 있는 기본형, 브랜드
+/// 태그와 두 액션이 있는 행, 설명이 없는 최소형, 경고·중립 상태 색, 그리고 폭이 좁을
+/// 때 액션이 아래로 내려가는 모습입니다.
 class HoronMcpServerRowGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronMcpServerRowGallerySection({super.key});
@@ -60,6 +60,26 @@ class HoronMcpServerRowGallerySection extends StatelessWidget {
                 child: const HoronMcpServerRow(
                   name: 'linear',
                   statusLabel: '연결됨',
+                ),
+              ),
+              _Cell(
+                label: '경고 상태 · warning',
+                width: wide,
+                child: const HoronMcpServerRow(
+                  name: 'sentry',
+                  description: '토큰이 만료되어 다시 연결해야 합니다',
+                  statusLabel: 'Needs attention',
+                  statusTone: HoronMcpServerStatusTone.warning,
+                ),
+              ),
+              _Cell(
+                label: '중립 상태 · neutral',
+                width: wide,
+                child: const HoronMcpServerRow(
+                  name: 'figma',
+                  description: '워크스페이스에서 꺼 두었습니다',
+                  statusLabel: 'Paused',
+                  statusTone: HoronMcpServerStatusTone.neutral,
                 ),
               ),
               _Cell(

@@ -26,6 +26,15 @@ enum HoronTabsSize {
   lg,
 }
 
+/// `tabs.tsx`의 `TabsListVariant`입니다.
+enum HoronTabsListVariant {
+  /// `variant="pill"` — 유리 쟁반 위의 알약 탭입니다. 기본값입니다.
+  pill,
+
+  /// `variant="underline"` — 쟁반 없이 아래 1px 경계와 2px 표시자만 두는 문서형 목록입니다.
+  underline,
+}
+
 typedef _TabMetrics = ({
   double paddingY,
   double plainPaddingX,
@@ -181,12 +190,20 @@ class _TabsScope extends InheritedWidget {
 /// 같은 일을 합니다. 좁은 폭에서는 탭이 다음 줄로 넘어가고 표시자도 그 줄을 따라갑니다.
 class HoronTabsList extends StatefulWidget {
   /// 탭 목록을 만듭니다.
-  const HoronTabsList({super.key, required this.children, this.surface = HoronSurface.solid});
+  const HoronTabsList({
+    super.key,
+    required this.children,
+    this.variant = HoronTabsListVariant.pill,
+    this.surface = HoronSurface.solid,
+  });
 
   /// [HoronTabsTab] 목록입니다.
   final List<Widget> children;
 
-  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  /// 목록의 모양입니다. [HoronTabsListVariant.underline]는 쟁반과 표면을 쓰지 않습니다.
+  final HoronTabsListVariant variant;
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다. `underline`에서는 쓰지 않습니다.
   final HoronSurface surface;
 
   @override
@@ -214,41 +231,75 @@ class _HoronTabsListState extends State<HoronTabsList> {
     );
     WidgetsBinding.instance.addPostFrameCallback((Duration _) => _measure(activeIndex));
 
-    return HoronSurfaceLayer(
-      surface: widget.surface,
-      tier: HoronGlassTier.regular,
-      borderRadius: BorderRadius.circular(theme.radius.full),
-      child: Padding(
-        padding: EdgeInsets.all(space.s1), // p-1
-        child: Stack(
-          children: <Widget>[
-            if (_indicator != null)
-              AnimatedPositioned(
-                // motion-indicator — 선택이 옮겨 갈 때만 280ms로 미끄러집니다.
-                duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.indicatorDuration,
-                curve: HoronMotion.indicatorCurve,
-                left: _indicator!.left,
-                top: _indicator!.top,
-                width: _indicator!.width,
-                height: _indicator!.height,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: colors.overlayInk10, // bg-overlay-ink-10
-                    borderRadius: BorderRadius.circular(theme.radius.full),
+    final Widget track = Wrap(
+      key: _track,
+      spacing: space.s6, // gap-6
+      runSpacing: space.s1,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: <Widget>[
+        for (int index = 0; index < widget.children.length; index++)
+          KeyedSubtree(key: _keys[index], child: widget.children[index]),
+      ],
+    );
+
+    if (widget.variant == HoronTabsListVariant.underline) {
+      // `variant="underline"`: 쟁반 없이 아래 1px 경계를 두고, 그 위에 2px 표시자가 미끄러집니다.
+      return _TabsVariantScope(
+        variant: widget.variant,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: colors.borderDefault)),
+          ), // border-b
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              if (_indicator != null)
+                AnimatedPositioned(
+                  duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.indicatorDuration,
+                  curve: HoronMotion.indicatorCurve,
+                  left: _indicator!.left,
+                  width: _indicator!.width,
+                  // `-bottom-px h-0.5`: 경계를 1px 넘어 아래로 걸칩니다.
+                  bottom: -1,
+                  height: 2,
+                  child: DecoratedBox(decoration: BoxDecoration(color: colors.textPrimary)), // bg-text-primary
+                ),
+              track,
+            ],
+          ),
+        ),
+      );
+    }
+
+    return _TabsVariantScope(
+      variant: widget.variant,
+      child: HoronSurfaceLayer(
+        surface: widget.surface,
+        tier: HoronGlassTier.regular,
+        borderRadius: BorderRadius.circular(theme.radius.full),
+        child: Padding(
+          padding: EdgeInsets.all(space.s1), // p-1
+          child: Stack(
+            children: <Widget>[
+              if (_indicator != null)
+                AnimatedPositioned(
+                  // motion-indicator — 선택이 옮겨 갈 때만 280ms로 미끄러집니다.
+                  duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.indicatorDuration,
+                  curve: HoronMotion.indicatorCurve,
+                  left: _indicator!.left,
+                  top: _indicator!.top,
+                  width: _indicator!.width,
+                  height: _indicator!.height,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: colors.overlayInk10, // bg-overlay-ink-10
+                      borderRadius: BorderRadius.circular(theme.radius.full),
+                    ),
                   ),
                 ),
-              ),
-            Wrap(
-              key: _track,
-              spacing: space.s6, // gap-6
-              runSpacing: space.s1,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: <Widget>[
-                for (int index = 0; index < widget.children.length; index++)
-                  KeyedSubtree(key: _keys[index], child: widget.children[index]),
-              ],
-            ),
-          ],
+              track,
+            ],
+          ),
         ),
       ),
     );
@@ -270,6 +321,19 @@ class _HoronTabsListState extends State<HoronTabsList> {
     if (next == _indicator) return;
     setState(() => _indicator = next);
   }
+}
+
+/// 목록이 정한 변형을 탭에 내리는 통로입니다. React의 `TabsVariantContext` 자리입니다.
+class _TabsVariantScope extends InheritedWidget {
+  const _TabsVariantScope({required this.variant, required super.child});
+
+  final HoronTabsListVariant variant;
+
+  static HoronTabsListVariant of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_TabsVariantScope>()?.variant ?? HoronTabsListVariant.pill;
+
+  @override
+  bool updateShouldNotify(_TabsVariantScope oldWidget) => variant != oldWidget.variant;
 }
 
 /// Figma `Tabs`(62:335)의 알약 탭입니다.
@@ -313,18 +377,28 @@ class _HoronTabsTabState extends State<HoronTabsTab> {
     final bool rich = widget.icon != null || widget.count != null;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
     final _TabMetrics metrics = _metricsOf(scope?.size ?? HoronTabsSize.md, theme);
+    final bool underline = _TabsVariantScope.of(context) == HoronTabsListVariant.underline;
 
     final Color foreground = selected || _hovered ? colors.textPrimary : colors.textSecondary;
-    final Color background = _hovered ? (selected ? colors.overlayInk14 : colors.overlayInk5) : Colors.transparent;
+    // `underline`는 알약 배경 없이 글자 색만 바꿉니다.
+    final Color background = underline
+        ? Colors.transparent
+        : _hovered
+        ? (selected ? colors.overlayInk14 : colors.overlayInk5)
+        : Colors.transparent;
 
     final Widget surface = AnimatedContainer(
       duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
       curve: HoronMotion.colorsCurve,
       padding: EdgeInsets.symmetric(
-        horizontal: rich ? metrics.richPaddingX : metrics.plainPaddingX,
+        // `underline`는 각 단계의 높이와 글자 크기만 남기고 좌우 여백을 없앱니다(px-0).
+        horizontal: underline ? 0 : (rich ? metrics.richPaddingX : metrics.plainPaddingX),
         vertical: metrics.paddingY,
       ),
-      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(theme.radius.full)),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(underline ? theme.radius.xs : theme.radius.full),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: metrics.richGap,
