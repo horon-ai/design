@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/horon_motion.dart';
@@ -37,9 +38,6 @@ const double _tileSide = 32;
 /// `source-row.tsx`의 `rounded-[14px]`입니다. card 변형의 반경입니다.
 const double _cardRadius = 14;
 
-/// `source-row.tsx`의 `rounded-[9px]`입니다.
-const double _tileRadius = 9;
-
 /// `source-row.tsx`의 `h-[3px]`입니다. 단계 막대 높이입니다.
 const double _barHeight = 3;
 
@@ -48,8 +46,9 @@ const double _barWidth = 44;
 
 /// Figma `Source row`(Knowledge base): 네 단계(parse, chunk, embed, index) 파이프라인을 가진 평평한 행입니다.
 ///
-/// `source-row.tsx`를 옮긴 것입니다. `card`는 14 반경의 옅은 표면이고, `list`는
-/// 아래 1px 구분선만 있는 투명 행입니다. 실패면 재시도 버튼이 나타납니다.
+/// `source-row.tsx`를 옮긴 것입니다. `card`는 14 반경의 불투명 표면에 기본 테두리를
+/// 두르고 좌우 12를 들이며, `list`는 아래 1px 구분선만 있는 투명 행입니다. 실패면
+/// 재시도 버튼이 나타납니다.
 class HoronSourceRow extends StatelessWidget {
   /// 행을 만듭니다.
   const HoronSourceRow({
@@ -128,9 +127,14 @@ class HoronSourceRow extends StatelessWidget {
     final bool failed = status == HoronSourceStatus.failed;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+      // `px-2` 목록 행과 `px-3` 카드가 세로 `py-3`을 함께 씁니다.
+      padding: EdgeInsets.symmetric(horizontal: card ? 12 : 8, vertical: 12),
       decoration: card
-          ? BoxDecoration(color: theme.colors.bgSubtle, borderRadius: BorderRadius.circular(_cardRadius))
+          ? BoxDecoration(
+              color: theme.colors.bgSurface, // bg-bg-surface
+              borderRadius: BorderRadius.circular(_cardRadius),
+              border: Border.all(color: theme.colors.borderDefault), // border border-border-default
+            )
           : BoxDecoration(
               border: last ? null : Border(bottom: BorderSide(color: theme.colors.overlayInk8)),
             ),
@@ -142,7 +146,7 @@ class HoronSourceRow extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: theme.colors.overlayInk5,
-              borderRadius: BorderRadius.circular(_tileRadius),
+              borderRadius: BorderRadius.circular(theme.space.step(2.5)), // rounded-[10px]
             ),
             child: IconTheme.merge(
               data: IconThemeData(size: 16, color: theme.colors.textPrimary),
@@ -235,26 +239,52 @@ class HoronSourceRow extends StatelessWidget {
                   '${progress.round()}%',
                   style: theme.text.labelMd.copyWith(color: theme.colors.textSecondary),
                 ),
-                HoronSourceStatus.failed => Semantics(
-                  button: true,
-                  child: GestureDetector(
-                    onTap: onRetry,
-                    child: Container(
-                      height: 28,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: theme.colors.overlayInk6,
-                        borderRadius: BorderRadius.circular(theme.radius.full),
-                      ),
-                      child: Text('Retry', style: theme.text.labelSm.copyWith(color: theme.colors.textPrimary)),
-                    ),
-                  ),
-                ),
+                HoronSourceStatus.failed => _RetryPill(onPressed: onRetry),
               },
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 실패 상태의 30px 재시도 알약입니다. hover에서 잉크가 6%에서 10%로 짙어집니다.
+class _RetryPill extends StatefulWidget {
+  const _RetryPill({this.onPressed});
+
+  final VoidCallback? onPressed;
+
+  @override
+  State<_RetryPill> createState() => _RetryPillState();
+}
+
+class _RetryPillState extends State<_RetryPill> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Semantics(
+      button: true,
+      enabled: widget.onPressed != null,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
+        onExit: (PointerExitEvent event) => setState(() => _hovered = false),
+        child: GestureDetector(
+          onTap: widget.onPressed,
+          child: Container(
+            height: theme.space.step(7.5), // h-7.5 = 30
+            padding: EdgeInsets.symmetric(horizontal: theme.space.s3), // px-3
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: _hovered ? theme.colors.overlayInk10 : theme.colors.overlayInk6, // hover:bg-overlay-ink-10
+              borderRadius: BorderRadius.circular(theme.radius.full),
+            ),
+            child: Text('Retry', style: theme.text.labelSm.copyWith(color: theme.colors.textPrimary)),
+          ),
+        ),
       ),
     );
   }

@@ -5,8 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../contracts/horon_strings.dart';
 import '../contracts/surface.dart';
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_veil.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -352,61 +351,64 @@ class _HoronCalendarState extends State<HoronCalendar> {
     final double available = maxWidth - padding * 2;
     final double cell = math.min(metrics.cell, math.max(_minCellSize, available / 7));
 
-    final Widget body = DecoratedBox(
-      key: const Key('horon-calendar-surface'),
-      decoration: BoxDecoration(
-        color: switch (widget.surface) {
-          HoronCalendarSurface.glass => null,
-          HoronCalendarSurface.flat => theme.colors.glassThick,
-          HoronCalendarSurface.solid => theme.colors.bgSurface,
-        },
-        borderRadius: radius,
-        border: widget.surface == HoronCalendarSurface.solid ? Border.all(color: theme.colors.borderDefault) : null,
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(padding),
-        child: SizedBox(
-          width: cell * 7,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: gap,
-            children: <Widget>[
-              if (widget.popover)
-                _buildPopoverHeader(theme, title, metrics)
-              else
-                _buildDefaultHeader(theme, title, metrics),
-              Focus(
-                focusNode: _gridFocus,
-                onKeyEvent: _handleKeyEvent,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    _buildWeekdays(theme, strings, days, cell, metrics),
-                    for (int week = 0; week < days.length ~/ 7; week++)
-                      _buildWeek(
-                        theme: theme,
-                        days: days.sublist(week * 7, week * 7 + 7),
-                        month: month,
-                        today: today,
-                        cell: cell,
-                        metrics: metrics,
-                      ),
-                  ],
-                ),
+    final Widget content = Padding(
+      padding: EdgeInsets.all(padding),
+      child: SizedBox(
+        width: cell * 7,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: gap,
+          children: <Widget>[
+            if (widget.popover)
+              _buildPopoverHeader(theme, title, metrics)
+            else
+              _buildDefaultHeader(theme, title, metrics),
+            Focus(
+              focusNode: _gridFocus,
+              onKeyEvent: _handleKeyEvent,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  _buildWeekdays(theme, strings, days, cell, metrics),
+                  for (int week = 0; week < days.length ~/ 7; week++)
+                    _buildWeek(
+                      theme: theme,
+                      days: days.sublist(week * 7, week * 7 + 7),
+                      month: month,
+                      today: today,
+                      cell: cell,
+                      metrics: metrics,
+                    ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
 
-    return Semantics(
-      container: true,
-      child: widget.surface == HoronCalendarSurface.glass
-          ? HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: body)
-          : body,
-    );
+    // glass는 React `.veil-overlay`입니다. HoronLiquidGlass를 깔지 않고 veil 한 겹만
+    // 쓰므로 테두리도 veil의 1px 링이 맡습니다.
+    final Widget body = switch (widget.surface) {
+      HoronCalendarSurface.glass => HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: content),
+      HoronCalendarSurface.flat => DecoratedBox(
+        key: const Key('horon-calendar-surface'),
+        decoration: BoxDecoration(color: theme.colors.glassThick, borderRadius: radius),
+        child: content,
+      ),
+      HoronCalendarSurface.solid => DecoratedBox(
+        key: const Key('horon-calendar-surface'),
+        decoration: BoxDecoration(
+          color: theme.colors.bgSurface,
+          borderRadius: radius,
+          border: Border.all(color: theme.colors.borderDefault),
+        ),
+        child: content,
+      ),
+    };
+
+    return Semantics(container: true, child: body);
   }
 
   Widget _buildDefaultHeader(HoronThemeData theme, String title, _CalendarMetrics metrics) {
@@ -546,7 +548,6 @@ class _HoronCalendarState extends State<HoronCalendar> {
             disabled: widget.isDateDisabled?.call(date) ?? false,
             focused: _gridFocus.hasFocus && _sameDay(date, _focused),
             textStyle: metrics.day,
-            todayDotTop: cell - 8,
             onTap: _select,
           ),
       ],
@@ -567,7 +568,6 @@ class _DayCell extends StatefulWidget {
     required this.disabled,
     required this.focused,
     required this.textStyle,
-    required this.todayDotTop,
     required this.onTap,
   });
 
@@ -580,7 +580,6 @@ class _DayCell extends StatefulWidget {
   final bool disabled;
   final bool focused;
   final TextStyle textStyle;
-  final double todayDotTop;
   final ValueChanged<DateTime> onTap;
 
   @override
@@ -652,10 +651,10 @@ class _DayCellState extends State<_DayCell> {
                   ),
                   child: Text('${widget.date.day}', maxLines: 1, style: style),
                 ),
-                // `top-8 left-[18px] size-1 rounded-full bg-status-live`.
+                // `bottom-1 left-1/2 -translate-x-1/2 size-1 rounded-full bg-status-live`.
                 if (widget.isToday && !widget.selected && !widget.between)
                   Positioned(
-                    top: widget.todayDotTop,
+                    bottom: theme.space.s1,
                     left: (widget.cell - _HoronCalendarState._todayDotSize) / 2,
                     child: Container(
                       key: ValueKey<String>(
@@ -677,8 +676,9 @@ class _DayCellState extends State<_DayCell> {
 
 /// 이전·다음 달 화살표 버튼입니다.
 ///
-/// React의 `motion-press`(누르면 0.97)와 팝오버 변형의 `hover:bg-overlay-ink-6`을
-/// 옮겼습니다. 기본 변형은 hover 배경이 없습니다.
+/// React의 `motion-press`(누르면 0.97)를 옮겼습니다. 기본 변형은 hover에서 글자색이
+/// `text-primary`가 되고, 팝오버 변형은 `hover:bg-overlay-ink-6` 배경을 씁니다. 두 변형
+/// 모두 키보드 포커스에 2px 브랜드 링을 그립니다.
 class _CaretButton extends StatefulWidget {
   const _CaretButton({
     super.key,
@@ -705,18 +705,36 @@ class _CaretButton extends StatefulWidget {
 
 class _CaretButtonState extends State<_CaretButton> {
   bool _hovered = false;
+  bool _focused = false;
   bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
     final bool animate = !MediaQuery.disableAnimationsOf(context);
+    // 기본 변형은 hover에서 글자색만 `text-primary`로 바뀝니다. 팝오버 변형은
+    // `hover:bg-overlay-ink-6` 배경을 그리므로 글자색을 그대로 둡니다.
+    final Color iconColor = _hovered && widget.hoverColor == null ? colors.textPrimary : widget.color;
     return Semantics(
       button: true,
       label: widget.label,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
-        onExit: (PointerExitEvent event) => setState(() => _hovered = false),
+      child: FocusableActionDetector(
+        mouseCursor: SystemMouseCursors.click,
+        onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
+        onShowFocusHighlight: (bool value) => setState(() => _focused = value),
+        shortcuts: const <ShortcutActivator, Intent>{
+          SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+          SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+        },
+        actions: <Type, Action<Intent>>{
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (ActivateIntent intent) {
+              widget.onPressed();
+              return null;
+            },
+          ),
+        },
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: (TapDownDetails details) => setState(() => _pressed = true),
@@ -727,21 +745,74 @@ class _CaretButtonState extends State<_CaretButton> {
             scale: _pressed ? HoronMotion.pressScale : 1,
             duration: animate ? HoronMotion.pressDuration : Duration.zero,
             curve: HoronMotion.pressCurve,
-            child: AnimatedContainer(
-              duration: animate ? HoronMotion.colorsDuration : Duration.zero,
-              curve: HoronMotion.colorsCurve,
-              width: widget.size,
-              height: widget.size,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _hovered && widget.hoverColor != null ? widget.hoverColor : Colors.transparent,
+            child: _CaretFocusRing(
+              visible: _focused,
+              gap: theme.space.s0_5,
+              width: theme.space.s0_5,
+              color: colors.textBrand,
+              radius: theme.radius.full,
+              child: AnimatedContainer(
+                duration: animate ? HoronMotion.colorsDuration : Duration.zero,
+                curve: HoronMotion.colorsCurve,
+                width: widget.size,
+                height: widget.size,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _hovered && widget.hoverColor != null ? widget.hoverColor : Colors.transparent,
+                ),
+                child: Icon(widget.icon, size: widget.iconSize, color: iconColor),
               ),
-              child: Icon(widget.icon, size: widget.iconSize, color: widget.color),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+/// `focus-visible:outline-2 outline-offset-2 outline-text-brand`을 그립니다.
+///
+/// 레이아웃을 밀지 않도록 링을 자식 바깥에 겹쳐 그립니다.
+class _CaretFocusRing extends StatelessWidget {
+  const _CaretFocusRing({
+    required this.visible,
+    required this.gap,
+    required this.width,
+    required this.color,
+    required this.radius,
+    required this.child,
+  });
+
+  final bool visible;
+  final double gap;
+  final double width;
+  final Color color;
+  final double radius;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!visible) return child;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        Positioned(
+          left: -gap,
+          top: -gap,
+          right: -gap,
+          bottom: -gap,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(radius + gap),
+                border: Border.all(color: color, width: width),
+              ),
+            ),
+          ),
+        ),
+        child,
+      ],
     );
   }
 }

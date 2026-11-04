@@ -28,9 +28,6 @@ const double _rowGapWithLeading = 12;
 /// `settings-list.tsx`의 `rounded-[9px]`입니다. 행 아이콘 타일의 반경입니다.
 const double _iconTileRadius = 9;
 
-/// `settings-list.tsx`의 `rounded-[6px]`입니다. 키캡의 반경입니다.
-const double _keycapRadius = 6;
-
 /// Paper `Settings list`(1VD8-0): 16px 라운드의 두꺼운 유리 카드에 구분선이 있는 행을 담습니다.
 class HoronSettingsList extends StatelessWidget {
   /// 목록을 만듭니다.
@@ -123,14 +120,7 @@ class HoronSettingsRow extends StatelessWidget {
                   Text(title, style: theme.text.labelMd.copyWith(color: theme.colors.textPrimary)),
                   if (description != null) ...<Widget>[
                     const SizedBox(height: 2),
-                    Text(
-                      description!,
-                      style: theme.text.caption.copyWith(
-                        fontSize: 13,
-                        height: 18 / 13,
-                        color: theme.colors.textSecondary,
-                      ),
-                    ),
+                    Text(description!, style: theme.text.bodySm.copyWith(color: theme.colors.textSecondary)),
                   ],
                 ],
               ),
@@ -205,18 +195,10 @@ class HoronSettingsKey extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         color: isDark ? HoronPalette.neutral800 : HoronPalette.neutral50,
-        borderRadius: BorderRadius.circular(_keycapRadius),
+        borderRadius: BorderRadius.circular(theme.radius.xs), // rounded-xs
         border: Border.all(color: theme.colors.borderDefault),
       ),
-      child: Text(
-        label,
-        style: theme.text.caption.copyWith(
-          fontSize: 12,
-          height: 16 / 12,
-          fontWeight: HoronFontWeight.medium,
-          color: theme.colors.textPrimary,
-        ),
-      ),
+      child: Text(label, style: theme.text.labelSm.copyWith(color: theme.colors.textPrimary)),
     );
   }
 }

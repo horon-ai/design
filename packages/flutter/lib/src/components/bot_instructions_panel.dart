@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
+import 'kbd.dart';
 
 /// `bot-instructions-panel.tsx`의 `InstructionVariableTone`입니다.
 enum HoronInstructionVariableTone {
@@ -143,7 +144,7 @@ class _HoronPanelPillTabsState extends State<HoronPanelPillTabs> {
   }
 }
 
-/// 알약 트랙 안의 탭 하나입니다. `h-7 rounded-full px-3 text-label-md`입니다.
+/// 알약 트랙 안의 탭 하나입니다. `h-7.5 rounded-full px-3 text-label-md`입니다.
 class _PanelPillTabButton extends StatefulWidget {
   const _PanelPillTabButton({required this.label, required this.selected, required this.onTap});
 
@@ -202,7 +203,7 @@ class _PanelPillTabButtonState extends State<_PanelPillTabButton> {
           child: AnimatedContainer(
             duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration, // motion-colors
             curve: HoronMotion.colorsCurve,
-            height: space.step(7), // h-7 = 28
+            height: space.step(7.5), // h-7.5 = 30
             padding: EdgeInsets.symmetric(horizontal: space.s3), // px-3 = 12
             decoration: BoxDecoration(
               // 선택 표시자입니다. React는 미끄러지는 span으로 그립니다.
@@ -352,7 +353,14 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
       widget.defaultScenario ??
       (widget.scenarios == null || widget.scenarios!.isEmpty ? null : widget.scenarios!.first);
 
-  void _run() => widget.onRun?.call(_scenario);
+  /// 실행 횟수입니다. React의 `runCount`처럼 출력 블록의 키가 되어 매 실행마다
+  /// `motion-rise`가 다시 재생됩니다.
+  int _runCount = 0;
+
+  void _run() {
+    setState(() => _runCount++);
+    widget.onRun?.call(_scenario);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -381,18 +389,24 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
               _body(theme, space, colors),
               if (showVariables) ...<Widget>[const _PanelDivider(), _testBlock(theme, space, colors)],
               if (widget.output != null)
-                Container(
-                  width: double.infinity,
-                  color: colors.overlayInk3, // bg-overlay-ink-3
-                  padding: EdgeInsets.fromLTRB(
-                    space.step(4.5), // pl-4.5 = 18
-                    space.s3_5, // pt-3.5 = 14
-                    space.step(4.5), // pr-4.5 = 18
-                    space.s4, // pb-4 = 16
-                  ),
-                  child: DefaultTextStyle.merge(
-                    style: theme.text.bodySm.copyWith(color: colors.textSecondary),
-                    child: widget.output!,
+                // `key={runCount}` + `motion-rise` — 실행할 때마다 출력이 다시 올라옵니다.
+                KeyedSubtree(
+                  key: ValueKey<int>(_runCount),
+                  child: _Rise(
+                    child: Container(
+                      width: double.infinity,
+                      color: colors.overlayInk3, // bg-overlay-ink-3
+                      padding: EdgeInsets.fromLTRB(
+                        space.s5, // px-5 = 20
+                        space.s3_5, // pt-3.5 = 14
+                        space.s5, // px-5 = 20
+                        space.s4, // pb-4 = 16
+                      ),
+                      child: DefaultTextStyle.merge(
+                        style: theme.text.bodySm.copyWith(color: colors.textSecondary),
+                        child: widget.output!,
+                      ),
+                    ),
                   ),
                 ),
             ],
@@ -402,7 +416,7 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
     );
   }
 
-  /// `header` — `gap-2 pt-3.5 pr-3.5 pb-3 pl-4.5`입니다.
+  /// `header` — `gap-2 px-5 pt-4 pb-3.5`입니다.
   Widget _header(HoronThemeData theme, HoronSpaceSpec space, HoronColors colors) {
     final Widget title = Text(
       widget.title,
@@ -414,7 +428,7 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
     final Widget bot = _botPill(theme, space, colors);
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(space.step(4.5), space.s3_5, space.s3_5, space.s3),
+      padding: EdgeInsets.fromLTRB(space.s5, space.s4, space.s5, space.s3_5),
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           // React는 한 줄 고정입니다. 400px 아래에서는 제목·버전 알약·봇 알약을 줄바꿈해
@@ -446,17 +460,17 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
     );
   }
 
-  /// 버전 알약 — `h-7 gap-1.5 rounded-full bg-overlay-ink-5 px-2.5 text-label-sm`입니다.
+  /// 버전 알약 — `h-7.5 gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 text-label-sm`입니다.
   Widget _versionPill(HoronThemeData theme, HoronSpaceSpec space, HoronColors colors) {
     final String version = widget.version!;
     final String? status = widget.versionStatus;
     return _PressSurface(
       onTap: widget.onVersionTap,
       radius: theme.radius.full,
-      height: space.step(7), // h-7 = 28
+      height: space.step(7.5), // h-7.5 = 30
       padding: EdgeInsets.symmetric(horizontal: space.s2_5), // px-2.5 = 10
-      color: colors.overlayInk5,
-      hoverColor: colors.overlayInk8,
+      color: colors.overlayInk6,
+      hoverColor: colors.overlayInk10,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: space.s1_5, // gap-1.5 = 6
@@ -470,23 +484,25 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
             ),
             Text(status, maxLines: 1, style: theme.text.labelSm.copyWith(color: colors.textSecondary)),
           ],
-          Icon(Icons.expand_more, size: _caretSize, color: colors.textSecondary), // CaretDown size-3
+          // 처리기가 없으면 React처럼 캐럿 없는 라벨입니다.
+          if (widget.onVersionTap != null)
+            Icon(Icons.expand_more, size: _caretSize, color: colors.textSecondary), // CaretDown size-3
         ],
       ),
     );
   }
 
-  /// 봇 알약 — `h-7 gap-1.5 rounded-full bg-overlay-ink-5 pr-2.5 pl-1.5`입니다.
+  /// 봇 알약 — `h-7.5 gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5`입니다.
   Widget _botPill(HoronThemeData theme, HoronSpaceSpec space, HoronColors colors) {
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: space.step(45)), // 이름이 길어도 머리말을 넘지 않습니다.
       child: _PressSurface(
         onTap: widget.onBotTap,
         radius: theme.radius.full,
-        height: space.step(7),
+        height: space.step(7.5),
         padding: EdgeInsets.only(left: space.s1_5, right: space.s2_5),
-        color: colors.overlayInk5,
-        hoverColor: colors.overlayInk8,
+        color: colors.overlayInk6,
+        hoverColor: colors.overlayInk10,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: space.s1_5,
@@ -509,18 +525,19 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
                 style: theme.text.labelSm.copyWith(color: colors.textPrimary),
               ),
             ),
-            Icon(Icons.expand_more, size: _caretSize, color: colors.textSecondary),
+            // 처리기가 없으면 React처럼 캐럿 없는 라벨입니다.
+            if (widget.onBotTap != null) Icon(Icons.expand_more, size: _caretSize, color: colors.textSecondary),
           ],
         ),
       ),
     );
   }
 
-  /// `gap-1 pt-3 pr-4.5 pb-3.5 pl-4.5` — 탭 줄, 지시문, 변수 안내입니다.
+  /// `gap-1 px-5 pt-3 pb-3.5` — 탭 줄, 지시문, 변수 안내입니다.
   Widget _body(HoronThemeData theme, HoronSpaceSpec space, HoronColors colors) {
     final bool showExample = _tab == 'example' && widget.example != null;
     return Padding(
-      padding: EdgeInsets.fromLTRB(space.step(4.5), space.s3, space.step(4.5), space.step(3.5)),
+      padding: EdgeInsets.fromLTRB(space.s5, space.s3, space.s5, space.s3_5),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -608,7 +625,10 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
       children: <Widget>[
         for (final HoronInstructionPart part in line)
           if (part.text != null)
-            Text(part.text!, style: theme.text.bodySm.copyWith(color: colors.textPrimary))
+            _PartText(
+              text: part.text!,
+              style: theme.text.bodySm.copyWith(color: colors.textPrimary),
+            )
           else
             _VariableChip(label: part.variable!, tone: part.tone),
       ],
@@ -620,7 +640,7 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
     final List<HoronInstructionVariable>? variables = widget.variables;
     final List<String>? scenarios = widget.scenarios;
     return Padding(
-      padding: EdgeInsets.fromLTRB(space.step(4.5), space.s3, space.step(4.5), space.step(3.5)),
+      padding: EdgeInsets.fromLTRB(space.s5, space.s3, space.s5, space.s3_5),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -676,7 +696,7 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
     );
   }
 
-  /// 변수 한 칸 — 이름 점·이름 줄과 값 상자(`h-9.5 rounded-xl`)입니다.
+  /// 변수 한 칸 — 이름 점·이름 줄과 값 상자(`h-10 rounded-md`)입니다.
   Widget _variable(HoronThemeData theme, HoronSpaceSpec space, HoronColors colors, HoronInstructionVariable variable) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -702,12 +722,12 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
         ),
         SizedBox(height: space.s1_5), // gap-1.5 = 6
         Container(
-          height: space.step(9.5), // h-9.5 = 38
+          height: space.step(10), // h-10 = 40
           padding: EdgeInsets.symmetric(horizontal: space.s3), // px-3 = 12
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
             color: colors.overlayInk5, // bg-overlay-ink-5
-            borderRadius: BorderRadius.circular(theme.radius.xl), // rounded-xl = 20
+            borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md = 12
           ),
           child: Text(
             variable.value,
@@ -720,13 +740,13 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
     );
   }
 
-  /// Run — `h-8 gap-1.5 rounded-full bg-interactive-primary pr-3.5 pl-3 text-label-sm`입니다.
+  /// Run — `h-7.5 gap-1.5 rounded-full bg-interactive-primary pr-3 pl-3.5 text-label-sm`입니다.
   Widget _runButton(HoronThemeData theme, HoronSpaceSpec space, HoronColors colors) {
     return _PressSurface(
       onTap: _run,
       radius: theme.radius.full,
-      height: space.step(8), // h-8 = 32
-      padding: EdgeInsets.only(left: space.s3, right: space.step(3.5)), // pl-3 pr-3.5
+      height: space.step(7.5), // h-7.5 = 30
+      padding: EdgeInsets.only(left: space.step(3.5), right: space.s3), // pl-3.5 pr-3
       color: colors.interactivePrimary,
       hoverColor: colors.interactivePrimaryHover,
       child: Row(
@@ -735,11 +755,8 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
         children: <Widget>[
           Icon(Icons.play_arrow, size: _runIconSize, color: colors.textInverse), // Play size-3.5
           Text('Run', maxLines: 1, style: theme.text.labelSm.copyWith(color: colors.textInverse)),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: space.s1_5, vertical: space.step(0.25)),
-            decoration: BoxDecoration(color: colors.overlayInk6, borderRadius: BorderRadius.circular(theme.radius.md)),
-            child: Text('⌘↵', maxLines: 1, style: theme.text.caption.copyWith(color: colors.textSecondary)),
-          ),
+          // `Kbd className="bg-bg-surface-6 text-text-inverse/80"`.
+          HoronKbd(label: '⌘↵', background: colors.bgSurface6, foreground: colors.textInverse.withValues(alpha: 0.8)),
         ],
       ),
     );
@@ -769,14 +786,43 @@ class _VariableChip extends StatelessWidget {
       HoronInstructionVariableTone.brand => theme.colors.accentSky700_18, // bg-accent-sky-700-18
       HoronInstructionVariableTone.neutral => theme.colors.textPlaceholder18, // bg-text-placeholder-18
     };
+    // `ring-1 ring-inset` — tone의 90% 색을 40% 알파로 두릅니다.
+    final Color ring = switch (tone) {
+      HoronInstructionVariableTone.sky => theme.colors.accentSky500_90.withValues(alpha: 0.4),
+      HoronInstructionVariableTone.brand => theme.colors.accentSky700_90.withValues(alpha: 0.4),
+      HoronInstructionVariableTone.neutral => theme.colors.textPlaceholder90.withValues(alpha: 0.4),
+    };
     return Container(
       padding: EdgeInsets.symmetric(horizontal: space.s1_5, vertical: space.step(0.25)), // px-1.5 py-px
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(theme.radius.xs), // rounded-xs
+        border: Border.all(color: ring), // ring-1 ring-inset
       ),
       child: Text(label, style: theme.text.bodySm.copyWith(color: theme.colors.textPrimary)),
     );
+  }
+}
+
+/// 지시문 한 줄의 글자 조각입니다.
+///
+/// React는 `{{변수}}` 뒤에 홀로 남은 문장부호에 `-ml-1`을 줘 4px 간격이 구두점
+/// 앞에서 벌어지지 않게 합니다. Flutter에는 음수 여백이 없으므로 같은 거리만큼
+/// 왼쪽으로 옮겨 그립니다.
+class _PartText extends StatelessWidget {
+  const _PartText({required this.text, required this.style});
+
+  final String text;
+  final TextStyle style;
+
+  /// React의 `/^[,.;:!?%)\]]/`와 같은 문자 집합입니다.
+  static final RegExp _punctuation = RegExp(r'^[,.;:!?%)\]]');
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget label = Text(text, style: style);
+    if (!_punctuation.hasMatch(text)) return label;
+    return Transform.translate(offset: const Offset(-4, 0), child: label);
   }
 }
 
@@ -924,6 +970,28 @@ class _FocusRing extends StatelessWidget {
         ),
         child,
       ],
+    );
+  }
+}
+
+/// `motion-rise` — 220ms 동안 4px 아래에서 올라오며 나타납니다.
+class _Rise extends StatelessWidget {
+  const _Rise({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: HoronMotion.riseDuration,
+      curve: HoronMotion.riseCurve,
+      builder: (BuildContext context, double t, Widget? child) => Opacity(
+        opacity: t,
+        child: Transform.translate(offset: Offset(0, (1 - t) * HoronMotion.riseOffset), child: child),
+      ),
+      child: child,
     );
   }
 }

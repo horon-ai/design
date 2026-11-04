@@ -67,8 +67,8 @@ class HoronSplitButton extends StatelessWidget {
     final HoronSpaceSpec space = theme.space;
     final bool animate = !MediaQuery.disableAnimationsOf(context);
     final Color onPrimary = colors.interactiveOnPrimary;
-    // Paper `1VGK-0`의 라벨은 `text-label-lg`(16/22 500)입니다.
-    final TextStyle labelStyle = theme.text.labelLg.copyWith(color: onPrimary);
+    // `text-label-md` — Paper `1VGK-0`의 32px 알약은 `Button`의 `sm`과 같은 라벨을 씁니다.
+    final TextStyle labelStyle = theme.text.labelMd.copyWith(color: onPrimary);
 
     return Opacity(
       opacity: disabled ? _disabledOpacity : 1,

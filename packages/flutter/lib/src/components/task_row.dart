@@ -19,9 +19,6 @@ enum HoronTaskStatus {
   done,
 }
 
-/// `task-row.tsx`의 `rounded-[16px]`입니다.
-const double _rowRadius = 16;
-
 /// `task-row.tsx`의 `px-4`입니다.
 const double _rowPaddingX = 16;
 
@@ -42,8 +39,8 @@ const double _dividerHeight = 1;
 
 /// Figma `Task row`(Agent tasks 112:939): 16 반경의 평평한 행에 네 상태가 살아 움직이는 작업 카드입니다.
 ///
-/// `task-row.tsx`를 옮긴 것입니다. `card`는 옅은 표면, `list`는 아래 1px 구분선만
-/// 있는 투명 행입니다. 상태마다 오른쪽 동작(취소·재시도·검토)과 아카이브가 달라집니다.
+/// `task-row.tsx`를 옮긴 것입니다. `card`는 기본 테두리가 있는 불투명 표면,
+/// `list`는 아래 1px 구분선만 있는 투명 행입니다. 상태마다 오른쪽 동작(취소·재시도·검토)과 아카이브가 달라집니다.
 class HoronTaskRow extends StatelessWidget {
   /// 행을 만듭니다.
   const HoronTaskRow({
@@ -124,10 +121,15 @@ class HoronTaskRow extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
 
     return Container(
+      // `variant="card"`는 `rounded-2xl border border-border-default bg-bg-surface`이고,
+      // `variant="list"`는 투명 행이라 반경이 없습니다.
       decoration: card
-          ? BoxDecoration(color: theme.colors.bgSubtle, borderRadius: BorderRadius.circular(_rowRadius))
-          // `variant="list"`의 `rounded-b-[16px]` — 배경 없이 아래 모서리만 둥급니다.
-          : BoxDecoration(borderRadius: BorderRadius.vertical(bottom: Radius.circular(_rowRadius))),
+          ? BoxDecoration(
+              color: theme.colors.bgSurface,
+              borderRadius: BorderRadius.circular(theme.radius.xl2),
+              border: Border.all(color: theme.colors.borderDefault),
+            )
+          : null,
       child: Stack(
         children: <Widget>[
           Padding(
@@ -185,7 +187,7 @@ class HoronTaskRow extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text('·', style: theme.text.caption.copyWith(color: theme.colors.textSecondary)),
                       const SizedBox(width: 6),
-                      Icon(Icons.folder_outlined, size: 13, color: theme.colors.textSecondary),
+                      Icon(Icons.folder_outlined, size: theme.space.step(3.5), color: theme.colors.textSecondary),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(

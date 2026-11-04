@@ -9,14 +9,11 @@ import '../theme/horon_theme.dart';
 /// `skeleton.tsx`의 `rounded-xs`입니다. 블록 자리표시자의 반경입니다.
 const double _skeletonBlockRadius = 6;
 
-/// `SkeletonCard`의 `rounded-[16px]`입니다.
-const double _skeletonCardRadius = 16;
+/// `skeleton.tsx`의 `p-4`입니다.
+const double _skeletonCardPadding = 16;
 
-/// `skeleton.tsx`의 `p-3.5`입니다.
-const double _skeletonCardPadding = 14;
-
-/// `skeleton.tsx`의 `gap-2.5`입니다.
-const double _skeletonCardGap = 10;
+/// `skeleton.tsx`의 `gap-3`입니다.
+const double _skeletonCardGap = 12;
 
 /// 7% 잉크 자리표시자입니다.
 ///
@@ -122,7 +119,7 @@ class HoronSkeletonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool row = _kind == _SkeletonCardKind.row;
-    final BorderRadius radius = BorderRadius.circular(_skeletonCardRadius);
+    final BorderRadius radius = BorderRadius.circular(HoronTheme.of(context).radius.xl2); // rounded-2xl
 
     return Semantics(
       label: 'Loading',
@@ -166,7 +163,7 @@ class HoronSkeletonCard extends StatelessWidget {
                             const HoronSkeleton(width: 120, height: 12),
                             const SizedBox(height: _skeletonCardGap),
                           ],
-                          const HoronSkeleton(width: 252, height: 8),
+                          const HoronSkeleton(width: 248, height: 8),
                           const SizedBox(height: 8),
                           HoronSkeleton(width: _kind == _SkeletonCardKind.card ? 220 : 236, height: 8),
                           const SizedBox(height: 8),

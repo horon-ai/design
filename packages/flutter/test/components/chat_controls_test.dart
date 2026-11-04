@@ -14,9 +14,9 @@ Future<void> pumpControls(WidgetTester tester, Widget child, {Brightness brightn
 }
 
 void main() {
-  testWidgets('jump to latest: 44px clear glass circle with a 20px caret', (WidgetTester tester) async {
+  testWidgets('jump to latest: 40px clear glass circle with a 20px caret', (WidgetTester tester) async {
     await pumpControls(tester, const HoronJumpToLatest(surface: HoronChatControlSurface.glass));
-    expect(tester.getSize(find.byType(HoronJumpToLatest)), const Size(44, 44));
+    expect(tester.getSize(find.byType(HoronJumpToLatest)), const Size(40, 40));
     expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass).first).tier, HoronGlassTier.clear);
     expect(tester.widget<Icon>(find.byIcon(Icons.keyboard_arrow_down)).size, 20);
   });

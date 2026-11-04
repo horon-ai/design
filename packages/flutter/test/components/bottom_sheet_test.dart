@@ -40,31 +40,17 @@ void main() {
     }
   });
 
-  testWidgets('the glass surface draws the liquid layer with a 32px top radius', (WidgetTester tester) async {
+  testWidgets('the glass sheet is the veil overlay with a 32px top radius', (WidgetTester tester) async {
     await tester.pumpWidget(_host(const HoronBottomSheet(solid: false, title: Text('알림 설정'))));
-    final HoronSpaceSpec space = _theme(tester).space;
+    final HoronThemeData theme = _theme(tester);
+    final HoronSpaceSpec space = theme.space;
 
-    // Paper `VBH-1`(라이트)은 `--color-glass-fill-frost`(#FFFFFFE5, 90%) + 24px 배경 흐림을,
-    // 다크 `DKE-0`은 두꺼운 유리(#17181ACC, 80%)를 씁니다. 라이트에서는 유리 엔진 대신
-    // 서리 채움과 흐림이 그 자리를 맡습니다.
-    final HoronThemeData light = _theme(tester);
-    expect(
-      find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == light.colors.glassFillFrost),
-      findsOneWidget,
-      reason: 'glass-fill-frost #FFFFFFE5',
-    );
-    expect(find.byType(BackdropFilter), findsOneWidget, reason: '24px 배경 흐림');
+    final HoronVeil veil = tester.widget<HoronVeil>(find.byType(HoronVeil).first);
+    expect(veil.kind, HoronVeilKind.overlay, reason: 'React veil-overlay');
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: '유리 레이어를 겹치지 않습니다');
     final BorderRadius radius = _panelClip(tester).borderRadius as BorderRadius;
     expect(radius.topLeft.x, 32, reason: 'rounded-t-[32px]');
     expect(radius.bottomLeft.x, 0, reason: '위쪽 모서리만 둥급니다');
-    // `0 0 0 1px var(--color-overlay-ink-3)` — 바깐 1px 잉크 고리입니다.
-    final HoronThemeData theme = _theme(tester);
-    final DecoratedBox outer = tester.widget<DecoratedBox>(
-      find.descendant(of: find.byType(HoronBottomSheet), matching: find.byType(DecoratedBox)).first,
-    );
-    final BoxShadow ring = (outer.decoration as BoxDecoration).boxShadow!.single;
-    expect(ring.color, theme.colors.overlayInk3, reason: '0 0 0 1px overlay-ink-3');
-    expect(ring.spreadRadius, 1, reason: '1px 고리');
     expect(
       find.byWidgetPredicate(
         (Widget widget) =>
@@ -76,7 +62,7 @@ void main() {
     );
   });
 
-  testWidgets('the solid surface paints bg-bg-default, 20px radius and pb-6 without glass', (
+  testWidgets('the solid surface paints bg-bg-surface, 20px radius and pb-6 without veil or glass', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(_host(const HoronBottomSheet(title: Text('워크스페이스'), solid: true)));
@@ -84,8 +70,9 @@ void main() {
     final HoronSpaceSpec space = theme.space;
 
     expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'surface="solid"에는 유리를 깔지 않습니다');
+    expect(find.byType(HoronVeil), findsNothing, reason: 'surface="solid"에는 veil을 깔지 않습니다');
     expect(
-      find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == theme.colors.bgDefault),
+      find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == theme.colors.bgSurface),
       findsOneWidget,
     );
     expect((_panelClip(tester).borderRadius as BorderRadius).topLeft.x, theme.radius.xl, reason: 'rounded-t-[20px]');
@@ -104,7 +91,7 @@ void main() {
     final HoronSpaceSpec space = HoronThemeData.light.space;
     Future<double> gapOf({required bool detail}) async {
       await tester.pumpWidget(
-        _host(HoronBottomSheet(title: const Text('제목'), closeLabel: null, detail: detail, child: const Text('본문'))),
+        _host(HoronBottomSheet(title: const Text('제목'), detail: detail, child: const Text('본문'))),
       );
       return tester.getRect(find.text('본문')).top - tester.getRect(find.text('제목')).bottom;
     }
@@ -113,22 +100,14 @@ void main() {
     expect(await gapOf(detail: true), space.step(4.5), reason: 'detail: gap-4.5');
   });
 
-  testWidgets('the close button keeps the 32px box and the 16/18px glyph', (WidgetTester tester) async {
-    int closed = 0;
-    await tester.pumpWidget(_host(HoronBottomSheet(title: const Text('시트'), onClose: () => closed += 1)));
-    final Icon panelIcon = tester.widget<Icon>(find.byIcon(Icons.close));
-    expect(panelIcon.size, 16, reason: 'panel: size-4');
-    expect(panelIcon.color, _theme(tester).colors.textSecondary);
-    expect(tester.getSize(find.byWidgetPredicate((Widget w) => w is Container && w.child is Icon)).width, 32);
+  testWidgets('the sheet has no close button and its title starts 8px in', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(const HoronBottomSheet(title: Text('시트'))));
+    expect(find.byIcon(Icons.close), findsNothing, reason: 'React는 닫기 버튼을 없앴습니다');
 
-    await tester.tap(find.byIcon(Icons.close));
-    expect(closed, 1);
-
-    await tester.pumpWidget(_host(const HoronBottomSheet(title: Text('상세'), detail: true)));
-    expect(tester.widget<Icon>(find.byIcon(Icons.close)).size, 18, reason: 'detail: size-[18px]');
-
-    await tester.pumpWidget(_host(const HoronBottomSheet(title: Text('숨김'), closeLabel: null)));
-    expect(find.byIcon(Icons.close), findsNothing, reason: 'closeLabel이 null이면 닫기를 숨깁니다');
+    final HoronThemeData theme = _theme(tester);
+    final Rect title = tester.getRect(find.text('시트'));
+    final Rect sheet = tester.getRect(find.byType(HoronBottomSheet));
+    expect(title.left - sheet.left, theme.space.s4 + theme.space.s2, reason: 'px-4 + pl-2');
   });
 
   testWidgets('a row is 48px with a 20px icon, a truncated label and a 16px caret', (WidgetTester tester) async {
@@ -215,7 +194,7 @@ void main() {
     expect(tester.getSize(find.byType(HoronBottomSheetActions)).height, greaterThan(theme.space.step(11)));
   });
 
-  testWidgets('the sheet opens from the bottom and closes by close and scrim', (WidgetTester tester) async {
+  testWidgets('the sheet opens from the bottom and closes by the scrim', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: horonTheme(Brightness.light),
@@ -234,7 +213,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('시트 제목'), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.close));
+    await tester.tapAt(const Offset(5, 5));
     await tester.pumpAndSettle();
     expect(find.text('시트 제목'), findsNothing);
 
@@ -274,7 +253,7 @@ void main() {
       await tester.tap(find.text('열기'));
       await tester.pumpAndSettle();
       final double width = tester.getSize(find.byType(HoronBottomSheet)).width;
-      await tester.tap(find.byIcon(Icons.close));
+      await tester.tapAt(const Offset(5, 5));
       await tester.pumpAndSettle();
       return width;
     }
@@ -302,14 +281,12 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the dark sheet keeps the thick glass, not the frost fill', (WidgetTester tester) async {
-    // Paper `DKE-0`은 라이트 `VBH-1`의 서리 채움 대신 두꺼운 유리를 씁니다.
+  testWidgets('the dark sheet is the same veil overlay', (WidgetTester tester) async {
     await tester.pumpWidget(
       _host(const HoronBottomSheet(solid: false, title: Text('알림 설정')), brightness: Brightness.dark),
     );
-    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '다크는 유리 엔진이 그립니다');
-    final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
-    expect(glass.tier, HoronGlassTier.thick, reason: '#17181ACC 80%');
+    expect(tester.widget<HoronVeil>(find.byType(HoronVeil).first).kind, HoronVeilKind.overlay);
+    expect(find.byType(HoronLiquidGlass), findsNothing);
   });
 
   // 라우트가 `RawDialogRoute` 서브클래스가 되면서 생긴 동작입니다. 스크린 리더는
@@ -358,7 +335,7 @@ void main() {
     final ModalRoute<dynamic> route = ModalRoute.of(tester.element(find.byType(HoronBottomSheet)))!;
     expect(route.reverseTransitionDuration, const Duration(milliseconds: 220), reason: 'motion-popup exit');
 
-    await tester.tap(find.byIcon(Icons.close));
+    await tester.tapAt(const Offset(5, 5));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 110));
     expect(find.byType(HoronBottomSheet), findsOneWidget, reason: '220ms 나가기의 중간입니다');

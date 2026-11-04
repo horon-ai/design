@@ -28,7 +28,7 @@ const double _cardGap = 12;
 /// Paper `Directory card`(Settings 1VJJ-0): 두꺼운 유리 행에 40px 타일, 이름과 한 줄 설명, 유리 추가 버튼입니다.
 ///
 /// `directory-card.tsx`를 옮긴 것입니다. 반경은 `rounded-2xl`(16), 타일은 Paper가
-/// 그리는 잉크 바탕(`#17181A`)에 반대색 20px 아이콘, 설명은 `line-clamp-1`이라 한
+/// 그리는 잉크 바탕(`#17181A`)에 neutral-50 20px 아이콘, 설명은 `line-clamp-1`이라 한
 /// 줄로 잘립니다. 추가 버튼은 [HoronIconButton]의 glass 변형입니다.
 class HoronDirectoryCard extends StatelessWidget {
   /// 디렉터리 카드를 만듭니다.
@@ -95,7 +95,7 @@ class HoronDirectoryCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(_tileRadius),
                   ),
                   child: IconTheme.merge(
-                    data: IconThemeData(size: 20, color: theme.colors.textInverse),
+                    data: IconThemeData(size: 20, color: HoronPalette.neutral50),
                     child: icon,
                   ),
                 ),
@@ -121,11 +121,7 @@ class HoronDirectoryCard extends StatelessWidget {
                           description!,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: theme.text.caption.copyWith(
-                            fontSize: 12,
-                            height: 16 / 12,
-                            color: theme.colors.textPlaceholder,
-                          ),
+                          style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
                         ),
                       ],
                     ],

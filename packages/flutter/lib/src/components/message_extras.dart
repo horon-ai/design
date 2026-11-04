@@ -233,7 +233,7 @@ class HoronAttachment extends StatelessWidget {
   }
 }
 
-/// Figma `Code block`(109:667): 잉크 표면, 14 반경, 복사 버튼이 있는 6% 헤더, Geist Mono 13/22 코드입니다.
+/// Figma `Code block`(109:667): 잉크 표면, 14 반경, 복사 버튼이 있는 6% 헤더, `text-code` 코드입니다.
 class HoronCodeBlock extends StatefulWidget {
   /// 코드 블록을 만듭니다.
   const HoronCodeBlock({
@@ -323,11 +323,7 @@ class _HoronCodeBlockState extends State<HoronCodeBlock> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.only(left: 14, right: 14, top: 12, bottom: 14),
-              child: Text(
-                widget.code,
-                softWrap: false,
-                style: theme.text.code.copyWith(fontSize: 13, height: 22 / 13, color: theme.colors.textOnInk),
-              ),
+              child: Text(widget.code, softWrap: false, style: theme.text.code.copyWith(color: theme.colors.textOnInk)),
             ),
           ],
         ),

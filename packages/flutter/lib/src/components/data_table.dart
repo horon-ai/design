@@ -49,14 +49,8 @@ const double _headIconSize = 14;
 /// `size-6` — 항목 로고 타일 한 변입니다(24).
 const double _itemTileSize = 24;
 
-/// `py-[3px]` — 태그의 세로 여백입니다. 간격 단위 0.75입니다.
-const double _tagPaddingYUnits = 0.75;
-
 /// `size-4` — 바닥글 더하기 아이콘 크기입니다(16).
 const double _footerIconSize = 16;
-
-/// `h-8` — 검색 필드의 높이입니다(32).
-const double _searchHeightUnits = 8;
 
 /// `min-w-max` — 모바일에서 표가 유지하는 최소 폭입니다.
 ///
@@ -685,10 +679,9 @@ class HoronDataTableTag extends StatelessWidget {
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: space.s2_5, // px-2.5
-        vertical: space.step(_tagPaddingYUnits), // py-[3px]
-      ),
+      height: space.step(6.5), // h-6.5 = 26
+      alignment: Alignment.center, // items-center
+      padding: EdgeInsets.symmetric(horizontal: space.s2_5), // px-2.5
       decoration: BoxDecoration(
         color: brand ? colors.bgBrand : colors.bgSubtle, // bg-bg-brand / bg-bg-subtle
         borderRadius: BorderRadius.circular(theme.radius.sm), // rounded-sm
@@ -971,18 +964,14 @@ class _HoronDataTableSearchState extends State<HoronDataTableSearch> {
 
   @override
   Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    return SizedBox(
-      height: theme.space.step(_searchHeightUnits), // h-8 = 32
-      child: HoronInput(
-        size: HoronInputSize.md,
-        surface: HoronInputSurface.solid, // surface="solid"
-        icon: const Icon(Icons.search),
-        hintText: widget.placeholder,
-        semanticLabel: widget.placeholder,
-        controller: _text,
-        onChanged: widget.controller.setQuery,
-      ),
+    return HoronInput(
+      size: HoronInputSize.sm, // size="sm"
+      surface: HoronInputSurface.solid, // surface="solid"
+      icon: const Icon(Icons.search),
+      hintText: widget.placeholder,
+      semanticLabel: widget.placeholder,
+      controller: _text,
+      onChanged: widget.controller.setQuery,
     );
   }
 }

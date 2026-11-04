@@ -9,7 +9,7 @@ enum HoronTextareaFieldSize {
   /// `size="sm"` — 간격 6, `label-sm`, 상자 88px.
   sm,
 
-  /// `size="md"` — 간격 8, `label-md`, 상자 120px. 기본값입니다.
+  /// `size="md"` — 간격 8, `label-md`, 상자 112px. 기본값입니다.
   md,
 
   /// `size="lg"` — 간격 10, `label-lg`, 상자 136px.
@@ -38,7 +38,7 @@ _FieldMetrics _metricsOf(HoronTextareaFieldSize size, HoronThemeData theme) => s
   ),
   HoronTextareaFieldSize.md => (
     gap: theme.space.s2,
-    boxHeight: theme.space.step(30),
+    boxHeight: theme.space.step(28),
     paddingX: theme.space.s3_5,
     paddingY: theme.space.s3,
     label: theme.text.labelMd,
@@ -48,7 +48,7 @@ _FieldMetrics _metricsOf(HoronTextareaFieldSize size, HoronThemeData theme) => s
   HoronTextareaFieldSize.lg => (
     gap: theme.space.s2_5,
     boxHeight: theme.space.step(34),
-    paddingX: theme.space.s4,
+    paddingX: theme.space.s5,
     paddingY: theme.space.s3_5,
     label: theme.text.labelLg,
     meta: theme.text.bodySm,
@@ -58,10 +58,11 @@ _FieldMetrics _metricsOf(HoronTextareaFieldSize size, HoronThemeData theme) => s
 
 /// React `TextareaField`(Figma 60:466)를 옮긴 라벨 붙은 여러 줄 필드입니다.
 ///
-/// 라벨 줄(오른쪽에 힌트), 120px 유리 상자, 아래 도움말·오류와 글자 수 푸터로
+/// 라벨 줄(오른쪽에 힌트), 112px 유리 상자, 아래 도움말·오류와 글자 수 푸터로
 /// 이루어집니다. [error]가 있으면 상자 테두리와 푸터가 `text-danger`로 바뀌고
 /// 도움말 자리에 오류 문구가 들어갑니다. 표면은 [surface]로 고르고, 기본값은 React와
-/// 같은 불투명 `solid`입니다. 유리 패널 위에서는 `glass`를 넘깁니다.
+/// 같은 불투명 `solid`입니다. 유리 패널 위에서는 `glass`를 넘기며, 이때
+/// [HoronFieldBox]의 `.veil-field`가 그려지고 HoronLiquidGlass는 겹치지 않습니다.
 class HoronTextareaField extends StatefulWidget {
   /// 라벨 붙은 여러 줄 필드를 만듭니다.
   const HoronTextareaField({
@@ -83,7 +84,7 @@ class HoronTextareaField extends StatefulWidget {
   /// 라벨입니다. React `label`에 대응합니다.
   final String label;
 
-  /// 표면입니다. 기본값 `solid`는 불투명 `bg-surface`, `glass`는 유리입니다.
+  /// 표면입니다. 기본값 `solid`는 불투명 `bg-surface`, `glass`는 React `.veil-field` 표면입니다.
   final HoronInputSurface surface;
 
   /// 크기입니다. 기본값은 [HoronTextareaFieldSize.md]입니다.

@@ -3,8 +3,10 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `sidebar` 갤러리 섹션입니다.
 ///
-/// 데스크톱 폭에서 세 가지 바탕(glass·photo·flue)과 휴대폰 폭의 280 고정 기둥을
+/// 데스크톱 폭에서 네 가지 바탕(glass·photo·plain·flue)과 휴대폰 폭의 280 고정 기둥을
 /// 나란히 보여 주고, 아래에 폭 조절 손잡이를 실제로 끌어 볼 수 있는 예를 둡니다.
+/// `plain`은 채움과 유리가 없어 뒤 레이아웃의 색이 그대로 비치고 오른쪽 1px 테두리만
+/// 남습니다.
 class HoronSidebarGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronSidebarGallerySection({super.key});
@@ -37,6 +39,14 @@ class HoronSidebarGallerySection extends StatelessWidget {
                   width: 280,
                   height: 560,
                   child: HoronSidebar.photo(children: _content()),
+                ),
+              ),
+              _Sample(
+                label: 'plain',
+                child: SizedBox(
+                  width: 280,
+                  height: 560,
+                  child: HoronSidebar.plain(children: _content()),
                 ),
               ),
               _Sample(
@@ -88,6 +98,13 @@ List<Widget> _content() => <Widget>[
         icon: const Icon(Icons.schedule),
         label: 'Later',
         attention: true,
+        onPressed: () {},
+      ),
+      // `href`가 있으면 React처럼 링크 시맨틱으로 읽힙니다. 이동은 onPressed가 맡습니다.
+      HoronSidebarItem(
+        icon: const Icon(Icons.menu_book),
+        label: 'Docs',
+        href: Uri.parse('https://horon.ai/docs'),
         onPressed: () {},
       ),
     ],

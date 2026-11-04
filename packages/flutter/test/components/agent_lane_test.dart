@@ -41,6 +41,14 @@ void main() {
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
     expect(find.byType(HoronSpinner), findsNothing);
 
+    final HoronThemeData doneTheme = HoronTheme.of(tester.element(find.byType(HoronAgentLane)));
+    final AnimatedContainer doneBox = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
+    final BoxDecoration doneDecoration = doneBox.decoration! as BoxDecoration;
+    expect(doneDecoration.color, doneTheme.colors.bgSurface);
+    expect((doneDecoration.border! as Border).top.color, doneTheme.colors.borderDefault);
+    expect(doneDecoration.borderRadius, BorderRadius.circular(doneTheme.radius.xl2));
+    expect(doneBox.padding, const EdgeInsets.symmetric(horizontal: 16, vertical: 12));
+
     await pumpLane(
       tester,
       const HoronAgentLane(
@@ -54,6 +62,7 @@ void main() {
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronAgentLane)));
     final AnimatedContainer box = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
     expect(((box.decoration! as BoxDecoration).border! as Border).top.color, theme.colors.borderDanger);
+    expect((box.decoration! as BoxDecoration).color, theme.colors.bgSurface);
     expect(find.byIcon(Icons.error), findsOneWidget);
     final RichText output = tester.widget<RichText>(
       find.descendant(of: find.text('응답이 잘렸습니다'), matching: find.byType(RichText)),

@@ -100,36 +100,41 @@ void main() {
     }
   });
 
-  testWidgets('the glass picker is a 40px tall, 160px wide field with the md radius', (WidgetTester tester) async {
+  testWidgets('the glass picker is a 40px tall, 160px wide veil field with 16px caret and body-md', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00', surface: HoronPickerSurface.glass)));
     final HoronThemeData theme = _theme(tester);
-    final BoxDecoration decoration = _triggerDecoration(tester);
 
     expect(tester.getSize(_trigger()), const Size(160, 40), reason: 'w-40 h-10');
-    expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.radius.md, reason: 'rounded-md');
-    expect(decoration.border!.top.color, theme.colors.glassRimStrong, reason: 'border-glass-rim-strong');
-    expect(
-      tester.widget<HoronLiquidGlass>(find.descendant(of: _trigger(), matching: find.byType(HoronLiquidGlass))).tier,
-      HoronGlassTier.regular,
-      reason: 'bg-glass-regular',
-    );
+    final HoronVeil veil = tester.widget<HoronVeil>(find.descendant(of: _trigger(), matching: find.byType(HoronVeil)));
+    expect(veil.kind, HoronVeilKind.field, reason: 'surface="glass"는 veil-field입니다');
+    expect(veil.borderRadius!.topLeft.x, theme.radius.md, reason: 'rounded-md');
+    expect(find.descendant(of: _trigger(), matching: find.byType(HoronLiquidGlass)), findsNothing);
 
     final Finder icons = find.descendant(of: _trigger(), matching: find.byType(Icon));
     expect(tester.getSize(icons.at(0)).width, theme.space.step(4), reason: '[&>svg]:size-4 (IconTheme)');
-    expect(tester.getSize(icons.at(1)).width, theme.space.step(3.5), reason: 'size-3.5');
+    expect(tester.getSize(icons.at(1)).width, theme.space.step(4), reason: 'size-4');
     expect(tester.widget<Icon>(icons.at(1)).icon, Icons.keyboard_arrow_down);
 
     final DefaultTextStyle value = tester.widget<DefaultTextStyle>(find.byKey(const Key('horon-picker-value')));
-    expect(value.style.fontSize, theme.text.bodySm.fontSize, reason: 'text-body-sm');
+    expect(value.style.fontSize, theme.text.bodyMd.fontSize, reason: 'text-body-md');
     expect(value.style.color, theme.colors.textPrimary);
   });
 
-  testWidgets('an inset picker paints the 4% ink and skips the glass', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00', surface: HoronPickerSurface.solid)));
+  testWidgets('an inset picker paints the 4% ink and a solid picker paints bg-surface with a border', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00', surface: HoronPickerSurface.inset)));
     final HoronThemeData theme = _theme(tester);
 
     expect(_triggerDecoration(tester).color, theme.colors.overlayInk4, reason: 'bg-overlay-ink-4');
     expect(find.descendant(of: _trigger(), matching: find.byType(HoronLiquidGlass)), findsNothing);
+
+    await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00', surface: HoronPickerSurface.solid)));
+    final BoxDecoration solid = _triggerDecoration(tester);
+    expect(solid.color, theme.colors.bgSurface, reason: 'bg-bg-surface');
+    expect(solid.border!.top.color, theme.colors.borderDefault, reason: 'border-border-default');
   });
 
   testWidgets('tapping the field opens the list and picking a value reports it', (WidgetTester tester) async {
@@ -260,7 +265,11 @@ void main() {
       theme.colors.interactivePrimary,
       reason: 'data-pressed:bg-interactive-primary',
     );
-    expect(_weekdayStyle(tester, 'M', 'mon').color, theme.colors.textInverse, reason: 'data-pressed:text-text-inverse');
+    expect(
+      _weekdayStyle(tester, 'M', 'mon').color,
+      theme.colors.interactiveOnPrimary,
+      reason: 'data-pressed:text-interactive-on-primary',
+    );
     expect(_weekdayDecoration(tester, 'tue').color, theme.colors.overlayInk6, reason: 'bg-overlay-ink-6');
     expect(_weekdayStyle(tester, 'T', 'tue').color, theme.colors.textSecondary);
     expect(_weekdayStyle(tester, 'T', 'tue').fontSize, theme.text.labelMd.fontSize, reason: 'text-label-md');
@@ -274,7 +283,7 @@ void main() {
     expect(changes.last, <String>['tue', 'wed'], reason: '다시 누르면 꺼집니다');
   });
 
-  testWidgets('the schedule card is a 380px thick-glass panel with 18 padding and 14 gaps', (
+  testWidgets('the schedule card is a 380px thick-glass panel with 20 padding and 16 gaps', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -300,14 +309,14 @@ void main() {
     expect(decoration.border!.top.color, theme.colors.glassRimStrong);
     expect(
       tester.widget<Padding>(find.descendant(of: surface, matching: find.byType(Padding)).first).padding,
-      EdgeInsets.all(theme.space.step(4.5)),
-      reason: 'p-4.5',
+      EdgeInsets.all(theme.space.s5),
+      reason: 'p-5',
     );
     final Column column = tester.widget<Column>(find.descendant(of: surface, matching: find.byType(Column)).first);
-    expect(column.spacing, theme.space.s3_5, reason: 'gap-3.5');
+    expect(column.spacing, theme.space.s4, reason: 'gap-4');
 
-    // 제목 줄의 반복 아이콘 18px, 다음 실행 줄의 달력 아이콘 16px.
-    expect(tester.widget<Icon>(find.byIcon(Icons.repeat)).size, theme.space.step(4.5));
+    // 제목 줄의 반복 아이콘 16px, 다음 실행 줄의 달력 아이콘 16px.
+    expect(tester.widget<Icon>(find.byIcon(Icons.repeat)).size, theme.space.step(4));
     expect(tester.widget<Icon>(find.byIcon(Icons.calendar_today_outlined)).size, theme.space.step(4));
 
     final Container nextRun = tester.widget<Container>(find.byKey(const Key('horon-schedule-card-next-run')));
@@ -319,8 +328,8 @@ void main() {
     );
     expect(
       nextRun.padding,
-      EdgeInsets.symmetric(horizontal: theme.space.s3, vertical: theme.space.s2_5),
-      reason: 'px-3 py-2.5',
+      EdgeInsets.symmetric(horizontal: theme.space.s3, vertical: theme.space.s2),
+      reason: 'px-3 py-2',
     );
 
     // 섹션 캡션은 caption + 보조 색입니다.
@@ -329,6 +338,11 @@ void main() {
     );
     expect(caption.style.fontSize, theme.text.caption.fontSize, reason: 'text-caption');
     expect(caption.style.color, theme.colors.textSecondary);
+
+    final Column section = tester.widget<Column>(
+      find.ancestor(of: find.text('Repeat'), matching: find.byType(Column)).first,
+    );
+    expect(section.spacing, theme.space.s2, reason: 'gap-2');
   });
 
   testWidgets('a narrow card shrinks instead of overflowing', (WidgetTester tester) async {

@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 
 import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
 import '../glass/horon_surface.dart';
+import '../glass/horon_veil.dart';
 import '../overlay/horon_menu_anchor.dart';
 import '../overlay/horon_overlay.dart';
 import '../theme/horon_motion.dart';
@@ -81,6 +81,7 @@ typedef _PickerMetrics = ({
   double icon,
   double caret,
   double check,
+  double triggerPaddingX,
   double itemHeight,
   double itemGap,
   double itemPaddingX,
@@ -94,39 +95,42 @@ _PickerMetrics _metricsOf(HoronPickerFieldSize size, HoronThemeData theme) => sw
     width: theme.space.step(36),
     height: theme.space.step(8),
     icon: 16,
-    caret: 12,
+    caret: 16,
     check: 16,
+    triggerPaddingX: theme.space.s3,
     itemHeight: theme.space.step(8),
     itemGap: theme.space.s2,
     itemPaddingX: theme.space.s2_5,
     popupPadding: theme.space.s1,
     value: theme.text.bodySm,
-    item: theme.text.labelMd,
+    item: theme.text.labelSm,
   ),
   HoronPickerFieldSize.md => (
     width: theme.space.step(40),
     height: theme.space.step(10),
     icon: 16,
-    caret: 14,
-    check: 18,
+    caret: 16,
+    check: 16,
+    triggerPaddingX: theme.space.s3_5,
     itemHeight: theme.space.step(10),
     itemGap: theme.space.s2_5,
     itemPaddingX: theme.space.s3,
     popupPadding: theme.space.s1_5,
-    value: theme.text.bodySm,
+    value: theme.text.bodyMd,
     item: theme.text.labelMd,
   ),
   HoronPickerFieldSize.lg => (
     width: theme.space.step(44),
     height: theme.space.step(12),
     icon: 20,
-    caret: 16,
+    caret: 20,
     check: 20,
+    triggerPaddingX: theme.space.s5,
     itemHeight: theme.space.step(12),
     itemGap: theme.space.s3,
-    itemPaddingX: theme.space.step(3.5),
+    itemPaddingX: theme.space.s4,
     popupPadding: theme.space.s2,
-    value: theme.text.bodyMd,
+    value: theme.text.bodyLg,
     item: theme.text.labelLg,
   ),
 };
@@ -183,6 +187,12 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
   late String? _value;
   final LayerLink _link = LayerLink();
   final MenuController _menu = MenuController();
+
+  /// 트리거가 키보드 포커스를 받았는지입니다.
+  bool _focused = false;
+
+  /// 트리거에 포인터가 올라와 있는지입니다(`hover` 테두리).
+  bool _hovered = false;
 
   /// 패널의 실제 크기를 오버레이가 한 번 재었는지입니다.
   ///
@@ -289,53 +299,58 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
     final double extraOffset = math.max(theme.space.s2 - HoronOverlayPosition.gap, 0);
     // 테두리와 패딩도 배치가 준 높이 안에 들어와야 합니다.
     final double contentMaxHeight = math.max(panelMaxHeight - metrics.popupPadding * 2 - extraOffset, 0);
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: panelMaxWidth, maxHeight: panelMaxHeight),
-      child: DecoratedBox(
-        // `bg-glass-thick`.
-        decoration: BoxDecoration(
-          color: colors.glassThick,
-          // `rounded-xl border border-glass-rim-strong`.
-          borderRadius: BorderRadius.circular(theme.radius.xl),
-          border: Border.all(color: colors.glassRimStrong),
-        ),
-        // `p-1.5`.
-        child: Padding(
-          padding: EdgeInsets.all(metrics.popupPadding),
-          child: SizedBox(
-            width: math.min(width, panelMaxWidth),
-            child: ConstrainedBox(
-              // `max-h-72 overflow-y-auto`. 자리가 모자라면 목록이 그 안에서
-              // 스크롤합니다.
-              constraints: BoxConstraints(maxHeight: math.min(_maxPopupHeight, contentMaxHeight)),
-              child: SingleChildScrollView(
-                // 패널이 포커스를 받을 때 스크롤 위치를 바꾸지 않도록 자체
-                // 컨트롤러를 씁니다.
-                primary: false,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  // `gap-0.5`.
-                  spacing: theme.space.s0_5,
-                  children: <Widget>[
-                    for (final HoronPickerItem item in widget.items)
-                      _PickerRow(
-                        key: ValueKey<String>('horon-picker-item-${item.value}'),
-                        height: metrics.itemHeight,
-                        paddingX: metrics.itemPaddingX,
-                        gap: metrics.itemGap,
-                        checkSize: metrics.check,
-                        style: metrics.item,
-                        selected: item.value == _value,
-                        onActivate: () => _select(item),
-                        label: item.label,
-                      ),
-                  ],
-                ),
-              ),
+    final BorderRadius radius = BorderRadius.circular(theme.radius.xl);
+    final Widget list = Padding(
+      padding: EdgeInsets.all(metrics.popupPadding),
+      child: SizedBox(
+        width: math.min(width, panelMaxWidth),
+        child: ConstrainedBox(
+          // `max-h-72 overflow-y-auto`. 자리가 모자라면 목록이 그 안에서
+          // 스크롤합니다.
+          constraints: BoxConstraints(maxHeight: math.min(_maxPopupHeight, contentMaxHeight)),
+          child: SingleChildScrollView(
+            // 패널이 포커스를 받을 때 스크롤 위치를 바꾸지 않도록 자체
+            // 컨트롤러를 씁니다.
+            primary: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              // `gap-0.5`.
+              spacing: theme.space.s0_5,
+              children: <Widget>[
+                for (final HoronPickerItem item in widget.items)
+                  _PickerRow(
+                    key: ValueKey<String>('horon-picker-item-${item.value}'),
+                    height: metrics.itemHeight,
+                    paddingX: metrics.itemPaddingX,
+                    gap: metrics.itemGap,
+                    checkSize: metrics.check,
+                    style: metrics.item,
+                    selected: item.value == _value,
+                    onActivate: () => _select(item),
+                    label: item.label,
+                  ),
+              ],
             ),
           ),
         ),
       ),
+    );
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: panelMaxWidth, maxHeight: panelMaxHeight),
+      child: widget.surface == HoronPickerSurface.solid
+          // React `border border-border-default bg-bg-surface shadow-popover`.
+          ? DecoratedBox(
+              decoration: BoxDecoration(
+                color: colors.bgSurface,
+                borderRadius: radius,
+                border: Border.all(color: colors.borderDefault),
+                boxShadow: theme.shadows.popover,
+              ),
+              child: ClipRRect(borderRadius: radius, child: list),
+            )
+          // React `veil-overlay` — glass·inset 모두 떠 있는 목록은 veil입니다.
+          : HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: list),
     );
   }
 
@@ -351,7 +366,7 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
     final BorderRadius radius = BorderRadius.circular(theme.radius.md);
 
     final Widget content = Padding(
-      padding: EdgeInsets.symmetric(horizontal: metrics.itemPaddingX),
+      padding: EdgeInsets.symmetric(horizontal: metrics.triggerPaddingX),
       child: Row(
         spacing: metrics.itemGap,
         children: <Widget>[
@@ -384,35 +399,79 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
       ),
     );
 
-    final Widget surface = widget.surface == HoronPickerSurface.glass
-        // `border-glass-rim-strong bg-glass-regular` + LiquidGlass regular.
-        ? HoronLiquidGlass(
-            tier: HoronGlassTier.regular,
-            borderRadius: radius,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: radius,
-                border: Border.all(color: colors.glassRimStrong),
+    final Widget body = SizedBox(height: metrics.height, child: content);
+    final Widget surface = switch (widget.surface) {
+      // React `veil-field` — 필드 상자의 유리 자리를 veil이 대신합니다.
+      HoronPickerSurface.glass => HoronVeil(kind: HoronVeilKind.field, borderRadius: radius, child: body),
+      // React `bg-overlay-ink-4`.
+      HoronPickerSurface.inset => DecoratedBox(
+        decoration: BoxDecoration(color: colors.overlayInk4, borderRadius: radius),
+        child: body,
+      ),
+      // React `border border-border-default bg-bg-surface hover:border-border-strong`.
+      HoronPickerSurface.solid => DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.bgSurface,
+          borderRadius: radius,
+          border: Border.all(color: _hovered ? colors.borderStrong : colors.borderDefault),
+        ),
+        child: body,
+      ),
+    };
+
+    Widget trigger = surface;
+    if (_focused) {
+      // `focus-within:outline-2 outline-offset-2 outline-text-brand`.
+      final double gap = theme.space.s0_5;
+      trigger = Stack(
+        clipBehavior: Clip.none,
+        children: <Widget>[
+          Positioned(
+            left: -gap,
+            top: -gap,
+            right: -gap,
+            bottom: -gap,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(theme.radius.md + gap),
+                  border: Border.all(color: colors.textBrand, width: 2),
+                ),
               ),
-              child: SizedBox(height: metrics.height, child: content),
             ),
-          )
-        // `bg-overlay-ink-4`.
-        : DecoratedBox(
-            decoration: BoxDecoration(color: colors.overlayInk4, borderRadius: radius),
-            child: SizedBox(height: metrics.height, child: content),
-          );
+          ),
+          surface,
+        ],
+      );
+    }
 
     return Semantics(
       button: true,
       label: widget.label,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          key: const Key('horon-picker-trigger'),
-          behavior: HitTestBehavior.opaque,
-          onTap: () => controller.isOpen ? controller.close() : controller.open(),
-          child: surface,
+      child: FocusableActionDetector(
+        onShowFocusHighlight: (bool value) => setState(() => _focused = value),
+        shortcuts: const <ShortcutActivator, Intent>{
+          SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+          SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+        },
+        actions: <Type, Action<Intent>>{
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (ActivateIntent intent) {
+              controller.isOpen ? controller.close() : controller.open();
+              return null;
+            },
+          ),
+        },
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (_) => setState(() => _hovered = true),
+          onExit: (_) => setState(() => _hovered = false),
+          child: GestureDetector(
+            key: const Key('horon-picker-trigger'),
+            behavior: HitTestBehavior.opaque,
+            onTap: () => controller.isOpen ? controller.close() : controller.open(),
+            child: trigger,
+          ),
         ),
       ),
     );
@@ -702,7 +761,10 @@ class _WeekdayToggleState extends State<_WeekdayToggle> {
             child: Text(
               widget.label,
               maxLines: 1,
-              style: widget.textStyle.copyWith(color: widget.selected ? colors.textInverse : colors.textSecondary),
+              // `data-pressed:text-interactive-on-primary`.
+              style: widget.textStyle.copyWith(
+                color: widget.selected ? colors.interactiveOnPrimary : colors.textSecondary,
+              ),
             ),
           ),
         ),
@@ -741,8 +803,8 @@ class HoronScheduleCard extends StatelessWidget {
   /// `w-95` — 카드의 폭입니다. 부모가 더 좁으면 그 폭을 따릅니다.
   static const double _width = 380;
 
-  /// `size-4.5` — 제목 줄의 반복 아이콘입니다.
-  static const double _repeatIcon = 18;
+  /// `size-4` — 제목 줄의 반복 아이콘입니다.
+  static const double _repeatIcon = 16;
 
   /// `size-4` — "다음 실행" 줄의 달력 아이콘입니다.
   static const double _nextRunIcon = 16;
@@ -770,12 +832,13 @@ class HoronScheduleCard extends StatelessWidget {
                 border: Border.all(color: colors.glassRimStrong),
               ),
               child: Padding(
-                padding: EdgeInsets.all(space.step(4.5)),
+                // `p-5` — md 카드의 20px 여백입니다.
+                padding: EdgeInsets.all(space.s5),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  // `gap-3.5`.
-                  spacing: space.s3_5,
+                  // `gap-4`.
+                  spacing: space.s4,
                   children: <Widget>[
                     Row(
                       // `gap-2.5`.
@@ -795,8 +858,8 @@ class HoronScheduleCard extends StatelessWidget {
                     if (nextRun != null)
                       Container(
                         key: const Key('horon-schedule-card-next-run'),
-                        // `rounded-md bg-accent-sky-500-16 px-3 py-2.5`.
-                        padding: EdgeInsets.symmetric(horizontal: space.s3, vertical: space.s2_5),
+                        // `rounded-md bg-accent-sky-500-16 px-3 py-2`.
+                        padding: EdgeInsets.symmetric(horizontal: space.s3, vertical: space.s2),
                         decoration: BoxDecoration(
                           color: colors.accentSky500_16,
                           borderRadius: BorderRadius.circular(theme.radius.md),
@@ -849,8 +912,8 @@ class HoronScheduleSection extends StatelessWidget {
       // React `flex-col`의 stretch 대신 start를 씁니다. React는 필드에 `w-40`을
       // 직접 적어 stretch를 막으므로, 자식이 자기 폭을 유지하는 쪽이 같은 그림입니다.
       crossAxisAlignment: CrossAxisAlignment.start,
-      // `gap-1.5`.
-      spacing: space.s1_5,
+      // `gap-2`.
+      spacing: space.s2,
       children: <Widget>[
         DefaultTextStyle.merge(
           // `text-caption text-text-secondary`.

@@ -43,8 +43,9 @@ class HoronInputGallerySection extends StatelessWidget {
           ),
           Text(
             'Figma `Input`(58:126)입니다. 상자는 40(MD)·48(LG)이고 반경은 '
-            '`radius.md`(12), 좌우 여백은 14입니다. 기본값은 Solid이고, Glass 표면은 '
-            '유리 레이어를 깔며 상태 테두리(초점·오류)를 림 색으로 칠합니다. '
+            '`radius.md`(12), 좌우 여백은 12/14/20입니다. 기본값은 Solid이고, Glass 표면은 '
+            'React `.veil-field`와 같은 veil 한 겹이라 LiquidGlass를 겹치지 않으며, '
+            '상태 테두리(초점·오류)를 veil 링이 맡습니다. '
             'SolidOnPage는 페이지 배경에 직접 놓는 불투명 표면입니다. 선행 아이콘은 '
             '`text-secondary`로 MD 16px·LG 20px입니다.',
             style: theme.text.bodySm.copyWith(

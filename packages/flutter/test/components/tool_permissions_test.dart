@@ -4,8 +4,9 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// 도구 권한 목록의 계약을 확인합니다.
 ///
-/// React `tool-permissions.tsx`가 정한 구조(중립 배경 헤더 + 개수 알약 + Allow all,
-/// 도구마다 한 줄 + Allow/Ask/Off 세그먼트)와 세 값의 선택 상태를 고정합니다.
+/// React `tool-permissions.tsx`가 정한 구조(둥근 카드, 옅은 헤더 + 개수 알약 + Allow all,
+/// 도구마다 한 줄 + `SegmentedControl size="sm" surface="solid"`)와 세 값의 선택 상태를
+/// 고정합니다.
 const List<HoronToolPermissionItem> _tools = <HoronToolPermissionItem>[
   HoronToolPermissionItem(name: 'files.read', description: Text('Read files in the workspace')),
   HoronToolPermissionItem(name: 'shell.run', defaultValue: HoronToolPermissionsToolPermission.off),
@@ -34,11 +35,13 @@ Widget _host(Brightness brightness, Widget child, {double width = 600}) {
   );
 }
 
-/// [label] 글자를 품은 세그먼트(AnimatedContainer)입니다.
-AnimatedContainer _segment(WidgetTester tester, String label, {int index = 0}) {
-  final Finder text = find.text(label).at(index);
-  return tester.widget<AnimatedContainer>(find.ancestor(of: text, matching: find.byType(AnimatedContainer)).first);
-}
+/// [color]로 채운 [Container]입니다.
+Finder _filled(Color color) => find.byWidgetPredicate((Widget widget) {
+  if (widget is! Container) return false;
+  final Decoration? decoration = widget.decoration;
+  if (decoration is! BoxDecoration || decoration.color != color) return false;
+  return true;
+});
 
 void main() {
   final HoronColors colors = HoronThemeData.light.colors;
@@ -62,55 +65,98 @@ void main() {
     }
   });
 
-  testWidgets('제목은 13/18 semibold, 도구 이름은 고정폭 13, 설명은 12 regular다', (WidgetTester tester) async {
+  testWidgets('카드는 16 반경 표면이고 헤더는 44 높이 옅은 띠다', (WidgetTester tester) async {
     await tester.pumpWidget(
       _host(Brightness.light, const HoronToolPermissions(title: Text('Tool permissions'), tools: _tools)),
     );
 
+    // `rounded-2xl border border-border-default bg-bg-surface` — 카드.
+    final Container card = tester.widget<Container>(
+      find.byWidgetPredicate((Widget widget) {
+        if (widget is! Container) return false;
+        final Decoration? decoration = widget.decoration;
+        return decoration is BoxDecoration &&
+            decoration.color == colors.bgSurface &&
+            decoration.borderRadius == BorderRadius.circular(radius.xl2) &&
+            (decoration.border! as Border).top.color == colors.borderDefault;
+      }),
+    );
+    expect(card.clipBehavior, Clip.antiAlias);
+
+    // `h-11 border-b bg-bg-subtle px-4` — 헤더.
+    final Finder header = _filled(colors.bgSubtle);
+    expect(header, findsOneWidget);
+    expect(tester.getSize(header).height, 44);
+    final BoxDecoration headerDecoration = tester.widget<Container>(header).decoration! as BoxDecoration;
+    expect((headerDecoration.border! as Border).bottom.color, colors.borderDefault);
+
+    // `h-5 px-1.5` — 개수 알약.
+    final Container pill = tester.widget<Container>(
+      find.byWidgetPredicate((Widget widget) {
+        if (widget is! Container) return false;
+        final Decoration? decoration = widget.decoration;
+        return decoration is BoxDecoration &&
+            decoration.color == colors.overlayInk6 &&
+            decoration.borderRadius == BorderRadius.circular(radius.full);
+      }),
+    );
+    expect(tester.getSize(find.byWidget(pill)).height, 20);
+    expect(pill.padding, const EdgeInsets.symmetric(horizontal: 6));
+
+    // `px-4 py-3 gap-4` — 도구 한 줄.
+    final Finder row = find.byWidgetPredicate(
+      (Widget widget) =>
+          widget is Container && widget.padding == const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    );
+    expect(row, findsWidgets);
+  });
+
+  testWidgets('제목은 labelMd semibold, 도구 이름은 고정폭 code, 설명은 caption이다', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      _host(Brightness.light, const HoronToolPermissions(title: Text('Tool permissions'), tools: _tools)),
+    );
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.text('files.read')));
+
     final DefaultTextStyle title = tester.widget<DefaultTextStyle>(
       find.ancestor(of: find.text('Tool permissions'), matching: find.byType(DefaultTextStyle)).first,
     );
-    expect(title.style.fontSize, 13);
+    expect(title.style.fontSize, theme.text.labelMd.fontSize);
     expect(title.style.fontWeight, HoronFontWeight.semibold);
     expect(title.style.color, colors.textPrimary);
 
+    // `font-mono text-code font-medium` — 도구 이름.
     final Text name = tester.widget<Text>(find.text('files.read'));
     expect(name.style!.fontFamily, HoronFont.mono);
-    expect(name.style!.fontSize, 13);
+    expect(name.style!.fontSize, theme.text.code.fontSize);
+    expect(name.style!.fontWeight, HoronFontWeight.medium);
     expect(name.style!.color, colors.textPrimary);
 
+    // `text-caption text-text-secondary` — 설명.
     final DefaultTextStyle description = tester.widget<DefaultTextStyle>(
       find.ancestor(of: find.text('Read files in the workspace'), matching: find.byType(DefaultTextStyle)).first,
     );
-    expect(description.style.fontSize, 12);
-    expect(description.style.fontWeight, HoronFontWeight.regular);
-    expect(description.style.color, colors.textPlaceholder);
+    expect(description.style.fontSize, theme.text.caption.fontSize);
+    expect(description.style.color, colors.textSecondary);
   });
 
-  testWidgets('기본값 ask가 선택되고 알약이 유리 표면과 rim을 쓴다', (WidgetTester tester) async {
+  testWidgets('각 줄의 세그먼트는 sm solid 인셋이 아닌 컨트롤이다', (WidgetTester tester) async {
     await tester.pumpWidget(_host(Brightness.light, const HoronToolPermissions(title: Text('T'), tools: _tools)));
 
-    final BoxDecoration ask = _segment(tester, 'Ask').decoration! as BoxDecoration;
-    expect(ask.color, colors.glassThick);
-    expect(ask.borderRadius, BorderRadius.circular(radius.full));
-    expect((ask.border! as Border).top.color, colors.glassRimStrong);
-
-    // 트랙은 `h-9 p-[3px]` — 36px이고, 세 칸이 그 안에 들어갑니다(`h-7.5`).
-    final Rect track = tester.getRect(find.byKey(const Key('horon-tool-permissions-track')).first);
-    expect(track.height, space.step(9));
-    for (final String label in <String>['Allow', 'Ask', 'Off']) {
-      final Rect text = tester.getRect(find.text(label).first);
-      expect(text.top, greaterThanOrEqualTo(track.top + space.step(3)), reason: '$label 칸의 위 여백');
-      expect(text.bottom, lessThanOrEqualTo(track.bottom - space.step(3)), reason: '$label 칸의 아래 여백');
+    final List<HoronSegmentedControl> controls = tester
+        .widgetList<HoronSegmentedControl>(find.byType(HoronSegmentedControl))
+        .toList();
+    expect(controls.length, 2);
+    for (final HoronSegmentedControl control in controls) {
+      expect(control.size, HoronSegmentedControlSize.sm);
+      expect(control.surface, HoronSegmentedControlSurface.solid);
+      expect(control.fill, isFalse);
+      expect(control.items.map((HoronSegmentedItem item) => item.label), <String>['Allow', 'Ask', 'Off']);
     }
-  });
-
-  testWidgets('선택되지 않은 칸은 알약을 칠하지 않는다', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(Brightness.light, const HoronToolPermissions(title: Text('T'), tools: _tools)));
-    final BoxDecoration allow = _segment(tester, 'Allow').decoration! as BoxDecoration;
-    expect(allow.color, Colors.transparent);
-    expect((allow.border! as Border).top.color, Colors.transparent);
-    expect(allow.boxShadow, isNull);
+    // 기본값 ask가 선택됩니다.
+    expect(controls.first.value, 'ask');
+    expect(controls.last.value, 'off');
+    // `h-9 p-[3px]` — sm 트랙은 36 높이입니다.
+    expect(tester.getSize(find.byType(HoronSegmentedControl).first).height, space.step(9));
   });
 
   testWidgets('세 값이 모두 선택 상태로 그려진다', (WidgetTester tester) async {
@@ -126,12 +172,16 @@ void main() {
         ),
       );
       expect(tester.takeException(), isNull, reason: '$value 상태가 그려지지 않습니다');
+      expect(
+        tester.widget<HoronSegmentedControl>(find.byType(HoronSegmentedControl)).value,
+        value.name,
+        reason: '$value가 선택 상태여야 합니다',
+      );
       for (final HoronToolPermissionsToolPermission option in HoronToolPermissionsToolPermission.values) {
         final Text text = tester.widget<Text>(find.text(_labels[option]!));
         final Color expected = option == value ? colors.textPrimary : colors.textSecondary;
         expect(text.style!.color, expected, reason: '$value일 때 ${_labels[option]}의 글자색');
       }
-      expect((_segment(tester, _labels[value]!).decoration! as BoxDecoration).color, colors.glassThick);
     }
   });
 
@@ -154,7 +204,6 @@ void main() {
     expect(changed, isNotNull);
     expect(changed!['files.read'], HoronToolPermissionsToolPermission.off);
     expect(changed!['shell.run'], HoronToolPermissionsToolPermission.off);
-    expect((_segment(tester, 'Off').decoration! as BoxDecoration).color, colors.glassThick);
   });
 
   testWidgets('Allow all은 모든 도구를 allow로 바꾼다', (WidgetTester tester) async {
@@ -189,8 +238,8 @@ void main() {
         ),
       ),
     );
-    expect((_segment(tester, 'Off').decoration! as BoxDecoration).color, colors.glassThick);
-    expect((_segment(tester, 'Ask').decoration! as BoxDecoration).color, Colors.transparent);
+    expect(tester.widget<HoronSegmentedControl>(find.byType(HoronSegmentedControl)).value, 'off');
+    expect(tester.widget<Text>(find.text('Off')).style!.color, colors.textPrimary, reason: '선택된 칸은 text-primary입니다');
   });
 
   testWidgets('좁은 폭에서는 세그먼트가 이름 아래로 내려간다', (WidgetTester tester) async {
@@ -199,7 +248,7 @@ void main() {
     await tester.pumpWidget(_host(Brightness.light, component, width: 768));
     expect(tester.takeException(), isNull);
     expect(
-      tester.getTopLeft(find.byKey(const Key('horon-tool-permissions-track')).first).dy,
+      tester.getTopLeft(find.byType(HoronSegmentedControl).first).dy,
       lessThan(tester.getBottomLeft(find.text('files.read')).dy),
       reason: '넓은 폭에서는 이름과 세그먼트가 한 줄을 나눠 씁니다',
     );
@@ -207,7 +256,7 @@ void main() {
     await tester.pumpWidget(_host(Brightness.light, component, width: 320));
     expect(tester.takeException(), isNull);
     expect(
-      tester.getTopLeft(find.byKey(const Key('horon-tool-permissions-track')).first).dy,
+      tester.getTopLeft(find.byType(HoronSegmentedControl).first).dy,
       greaterThan(tester.getBottomLeft(find.text('files.read')).dy),
       reason: '320px에서는 세그먼트가 이름 아래로 내려갑니다',
     );

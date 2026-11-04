@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_veil.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -48,7 +47,7 @@ HoronFieldMetrics horonFieldMetrics(HoronInputSize size, HoronThemeData theme) =
 
 /// React `InputSurface`와 같은 값 집합입니다.
 enum HoronInputSurface {
-  /// `glass` — 이미지나 유리 패널 위에 얹는 기본 표면입니다.
+  /// `glass` — 이미지나 유리 패널 위에 얹는 `.veil-field` 표면입니다.
   glass,
 
   /// `solid` — 올라온 표면(`bg-surface`) 위에 쓰는 불투명 표면입니다.
@@ -64,8 +63,8 @@ enum HoronInputSurface {
 /// 씁니다. React는 클래스 문자열을 export하고, 여기서는 테두리·채움·반경·여백을
 /// 그리는 위젯이 그 자리를 대신합니다.
 ///
-/// 유리 표면은 [HoronLiquidGlass]의 `regular` 티어로 채우고, 상태 테두리(초점·오류)는
-/// 호스트에 겹쳐 그리지 않고 [HoronLiquidGlass.edgeColor]로 림에 칠합니다. 불투명
+/// 유리 표면은 React `.veil-field`와 같은 [HoronVeil] 한 겹으로 채우고, 상태 테두리
+/// (초점·오류)는 veil의 1px 링이 맡습니다. 불투명
 /// 표면은 React의 `hover:border-border-strong`을 포인터가 있는 환경의 hover 상태로
 /// 옮기고, `focus-within:outline-2`는 상자 안쪽 2px 링으로 옮겼습니다(outline-offset만큼
 /// 밖으로 나가면 레이아웃이 흔들립니다).
@@ -120,17 +119,10 @@ class _HoronFieldBoxState extends State<HoronFieldBox> {
     return colors.borderDefault;
   }
 
-  /// 유리 표면의 상태 테두리입니다. 호스트 위에 겹쳐 그리지 않고 림 색으로 칠합니다.
-  Color? _glassEdgeColor(HoronColors colors) {
-    if (widget.invalid) return colors.borderDanger;
-    return _focused ? colors.textBrand : null;
-  }
-
   Color _fillColor(HoronColors colors) {
     if (!widget.enabled) {
-      // React `has-[[data-disabled]]:bg-bg-subtle`와 다크 전용
-      // `dark:bg-neutral-800`입니다. 다크 전용 회색은 토큰에 없어
-      // `bg-subtle`(다크 #2a2b2d)로 대신합니다.
+      // React `has-[[data-disabled]]:bg-bg-subtle`입니다. `solid-on-page`의 다크 전용
+      // 중립색 예외는 이번 React 변경에서 사라졌습니다.
       return colors.bgSubtle;
     }
     return switch (widget.surface) {
@@ -152,12 +144,16 @@ class _HoronFieldBoxState extends State<HoronFieldBox> {
 
     Widget box;
     if (widget.surface == HoronInputSurface.glass) {
-      box = HoronLiquidGlass(
-        tier: HoronGlassTier.regular,
+      // React `fieldBoxClass.glass`는 `.veil-field`입니다. HoronLiquidGlass를 겹치지
+      // 않고 veil 한 겹만 씁니다. 비활성은 `has-[[data-disabled]]:opacity-60`입니다.
+      final Widget veil = HoronVeil(
+        kind: HoronVeilKind.field,
         borderRadius: radius,
-        edgeColor: _glassEdgeColor(horon.colors),
+        focused: _focused,
+        invalid: widget.invalid,
         child: content,
       );
+      box = widget.enabled ? veil : Opacity(opacity: _disabledOpacity, child: veil);
     } else {
       box = AnimatedContainer(
         duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,
@@ -171,7 +167,11 @@ class _HoronFieldBoxState extends State<HoronFieldBox> {
       );
     }
 
-    final Widget clipped = ClipRRect(borderRadius: radius, child: box);
+    // veil은 링·그림자를 표면 바깥에 그리므로 바깥 ClipRRect로 잘라 내면 안 됩니다.
+    // HoronVeil이 자기 표면과 내용을 이미 둥글게 자릅니다.
+    final Widget clipped = widget.surface == HoronInputSurface.glass
+        ? box
+        : ClipRRect(borderRadius: radius, child: box);
     final Widget sized = widget.minHeight == null && widget.height == null
         ? clipped
         : ConstrainedBox(
@@ -336,3 +336,6 @@ class _HoronInputState extends State<HoronInput> {
     );
   }
 }
+
+/// `has-[[data-disabled]]:opacity-60` — veil 필드의 비활성 불투명도입니다.
+const double _disabledOpacity = 0.6;

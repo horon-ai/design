@@ -51,6 +51,41 @@ void main() {
     expect(find.bySemanticsLabel('Loading'), findsWidgets);
   });
 
+  testWidgets('skeleton card: rounded-2xl shell with p-4, gap-3 and a 248px first bar', (WidgetTester tester) async {
+    await pumpSkeleton(tester, const HoronSkeletonCard.card());
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronSkeletonCard)));
+
+    final ClipRRect clip = tester.widget<ClipRRect>(
+      find.descendant(of: find.byType(HoronSkeletonCard), matching: find.byType(ClipRRect)).first,
+    );
+    expect((clip.borderRadius as BorderRadius).topLeft.x, theme.radius.xl2, reason: 'rounded-2xl');
+    expect(theme.radius.xl2, 16);
+
+    expect(
+      find.descendant(
+        of: find.byType(HoronSkeletonCard),
+        matching: find.byWidgetPredicate(
+          (Widget widget) => widget is Padding && widget.padding == EdgeInsets.all(theme.space.s4),
+        ),
+      ),
+      findsOneWidget,
+      reason: 'p-4 = 16',
+    );
+    expect(
+      find.descendant(
+        of: find.byType(HoronSkeletonCard),
+        matching: find.byWidgetPredicate((Widget widget) => widget is SizedBox && widget.height == theme.space.s3),
+      ),
+      findsWidgets,
+      reason: 'gap-3 = 12',
+    );
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is HoronSkeleton && widget.width == 248),
+      findsOneWidget,
+      reason: 'w-62 = 248',
+    );
+  });
+
   testWidgets('skeleton card: card and text shapes differ in the number of lines', (WidgetTester tester) async {
     await pumpSkeleton(tester, const HoronSkeletonCard.card());
     expect(find.byType(HoronSkeleton), findsNWidgets(5));

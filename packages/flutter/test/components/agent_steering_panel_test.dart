@@ -74,7 +74,9 @@ void main() {
     }
   });
 
-  testWidgets('steering: the header carries the 18px sparkle and a 32px pause button', (WidgetTester tester) async {
+  testWidgets('steering: the header carries the 18px sparkle, a 6px live dot and a 30px pause button', (
+    WidgetTester tester,
+  ) async {
     await pumpPanel(tester, const HoronAgentSteeringPanel(title: 'Draft', steps: _steps));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronAgentSteeringPanel)));
     // `Sparkle size-4.5 text-text-primary`.
@@ -83,12 +85,29 @@ void main() {
     expect(sparkle.color, theme.colors.textPrimary);
     // `text-label-lg`.
     expect(_labelColor(tester, 'Draft'), theme.colors.textPrimary);
-    // `size-8 rounded-[10px]`, `[&>svg]:size-4`.
+
+    // `size-1.5 rounded-full bg-status-live`.
+    final Iterable<Container> dots = tester.widgetList<Container>(find.byType(Container)).where((Container box) {
+      final Decoration? decoration = box.decoration;
+      return decoration is BoxDecoration &&
+          decoration.shape == BoxShape.circle &&
+          decoration.color == theme.colors.statusLive &&
+          tester.getSize(find.byWidget(box)) == const Size(6, 6);
+    });
+    expect(dots.length, 1);
+
+    // `size-7.5 rounded-full`, `[&>svg]:size-4`.
     expect(tester.widget<Icon>(find.byIcon(Icons.pause)).size, 16);
+    final Finder pauseButton = find
+        .ancestor(of: find.byIcon(Icons.pause), matching: find.byType(AnimatedContainer))
+        .first;
+    expect(tester.getSize(pauseButton), const Size(30, 30));
     expect(
-      tester.getSize(find.ancestor(of: find.byIcon(Icons.pause), matching: find.byType(AnimatedContainer)).first),
-      const Size(32, 32),
+      (tester.widget<AnimatedContainer>(pauseButton).decoration! as BoxDecoration).borderRadius,
+      BorderRadius.circular(theme.radius.full),
     );
+    // `h-px bg-overlay-ink-8` 구분선 두 줄.
+    expect(_paints(tester, theme.colors.overlayInk8), isTrue);
   });
 
   testWidgets('steering: the pause button reports the flipped state', (WidgetTester tester) async {
@@ -127,6 +146,11 @@ void main() {
     expect(tester.widget<Icon>(find.byIcon(Icons.check)).size, 12);
     // `<Spinner size={18} />` — 도는 단계는 18px 스피너입니다.
     expect(tester.widget<HoronSpinner>(find.byType(HoronSpinner)).pixelSize, 18);
+    // `size-4.5` — 할 일 표식은 18px 점선 원입니다.
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is SizedBox && widget.width == 18 && widget.height == 18),
+      findsWidgets,
+    );
     // `text-body-sm text-text-secondary` (todo) / `text-text-primary`.
     expect(_labelColor(tester, '메일을 읽습니다'), theme.colors.textPrimary);
     expect(_labelColor(tester, '답장을 계획합니다'), theme.colors.textPrimary);
@@ -188,8 +212,11 @@ void main() {
     await tester.pump();
     expect(applied, 'tone');
 
+    // `animate-pop-out` 130ms가 끝난 뒤에 제거를 알립니다.
     await tester.tap(find.byIcon(Icons.close));
     await tester.pump();
+    expect(removed, isNull);
+    await tester.pump(const Duration(milliseconds: 200));
     expect(removed, 'tone');
   });
 
@@ -231,11 +258,23 @@ void main() {
     expect(sent.last, ('멈춰', true));
   });
 
-  testWidgets('steering: the steer box keeps the 44px height and the 16px send icon', (WidgetTester tester) async {
+  testWidgets('steering: the steer box is a 44px full pill with a 16px send icon', (WidgetTester tester) async {
     await pumpPanel(tester, const HoronAgentSteeringPanel(title: 'Draft', steps: _steps));
-    // `h-11` — 조타 상자는 44입니다.
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronAgentSteeringPanel)));
+    // `h-11 rounded-full pr-1.5 pl-4` — 조타 상자는 44 높이의 알약입니다.
     final Finder box = find.ancestor(of: find.byType(TextField), matching: find.byType(Container)).first;
     expect(tester.getSize(box).height, 44);
+    final Container steerBox = tester.widget<Container>(box);
+    expect((steerBox.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.full));
+    expect(steerBox.padding, const EdgeInsets.only(left: 16, right: 6));
+    // `rounded-full` — 보내기 버튼도 원입니다.
+    final Finder send = find
+        .ancestor(of: find.byIcon(Icons.arrow_upward), matching: find.byType(AnimatedContainer))
+        .first;
+    expect(
+      (tester.widget<AnimatedContainer>(send).decoration! as BoxDecoration).borderRadius,
+      BorderRadius.circular(theme.radius.full),
+    );
     // `[&>svg]:size-4`.
     expect(tester.widget<Icon>(find.byIcon(Icons.arrow_upward)).size, 16);
   });

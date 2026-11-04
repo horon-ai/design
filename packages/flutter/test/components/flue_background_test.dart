@@ -20,20 +20,22 @@ void main() {
 
   Future<void> pumpFlue(
     WidgetTester tester, {
-    HoronFlueConfig config = HoronFlueConfig.sky,
+    HoronFlueConfig? config,
+    HoronFlueVariant variant = HoronFlueVariant.defaultValue,
     Color? tint,
     bool animations = true,
+    Brightness brightness = Brightness.light,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
-        theme: horonTheme(Brightness.light),
+        theme: horonTheme(brightness),
         home: MediaQuery(
           data: MediaQueryData(size: hostSize, disableAnimations: !animations),
           child: Scaffold(
             body: SizedBox(
               width: hostSize.width,
               height: hostSize.height,
-              child: HoronFlueBackground(config: config, tint: tint),
+              child: HoronFlueBackground(variant: variant, config: config, tint: tint),
             ),
           ),
         ),
@@ -88,6 +90,34 @@ void main() {
     await drain(tester);
   });
 
+  testWidgets('sidebar and auth lay no tint of their own', (WidgetTester tester) async {
+    for (final HoronFlueVariant variant in <HoronFlueVariant>[HoronFlueVariant.sidebar, HoronFlueVariant.auth]) {
+      await pumpFlue(tester, variant: variant);
+      final HoronThemeData horon = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
+      expect(
+        find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == horon.colors.glassRegular),
+        findsNothing,
+        reason: variant.name,
+      );
+      await drain(tester);
+    }
+  });
+
+  testWidgets('dark theme paints the night palette with no light tint', (WidgetTester tester) async {
+    await pumpFlue(tester, brightness: Brightness.dark);
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == HoronFlueConfig.night.bgColor),
+      findsOneWidget,
+    );
+    // React `bg-glass-regular dark:bg-transparent`: 다크 기본값에는 색조가 없습니다.
+    final HoronThemeData horon = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == horon.colors.glassRegular),
+      findsNothing,
+    );
+    await drain(tester);
+  });
+
   testWidgets('the ticker advances the clock and the frame while animations are allowed', (WidgetTester tester) async {
     await pumpFlue(tester);
     final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
@@ -99,8 +129,16 @@ void main() {
     await drain(tester);
   });
 
+  testWidgets('the public enum mirrors the React variant vocabulary', (WidgetTester tester) async {
+    expect(HoronFlueVariant.values, <HoronFlueVariant>[
+      HoronFlueVariant.defaultValue,
+      HoronFlueVariant.sidebar,
+      HoronFlueVariant.auth,
+    ]);
+  });
+
   testWidgets('pointer steering aims at the normalized position like aim()', (WidgetTester tester) async {
-    await pumpFlue(tester);
+    await pumpFlue(tester, config: HoronFlueConfig.sky.copyWith(cursor: 1));
     final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
     final Rect rect = tester.getRect(find.byType(HoronFlueBackground));
 

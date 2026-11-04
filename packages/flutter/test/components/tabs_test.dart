@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
@@ -14,10 +15,19 @@ Widget _host(Widget child, {Brightness brightness = Brightness.light, double wid
 
 HoronThemeData _theme(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronTabs)));
 
-Widget _tabs({ValueChanged<String>? onChanged, bool logsEnabled = true}) => HoronTabs(
+Widget _tabs({
+  ValueChanged<String>? onChanged,
+  bool logsEnabled = true,
+  HoronTabsSize size = HoronTabsSize.md,
+  HoronTabsListVariant variant = HoronTabsListVariant.pill,
+  HoronSurface surface = HoronSurface.solid,
+}) => HoronTabs(
+  size: size,
   onChanged: onChanged,
   children: <Widget>[
     HoronTabsList(
+      variant: variant,
+      surface: surface,
       children: <Widget>[
         const HoronTabsTab(value: 'overview', label: '개요와 통계', icon: Icon(Icons.dashboard_outlined), count: 4),
         const HoronTabsTab(value: 'members', label: '멤버 관리'),
@@ -105,31 +115,140 @@ void main() {
     expect(pill('12').color, theme.colors.overlayInk6, reason: '나머지는 overlay-ink-6');
     expect(
       tester.getSize(find.ancestor(of: find.text('4'), matching: find.byType(AnimatedContainer)).first).height,
-      22,
+      theme.space.step(5),
+      reason: 'md 개수 알약 h-5 = 20',
+    );
+    expect(
+      tester.widget<Text>(find.text('4')).style!.fontSize,
+      theme.text.labelSm.fontSize,
+      reason: '개수 글자는 모든 단계에서 label-sm',
     );
   });
 
-  testWidgets('a rich tab pads 14/10 and a plain tab pads 4/10 with a 16px icon', (WidgetTester tester) async {
+  testWidgets('each rung sets its own height, side padding, type and icon', (WidgetTester tester) async {
+    // (단계, 높이, 좌우 여백, 아이콘, 라벨 글자 크기) — React `tabClass`와 같은 값입니다.
+    final List<(HoronTabsSize, double, double, double, double)> rungs =
+        <(HoronTabsSize, double, double, double, double)>[
+          (HoronTabsSize.sm, 26, 10, 14, 12),
+          (HoronTabsSize.md, 30, 16, 16, 14),
+          (HoronTabsSize.lg, 36, 16, 20, 16),
+        ];
+
+    for (final (HoronTabsSize size, double height, double paddingX, double icon, double labelSize) in rungs) {
+      await tester.pumpWidget(_host(_tabs(size: size)));
+      await tester.pump();
+      final HoronThemeData theme = _theme(tester);
+
+      AnimatedContainer surfaceOf(String label) => tester.widget<AnimatedContainer>(
+        find.ancestor(of: find.text(label), matching: find.byType(AnimatedContainer)).first,
+      );
+
+      expect(surfaceOf('개요와 통계').constraints?.maxHeight, height, reason: '$size 높이');
+      expect(surfaceOf('개요와 통계').padding, EdgeInsets.symmetric(horizontal: paddingX), reason: '$size 좌우 여백');
+      expect(
+        surfaceOf('멤버 관리').padding,
+        EdgeInsets.symmetric(horizontal: paddingX),
+        reason: '$size는 아이콘·개수와 무관하게 같은 좌우 여백을 씁니다',
+      );
+      final Padding tray = tester.widget<Padding>(
+        find.descendant(of: find.byType(HoronTabsList), matching: find.byType(Padding)).first,
+      );
+      expect(
+        tray.padding,
+        EdgeInsets.all(size == HoronTabsSize.lg ? theme.space.s1 : theme.space.step(0.75)),
+        reason: '$size 쟁반 여백은 3/3/4px입니다',
+      );
+      expect(IconTheme.of(tester.element(find.byIcon(Icons.dashboard_outlined))).size, icon, reason: '$size 아이콘');
+      expect(IconTheme.of(tester.element(find.byIcon(Icons.dashboard_outlined))).color, theme.colors.textPrimary);
+      expect(tester.widget<Text>(find.text('멤버 관리')).style!.fontSize, labelSize, reason: '$size 라벨 크기');
+    }
+  });
+
+  testWidgets('hover lifts the label colour and adds no background', (WidgetTester tester) async {
     await tester.pumpWidget(_host(_tabs()));
     await tester.pump();
     final HoronThemeData theme = _theme(tester);
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: Offset.zero);
+    addTearDown(pointer.removePointer);
 
-    AnimatedContainer surfaceOf(String label) => tester.widget<AnimatedContainer>(
-      find.ancestor(of: find.text(label), matching: find.byType(AnimatedContainer)).first,
+    BoxDecoration decorationOf(String label) =>
+        tester
+                .widget<AnimatedContainer>(
+                  find.ancestor(of: find.text(label), matching: find.byType(AnimatedContainer)).first,
+                )
+                .decoration!
+            as BoxDecoration;
+
+    expect(decorationOf('멤버 관리').color, isNull, reason: '평상시 바탕이 없습니다');
+    expect(tester.widget<Text>(find.text('멤버 관리')).style!.color, theme.colors.textSecondary);
+
+    await pointer.moveTo(tester.getCenter(find.text('멤버 관리')));
+    await tester.pumpAndSettle();
+
+    expect(decorationOf('멤버 관리').color, isNull, reason: 'React는 hover에서 바탕을 더하지 않습니다');
+    expect(tester.widget<Text>(find.text('멤버 관리')).style!.color, theme.colors.textPrimary);
+  });
+
+  testWidgets('surface="glass" draws a thick glass pill under the indicator', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(_tabs(surface: HoronSurface.glass)));
+    await tester.pump();
+
+    final Finder glasses = find.byType(HoronLiquidGlass);
+    expect(glasses, findsNWidgets(2), reason: 'regular 유리 쟁반 하나와 두꺼운 유리 표시자 하나');
+    final List<HoronGlassTier> tiers = tester
+        .widgetList<HoronLiquidGlass>(glasses)
+        .map((HoronLiquidGlass glass) => glass.tier)
+        .toList();
+    expect(tiers, containsAll(<HoronGlassTier>[HoronGlassTier.regular, HoronGlassTier.thick]));
+  });
+
+  testWidgets('variant="underline" drops the tray, the padding and draws a 2px primary bar', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(_host(_tabs(variant: HoronTabsListVariant.underline)));
+    await tester.pump();
+    final HoronThemeData theme = _theme(tester);
+
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: '쟁반이 없습니다');
+    expect(tester.getSize(find.byType(HoronTabsList)).width, 1024, reason: 'w-full');
+
+    final AnimatedContainer tab = tester.widget<AnimatedContainer>(
+      find.ancestor(of: find.text('멤버 관리'), matching: find.byType(AnimatedContainer)).first,
     );
+    expect(tab.padding, EdgeInsets.symmetric(horizontal: 0), reason: 'underline은 px-0');
+    expect(
+      (tab.decoration! as BoxDecoration).borderRadius,
+      BorderRadius.circular(theme.radius.xs),
+      reason: 'rounded-xs',
+    );
+    expect(tab.constraints?.maxHeight, 30, reason: '단계 높이는 그대로입니다');
+
+    final Finder bar = find.descendant(
+      of: find.byType(HoronTabsList),
+      matching: find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is DecoratedBox && (widget.decoration as BoxDecoration).color == theme.colors.textPrimary,
+      ),
+    );
+    expect(bar, findsOneWidget, reason: '밑줄 표시자는 text-primary 한 겹입니다');
+    final Rect barRect = tester.getRect(bar);
+    expect(barRect.height, theme.space.s0_5, reason: 'h-0.5 = 2');
+    final Rect first = tester.getRect(
+      find.ancestor(of: find.text('개요와 통계'), matching: find.byType(AnimatedContainer)).first,
+    );
+    expect(barRect.width, closeTo(first.width, 0.01), reason: '표시자 폭은 선택된 탭 폭입니다');
 
     expect(
-      surfaceOf('개요와 통계').padding,
-      EdgeInsets.symmetric(horizontal: theme.space.s3_5, vertical: theme.space.s2_5),
-      reason: 'rich: px-3.5 py-2.5',
+      find.descendant(
+        of: find.byType(HoronTabsList),
+        matching: find.byWidgetPredicate(
+          (Widget widget) => widget is ColoredBox && widget.color == theme.colors.borderDefault,
+        ),
+      ),
+      findsOneWidget,
+      reason: 'border-b border-border-default',
     );
-    expect(
-      surfaceOf('멤버 관리').padding,
-      EdgeInsets.symmetric(horizontal: theme.space.s1, vertical: theme.space.s2_5),
-      reason: 'plain: px-1 py-2.5',
-    );
-    expect(IconTheme.of(tester.element(find.byIcon(Icons.dashboard_outlined))).size, 16, reason: '[&_svg]:size-4');
-    expect(IconTheme.of(tester.element(find.byIcon(Icons.dashboard_outlined))).color, theme.colors.textPrimary);
   });
 
   testWidgets('a disabled tab is 40% opaque and does not select', (WidgetTester tester) async {

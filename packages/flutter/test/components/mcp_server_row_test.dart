@@ -54,11 +54,12 @@ void main() {
 
     expect(find.text('NO'), findsOneWidget);
     expect(_sizedBox(theme.space.step(10)), findsOneWidget, reason: 'size-10 타일');
-    expect(_decoratedWith(theme.colors.interactivePrimary), findsOneWidget);
+    // `bg-sky-500 text-label-md text-neutral-50`
+    expect(_decoratedWith(HoronPalette.sky500), findsOneWidget);
     final Text initials = tester.widget<Text>(find.text('NO'));
-    expect(initials.style?.fontWeight, HoronFontWeight.semibold);
-    // Paper `1VHS-0`: 타일 글자 #F9FAFB
-    expect(initials.style?.color, theme.colors.textInverse);
+    expect(initials.style?.fontWeight, theme.text.labelMd.fontWeight);
+    expect(initials.style?.fontSize, theme.text.labelMd.fontSize);
+    expect(initials.style?.color, HoronPalette.neutral50);
 
     await tester.pumpWidget(_host(const HoronMcpServerRow(name: 'notion', initials: 'NT'), width: 720));
     expect(find.text('NT'), findsOneWidget);
@@ -77,10 +78,13 @@ void main() {
     final Container brand = _pillOf(tester, 'All devices');
     expect((brand.decoration! as BoxDecoration).color, theme.colors.accentSky500_18);
 
+    // 다크 예외가 없어졌으므로 두 밝기 모두 `bg-overlay-ink-6`입니다.
     await tester.pumpWidget(_host(_row(), brightness: Brightness.dark, width: 720));
     await tester.pumpAndSettle();
     theme = _themeOf(tester);
-    expect((_pillOf(tester, 'Official').decoration! as BoxDecoration).color, theme.colors.bgSurface6);
+    expect((_pillOf(tester, 'Official').decoration! as BoxDecoration).color, theme.colors.overlayInk6);
+    final Text tagLabel = tester.widget<Text>(find.text('Official'));
+    expect(tagLabel.style?.fontSize, theme.text.labelSm.fontSize, reason: 'text-label-sm');
   });
 
   testWidgets('the meta line joins values with a middle dot and repeats duplicates', (WidgetTester tester) async {
@@ -92,7 +96,8 @@ void main() {
     expect(find.text('stdio'), findsNWidgets(2), reason: 'React는 같은 값에 key 접미사를 붙여 둘 다 그립니다');
     expect(find.text('·'), findsNWidgets(2));
     final Text value = tester.widget<Text>(find.text('2 tools'));
-    expect(value.style?.fontSize, 12);
+    expect(value.style?.fontSize, theme.text.labelSm.fontSize, reason: 'text-label-sm');
+    expect(value.style?.height, theme.text.labelSm.height);
     expect(value.style?.color, theme.colors.textPlaceholder);
   });
 
@@ -104,23 +109,18 @@ void main() {
     expect(status.constraints?.maxHeight, theme.space.step(5.5));
     expect((status.decoration! as BoxDecoration).color, theme.colors.accentSky500_18);
 
-    // 액션 두 개는 컴포넌트 안의 사설 위젯이라 클래스로 찾지 않고, 그려진 크기와
-    // 아이콘 크기로 확인합니다.
+    // Configure는 `Button`의 `solid`·`sm`, 오버플로는 `IconButton`의 `ghost`·`sm`입니다.
     expect(find.text('Configure'), findsOneWidget);
-    expect(
-      tester.getSize(find.ancestor(of: find.text('Configure'), matching: find.byType(SizedBox)).first).height,
-      theme.space.step(8),
-      reason: 'glass sm h-8',
-    );
-    expect(IconTheme.of(tester.element(find.byIcon(Icons.settings_outlined))).size, theme.space.s3_5);
-    expect(tester.getSize(find.byIcon(Icons.more_horiz)).width, greaterThanOrEqualTo(theme.space.s4));
-    final Icon dots = tester.widget<Icon>(find.byIcon(Icons.more_horiz));
-    expect(dots.size, theme.space.s4, reason: 'IconButton sm [&_svg]:size-4');
-    final AnimatedContainer overflow = tester.widget<AnimatedContainer>(
-      find.ancestor(of: find.byIcon(Icons.more_horiz), matching: find.byType(AnimatedContainer)).first,
-    );
-    // Paper `1VHS-0`: 오버플로 버튼 반경 8
-    expect((overflow.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.sm));
+    final HoronButton configure = tester.widget<HoronButton>(find.byType(HoronButton));
+    expect(configure.variant, HoronButtonVariant.solid);
+    expect(configure.size, HoronButtonSize.sm);
+    expect(tester.getSize(find.byIcon(Icons.settings_outlined)).width, theme.space.s3_5, reason: 'GearSix 14');
+
+    final HoronIconButton overflow = tester.widget<HoronIconButton>(find.byType(HoronIconButton));
+    expect(overflow.variant, HoronIconButtonVariant.ghost);
+    expect(overflow.size, HoronIconButtonSize.sm);
+    expect(overflow.label, 'More');
+    expect(tester.getSize(find.byIcon(Icons.more_horiz)).width, theme.space.s4, reason: 'IconButton sm 16');
   });
 
   testWidgets('the actions call back', (WidgetTester tester) async {

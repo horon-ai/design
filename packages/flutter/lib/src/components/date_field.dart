@@ -3,8 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../contracts/surface.dart';
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
 import '../overlay/horon_menu_anchor.dart';
 import '../overlay/horon_overlay.dart';
 import '../theme/horon_motion.dart';
@@ -169,7 +167,6 @@ class _HoronDateFieldState extends State<HoronDateField> {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
-    final BorderRadius radius = BorderRadius.circular(theme.radius.md);
     final String text = _label(MaterialLocalizations.of(context));
     final HoronFieldMetrics metrics = horonFieldMetrics(_inputSizeOf(widget.size), theme);
     // 달력은 폭을 받지 않으면 자기 LayoutBuilder로 폭을 정합니다. 팝업은 폭을
@@ -210,23 +207,15 @@ class _HoronDateFieldState extends State<HoronDateField> {
               child: SizedBox(
                 key: const Key('horon-date-field-surface'),
                 height: metrics.height,
-                child: widget.surface == HoronSurface.glass
-                    ? HoronLiquidGlass(
-                        tier: HoronGlassTier.regular,
-                        borderRadius: radius,
-                        edgeColor: widget.invalid ? colors.borderDanger : null,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
-                          child: _row(colors, metrics, text, valueStyle),
-                        ),
-                      )
-                    : HoronFieldBox(
-                        surface: HoronInputSurface.solid,
-                        invalid: widget.invalid,
-                        enabled: !widget.disabled,
-                        padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
-                        child: _row(colors, metrics, text, valueStyle),
-                      ),
+                // React `fieldBoxClass[surface]` — glass는 veil-field이고 나머지는 불투명
+                // 상자입니다. 유리 레이어를 따로 깔지 않고 필드 상자가 표면을 그립니다.
+                child: HoronFieldBox(
+                  surface: widget.surface == HoronSurface.glass ? HoronInputSurface.glass : HoronInputSurface.solid,
+                  invalid: widget.invalid,
+                  enabled: !widget.disabled,
+                  padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
+                  child: _row(colors, metrics, text, valueStyle),
+                ),
               ),
             ),
           ),
@@ -237,9 +226,8 @@ class _HoronDateFieldState extends State<HoronDateField> {
         anchor: info.anchorRect,
         screen: MediaQuery.sizeOf(context),
         safeArea: MediaQuery.paddingOf(context),
-        // `sideOffset={8}` — placeHoronOverlay가 기본 gap(s1)을 이미 더하므로 그
-        // 차이만 준다. 뒤집히면 주축 성분의 부호가 함께 뒤집혀 위로 8px가 된다.
-        position: HoronOverlayPosition(offset: Offset(0, space.s2 - HoronOverlayPosition.gap)),
+        // `sideOffset={4}` — placeHoronOverlay의 기본 gap(s1)이 4라 추가 이동이 없다.
+        position: const HoronOverlayPosition(),
         // 달력이 자기 유리 판을 그리므로 패널 상자는 아무것도 칠하지 않습니다.
         //
         // 양쪽 어디에도 달력 높이만 한 자리가 없으면 [HoronOverlayPlacement]가
@@ -290,6 +278,8 @@ class _HoronDateFieldState extends State<HoronDateField> {
               today: widget.today,
               popover: widget.popover,
               size: _calendarSizeOf(widget.size),
+              // React `surface === "glass" ? "glass" : "solid"` — 달력 표면은 유리일 때만
+              // 유리이고, 그 유리는 `veil-overlay`로 그려집니다.
               surface: widget.surface == HoronSurface.glass ? HoronCalendarSurface.glass : HoronCalendarSurface.solid,
             ),
           ),

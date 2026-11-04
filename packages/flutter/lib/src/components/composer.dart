@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_veil.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -11,7 +10,7 @@ enum HoronComposerSurface {
   /// `surface="solid"` — 불투명 `bg-surface`에 1px 테두리. 기본값입니다.
   solid,
 
-  /// `surface="glass"` — 이미지나 유리 패널 위의 유리 알약입니다.
+  /// `surface="glass"` — 이미지나 유리 패널 위의 `veil-field` 알약입니다.
   glass,
 }
 
@@ -55,7 +54,7 @@ _ComposerMetrics _metricsOf(HoronComposerSize size, HoronThemeData theme) => swi
 
 /// 메시지 입력 알약입니다.
 ///
-/// React `Composer`: regular 유리 알약 안에 첨부 버튼, 입력칸, 그리고 글이 없을 때는 음성
+/// React `Composer`: `veil-field` 알약 안에 첨부 버튼, 입력칸, 그리고 글이 없을 때는 음성
 /// 버튼, 글이 있으면 잉크색 전송 버튼이 들어갑니다. 여백 8, 간격 8, `rounded-full`입니다.
 ///
 /// React는 `value`/`defaultValue`로 값을 제어합니다. Flutter에서는 관례대로
@@ -167,7 +166,7 @@ class _HoronComposerState extends State<HoronComposer> {
               controller: _controller,
               enabled: !disabled,
               maxLines: 1,
-              style: metrics.textStyle.copyWith(color: colors.textPrimary),
+              style: metrics.textStyle.copyWith(color: disabled ? colors.textDisabled : colors.textPrimary),
               cursorColor: colors.textPrimary,
               textInputAction: TextInputAction.send,
               onChanged: widget.onValueChange,
@@ -222,19 +221,7 @@ class _HoronComposerState extends State<HoronComposer> {
     );
 
     final Widget surfaceBody = widget.surface == HoronComposerSurface.glass
-        ? Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              Positioned.fill(
-                child: HoronLiquidGlass(
-                  tier: HoronGlassTier.regular,
-                  borderRadius: radius,
-                  child: const SizedBox.expand(),
-                ),
-              ),
-              content,
-            ],
-          )
+        ? HoronVeil(kind: HoronVeilKind.field, borderRadius: radius, child: content)
         : DecoratedBox(
             decoration: BoxDecoration(
               color: colors.bgSurface,

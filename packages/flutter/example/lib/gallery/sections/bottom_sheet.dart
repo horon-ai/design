@@ -28,7 +28,7 @@ class HoronBottomSheetGallerySection extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.start,
             children: <Widget>[
               _Preview(
-                label: 'panel · glass',
+                label: 'panel · veil',
                 width: width,
                 height: 320,
                 child: HoronBottomSheet(

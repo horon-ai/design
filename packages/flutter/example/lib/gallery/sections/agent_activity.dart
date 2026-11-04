@@ -3,7 +3,8 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `agent_activity`의 갤러리 섹션입니다.
 ///
-/// 생각 중 표시, 스트리밍 말풍선, 도구 단계 세 상태, 작업 기록을 세로로 보여 줍니다.
+/// 생각 중 표시, 스트리밍 말풍선(진행 중·완료·즉시 표시), 도구 단계 세 상태, 작업 기록을
+/// 세로로 보여 줍니다.
 class HoronAgentActivityGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronAgentActivityGallerySection({super.key});
@@ -22,6 +23,13 @@ class HoronAgentActivityGallerySection extends StatelessWidget {
           children: <Widget>[
             const HoronThinkingIndicator(),
             const HoronStreamingText(text: '세 개의 문서를 읽고 요약을 준비하고 있습니다'),
+            // `streaming: false` — 스트림이 끝나면 캐럿이 사라지고 남은 글자가 한 번에 보입니다.
+            const HoronStreamingText(
+              text: '세 문서를 읽고 요약을 마쳤습니다',
+              streaming: false,
+            ),
+            // `smooth: false` — 들어오는 글자를 프레임마다 나눠 드러내지 않습니다.
+            const HoronStreamingText(text: '지표를 모으는 중', smooth: false),
             const HoronToolStep(
               title: 'Q3 지표를 검색한다',
               detail: 'notion · search',

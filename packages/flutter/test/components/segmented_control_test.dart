@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
@@ -116,6 +117,36 @@ void main() {
       );
       expect((rim.decoration as BoxDecoration).border!.top.color, themeOf(tester).colors.glassRimStrong);
     }
+  });
+
+  testWidgets('the lg track insets all four sides by 4', (WidgetTester tester) async {
+    await pumpControl(tester, size: HoronSegmentedControlSize.lg, value: 'a');
+    final Finder trackPadding = find.descendant(
+      of: find.byType(HoronSegmentedControl),
+      matching: find.byWidgetPredicate(
+        (Widget widget) => widget is Padding && widget.padding == EdgeInsets.all(themeOf(tester).space.s1),
+      ),
+    );
+    expect(trackPadding, findsOneWidget, reason: 'h-11 p-1');
+  });
+
+  testWidgets('hover lifts an unselected label to text-primary', (WidgetTester tester) async {
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: Offset.zero);
+    addTearDown(pointer.removePointer);
+
+    await pumpControl(tester, value: 'a');
+    await pointer.moveTo(tester.getCenter(find.text('B')));
+    await tester.pump();
+    expect(
+      tester.widget<Text>(find.text('B')).style!.color,
+      themeOf(tester).colors.textPrimary,
+      reason: 'hover:text-text-primary',
+    );
+
+    await pointer.moveTo(Offset.zero);
+    await tester.pump();
+    expect(tester.widget<Text>(find.text('B')).style!.color, themeOf(tester).colors.textSecondary);
   });
 
   testWidgets('the chosen segment takes the primary text colour', (WidgetTester tester) async {

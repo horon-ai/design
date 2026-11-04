@@ -3,9 +3,10 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `flue_background` 갤러리 섹션입니다.
 ///
-/// 기본 하늘 팔레트와 팔레트 덮어쓰기를 나란히 두고, 그 위에 내용을 얹어 배경이
-/// 내용 뒤에 남는지 보여 줍니다. 갤러리에서는 티커를 끄고 12초 시점의 한 프레임만
-/// 그립니다. 그래야 스크롤하는 동안 매 프레임 다시 그리지 않습니다.
+/// 하늘·밤 팔레트와 세 변형(`defaultValue`·`sidebar`·`auth`), 팔레트 덮어쓰기를
+/// 나란히 두고, 그 위에 내용을 얹어 배경이 내용 뒤에 남는지 보여 줍니다. 갤러리에서는
+/// 티커를 끄고 12초 시점의 한 프레임만 그립니다. 그래야 스크롤하는 동안 매 프레임 다시
+/// 그리지 않습니다.
 ///
 /// 셰이더는 Impeller가 있는 기기에서만 돕니다. 시뮬레이터나 테스트처럼 셰이더를 읽지
 /// 못하는 환경에서는 [HoronFlueConfig.bgColor] 단색과 색조만 남습니다.
@@ -39,13 +40,24 @@ class HoronFlueBackgroundGallerySection extends StatelessWidget {
                   colorD: Color(0xFF3B2113),
                 ),
               ),
+              const _FlueCell(
+                label: 'Sidebar 변형',
+                variant: HoronFlueVariant.sidebar,
+              ),
+              const _FlueCell(label: 'Auth 변형', variant: HoronFlueVariant.auth),
+              const _FlueCell(
+                label: '밤 팔레트 (FLUE_NIGHT)',
+                config: HoronFlueConfig.night,
+              ),
               _FlueCell(label: '색조 없음 (연기만)', tint: Colors.transparent),
             ],
           ),
           SizedBox(height: theme.space.s4),
           Text(
             '셰이더를 못 쓰는 엔진과 테스트에서는 단색으로 내려갑니다. 포인터를 따라 '
-            '연기가 휘는 움직임과 모션 축소 시의 정지 프레임은 앱에서 확인합니다.',
+            '연기가 휘는 움직임과 모션 축소 시의 정지 프레임은 앱에서 확인합니다. '
+            '밤 팔레트는 다크 테마에서 자동으로 선택되고, Sidebar·Auth 변형은 자기 '
+            '색조를 얹지 않습니다.',
             style: theme.text.bodySm.copyWith(
               color: theme.colors.textSecondary,
             ),
@@ -61,12 +73,14 @@ class HoronFlueBackgroundGallerySection extends StatelessWidget {
 class _FlueCell extends StatelessWidget {
   const _FlueCell({
     required this.label,
-    this.config = HoronFlueConfig.sky,
+    this.variant = HoronFlueVariant.defaultValue,
+    this.config,
     this.tint,
   });
 
   final String label;
-  final HoronFlueConfig config;
+  final HoronFlueVariant variant;
+  final HoronFlueConfig? config;
   final Color? tint;
 
   @override
@@ -90,7 +104,11 @@ class _FlueCell extends StatelessWidget {
                   // 정지 프레임: 갤러리에서 티커를 돌리지 않습니다.
                   TickerMode(
                     enabled: false,
-                    child: HoronFlueBackground(config: config, tint: tint),
+                    child: HoronFlueBackground(
+                      variant: variant,
+                      config: config,
+                      tint: tint,
+                    ),
                   ),
                   Center(
                     child: Padding(

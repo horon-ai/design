@@ -49,3 +49,13 @@ ui.ImageFilter horonGlassBackdropFilter(HoronGlassTokens glass) => ui.ImageFilte
   outer: ui.ColorFilter.matrix(glass.saturateMatrix),
   inner: ui.ImageFilter.blur(sigmaX: glass.blur, sigmaY: glass.blur, tileMode: ui.TileMode.mirror),
 );
+
+/// veil의 뒤 배경 필터입니다.
+///
+/// [horonGlassBackdropFilter]와 같은 순서로, 먼저 [HoronVeilTokens.blur]만큼 흐리고 그
+/// 결과에 [HoronVeilTokens.saturate]의 채도 행렬을 겁니다. CSS veil 유틸의
+/// `backdrop-filter: blur(8px) saturate(1.6)`과 같은 값입니다.
+ui.ImageFilter horonVeilBackdropFilter(HoronVeilTokens veil) => ui.ImageFilter.compose(
+  outer: ui.ColorFilter.matrix(veil.saturateMatrix),
+  inner: ui.ImageFilter.blur(sigmaX: veil.blur, sigmaY: veil.blur, tileMode: ui.TileMode.mirror),
+);

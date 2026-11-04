@@ -72,15 +72,15 @@ void main() {
     }
   });
 
-  testWidgets('date field: the calendar opens 8px below the field', (WidgetTester tester) async {
+  testWidgets('date field: the calendar opens 4px below the field', (WidgetTester tester) async {
     await pumpAnchoredField(tester, alignment: Alignment.topCenter);
     await tester.tap(find.byKey(const Key('horon-date-field-trigger')));
     await tester.pumpAndSettle();
 
     final Rect field = tester.getRect(find.byKey(const Key('horon-date-field-surface')));
     final Rect calendar = tester.getRect(find.byType(HoronCalendar));
-    // `sideOffset={8}`: 필드 아래 8px, 필드 왼쪽에 맞춥니다.
-    expect(calendar.top - field.bottom, moreOrLessEquals(8, epsilon: 0.5));
+    // `sideOffset={4}`: 필드 아래 4px, 필드 왼쪽에 맞춥니다.
+    expect(calendar.top - field.bottom, moreOrLessEquals(4, epsilon: 0.5));
     expect(calendar.left, moreOrLessEquals(field.left, epsilon: 0.5));
   });
 
@@ -91,8 +91,8 @@ void main() {
 
     final Rect field = tester.getRect(find.byKey(const Key('horon-date-field-surface')));
     final Rect calendar = tester.getRect(find.byType(HoronCalendar));
-    // 뒤집혀도 트리거에서 같은 8px만큼 떨어집니다.
-    expect(field.top - calendar.bottom, moreOrLessEquals(8, epsilon: 0.5));
+    // 뒤집혀도 트리거에서 같은 4px만큼 떨어집니다.
+    expect(field.top - calendar.bottom, moreOrLessEquals(4, epsilon: 0.5));
     expect(calendar.bottom, lessThan(field.top));
   });
 
@@ -133,6 +133,21 @@ void main() {
       find.ancestor(of: find.byType(HoronCalendar), matching: find.byType(SingleChildScrollView)).first,
     );
     expect(viewport.height, moreOrLessEquals(calendar.height, epsilon: 0.5));
+  });
+
+  testWidgets('date field: a glass field is the veil and hands the calendar its glass surface', (
+    WidgetTester tester,
+  ) async {
+    await pumpField(tester, const HoronDateField(placeholder: '날짜 선택', surface: HoronSurface.glass));
+    final HoronVeil veil = tester.widget<HoronVeil>(
+      find.descendant(of: find.byKey(const Key('horon-date-field-surface')), matching: find.byType(HoronVeil)),
+    );
+    expect(veil.kind, HoronVeilKind.field, reason: 'glass 트리거는 veil-field입니다');
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: '유리 레이어를 겹치지 않습니다');
+
+    await tester.tap(find.byKey(const Key('horon-date-field-trigger')));
+    await tester.pumpAndSettle();
+    expect(tester.widget<HoronCalendar>(find.byType(HoronCalendar)).surface, HoronCalendarSurface.glass);
   });
 
   testWidgets('date field: escape and an outside tap close the calendar', (WidgetTester tester) async {

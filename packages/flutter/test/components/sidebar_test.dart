@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
@@ -46,6 +47,17 @@ Finder _itemRow(int index) =>
 
 BoxDecoration _decoration(WidgetTester tester, Finder finder) =>
     tester.widget<AnimatedContainer>(finder).decoration! as BoxDecoration;
+
+/// `border-r border-border-default` — plain 표면만 갖는 오른쪽 1px 테두리입니다.
+Finder _rightBorder(HoronColors colors) => find.descendant(
+  of: find.byType(HoronSidebar),
+  matching: find.byWidgetPredicate(
+    (Widget widget) =>
+        widget is DecoratedBox &&
+        widget.decoration is BoxDecoration &&
+        (widget.decoration as BoxDecoration).border == Border(right: BorderSide(color: colors.borderDefault, width: 1)),
+  ),
+);
 
 /// 갤러리와 같은 조립의 사이드바 내용입니다. 부품이 모두 한 번씩 들어갑니다.
 List<Widget> _content({bool projectOpen = true}) => <Widget>[
@@ -183,6 +195,7 @@ void main() {
       ),
     );
 
+    final HoronColors colors = _colors(tester);
     Visibility chevron() => tester.widget<Visibility>(
       find.descendant(of: find.byType(HoronSidebarProject), matching: find.byType(Visibility)).first,
     );
@@ -190,14 +203,24 @@ void main() {
       find.descendant(of: find.byType(HoronSidebarProject), matching: find.byType(AnimatedOpacity)),
     );
 
+    BoxDecoration rowDecoration() =>
+        tester
+                .widget<AnimatedContainer>(
+                  find.descendant(of: find.byType(HoronSidebarProject), matching: find.byType(AnimatedContainer)).first,
+                )
+                .decoration!
+            as BoxDecoration;
+
     // 평상시: 캐럿이 보이고 액션은 투명합니다.
     expect(chevron().visible, isTrue);
     expect(actions().opacity, 0);
+    expect(rowDecoration().color, Colors.transparent, reason: '평상시 바탕이 없습니다');
 
     await pointer.moveTo(tester.getCenter(find.byType(HoronSidebarProject)));
     await tester.pumpAndSettle();
     expect(chevron().visible, isFalse, reason: 'group-hover/project:invisible');
     expect(actions().opacity, 1, reason: 'group-hover/project:opacity-100');
+    expect(rowDecoration().color, colors.overlayInk4, reason: 'hover:bg-overlay-ink-4');
 
     // `menuOpen`은 React의 has-data-popup-open과 같습니다.
     await tester.pumpWidget(
@@ -218,6 +241,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(chevron().visible, isFalse);
     expect(actions().opacity, 1);
+    expect(rowDecoration().color, colors.overlayInk6, reason: 'has-data-popup-open:bg-overlay-ink-6');
   });
 
   testWidgets('the drag handle resizes within its bounds', (WidgetTester tester) async {
@@ -326,13 +350,16 @@ void main() {
     for (final Brightness brightness in Brightness.values) {
       await tester.pumpWidget(_host(HoronSidebar(children: _content()), brightness: brightness));
       await tester.pump();
+      final HoronColors colors = _colors(tester);
       expect(tester.takeException(), isNull, reason: 'glass $brightness');
       expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'glass $brightness');
       expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier, HoronGlassTier.thick);
+      expect(_rightBorder(colors), findsNothing, reason: 'glass는 테두리가 없습니다');
 
       await tester.pumpWidget(_host(HoronSidebar.photo(children: _content()), brightness: brightness));
       await tester.pump();
       expect(tester.takeException(), isNull, reason: 'photo $brightness');
+      expect(_rightBorder(colors), findsNothing, reason: 'photo도 테두리가 없습니다');
       if (brightness == Brightness.light) {
         // 라이트는 사진 바탕(#EEF3F8 근사)과 흰 막이고 유리 겹이 없습니다.
         expect(find.byType(HoronLiquidGlass), findsNothing);
@@ -346,9 +373,17 @@ void main() {
           findsOneWidget,
         );
       } else {
-        // `dark:bg-glass-thick dark:bg-none`
-        expect(find.byType(HoronLiquidGlass), findsOneWidget);
-        expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier, HoronGlassTier.thick);
+        // `dark:bg-glass-thick dark:bg-none` — 유리 레이어 없이 두꺼운 유리 색만 남습니다.
+        expect(find.byType(HoronLiquidGlass), findsNothing);
+        expect(
+          find.descendant(
+            of: find.byType(HoronSidebar),
+            matching: find.byWidgetPredicate(
+              (Widget widget) => widget is ColoredBox && widget.color == colors.glassThick,
+            ),
+          ),
+          findsOneWidget,
+        );
       }
 
       await tester.pumpWidget(_host(HoronSidebar.flue(children: _content()), brightness: brightness));
@@ -356,7 +391,43 @@ void main() {
       expect(tester.takeException(), isNull, reason: 'flue $brightness');
       expect(find.byType(HoronFlueBackground), findsOneWidget, reason: 'flue $brightness');
       expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier, HoronGlassTier.regular);
+      expect(_rightBorder(colors), findsNothing, reason: 'flue도 테두리가 없습니다');
+
+      // `surface="plain"` — 채움도 유리도 없이 오른쪽 1px 테두리만 남습니다.
+      await tester.pumpWidget(_host(HoronSidebar.plain(children: _content()), brightness: brightness));
+      await tester.pump();
+      expect(tester.takeException(), isNull, reason: 'plain $brightness');
+      expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'plain $brightness');
+      expect(find.byType(HoronFlueBackground), findsNothing, reason: 'plain $brightness');
+      expect(_rightBorder(colors), findsOneWidget, reason: 'border-r border-border-default');
+      final BoxDecoration plain = tester.widget<DecoratedBox>(_rightBorder(colors)).decoration as BoxDecoration;
+      expect(plain.color, isNull, reason: '채움이 없습니다');
     }
+  });
+
+  testWidgets('an item with href reads as a link and keeps aria-current as selected', (WidgetTester tester) async {
+    _useSurface(tester);
+    final SemanticsHandle handle = tester.ensureSemantics();
+    await tester.pumpWidget(
+      _host(
+        HoronSidebar(
+          children: <Widget>[
+            HoronSidebarItem(label: 'Docs', href: Uri.parse('https://horon.ai/docs'), current: true, onPressed: () {}),
+            HoronSidebarItem(label: 'Inbox', onPressed: () {}),
+          ],
+        ),
+      ),
+    );
+
+    final SemanticsNode link = tester.getSemantics(find.byType(HoronSidebarItem).first);
+    expect(link.flagsCollection.isLink, isTrue, reason: 'href가 있으면 링크입니다');
+    expect(link.flagsCollection.isButton, isFalse);
+    expect(link.flagsCollection.isSelected.toBoolOrNull(), isTrue, reason: 'aria-current="page"');
+
+    final SemanticsNode button = tester.getSemantics(find.byType(HoronSidebarItem).last);
+    expect(button.flagsCollection.isButton, isTrue, reason: 'href가 없으면 버튼입니다');
+    expect(button.flagsCollection.isLink, isFalse);
+    handle.dispose();
   });
 
   testWidgets('the sidebar does not overflow at 320, 390 and 1024', (WidgetTester tester) async {
@@ -438,6 +509,16 @@ void main() {
     expect(theme.radius.md, 12, reason: 'rounded-md');
     // 트리 밖 아이콘은 18px(`[&>svg]:size-4.5`), 트리 안은 16px입니다.
     expect(IconTheme.of(tester.element(find.byIcon(Icons.inbox))).size, 18, reason: 'size-4.5');
+    // React가 `[&>[data-slot=icon]]:size-4`를 지워 아이콘이 라벨 글자 크기(1em)를 따릅니다.
+    expect(
+      IconTheme.of(
+        tester.element(
+          find.descendant(of: find.byType(HoronSidebarAddButton), matching: find.byIcon(Icons.add_circle_outline)),
+        ),
+      ).size,
+      theme.text.labelMd.fontSize,
+      reason: '추가 버튼 아이콘은 1em',
+    );
     expect(IconTheme.of(tester.element(find.byIcon(Icons.article))).size, 16, reason: '트리 안 size-4');
   });
 }

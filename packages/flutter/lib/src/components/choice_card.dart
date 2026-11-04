@@ -86,17 +86,14 @@ class HoronChoiceCard extends StatelessWidget {
     final HoronSpaceSpec space = theme.space;
     final bool animate = !MediaQuery.disableAnimationsOf(context);
 
-    // `text-sm/5 font-semibold` — 토큰의 14/20 medium에서 굵기만 올립니다.
+    // `text-label-md font-semibold` — 토큰의 14/20에서 굵기만 올립니다.
     final TextStyle titleStyle = theme.text.labelMd.copyWith(
       fontWeight: HoronFontWeight.semibold,
       color: colors.textPrimary,
     );
-    // `text-xs/4 text-text-secondary`.
-    final TextStyle descriptionStyle = theme.text.labelSm.copyWith(
-      fontWeight: HoronFontWeight.regular,
-      color: colors.textSecondary,
-    );
-    // `text-xs/4 font-medium` — 알약의 글자.
+    // `text-caption text-text-secondary`.
+    final TextStyle descriptionStyle = theme.text.caption.copyWith(color: colors.textSecondary);
+    // `text-label-sm` — 알약의 글자.
     final TextStyle badgeStyle = theme.text.labelSm.copyWith(
       color: neutralBadge ? colors.textSecondary : colors.textBrand,
     );
@@ -107,20 +104,14 @@ class HoronChoiceCard extends StatelessWidget {
             ? math.min(HoronChoiceCard._width, constraints.maxWidth)
             : HoronChoiceCard._width;
         // 제목 칸이 실제로 쓰는 폭: 카드 여백·고리·간격을 뺀 나머지입니다.
-        final double textColumnWidth = math.max(
-          0,
-          width - space.s3_5 * 2 - HoronChoiceCard._radioSize - space.s3,
-        );
-        final double badgeMaxWidth =
-            textColumnWidth * HoronChoiceCard._badgeMaxFraction;
+        final double textColumnWidth = math.max(0, width - space.s3_5 * 2 - HoronChoiceCard._radioSize - space.s3);
+        final double badgeMaxWidth = textColumnWidth * HoronChoiceCard._badgeMaxFraction;
         return SizedBox(
           width: width,
           child: Opacity(
             opacity: disabled ? HoronChoiceCard._disabledOpacity : 1,
             child: MouseRegion(
-              cursor: disabled
-                  ? SystemMouseCursors.basic
-                  : SystemMouseCursors.click,
+              cursor: disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
               child: Semantics(
                 checked: checked,
                 inMutuallyExclusiveGroup: true,
@@ -132,20 +123,14 @@ class HoronChoiceCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(theme.radius.xl2),
                     child: AnimatedContainer(
                       key: const Key('horon-choice-card-surface'),
-                      duration: animate
-                          ? HoronMotion.colorsDuration
-                          : Duration.zero,
+                      duration: animate ? HoronMotion.colorsDuration : Duration.zero,
                       curve: HoronMotion.colorsCurve,
                       // React `choice-card.tsx`: `bg-bg-surface`에 1px `border-default`,
                       // 선택되면 `data-checked:border-border-brand`. 유리 레이어는 없습니다.
                       decoration: BoxDecoration(
                         color: colors.bgSurface,
                         borderRadius: BorderRadius.circular(theme.radius.xl2),
-                        border: Border.all(
-                          color: checked
-                              ? colors.borderBrand
-                              : colors.borderDefault,
-                        ),
+                        border: Border.all(color: checked ? colors.borderBrand : colors.borderDefault),
                       ),
                       child: Padding(
                         padding: EdgeInsets.all(space.s3_5),
@@ -154,14 +139,10 @@ class HoronChoiceCard extends StatelessWidget {
                           spacing: space.s3,
                           children: <Widget>[
                             Padding(
-                              padding: const EdgeInsets.only(
-                                top: HoronChoiceCard._radioTopOffset,
-                              ),
+                              padding: const EdgeInsets.only(top: HoronChoiceCard._radioTopOffset),
                               child: AnimatedContainer(
                                 key: const Key('horon-choice-card-ring'),
-                                duration: animate
-                                    ? HoronMotion.colorsDuration
-                                    : Duration.zero,
+                                duration: animate ? HoronMotion.colorsDuration : Duration.zero,
                                 curve: HoronMotion.colorsCurve,
                                 width: HoronChoiceCard._radioSize,
                                 height: HoronChoiceCard._radioSize,
@@ -169,19 +150,13 @@ class HoronChoiceCard extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    width: checked
-                                        ? HoronChoiceCard._ringOn
-                                        : HoronChoiceCard._ringOff,
-                                    color: checked
-                                        ? colors.interactivePrimary
-                                        : colors.borderDashed,
+                                    width: checked ? HoronChoiceCard._ringOn : HoronChoiceCard._ringOff,
+                                    color: checked ? colors.interactivePrimary : colors.borderDashed,
                                   ),
                                 ),
                                 child: AnimatedScale(
                                   scale: checked ? 1 : 0,
-                                  duration: animate
-                                      ? HoronMotion.popInDuration
-                                      : Duration.zero,
+                                  duration: animate ? HoronMotion.popInDuration : Duration.zero,
                                   curve: HoronMotion.popInCurve,
                                   child: Container(
                                     key: const Key('horon-choice-card-dot'),
@@ -199,41 +174,27 @@ class HoronChoiceCard extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
-                                // `gap-[3px]`.
-                                spacing: space.step(0.75),
+                                // `gap-1`.
+                                spacing: space.s1,
                                 children: <Widget>[
                                   Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     // `gap-2.5`.
                                     spacing: space.s2_5,
                                     children: <Widget>[
                                       Expanded(
-                                        child: DefaultTextStyle.merge(
-                                          style: titleStyle,
-                                          child: title,
-                                        ),
+                                        child: DefaultTextStyle.merge(style: titleStyle, child: title),
                                       ),
                                       if (badge != null)
                                         ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            maxWidth: badgeMaxWidth,
-                                          ),
+                                          constraints: BoxConstraints(maxWidth: badgeMaxWidth),
                                           child: Container(
-                                            height:
-                                                HoronChoiceCard._badgeHeight,
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: space.s2,
-                                            ),
+                                            height: HoronChoiceCard._badgeHeight,
+                                            padding: EdgeInsets.symmetric(horizontal: space.s2),
                                             alignment: Alignment.center,
                                             decoration: BoxDecoration(
-                                              color: neutralBadge
-                                                  ? colors.overlayInk6
-                                                  : colors.accentSky500_18,
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                    theme.radius.full,
-                                                  ),
+                                              color: neutralBadge ? colors.overlayInk6 : colors.accentSky500_18,
+                                              borderRadius: BorderRadius.circular(theme.radius.full),
                                             ),
                                             child: DefaultTextStyle.merge(
                                               style: badgeStyle,
@@ -246,10 +207,7 @@ class HoronChoiceCard extends StatelessWidget {
                                     ],
                                   ),
                                   if (description != null)
-                                    DefaultTextStyle.merge(
-                                      style: descriptionStyle,
-                                      child: description!,
-                                    ),
+                                    DefaultTextStyle.merge(style: descriptionStyle, child: description!),
                                 ],
                               ),
                             ),

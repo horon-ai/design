@@ -33,8 +33,9 @@ class HoronTextareaGallerySection extends StatelessWidget {
           ),
           Text(
             'Figma `Textarea`(58:137)입니다. 상자는 `min-h-28`(112)에서 시작해 입력이 '
-            '늘면 함께 자라고, 여백은 좌우 14·위아래 12입니다. 글자는 `body-md`, 안내 '
-            '문구는 `text-placeholder`, 오류 테두리는 `border-danger`입니다.',
+            '늘면 함께 자라고, 좌우 여백은 12/14/20, 위아래는 8/12/14입니다. 글자는 '
+            '`body-md`, 안내 문구는 `text-placeholder`, 오류 테두리는 `border-danger`입니다. '
+            'Glass 표면은 `.veil-field` 한 겹입니다.',
             style: theme.text.bodySm.copyWith(
               color: theme.colors.textSecondary,
             ),

@@ -162,4 +162,32 @@ void main() {
       expect(tester.takeException(), isNull, reason: '폭 $width에서 예외가 없어야 합니다');
     }
   });
+
+  testWidgets('href turns the button into a link and current paints the link label', (WidgetTester tester) async {
+    final SemanticsHandle handle = tester.ensureSemantics();
+    addTearDown(handle.dispose);
+    final Uri href = Uri.parse('https://horon.example/docs');
+
+    await tester.pumpWidget(
+      _host(HoronButton(label: '문서', variant: HoronButtonVariant.link, href: href, current: true, onPressed: () {})),
+    );
+    final Finder link = find.byWidgetPredicate(
+      (Widget widget) => widget is Semantics && widget.properties.link == true,
+    );
+    expect(link, findsOneWidget, reason: 'href가 있으면 링크 의미를 켭니다');
+    expect(tester.getSemantics(link).flagsCollection.isLink, isTrue);
+    expect(
+      _labelStyle(tester).color,
+      _theme(tester).colors.textPrimary,
+      reason: 'aria-[current=page]:text-text-primary',
+    );
+
+    await tester.pumpWidget(
+      _host(HoronButton(label: '문서', variant: HoronButtonVariant.link, href: href, onPressed: () {})),
+    );
+    expect(_labelStyle(tester).color, _theme(tester).colors.textSecondary, reason: '현재 페이지가 아니면 secondary');
+
+    await tester.pumpWidget(_host(HoronButton(label: '저장', onPressed: () {})));
+    expect(link, findsNothing, reason: 'href가 없으면 링크가 아닙니다');
+  });
 }

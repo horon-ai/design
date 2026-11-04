@@ -36,6 +36,9 @@ const double _fileIconSize = 16;
 /// `h-px` — 구분선 두께 1px입니다.
 const double _hairline = 1;
 
+/// `rounded-[5px]` — 바닥줄 봇 머리글자 타일의 반경입니다. 토큰 단계에 없습니다.
+const double _botTileRadius = 5;
+
 /// `disabled:opacity-40`입니다.
 const double _disabledOpacity = 0.4;
 
@@ -353,7 +356,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.fromLTRB(space.step(3.5), space.s3, space.s3, space.s3), // py-3 pr-3 pl-3.5
+          padding: EdgeInsets.symmetric(horizontal: space.s5, vertical: space.s3), // px-5 py-3
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
               final Widget file = Row(
@@ -364,7 +367,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: colors.overlayInk5, // bg-overlay-ink-5
-                      borderRadius: BorderRadius.circular(theme.radius.lg), // rounded-lg = 14
+                      borderRadius: BorderRadius.circular(space.step(2.5)), // rounded-[10px]
                     ),
                     child: Icon(Icons.picture_as_pdf, size: _fileIconSize, color: colors.textDanger), // FilePdf size-4
                   ),
@@ -561,7 +564,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.fromLTRB(space.s3, space.s3, space.step(3.5), space.s3), // py-3 pr-3.5 pl-4
+          padding: EdgeInsets.symmetric(horizontal: space.s5, vertical: space.s3), // px-5 py-3
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -586,10 +589,10 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
                   widget.onExtract?.call();
                 },
                 radius: theme.radius.full,
-                height: space.step(8), // h-8 = 32
-                padding: EdgeInsets.only(left: space.s3, right: space.step(3.5)),
+                height: space.step(7.5), // h-7.5 = 30
+                padding: EdgeInsets.only(left: space.step(3.5), right: space.s3), // pl-3.5 pr-3
                 color: colors.overlayInk6,
-                hoverColor: colors.overlayInk8,
+                hoverColor: colors.overlayInk10,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   spacing: space.s1_5,
@@ -605,9 +608,9 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
         const _PanelDivider(),
         Padding(
           padding: EdgeInsets.fromLTRB(
-            space.step(4.5), // pt-3.5 pl-4.5
+            space.s5, // px-5 pt-3.5
             space.step(3.5),
-            space.step(4.5),
+            space.s5,
             space.s4, // pb-4
           ),
           child: KeyedSubtree(
@@ -704,9 +707,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
                 padding: EdgeInsets.symmetric(horizontal: space.s3), // px-3
                 color: needsCheck ? colors.overlayInk12 : colors.overlayInk4,
                 hoverColor: needsCheck ? colors.overlayInk14 : null,
-                borderColor: needsCheck
-                    ? HoronPalette.red500.withValues(alpha: 0.9)
-                    : Colors.transparent, // border-red-500/90
+                borderColor: needsCheck ? colors.borderDanger : Colors.transparent, // border-border-danger
                 child: Row(
                   spacing: space.s2, // gap-2 = 8
                   children: <Widget>[
@@ -786,7 +787,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: space.s3, vertical: space.s0_5), // px-3 py-0.5
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(theme.radius.xl), // rounded-xl = 20
+            borderRadius: BorderRadius.circular(space.step(2.5)), // rounded-[10px]
             border: Border.all(color: colors.overlayInk10), // border-overlay-ink-10
           ),
           child: Column(
@@ -863,7 +864,10 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(space.s3), // p-3 = 12
-      decoration: BoxDecoration(color: colors.overlayInk4, borderRadius: BorderRadius.circular(theme.radius.xl)),
+      decoration: BoxDecoration(
+        color: colors.overlayInk4,
+        borderRadius: BorderRadius.circular(space.step(2.5)), // rounded-[10px]
+      ),
       child: Text(
         _json(flat),
         // font-mono text-caption — 패밀리는 code 토큰에서 가져옵니다.
@@ -887,7 +891,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
           Row(
             children: <Widget>[
               SizedBox(
-                width: space.step(35), // w-35 = 140
+                width: space.step(25), // w-25 = 100
                 child: Text(
                   entry.label,
                   maxLines: 1,
@@ -949,8 +953,8 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
     final Widget accept = _TapSurface(
       onTap: _acceptAll,
       radius: theme.radius.full,
-      height: space.step(9), // h-9 = 36
-      padding: EdgeInsets.only(left: space.s3, right: space.step(3.5)),
+      height: space.step(7.5), // h-7.5 = 30
+      padding: EdgeInsets.only(left: space.step(3.5), right: space.s3), // pl-3.5 pr-3
       color: colors.interactivePrimary, // bg-interactive-primary
       hoverColor: colors.interactivePrimaryHover,
       child: Text('Accept all', maxLines: 1, style: theme.text.labelSm.copyWith(color: colors.textInverse)),
@@ -967,7 +971,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: colors.interactivePrimary,
-                borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md
+                borderRadius: BorderRadius.circular(_botTileRadius), // rounded-[5px]
               ),
               child: Text(bot.initial, style: theme.text.labelSm.copyWith(color: colors.textInverse)),
             ),
@@ -986,7 +990,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
     ];
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(space.step(4.5), space.s3, space.step(3.5), space.s3), // py-3 pr-3.5 pl-4.5
+      padding: EdgeInsets.symmetric(horizontal: space.s5, vertical: space.s3), // px-5 py-3
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           final Widget left = Wrap(

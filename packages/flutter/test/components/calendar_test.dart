@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -37,6 +38,9 @@ TextStyle _dayStyle(WidgetTester tester, int year, int month, int day) =>
 final DateTime _month = DateTime(2026, 10);
 final DateTime _today = DateTime(2026, 10, 19);
 
+/// `size-1` — 오늘 점의 지름입니다.
+const double _todayDotSize = 4;
+
 void main() {
   testWidgets('default state renders in light and dark', (WidgetTester tester) async {
     for (final Brightness brightness in Brightness.values) {
@@ -51,26 +55,23 @@ void main() {
     }
   });
 
-  testWidgets('the default calendar is a thick-glass plate with the 20 radius and 16 padding', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('the glass calendar is a veil overlay with the 20 radius and 16 padding', (WidgetTester tester) async {
     await tester.pumpWidget(
       _host(HoronCalendar(defaultMonth: _month, today: _today, surface: HoronCalendarSurface.glass)),
     );
     final HoronThemeData theme = _theme(tester);
-    final BoxDecoration decoration = _surfaceDecoration(tester);
 
-    expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.radius.xl, reason: 'rounded-xl');
-    expect(decoration.border, isNull, reason: 'Paper는 호스트 테두리를 그리지 않습니다(가장자리는 유리 레이어가 맡습니다)');
+    final HoronVeil veil = tester.widget<HoronVeil>(find.byType(HoronVeil));
+    expect(veil.kind, HoronVeilKind.overlay, reason: '.veil-overlay');
+    expect((veil.borderRadius!.topLeft.x), theme.radius.xl, reason: 'rounded-xl');
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'veil은 LiquidGlass를 겹치지 않습니다');
     expect(
-      tester.widget<Padding>(find.descendant(of: _surface(), matching: find.byType(Padding)).first).padding,
+      tester.widget<Padding>(find.descendant(of: find.byType(HoronVeil), matching: find.byType(Padding)).first).padding,
       EdgeInsets.all(theme.space.s4),
       reason: 'p-4',
     );
     // `size-10` — 날짜 칸은 40px 정사각형입니다.
     expect(tester.getSize(_dayOf(2026, 10, 5)), Size(theme.space.step(10), theme.space.step(10)));
-    // `h-6 w-10` — 요일 줄.
-    expect(tester.getSize(find.byType(Center).at(0)), isNotNull, reason: '요일 줄이 그려져야 합니다');
     // `text-title-sm text-text-primary` — 기본 변형의 월 제목.
     final Text title = tester.widget<Text>(find.byKey(const Key('horon-calendar-title')));
     expect(title.style!.fontSize, theme.text.titleSm.fontSize);
@@ -203,7 +204,13 @@ void main() {
     expect(_dayStyle(tester, 2026, 9, 27).fontSize, theme.text.labelMd.fontSize, reason: 'text-label-md');
     expect(_dayStyle(tester, 2026, 10, 19).color, theme.colors.textBrand, reason: 'text-text-brand (오늘)');
     expect(_dayStyle(tester, 2026, 10, 19).fontSize, theme.text.labelMd.fontSize);
-    expect(find.byKey(const Key('horon-calendar-today-dot-2026-10-19')), findsOneWidget);
+    final Finder dot = find.byKey(const Key('horon-calendar-today-dot-2026-10-19'));
+    expect(dot, findsOneWidget);
+    final Positioned position = tester.widget<Positioned>(
+      find.ancestor(of: dot, matching: find.byType(Positioned)).first,
+    );
+    expect(position.bottom, theme.space.s1, reason: 'bottom-1');
+    expect(position.left, (theme.space.step(10) - _todayDotSize) / 2, reason: 'left-1/2 -translate-x-1/2 — 칸 가로 중앙');
     // 고른 날에는 오늘 점을 그리지 않습니다.
     await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today, value: DateTime(2026, 10, 19))));
     await tester.pumpAndSettle();
@@ -239,6 +246,23 @@ void main() {
       'October 2026',
       reason: 'month를 바깥에서 정하면 스스로 넘어가지 않습니다',
     );
+  });
+
+  testWidgets('the arrows lift to text-primary on hover', (WidgetTester tester) async {
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: Offset.zero);
+    addTearDown(pointer.removePointer);
+
+    await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today)));
+    final HoronThemeData theme = _theme(tester);
+    Icon nextIcon() => tester.widget<Icon>(
+      find.descendant(of: find.byKey(const Key('horon-calendar-next')), matching: find.byType(Icon)),
+    );
+
+    expect(nextIcon().color, theme.colors.textSecondary);
+    await pointer.moveTo(tester.getCenter(find.byKey(const Key('horon-calendar-next'))));
+    await tester.pump();
+    expect(nextIcon().color, theme.colors.textPrimary, reason: 'hover:text-text-primary');
   });
 
   testWidgets('arrow keys move the focused day and cross the month boundary', (WidgetTester tester) async {

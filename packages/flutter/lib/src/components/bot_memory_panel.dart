@@ -233,8 +233,8 @@ class _HoronBotMemoryPanelState extends State<HoronBotMemoryPanel> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Padding(
-                  // px-4.5 pt-4 pb-3
-                  padding: EdgeInsets.fromLTRB(space.step(4.5), space.s4, space.step(4.5), space.s3),
+                  // px-5 pt-4 pb-3.5
+                  padding: EdgeInsets.fromLTRB(space.s5, space.s4, space.s5, space.s3_5),
                   child: Row(
                     spacing: space.s2_5, // gap-2.5
                     children: <Widget>[
@@ -302,8 +302,8 @@ class _HoronBotMemoryPanelState extends State<HoronBotMemoryPanel> {
                 ),
                 if (widget.toast != null && !_toastDismissed)
                   Padding(
-                    // px-3.5 py-1.5
-                    padding: EdgeInsets.symmetric(horizontal: space.s3_5, vertical: space.s1_5),
+                    // px-5 py-1.5
+                    padding: EdgeInsets.symmetric(horizontal: space.s5, vertical: space.s1_5),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: _MemoryToast(
@@ -346,8 +346,8 @@ class _HoronBotMemoryPanelState extends State<HoronBotMemoryPanel> {
           .toList();
       rows.add(
         Padding(
-          // px-4.5 pt-3 pb-1
-          padding: EdgeInsets.fromLTRB(space.step(4.5), space.s3, space.step(4.5), space.s1),
+          // px-5 pt-3 pb-1
+          padding: EdgeInsets.fromLTRB(space.s5, space.s3, space.s5, space.s1),
           child: Row(
             spacing: space.s1_5, // gap-1.5
             children: <Widget>[
@@ -362,8 +362,8 @@ class _HoronBotMemoryPanelState extends State<HoronBotMemoryPanel> {
           _Rise(
             index: rowIndex,
             child: Container(
-              // px-4.5 py-2
-              padding: EdgeInsets.symmetric(horizontal: space.step(4.5), vertical: space.s2),
+              // px-5 py-2
+              padding: EdgeInsets.symmetric(horizontal: space.s5, vertical: space.s2),
               color: memory.fresh ? colors.accentSky500_10 : Colors.transparent,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -387,8 +387,8 @@ class _HoronBotMemoryPanelState extends State<HoronBotMemoryPanel> {
     final HoronSpaceSpec space = theme.space;
     final HoronColors colors = theme.colors;
     return Padding(
-      // px-4.5 py-2.5
-      padding: EdgeInsets.symmetric(horizontal: space.step(4.5), vertical: space.s2_5),
+      // px-5 py-2.5
+      padding: EdgeInsets.symmetric(horizontal: space.s5, vertical: space.s2_5),
       child: Row(
         spacing: space.s3, // gap-3
         children: <Widget>[
@@ -475,7 +475,7 @@ class _Hairline extends StatelessWidget {
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: inset ? theme.space.step(4.5) : 0), // inset && px-4.5
+      padding: EdgeInsets.symmetric(horizontal: inset ? theme.space.s5 : 0), // inset && px-5
       child: SizedBox(
         height: _hairline,
         child: ColoredBox(color: theme.colors.overlayInk8),
@@ -623,11 +623,12 @@ class _IconActionState extends State<_IconAction> {
     final HoronColors colors = theme.colors;
     final bool interactive = widget.onPressed != null;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final Color foreground = _hovered ? colors.textPrimary : colors.textSecondary;
+    final Color foreground = interactive && _hovered ? colors.textPrimary : colors.textSecondary;
 
     return Semantics(
-      button: true,
+      button: interactive,
       enabled: interactive,
+      hidden: !interactive,
       label: widget.label,
       child: FocusableActionDetector(
         enabled: interactive,
@@ -659,7 +660,8 @@ class _IconActionState extends State<_IconAction> {
               height: widget.size,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: _hovered ? colors.overlayInk8 : Colors.transparent, // hover:bg-overlay-ink-8
+                // `bg-overlay-ink-6`, `hover:bg-overlay-ink-10`.
+                color: interactive && _hovered ? colors.overlayInk10 : colors.overlayInk6,
                 borderRadius: BorderRadius.circular(theme.radius.full),
               ),
               child: Icon(widget.icon, size: widget.iconSize, color: foreground),
@@ -874,8 +876,8 @@ class _AddMemoryButtonState extends State<_AddMemoryButton> {
           behavior: HitTestBehavior.opaque,
           onTap: widget.onPressed,
           child: Padding(
-            // px-4.5 pt-3 pb-4
-            padding: EdgeInsets.fromLTRB(space.step(4.5), space.s3, space.step(4.5), space.s4),
+            // px-5 pt-3 pb-4
+            padding: EdgeInsets.fromLTRB(space.s5, space.s3, space.s5, space.s4),
             child: _FocusRing(
               visible: _focused && interactive,
               radius: theme.radius.sm,

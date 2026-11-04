@@ -40,10 +40,18 @@ void main() {
     expect(find.byIcon(Icons.check), findsNothing);
   });
 
-  testWidgets('the sm size is the 18px data-table box with a 5px radius', (WidgetTester tester) async {
+  testWidgets('every size keeps the 6px rounded-xs corner', (WidgetTester tester) async {
     await tester.pumpWidget(_host(HoronCheckbox(value: false, size: HoronCheckboxSize.sm, onChanged: (_) {})));
     expect(tester.getSize(_box()), const Size(18, 18), reason: 'size-4.5');
-    expect((_decoration(tester).borderRadius! as BorderRadius).topLeft.x, 5, reason: 'rounded-[5px]');
+    expect(
+      (_decoration(tester).borderRadius! as BorderRadius).topLeft.x,
+      _theme(tester).radius.xs,
+      reason: 'rounded-xs',
+    );
+
+    await tester.pumpWidget(_host(HoronCheckbox(value: false, size: HoronCheckboxSize.lg, onChanged: (_) {})));
+    expect(tester.getSize(_box()), const Size(24, 24), reason: 'size-6');
+    expect((_decoration(tester).borderRadius! as BorderRadius).topLeft.x, _theme(tester).radius.xs);
   });
 
   testWidgets('checked and indeterminate fill with ink and draw a 14px indicator', (WidgetTester tester) async {

@@ -5,11 +5,14 @@ import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 import 'glass_geometry.dart';
 import 'horon_glass.dart';
+import 'horon_veil.dart';
 
 /// 컴포넌트가 쓰는 표면 한 겹입니다.
 ///
 /// solid는 유리 없이 `bg-surface` 채움과 `border-default` 1px을 그리고, glass는
-/// [HoronLiquidGlass]를 깝니다. 떠 있는 표면은 [shadow]로 자기 그림자를 답니다.
+/// [HoronLiquidGlass]를, veilField·veilOverlay는 [HoronVeil]을 깝니다. 떠 있는 표면은
+/// 자기 그림자를 답니다. veil은 토큰이 정한 soft shadow를 스스로 그리므로 [shadow]를
+/// 넘기지 않습니다.
 class HoronSurfaceLayer extends StatelessWidget {
   /// 표면 한 겹을 만듭니다.
   const HoronSurfaceLayer({
@@ -42,23 +45,24 @@ class HoronSurfaceLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (surface == HoronSurface.glass) {
-      return HoronLiquidGlass(
-        tier: tier,
-        borderRadius: borderRadius,
-        edgeColor: borderColor,
-        child: child,
-      );
+    switch (surface) {
+      case HoronSurface.glass:
+        return HoronLiquidGlass(tier: tier, borderRadius: borderRadius, edgeColor: borderColor, child: child);
+      case HoronSurface.veilField:
+        return HoronVeil(kind: HoronVeilKind.field, borderRadius: borderRadius, child: child);
+      case HoronSurface.veilOverlay:
+        return HoronVeil(kind: HoronVeilKind.overlay, borderRadius: borderRadius, child: child);
+      case HoronSurface.solid:
+        final HoronColors colors = HoronTheme.of(context).colors;
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: colors.bgSurface,
+            borderRadius: borderRadius,
+            border: Border.all(color: borderColor ?? colors.borderDefault),
+            boxShadow: shadow,
+          ),
+          child: child,
+        );
     }
-    final HoronColors colors = HoronTheme.of(context).colors;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.bgSurface,
-        borderRadius: borderRadius,
-        border: Border.all(color: borderColor ?? colors.borderDefault),
-        boxShadow: shadow,
-      ),
-      child: child,
-    );
   }
 }

@@ -26,7 +26,7 @@ class HoronComposerGallerySection extends StatelessWidget {
             child: _composers(theme, HoronComposerSurface.solid),
           ),
           SurfaceGroup(
-            label: 'Glass',
+            label: 'Glass · veil field',
             glass: true,
             child: _composers(theme, HoronComposerSurface.glass),
           ),

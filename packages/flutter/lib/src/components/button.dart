@@ -70,6 +70,8 @@ class HoronButton extends StatefulWidget {
     this.icon,
     this.onPressed,
     this.enabled = true,
+    this.href,
+    this.current = false,
   });
 
   /// 라벨 문구입니다. React의 `children`입니다.
@@ -89,6 +91,16 @@ class HoronButton extends StatefulWidget {
 
   /// 거짓이면 `opacity-40`으로 흐려지고 눌리지 않습니다.
   final bool enabled;
+
+  /// 이동할 주소입니다. React의 `<a href>` 변형에 대응합니다.
+  ///
+  /// 패키지는 URL을 열지 않습니다. 값이 있으면 [Semantics.link]를 켜서 화면 읽기
+  /// 프로그램이 링크로 읽게 하고, 실제 이동은 호스트가 [onPressed]에서 처리합니다.
+  final Uri? href;
+
+  /// `aria-current="page"`에 대응합니다. [HoronButtonVariant.link]에서만 색에 반영되어
+  /// 라벨이 `text-primary`가 됩니다.
+  final bool current;
 
   @override
   State<HoronButton> createState() => _HoronButtonState();
@@ -169,7 +181,9 @@ class _HoronButtonState extends State<HoronButton> {
             Colors.transparent,
             Colors.transparent,
             Colors.transparent,
-            _hovered && interactive ? colors.textPrimary : colors.textSecondary,
+            // aria-[current=page]:text-text-primary — 현재 페이지 링크는 hover 없이도
+            // text-primary입니다.
+            _hovered || widget.current ? colors.textPrimary : colors.textSecondary,
           ),
         };
 
@@ -253,7 +267,7 @@ class _HoronButtonState extends State<HoronButton> {
           )
         : surface;
 
-    return Opacity(
+    final Widget button = Opacity(
       opacity: widget.enabled ? 1 : _disabledOpacity,
       child: AnimatedScale(
         // motion-press: scale .97. link는 배율을 쓰지 않습니다.
@@ -300,6 +314,9 @@ class _HoronButtonState extends State<HoronButton> {
         ),
       ),
     );
+
+    // `<a href>` 변형은 링크 의미를 갖습니다. 값이 없으면 기존 버튼 그대로입니다.
+    return widget.href == null ? button : Semantics(link: true, child: button);
   }
 }
 

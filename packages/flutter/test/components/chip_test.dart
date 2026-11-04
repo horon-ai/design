@@ -39,8 +39,8 @@ void main() {
     expect(decoration.border!.top.color, theme.colors.borderDefault, reason: 'border-border-default');
     expect(decoration.border!.top.width, 1, reason: 'border');
     expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.radius.full, reason: 'rounded-full');
-    // 체크 자리가 `w-0 -mr-1.5`이라 라벨은 12px에서 6px 당겨진 자리에서 시작합니다.
-    expect(_contentPadding(tester), EdgeInsets.only(left: theme.space.s3 - theme.space.s1_5, right: theme.space.s3));
+    // React가 체크 슬롯 음수 마진을 없앴으므로 라벨은 선택 전후 모두 12px에서 시작합니다.
+    expect(_contentPadding(tester), EdgeInsets.symmetric(horizontal: theme.space.s3));
     expect(tester.widget<Text>(find.text('필터')).style!.fontSize, theme.text.labelMd.fontSize, reason: 'text-label-md');
     expect(find.byIcon(Icons.check), findsNothing, reason: '선택 전에는 체크가 숨습니다');
   });
@@ -59,7 +59,7 @@ void main() {
     expect(_decoration(tester).border!.top.color, theme.colors.borderBrand, reason: 'data-pressed:border-border-brand');
     expect(tester.widget<Text>(find.text('필터')).style!.color, theme.colors.textBrand, reason: 'text-text-brand');
     expect(_container(tester).padding, isNull, reason: '패딩은 유리 위 내용으로 옮겼습니다');
-    expect(_contentPadding(tester), EdgeInsets.only(left: theme.space.s3, right: theme.space.s3));
+    expect(_contentPadding(tester), EdgeInsets.symmetric(horizontal: theme.space.s3));
 
     await tester.tap(find.byType(HoronChip));
     await tester.pumpAndSettle();

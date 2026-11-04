@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 
-/// `empty-state.tsx`의 `w-90`입니다.
+/// `empty-state.tsx`의 `max-w-90`입니다. 폭 상한입니다.
 const double _emptyWidth = 360;
 
 /// `empty-state.tsx`의 `size-35`입니다. 일러스트 상자입니다.
@@ -20,7 +20,8 @@ const double _actionGap = 28;
 
 /// Figma `Empty state`(64:485): 140px 일러스트, `title-md` 제목, `body-md` 설명, 동작 버튼입니다.
 ///
-/// `empty-state.tsx`를 옮긴 것입니다. 폭은 `w-90`(360)이고 내용은 가운데 정렬이며,
+/// `empty-state.tsx`를 옮긴 것입니다. 폭은 `w-full max-w-90`이라 부모를 채우되
+/// 360을 넘지 않고, 내용은 가운데 정렬이며,
 /// 등장할 때 React의 `tab-panel-in 240ms`와 같은 페이드·이동으로 나타납니다.
 class HoronEmptyState extends StatelessWidget {
   /// 빈 상태를 만듭니다.
@@ -43,41 +44,44 @@ class HoronEmptyState extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     final bool animate = !MediaQuery.disableAnimationsOf(context);
 
-    final Widget content = SizedBox(
-      width: _emptyWidth,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: theme.space.s6, vertical: theme.space.s8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            if (illustration != null) ...<Widget>[
-              SizedBox(
-                width: _illustrationSize,
-                height: _illustrationSize,
-                child: Center(child: illustration),
-              ),
-              const SizedBox(height: _emptyGap),
-            ],
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: theme.text.titleMd.copyWith(color: theme.colors.textPrimary),
-            ),
-            if (description != null) ...<Widget>[
-              const SizedBox(height: _emptyGap),
-              // Paper `WG7-1`은 폭 312(`alignSelf: stretch`, 360 − 24×2) 상자를 씁니다.
-              SizedBox(
-                width: double.infinity,
-                child: Text(
-                  description!,
-                  textAlign: TextAlign.center,
-                  style: theme.text.bodyMd.copyWith(color: theme.colors.textSecondary),
+    final Widget content = ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: _emptyWidth),
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: theme.space.s6, vertical: theme.space.s8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              if (illustration != null) ...<Widget>[
+                SizedBox(
+                  width: _illustrationSize,
+                  height: _illustrationSize,
+                  child: Center(child: illustration),
                 ),
+                const SizedBox(height: _emptyGap),
+              ],
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: theme.text.titleMd.copyWith(color: theme.colors.textPrimary),
               ),
+              if (description != null) ...<Widget>[
+                const SizedBox(height: _emptyGap),
+                // Paper `WG7-1`은 폭 312(`alignSelf: stretch`, 360 − 24×2) 상자를 씁니다.
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    description!,
+                    textAlign: TextAlign.center,
+                    style: theme.text.bodyMd.copyWith(color: theme.colors.textSecondary),
+                  ),
+                ),
+              ],
+              if (action != null) ...<Widget>[const SizedBox(height: _actionGap), action!],
             ],
-            if (action != null) ...<Widget>[const SizedBox(height: _actionGap), action!],
-          ],
+          ),
         ),
       ),
     );

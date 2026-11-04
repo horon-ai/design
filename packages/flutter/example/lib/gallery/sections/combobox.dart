@@ -79,9 +79,9 @@ class HoronComboboxGallerySection extends StatelessWidget {
             child: _comboboxes(theme, HoronInputSurface.glass),
           ),
           Text(
-            '검색과 선택을 합친 필드입니다. 목록은 Select와 같은 두꺼운 유리 위에 검색 '
-            '상자를 얹고, 입력한 말로 항목을 거릅니다. 복수 선택은 고른 항목을 칩으로 '
-            '쌓고 X로 뺍니다. `segment`를 켜면 InputGroup의 앞·뒤 칸이 되어 그룹의 '
+            '검색과 선택을 합친 필드입니다. 목록은 Select와 같은 `veil-overlay` 위에 검색 '
+            '상자를 얹고, 입력한 말로 항목을 거릅니다. 복수 선택은 240px 필드에 고른 항목을 '
+            '칩으로 쌓고 X로 뺍니다. `segment`를 켜면 InputGroup의 앞·뒤 칸이 되어 그룹의 '
             '크기와 비활성 상태를 따릅니다.',
             style: theme.text.bodySm.copyWith(
               color: theme.colors.textSecondary,

@@ -9,7 +9,8 @@ import '../surface_group.dart';
 /// Breadcrumb 갤러리 섹션입니다.
 ///
 /// 맨 조각과 조각이 많은 줄을 solid와 glass 두 표면에 같은 목록으로 놓습니다.
-/// 조각이 많으면 폭에 따라 줄을 바꾸는 모습을 볼 수 있습니다.
+/// 조각이 많으면 폭에 따라 줄을 바꾸고, 구분 캐럿은 폭이 좁아져도 줄어들지 않습니다
+/// (React `shrink-0`).
 class HoronBreadcrumbGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronBreadcrumbGallerySection({super.key});
@@ -70,6 +71,20 @@ class HoronBreadcrumbGallerySection extends StatelessWidget {
               HoronBreadcrumbItem(label: '도구 권한', onTap: () {}),
               const HoronBreadcrumbItem(label: '위험한 도구 승인', current: true),
             ],
+          ),
+        ),
+        _Sample(
+          label: '좁은 폭 (캐럿 고정)',
+          child: SizedBox(
+            width: 240,
+            child: HoronBreadcrumb(
+              surface: surface,
+              children: <Widget>[
+                HoronBreadcrumbItem(label: '워크스페이스 설정과 통합', onTap: () {}),
+                HoronBreadcrumbItem(label: '에이전트 관리 목록', onTap: () {}),
+                const HoronBreadcrumbItem(label: '설정', current: true),
+              ],
+            ),
           ),
         ),
       ],

@@ -93,6 +93,15 @@ void main() {
     handle.dispose();
   });
 
+  testWidgets('crumbs are rendered by BreadcrumbItem so one style owns them', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronBreadcrumbHeader(crumbs: _crumbs())));
+
+    expect(find.byType(HoronBreadcrumbItem), findsNWidgets(3), reason: '조각 렌더는 BreadcrumbItem 하나입니다');
+    final HoronBreadcrumbItem current = tester.widget<HoronBreadcrumbItem>(find.byType(HoronBreadcrumbItem).last);
+    expect(current.current, isTrue, reason: '마지막 조각이 현재 페이지');
+    expect(current.label, '설정');
+  });
+
   testWidgets('a crumb tap calls back only when the crumb is not the current page', (WidgetTester tester) async {
     int taps = 0;
     await tester.pumpWidget(_host(HoronBreadcrumbHeader(crumbs: _crumbs(onWorkspace: () => taps += 1))));

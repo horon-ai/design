@@ -6,13 +6,13 @@ import 'input.dart';
 
 /// `input-group.tsx`의 `InputGroupSize`입니다.
 enum HoronInputGroupSize {
-  /// `size="sm"` — 높이 32, 입력 여백 10.
+  /// `size="sm"` — 높이 32, 입력 여백 12.
   sm,
 
-  /// `size="md"` — 높이 40, 입력 여백 12. 기본값입니다.
+  /// `size="md"` — 높이 40, 입력 여백 14. 기본값입니다.
   md,
 
-  /// `size="lg"` — 높이 48, 입력 여백 16.
+  /// `size="lg"` — 높이 48, 입력 여백 20.
   lg,
 }
 
@@ -42,9 +42,9 @@ typedef HoronSegmentMetrics = ({double paddingX, double gap, double icon, TextSt
 
 /// [size]의 칸 값을 계산합니다.
 HoronSegmentMetrics horonSegmentMetrics(HoronInputGroupSize size, HoronThemeData theme) => switch (size) {
-  HoronInputGroupSize.sm => (paddingX: theme.space.s2_5, gap: theme.space.s1, icon: 14, textStyle: theme.text.labelSm),
-  HoronInputGroupSize.md => (paddingX: theme.space.s3, gap: theme.space.s1, icon: 14, textStyle: theme.text.labelMd),
-  HoronInputGroupSize.lg => (paddingX: theme.space.s4, gap: theme.space.s1_5, icon: 16, textStyle: theme.text.labelLg),
+  HoronInputGroupSize.sm => (paddingX: theme.space.s2_5, gap: theme.space.s1, icon: 16, textStyle: theme.text.bodySm),
+  HoronInputGroupSize.md => (paddingX: theme.space.s3, gap: theme.space.s1, icon: 16, textStyle: theme.text.bodyMd),
+  HoronInputGroupSize.lg => (paddingX: theme.space.s4, gap: theme.space.s1_5, icon: 20, textStyle: theme.text.bodyLg),
 };
 
 /// React `InputGroup`(Figma 60:429)를 옮긴 나눠진 입력 필드입니다.
@@ -80,7 +80,7 @@ class HoronInputGroup extends StatefulWidget {
   /// 입력 뒤의 칸입니다. 통화 셀렉트처럼 씁니다.
   final Widget? suffix;
 
-  /// 표면입니다. 기본값 `solid`는 불투명 `bg-surface`, `glass`는 유리입니다.
+  /// 표면입니다. 기본값 `solid`는 불투명 `bg-surface`, `glass`는 React `.veil-field` 표면입니다.
   final HoronInputSurface surface;
 
   /// 크기입니다. 칸에도 이 값이 내려갑니다. 기본값은 [HoronInputGroupSize.md]입니다.
@@ -137,7 +137,12 @@ class _HoronInputGroupState extends State<HoronInputGroup> {
     final HoronThemeData horon = HoronTheme.of(context);
     final HoronColors colors = horon.colors;
     final Color divider = _dividerColor(colors);
-    final HoronSegmentMetrics metrics = horonSegmentMetrics(widget.size, horon);
+    // `inputPaddingClass` — 입력 자체의 좌우 여백은 독립 Input과 같은 12/14/20입니다.
+    final double inputPadding = switch (widget.size) {
+      HoronInputGroupSize.sm => horon.space.s3,
+      HoronInputGroupSize.md => horon.space.s3_5,
+      HoronInputGroupSize.lg => horon.space.s5,
+    };
     final double height = switch (widget.size) {
       HoronInputGroupSize.sm => horon.space.step(8),
       HoronInputGroupSize.md => horon.space.step(10),
@@ -168,7 +173,7 @@ class _HoronInputGroupState extends State<HoronInputGroup> {
                   if (widget.prefix != null) ...<Widget>[widget.prefix!, _Divider(color: divider)],
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
+                      padding: EdgeInsets.symmetric(horizontal: inputPadding),
                       child: Center(
                         child: TextField(
                           controller: _controller,
@@ -199,7 +204,7 @@ class _HoronInputGroupState extends State<HoronInputGroup> {
 
 /// React `InputGroupSegment`를 옮긴 칸입니다.
 ///
-/// `bg-overlay-ink-4` 바탕에 `label-md` 글자, 14px 아이콘을 담습니다.
+/// `bg-overlay-ink-4` 바탕에 `body-sm`/`body-md`/`body-lg` 글자, 16/16/20px 아이콘을 담습니다.
 class HoronInputGroupSegment extends StatelessWidget {
   /// 칸을 만듭니다.
   const HoronInputGroupSegment({super.key, required this.child, this.disabled});

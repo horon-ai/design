@@ -6,8 +6,8 @@ const double _previewMaxWidth = 380;
 
 /// Dialog 갤러리 섹션입니다.
 ///
-/// 유리 다이얼로그와 Paper의 불투명 모달을 나란히 놓고, 실제로 열리는 다이얼로그
-/// 하나를 둡니다.
+/// veil 다이얼로그와 Paper의 불투명 모달을 나란히 놓고, 실제로 열리는 다이얼로그
+/// 하나를 둡니다. 두 표면 모두 16px 리듬이고 닫기는 32px 히트 영역입니다.
 class HoronDialogGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronDialogGallerySection({super.key});
@@ -28,7 +28,7 @@ class HoronDialogGallerySection extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.start,
             children: <Widget>[
               _Sample(
-                label: 'glass',
+                label: 'glass · veil-overlay',
                 child: SizedBox(
                   width: width,
                   child: HoronDialog(

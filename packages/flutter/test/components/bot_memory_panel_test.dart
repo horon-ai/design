@@ -102,6 +102,56 @@ void main() {
     expect(tester.widget<Icon>(find.byIcon(Icons.search)).size, 16); // size-4
     expect(tester.getSize(find.byIcon(Icons.search)).height, 16);
     expect(theme.space.step(7.5), 30); // size-7.5, the round search button
+    // `rounded-full bg-overlay-ink-6` — 검색은 이제 6% 잉크 알약입니다.
+    expect(
+      tester.widgetList<AnimatedContainer>(find.byType(AnimatedContainer)).any((AnimatedContainer box) {
+        final Decoration? decoration = box.decoration;
+        return decoration is BoxDecoration &&
+            decoration.color == theme.colors.overlayInk6 &&
+            decoration.borderRadius == BorderRadius.circular(theme.radius.full);
+      }),
+      isTrue,
+    );
+  });
+
+  testWidgets('spacing: header, rows, groups, toast and add row inset to 20', (WidgetTester tester) async {
+    await pumpPanel(
+      tester,
+      const HoronBotMemoryPanel(
+        usage: 20,
+        settings: _settings,
+        memories: _memories,
+        toast: HoronBotMemoryToast(title: 'Memory updated', message: '보고서는 표로 정리합니다'),
+      ),
+    );
+    // `px-5 py-2` — 기억 행.
+    expect(
+      tester
+          .widgetList<Container>(find.byType(Container))
+          .where((Container box) => box.padding == const EdgeInsets.symmetric(horizontal: 20, vertical: 8)),
+      isNotEmpty,
+    );
+    // `px-5 pt-4 pb-3.5` — 머리말.
+    expect(
+      tester
+          .widgetList<Padding>(find.byType(Padding))
+          .any((Padding padding) => padding.padding == const EdgeInsets.fromLTRB(20, 16, 20, 14)),
+      isTrue,
+    );
+    // `px-5 py-1.5` — 토스트 줄.
+    expect(
+      tester
+          .widgetList<Padding>(find.byType(Padding))
+          .any((Padding padding) => padding.padding == const EdgeInsets.symmetric(horizontal: 20, vertical: 6)),
+      isTrue,
+    );
+    // `px-5 pt-3 pb-4` — 추가 버튼 줄.
+    expect(
+      tester
+          .widgetList<Padding>(find.byType(Padding))
+          .any((Padding padding) => padding.padding == const EdgeInsets.fromLTRB(20, 12, 20, 16)),
+      isTrue,
+    );
   });
 
   testWidgets('settings: compact switch is 40x24 and reports the id it toggles', (WidgetTester tester) async {
