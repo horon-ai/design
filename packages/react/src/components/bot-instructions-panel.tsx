@@ -81,9 +81,9 @@ export function PanelPillTabs({ items, value, defaultValue, onValueChange, class
 export type InstructionVariableTone = "sky" | "brand" | "neutral";
 
 const variableToneClass: Record<InstructionVariableTone, string> = {
-  sky: "bg-accent-sky-500-18",
-  brand: "bg-accent-sky-700-18",
-  neutral: "bg-text-placeholder-18",
+  sky: "bg-accent-sky-500-18 ring-accent-sky-500-90/40",
+  brand: "bg-accent-sky-700-18 ring-accent-sky-700-90/40",
+  neutral: "bg-text-placeholder-18 ring-text-placeholder-90/40",
 };
 
 const variableDotClass: Record<InstructionVariableTone, string> = {
@@ -116,6 +116,10 @@ export type BotInstructionsPanelProps = WithClass<Omit<ComponentProps<"section">
   onRun?: (scenario: string | undefined) => void;
   /** The last run's output, or a hint until there is one. */
   output?: ReactNode;
+  /** Makes the version pill actionable; without it the pill is a plain label. */
+  onVersionClick?: () => void;
+  /** Makes the bot pill actionable; without it the pill is a plain label. */
+  onBotClick?: () => void;
 };
 
 function partKey(part: InstructionPart) {
@@ -131,7 +135,11 @@ function VariableChip({
   className?: string;
   children: ReactNode;
 }) {
-  return <span className={cn("rounded-xs px-1.5 py-px", variableToneClass[tone], className)}>{children}</span>;
+  return (
+    <span className={cn("rounded-xs px-1.5 py-px ring-1 ring-inset", variableToneClass[tone], className)}>
+      {children}
+    </span>
+  );
 }
 
 function Divider() {
@@ -155,12 +163,14 @@ export function BotInstructionsPanel({
   defaultScenario,
   onRun,
   output,
+  onVersionClick,
+  onBotClick,
   className,
   ...props
 }: BotInstructionsPanelProps) {
   const [tab, setTab] = useState("instructions");
   const [scenario, setScenario] = useState(defaultScenario ?? scenarios?.[0]);
-  const [running, setRunning] = useState(false);
+  const [runCount, setRunCount] = useState(0);
 
   return (
     <section
@@ -170,34 +180,63 @@ export function BotInstructionsPanel({
       )}
       {...props}
     >
-      <header className="flex items-center gap-2 px-5 pt-3.5 pb-3">
+      <header className="flex items-center gap-2 px-5 pt-4 pb-3.5">
         <h3 className="text-label-lg text-text-primary">{title}</h3>
         {version ? (
-          <button
-            type="button"
-            className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
-          >
-            {version}
-            {versionStatus ? (
-              <>
-                <span aria-hidden className="size-1.5 rounded-full bg-sky-500" />
-                <span className="text-text-secondary">{versionStatus}</span>
-              </>
-            ) : null}
-            <CaretDown aria-hidden className="size-3 text-text-secondary" />
-          </button>
+          onVersionClick ? (
+            <button
+              type="button"
+              onClick={onVersionClick}
+              className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+            >
+              {version}
+              {versionStatus ? (
+                <>
+                  <span
+                    aria-hidden
+                    className="size-1.5 animate-live-pulse rounded-full bg-status-live text-status-live"
+                  />
+                  <span className="text-text-secondary">{versionStatus}</span>
+                </>
+              ) : null}
+              <CaretDown aria-hidden className="size-3 text-text-secondary" />
+            </button>
+          ) : (
+            <span className="flex h-7.5 shrink-0 items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 text-label-sm text-text-primary">
+              {version}
+              {versionStatus ? (
+                <>
+                  <span
+                    aria-hidden
+                    className="size-1.5 animate-live-pulse rounded-full bg-status-live text-status-live"
+                  />
+                  <span className="text-text-secondary">{versionStatus}</span>
+                </>
+              ) : null}
+            </span>
+          )
         ) : null}
         <span className="min-w-0 flex-1" />
-        <button
-          type="button"
-          className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
-        >
-          <span className="flex size-4.5 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
-            {bot.initial}
+        {onBotClick ? (
+          <button
+            type="button"
+            onClick={onBotClick}
+            className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+          >
+            <span className="flex size-4.5 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
+              {bot.initial}
+            </span>
+            {bot.name}
+            <CaretDown aria-hidden className="size-3 text-text-secondary" />
+          </button>
+        ) : (
+          <span className="flex h-7.5 shrink-0 items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5 text-label-sm text-text-primary">
+            <span className="flex size-4.5 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
+              {bot.initial}
+            </span>
+            {bot.name}
           </span>
-          {bot.name}
-          <CaretDown aria-hidden className="size-3 text-text-secondary" />
-        </button>
+        )}
       </header>
       <Divider />
       <div className="flex flex-col gap-1 px-5 pt-3 pb-3.5">
@@ -293,7 +332,7 @@ export function BotInstructionsPanel({
               <button
                 type="button"
                 onClick={() => {
-                  setRunning(true);
+                  setRunCount((count) => count + 1);
                   onRun?.(scenario);
                 }}
                 className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full bg-interactive-primary pr-3 pl-3.5 text-label-sm text-text-inverse hover:bg-interactive-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
@@ -306,14 +345,18 @@ export function BotInstructionsPanel({
           </div>
         </>
       ) : null}
-      {output === undefined ? null : (
-        <div
-          key={running ? "ran" : "idle"}
-          className={cn("bg-overlay-ink-3 px-5 pt-3.5 pb-4 text-body-sm text-text-secondary", running && "motion-rise")}
-        >
-          {output}
+      <div className="motion-reveal" data-collapsed={output === undefined || undefined}>
+        <div>
+          {output === undefined ? null : (
+            <div
+              key={runCount}
+              className="motion-rise bg-overlay-ink-3 px-5 pt-3.5 pb-4 text-body-sm text-text-secondary"
+            >
+              {output}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </section>
   );
 }

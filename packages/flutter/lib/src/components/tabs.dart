@@ -263,9 +263,12 @@ class _HoronTabsListState extends State<HoronTabsList> {
     );
 
     if (widget.variant == HoronTabsListVariant.underline) {
+      // `variant="underline"`: 쟁반 없이 아래 1px 경계를 두고, 그 위에 2px 표시자가 미끄러집니다.
+      // React의 `w-full`을 지키려고 `Column(stretch)`가 폭을 채웁니다.
       return _TabsVariantScope(
         variant: widget.variant,
         child: Stack(
+          clipBehavior: Clip.none,
           children: <Widget>[
             Column(
               mainAxisSize: MainAxisSize.min,
@@ -285,13 +288,10 @@ class _HoronTabsListState extends State<HoronTabsList> {
                 curve: HoronMotion.indicatorCurve,
                 left: _indicator!.left,
                 width: _indicator!.width,
-                // `-bottom-px h-0.5` — 1px 테두리 위로 1px 더 올라와 겹칩니다.
-                bottom: 0,
+                // `-bottom-px h-0.5`: 경계를 1px 넘어 아래로 걸칩니다.
+                bottom: -_hairline,
                 height: space.s0_5,
-                child: DecoratedBox(
-                  // `bg-text-primary` — 밑줄 표시자입니다.
-                  decoration: BoxDecoration(color: colors.textPrimary),
-                ),
+                child: DecoratedBox(decoration: BoxDecoration(color: colors.textPrimary)), // bg-text-primary
               ),
           ],
         ),

@@ -4,13 +4,14 @@ import { useState } from "react";
 
 export default function PluginRowDemo() {
   const [enabled, setEnabled] = useState(true);
+  const [update, setUpdate] = useState(true);
   return (
     <div className="w-full max-w-190 rounded-2xl border border-border-default bg-bg-surface px-5">
       <PluginRow
         initials="GH"
         name="GitHub tools"
         version="v1.4.0"
-        updateBadge="Update available"
+        updateBadge={update ? "Update available" : undefined}
         author="by Horon Labs"
         verified
         chips={[
@@ -20,7 +21,7 @@ export default function PluginRowDemo() {
         ]}
         enabled={enabled}
         onEnabledChange={setEnabled}
-        onUpdate={() => undefined}
+        onUpdate={update ? () => setUpdate(false) : undefined}
         menu={
           <>
             <MenuItem>Details</MenuItem>

@@ -21,7 +21,7 @@ export function ChoiceCard({ title, description, badge, badgeTone = "brand", cla
   return (
     <BaseRadio.Root
       className={cn(
-        "group relative flex w-[252px] cursor-pointer items-start gap-3 overflow-clip rounded-2xl border border-border-default bg-bg-surface p-3.5 text-left motion-colors data-checked:border-border-brand",
+        "group relative flex w-[252px] cursor-pointer items-start gap-3 overflow-clip rounded-2xl border border-border-default bg-bg-surface p-3.5 text-left motion-colors data-checked:border-border-brand data-unchecked:hover:border-border-strong",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
         "data-disabled:cursor-not-allowed data-disabled:opacity-40",
         className,
@@ -30,7 +30,7 @@ export function ChoiceCard({ title, description, badge, badgeTone = "brand", cla
     >
       <span
         aria-hidden
-        className="relative mt-px flex size-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-border-dashed motion-colors group-data-checked:border-[5px] group-data-checked:border-interactive-primary"
+        className="relative mt-px flex size-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-border-dashed motion-colors group-data-checked:border-interactive-primary group-data-checked:shadow-[inset_0_0_0_3.5px_var(--color-interactive-primary)]"
       >
         <BaseRadio.Indicator className="size-2 animate-pop-in rounded-full bg-interactive-on-primary data-unchecked:hidden" />
       </span>

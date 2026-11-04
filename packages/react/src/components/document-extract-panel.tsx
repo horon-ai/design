@@ -41,6 +41,8 @@ export type DocumentExtractPanelProps = WithClass<Omit<ComponentProps<"section">
   bot?: { initial: string; name: string; elapsed?: string };
   onExtract?: () => void;
   onAcceptAll?: () => void;
+  /** Makes the file name actionable; without it the name is a plain label. */
+  onOpenFile?: () => void;
 };
 
 const ZOOM_MIN = 30;
@@ -103,6 +105,7 @@ export function DocumentExtractPanel({
   bot,
   onExtract,
   onAcceptAll,
+  onOpenFile,
   className,
   ...props
 }: DocumentExtractPanelProps) {
@@ -147,11 +150,21 @@ export function DocumentExtractPanel({
             <span className="flex size-7 shrink-0 items-center justify-center rounded-[10px] bg-overlay-ink-5 text-text-danger">
               <FilePdf aria-hidden className="size-4" />
             </span>
-            <span className="min-w-0 truncate text-label-md text-text-primary">{fileName}</span>
-            <CaretDown aria-hidden className="size-3.5 shrink-0 text-text-secondary" />
+            {onOpenFile ? (
+              <button
+                type="button"
+                onClick={onOpenFile}
+                className="flex min-w-0 cursor-pointer items-center gap-1 rounded-md text-left focus-visible:outline-2 focus-visible:outline-text-brand"
+              >
+                <span className="min-w-0 truncate text-label-md text-text-primary">{fileName}</span>
+                <CaretDown aria-hidden className="size-3.5 shrink-0 text-text-secondary" />
+              </button>
+            ) : (
+              <span className="min-w-0 truncate text-label-md text-text-primary">{fileName}</span>
+            )}
             <span className="min-w-0 flex-1" />
             <span className="shrink-0 text-caption text-text-secondary">{pageLabel}</span>
-            <div className="flex h-7.5 shrink-0 items-center gap-0.5 rounded-full bg-overlay-ink-5 px-1">
+            <div className="flex h-7.5 shrink-0 items-center gap-0.5 rounded-full bg-overlay-ink-5 p-[3px]">
               <button
                 type="button"
                 aria-label="Zoom out"
@@ -182,7 +195,7 @@ export function DocumentExtractPanel({
           </div>
           <div className="flex min-h-120 flex-1 justify-center overflow-hidden bg-overlay-ink-7 px-6 py-5">
             <div
-              className="flex h-fit w-117.5 shrink-0 origin-top flex-col gap-3.5 bg-bg-surface px-6.5 pt-6.5 pb-5 text-text-primary [filter:drop-shadow(0_2px_4px_#00000014)] transition-[scale] duration-220 ease-out-quint"
+              className="flex h-fit w-117.5 shrink-0 origin-top flex-col gap-3.5 bg-neutral-50 px-6.5 pt-6.5 pb-5 text-neutral-900 ring-1 ring-overlay-ink-8 [filter:drop-shadow(0_2px_4px_#00000014)] transition-[scale] duration-220 ease-out-quint"
               style={{ scale: zoom / ZOOM_FIT }}
             >
               {sheet}
@@ -219,7 +232,7 @@ export function DocumentExtractPanel({
           <div key={`${view}-${run}`} className="flex flex-col gap-1.5 px-5 pt-3.5 pb-4">
             {view === "fields" ? (
               <>
-                <p className="text-body-sm text-text-secondary">{total} fields filled from this document</p>
+                <p className="text-body-sm text-text-secondary">{total} fields read from this document</p>
                 {groups.map((group) => (
                   <div key={group.id} className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-2 pt-3 pb-1">
@@ -291,7 +304,7 @@ export function DocumentExtractPanel({
                             onClick={() => resolve(field.id)}
                             aria-label={needsCheck ? `Confirm ${field.label}` : undefined}
                             className={cn(
-                              "flex h-9 w-full max-w-75 min-w-0 items-center gap-2 rounded-[10px] border px-3 text-start motion-colors",
+                              "flex h-9 min-w-0 flex-1 items-center gap-2 rounded-[10px] border px-3 text-start motion-colors",
                               needsCheck
                                 ? "cursor-pointer border-border-danger bg-overlay-ink-12 hover:bg-overlay-ink-14 focus-visible:outline-2 focus-visible:outline-text-brand"
                                 : "cursor-default border-transparent bg-overlay-ink-4",
@@ -323,12 +336,12 @@ export function DocumentExtractPanel({
               </>
             ) : null}
             {view === "json" ? (
-              <pre className="overflow-x-auto rounded-[10px] bg-overlay-ink-4 p-3 font-mono text-caption whitespace-pre text-text-primary">
+              <pre className="animate-slide-shift-next overflow-x-auto rounded-[10px] bg-overlay-ink-4 p-3 font-mono text-caption whitespace-pre text-text-primary">
                 {json}
               </pre>
             ) : null}
             {view === "schema" ? (
-              <ul className="flex flex-col gap-1.5">
+              <ul className="flex animate-slide-shift-next flex-col gap-1.5">
                 {flat.map((field) => (
                   <li key={field.id} className="flex items-center gap-3 text-body-sm text-text-primary">
                     <span className="w-25 shrink-0 text-text-secondary">{field.label}</span>

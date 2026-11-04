@@ -220,10 +220,10 @@ describe('타이포와 글래스', () => {
 
   test('글래스 값이 glass.ts와 같다', () => {
     const expectations = [
-      `this.blur = ${glass.blur}.0,`,
-      `this.saturate = ${glass.saturate},`,
-      `this.rimWidth = ${glass.rimWidth}.0,`,
-      `this.rimMidStop = ${glass.rimMidStop},`,
+      `this.blur = ${glass.blur}.0`,
+      `this.saturate = ${glass.saturate}`,
+      `this.rimWidth = ${glass.rimWidth}.0`,
+      `this.rimMidStop = ${glass.rimMidStop}`,
     ];
     const missing = expectations.filter((line) => !committed.includes(line));
     expect(missing).toEqual([]);

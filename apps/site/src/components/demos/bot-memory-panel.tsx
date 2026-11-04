@@ -1,8 +1,12 @@
-import { BotMemoryPanel } from "@horon-ai/react";
+import { BotMemoryPanel, Button, type BotMemoryToast } from "@horon-ai/react";
+import { useState } from "react";
+
+const initialToast: BotMemoryToast = { title: "Memory updated", message: "Noted: you prefer replies under 120 words" };
 
 export default function BotMemoryPanelDemo() {
+  const [toast, setToast] = useState<BotMemoryToast | undefined>(initialToast);
   return (
-    <div className="flex w-full justify-center">
+    <div className="flex w-full flex-col items-center gap-4">
       <BotMemoryPanel
         subtitle="What Chief of staff remembers across chats"
         usage={62}
@@ -20,7 +24,8 @@ export default function BotMemoryPanelDemo() {
             defaultChecked: true,
           },
         ]}
-        toast={{ title: "Memory updated", message: "Noted: you prefer replies under 120 words" }}
+        toast={toast}
+        onToastDismiss={() => setToast(undefined)}
         memories={[
           {
             id: "1",
@@ -50,6 +55,9 @@ export default function BotMemoryPanelDemo() {
           },
         ]}
       />
+      <Button variant="solid" size="sm" onClick={() => setToast({ ...initialToast })}>
+        Show a new memory update
+      </Button>
     </div>
   );
 }

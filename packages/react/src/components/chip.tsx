@@ -62,9 +62,9 @@ export function Chip({ size = "md", className, children, onPressedChange, ...pro
       >
         <Check
           className={cn(
-            "opacity-0 group-data-pressed:animate-pop-in",
-            checkIconClass[size],
+            "opacity-0 group-data-pressed:opacity-100",
             toggled && "animate-pop-out group-data-pressed:animate-pop-in",
+            checkIconClass[size],
           )}
         />
       </span>

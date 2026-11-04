@@ -114,8 +114,10 @@ export function MenuItem({
         </span>
       )}
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className={cn("text-label-md", danger ? "text-text-danger" : "text-text-primary")}>{children}</span>
-        {description && <span className="text-caption text-text-secondary">{description}</span>}
+        <span className={cn("truncate text-label-md", danger ? "text-text-danger" : "text-text-primary")}>
+          {children}
+        </span>
+        {description && <span className="truncate text-caption text-text-secondary">{description}</span>}
       </span>
       {trailing && (
         <span className="flex shrink-0 text-caption text-text-secondary [&>svg]:size-4 [&>svg]:text-text-primary">

@@ -51,28 +51,37 @@ export function BreadcrumbHeader({
           {crumbs.map((crumb, index) => {
             const current = index === crumbs.length - 1;
             return (
-              <li key={crumb.label} className="flex items-center gap-1.5">
+              <li key={crumb.label} className={cn("flex items-center gap-1.5", current && "min-w-0")}>
                 {index > 0 && <CaretRight aria-hidden className="size-3.5 shrink-0 text-text-secondary" />}
-                <BreadcrumbItem current={current} tile={crumb.tile} href={crumb.href}>
-                  {crumb.label}
+                <BreadcrumbItem
+                  current={current}
+                  tile={crumb.tile}
+                  href={crumb.href}
+                  className={current ? "min-w-0" : undefined}
+                >
+                  <span className="min-w-0 truncate">{crumb.label}</span>
                 </BreadcrumbItem>
               </li>
             );
           })}
         </ol>
       </nav>
-      <IconButton
-        icon={<MagnifyingGlass />}
-        label={searchLabel}
-        onClick={onSearch}
-        className="relative size-9 [&_svg]:size-4.5"
-      />
-      <IconButton
-        icon={<DotsThree weight="bold" />}
-        label={moreLabel}
-        onClick={onMore}
-        className="relative size-9 [&_svg]:size-4.5"
-      />
+      {onSearch && (
+        <IconButton
+          icon={<MagnifyingGlass />}
+          label={searchLabel}
+          onClick={onSearch}
+          className="relative size-9 [&_svg]:size-4.5"
+        />
+      )}
+      {onMore && (
+        <IconButton
+          icon={<DotsThree weight="bold" />}
+          label={moreLabel}
+          onClick={onMore}
+          className="relative size-9 [&_svg]:size-4.5"
+        />
+      )}
     </header>
   );
 }

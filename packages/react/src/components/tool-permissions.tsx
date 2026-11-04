@@ -74,11 +74,10 @@ export function ToolPermissions({
           {allowAllLabel}
         </button>
       </div>
-      {tools.map((tool, index) => (
+      {tools.map((tool) => (
         <div
           key={tool.name}
-          className="flex motion-rise items-center gap-4 border-b border-border-default px-4 py-3 last:border-b-0"
-          style={{ animationDelay: `${index * 30}ms` }}
+          className="flex items-center gap-4 border-b border-border-default px-4 py-3 last:border-b-0"
         >
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <span className="truncate font-mono text-code font-medium text-text-primary">{tool.name}</span>

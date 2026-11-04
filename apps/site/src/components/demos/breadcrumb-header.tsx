@@ -8,6 +8,8 @@ function Examples({ surface }: { surface: "solid" | "glass" }) {
       <BreadcrumbHeader
         surface={surface}
         className="w-full max-w-180"
+        onSearch={() => undefined}
+        onMore={() => undefined}
         crumbs={[
           { label: "Horon HQ", tile: "H", href: "#" },
           { label: "Q4 hiring", href: "#" },
@@ -17,6 +19,8 @@ function Examples({ surface }: { surface: "solid" | "glass" }) {
       <BreadcrumbHeader
         surface={surface}
         className="w-full max-w-97.5"
+        onSearch={() => undefined}
+        onMore={() => undefined}
         crumbs={[{ label: "Horon HQ", tile: "H", href: "#" }, { label: "Settings" }]}
       />
     </div>

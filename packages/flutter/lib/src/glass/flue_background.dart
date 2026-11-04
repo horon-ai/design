@@ -70,9 +70,9 @@ class HoronFlueConfig {
   /// Horon 하늘 팔레트입니다. 원본의 `FLUE_SKY`입니다.
   static const HoronFlueConfig sky = HoronFlueConfig();
 
-  /// 다크 모드의 밤 팔레트입니다. 원본의 `FLUE_NIGHT`입니다.
+  /// 어두운 모드 팔레트입니다. 원본의 `FLUE_NIGHT`입니다.
   ///
-  /// 바탕은 거의 검정이고 연기는 파랑입니다. 나머지 값은 [sky]와 같습니다.
+  /// 거의 검은 바탕에 푸른 연기이고, 움직임은 [sky]와 같습니다.
   static const HoronFlueConfig night = HoronFlueConfig(
     bgColor: Color(0xFF050608),
     colorA: Color(0xFF07090D),
@@ -480,6 +480,22 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   @visibleForTesting
   HoronFlueFrame get frame => _frame.value;
 
+  /// 지금 적용되는 팔레트입니다. 테마 밝기, [HoronFlueBackground.variant], 명시 config를 모두 반영합니다.
+  @visibleForTesting
+  HoronFlueConfig get resolvedConfig => _resolveConfig(HoronTheme.of(context));
+
+  /// React의 `{ ...(dark ? FLUE_NIGHT : FLUE_SKY), ...tuning, ...config }`입니다.
+  HoronFlueConfig _resolveConfig(HoronThemeData horon) =>
+      HoronFlueConfig.resolve(brightness: horon.brightness, variant: widget.variant, config: widget.config);
+
+  /// 변형이 정한 색조입니다. React의 `FLUE_VARIANTS[...].tint`입니다.
+  Color? _variantTint(HoronThemeData horon) => switch (widget.variant) {
+    // `bg-glass-regular dark:bg-transparent`
+    HoronFlueVariant.defaultValue => horon.brightness == Brightness.dark ? null : horon.colors.glassRegular,
+    // 사이드바 유리가 바탕을 채우고, 인증 화면은 색조를 얹지 않습니다.
+    HoronFlueVariant.sidebar || HoronFlueVariant.auth => null,
+  };
+
   @override
   void initState() {
     super.initState();
@@ -570,10 +586,7 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
     _settings = HoronFlueConfig.resolve(brightness: horon.brightness, variant: widget.variant, config: widget.config);
     // React의 기본 tint 클래스는 `bg-glass-regular dark:bg-transparent`입니다.
     // 다크에서는 색조를 얹지 않아야 밤 팔레트가 회색으로 뜨지 않습니다.
-    final Color? defaultTint = widget.variant == HoronFlueVariant.defaultValue && horon.brightness == Brightness.light
-        ? horon.colors.glassRegular
-        : null;
-    final Color? tint = widget.tint ?? defaultTint;
+    final Color? tint = widget.tint ?? _variantTint(horon);
     final ui.FragmentShader? shader = _shader;
 
     return LayoutBuilder(

@@ -32,7 +32,7 @@ const defaultStages: Record<SourceStatus, SourceStages> = {
   failed: ["done", "done", "failed", "todo"],
 };
 
-const stageFill = { done: "bg-overlay-ink-35", todo: "bg-overlay-ink-8", failed: "bg-red-500" } as const;
+const stageFill = { done: "bg-overlay-ink-35", todo: "bg-overlay-ink-8", failed: "bg-accent-red-500-90" } as const;
 const stage = (state: keyof typeof stageFill) =>
   cn("h-[3px] w-11 overflow-clip rounded-full transition-colors duration-150", stageFill[state]);
 
@@ -79,7 +79,7 @@ export function SourceRow({
           return state === "active" ? (
             <span key={stageName} className={stage("todo")}>
               <span
-                className="block h-full rounded-full bg-sky-500 transition-[width] duration-400 ease-out-quint"
+                className="block h-full rounded-full bg-status-live transition-[width] duration-400 ease-out-quint"
                 style={{ width: `${progress}%` }}
               />
             </span>
@@ -90,7 +90,13 @@ export function SourceRow({
       </span>
       <span className="flex h-7.5 w-18 shrink-0 items-center justify-end">
         {status === "ready" && <Check aria-label="Ready" className="size-4 text-text-secondary" />}
-        {status === "indexing" && <span className="text-label-md text-text-secondary">{progress}%</span>}
+        {status === "indexing" && (
+          <span className="w-9 text-right text-label-md text-text-secondary tabular-nums">
+            <span key={progress} className="inline-block animate-fade-in">
+              {progress}%
+            </span>
+          </span>
+        )}
         {status === "failed" && (
           <button
             type="button"

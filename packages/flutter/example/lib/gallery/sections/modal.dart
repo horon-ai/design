@@ -7,7 +7,7 @@ const double _previewMaxWidth = 560;
 /// Modal 갤러리 섹션입니다.
 ///
 /// 폼과 긴 글을 담는 모달을 solid와 veil(glass) 두 표면, sm·md·lg 세 폭으로
-/// 보여 주고, 푸터가 붙은 모달을 실제 스크림 위에 띄워 봅니다.
+/// 보여 주고, 크기 세 단계를 실제 스크림 위에 띄워 봅니다.
 class HoronModalGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronModalGallerySection({super.key});
@@ -34,6 +34,7 @@ class HoronModalGallerySection extends StatelessWidget {
                   child: HoronModal(
                     title: const Text('워크스페이스 만들기'),
                     description: const Text('이름과 멤버를 정합니다.'),
+                    onClose: () {},
                     footer: HoronModalFooter(
                       children: <Widget>[
                         HoronButton(label: '취소', onPressed: () {}),
@@ -65,6 +66,7 @@ class HoronModalGallerySection extends StatelessWidget {
                     description: const Text('링크를 아는 사람은 참여할 수 있습니다.'),
                     size: HoronModalSize.sm,
                     surface: HoronModalSurfaceKind.glass,
+                    onClose: () {},
                     footer: HoronModalFooter(
                       children: <Widget>[
                         HoronButton(label: '복사', onPressed: () {}),
@@ -97,6 +99,7 @@ class HoronModalGallerySection extends StatelessWidget {
                         color: theme.colors.textSecondary,
                       ),
                     ),
+                    onClose: () {},
                     footer: HoronModalFooter(
                       children: <Widget>[
                         HoronButton(label: '취소', onPressed: () {}),
@@ -108,42 +111,46 @@ class HoronModalGallerySection extends StatelessWidget {
                 ),
               ),
               _Sample(
-                label: 'live · 32% 스크림 위에 가운데로 뜹니다',
-                child: HoronButton(
-                  label: '모달 열기',
-                  onPressed: () => showHoronModal<void>(
-                    context,
-                    barrierLabel: '닫기',
-                    builder: (BuildContext context) => Center(
-                      child: HoronModal(
-                        title: const Text('워크스페이스 만들기'),
-                        description: const Text('이름과 멤버를 정합니다.'),
-                        onClose: () => Navigator.of(context).maybePop(),
-                        footer: HoronModalFooter(
-                          children: <Widget>[
-                            HoronButton(
-                              label: '취소',
-                              onPressed: () => Navigator.of(context).maybePop(),
-                            ),
-                            HoronButton(
-                              label: '만들기',
-                              onPressed: () => Navigator.of(context).maybePop(),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          '모달은 머리글·스크롤 본문·푸터 세 부분으로 고정됩니다.',
-                          style: HoronTheme.of(context).text.bodyMd,
-                        ),
+                label: 'live · 크기 세 단계',
+                child: Wrap(
+                  spacing: theme.space.s2,
+                  runSpacing: theme.space.s2,
+                  children: <Widget>[
+                    for (final HoronModalSize size in HoronModalSize.values)
+                      HoronButton(
+                        label: '${size.name} 열기',
+                        onPressed: () => _open(context, size),
                       ),
-                    ),
-                  ),
+                  ],
                 ),
               ),
             ],
           );
         },
       ),
+    );
+  }
+
+  void _open(BuildContext context, HoronModalSize size) {
+    showHoronModalContent<void>(
+      context,
+      size: size,
+      title: const Text('워크스페이스 삭제'),
+      description: const Text('이 작업은 되돌릴 수 없습니다.'),
+      footer: HoronModalFooter(
+        children: <Widget>[
+          HoronButton(
+            label: '취소',
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+          HoronButton(
+            label: '삭제',
+            variant: HoronButtonVariant.danger,
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+        ],
+      ),
+      child: const Text('삭제하면 이 워크스페이스의 봇과 실행 기록이 함께 사라집니다.'),
     );
   }
 }
@@ -161,7 +168,7 @@ class _Sample extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: theme.space.s1,
+      spacing: theme.space.s2,
       children: <Widget>[
         Text(
           label,

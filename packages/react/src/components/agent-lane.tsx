@@ -50,10 +50,12 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
           </span>
         </span>
         <span className="min-w-0 flex-1 truncate">{bot.name}</span>
-        {status === "running" && <Spinner size={12} />}
-        {status === "done" && <CheckCircle aria-hidden className="size-3.5 shrink-0" />}
-        {status === "failed" && <WarningCircle aria-hidden className="size-3.5 shrink-0 text-text-danger" />}
-        {elapsed && <span className="shrink-0">{elapsed}</span>}
+        <span className="flex size-3.5 shrink-0 items-center justify-center">
+          {status === "running" && <Spinner size={12} />}
+          {status === "done" && <CheckCircle aria-hidden className="size-3.5" />}
+          {status === "failed" && <WarningCircle aria-hidden className="size-3.5 text-text-danger" />}
+        </span>
+        {elapsed && <span className="shrink-0 tabular-nums">{elapsed}</span>}
       </div>
       <p className="text-label-lg text-text-primary">{task}</p>
       {tool && (

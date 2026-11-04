@@ -80,9 +80,17 @@ void main() {
     expect(shadow.blurRadius, 64);
 
     await tester.pumpWidget(_host(const HoronModal(title: Text('제목'), surface: HoronModalSurfaceKind.glass)));
-    final HoronVeil veil = tester.widget<HoronVeil>(find.byType(HoronVeil).first);
-    expect(veil.kind, HoronVeilKind.overlay, reason: 'React ModalSurface glass = veil-overlay');
-    expect(veil.borderRadius!.topLeft.x, theme.radius.xl, reason: 'rounded-xl');
+    expect(find.byType(BackdropFilter), findsOneWidget, reason: 'glass는 8px 흐림 위의 베일');
+    expect(
+      find.descendant(
+        of: find.byType(HoronModal),
+        matching: find.byWidgetPredicate(
+          (Widget widget) => widget is ColoredBox && widget.color == theme.colors.bgSurface75,
+        ),
+      ),
+      findsOneWidget,
+      reason: '베일 채움은 75% 표면입니다',
+    );
     expect(find.byType(HoronLiquidGlass), findsNothing);
   });
 
@@ -118,13 +126,14 @@ void main() {
             widget.padding ==
                 EdgeInsets.only(
                   left: theme.space.s6,
-                  right: theme.space.s6,
+                  // 닫기 버튼이 `-mr-2`로 오른쪽 여백을 먹으므로 머리글 오른쪽은 16입니다.
+                  right: theme.space.s4,
                   top: theme.space.s6,
                   bottom: theme.space.s4,
                 ),
       ),
       findsOneWidget,
-      reason: 'px-6 pt-6 pb-4',
+      reason: 'px-6 pt-6 pb-4 (-mr-2)',
     );
     final Icon close = tester.widget<Icon>(find.byIcon(Icons.close));
     expect(close.size, 16, reason: '[&_svg]:size-4');

@@ -34,12 +34,7 @@ export function Textarea({
 }: TextareaProps) {
   return (
     <div
-      className={cn(
-        "relative flex overflow-clip rounded-md border motion-colors",
-        sizeClass[size],
-        fieldBoxClass[surface],
-        className,
-      )}
+      className={cn(fieldBoxClass.base, "items-stretch", sizeClass[size], fieldBoxClass[surface], className)}
       data-invalid={invalid ? "" : undefined}
     >
       <Field.Control
