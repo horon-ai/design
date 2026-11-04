@@ -1,6 +1,11 @@
 {
 	"name": "@horon-ai/react",
 	"version": "0.1.0",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/horon-ai/design.git",
+		"directory": "packages/react"
+	},
 	"type": "module",
 	"files": [
 		"src",
