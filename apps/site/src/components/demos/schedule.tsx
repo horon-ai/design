@@ -17,36 +17,81 @@ const times = ["7:00 AM", "8:00 AM", "9:00 AM"].map((time) => ({ value: time, la
 
 export default function ScheduleDemo() {
   return (
-    <Backdrop>
-      <ScheduleCard title="Morning brief" nextRun="Next run: Tomorrow, 8:00 AM">
-        <ScheduleSection label="Repeat">
-          <SegmentedControl
-            aria-label="Repeat"
-            size="sm"
-            surface="inset"
-            fill
-            items={frequency}
-            defaultValue="weekdays"
-          />
-        </ScheduleSection>
-        <ScheduleSection label="Days">
-          <WeekdayPicker days={days} defaultValue={["mon", "tue", "wed", "thu", "fri"]} />
-        </ScheduleSection>
-        <div className="flex gap-3">
-          <ScheduleSection label="Time">
-            <PickerField aria-label="Time" surface="inset" items={times} defaultValue="8:00 AM" />
-          </ScheduleSection>
-          <ScheduleSection label="Report to">
-            <PickerField
-              aria-label="Report to"
+    <div className="flex w-full flex-col items-center gap-6">
+      <Backdrop className="flex-col">
+        <ScheduleCard surface="glass" title="Morning brief" nextRun="Next run: Tomorrow, 8:00 AM">
+          <ScheduleSection label="Repeat">
+            <SegmentedControl
+              aria-label="Repeat"
+              size="sm"
               surface="inset"
-              icon={<EnvelopeSimple />}
-              items={[{ value: "email", label: "Email" }]}
-              defaultValue="email"
+              fill
+              items={frequency}
+              defaultValue="weekdays"
             />
           </ScheduleSection>
-        </div>
-      </ScheduleCard>
-    </Backdrop>
+          <ScheduleSection label="Days">
+            <WeekdayPicker days={days} defaultValue={["mon", "tue", "wed", "thu", "fri"]} />
+          </ScheduleSection>
+          <div className="flex gap-3">
+            <ScheduleSection label="Time">
+              <PickerField aria-label="Time" surface="inset" items={times} defaultValue="8:00 AM" />
+            </ScheduleSection>
+            <ScheduleSection label="Report to">
+              <PickerField
+                aria-label="Report to"
+                surface="inset"
+                icon={<EnvelopeSimple />}
+                items={[{ value: "email", label: "Email" }]}
+                defaultValue="email"
+              />
+            </ScheduleSection>
+          </div>
+        </ScheduleCard>
+      </Backdrop>
+      <div className="flex w-full flex-wrap items-start justify-center gap-4 rounded-2xl bg-bg-default p-4">
+        <ScheduleCard title="Morning brief" nextRun="Next run: Tomorrow, 8:00 AM">
+          <ScheduleSection label="Repeat">
+            <SegmentedControl
+              aria-label="Repeat"
+              size="sm"
+              surface="inset"
+              fill
+              items={frequency}
+              defaultValue="weekdays"
+            />
+          </ScheduleSection>
+          <ScheduleSection label="Days">
+            <WeekdayPicker days={days} defaultValue={["mon", "tue", "wed", "thu", "fri"]} />
+          </ScheduleSection>
+          <div className="flex gap-3">
+            <ScheduleSection label="Time">
+              <PickerField aria-label="Time" surface="inset" items={times} defaultValue="8:00 AM" />
+            </ScheduleSection>
+            <ScheduleSection label="Report to">
+              <PickerField
+                aria-label="Report to"
+                surface="inset"
+                icon={<EnvelopeSimple />}
+                items={[{ value: "email", label: "Email" }]}
+                defaultValue="email"
+              />
+            </ScheduleSection>
+          </div>
+        </ScheduleCard>
+      </div>
+      <div className="flex flex-wrap items-start justify-center gap-4 rounded-2xl bg-bg-default p-4">
+        {(["sm", "md", "lg"] as const).map((size) => (
+          <ScheduleCard key={size} size={size} surface="glass" title="Morning brief">
+            <ScheduleSection size={size} label="Days">
+              <WeekdayPicker size={size} days={days} defaultValue={["mon", "tue", "wed", "thu", "fri"]} />
+            </ScheduleSection>
+            <ScheduleSection size={size} label="Time">
+              <PickerField size={size} aria-label="Time" surface="inset" items={times} defaultValue="8:00 AM" />
+            </ScheduleSection>
+          </ScheduleCard>
+        ))}
+      </div>
+    </div>
   );
 }

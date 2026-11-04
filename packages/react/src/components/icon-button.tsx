@@ -2,10 +2,11 @@ import { Button as BaseButton } from "@base-ui/react/button";
 import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
+import type { ControlSize } from "../lib/size";
 import { LiquidGlass } from "./liquid-glass";
 
-export type IconButtonVariant = "primary" | "ghost" | "glass";
-export type IconButtonSize = "sm" | "md" | "lg";
+export type IconButtonVariant = "primary" | "ghost" | "glass" | "solid";
+export type IconButtonSize = ControlSize;
 
 export type IconButtonProps = Omit<ComponentProps<typeof BaseButton>, "className" | "children"> & {
   variant?: IconButtonVariant;
@@ -28,9 +29,11 @@ const variantClass: Record<IconButtonVariant, string> = {
   ghost: "text-text-primary hover:not-data-disabled:bg-overlay-ink-6 active:not-data-disabled:bg-overlay-ink-10",
   glass:
     "overflow-clip bg-glass-clear text-text-primary hover:not-data-disabled:bg-glass-clear-hover active:not-data-disabled:bg-glass-clear-pressed",
+  solid:
+    "border border-border-default bg-bg-surface text-text-primary hover:not-data-disabled:bg-bg-subtle active:not-data-disabled:bg-interactive-secondary-hover",
 };
 
-/** Figma `Icon button` (57:167): Primary, Ghost and Glass in three sizes. */
+/** Figma `Icon button` (57:167): Primary, Ghost, Glass and Solid in three sizes. */
 export function IconButton({ variant = "ghost", size = "md", icon, label, className, ...props }: IconButtonProps) {
   return (
     <BaseButton

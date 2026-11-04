@@ -36,7 +36,7 @@ export function BottomSheetContent({
   title,
   closeLabel = "Close",
   variant = "panel",
-  surface = "glass",
+  surface = "solid",
   backdrop = true,
   floating = false,
   className,
@@ -58,14 +58,14 @@ export function BottomSheetContent({
             "relative flex w-full flex-col items-stretch overflow-clip px-4 pt-2 outline-none",
             solid
               ? "rounded-t-[20px] bg-bg-default pb-6"
-              : "rounded-t-[32px] bg-glass-fill-frost pb-5 shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost),0_0_0_1px_var(--color-overlay-ink-3)] backdrop-blur-[24px] dark:bg-glass-thick dark:shadow-none dark:backdrop-blur-none",
+              : "rounded-t-[32px] bg-glass-thick pb-5",
             "transition-[translate] duration-320 ease-out-quint data-ending-style:translate-y-full data-ending-style:duration-220 data-ending-style:ease-in data-starting-style:translate-y-full",
             detail ? "gap-4.5" : floating ? "gap-3" : "max-w-93.5 gap-1",
             className,
           )}
           {...props}
         >
-          {solid || floating ? null : <LiquidGlass tier="thick" />}
+          {solid || floating ? null : <LiquidGlass />}
           <span aria-hidden className="relative mx-auto h-[5px] w-9 rounded-[3px] bg-overlay-ink-20" />
           <Drawer.Content className={cn("relative flex flex-col", detail ? "gap-4.5" : floating ? "gap-3" : "gap-1")}>
             <div className={cn("flex gap-2", detail ? "items-start" : "items-center pt-2.5 pb-2 pl-1")}>

@@ -7,7 +7,7 @@ import { glass } from "@horon-ai/tokens";
 const usage = `import { LiquidGlass } from "@horon-ai/react";
 
 <div className="relative overflow-clip rounded-xl bg-glass-thick p-5">
-  <LiquidGlass tier="thick" />
+  <LiquidGlass />
   <p className="relative">내용</p>
 </div>`;
 ---
@@ -16,43 +16,36 @@ const usage = `import { LiquidGlass } from "@horon-ai/react";
   title="Glass"
   eyebrow="Foundations"
   section="foundations"
-  description="Figma의 Liquid layers를 그대로 옮긴 유리 표면입니다. 흐림과 경계선이 표면 높이에 비례합니다."
+  description="web, desktop, iOS, Android가 같은 값으로 그리는 유리 표면입니다."
 >
   <div class="not-prose mt-2"><GlassDemo /></div>
 
   <h2>레이어</h2>
   <p>
-    유리는 채움색(<code>glass-clear</code>, <code>glass-regular</code>, <code>glass-thick</code>) 위에 세 장의 레이어를
-    겹친 것입니다. Figma는 이 묶음 전체를 50% 마스크로 덮어서, 모든 레이어가 {glass.layerOpacity * 100}% 세기로 그려집니다.
-    칩은 Paper의 Texture층을 하나 더 얹고, 배경을 휘게 하는 엔진에서는 refraction층이, 그렇지 않은 엔진에서는 rim sheen이
-    표면 가장자리를 대신합니다.
+    아래에서 위로 세 겹입니다. React의 <code>LiquidGlass</code>와 Flutter의 <code>HoronLiquidGlass</code>가
+    <code>@horon-ai/tokens</code>의 같은 값을 읽습니다.
   </p>
   <ul>
-    <li>Tint: {glass.tint.color}, 배경 흐림 {glass.tint.blur}px</li>
-    <li>Inner shade: {glass.innerShade.color}, 흐림 {glass.innerShade.blur}px, 여백은 높이의 1/14 (위아래 최대 {glass.innerShade.maxInsetY}px, 좌우 최대 {glass.innerShade.maxInsetX}px)</li>
-    <li>Soft light edge: {glass.edgeLightSoft.color}, 테두리 1px, 흐림 clamp(0.75, 1.5H/84, 1.5)px</li>
-    <li>Texture(칩만): 흰색 3% 바탕을 위아래 -9px, 좌우 -8px로 넓히고 2px 흐림을 겁니다</li>
+    <li>배경: 뒤 내용을 {glass.blur}px 흐리게 하고 채도를 {glass.saturate * 100}%로 올립니다.</li>
+    <li>채움: <code>glass-clear</code>, <code>glass-regular</code>, <code>glass-thick</code> 중 하나입니다. React는 호스트가 칠하고 Flutter는 위젯이 칠합니다.</li>
+    <li>
+      테두리: 가장자리 안쪽 {glass.rimWidth}px 링입니다. 위가 가장 밝고({glass.rim.light.top}), 가운데에서 옅어졌다가
+      ({glass.rim.light.mid}) 아래에서 조금 다시 밝아집니다({glass.rim.light.bottom}). 다크 모드는 더 옅습니다.
+    </li>
   </ul>
-  <p>H는 표면 높이입니다. 레이어 묶음을 CSS 크기 컨테이너로 만들어 <code>100cqh</code>로 높이를 읽기 때문에, 32px 칩부터 큰 카드까지 Figma와 같은 비율로 흐려집니다.</p>
-
-  <h2>굴절</h2>
   <p>
-    Chromium 계열 브라우저(Chrome, Edge, Arc, Android Chrome, Windows 데스크톱 앱)에서는 패키지가 직접 만든 SVG 변위 필터가
-    뒤 배경을 표면 가장자리에서 휘게 합니다. 칩이나 버튼처럼 작은 표면뿐 아니라 카드, 시트처럼 큰 사각형도 같은 방식으로
-    휘고, 같은 크기의 표면은 필터 하나를 나눠 씁니다.
+    굴절, 혼합 모드, 높이에 따라 바뀌는 값은 쓰지 않습니다. Safari와 macOS 데스크톱 앱(WKWebView)은 배경을 휘게 할 수
+    없어서, 모든 플랫폼이 같은 모습이 되도록 모두가 그릴 수 있는 것만 남겼습니다. 그림자도 재질에 넣지 않고, 떠 있는 표면이
+    <code>shadow</code> 토큰으로 따로 정합니다.
   </p>
   <p>
-    Safari, iOS의 모든 브라우저, Firefox, macOS 데스크톱 앱은 배경에 SVG 필터를 걸지 못합니다
-    (<a href="https://bugs.webkit.org/show_bug.cgi?id=245510">WebKit 245510</a>,
-    <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1961378">Gecko 1961378</a>). 이 엔진에서는 위의 CSS 레이어에
-    rim sheen(밝은 테두리)을 더한 흐린 유리로 그립니다.
+    호스트에는 자기 테두리를 두지 않습니다. 유리 테두리가 가장자리입니다. 오류 상태(<code>data-invalid</code>)에서는 테두리가
+    위험 색으로 바뀝니다.
   </p>
-  <ul>
-    <li>한 번에 굴절하는 표면은 16개까지이고, 터치 기기에서는 6개까지입니다.</li>
-    <li>화면 밖 표면과 터치 기기에서 너무 큰 표면은 굴절하지 않습니다.</li>
-    <li>투명도 줄이기 설정이 켜져 있거나 <code>backdrop-filter</code>를 지원하지 않으면 불투명한 흐린 표면이 됩니다.</li>
-    <li><code>{"<LiquidGlass refract={false} />"}</code>처럼 <code>refract</code>를 끄면 굴절만 사라집니다.</li>
-  </ul>
+  <p>
+    투명도 줄이기 설정이 켜져 있거나 <code>backdrop-filter</code>를 지원하지 않으면 흐림 대신 <code>glass-fill-frost</code>
+    채움을 쓰고 테두리는 그대로 둡니다.
+  </p>
 
   <h2>쓰는 법</h2>
   <CodeBlock code={usage} title="tsx" />

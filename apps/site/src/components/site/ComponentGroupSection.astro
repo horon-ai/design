@@ -56,13 +56,17 @@ const items = componentsInGroup(group.id);
    * are shown whole instead of being cut off by the tile. */
   const MAX_SCALE = 0.8;
 
+  /* `max-width` caps the preview box, but a row that cannot wrap still spills
+   * past it, so the scale reads the scroll size, which includes the overflow. */
   function fit(preview: HTMLElement) {
     const tile = preview.parentElement;
-    if (!tile || preview.offsetWidth === 0 || preview.offsetHeight === 0) return;
+    const contentWidth = Math.max(preview.offsetWidth, preview.scrollWidth);
+    const contentHeight = Math.max(preview.offsetHeight, preview.scrollHeight);
+    if (!tile || contentWidth === 0 || contentHeight === 0) return;
     const style = getComputedStyle(tile);
     const width = tile.clientWidth - Number.parseFloat(style.paddingLeft) - Number.parseFloat(style.paddingRight);
     const height = tile.clientHeight - Number.parseFloat(style.paddingTop) - Number.parseFloat(style.paddingBottom);
-    const scale = Math.min(MAX_SCALE, width / preview.offsetWidth, height / preview.offsetHeight);
+    const scale = Math.min(MAX_SCALE, width / contentWidth, height / contentHeight);
     preview.style.setProperty("--demo-fit", String(scale));
   }
 

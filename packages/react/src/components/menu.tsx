@@ -36,7 +36,7 @@ export const menuPopupClass = {
 
 /** Figma `Menus and popovers` (88:495): `Menu`, `Account menu` and `Workspace menu`. */
 export function MenuContent({
-  surface = "glass",
+  surface = "solid",
   side,
   align = "start",
   sideOffset = 8,
@@ -63,7 +63,7 @@ export function MenuContent({
           )}
           {...props}
         >
-          {surface === "paper" ? null : <LiquidGlass tier="thick" />}
+          {surface === "paper" ? null : <LiquidGlass />}
           <SurfaceContext value={surface}>{children}</SurfaceContext>
         </BaseMenu.Popup>
       </BaseMenu.Positioner>

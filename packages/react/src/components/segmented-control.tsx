@@ -3,11 +3,13 @@ import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { type ReactNode, useRef } from "react";
 
 import { cn } from "../lib/cn";
+import type { ControlSize } from "../lib/size";
 import { useActiveIndicator } from "../lib/use-active-indicator";
 import { LiquidGlass } from "./liquid-glass";
 
-export type SegmentedControlSize = "sm" | "md" | "lg" | "tab";
-export type SegmentedControlSurface = "glass" | "inset" | "inset-faint" | "subtle";
+/** `tab` keeps Paper's page-tab rung beside the three control sizes. */
+export type SegmentedControlSize = ControlSize | "tab";
+export type SegmentedControlSurface = "solid" | "glass" | "inset" | "inset-faint" | "subtle";
 
 export type SegmentedControlProps = {
   items: { value: string; label: ReactNode; disabled?: boolean }[];
@@ -16,12 +18,13 @@ export type SegmentedControlProps = {
   onValueChange?: (value: string) => void;
   /**
    * `md`: Segmented control (62:379), 36px track, 30px segments, 16px padding.
-   * `sm`: Frequency (110:765), 30px segments with 12px padding.
+   * `sm`: one rung down, a 32px track with 26px segments and 10px padding.
    * `lg`: Segmented filter (88:723), 44px track, 36px segments.
    * `tab`: Paper page tabs (Projects Active/Archived), 4px track padding and gap, 32px segments with 14px padding.
    */
   size?: SegmentedControlSize;
   /**
+   * `solid` (default) is the opaque surface track with a default border and a 10% ink selection.
    * `glass` is regular glass. `inset` is the 5% ink track inside the routine card,
    * `inset-faint` the 4% ink track inside the header filter. `subtle` is the bg-subtle page-tab tray whose
    * selection is a plain white pill.
@@ -41,13 +44,14 @@ const trackClass: Record<SegmentedControlSize, string> = {
 };
 
 const segmentClass: Record<SegmentedControlSize, string> = {
-  sm: "h-7.5 px-3",
-  md: "h-7.5 px-4",
-  lg: "h-9 px-4",
-  tab: "h-8 px-3.5",
+  sm: "h-6.5 px-2.5 text-label-sm",
+  md: "h-7.5 px-4 text-label-md",
+  lg: "h-9 px-4 text-label-lg",
+  tab: "h-8 px-3.5 text-label-md",
 };
 
 const surfaceClass: Record<SegmentedControlSurface, string> = {
+  solid: "border border-border-default bg-bg-surface",
   glass: "overflow-clip bg-glass-regular",
   inset: "bg-overlay-ink-5",
   "inset-faint": "bg-overlay-ink-4",
@@ -56,11 +60,9 @@ const surfaceClass: Record<SegmentedControlSurface, string> = {
 
 /**
  * Single-choice segmented control. The selection is one pill that slides to the
- * pressed segment. On the glass track it is a clear glass pill (Figma 62:379):
- * thick-glass fill, 1px strong rim and a 0 1 3 8% shadow; dark mode keeps a 10%
- * fill, as the Components / Dark board does. On the inset tracks it is 10% ink.
- * The moving pill keeps the CSS glass: refraction on a sliding layer leaks a
- * square frost past its rounded clip and re-renders every frame.
+ * pressed segment. On the glass track it is a glass pill over the glass track,
+ * thick fill and a 0 1 3 8% shadow, the iOS tab bar selection; dark mode keeps a
+ * 10% fill. On the solid and inset tracks it is 10% ink.
  */
 export function SegmentedControl({
   items,
@@ -68,7 +70,7 @@ export function SegmentedControl({
   defaultValue,
   onValueChange,
   size = "md",
-  surface = "glass",
+  surface = "solid",
   fill = size === "md",
   className,
   ...props
@@ -91,13 +93,13 @@ export function SegmentedControl({
       )}
       aria-label={props["aria-label"]}
     >
-      {surface === "glass" && <LiquidGlass tier="regular" />}
+      {surface === "glass" && <LiquidGlass />}
       <span
         aria-hidden
         className={cn(
           "pointer-events-none absolute overflow-clip rounded-full",
           surface === "glass" && size !== "lg"
-            ? "border border-glass-rim-strong bg-glass-thick shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:bg-overlay-ink-10"
+            ? "bg-glass-thick shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:bg-overlay-ink-10"
             : surface === "subtle"
               ? "bg-bg-default"
               : "bg-overlay-ink-10",
@@ -105,7 +107,7 @@ export function SegmentedControl({
         )}
         style={rect ? { ...rect, opacity: 1 } : { opacity: 0 }}
       >
-        {surface === "glass" && size !== "lg" && <LiquidGlass tier="clear" refract={false} />}
+        {surface === "glass" && size !== "lg" && <LiquidGlass />}
       </span>
       {items.map((item) => (
         <Toggle
@@ -113,7 +115,7 @@ export function SegmentedControl({
           value={item.value}
           disabled={item.disabled}
           className={cn(
-            "relative flex min-w-0 cursor-pointer items-center justify-center rounded-full text-label-md whitespace-nowrap text-text-secondary motion-colors",
+            "relative flex min-w-0 cursor-pointer items-center justify-center rounded-full whitespace-nowrap text-text-secondary motion-colors",
             "data-disabled:cursor-not-allowed data-disabled:opacity-40 data-pressed:text-text-primary",
             "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
             segmentClass[size],

@@ -20,7 +20,7 @@ export default function MenuDemo() {
       </Menu>
       <Menu>
         <MenuTrigger render={<Button variant="glass" />}>Account</MenuTrigger>
-        <MenuContent surface="solid">
+        <MenuContent surface="glass">
           <MenuLabel>mina@horon.ai</MenuLabel>
           <MenuItem icon={<User />}>Profile</MenuItem>
           <MenuItem icon={<Gear />}>Settings</MenuItem>

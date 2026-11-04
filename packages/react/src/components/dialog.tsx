@@ -19,8 +19,8 @@ export type DialogContentProps = Omit<ComponentProps<typeof BaseDialog.Popup>, "
   /** Tile or icon set before the title (Paper settings modals). */
   leading?: ReactNode;
   /**
-   * `glass` is the Figma frost dialog. `solid` is the Paper workspace modal: opaque default fill,
-   * 20px radius, 24px padding, 20px gap and a 0 24 64 shadow, no glass layer.
+   * `glass` is the thick glass dialog with a palette shadow. `solid` is the Paper workspace modal:
+   * opaque default fill, 20px radius, 24px padding, 20px gap and a 0 24 64 shadow, no glass layer.
    */
   surface?: "glass" | "solid";
   className?: string;
@@ -36,7 +36,7 @@ export function DialogContent({
   closeLabel = "Close",
   closeSlot,
   leading,
-  surface = "glass",
+  surface = "solid",
   className,
   children,
   ...props
@@ -51,17 +51,13 @@ export function DialogContent({
             "relative flex w-105 max-w-[calc(100vw-2rem)] flex-col items-start overflow-clip p-6 outline-none",
             solid
               ? "gap-5 rounded-[20px] bg-bg-default shadow-[0_24px_64px_#0A142433]"
-              : cn(
-                  "gap-2 rounded-xl bg-glass-fill-frost backdrop-blur-[24px]",
-                  "shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost),0_0_0_1px_var(--color-overlay-ink-3)]",
-                  "dark:bg-glass-thick dark:shadow-none dark:backdrop-blur-none",
-                ),
+              : "gap-2 rounded-xl bg-glass-thick shadow-palette",
             "motion-popup duration-240 data-starting-style:translate-y-2",
             className,
           )}
           {...props}
         >
-          {solid ? null : <LiquidGlass tier="thick" />}
+          {solid ? null : <LiquidGlass />}
           <div className={cn("relative flex w-full items-start", leading ? "gap-3.5" : "gap-2")}>
             {leading}
             <BaseDialog.Title className="min-w-0 flex-1 text-title-md text-text-primary">{title}</BaseDialog.Title>

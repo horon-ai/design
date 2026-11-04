@@ -6,9 +6,12 @@ import { Button } from "./button";
 import { LiquidGlass } from "./liquid-glass";
 
 export type ApprovalState = "pending" | "approved" | "declined";
+export type ApprovalCardSurface = "solid" | "glass";
 
 export type ApprovalCardProps = {
   state?: ApprovalState;
+  /** `solid` (default) on raised surfaces, `glass` over imagery and glass panels. */
+  surface?: ApprovalCardSurface;
   /** Status line, defaults to "Needs your yes", "Approved" or "Declined". */
   status?: ReactNode;
   /** The question, such as "Send the Q3 board deck to the team?". */
@@ -29,11 +32,12 @@ const statusClass: Record<ApprovalState, { dot: string; text: string; label: str
 };
 
 /**
- * Figma `Approval card` (64:398): the one conversation part that is glass,
- * because it asks for an action. Pending keeps the brand rim and the actions.
+ * Figma `Approval card` (64:398): the conversation part that asks for an action.
+ * Pending keeps the brand rim and the actions.
  */
 export function ApprovalCard({
   state = "pending",
+  surface = "solid",
   status,
   title,
   attachment,
@@ -47,12 +51,14 @@ export function ApprovalCard({
   return (
     <div
       className={cn(
-        "relative flex w-90 flex-col items-start gap-3 overflow-clip rounded-xl bg-glass-thick p-4 motion-colors",
-        state === "pending" && "border border-border-brand",
+        "relative flex w-90 flex-col items-start gap-3 overflow-clip rounded-xl p-4 motion-colors",
+        surface === "glass"
+          ? cn("bg-glass-thick", state === "pending" && "[--glass-edge:var(--color-border-brand)]")
+          : cn("border border-border-default bg-bg-surface", state === "pending" && "border-border-brand"),
         className,
       )}
     >
-      <LiquidGlass tier="thick" />
+      {surface === "glass" && <LiquidGlass />}
       <div className={cn("relative flex items-center gap-1.5 text-label-sm", tone.text)}>
         <span aria-hidden className={cn("size-2 rounded-full", tone.dot)} />
         {status ?? tone.label}
@@ -69,7 +75,7 @@ export function ApprovalCard({
           <Button size="sm" onClick={onApprove}>
             {approveLabel}
           </Button>
-          <Button size="sm" variant="glass" onClick={onLater}>
+          <Button size="sm" variant={surface === "glass" ? "glass" : "solid"} onClick={onLater}>
             {laterLabel}
           </Button>
         </div>

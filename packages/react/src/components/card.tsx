@@ -15,10 +15,10 @@ export type CardProps = Omit<ComponentProps<"div">, "className" | "title"> & {
   /** Render as another element, such as `<button />` or `<a />`. */
   render?: ReactElement;
   /**
-   * `glass` (default) layers the thick liquid glass. `frost` is the Paper home board card: frost fill,
-   * 24px backdrop blur, white inner rim, 3% ink hairline and a 0 8 24 6% drop, without the glass layer.
+   * `solid` (default) is an opaque surface with a default border. `glass` is the thick glass.
+   * `frost` is the Paper home board card: the same glass with the denser frost fill and a 0 8 24 6% drop.
    */
-  surface?: "glass" | "frost";
+  surface?: "glass" | "frost" | "solid";
   className?: string;
 };
 
@@ -29,7 +29,7 @@ export function Card({
   interactive,
   selected,
   render,
-  surface = "glass",
+  surface = "solid",
   className,
   children,
   ...props
@@ -40,17 +40,17 @@ export function Card({
       ...props,
       "data-selected": selected ? "" : undefined,
       className: cn(
-        "relative flex flex-col items-start gap-2 overflow-clip rounded-xl bg-glass-thick p-5 text-left motion-colors",
-        surface === "frost" &&
-          "bg-glass-fill-frost shadow-[inset_0_0_0_1px_#ffffffb3,0_0_0_1px_#00000008,0_8px_24px_#0a14240f] backdrop-blur-[24px]",
-        selected && "border border-border-brand",
+        "relative flex flex-col items-start gap-2 overflow-clip rounded-xl p-5 text-left motion-colors",
+        surface === "solid" ? "border border-border-default bg-bg-surface" : "bg-glass-thick",
+        surface === "frost" && "bg-glass-fill-frost shadow-[0_8px_24px_#0a14240f]",
+        selected && (surface === "solid" ? "border-border-brand" : "[--glass-edge:var(--color-border-brand)]"),
         interactive &&
           "cursor-pointer transition-[border-color,scale] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand active:scale-[0.99]",
         className,
       ),
       children: (
         <>
-          {surface === "glass" && <LiquidGlass tier="thick" />}
+          {surface !== "solid" && <LiquidGlass />}
           {(title || interactive) && (
             <div className="relative flex w-full items-center gap-2">
               <span className="min-w-0 flex-1 text-title-sm text-text-primary">{title}</span>

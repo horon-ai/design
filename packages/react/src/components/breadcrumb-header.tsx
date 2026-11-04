@@ -19,6 +19,8 @@ export type BreadcrumbHeaderProps = Omit<ComponentProps<"header">, "className"> 
   onMore?: () => void;
   searchLabel?: string;
   moreLabel?: string;
+  /** `solid` (default) on the page, `glass` over imagery and glass panels. */
+  surface?: "solid" | "glass";
   className?: string;
 };
 
@@ -32,15 +34,20 @@ export function BreadcrumbHeader({
   onMore,
   searchLabel = "Search",
   moreLabel = "More",
+  surface = "solid",
   className,
   ...props
 }: BreadcrumbHeaderProps) {
   return (
     <header
-      className={cn("relative flex h-13 items-center gap-2 overflow-clip rounded-full bg-glass-regular p-2", className)}
+      className={cn(
+        "relative flex h-13 items-center gap-2 overflow-clip rounded-full p-2",
+        surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
+        className,
+      )}
       {...props}
     >
-      <LiquidGlass tier="regular" />
+      {surface === "glass" && <LiquidGlass />}
       <nav aria-label="Breadcrumb" className="relative min-w-0 flex-1 overflow-clip">
         <ol className="flex items-center gap-1.5">
           {crumbs.map((crumb, index) => {
@@ -71,8 +78,18 @@ export function BreadcrumbHeader({
           })}
         </ol>
       </nav>
-      <IconButton icon={<MagnifyingGlass />} label={searchLabel} onClick={onSearch} className="relative size-9 [&_svg]:size-4.5" />
-      <IconButton icon={<DotsThree weight="bold" />} label={moreLabel} onClick={onMore} className="relative size-9 [&_svg]:size-4.5" />
+      <IconButton
+        icon={<MagnifyingGlass />}
+        label={searchLabel}
+        onClick={onSearch}
+        className="relative size-9 [&_svg]:size-4.5"
+      />
+      <IconButton
+        icon={<DotsThree weight="bold" />}
+        label={moreLabel}
+        onClick={onMore}
+        className="relative size-9 [&_svg]:size-4.5"
+      />
     </header>
   );
 }

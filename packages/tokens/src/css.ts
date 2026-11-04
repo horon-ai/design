@@ -49,24 +49,20 @@ function themeBlock(): string[] {
   return lines;
 }
 
+/** The rim gradient for one scheme; `.dark` repeats it with the dark colours. */
+const rimLines = (scheme: keyof typeof glass.rim) => [
+  `  --glass-rim-top: ${glass.rim[scheme].top};`,
+  `  --glass-rim-mid: ${glass.rim[scheme].mid};`,
+  `  --glass-rim-bottom: ${glass.rim[scheme].bottom};`,
+];
+
 function rootBlock(): string[] {
   const lines = [
-    `  --glass-layer-opacity: ${glass.layerOpacity};`,
-    `  --glass-tint: ${glass.tint.color};`,
-    `  --glass-tint-blur: ${px(glass.tint.blur)};`,
-    `  --glass-inner-shade: ${glass.innerShade.color};`,
-    `  --glass-inner-shade-blur: ${px(glass.innerShade.blur)};`,
-    `  --glass-inner-inset-ratio: ${ratio(glass.innerShade.insetPerPx)};`,
-    `  --glass-inner-inset-max-y: ${px(glass.innerShade.maxInsetY)};`,
-    `  --glass-inner-inset-max-x: ${px(glass.innerShade.maxInsetX)};`,
-    `  --glass-edge-dark: ${glass.edgeDark.color};`,
-    `  --glass-edge-dark-ratio: ${ratio(glass.edgeDark.blurPerPx)};`,
-    `  --glass-edge-dark-max: ${px(glass.edgeDark.maxBlur)};`,
-    `  --glass-edge-light: ${glass.edgeLight.color};`,
-    `  --glass-edge-light-ratio: ${ratio(glass.edgeLight.blurPerPx)};`,
-    `  --glass-edge-light-min: ${px(glass.edgeLight.minBlur)};`,
-    `  --glass-edge-light-max: ${px(glass.edgeLight.maxBlur)};`,
-    `  --glass-edge-light-soft: ${glass.edgeLightSoft.color};`,
+    `  --glass-blur: ${px(glass.blur)};`,
+    `  --glass-saturate: ${glass.saturate};`,
+    `  --glass-rim-width: ${px(glass.rimWidth)};`,
+    `  --glass-rim-mid-stop: ${ratio(glass.rimMidStop * 100)}%;`,
+    ...rimLines("light"),
   ];
   for (const [name, style] of Object.entries(textStyles)) {
     if ("paragraph" in style) lines.push(`  --paragraph-${name}: ${style.paragraph}em;`);
@@ -99,6 +95,7 @@ export function buildThemeCss(): string {
     ".dark {",
     "  color-scheme: dark;",
     ...dark,
+    ...rimLines("dark"),
     "}",
     "",
   ].join("\n");

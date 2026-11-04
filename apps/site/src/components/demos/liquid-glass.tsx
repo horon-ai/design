@@ -12,7 +12,7 @@ export default function LiquidGlassDemo() {
             tier === "clear" ? "bg-glass-clear" : tier === "regular" ? "bg-glass-regular" : "bg-glass-thick"
           }`}
         >
-          <LiquidGlass tier={tier} />
+          <LiquidGlass />
           <span className="relative">{tier}</span>
         </div>
       ))}
