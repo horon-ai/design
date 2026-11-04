@@ -87,7 +87,8 @@ void main() {
         expect(data.shadows.palette, HoronShadow.palette);
         expect(data.space.s3_5, HoronSpace.s3_5);
         expect(data.breakpoints.md, HoronBreakpoint.md);
-        expect(data.glass.edgeLightSoftColor, const Color(0x33FFFFFF));
+        expect(data.glass.blur, 20);
+        expect(data.glass.rimWidth, 1);
       });
     });
   }
@@ -118,7 +119,7 @@ void main() {
       const text = HoronTextStyles();
       const glass = HoronGlassTokens();
       expect(text.labelSm.fontSize, 12);
-      expect(glass.layerOpacity, 0.5);
+      expect(glass.saturate, 1.8);
     });
   });
 

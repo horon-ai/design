@@ -2,8 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_glass.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -46,6 +48,86 @@ class HoronWeekday {
 /// React의 `surface: "glass" | "inset"`은 `export type`이 아닌 인라인 유니온이라
 /// 공개 enum이 될 수 없습니다. variant 게이트가 React에 없는 공개 enum을 거부하므로
 /// [glass] 불리언으로 옮겼습니다. 거짓이면 스케줄 카드 안의 4% 잉크 필드가 됩니다.
+/// `schedule.tsx`의 `PickerFieldSize`(`ControlSize`)입니다.
+enum HoronPickerFieldSize {
+  /// `size="sm"` — 높이 32, 폭 144, 목록 줄 32.
+  sm,
+
+  /// `size="md"` — 높이 40, 폭 160, 목록 줄 40. 기본값입니다.
+  md,
+
+  /// `size="lg"` — 높이 48, 폭 176, 목록 줄 48.
+  lg,
+}
+
+/// `schedule.tsx`의 `WeekdayPickerSize`(`ControlSize`)입니다.
+enum HoronWeekdayPickerSize {
+  /// `size="sm"` — 토글 32, `label-sm`, 간격 4.
+  sm,
+
+  /// `size="md"` — 토글 36, `label-md`, 간격 6. 기본값입니다.
+  md,
+
+  /// `size="lg"` — 토글 44, `label-lg`, 간격 8.
+  lg,
+}
+
+typedef _PickerMetrics = ({
+  double width,
+  double height,
+  double icon,
+  double caret,
+  double check,
+  double itemHeight,
+  double itemGap,
+  double itemPaddingX,
+  double popupPadding,
+  TextStyle value,
+  TextStyle item,
+});
+
+_PickerMetrics _metricsOf(HoronPickerFieldSize size, HoronThemeData theme) => switch (size) {
+  HoronPickerFieldSize.sm => (
+    width: theme.space.step(36),
+    height: theme.space.step(8),
+    icon: 16,
+    caret: 12,
+    check: 16,
+    itemHeight: theme.space.step(8),
+    itemGap: theme.space.s2,
+    itemPaddingX: theme.space.s2_5,
+    popupPadding: theme.space.s1,
+    value: theme.text.bodySm,
+    item: theme.text.labelMd,
+  ),
+  HoronPickerFieldSize.md => (
+    width: theme.space.step(40),
+    height: theme.space.step(10),
+    icon: 16,
+    caret: 14,
+    check: 18,
+    itemHeight: theme.space.step(10),
+    itemGap: theme.space.s2_5,
+    itemPaddingX: theme.space.s3,
+    popupPadding: theme.space.s1_5,
+    value: theme.text.bodySm,
+    item: theme.text.labelMd,
+  ),
+  HoronPickerFieldSize.lg => (
+    width: theme.space.step(44),
+    height: theme.space.step(12),
+    icon: 20,
+    caret: 16,
+    check: 20,
+    itemHeight: theme.space.step(12),
+    itemGap: theme.space.s3,
+    itemPaddingX: theme.space.step(3.5),
+    popupPadding: theme.space.s2,
+    value: theme.text.bodyMd,
+    item: theme.text.labelLg,
+  ),
+};
+
 class HoronPickerField extends StatefulWidget {
   /// 필드를 만듭니다.
   const HoronPickerField({
@@ -55,7 +137,8 @@ class HoronPickerField extends StatefulWidget {
     this.defaultValue,
     this.onChanged,
     this.icon,
-    this.glass = true,
+    this.surface = HoronPickerSurface.solid,
+    this.size = HoronPickerFieldSize.md,
     this.label,
   });
 
@@ -74,8 +157,11 @@ class HoronPickerField extends StatefulWidget {
   /// 앞에 놓을 16px 아이콘입니다. 생략하면 시계입니다. React `icon`.
   final Widget? icon;
 
-  /// 유리 표면으로 그립니다. React `surface: "glass"`.
-  final bool glass;
+  /// 표면입니다. 기본값은 [HoronPickerSurface.solid]입니다.
+  final HoronPickerSurface surface;
+
+  /// 크기입니다. 기본값은 [HoronPickerFieldSize.md]입니다.
+  final HoronPickerFieldSize size;
 
   /// 필드의 이름입니다. React `aria-label`.
   final String? label;
@@ -85,21 +171,6 @@ class HoronPickerField extends StatefulWidget {
 }
 
 class _HoronPickerFieldState extends State<HoronPickerField> {
-  /// `w-40` — 필드의 폭입니다. 부모가 더 좁으면 그 폭을 따릅니다.
-  static const double _width = 160;
-
-  /// `h-10` — 필드와 목록 줄의 높이입니다.
-  static const double _height = 40;
-
-  /// `[&>svg]:size-4` — 앞 아이콘.
-  static const double _iconSize = 16;
-
-  /// `size-3.5` — 캐럿.
-  static const double _caretSize = 14;
-
-  /// `[&_svg]:size-4.5` — 고른 줄의 체크.
-  static const double _checkSize = 18;
-
   /// `max-h-72` — 목록의 최대 높이입니다.
   static const double _maxPopupHeight = 288;
 
@@ -144,7 +215,10 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final double width = constraints.maxWidth.isFinite ? math.min(_width, constraints.maxWidth) : _width;
+        final _PickerMetrics metrics = _metricsOf(widget.size, theme);
+        final double width = constraints.maxWidth.isFinite
+            ? math.min(metrics.width, constraints.maxWidth)
+            : metrics.width;
         return MenuAnchor(
           controller: _menu,
           // `sideOffset={8}` — 목록은 필드 8px 아래에 열립니다.
@@ -158,7 +232,7 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
             shadowColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
             elevation: const WidgetStatePropertyAll<double>(0),
             // `p-1.5`.
-            padding: WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.all(space.s1_5)),
+            padding: WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.all(metrics.popupPadding)),
             // `min-w-(--anchor-width)`.
             minimumSize: WidgetStatePropertyAll<Size>(Size(width, 0)),
             // `rounded-xl border border-glass-rim-strong`.
@@ -189,10 +263,11 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
                           key: ValueKey<String>('horon-picker-item-${item.value}'),
                           onPressed: () => _select(item),
                           style: ButtonStyle(
-                            minimumSize: WidgetStatePropertyAll<Size>(Size(0, _height)),
-                            maximumSize: const WidgetStatePropertyAll<Size>(Size(double.infinity, _height)),
-                            // `px-3`.
-                            padding: WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: space.s3)),
+                            minimumSize: WidgetStatePropertyAll<Size>(Size(0, metrics.itemHeight)),
+                            maximumSize: WidgetStatePropertyAll<Size>(Size(double.infinity, metrics.itemHeight)),
+                            padding: WidgetStatePropertyAll<EdgeInsets>(
+                              EdgeInsets.symmetric(horizontal: metrics.itemPaddingX),
+                            ),
                             // `rounded-md`.
                             shape: WidgetStatePropertyAll<OutlinedBorder>(
                               RoundedRectangleBorder(borderRadius: BorderRadius.circular(theme.radius.md)),
@@ -207,22 +282,22 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
                             }),
                             overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
                             // `text-label-md text-text-primary`.
-                            textStyle: WidgetStatePropertyAll<TextStyle>(theme.text.labelMd),
+                            textStyle: WidgetStatePropertyAll<TextStyle>(metrics.item),
                             foregroundColor: WidgetStatePropertyAll<Color>(colors.textPrimary),
                           ),
                           child: Row(
-                            // `gap-2.5`.
-                            spacing: space.s2_5,
+                            spacing: metrics.itemGap,
                             children: <Widget>[
                               Expanded(
                                 child: DefaultTextStyle.merge(
-                                  style: theme.text.labelMd.copyWith(color: colors.textPrimary),
+                                  style: metrics.item.copyWith(color: colors.textPrimary),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   child: item.label,
                                 ),
                               ),
-                              if (item.value == _value) Icon(Icons.check, size: _checkSize, color: colors.textPrimary),
+                              if (item.value == _value)
+                                Icon(Icons.check, size: metrics.check, color: colors.textPrimary),
                             ],
                           ),
                         ),
@@ -233,32 +308,40 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
             ),
           ],
           builder: (BuildContext context, MenuController controller, Widget? child) =>
-              SizedBox(width: width, child: _trigger(theme, animate, selected, controller)),
+              SizedBox(width: width, child: _trigger(theme, metrics, animate, selected, controller)),
         );
       },
     );
   }
 
-  Widget _trigger(HoronThemeData theme, bool animate, HoronPickerItem? selected, MenuController controller) {
+  Widget _trigger(
+    HoronThemeData theme,
+    _PickerMetrics metrics,
+    bool animate,
+    HoronPickerItem? selected,
+    MenuController controller,
+  ) {
     final HoronColors colors = theme.colors;
-    final HoronSpaceSpec space = theme.space;
     final BorderRadius radius = BorderRadius.circular(theme.radius.md);
 
-    // `h-10 items-center gap-2 rounded-md px-3 text-left`.
     final Widget content = Padding(
-      padding: EdgeInsets.symmetric(horizontal: space.s3),
+      padding: EdgeInsets.symmetric(horizontal: metrics.itemPaddingX),
       child: Row(
-        spacing: space.s2,
+        spacing: metrics.itemGap,
         children: <Widget>[
           IconTheme.merge(
-            data: IconThemeData(size: _iconSize, color: colors.textSecondary),
-            child: SizedBox(width: _iconSize, height: _iconSize, child: widget.icon ?? const Icon(Icons.schedule)),
+            data: IconThemeData(size: metrics.icon, color: colors.textSecondary),
+            child: SizedBox(
+              width: metrics.icon,
+              height: metrics.icon,
+              child: widget.icon ?? const Icon(Icons.schedule),
+            ),
           ),
           Expanded(
             child: DefaultTextStyle.merge(
               key: const Key('horon-picker-value'),
               // `text-body-sm text-text-primary`.
-              style: theme.text.bodySm.copyWith(color: colors.textPrimary),
+              style: metrics.value.copyWith(color: colors.textPrimary),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               child: selected?.label ?? const SizedBox.shrink(),
@@ -269,13 +352,13 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
             turns: _open ? 0.5 : 0,
             duration: animate ? _caretTurn : Duration.zero,
             curve: HoronMotion.easeOutQuint,
-            child: Icon(Icons.keyboard_arrow_down, size: _caretSize, color: colors.textSecondary),
+            child: Icon(Icons.keyboard_arrow_down, size: metrics.caret, color: colors.textSecondary),
           ),
         ],
       ),
     );
 
-    final Widget surface = widget.glass
+    final Widget surface = widget.surface == HoronPickerSurface.glass
         // `border-glass-rim-strong bg-glass-regular` + LiquidGlass regular.
         ? HoronLiquidGlass(
             tier: HoronGlassTier.regular,
@@ -285,13 +368,13 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
                 borderRadius: radius,
                 border: Border.all(color: colors.glassRimStrong),
               ),
-              child: SizedBox(height: _height, child: content),
+              child: SizedBox(height: metrics.height, child: content),
             ),
           )
         // `bg-overlay-ink-4`.
         : DecoratedBox(
             decoration: BoxDecoration(color: colors.overlayInk4, borderRadius: radius),
-            child: SizedBox(height: _height, child: content),
+            child: SizedBox(height: metrics.height, child: content),
           );
 
     return Semantics(
@@ -317,7 +400,15 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
 /// 넘어갑니다.
 class HoronWeekdayPicker extends StatefulWidget {
   /// 요일 줄을 만듭니다.
-  const HoronWeekdayPicker({super.key, required this.days, this.value, this.defaultValue, this.onChanged, this.label});
+  const HoronWeekdayPicker({
+    super.key,
+    required this.days,
+    this.value,
+    this.defaultValue,
+    this.onChanged,
+    this.size = HoronWeekdayPickerSize.md,
+    this.label,
+  });
 
   /// 표시 순서대로 놓을 요일입니다. React `days`.
   final List<HoronWeekday> days;
@@ -331,6 +422,9 @@ class HoronWeekdayPicker extends StatefulWidget {
   /// 켜진 요일이 바뀔 때 호출됩니다. React `onValueChange`.
   final ValueChanged<List<String>>? onChanged;
 
+  /// 크기입니다. 기본값은 [HoronWeekdayPickerSize.md]입니다.
+  final HoronWeekdayPickerSize size;
+
   /// 줄의 이름입니다. React `aria-label`(기본 `Days`).
   final String? label;
 
@@ -339,9 +433,6 @@ class HoronWeekdayPicker extends StatefulWidget {
 }
 
 class _HoronWeekdayPickerState extends State<HoronWeekdayPicker> {
-  /// `size-9` — 토글의 지름입니다.
-  static const double _toggleSize = 36;
-
   late List<String> _selected;
 
   @override
@@ -374,13 +465,17 @@ class _HoronWeekdayPickerState extends State<HoronWeekdayPicker> {
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronSpaceSpec space = theme.space;
+    final (double gap, double toggle) = switch (widget.size) {
+      HoronWeekdayPickerSize.sm => (space.s1, space.step(8)),
+      HoronWeekdayPickerSize.md => (space.s1_5, space.step(9)),
+      HoronWeekdayPickerSize.lg => (space.s2, space.step(11)),
+    };
     return Semantics(
       container: true,
       label: widget.label ?? 'Days',
       child: Wrap(
-        // `gap-1.5`.
-        spacing: space.s1_5,
-        runSpacing: space.s1_5,
+        spacing: gap,
+        runSpacing: gap,
         children: <Widget>[
           for (final HoronWeekday day in widget.days)
             _WeekdayToggle(
@@ -388,7 +483,12 @@ class _HoronWeekdayPickerState extends State<HoronWeekdayPicker> {
               label: day.label,
               name: day.name,
               selected: _selected.contains(day.value),
-              size: _toggleSize,
+              size: toggle,
+              textStyle: switch (widget.size) {
+                HoronWeekdayPickerSize.sm => theme.text.labelSm,
+                HoronWeekdayPickerSize.md => theme.text.labelMd,
+                HoronWeekdayPickerSize.lg => theme.text.labelLg,
+              },
               onTap: () => _toggle(day.value),
             ),
         ],
@@ -405,6 +505,7 @@ class _WeekdayToggle extends StatefulWidget {
     required this.name,
     required this.selected,
     required this.size,
+    required this.textStyle,
     required this.onTap,
   });
 
@@ -412,6 +513,7 @@ class _WeekdayToggle extends StatefulWidget {
   final String name;
   final bool selected;
   final double size;
+  final TextStyle textStyle;
   final VoidCallback onTap;
 
   @override
@@ -457,7 +559,7 @@ class _WeekdayToggleState extends State<_WeekdayToggle> {
             child: Text(
               widget.label,
               maxLines: 1,
-              style: theme.text.labelMd.copyWith(color: widget.selected ? colors.textInverse : colors.textSecondary),
+              style: widget.textStyle.copyWith(color: widget.selected ? colors.textInverse : colors.textSecondary),
             ),
           ),
         ),
@@ -473,7 +575,16 @@ class _WeekdayToggleState extends State<_WeekdayToggle> {
 /// 실행" 줄이 하늘색 16% 바탕으로 들어갑니다.
 class HoronScheduleCard extends StatelessWidget {
   /// 카드를 만듭니다.
-  const HoronScheduleCard({super.key, required this.title, required this.children, this.nextRun});
+  const HoronScheduleCard({
+    super.key,
+    required this.title,
+    required this.children,
+    this.nextRun,
+    this.surface = HoronSurface.solid,
+  });
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
 
   /// 카드의 제목입니다. React `title`(`ReactNode`).
   final Widget title;
@@ -505,7 +616,8 @@ class HoronScheduleCard extends StatelessWidget {
         final double width = constraints.maxWidth.isFinite ? math.min(_width, constraints.maxWidth) : _width;
         return SizedBox(
           width: width,
-          child: HoronLiquidGlass(
+          child: HoronSurfaceLayer(
+            surface: surface,
             tier: HoronGlassTier.thick,
             borderRadius: radius,
             child: DecoratedBox(

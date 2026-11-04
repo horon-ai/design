@@ -30,6 +30,16 @@ class HoronListDetailGallerySection extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.start,
             children: <Widget>[
               _Cell(
+                label: 'glass — 유리 껍데기',
+                width: full,
+                child: HoronListDetail(
+                  surface: HoronSurface.glass,
+                  groups: _groups,
+                  detailBuilder: (HoronListDetailItem item) =>
+                      _SampleDetail(item: item),
+                ),
+              ),
+              _Cell(
                 label: '목록 + 상세 (md 이상에서 나란히)',
                 width: full,
                 child: HoronListDetail(

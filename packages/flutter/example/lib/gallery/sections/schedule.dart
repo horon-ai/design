@@ -19,8 +19,14 @@ class HoronScheduleGallerySection extends StatelessWidget {
         runSpacing: theme.space.s6,
         crossAxisAlignment: WrapCrossAlignment.start,
         children: const <Widget>[
-          _Sample(label: '유리 필드', child: _TimePicker(glass: true)),
-          _Sample(label: '카드 안 필드', child: _TimePicker(glass: false)),
+          _Sample(
+            label: '유리 필드',
+            child: _TimePicker(surface: HoronPickerSurface.glass),
+          ),
+          _Sample(
+            label: '카드 안 필드',
+            child: _TimePicker(surface: HoronPickerSurface.solid),
+          ),
           _Sample(label: '요일', child: _DaysPicker()),
           _Sample(label: '루틴 카드', child: _RoutineCard()),
         ],
@@ -56,9 +62,9 @@ class _Sample extends StatelessWidget {
 
 /// 하루 중 시각을 고르는 표본입니다.
 class _TimePicker extends StatefulWidget {
-  const _TimePicker({required this.glass});
+  const _TimePicker({required this.surface});
 
-  final bool glass;
+  final HoronPickerSurface surface;
 
   @override
   State<_TimePicker> createState() => _TimePickerState();
@@ -83,7 +89,7 @@ class _TimePickerState extends State<_TimePicker> {
       child: HoronPickerField(
         items: _items,
         value: _value,
-        glass: widget.glass,
+        surface: widget.surface,
         label: 'Time',
         onChanged: (String? next) => setState(() => _value = next),
       ),
@@ -138,7 +144,7 @@ class _RoutineCard extends StatelessWidget {
       children: <Widget>[
         HoronScheduleSection(
           label: Text('Repeat'),
-          children: <Widget>[_TimePicker(glass: false)],
+          children: <Widget>[_TimePicker(surface: HoronPickerSurface.solid)],
         ),
         HoronScheduleSection(
           label: Text('Days'),

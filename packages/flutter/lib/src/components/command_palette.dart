@@ -3,8 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -104,7 +105,11 @@ class HoronCommandPalette extends StatelessWidget {
     this.placeholder = 'Search',
     this.hints,
     this.trigger,
+    this.surface = HoronSurface.solid,
   });
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
 
   /// 팔레트의 결과 묶음입니다(React `groups`).
   final List<HoronCommandGroup> groups;
@@ -161,7 +166,13 @@ class HoronCommandPalette extends StatelessWidget {
                   opacity: t,
                   child: Transform.translate(offset: Offset(0, theme.space.s2 * (1 - t)), child: child),
                 ),
-                child: _PaletteSurface(groups: groups, placeholder: placeholder, hints: hints, onDismiss: dismiss),
+                child: _PaletteSurface(
+                  groups: groups,
+                  placeholder: placeholder,
+                  hints: hints,
+                  surface: surface,
+                  onDismiss: dismiss,
+                ),
               ),
             ),
           ),
@@ -181,12 +192,14 @@ class _PaletteSurface extends StatelessWidget {
     required this.groups,
     required this.placeholder,
     required this.hints,
+    required this.surface,
     required this.onDismiss,
   });
 
   final List<HoronCommandGroup> groups;
   final String placeholder;
   final List<(Widget, String)>? hints;
+  final HoronSurface surface;
   final VoidCallback onDismiss;
 
   @override
@@ -201,9 +214,13 @@ class _PaletteSurface extends StatelessWidget {
         borderRadius: radius,
         child: Stack(
           children: <Widget>[
-            Positioned.fill(child: ColoredBox(color: theme.colors.glassFillFrost)),
             Positioned.fill(
-              child: HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: const SizedBox.expand()),
+              child: HoronSurfaceLayer(
+                surface: surface,
+                tier: HoronGlassTier.thick,
+                borderRadius: radius,
+                child: const SizedBox.expand(),
+              ),
             ),
             Padding(
               padding: EdgeInsets.all(theme.space.s1_5),

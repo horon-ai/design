@@ -9,8 +9,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -49,7 +50,11 @@ class HoronMarketplaceCard extends StatelessWidget {
     this.installs,
     this.onInstall,
     this.installLabel = 'Install',
+    this.surface = HoronSurface.solid,
   });
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다. solid면 Install도 solid입니다.
+  final HoronSurface surface;
 
   /// 40px 잉크 타일에 보이는 두 글자입니다.
   final String initials;
@@ -81,7 +86,8 @@ class HoronMarketplaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    return HoronLiquidGlass(
+    return HoronSurfaceLayer(
+      surface: surface,
       tier: HoronGlassTier.thick,
       borderRadius: BorderRadius.circular(theme.radius.xl), // rounded-[20px]
       child: Padding(
@@ -224,7 +230,7 @@ class HoronMarketplaceCard extends StatelessWidget {
                 ],
               ),
             ),
-            _GlassButton(label: installLabel, onPressed: onInstall),
+            _GlassButton(label: installLabel, surface: surface, onPressed: onInstall),
           ],
         ),
       ),
@@ -234,9 +240,10 @@ class HoronMarketplaceCard extends StatelessWidget {
 
 /// `button.tsx`의 `glass`·`sm` 변형입니다. `h-8`, `px-3`, `text-label-md`입니다.
 class _GlassButton extends StatefulWidget {
-  const _GlassButton({required this.label, this.onPressed});
+  const _GlassButton({required this.label, required this.surface, this.onPressed});
 
   final String label;
+  final HoronSurface surface;
   final VoidCallback? onPressed;
 
   @override
@@ -263,7 +270,9 @@ class _GlassButtonState extends State<_GlassButton> {
           scale: _pressed && !reduce ? HoronMotion.pressScale : 1, // motion-press
           duration: reduce ? Duration.zero : HoronMotion.pressDuration,
           curve: HoronMotion.pressCurve,
-          child: HoronLiquidGlass(
+          child: HoronSurfaceLayer(
+            surface: widget.surface,
+            tier: HoronGlassTier.clear,
             borderRadius: BorderRadius.circular(theme.radius.full), // rounded-full
             child: SizedBox(
               height: theme.space.step(8), // h-8 = 32

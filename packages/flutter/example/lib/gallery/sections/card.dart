@@ -20,8 +20,16 @@ class HoronCardGallerySection extends StatelessWidget {
           SizedBox(
             width: 320,
             child: HoronCard(
-              title: '기본 카드',
+              title: '기본 카드 (solid)',
+              description: '불투명 표면 위에 제목과 설명이 놓입니다.',
+            ),
+          ),
+          SizedBox(
+            width: 320,
+            child: HoronCard(
+              title: '유리 카드 (glass)',
               description: '두꺼운 유리 위에 제목과 설명이 놓입니다.',
+              surface: HoronCardSurface.glass,
             ),
           ),
           SizedBox(
@@ -46,7 +54,7 @@ class HoronCardGallerySection extends StatelessWidget {
             child: HoronCard(
               title: '서리 카드',
               description: 'Paper 홈 보드 카드입니다.',
-              frost: true,
+              surface: HoronCardSurface.frost,
               child: HoronUsageMeter(label: '작업', value: 42),
             ),
           ),

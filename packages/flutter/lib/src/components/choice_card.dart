@@ -12,6 +12,15 @@ import '../tokens/horon_tokens.g.dart';
 ///
 /// React `ChoiceCard`: 252px 유리 카드에 14 여백, 16 반경, 12 간격입니다. 18px 고리는
 /// 꺼져 있을 때 1.5px 회색 테두리이고, 켜지면 잉크색 5px 고리 안에 8px 점이 들어갑니다.
+/// `choice-card.tsx`의 `ChoiceCardSurface`입니다.
+enum HoronChoiceCardSurface {
+  /// `surface="solid"` — 불투명 `bg-surface`에 1px 테두리. 기본값입니다.
+  solid,
+
+  /// `surface="glass"` — 이미지나 유리 패널 위의 유리 카드입니다.
+  glass,
+}
+
 class HoronChoiceCard extends StatelessWidget {
   /// 제목과 선택 값을 받습니다.
   const HoronChoiceCard({
@@ -23,7 +32,11 @@ class HoronChoiceCard extends StatelessWidget {
     this.checked = false,
     this.disabled = false,
     this.onTap,
+    this.surface = HoronChoiceCardSurface.solid,
   });
+
+  /// 표면입니다. 기본값은 [HoronChoiceCardSurface.solid]입니다.
+  final HoronChoiceCardSurface surface;
 
   /// 카드의 첫 줄 제목입니다. React `title`(`ReactNode`).
   final Widget title;
@@ -129,26 +142,29 @@ class HoronChoiceCard extends StatelessWidget {
                       key: const Key('horon-choice-card-surface'),
                       duration: animate ? HoronMotion.colorsDuration : Duration.zero,
                       curve: HoronMotion.colorsCurve,
-                      // `p-3.5 rounded-2xl border` — 켜지면 `border-border-brand`, 꺼지면
-                      // Paper `1VXR-0`의 흰 70% 림(`glass-rim-frost`)입니다.
-                      // 바탕은 유리 엔진이 그립니다. React는 호스트에 `bg-glass-clear`를
-                      // 깔고 그 위에 `<LiquidGlass tier="clear" />`를 얹으며(`choice-card.tsx:34`),
-                      // 선택되면 둘 다 thick으로 바뀝니다. Flutter는 채움까지 유리 위젯이
-                      // 그리므로 컨테이너에는 테두리만 남깁니다.
+                      // 바탕과 테두리는 유리 엔진이 그립니다. React는 호스트에
+                      // `bg-glass-clear`를 깔고 그 위에 `<LiquidGlass tier="clear" />`를
+                      // 얹으며(`choice-card.tsx:34`), 선택되면 둘 다 thick으로 바뀝니다.
+                      // 선택 상태의 브랜드 테두리는 호스트 테두리가 아니라 림 색으로 칠합니다.
                       decoration: BoxDecoration(
+                        color: surface == HoronChoiceCardSurface.solid ? colors.bgSurface : null,
                         borderRadius: BorderRadius.circular(theme.radius.xl2),
-                        border: Border.all(color: checked ? colors.borderBrand : colors.glassRimFrost),
+                        border: surface == HoronChoiceCardSurface.solid
+                            ? Border.all(color: checked ? colors.borderBrand : colors.borderDefault)
+                            : null,
                       ),
                       child: Stack(
                         alignment: Alignment.center,
                         children: <Widget>[
-                          Positioned.fill(
-                            child: HoronLiquidGlass(
-                              tier: checked ? HoronGlassTier.thick : HoronGlassTier.clear,
-                              borderRadius: BorderRadius.circular(theme.radius.xl2),
-                              child: const SizedBox.expand(),
+                          if (surface == HoronChoiceCardSurface.glass)
+                            Positioned.fill(
+                              child: HoronLiquidGlass(
+                                tier: checked ? HoronGlassTier.thick : HoronGlassTier.clear,
+                                borderRadius: BorderRadius.circular(theme.radius.xl2),
+                                edgeColor: checked ? colors.borderBrand : null,
+                                child: const SizedBox.expand(),
+                              ),
                             ),
-                          ),
                           // 패딩은 내용에만 걸어 유리가 카드 전체를 채우게 합니다.
                           Padding(
                             padding: EdgeInsets.all(space.s3_5),

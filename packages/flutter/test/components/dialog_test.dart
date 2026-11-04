@@ -39,7 +39,7 @@ void main() {
   testWidgets('the light glass dialog is the frost surface: 90% fill, 24px blur, 20px radius, 24px padding', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(_host(const HoronDialog(title: Text('제목'), description: Text('설명'))));
+    await tester.pumpWidget(_host(const HoronDialog(solid: false, title: Text('제목'), description: Text('설명'))));
     final HoronThemeData theme = _theme(tester);
 
     final Finder frost = find.byWidgetPredicate(
@@ -71,7 +71,7 @@ void main() {
   testWidgets('the dark glass dialog keeps the thick tier and draws no rim', (WidgetTester tester) async {
     await tester.pumpWidget(
       _host(
-        const HoronDialog(title: Text('제목'), description: Text('설명')),
+        const HoronDialog(solid: false, title: Text('제목'), description: Text('설명')),
         brightness: Brightness.dark,
       ),
     );
@@ -118,7 +118,7 @@ void main() {
   testWidgets('glass keeps an 8px rhythm where solid uses 20px and a 0/24/64 shadow', (WidgetTester tester) async {
     final HoronSpaceSpec space = HoronThemeData.light.space;
 
-    await tester.pumpWidget(_host(const HoronDialog(title: Text('제목'), description: Text('설명'))));
+    await tester.pumpWidget(_host(const HoronDialog(solid: false, title: Text('제목'), description: Text('설명'))));
     expect(
       tester.getRect(find.text('설명')).top - tester.getRect(find.text('제목')).bottom,
       space.s2,

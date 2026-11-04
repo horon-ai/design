@@ -31,6 +31,17 @@ class HoronIntegrationRowGallerySection extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.start,
             children: <Widget>[
               _Cell(
+                label: 'glass — 유리 표면',
+                width: wide,
+                child: HoronIntegrationRow(
+                  icon: const Icon(Icons.cloud_outlined),
+                  name: 'Notion',
+                  detail: 'alpox@horon.ai · pages.read',
+                  status: HoronIntegrationStatus.connected,
+                  surface: HoronSurface.glass,
+                ),
+              ),
+              _Cell(
                 label: 'connected — 점이 있는 알약',
                 width: wide,
                 child: const HoronIntegrationRow(

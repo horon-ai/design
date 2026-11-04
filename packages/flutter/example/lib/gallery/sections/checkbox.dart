@@ -46,7 +46,7 @@ class _CheckboxSamplesState extends State<_CheckboxSamples> {
         ),
         HoronCheckbox(
           value: _sm,
-          small: true,
+          size: HoronCheckboxSize.sm,
           label: 'sm · 18px',
           onChanged: (bool? value) => setState(() => _sm = value),
         ),

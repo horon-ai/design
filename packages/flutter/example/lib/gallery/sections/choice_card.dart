@@ -28,6 +28,16 @@ class HoronChoiceCardGallerySection extends StatelessWidget {
             ),
           ),
           _Sample(
+            label: '유리 (glass)',
+            child: HoronChoiceCard(
+              title: const Text('Workspace connection'),
+              description: const Text('Share this workspace with the bot'),
+              badge: const Text('Recommended'),
+              surface: HoronChoiceCardSurface.glass,
+              onTap: () {},
+            ),
+          ),
+          _Sample(
             label: '켜짐',
             child: HoronChoiceCard(
               title: const Text('Workspace connection'),

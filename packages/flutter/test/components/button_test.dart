@@ -47,12 +47,21 @@ void main() {
         // 깔고 라벨을 얹는 것과 같은 순서입니다. 쉬는 상태의 컨테이너 색은 비어 있고,
         // 호버·누름에서만 토큰 색이 얇게 얹힙니다.
         HoronButtonVariant.glass => (null, colors.textPrimary),
+        HoronButtonVariant.solid => (colors.bgSurface, colors.textPrimary),
         HoronButtonVariant.danger => (colors.interactiveDanger, colors.interactiveOnDanger),
         HoronButtonVariant.link => (Colors.transparent, colors.textSecondary),
       };
       expect(_decoration(tester).color, expected.$1, reason: '$variant 배경색');
       if (variant == HoronButtonVariant.glass) {
         expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'glass 변형은 유리 레이어를 깝니다');
+      }
+      if (variant == HoronButtonVariant.solid) {
+        expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'solid 변형은 유리를 쓰지 않습니다');
+        expect(
+          (_decoration(tester).border! as Border).top.color,
+          colors.borderDefault,
+          reason: 'solid 변형은 border-default 1px 테두리를 그립니다',
+        );
       }
       expect(_labelStyle(tester).color, expected.$2, reason: '$variant 라벨색');
     }

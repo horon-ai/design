@@ -27,6 +27,18 @@ class HoronDateFieldGallerySection extends StatelessWidget {
           const HoronDateField(placeholder: '날짜 선택'),
           SizedBox(height: theme.space.s4),
           Text(
+            '유리 표면',
+            style: theme.text.caption.copyWith(
+              color: theme.colors.textSecondary,
+            ),
+          ),
+          SizedBox(height: theme.space.s2),
+          const HoronDateField(
+            placeholder: '날짜 선택',
+            surface: HoronSurface.glass,
+          ),
+          SizedBox(height: theme.space.s4),
+          Text(
             '값이 있는 필드',
             style: theme.text.caption.copyWith(
               color: theme.colors.textSecondary,
