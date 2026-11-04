@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
@@ -19,6 +20,22 @@ const List<HoronPickerItem> _times = <HoronPickerItem>[
   HoronPickerItem(value: '18:00', label: Text('18:00')),
 ];
 
+/// 12개짜리 긴 목록입니다. 짧은 화면에서 패널이 줄고 스크롤되는지 봅니다.
+const List<HoronPickerItem> _longTimes = <HoronPickerItem>[
+  HoronPickerItem(value: '08:00', label: Text('08:00')),
+  HoronPickerItem(value: '09:00', label: Text('09:00')),
+  HoronPickerItem(value: '10:00', label: Text('10:00')),
+  HoronPickerItem(value: '11:00', label: Text('11:00')),
+  HoronPickerItem(value: '12:00', label: Text('12:00')),
+  HoronPickerItem(value: '13:00', label: Text('13:00')),
+  HoronPickerItem(value: '14:00', label: Text('14:00')),
+  HoronPickerItem(value: '15:00', label: Text('15:00')),
+  HoronPickerItem(value: '16:00', label: Text('16:00')),
+  HoronPickerItem(value: '17:00', label: Text('17:00')),
+  HoronPickerItem(value: '18:00', label: Text('18:00')),
+  HoronPickerItem(value: '19:00', label: Text('19:00')),
+];
+
 const List<HoronWeekday> _days = <HoronWeekday>[
   HoronWeekday(value: 'mon', label: 'M', name: 'Monday'),
   HoronWeekday(value: 'tue', label: 'T', name: 'Tuesday'),
@@ -29,7 +46,25 @@ const List<HoronWeekday> _days = <HoronWeekday>[
   HoronWeekday(value: 'sun', label: 'S', name: 'Sunday'),
 ];
 
+/// 표본을 화면 위쪽 [top] 자리에 놓습니다. 목록이 아래로 열릴지 위로 뒤집힐지
+/// 정하려고 세로 위치를 직접 잡습니다.
+Widget _positionedHost(Widget child, {required double top}) {
+  return MaterialApp(
+    theme: horonTheme(Brightness.light),
+    home: Scaffold(
+      body: Stack(
+        children: <Widget>[Positioned(left: 100, top: top, child: child)],
+      ),
+    ),
+  );
+}
+
 Finder _trigger() => find.byKey(const Key('horon-picker-trigger'));
+
+/// 목록 패널입니다. 항목의 가장 가까운 바깥 [DecoratedBox]가 패널 표면입니다.
+Finder _panel() => find
+    .ancestor(of: find.byKey(const ValueKey<String>('horon-picker-item-09:00')), matching: find.byType(DecoratedBox))
+    .first;
 
 BoxDecoration _triggerDecoration(WidgetTester tester) =>
     tester.widget<DecoratedBox>(find.descendant(of: _trigger(), matching: find.byType(DecoratedBox)).first).decoration
@@ -122,6 +157,93 @@ void main() {
       findsOneWidget,
       reason: '체크는 18:00 줄에 있습니다',
     );
+  });
+
+  testWidgets('the picker list opens 8px below the field and flips above near the bottom', (WidgetTester tester) async {
+    await tester.pumpWidget(_positionedHost(HoronPickerField(items: _times, value: '09:00'), top: 200));
+    await tester.tap(_trigger());
+    await tester.pumpAndSettle();
+
+    final Rect field = tester.getRect(_trigger());
+    final Rect below = tester.getRect(_panel());
+    expect(below.top, moreOrLessEquals(field.bottom + 8, epsilon: 0.5), reason: 'sideOffset={8}');
+
+    // 화면 아래쪽에서는 남은 자리가 모자라 목록이 필드 위로 뒤집힙니다.
+    await tester.pumpWidget(
+      _positionedHost(HoronPickerField(key: UniqueKey(), items: _times, value: '09:00'), top: 520),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(_trigger());
+    await tester.pumpAndSettle();
+
+    final Rect nearBottom = tester.getRect(_trigger());
+    final Rect above = tester.getRect(_panel());
+    expect(above.bottom, moreOrLessEquals(nearBottom.top - 8, epsilon: 0.5), reason: '뒤집혀도 8px을 유지합니다');
+    expect(above.bottom, lessThan(nearBottom.top));
+    expect(above.top, greaterThanOrEqualTo(8), reason: '화면 위 여백 안에 들어옵니다');
+  });
+
+  testWidgets('the picker list stays on screen on a short viewport', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 300);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(_host(HoronPickerField(items: _longTimes, value: '09:00')));
+    await tester.tap(_trigger());
+    await tester.pumpAndSettle();
+
+    final Rect panel = tester.getRect(_panel());
+    expect(panel.top, greaterThanOrEqualTo(0), reason: '패널이 화면 위로 나가지 않습니다');
+    expect(panel.bottom, lessThanOrEqualTo(300), reason: '패널이 화면 아래로 나가지 않습니다');
+
+    // 줄어든 패널 안에서 마지막 항목까지 스크롤로 닿습니다.
+    final Finder last = find.byKey(const ValueKey<String>('horon-picker-item-19:00'));
+    final Finder scrollable = find.descendant(of: _panel(), matching: find.byType(Scrollable)).first;
+    await tester.scrollUntilVisible(last, 80, scrollable: scrollable);
+    await tester.pumpAndSettle();
+
+    expect(last, findsOneWidget);
+    final Rect lastRect = tester.getRect(last);
+    expect(lastRect.top, greaterThanOrEqualTo(panel.top));
+    expect(lastRect.bottom, lessThanOrEqualTo(panel.bottom));
+  });
+
+  testWidgets('escape and an outside tap close the picker list', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00')));
+    final Finder item = find.byKey(const ValueKey<String>('horon-picker-item-12:30'));
+
+    await tester.tap(_trigger());
+    await tester.pumpAndSettle();
+    expect(item, findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(item, findsNothing, reason: 'Escape가 목록을 닫습니다');
+
+    await tester.tap(_trigger());
+    await tester.pumpAndSettle();
+    expect(item, findsOneWidget);
+
+    await tester.tapAt(const Offset(700, 560));
+    await tester.pumpAndSettle();
+    expect(item, findsNothing, reason: '바깥 탭이 목록을 닫습니다');
+  });
+
+  testWidgets('a focused picker row picks its value with Enter', (WidgetTester tester) async {
+    final List<String?> changes = <String?>[];
+    await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00', onChanged: changes.add)));
+
+    await tester.tap(_trigger());
+    await tester.pumpAndSettle();
+
+    // 패널이 포커스를 받은 뒤 Tab이 첫 줄로 옮깁니다.
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+
+    expect(changes, <String?>['09:00'], reason: '포커스된 줄이 Enter로 골라집니다');
+    expect(find.byKey(const ValueKey<String>('horon-picker-item-09:00')), findsNothing, reason: '고르면 목록이 닫힙니다');
   });
 
   testWidgets('the weekday picker is 36px round toggles that report display order', (WidgetTester tester) async {
