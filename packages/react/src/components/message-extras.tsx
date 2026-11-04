@@ -1,7 +1,8 @@
 import { Copy, FileText, X } from "@phosphor-icons/react";
-import { useState, type ComponentProps, type ReactNode } from "react";
+import { useEffect, useState, type ComponentProps, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
+import { IconButton } from "./icon-button";
 import { LiquidGlass } from "./liquid-glass";
 
 /** Figma `Date separator` (Message extras 109:667): caption between two 10% ink lines. */
@@ -44,7 +45,7 @@ export function MessageActions({
           type="button"
           aria-label={action.label}
           onClick={action.onClick}
-          className="relative flex size-7.5 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary motion-colors hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
+          className="relative flex size-7.5 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary motion-colors hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand [&>svg]:size-4"
         >
           {action.icon}
         </button>
@@ -67,7 +68,7 @@ export type AttachmentProps = {
 /** Figma `Attachment` (109:667): a flat subtle card with a 40px thumb, name, detail and remove button. */
 export function Attachment({ name, detail, thumbnail, onRemove, removeLabel = "Remove", className }: AttachmentProps) {
   return (
-    <div className={cn("flex w-70 items-center gap-2.5 rounded-lg bg-bg-subtle py-2 pr-3 pl-2", className)}>
+    <div className={cn("flex w-70 motion-rise items-center gap-2.5 rounded-lg bg-bg-subtle py-2 pr-2 pl-2", className)}>
       {thumbnail ? (
         <span
           aria-hidden
@@ -75,7 +76,7 @@ export function Attachment({ name, detail, thumbnail, onRemove, removeLabel = "R
           style={{ backgroundImage: `url(${JSON.stringify(thumbnail)})` }}
         />
       ) : (
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-100 text-text-primary">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-accent-sky-500-16 text-text-brand">
           <FileText aria-hidden className="size-5" />
         </span>
       )}
@@ -84,14 +85,13 @@ export function Attachment({ name, detail, thumbnail, onRemove, removeLabel = "R
         {detail && <span className="truncate text-caption text-text-secondary">{detail}</span>}
       </span>
       {onRemove && (
-        <button
-          type="button"
-          aria-label={removeLabel}
+        <IconButton
+          size="sm"
+          icon={<X aria-hidden />}
+          label={removeLabel}
           onClick={onRemove}
-          className="flex shrink-0 motion-press cursor-pointer text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
-        >
-          <X aria-hidden className="size-4" />
-        </button>
+          className="text-text-secondary"
+        />
       )}
     </div>
   );
@@ -115,20 +115,32 @@ export function CodeBlock({
   ...props
 }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return undefined;
+    const timer = setTimeout(() => setCopied(false), 1500);
+    return () => clearTimeout(timer);
+  }, [copied]);
   const copy = () => {
-    void navigator.clipboard.writeText(code).then(() => setCopied(true));
+    navigator.clipboard?.writeText(code).then(
+      () => setCopied(true),
+      () => undefined,
+    );
   };
   return (
     <div className={cn("flex flex-col overflow-clip rounded-lg bg-surface-ink", className)} {...props}>
-      <div className="flex items-center gap-2 bg-bg-surface-6 py-2 pr-3 pl-3.5 text-caption text-text-on-ink">
+      <div className="flex items-center gap-2 bg-bg-surface-6 py-2 pr-3.5 pl-3.5 text-caption text-text-on-ink">
         <span className="min-w-0 flex-1 opacity-70">{language}</span>
         <button
           type="button"
           onClick={copy}
-          className="flex shrink-0 motion-press cursor-pointer items-center gap-1 focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="flex shrink-0 motion-press cursor-pointer items-center gap-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
         >
-          <Copy aria-hidden className="size-3.5" />
-          {copied ? copiedLabel : copyLabel}
+          <Copy aria-hidden className="size-3.5 shrink-0" />
+          <span className="min-w-10 text-left">
+            <span key={copied ? "copied" : "copy"} className="inline-block animate-fade-in">
+              {copied ? copiedLabel : copyLabel}
+            </span>
+          </span>
         </button>
       </div>
       <pre className="overflow-x-auto px-3.5 pt-3 pb-3.5 font-mono text-code text-text-on-ink">

@@ -65,17 +65,25 @@ export function Composer({
     onSubmit?.(value);
     setValue("");
   };
+  const canSubmit = value.trim() !== "";
   return (
     <form
       onSubmit={submit}
       className={cn(
-        "relative flex items-center overflow-clip rounded-full motion-colors",
+        "relative flex items-center overflow-clip rounded-full motion-colors has-[input:focus-visible]:border-border-strong",
         surface === "glass" ? "veil-field" : "border border-border-default bg-bg-surface",
         sizeClass[size],
         className,
       )}
     >
-      <IconButton type="button" size={size} icon={<Plus />} label="Attach" onClick={onAttach} disabled={disabled} />
+      <IconButton
+        type="button"
+        size={size}
+        icon={<Plus className="text-text-secondary" />}
+        label="Attach"
+        onClick={onAttach}
+        disabled={disabled}
+      />
       <input
         value={value}
         onChange={(event) => setValue(event.target.value)}
@@ -87,29 +95,30 @@ export function Composer({
           textClass[size],
         )}
       />
-      {value.trim() ? (
-        <IconButton
-          key="send"
-          type="submit"
-          size={size}
-          variant="primary"
-          icon={<ArrowUp />}
-          label="Send"
-          disabled={disabled}
-          className="animate-pop-in"
-        />
-      ) : (
-        <IconButton
-          key="voice"
-          type="button"
-          size={size}
-          className="animate-pop-in"
-          icon={<Microphone className="text-text-secondary" />}
-          label="Voice input"
-          onClick={onVoice}
-          disabled={disabled}
-        />
-      )}
+      <span className="motion-swap">
+        <span data-hidden={!canSubmit || undefined} inert={!canSubmit}>
+          <IconButton
+            type="submit"
+            size={size}
+            variant="primary"
+            icon={<ArrowUp />}
+            label="Send"
+            disabled={disabled}
+            tabIndex={canSubmit ? undefined : -1}
+          />
+        </span>
+        <span data-hidden={canSubmit || undefined} inert={canSubmit}>
+          <IconButton
+            type="button"
+            size={size}
+            icon={<Microphone className="text-text-secondary" />}
+            label="Voice input"
+            onClick={onVoice}
+            disabled={disabled}
+            tabIndex={canSubmit ? -1 : undefined}
+          />
+        </span>
+      </span>
     </form>
   );
 }
