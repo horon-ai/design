@@ -416,8 +416,11 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   Color? _variantTint(HoronThemeData horon) => switch (widget.variant) {
     // `bg-glass-regular dark:bg-transparent`
     HoronFlueVariant.defaultValue => horon.brightness == Brightness.dark ? null : horon.colors.glassRegular,
-    // 사이드바 유리가 바탕을 채우고, 인증 화면은 색조를 얹지 않습니다.
-    HoronFlueVariant.sidebar || HoronFlueVariant.auth => null,
+    // `bg-glass-thick dark:bg-transparent`: 연기가 사이드바 유리 채움보다 위에 그려지므로 라이트에서는
+    // 80% 흰 유리를 직접 얹어 보조 글자 대비를 지킵니다.
+    HoronFlueVariant.sidebar => horon.brightness == Brightness.dark ? null : horon.colors.glassThick,
+    // 인증 화면은 색조를 얹지 않습니다.
+    HoronFlueVariant.auth => null,
   };
 
   @override
