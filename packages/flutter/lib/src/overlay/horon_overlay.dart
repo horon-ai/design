@@ -55,6 +55,9 @@ class HoronOverlayPosition {
   final HoronOverlayAlign align;
 
   /// 기준점을 맞춘 뒤 더 미는 거리입니다.
+  ///
+  /// 패널이 뒤집히면 주축 성분(세로 배치면 `dy`, 가로 배치면 `dx`)의 부호가
+  /// 뒤집혀 적용됩니다. 트리거에서 같은 거리만큼 떨어뜨리려는 값이기 때문입니다.
   final Offset offset;
 
   /// 트리거와 패널 사이의 기본 간격입니다.
@@ -143,6 +146,13 @@ HoronOverlayPlacement placeHoronOverlay({
   final Alignment followerAnchor;
   final Offset offset;
 
+  // 뒤집히면 패널이 트리거의 반대편에 서므로, 호출자가 준 주축 오프셋도 부호를
+  // 뒤집어야 "트리거에서 이만큼 떨어져"라는 뜻이 유지됩니다. 교차축 성분은
+  // 뒤집힘과 관계가 없으므로 그대로 둡니다.
+  final Offset userOffset = flip
+      ? (horizontal ? Offset(-position.offset.dx, position.offset.dy) : Offset(position.offset.dx, -position.offset.dy))
+      : position.offset;
+
   switch (side) {
     case HoronOverlaySide.bottom:
     case HoronOverlaySide.top:
@@ -156,7 +166,7 @@ HoronOverlayPlacement placeHoronOverlay({
         minLeft: minLeft,
         maxRight: maxRight,
       );
-      offset = Offset(dx, dy) + position.offset;
+      offset = Offset(dx, dy) + userOffset;
     case HoronOverlaySide.right:
     case HoronOverlaySide.left:
       targetAnchor = side == HoronOverlaySide.right ? Alignment.topRight : Alignment.topLeft;
@@ -169,7 +179,7 @@ HoronOverlayPlacement placeHoronOverlay({
         minTop: minTop,
         maxBottom: maxBottom,
       );
-      offset = Offset(dx, dy) + position.offset;
+      offset = Offset(dx, dy) + userOffset;
   }
 
   final double maxWidth = horizontal
@@ -414,7 +424,7 @@ class _HoronOverlayState extends State<HoronOverlay> {
         final MediaQueryData media = MediaQuery.of(overlayContext);
         // 패널 크기를 모르면 "이 자리에 들어가는가"를 판단할 수 없으므로 뒤집힘이
         // 동작하지 않습니다. 그래서 측정과 배치를 한 위젯 안에서 되풀이합니다.
-        return _OverlayBody(
+        return HoronOverlayBody(
           link: _link,
           anchor: anchor,
           screen: media.size,
@@ -443,8 +453,12 @@ class _HoronOverlayState extends State<HoronOverlay> {
 /// 크기를 재는 일과 배치하는 일을 같은 State가 들고 있어야 합니다. 바깥 상태의
 /// setState는 `OverlayPortal`의 자식까지 전파되지 않으므로, 바깥에서 재면 측정값이
 /// 배치에 반영되지 않습니다(2026-10-22에 테스트가 잡았습니다).
-class _OverlayBody extends StatefulWidget {
-  const _OverlayBody({
+///
+/// [HoronOverlay] 말고 다른 오버레이도 같은 측정·배치를 쓸 수 있도록 공개합니다.
+class HoronOverlayBody extends StatefulWidget {
+  /// 패널 몸통을 만듭니다.
+  const HoronOverlayBody({
+    super.key,
     required this.link,
     required this.anchor,
     required this.screen,
@@ -453,18 +467,29 @@ class _OverlayBody extends StatefulWidget {
     required this.panelBuilder,
   });
 
+  /// 트리거에 걸어 둔 레이어 링크입니다. 패널은 이 링크를 따라갑니다.
   final LayerLink link;
+
+  /// 오버레이 좌표계에서의 트리거 사각형입니다.
   final Rect anchor;
+
+  /// 오버레이가 그려지는 화면 크기입니다.
   final Size screen;
+
+  /// 화면 가장자리에서 피해야 할 여백입니다.
   final EdgeInsets safeArea;
+
+  /// 배치 요청입니다.
   final HoronOverlayPosition position;
+
+  /// 패널을 만드는 함수입니다. 계산된 배치를 받습니다.
   final Widget Function(BuildContext context, HoronOverlayPlacement placement) panelBuilder;
 
   @override
-  State<_OverlayBody> createState() => _OverlayBodyState();
+  State<HoronOverlayBody> createState() => _HoronOverlayBodyState();
 }
 
-class _OverlayBodyState extends State<_OverlayBody> {
+class _HoronOverlayBodyState extends State<HoronOverlayBody> {
   Size? _panelSize;
 
   void _onMeasured(Size size) {

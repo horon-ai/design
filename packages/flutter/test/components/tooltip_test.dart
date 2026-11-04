@@ -36,6 +36,30 @@ void main() {
     expect(find.text('복사'), findsNothing);
   });
 
+  testWidgets('tooltip: leaving the trigger hides the bubble on the next frame', (WidgetTester tester) async {
+    await pumpTooltip(
+      tester,
+      const HoronTooltip.top(
+        label: '복사',
+        child: SizedBox(key: Key('trigger'), width: 40, height: 40),
+      ),
+    );
+
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: tester.getCenter(find.byKey(const Key('trigger'))));
+    await tester.pumpAndSettle();
+    expect(find.text('복사'), findsOneWidget);
+
+    // 한 번의 프레임 뒤 바로 사라져야 합니다. SDK 기본 닫기 애니메이션(75ms)이면
+    // 이 프레임에도 말풍선이 남습니다.
+    await pointer.moveTo(const Offset(5, 5));
+    await tester.pump();
+    expect(find.text('복사'), findsNothing);
+
+    await pointer.removePointer();
+    await tester.pumpAndSettle();
+  });
+
   testWidgets('tooltip: the bubble is ink at an 8px radius with label-sm text', (WidgetTester tester) async {
     await pumpTooltip(tester, const HoronTooltip.bottom(label: '붙여넣기', child: SizedBox(width: 40, height: 40)));
     // 내용 검사는 호버로 엽니다(터치 길게 누르기는 아래 전용 테스트가 봅니다).
@@ -71,7 +95,7 @@ void main() {
     await pointer.addPointer(location: tester.getCenter(find.byKey(const Key('trigger'))));
     await tester.pumpAndSettle();
 
-    final Finder clip = find.descendant(of: find.byType(CompositedTransformFollower), matching: find.byType(ClipPath));
+    final Finder clip = find.descendant(of: find.byType(RawTooltip), matching: find.byType(ClipPath)).last;
     expect(clip, findsOneWidget);
     expect(tester.getSize(clip), const Size(10, 6));
 
@@ -115,6 +139,66 @@ void main() {
       await hold.up();
       await tester.pumpAndSettle();
     }
+  });
+
+  testWidgets('tooltip: the trigger announces the label as a tooltip', (WidgetTester tester) async {
+    final SemanticsHandle handle = tester.ensureSemantics();
+    await pumpTooltip(
+      tester,
+      const HoronTooltip.top(
+        label: '복사',
+        child: SizedBox(key: Key('trigger'), width: 40, height: 40),
+      ),
+    );
+    expect(tester.getSemantics(find.byKey(const Key('trigger'))).tooltip, '복사');
+    handle.dispose();
+  });
+
+  testWidgets('tooltip: opening a second tooltip closes the first', (WidgetTester tester) async {
+    await pumpTooltip(
+      tester,
+      const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          HoronTooltip.top(
+            label: '첫째',
+            child: SizedBox(key: Key('first'), width: 40, height: 40),
+          ),
+          SizedBox(width: 40),
+          HoronTooltip.top(
+            label: '둘째',
+            child: SizedBox(key: Key('second'), width: 40, height: 40),
+          ),
+        ],
+      ),
+    );
+
+    // 마우스를 첫째에서 둘째로 옮기면 그 프레임에 첫째가 사라지고 둘째만 남아야
+    // 합니다. 말풍선 닫기에 페이드가 붙으면 두 말풍선이 잠깐 겹칩니다.
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: tester.getCenter(find.byKey(const Key('first'))));
+    await tester.pumpAndSettle();
+    expect(find.text('첫째'), findsOneWidget);
+
+    await pointer.moveTo(tester.getCenter(find.byKey(const Key('second'))));
+    await tester.pump();
+    expect(find.text('첫째'), findsNothing, reason: '옮긴 첫 프레임에 첫째가 닫힘');
+    expect(find.text('둘째'), findsOneWidget, reason: '옮긴 첫 프레임에 둘째가 열림');
+
+    // 같은 규칙이 터치 길게 누르기에도 섭니다. 첫째에 마우스가 올라가 있어도 둘째가
+    // 열리는 프레임에는 첫째가 이미 닫혀 있습니다.
+    await pointer.moveTo(tester.getCenter(find.byKey(const Key('first'))));
+    await tester.pump();
+    expect(find.text('첫째'), findsOneWidget);
+
+    final TestGesture hold = await tester.startGesture(tester.getCenter(find.byKey(const Key('second'))));
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.text('첫째'), findsNothing, reason: '길게 누른 프레임에 첫째가 닫힘');
+    expect(find.text('둘째'), findsOneWidget, reason: '길게 누른 프레임에 둘째가 열림');
+
+    await hold.up();
+    await pointer.removePointer();
+    await tester.pumpAndSettle();
   });
 
   testWidgets('tooltip: both brightnesses render', (WidgetTester tester) async {
