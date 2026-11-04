@@ -59,7 +59,7 @@ export function TaskRow({
         "flex flex-col gap-2 px-4 py-3.5",
         variant === "list"
           ? "relative rounded-b-[16px] after:absolute after:inset-x-4 after:bottom-0 after:h-px after:bg-overlay-ink-8 last:after:hidden"
-          : "rounded-[16px] bg-bg-subtle",
+          : "rounded-[16px] border border-border-default bg-bg-surface",
         className,
       )}
     >

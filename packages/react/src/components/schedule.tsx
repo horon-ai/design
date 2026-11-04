@@ -18,7 +18,7 @@ export type PickerFieldProps = {
   /** Leading 16px icon; the Time field uses a clock. */
   icon?: ReactNode;
   /**
-   * `solid` (default) is the opaque surface field with a default border, `glass` the regular-glass field,
+   * `solid` (default) is the opaque surface field with a default border, `glass` the veil field,
    * `inset` the 4% ink field inside the schedule card.
    */
   surface?: "solid" | "glass" | "inset";
@@ -89,14 +89,13 @@ export function PickerField({
           "relative flex cursor-pointer items-center rounded-md text-left motion-colors outline-none",
           triggerSizeClass[size],
           surface === "glass"
-            ? "group overflow-clip bg-glass-regular"
+            ? "group veil-field"
             : surface === "inset"
               ? "group bg-overlay-ink-4"
               : "group border border-border-default bg-bg-surface",
           className,
         )}
       >
-        {surface === "glass" && <LiquidGlass />}
         <span className={cn("relative flex shrink-0 text-text-secondary", triggerIconSizeClass[size])}>
           {icon ?? <Clock />}
         </span>
@@ -114,11 +113,10 @@ export function PickerField({
           <BaseSelect.Popup
             className={cn(
               "relative max-h-72 min-w-(--anchor-width) motion-popup overflow-y-auto rounded-xl outline-none",
-              surface === "solid" ? "border border-border-default bg-bg-surface shadow-popover" : "bg-glass-thick",
+              surface === "solid" ? "border border-border-default bg-bg-surface shadow-popover" : "veil-overlay",
               popupSizeClass[size],
             )}
           >
-            {surface !== "solid" && <LiquidGlass />}
             <BaseSelect.List className="relative flex flex-col gap-0.5">
               {items.map((item) => (
                 <BaseSelect.Item

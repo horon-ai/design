@@ -3,7 +3,6 @@ import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
-import { LiquidGlass } from "./liquid-glass";
 
 export type DateRange = { start: Date | null; end: Date | null };
 export type CalendarSize = ControlSize;
@@ -27,8 +26,9 @@ type CommonProps = {
    */
   variant?: "default" | "popover";
   /**
-   * `solid` (default) is an opaque surface with a default border. `glass` layers the thick liquid glass;
-   * `flat` keeps the same 80% white fill without it (Paper Schedule mini calendar).
+   * `solid` (default) is an opaque surface with a default border. `glass` puts it on the veil (`veil-overlay`),
+   * the material of the `DateField` popup; `flat` keeps the 80% white fill of the old thick glass
+   * without it (Paper Schedule mini calendar).
    */
   surface?: "glass" | "flat" | "solid";
   /** Days drawn as subtle ink circles in the day cell size, e.g. the week the schedule shows; selection still draws on top. */
@@ -217,7 +217,11 @@ export function Calendar(props: CalendarProps) {
     <div
       className={cn(
         "relative flex flex-col overflow-clip",
-        surface === "solid" ? "border border-border-default bg-bg-surface" : "bg-glass-thick",
+        surface === "solid"
+          ? "border border-border-default bg-bg-surface"
+          : surface === "glass"
+            ? "veil-overlay"
+            : "bg-glass-thick",
         variant === "popover"
           ? cn("rounded-[24px]", containerSizeClass[size].popover)
           : cn("w-fit rounded-xl", containerSizeClass[size].default),
@@ -226,7 +230,6 @@ export function Calendar(props: CalendarProps) {
         className,
       )}
     >
-      {surface === "glass" && <LiquidGlass />}
       {variant === "popover" ? (
         <div className={cn("relative flex w-full items-center", popoverHeaderSizeClass[size])}>
           <p aria-live="polite" className={cn("min-w-0 flex-1 text-text-primary", popoverTitleSizeClass[size])}>

@@ -4,7 +4,6 @@ import { createContext, useContext, useMemo, type ComponentProps, type ReactNode
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { fieldBoxClass, fieldTextClass, type InputSurface } from "./input";
-import { LiquidGlass } from "./liquid-glass";
 
 export type InputGroupSize = ControlSize;
 
@@ -78,7 +77,6 @@ export function InputGroup({
         data-invalid={invalid ? "" : undefined}
         data-disabled={disabled ? "" : undefined}
       >
-        {surface === "glass" && <LiquidGlass />}
         {prefix && (
           <>
             {prefix}

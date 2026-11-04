@@ -35,7 +35,7 @@ export function ToolCallsHeader({
       defaultOpen={defaultOpen}
       open={open}
       onOpenChange={onOpenChange}
-      className={cn("flex w-full flex-col", className)}
+      className={cn("flex w-full flex-col rounded-xl border border-border-default bg-bg-surface p-3", className)}
     >
       <Collapsible.Trigger className="group flex w-full cursor-pointer items-center gap-2.5 pb-1 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand">
         {chips.length > 0 && (

@@ -3,7 +3,6 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
-import { LiquidGlass } from "./liquid-glass";
 
 export type InputSize = ControlSize;
 export type InputSurface = "glass" | "solid" | "solid-on-page";
@@ -37,7 +36,8 @@ export const fieldTextClass: Record<ControlSize, string> = {
 
 export const fieldBoxClass = {
   base: "motion-colors relative flex items-center overflow-clip rounded-md border",
-  glass: "border-0 bg-glass-regular",
+  /** The veil field (globals.css `.veil-field`): no liquid layers, so hosts render no `LiquidGlass`. */
+  glass: "veil-field has-[[data-disabled]]:opacity-60",
   solid:
     "border-border-default bg-bg-surface has-[[data-disabled]]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
   "solid-on-page":
@@ -65,7 +65,6 @@ export function Input({
       )}
       data-invalid={invalid ? "" : undefined}
     >
-      {surface === "glass" && <LiquidGlass />}
       {icon && <span className="relative flex shrink-0 text-text-secondary">{icon}</span>}
       <BaseInput
         aria-invalid={invalid || undefined}

@@ -4,7 +4,6 @@ import { useState, type FormEvent } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { IconButton } from "./icon-button";
-import { LiquidGlass } from "./liquid-glass";
 
 export type ComposerSize = ControlSize;
 export type ComposerSurface = "solid" | "glass";
@@ -71,12 +70,11 @@ export function Composer({
       onSubmit={submit}
       className={cn(
         "relative flex items-center overflow-clip rounded-full motion-colors",
-        surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
+        surface === "glass" ? "veil-field" : "border border-border-default bg-bg-surface",
         sizeClass[size],
         className,
       )}
     >
-      {surface === "glass" && <LiquidGlass />}
       <IconButton type="button" size={size} icon={<Plus />} label="Attach" onClick={onAttach} disabled={disabled} />
       <input
         value={value}

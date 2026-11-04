@@ -24,10 +24,18 @@ export function Tabs({
   );
 }
 
+/** Track padding per rung, the same as `SegmentedControl` so the two pill trays line up. */
+const listClass: Record<TabsSize, string> = {
+  sm: "p-[3px]",
+  md: "p-[3px]",
+  lg: "p-1",
+};
+
 /**
- * Figma `Tabs example` (62:353): a pill tray with 4px padding and 24px between
- * tabs, solid or regular glass. The 10% ink selection is one indicator that slides
- * to the active tab (Base UI `Tabs.Indicator` positions it).
+ * Figma `Tabs example` (62:353): a pill tray, solid or regular glass, with the same rungs as
+ * `SegmentedControl` (3/3/4px padding, 2px between tabs). The selection is one indicator that
+ * slides to the active tab (Base UI `Tabs.Indicator` positions it): 10% ink on solid, the thick
+ * glass pill with a soft shadow on glass, as on the segmented control.
  */
 export function TabsList({
   surface = "solid",
@@ -38,47 +46,47 @@ export function TabsList({
   /** `solid` (default) is an opaque surface tray with a default border; `glass` is the regular glass tray. */
   surface?: "solid" | "glass";
 }) {
+  const size = useContext(TabsSizeContext);
   return (
     <BaseTabs.List
       className={cn(
-        "relative flex w-fit items-start gap-6 overflow-clip rounded-full p-1",
+        "relative flex w-fit items-center gap-0.5 overflow-clip rounded-full",
+        listClass[size],
         surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
     >
       {surface === "glass" && <LiquidGlass />}
-      <BaseTabs.Indicator className="absolute top-(--active-tab-top) left-(--active-tab-left) h-(--active-tab-height) w-(--active-tab-width) rounded-full bg-overlay-ink-10 motion-indicator" />
+      <BaseTabs.Indicator
+        className={cn(
+          "absolute top-(--active-tab-top) left-(--active-tab-left) h-(--active-tab-height) w-(--active-tab-width) overflow-clip rounded-full motion-indicator",
+          surface === "glass"
+            ? "bg-glass-thick shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:bg-overlay-ink-10"
+            : "bg-overlay-ink-10",
+        )}
+      >
+        {surface === "glass" && <LiquidGlass />}
+      </BaseTabs.Indicator>
       {children}
     </BaseTabs.List>
   );
 }
 
+/** One tab per rung: the `SegmentedControl` segment heights and padding (26/30/36px, 10/16/16px). */
 const tabClass: Record<TabsSize, string> = {
-  sm: "py-1.5 text-label-md",
-  md: "py-2.5 text-label-lg",
-  lg: "py-3.5 text-label-lg",
-};
-
-const plainClass: Record<TabsSize, string> = {
-  sm: "px-1",
-  md: "px-1",
-  lg: "px-1.5",
-};
-
-const richClass: Record<TabsSize, string> = {
-  sm: "inline-flex items-center gap-1 px-2.5 [&_svg]:size-3.5",
-  md: "inline-flex items-center gap-1.5 px-3.5 [&_svg]:size-4",
-  lg: "inline-flex items-center gap-2 px-4 [&_svg]:size-5",
+  sm: "h-6.5 gap-1 px-2.5 text-label-sm [&_svg]:size-3.5",
+  md: "h-7.5 gap-1.5 px-4 text-label-md [&_svg]:size-4",
+  lg: "h-9 gap-2 px-4 text-label-lg [&_svg]:size-5",
 };
 
 const countClass: Record<TabsSize, string> = {
-  sm: "h-5 px-1.5",
-  md: "h-5.5 px-2",
-  lg: "h-6 px-2 text-label-md",
+  sm: "h-4.5 px-1.5",
+  md: "h-5 px-1.5",
+  lg: "h-6 px-2",
 };
 
-/** Figma `Tabs` (62:335): a pill tab; the list's indicator draws the 10% selection, hover adds 5% (4% over the selection, 14% total). */
+/** Figma `Tabs` (62:335): a pill tab; the list's indicator draws the selection under the active tab. */
 export function TabsTab({
   className,
   icon,
@@ -92,14 +100,12 @@ export function TabsTab({
   count?: number;
 }) {
   const size = useContext(TabsSizeContext);
-  const rich = icon !== undefined || count !== undefined;
   return (
     <BaseTabs.Tab
       className={cn(
-        "group/tab relative cursor-pointer rounded-full whitespace-nowrap text-text-secondary",
+        "group/tab relative inline-flex cursor-pointer items-center justify-center rounded-full whitespace-nowrap text-text-secondary",
         tabClass[size],
-        rich ? richClass[size] : plainClass[size],
-        "motion-colors hover:bg-overlay-ink-5 hover:text-text-primary data-active:text-text-primary hover:data-active:bg-overlay-ink-14",
+        "motion-colors hover:text-text-primary data-active:text-text-primary",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed data-disabled:opacity-40",
         className,
       )}

@@ -5,7 +5,6 @@ import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { Calendar, type CalendarProps, type DateRange } from "./calendar";
 import { fieldBoxClass, fieldSizeClass, fieldTextClass, type InputSurface } from "./input";
-import { LiquidGlass } from "./liquid-glass";
 
 export type DateFieldSize = ControlSize;
 export type DateFieldSurface = InputSurface;
@@ -63,7 +62,6 @@ export function DateField({
         )}
         data-invalid={invalid ? "" : undefined}
       >
-        {surface === "glass" && <LiquidGlass />}
         <span className="relative flex shrink-0 text-text-secondary">
           <CalendarBlank />
         </span>

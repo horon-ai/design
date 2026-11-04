@@ -1,7 +1,5 @@
 import { ResearchRunPanel } from "@horon-ai/react";
 
-import { Backdrop } from "../demo-backdrop";
-
 const queries = [
   { id: "q1", text: "seed round AI agent startup Korea 2026", results: "16 results" },
   { id: "q2", text: "lead investor agent startup Seoul seed", results: "12 results" },
@@ -11,7 +9,7 @@ const queries = [
 
 export default function ResearchRunPanelDemo() {
   return (
-    <Backdrop className="flex-col items-stretch">
+    <div className="flex w-full flex-col items-stretch gap-6">
       <ResearchRunPanel
         question="Which seed investors led AI agent rounds in Korea this year?"
         elapsed="12s"
@@ -25,6 +23,6 @@ export default function ResearchRunPanelDemo() {
         question="Which blur radius keeps text legible on busy backgrounds?"
         queries={queries.slice(0, 3)}
       />
-    </Backdrop>
+    </div>
   );
 }

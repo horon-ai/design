@@ -219,6 +219,15 @@
   --glass-rim-top: rgba(255, 255, 255, 0.7);
   --glass-rim-mid: rgba(255, 255, 255, 0.12);
   --glass-rim-bottom: rgba(255, 255, 255, 0.3);
+  --veil-blur: 8px;
+  --veil-saturate: 1.6;
+  --veil-ring-width: 1px;
+  --veil-ring: rgba(23, 24, 26, 0.06);
+  --veil-field: rgba(23, 24, 26, 0.06);
+  --veil-field-focus: rgba(23, 24, 26, 0.09);
+  --veil-field-shadow: rgba(23, 24, 26, 0.06);
+  --veil-overlay: rgba(255, 255, 255, 0.74);
+  --veil-overlay-shadow: rgba(23, 24, 26, 0.1);
   --paragraph-body-lg: 0.75em;
   --paragraph-body-md: 0.75em;
   --paragraph-body-sm: 0.75em;
@@ -378,4 +387,10 @@
   --glass-rim-top: rgba(255, 255, 255, 0.22);
   --glass-rim-mid: rgba(255, 255, 255, 0.04);
   --glass-rim-bottom: rgba(255, 255, 255, 0.1);
+  --veil-ring: rgba(255, 255, 255, 0.06);
+  --veil-field: rgba(255, 255, 255, 0.09);
+  --veil-field-focus: rgba(255, 255, 255, 0.12);
+  --veil-field-shadow: rgba(0, 0, 0, 0.06);
+  --veil-overlay: rgba(23, 24, 26, 0.74);
+  --veil-overlay-shadow: rgba(0, 0, 0, 0.3);
 }

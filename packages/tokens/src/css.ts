@@ -1,5 +1,5 @@
 import { darkColors, lightColors, primitives } from "./color";
-import { glass } from "./glass";
+import { glass, veil } from "./glass";
 import { radius, shadow } from "./scale";
 import { fontFamily, fontWeight, textStyles, type Platform } from "./typography";
 
@@ -56,6 +56,16 @@ const rimLines = (scheme: keyof typeof glass.rim) => [
   `  --glass-rim-bottom: ${glass.rim[scheme].bottom};`,
 ];
 
+/** The veil, the light glass of fields and overlays; `.dark` repeats it with the dark colours. */
+const veilLines = (scheme: keyof typeof veil.scheme) => [
+  `  --veil-ring: ${veil.scheme[scheme].ring};`,
+  `  --veil-field: ${veil.scheme[scheme].field};`,
+  `  --veil-field-focus: ${veil.scheme[scheme].fieldFocus};`,
+  `  --veil-field-shadow: ${veil.scheme[scheme].fieldShadow};`,
+  `  --veil-overlay: ${veil.scheme[scheme].overlay};`,
+  `  --veil-overlay-shadow: ${veil.scheme[scheme].overlayShadow};`,
+];
+
 function rootBlock(): string[] {
   const lines = [
     `  --glass-blur: ${px(glass.blur)};`,
@@ -63,6 +73,10 @@ function rootBlock(): string[] {
     `  --glass-rim-width: ${px(glass.rimWidth)};`,
     `  --glass-rim-mid-stop: ${ratio(glass.rimMidStop * 100)}%;`,
     ...rimLines("light"),
+    `  --veil-blur: ${px(veil.blur)};`,
+    `  --veil-saturate: ${veil.saturate};`,
+    `  --veil-ring-width: ${px(veil.ringWidth)};`,
+    ...veilLines("light"),
   ];
   for (const [name, style] of Object.entries(textStyles)) {
     if ("paragraph" in style) lines.push(`  --paragraph-${name}: ${style.paragraph}em;`);
@@ -96,6 +110,7 @@ export function buildThemeCss(): string {
     "  color-scheme: dark;",
     ...dark,
     ...rimLines("dark"),
+    ...veilLines("dark"),
     "}",
     "",
   ].join("\n");
