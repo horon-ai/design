@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../surface_group.dart';
+
 /// `schedule` 갤러리 섹션입니다.
 ///
-/// 시간 고르기 필드의 두 표면(유리·카드 안), 요일 토글, 그리고 그 둘을 담은
-/// 루틴 스케줄 카드를 나란히 놓습니다. 각 표본은 실제로 눌러 볼 수 있습니다.
+/// 시간 고르기 필드와 루틴 스케줄 카드를 solid와 glass 두 표면에 같은 목록으로
+/// 놓고, 요일 토글을 따로 보여 줍니다. 각 표본은 실제로 눌러 볼 수 있습니다.
 class HoronScheduleGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronScheduleGallerySection({super.key});
@@ -14,23 +16,54 @@ class HoronScheduleGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: Wrap(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: theme.space.s6,
-        runSpacing: theme.space.s6,
-        crossAxisAlignment: WrapCrossAlignment.start,
-        children: const <Widget>[
-          _Sample(
-            label: '유리 필드',
-            child: _TimePicker(surface: HoronPickerSurface.glass),
+        children: <Widget>[
+          SurfaceGroup(
+            label: 'Solid',
+            child: _samples(
+              theme,
+              HoronPickerSurface.solid,
+              HoronSurface.solid,
+            ),
           ),
-          _Sample(
-            label: '카드 안 필드',
-            child: _TimePicker(surface: HoronPickerSurface.solid),
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
+            child: _samples(
+              theme,
+              HoronPickerSurface.glass,
+              HoronSurface.glass,
+            ),
           ),
-          _Sample(label: '요일', child: _DaysPicker()),
-          _Sample(label: '루틴 카드', child: _RoutineCard()),
+          _Sample(label: '요일', child: const _DaysPicker()),
         ],
       ),
+    );
+  }
+
+  /// 한 표면의 표본 목록입니다. 표면만 바뀌고 내용은 같습니다.
+  Widget _samples(
+    HoronThemeData theme,
+    HoronPickerSurface picker,
+    HoronSurface card,
+  ) {
+    return Wrap(
+      spacing: theme.space.s6,
+      runSpacing: theme.space.s6,
+      crossAxisAlignment: WrapCrossAlignment.start,
+      children: <Widget>[
+        _Sample(
+          label: '시간 필드',
+          child: _TimePicker(surface: picker),
+        ),
+        _Sample(
+          label: '루틴 카드',
+          child: _RoutineCard(surface: card),
+        ),
+      ],
     );
   }
 }
@@ -134,19 +167,28 @@ class _DaysPickerState extends State<_DaysPicker> {
 
 /// 루틴 스케줄 카드 표본입니다.
 class _RoutineCard extends StatelessWidget {
-  const _RoutineCard();
+  const _RoutineCard({this.surface = HoronSurface.solid});
+
+  final HoronSurface surface;
 
   @override
   Widget build(BuildContext context) {
-    return const HoronScheduleCard(
-      title: Text('Morning digest'),
-      nextRun: Text('Tomorrow, 09:00'),
+    return HoronScheduleCard(
+      surface: surface,
+      title: const Text('Morning digest'),
+      nextRun: const Text('Tomorrow, 09:00'),
       children: <Widget>[
         HoronScheduleSection(
-          label: Text('Repeat'),
-          children: <Widget>[_TimePicker(surface: HoronPickerSurface.solid)],
+          label: const Text('Repeat'),
+          children: <Widget>[
+            _TimePicker(
+              surface: surface == HoronSurface.glass
+                  ? HoronPickerSurface.glass
+                  : HoronPickerSurface.solid,
+            ),
+          ],
         ),
-        HoronScheduleSection(
+        const HoronScheduleSection(
           label: Text('Days'),
           children: <Widget>[_DaysPicker()],
         ),
