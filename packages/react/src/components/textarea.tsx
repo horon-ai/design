@@ -4,7 +4,6 @@ import type { ComponentProps } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { fieldBoxClass, fieldTextClass, type InputSurface } from "./input";
-import { LiquidGlass } from "./liquid-glass";
 
 export type TextareaSize = ControlSize;
 
@@ -20,22 +19,24 @@ export type TextareaProps = Omit<ComponentProps<"textarea">, "className"> & {
 const sizeClass: Record<TextareaSize, string> = {
   sm: "min-h-22 px-3 py-2",
   md: "min-h-28 px-3.5 py-3",
-  lg: "min-h-34 px-4 py-3.5",
+  lg: "min-h-34 px-5 py-3.5",
 };
 
-/** Figma `Textarea` (58:137): an 88/112/136px glass or solid box with 12/14px padding. */
-export function Textarea({ size = "md", invalid, surface = "solid", className, textareaClassName, rows = 3, ...props }: TextareaProps) {
+/** Figma `Textarea` (58:137): an 88/112/136px glass or solid box with 12/14/20px padding, the same field rungs as `Input`. */
+export function Textarea({
+  size = "md",
+  invalid,
+  surface = "solid",
+  className,
+  textareaClassName,
+  rows = 3,
+  ...props
+}: TextareaProps) {
   return (
     <div
-      className={cn(
-        "relative flex overflow-clip rounded-md border motion-colors",
-        sizeClass[size],
-        fieldBoxClass[surface],
-        className,
-      )}
+      className={cn(fieldBoxClass.base, "items-stretch", sizeClass[size], fieldBoxClass[surface], className)}
       data-invalid={invalid ? "" : undefined}
     >
-      {surface === "glass" && <LiquidGlass />}
       <Field.Control
         render={<textarea rows={rows} {...props} />}
         aria-invalid={invalid || undefined}

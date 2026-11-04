@@ -12,6 +12,7 @@ function Examples({ surface }: { surface: "solid" | "glass" }) {
         icon={<GithubLogo />}
         name="GitHub"
         description="Read issues, open pull requests, and review code."
+        onAdd={() => undefined}
       />
       <DirectoryCard
         surface={surface}
@@ -19,6 +20,7 @@ function Examples({ surface }: { surface: "solid" | "glass" }) {
         icon={<Notebook />}
         name="Notion"
         description="Search pages and databases, then draft new notes from a conversation with your team."
+        onAdd={() => undefined}
       />
       <DirectoryCard surface={surface} className="w-full max-w-100" icon={<Folder />} name="Local files" />
     </div>

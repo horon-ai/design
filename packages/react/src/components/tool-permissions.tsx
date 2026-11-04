@@ -30,8 +30,10 @@ const options: { value: ToolPermission; label: string }[] = [
 ];
 
 /**
- * Paper `Tool permissions` (1VT5-0): a neutral-50 group header with a count pill and an "Allow all" text button,
- * then one divided row per tool with a mono name, a description and an Allow / Ask / Off segmented control.
+ * Paper `Tool permissions` (1VT5-0): one solid card, 16px radius with a default border. A subtle header
+ * carries the group title, a count pill and an "Allow all" text button; below it one divided row per tool
+ * with a mono name, a description and a small solid Allow / Ask / Off segmented control. 16px side padding
+ * on every row so the names, the header title and the controls line up.
  */
 export function ToolPermissions({
   title,
@@ -51,35 +53,42 @@ export function ToolPermissions({
     onValuesChange?.(next);
   };
   return (
-    <div className={cn("flex w-full max-w-130.25 flex-col", className)} {...props}>
-      <div className="flex items-center gap-2 rounded-sm bg-neutral-50 px-3 py-2 dark:bg-neutral-800">
-        <span className="text-[13px]/[18px] font-semibold text-text-primary">{title}</span>
-        <span className="inline-flex h-5.5 items-center rounded-full bg-overlay-ink-6 px-2 text-[12px]/[16px] font-medium text-text-secondary">
-          {tools.length}
+    <div
+      className={cn(
+        "flex w-full max-w-130 flex-col overflow-clip rounded-2xl border border-border-default bg-bg-surface",
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex h-11 items-center gap-2 border-b border-border-default bg-bg-subtle px-4">
+        <span className="text-label-md font-semibold text-text-primary">{title}</span>
+        <span className="inline-flex h-5 items-center rounded-full bg-overlay-ink-6 px-1.5 text-label-sm text-text-secondary">
+          <span className="text-trim">{tools.length}</span>
         </span>
         <span className="flex-1" />
         <button
           type="button"
-          className="cursor-pointer rounded-sm text-[12px]/[16px] font-medium text-text-placeholder motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+          className="cursor-pointer rounded-sm text-label-sm text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
           onClick={() => update(Object.fromEntries(tools.map((tool) => [tool.name, "allow" as const])))}
         >
           {allowAllLabel}
         </button>
       </div>
-      {tools.map((tool, index) => (
+      {tools.map((tool) => (
         <div
           key={tool.name}
-          className="flex motion-rise items-center gap-3 border-b border-border-default py-[11px] pr-1 pl-3 last:border-b-0"
-          style={{ animationDelay: `${index * 30}ms` }}
+          className="flex items-center gap-4 border-b border-border-default px-4 py-3 last:border-b-0"
         >
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <span className="truncate font-mono text-[13px]/[18px] font-medium text-text-primary">{tool.name}</span>
-            {tool.description && <span className="text-[12px]/[16px] text-text-placeholder">{tool.description}</span>}
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className="truncate font-mono text-code font-medium text-text-primary">{tool.name}</span>
+            {tool.description && <span className="text-caption text-text-secondary">{tool.description}</span>}
           </div>
           <SegmentedControl
             aria-label={`${tool.name} permission`}
-            surface="glass"
+            size="sm"
+            surface="solid"
             fill={false}
+            className="shrink-0"
             items={options}
             value={current[tool.name] ?? "ask"}
             onValueChange={(value) => {

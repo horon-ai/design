@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { componentGroups, components, componentsInGroup } from "@/data/components";
 import { foundationsNav } from "@/data/nav";
+import { pick } from "@/i18n";
 
 export const GET: APIRoute = ({ site }) => {
   const origin = site?.origin ?? "https://design.horon.ai";
@@ -21,16 +22,18 @@ export const GET: APIRoute = ({ site }) => {
     "",
     "## Foundations",
     "",
-    ...foundationsNav.slice(1).map((item) => `- [${item.label}](${link(item.href)})`),
+    ...foundationsNav.slice(1).map((item) => `- [${pick(item.label, "ko")}](${link(item.href)})`),
     "",
     "## Components",
     "",
   ];
 
   for (const group of componentGroups) {
-    lines.push(`### ${group.title}`, "");
+    lines.push(`### ${pick(group.title, "ko")}`, "");
     for (const component of componentsInGroup(group.id)) {
-      lines.push(`- [${component.title}](${link(`/components/${component.slug}`)}): ${component.description}`);
+      lines.push(
+        `- [${pick(component.title, "ko")}](${link(`/components/${component.slug}`)}): ${pick(component.description, "ko")}`,
+      );
     }
     lines.push("");
   }

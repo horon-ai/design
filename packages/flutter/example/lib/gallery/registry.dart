@@ -121,6 +121,7 @@ const List<GallerySection> gallerySections = <GallerySection>[
   ),
   GallerySection(slug: 'filter_bar', title: 'Filter Bar', group: 'navigation'),
   GallerySection(slug: 'dialog', title: 'Dialog', group: 'overlays'),
+  GallerySection(slug: 'modal', title: 'Modal', group: 'overlays'),
   GallerySection(
     slug: 'bottom_sheet',
     title: 'Bottom Sheet',

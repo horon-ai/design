@@ -22,9 +22,10 @@ export type SidebarProps = Omit<ComponentProps<"nav">, "className"> & {
   className?: string;
   /**
    * `glass` (default) is the thick-glass column. `photo` is the Paper app sidebar: the Horon photo
-   * on #EEF3F8 under a 55% white veil, with the thick glass kept for dark mode.
+   * on #EEF3F8 under a 55% white veil, with the thick glass kept for dark mode. `plain` paints no
+   * fill or glass, so the column takes the color of the layout behind it, divided by a 1px border.
    */
-  surface?: "glass" | "photo";
+  surface?: "glass" | "photo" | "plain";
   /**
    * Drag the right edge to change the width, from the `md` breakpoint (768px) up.
    * Below `md` the handle is hidden and the sidebar keeps its fixed 280px width.
@@ -119,15 +120,19 @@ export function Sidebar({
   return (
     <nav
       className={cn(
-        "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip bg-glass-thick px-3 pt-4 pb-3",
+        "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip px-3 pt-4 pb-3",
+        resizable && "transition-[width] duration-200 ease-out-quint data-resizing:transition-none",
+        surface === "glass" && "bg-glass-thick",
         surface === "photo" && "bg-sidebar-photo dark:bg-glass-thick dark:bg-none",
+        surface === "plain" && "border-r border-border-default",
         resizable && "md:w-(--sidebar-width)",
         className,
       )}
       style={resizable ? ({ ...style, "--sidebar-width": `${width}px` } as CSSProperties) : style}
+      data-resizing={(resizable && dragging) || undefined}
       {...props}
     >
-      {surface === "photo" ? null : <LiquidGlass />}
+      {surface === "glass" && <LiquidGlass />}
       {children}
       {resizable && (
         <div
@@ -212,7 +217,7 @@ export function SidebarHeader({
           type="button"
           aria-label={collapseLabel}
           onClick={onCollapse}
-          className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm text-text-secondary motion-colors after:absolute after:top-1/2 after:left-1/2 after:min-h-11 after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] hover:bg-overlay-ink-6 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand active:bg-overlay-ink-10"
         >
           <CaretLeft aria-hidden className="size-4" />
         </button>
@@ -221,7 +226,7 @@ export function SidebarHeader({
   );
 }
 
-export type SidebarItemProps = ButtonProps & {
+type SidebarItemCommonProps = {
   /** 18px icon, or a `SidebarProjectTile`. */
   icon?: ReactNode;
   /** Count on the right, such as unread items. */
@@ -229,23 +234,29 @@ export type SidebarItemProps = ButtonProps & {
   /** Trailing 7px red dot for attention. */
   attention?: boolean;
   current?: boolean;
+  className?: string;
 };
 
-/** Figma sidebar `Item`: 32px row, 12px radius, 10px gap; the current item is 6% ink. */
+/** With `href`, the row is a real link and takes anchor props; without it, a `type="button"` button. */
+export type SidebarItemProps =
+  | (SidebarItemCommonProps & { href: string } & Omit<ComponentProps<"a">, "className" | "href" | "type">)
+  | (SidebarItemCommonProps & { href?: undefined } & ButtonProps);
+
+/**
+ * Figma sidebar `Item`: 32px row, 12px radius, 10px gap; the current item is 6% ink.
+ * Pass `href` to render an `<a>` with the same look.
+ */
 export function SidebarItem({ icon, count, attention, current, className, children, ...props }: SidebarItemProps) {
-  return (
-    <button
-      type="button"
-      aria-current={current ? "page" : undefined}
-      className={cn(
-        "relative flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-label-md text-text-primary",
-        "motion-colors",
-        current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-4",
-        "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
-        className,
-      )}
-      {...props}
-    >
+  const classes = cn(
+    "relative flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-label-md text-text-primary",
+    "motion-colors",
+    current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-4",
+    "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
+    className,
+  );
+
+  const content = (
+    <>
       {icon && (
         <span data-slot="icon" className="flex shrink-0 [&>svg]:size-4.5">
           {icon}
@@ -254,6 +265,21 @@ export function SidebarItem({ icon, count, attention, current, className, childr
       <span className="min-w-0 flex-1 truncate">{children}</span>
       {count !== undefined && <span className="shrink-0 text-body-sm text-text-secondary">{count}</span>}
       {attention && <span aria-label="Needs attention" className="size-[7px] shrink-0 rounded-full bg-text-danger" />}
+    </>
+  );
+
+  if (props.href !== undefined) {
+    const { href, ...anchorProps } = props;
+    return (
+      <a href={href} aria-current={current ? "page" : undefined} className={classes} {...anchorProps}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button type="button" aria-current={current ? "page" : undefined} className={classes} {...props}>
+      {content}
     </button>
   );
 }
@@ -285,7 +311,7 @@ export type SidebarGroupProps = {
 export function SidebarGroup({ label, defaultOpen = true, children, className }: SidebarGroupProps) {
   return (
     <Collapsible.Root defaultOpen={defaultOpen} className={cn("relative mt-3.5 flex flex-col gap-0.5", className)}>
-      <Collapsible.Trigger className="group flex h-7 w-fit cursor-pointer items-center gap-1 px-2.5 text-label-md text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand">
+      <Collapsible.Trigger className="group flex h-7 w-fit cursor-pointer items-center gap-1 px-2.5 text-label-md text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand">
         {label}
         <CaretDown
           aria-hidden
@@ -414,7 +440,7 @@ export function SidebarProject({
         className={cn(
           "group/project relative flex h-8 items-center rounded-md has-data-popup-open:bg-overlay-ink-6",
           "motion-colors",
-          current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-6",
+          current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-4",
         )}
       >
         <Collapsible.Trigger
@@ -432,8 +458,8 @@ export function SidebarProject({
             <span
               aria-hidden
               className={cn(
-                "flex size-3.5 shrink-0 [&>svg]:size-3.5",
-                actions !== undefined && "group-hover/project:invisible group-has-data-popup-open/project:invisible",
+                "flex size-3.5 shrink-0 opacity-100 transition-opacity duration-150 [&>svg]:size-3.5",
+                actions !== undefined && "group-hover/project:opacity-0 group-has-data-popup-open/project:opacity-0",
               )}
             >
               <CaretRight className="transition-transform duration-200 ease-out-quint group-data-panel-open/trigger:rotate-90" />
@@ -464,7 +490,7 @@ export function SidebarProjectMore({ label = "Project actions", className, ...pr
       type="button"
       aria-label={label}
       className={cn(
-        "flex size-4 cursor-pointer items-center justify-center rounded-xs text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand",
+        "relative flex size-4 cursor-pointer items-center justify-center rounded-xs text-text-primary motion-colors after:absolute after:top-1/2 after:left-1/2 after:min-h-11 after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}
       {...props}
@@ -489,7 +515,7 @@ export function SidebarAddButton({ icon = addIcon, className, children, ...props
       type="button"
       className={cn(
         "relative mt-2 flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-[10px] text-label-md text-text-secondary motion-colors hover:bg-overlay-ink-4",
-        "focus-visible:outline-2 focus-visible:outline-text-brand [&>[data-slot=icon]]:size-4",
+        "focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}
       {...props}

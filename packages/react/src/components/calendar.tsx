@@ -3,7 +3,6 @@ import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
-import { LiquidGlass } from "./liquid-glass";
 
 export type DateRange = { start: Date | null; end: Date | null };
 export type CalendarSize = ControlSize;
@@ -27,8 +26,9 @@ type CommonProps = {
    */
   variant?: "default" | "popover";
   /**
-   * `solid` (default) is an opaque surface with a default border. `glass` layers the thick liquid glass;
-   * `flat` keeps the same 80% white fill without it (Paper Schedule mini calendar).
+   * `solid` (default) is an opaque surface with a default border. `glass` puts it on the veil (`veil-overlay`),
+   * the material of the `DateField` popup; `flat` keeps the 80% white fill of the old thick glass
+   * without it (Paper Schedule mini calendar).
    */
   surface?: "glass" | "flat" | "solid";
   /** Days drawn as subtle ink circles in the day cell size, e.g. the week the schedule shows; selection still draws on top. */
@@ -65,9 +65,9 @@ const popoverHeaderSizeClass: Record<CalendarSize, string> = {
 };
 
 const arrowSizeClass: Record<CalendarSize, string> = {
-  sm: "size-4 [&_svg]:size-4",
-  md: "size-5 [&_svg]:size-5",
-  lg: "size-6 [&_svg]:size-6",
+  sm: "size-6 [&_svg]:size-4",
+  md: "size-7 [&_svg]:size-4.5",
+  lg: "size-8 [&_svg]:size-5",
 };
 
 const popoverArrowSizeClass: Record<CalendarSize, string> = {
@@ -100,11 +100,8 @@ const dayEmphasisClass: Record<CalendarSize, string> = {
   lg: "text-label-lg",
 };
 
-const todayDotSizeClass: Record<CalendarSize, string> = {
-  sm: "top-6 left-3.5",
-  md: "top-8 left-[18px]",
-  lg: "top-10 left-[22px]",
-};
+/** The today dot sits 4px above the cell's bottom edge, centred at every rung. */
+const todayDotClass = "bottom-1 left-1/2 -translate-x-1/2";
 
 const popoverDayTextClass: Record<CalendarSize, string> = {
   sm: "[&_[role=gridcell]]:text-label-sm",
@@ -217,7 +214,11 @@ export function Calendar(props: CalendarProps) {
     <div
       className={cn(
         "relative flex flex-col overflow-clip",
-        surface === "solid" ? "border border-border-default bg-bg-surface" : "bg-glass-thick",
+        surface === "solid"
+          ? "border border-border-default bg-bg-surface"
+          : surface === "glass"
+            ? "veil-overlay"
+            : "bg-glass-thick",
         variant === "popover"
           ? cn("rounded-[24px]", containerSizeClass[size].popover)
           : cn("w-fit rounded-xl", containerSizeClass[size].default),
@@ -226,11 +227,12 @@ export function Calendar(props: CalendarProps) {
         className,
       )}
     >
-      {surface === "glass" && <LiquidGlass />}
       {variant === "popover" ? (
         <div className={cn("relative flex w-full items-center", popoverHeaderSizeClass[size])}>
           <p aria-live="polite" className={cn("min-w-0 flex-1 text-text-primary", popoverTitleSizeClass[size])}>
-            {title}
+            <span key={title} className="animate-fade-in">
+              {title}
+            </span>
           </p>
           {(
             [
@@ -244,6 +246,7 @@ export function Calendar(props: CalendarProps) {
               aria-label={label}
               className={cn(
                 "flex motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
                 popoverArrowSizeClass[size],
               )}
               onClick={() => setMonth(addMonths(month, step))}
@@ -257,18 +260,28 @@ export function Calendar(props: CalendarProps) {
           <button
             type="button"
             aria-label="Previous month"
-            className={cn("flex motion-press cursor-pointer text-text-secondary", arrowSizeClass[size])}
+            className={cn(
+              "flex motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary",
+              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
+              arrowSizeClass[size],
+            )}
             onClick={() => setMonth(addMonths(month, -1))}
           >
             <CaretLeft />
           </button>
           <p aria-live="polite" className={cn("flex-1 text-center text-text-primary", titleSizeClass[size])}>
-            {title}
+            <span key={title} className="animate-fade-in">
+              {title}
+            </span>
           </p>
           <button
             type="button"
             aria-label="Next month"
-            className={cn("flex motion-press cursor-pointer text-text-secondary", arrowSizeClass[size])}
+            className={cn(
+              "flex motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary",
+              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
+              arrowSizeClass[size],
+            )}
             onClick={() => setMonth(addMonths(month, 1))}
           >
             <CaretRight />
@@ -282,8 +295,8 @@ export function Calendar(props: CalendarProps) {
         aria-label={title}
         className={cn(
           "relative flex flex-col",
-          slide === "next" && "animate-slide-next",
-          slide === "prev" && "animate-slide-prev",
+          slide === "next" && "animate-slide-shift-next",
+          slide === "prev" && "animate-slide-shift-prev",
         )}
         onKeyDown={onKeyDown}
       >
@@ -336,7 +349,7 @@ export function Calendar(props: CalendarProps) {
                       (disabled
                         ? cn("cursor-not-allowed text-text-disabled", dayTextClass[size])
                         : outside
-                          ? cn("text-text-disabled", dayTextClass[size])
+                          ? cn("text-text-placeholder", dayTextClass[size])
                           : isToday
                             ? cn("text-text-brand", dayEmphasisClass[size])
                             : cn("text-text-primary", dayTextClass[size])),
@@ -344,10 +357,7 @@ export function Calendar(props: CalendarProps) {
                 >
                   {date.getDate()}
                   {isToday && !selected && !between && (
-                    <span
-                      aria-hidden
-                      className={cn("absolute size-1 rounded-full bg-status-live", todayDotSizeClass[size])}
-                    />
+                    <span aria-hidden className={cn("absolute size-1 rounded-full bg-status-live", todayDotClass)} />
                   )}
                 </button>
               );

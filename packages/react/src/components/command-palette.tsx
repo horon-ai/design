@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { Kbd } from "./kbd";
-import { LiquidGlass } from "./liquid-glass";
 
 export type CommandItem = {
   value: string;
@@ -29,11 +28,13 @@ export type CommandPaletteProps = {
   onOpenChange?: (open: boolean) => void;
   groups: CommandGroup[];
   placeholder?: string;
+  /** Shown when the query has no matches; defaults to "No results". */
+  empty?: ReactNode;
   /** Footer key hints, such as `[["↑↓", "Move"], ["↵", "Open"]]`. */
   hints?: [ReactNode, string][];
   trigger?: ReactNode;
   /**
-   * `solid` (default) is an opaque palette with a default border. `glass` is the frosted Figma palette.
+   * `solid` (default) is an opaque palette with a default border. `glass` puts it on the veil (`veil-overlay`).
    */
   surface?: "solid" | "glass";
   className?: string;
@@ -48,6 +49,7 @@ export function CommandPalette({
   onOpenChange,
   groups,
   placeholder = "Search",
+  empty,
   hints,
   trigger,
   surface = "solid",
@@ -57,21 +59,21 @@ export function CommandPalette({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       {trigger}
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-bg-scrim motion-fade opacity-40" />
-        <Dialog.Viewport className="fixed inset-0 flex items-start justify-center px-2 pt-24">
+        <Dialog.Backdrop className="fixed inset-0 z-50 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]" />
+        <Dialog.Viewport className="fixed inset-0 z-50 flex items-start justify-center px-2 pt-24">
           <Dialog.Popup
             aria-label={placeholder}
             className={cn(
-              "relative flex w-140 max-w-full motion-popup flex-col overflow-clip rounded-[24px] p-1.5 shadow-palette",
-              surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
+              "relative flex w-140 max-w-full motion-popup flex-col overflow-clip rounded-[24px] p-1.5",
+              surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-palette",
               "duration-240 data-starting-style:translate-y-2",
               className,
             )}
           >
-            {surface === "glass" && <LiquidGlass />}
             <CommandPaletteBody
               groups={groups}
               placeholder={placeholder}
+              empty={empty}
               closeControl={
                 <Dialog.Close aria-label="Close" className="motion-press cursor-pointer">
                   <Kbd>esc</Kbd>
@@ -80,7 +82,7 @@ export function CommandPalette({
               onSelect={() => onOpenChange?.(false)}
             />
             {hints && hints.length > 0 && (
-              <div className="relative flex items-center gap-3.5 px-3 pt-2.5 pb-1.5">
+              <div className="relative flex items-center gap-4 px-3 pt-2 pb-1">
                 {hints.map(([key, label]) => (
                   <span key={label} className="flex items-center gap-1.5 text-caption text-text-secondary">
                     <Kbd>{key}</Kbd>
@@ -125,8 +127,10 @@ export function CommandPaletteBody({
       autoHighlight="always"
       keepHighlight
     >
-      <div className="relative flex h-12 items-center gap-2.5 px-3.5">
-        <MagnifyingGlass aria-hidden className="size-5 shrink-0 text-text-secondary" />
+      <div className="relative flex h-12 items-center gap-2.5 px-3">
+        <span className="flex size-7 shrink-0 items-center justify-center">
+          <MagnifyingGlass aria-hidden className="size-5 text-text-secondary" />
+        </span>
         <Autocomplete.Input
           placeholder={placeholder}
           className="min-w-0 flex-1 bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
@@ -138,14 +142,16 @@ export function CommandPaletteBody({
             </button>
           ))}
       </div>
-      <div className="relative pt-1 pb-1.5">
+      <div className="relative pt-1">
         <div className="h-px bg-overlay-ink-8" />
       </div>
-      <Autocomplete.Empty className="relative px-3 py-4 text-body-sm text-text-secondary">{empty}</Autocomplete.Empty>
+      <Autocomplete.Empty className="relative px-3 py-4 text-body-sm text-text-secondary empty:hidden">
+        {empty}
+      </Autocomplete.Empty>
       <Autocomplete.List className="relative flex max-h-[min(60dvh,24rem)] flex-col overflow-y-auto">
         {(group: CommandGroup) => (
-          <Autocomplete.Group key={group.label} items={group.items} className="flex flex-col">
-            <Autocomplete.GroupLabel className="px-3 pt-2 pb-1 text-caption text-text-secondary">
+          <Autocomplete.Group key={group.label} items={group.items} className="flex flex-col pt-1">
+            <Autocomplete.GroupLabel className="px-3 pt-1 pb-1 text-caption text-text-secondary">
               {group.label}
             </Autocomplete.GroupLabel>
             <Autocomplete.Collection>
@@ -157,7 +163,7 @@ export function CommandPaletteBody({
                     item.onSelect?.();
                     onSelect?.();
                   }}
-                  className="flex h-11 cursor-pointer items-center gap-2.5 rounded-md pr-3 pl-2.5 motion-colors outline-none select-none data-highlighted:bg-overlay-ink-6"
+                  className="flex h-11 cursor-pointer items-center gap-2.5 rounded-md px-3 motion-colors outline-none select-none data-highlighted:bg-overlay-ink-6"
                 >
                   {item.tile && (
                     <span

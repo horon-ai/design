@@ -32,7 +32,7 @@ import { Button, Card, Input } from "@horon-ai/react";
 ```bash
 bun install
 bun run tokens        # 토큰 CSS(theme.css) 생성
-bun run site          # 문서 사이트 → http://localhost:4321
+bun run site          # 문서 사이트 → http://localhost:4321 (tokens 원본·react 변경을 hot reload)
 ```
 
 ## 컴포넌트 사용

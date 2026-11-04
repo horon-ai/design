@@ -19,6 +19,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
+import '../components/flue_background.dart' show HoronFlueVariant;
 import '../theme/horon_theme.dart';
 import 'glass_shader.dart';
 
@@ -67,6 +68,65 @@ class HoronFlueConfig {
 
   /// Horon 하늘 팔레트입니다. 원본의 `FLUE_SKY`입니다.
   static const HoronFlueConfig sky = HoronFlueConfig();
+
+  /// 어두운 모드 팔레트입니다. 원본의 `FLUE_NIGHT`입니다.
+  ///
+  /// 거의 검은 바탕에 푸른 연기이고, 움직임은 [sky]와 같습니다.
+  static const HoronFlueConfig night = HoronFlueConfig(
+    bgColor: Color(0xFF050608),
+    colorA: Color(0xFF07090D),
+    colorB: Color(0xFF0C1A2C),
+    colorC: Color(0xFF1F4A78),
+    colorD: Color(0xFF4F8FD0),
+    glow: 0.35,
+  );
+
+  /// [HoronFlueVariant]가 덮어쓰는 값만 바꾼 사본입니다. 원본의 `Partial<FlueConfig>` 자리입니다.
+  HoronFlueConfig _tuned({
+    double? speed,
+    double? smokeScale,
+    double? width,
+    double? spread,
+    double? density,
+    double? contrast,
+    double? midpoint,
+    double? glow,
+    double? vignette,
+  }) => HoronFlueConfig(
+    bgColor: bgColor,
+    colorA: colorA,
+    colorB: colorB,
+    colorC: colorC,
+    colorD: colorD,
+    scale: scale,
+    speed: speed ?? this.speed,
+    flow: flow,
+    roughness: roughness,
+    lacunarity: lacunarity,
+    smokeScale: smokeScale ?? this.smokeScale,
+    curl: curl,
+    curlScale: curlScale,
+    rise: rise,
+    slender: slender,
+    width: width ?? this.width,
+    spread: spread ?? this.spread,
+    lean: lean,
+    density: density ?? this.density,
+    contrast: contrast ?? this.contrast,
+    midpoint: midpoint ?? this.midpoint,
+    glow: glow ?? this.glow,
+    sink: sink,
+    grain: grain,
+    grainAnim: grainAnim,
+    dither: dither,
+    vignette: vignette ?? this.vignette,
+    cursor: cursor,
+    pointerRadius: pointerRadius,
+    draft: draft,
+    pointerStrength: pointerStrength,
+    parallax: parallax,
+    maxDpr: maxDpr,
+  );
 
   /// 셰이더를 못 쓸 때 남는 바탕색입니다.
   final Color bgColor;
@@ -276,13 +336,18 @@ class HoronFlueDamping {
 /// 셰이더를 못 쓰면 [HoronFlueConfig.bgColor] 단색에 색조 한 겹만 남습니다.
 class HoronFlueBackground extends StatefulWidget {
   /// 배경을 만듭니다.
-  const HoronFlueBackground({super.key, this.config = HoronFlueConfig.sky, this.tint});
+  const HoronFlueBackground({super.key, this.variant = HoronFlueVariant.defaultValue, this.config, this.tint});
 
-  /// 팔레트와 파라미터입니다.
-  final HoronFlueConfig config;
+  /// 연기를 그리는 자리입니다. 밝기에 맞는 기본 팔레트 위에 모션과 색을 조금 다르게 얹습니다.
+  final HoronFlueVariant variant;
 
-  /// 연기 위에 얹는 색조입니다. 없으면 테마의 `glass-regular`입니다(React의
-  /// `bg-glass-regular`).
+  /// 팔레트와 파라미터의 덮어쓰기입니다. 값이 있으면 변형 조정을 덮어씁니다.
+  ///
+  /// 없으면 테마 밝기에 따라 [HoronFlueConfig.sky]나 [HoronFlueConfig.night]를 쓰고,
+  /// [variant]의 조정을 그 위에 얹습니다.
+  final HoronFlueConfig? config;
+
+  /// 연기 위에 얹는 색조입니다. 없으면 변형이 정합니다. React의 `tintClassName` 자리입니다.
   final Color? tint;
 
   @override
@@ -314,6 +379,46 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   /// 지금 그리는 프레임입니다.
   @visibleForTesting
   HoronFlueFrame get frame => _frame.value;
+
+  /// 지금 적용되는 팔레트입니다. 테마 밝기, [HoronFlueBackground.variant], 명시 config를 모두 반영합니다.
+  @visibleForTesting
+  HoronFlueConfig get resolvedConfig => _resolveConfig(HoronTheme.of(context));
+
+  /// React의 `{ ...(dark ? FLUE_NIGHT : FLUE_SKY), ...tuning, ...config }`입니다.
+  HoronFlueConfig _resolveConfig(HoronThemeData horon) {
+    final HoronFlueConfig? explicit = widget.config;
+    if (explicit != null) return explicit;
+    final bool dark = horon.brightness == Brightness.dark;
+    final HoronFlueConfig base = dark ? HoronFlueConfig.night : HoronFlueConfig.sky;
+    return switch (widget.variant) {
+      HoronFlueVariant.defaultValue => base,
+      HoronFlueVariant.sidebar => base._tuned(
+        speed: 0.22,
+        smokeScale: 1.9,
+        density: 1.85,
+        contrast: dark ? 1.5 : 1.45,
+        midpoint: 0.8,
+        glow: dark ? 0.22 : 0.3,
+        vignette: 0,
+      ),
+      HoronFlueVariant.auth => base._tuned(
+        width: 1.9,
+        spread: 1.3,
+        density: 2.0,
+        midpoint: dark ? 0.76 : 0.74,
+        glow: 0.45,
+        vignette: dark ? 0.45 : 0.18,
+      ),
+    };
+  }
+
+  /// 변형이 정한 색조입니다. React의 `FLUE_VARIANTS[...].tint`입니다.
+  Color? _variantTint(HoronThemeData horon) => switch (widget.variant) {
+    // `bg-glass-regular dark:bg-transparent`
+    HoronFlueVariant.defaultValue => horon.brightness == Brightness.dark ? null : horon.colors.glassRegular,
+    // 사이드바 유리가 바탕을 채우고, 인증 화면은 색조를 얹지 않습니다.
+    HoronFlueVariant.sidebar || HoronFlueVariant.auth => null,
+  };
 
   @override
   void initState() {
@@ -397,7 +502,8 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   @override
   Widget build(BuildContext context) {
     final HoronThemeData horon = HoronTheme.of(context);
-    final Color tint = widget.tint ?? horon.colors.glassRegular;
+    final HoronFlueConfig config = _resolveConfig(horon);
+    final Color? tint = widget.tint ?? _variantTint(horon);
     final ui.FragmentShader? shader = _shader;
 
     return LayoutBuilder(
@@ -405,19 +511,19 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
         final Size size = constraints.biggest;
         return Listener(
           behavior: HitTestBehavior.translucent,
-          onPointerDown: (PointerEvent event) => _aim(event.localPosition, size),
-          onPointerMove: (PointerEvent event) => _aim(event.localPosition, size),
+          onPointerDown: (PointerEvent event) => _aim(event.localPosition, size, config),
+          onPointerMove: (PointerEvent event) => _aim(event.localPosition, size, config),
           child: ColoredBox(
-            color: widget.config.bgColor,
+            color: config.bgColor,
             child: Stack(
               fit: StackFit.expand,
               children: <Widget>[
                 if (shader != null)
                   CustomPaint(
                     key: horonFlueCanvasKey,
-                    painter: _HoronFluePainter(shader: shader, config: widget.config, repaint: _frame),
+                    painter: _HoronFluePainter(shader: shader, config: config, repaint: _frame),
                   ),
-                IgnorePointer(child: ColoredBox(color: tint)),
+                if (tint != null) IgnorePointer(child: ColoredBox(color: tint)),
               ],
             ),
           ),
@@ -426,8 +532,8 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
     );
   }
 
-  void _aim(Offset localPosition, Size size) {
-    if (widget.config.cursor == 0) return;
+  void _aim(Offset localPosition, Size size, HoronFlueConfig config) {
+    if (config.cursor == 0) return;
     _damping.aim(localPosition: localPosition, size: size);
   }
 }

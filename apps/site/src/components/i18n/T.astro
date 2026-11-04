@@ -1,0 +1,23 @@
+---
+/**
+ * Renders one phrase in both locales and lets `styles/i18n.css` show the half
+ * that matches `<html data-locale>`. Static Astro markup switches language with
+ * no client script; the inactive half stays out of the accessibility tree.
+ *
+ * The halves are literal `<span>` elements on purpose: a `const Tag = "span"`
+ * style dynamic tag is not typed by `astro check`, and every call site wants an
+ * inline element inside its own heading, paragraph or list item.
+ *
+ * Attributes such as `aria-label` and `placeholder` take the Korean string
+ * unless they live inside a React island.
+ */
+import type { Localized } from "@/i18n";
+
+interface Props {
+  /** Both locales of one phrase. Korean is canonical. */
+  m: Localized;
+}
+
+const { m } = Astro.props;
+---
+<span data-locale-text="ko" lang="ko">{m.ko}</span><span data-locale-text="en" lang="en">{m.en}</span>

@@ -4,7 +4,6 @@ import { useState, type ComponentProps, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { fieldBoxClass, fieldTextClass, type InputSurface } from "./input";
-import { LiquidGlass } from "./liquid-glass";
 
 export type TextareaFieldSize = ControlSize;
 
@@ -41,13 +40,14 @@ const metaClass: Record<TextareaFieldSize, string> = {
   lg: "text-body-sm",
 };
 
+/** The same box heights and padding as `Textarea` (88/112/136px, 12/14/20px), so one size reads the same in both. */
 const boxClass: Record<TextareaFieldSize, string> = {
   sm: "h-22 px-3 py-2",
-  md: "h-30 px-3.5 py-3",
-  lg: "h-34 px-4 py-3.5",
+  md: "h-28 px-3.5 py-3",
+  lg: "h-34 px-5 py-3.5",
 };
 
-/** Figma `Textarea field` (60:466): label row, 88/120/136px glass or solid box, footer with help text and counter. */
+/** Figma `Textarea field` (60:466): label row, glass or solid box, footer with help text and counter. */
 export function TextareaField({
   label,
   hint,
@@ -64,6 +64,9 @@ export function TextareaField({
   ...props
 }: TextareaFieldProps) {
   const [count, setCount] = useState(() => String(value ?? defaultValue ?? "").length);
+  // A controlled value can change without an input event (form reset, a parent rewriting it),
+  // so the counter follows the value whenever the caller owns it.
+  const length = value !== undefined ? String(value).length : count;
   const invalid = !!error;
   return (
     <BaseField.Root
@@ -82,7 +85,6 @@ export function TextareaField({
           fieldBoxClass[surface],
         )}
       >
-        {surface === "glass" && <LiquidGlass />}
         <BaseField.Control
           render={
             <textarea
@@ -101,16 +103,13 @@ export function TextareaField({
       {(description || error || maxLength) && (
         <div
           className={cn(
-            "motion-colors flex w-full items-center gap-2",
+            "flex w-full items-center gap-2 motion-colors",
             metaClass[size],
             invalid ? "text-text-danger" : "text-text-secondary",
           )}
         >
           {invalid ? (
-            <BaseField.Error
-              match
-              className="min-w-0 flex-1 animate-[tab-panel-in_160ms_var(--ease-out-quint)]"
-            >
+            <BaseField.Error match className="min-w-0 flex-1 animate-[tab-panel-in_160ms_var(--ease-out-quint)]">
               {error}
             </BaseField.Error>
           ) : (
@@ -118,7 +117,7 @@ export function TextareaField({
           )}
           {maxLength !== undefined && (
             <span className="shrink-0 whitespace-nowrap">
-              {count} / {maxLength}
+              {length} / {maxLength}
             </span>
           )}
         </div>

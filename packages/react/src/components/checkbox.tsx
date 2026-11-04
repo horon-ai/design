@@ -23,10 +23,11 @@ const labelClass: Record<CheckboxSize, string> = {
   lg: "gap-3 text-body-lg",
 };
 
+/** One 6px corner (`rounded-xs`, the Figma radius) at every size; only the box grows with the rung. */
 const boxClass: Record<CheckboxSize, string> = {
-  sm: "size-4.5 rounded-[5px]",
+  sm: "size-4.5 rounded-xs",
   md: "size-5 rounded-xs",
-  lg: "size-6 rounded-[3px]",
+  lg: "size-6 rounded-xs",
 };
 
 const indicatorClass: Record<CheckboxSize, string> = {
@@ -50,14 +51,17 @@ export function Checkbox({ label, size = "md", className, ...props }: CheckboxPr
           "flex shrink-0 items-center justify-center border-[1.5px] border-border-strong bg-bg-surface motion-colors",
           boxClass[size],
           "hover:not-data-disabled:border-text-secondary",
-          "data-checked:border-0 data-checked:bg-interactive-primary data-indeterminate:border-0 data-indeterminate:bg-interactive-primary",
-          "hover:not-data-disabled:data-checked:bg-interactive-primary-hover hover:not-data-disabled:data-indeterminate:bg-interactive-primary-hover",
+          "data-checked:border-interactive-primary data-checked:bg-interactive-primary data-indeterminate:border-interactive-primary data-indeterminate:bg-interactive-primary",
+          "hover:not-data-disabled:data-checked:border-interactive-primary-hover hover:not-data-disabled:data-checked:bg-interactive-primary-hover hover:not-data-disabled:data-indeterminate:border-interactive-primary-hover hover:not-data-disabled:data-indeterminate:bg-interactive-primary-hover",
           "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
         )}
         {...props}
       >
         <BaseCheckbox.Indicator
-          className={cn("flex animate-pop-in text-interactive-on-primary", indicatorClass[size])}
+          className={cn(
+            "flex animate-pop-in text-interactive-on-primary data-ending-style:animate-scale-out",
+            indicatorClass[size],
+          )}
           render={(indicatorProps, state) => (
             <span {...indicatorProps}>{state.indeterminate ? <Minus /> : <Check />}</span>
           )}

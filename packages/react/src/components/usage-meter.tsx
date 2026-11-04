@@ -23,7 +23,7 @@ export function UsageMeter({ label, value, detail, note, surface = "solid", clas
     <Meter.Root
       value={value}
       className={cn(
-        "relative flex w-75 flex-col gap-2.5 overflow-clip rounded-xl p-4",
+        "relative flex w-75 flex-col gap-2 overflow-clip rounded-xl p-4",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         className,
       )}
@@ -31,7 +31,7 @@ export function UsageMeter({ label, value, detail, note, surface = "solid", clas
       {surface === "glass" && <LiquidGlass />}
       <div className="relative flex w-full items-center gap-2 text-label-md">
         <Meter.Label className="min-w-0 flex-1 text-text-primary">{label}</Meter.Label>
-        <Meter.Value className="shrink-0 text-text-secondary" />
+        <Meter.Value className="shrink-0 text-text-secondary tabular-nums" />
       </div>
       <Meter.Track className="relative h-1.5 w-full overflow-clip rounded-full bg-overlay-ink-8">
         <Meter.Indicator className="h-full rounded-full bg-sky-500 transition-[width] duration-400 ease-out-quint" />

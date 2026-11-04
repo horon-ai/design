@@ -1,0 +1,12 @@
+/*
+ * The one site-level stylesheet the locale design needs: every <T /> pair
+ * renders both languages, and this shows exactly one. Korean is the default
+ * when <html> has no data-locale yet (server render, script blocked).
+ *
+ * Imported once by BaseLayout (src/styles/i18n.css). Keep this file free of
+ * anything else.
+ */
+html:not([data-locale="en"]) [data-locale-text="en"],
+html[data-locale="en"] [data-locale-text="ko"] {
+  display: none;
+}

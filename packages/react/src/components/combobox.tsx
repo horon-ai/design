@@ -6,7 +6,6 @@ import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { fieldBoxClass, fieldSizeClass, fieldTextClass, type InputSurface } from "./input";
 import { inputGroupSegmentClass, useInputGroup } from "./input-group";
-import { LiquidGlass } from "./liquid-glass";
 
 export type ComboboxSize = ControlSize;
 
@@ -64,7 +63,7 @@ export type ComboboxProps = ComboboxSingleProps | ComboboxMultipleProps;
 
 const itemClass: Record<ComboboxSize, string> = {
   sm: "h-8 gap-2 px-2.5 text-label-sm [&_svg]:size-4",
-  md: "h-10 gap-2.5 px-3 text-label-md [&_svg]:size-4.5",
+  md: "h-10 gap-2.5 px-3 text-label-md [&_svg]:size-4",
   lg: "h-12 gap-3 px-4 text-label-lg [&_svg]:size-5",
 };
 
@@ -76,15 +75,15 @@ const chipClass: Record<ComboboxSize, string> = {
 
 /** Multiple chips wrap, so the field grows from its rung height instead of fixing it. */
 const multiFieldClass: Record<ComboboxSize, string> = {
-  sm: "min-h-8 flex-wrap gap-1 px-2 py-1 [&_svg]:size-4",
-  md: "min-h-10 flex-wrap gap-1.5 px-2.5 py-1.5 [&_svg]:size-4",
-  lg: "min-h-12 flex-wrap gap-2 px-3 py-2 [&_svg]:size-5",
+  sm: "min-h-8 flex-wrap gap-1 px-2 py-1",
+  md: "min-h-10 flex-wrap gap-1.5 px-2.5 py-1.5",
+  lg: "min-h-12 flex-wrap gap-2 px-3 py-2",
 };
 
-/** The popup follows the field's surface (a segment takes its group's): glass stays glass, every solid kind is solid. */
+/** The popup follows the field's surface (a segment takes its group's): glass is the veil, every solid kind is solid. */
 const popupClass = "relative max-h-80 min-w-(--anchor-width) motion-popup overflow-clip rounded-xl p-1.5 outline-none";
 const popupSurfaceClass = (surface: InputSurface) =>
-  surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface shadow-popover";
+  surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-popover";
 
 const findItem = (items: readonly ComboboxItemData[], value: string | null | undefined) =>
   value == null ? null : (items.find((item) => item.value === value) ?? null);
@@ -93,7 +92,7 @@ const shortLabel = (item: ComboboxItemData) => item.selectedLabel ?? item.label;
 
 /**
  * Search and choose: a field you type into to narrow the list, then pick one item or, with
- * `multiple`, several items shown as chips. The popup matches `Select`: thick glass, rows with
+ * `multiple`, several items shown as chips. The popup matches `Select`: the veil, rows with
  * a check. `variant="segment"` puts it in an `InputGroup`, such as a country code before a
  * phone number.
  */
@@ -129,7 +128,6 @@ export function Combobox(props: ComboboxProps) {
         <BaseCombobox.Popup
           className={cn(popupClass, popupSurfaceClass(popupSurface), segment && "flex w-64 flex-col gap-1")}
         >
-          {popupSurface === "glass" && <LiquidGlass />}
           {segment && (
             <div className={cn(fieldBoxClass.base, fieldBoxClass.solid, fieldSizeClass[size], "shrink-0")}>
               <MagnifyingGlass aria-hidden className="relative shrink-0 text-text-secondary" />
@@ -219,11 +217,10 @@ export function Combobox(props: ComboboxProps) {
             fieldBoxClass.base,
             fieldBoxClass[surface],
             multiFieldClass[size],
-            "w-72 cursor-text data-disabled:cursor-not-allowed",
+            "w-60 cursor-text data-disabled:cursor-not-allowed",
             className,
           )}
         >
-          {surface === "glass" && <LiquidGlass />}
           <BaseCombobox.Value>
             {(value: ComboboxItemData[]) => (
               <>
@@ -231,7 +228,7 @@ export function Combobox(props: ComboboxProps) {
                   <BaseCombobox.Chip
                     key={item.value}
                     className={cn(
-                      "relative flex shrink-0 items-center rounded-full bg-overlay-ink-6 text-text-primary outline-none data-highlighted:bg-overlay-ink-12",
+                      "relative flex shrink-0 animate-pop-in items-center rounded-full bg-overlay-ink-6 text-text-primary outline-none data-highlighted:bg-overlay-ink-12",
                       chipClass[size],
                     )}
                   >
@@ -260,7 +257,6 @@ export function Combobox(props: ComboboxProps) {
           data-invalid={invalid ? "" : undefined}
           className={cn(fieldBoxClass.base, fieldBoxClass[surface], fieldSizeClass[size], "w-60", className)}
         >
-          {surface === "glass" && <LiquidGlass />}
           <MagnifyingGlass aria-hidden className="relative shrink-0 text-text-secondary" />
           <BaseCombobox.Input
             aria-label={ariaLabel}

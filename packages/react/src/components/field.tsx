@@ -51,15 +51,25 @@ export function FieldLabel({ className, ...props }: WithClass<ComponentProps<typ
 
 export function FieldDescription({ className, ...props }: WithClass<ComponentProps<typeof BaseField.Description>>) {
   const size = useContext(FieldSizeContext);
-  return <BaseField.Description className={cn(metaClass[size], "text-text-secondary", className)} {...props} />;
+  return <BaseField.Description className={cn(metaClass[size], "w-full text-text-secondary", className)} {...props} />;
 }
 
-export function FieldError({ className, ...props }: WithClass<ComponentProps<typeof BaseField.Error>>) {
+export function FieldError({ className, children, ...props }: WithClass<ComponentProps<typeof BaseField.Error>>) {
   const size = useContext(FieldSizeContext);
+  // Base UI keeps the message mounted through its exit (`data-ending-style`), so the row can close
+  // as it fades: the fields below move with it instead of jumping when the text appears.
   return (
     <BaseField.Error
-      className={cn("animate-[tab-panel-in_160ms_var(--ease-out-quint)]", metaClass[size], "text-text-danger", className)}
+      className={cn(
+        "motion-reveal data-ending-style:grid-rows-[0fr] data-starting-style:grid-rows-[0fr]",
+        "data-ending-style:opacity-0 data-starting-style:opacity-0",
+        metaClass[size],
+        "text-text-danger",
+        className,
+      )}
       {...props}
-    />
+    >
+      <span className="block">{children}</span>
+    </BaseField.Error>
   );
 }

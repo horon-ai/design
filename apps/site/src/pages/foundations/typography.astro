@@ -1,68 +1,95 @@
 ---
-import DocsLayout from "@/layouts/DocsLayout.astro";
+import {
+  DataTable,
+  DataTableCell,
+  DataTableHead,
+  DataTableRow,
+  DataTableTable,
+} from "@horon-ai/react";
 import { fontFamily, fontWeight, platforms, textStyles } from "@horon-ai/tokens";
 
+import T from "@/components/i18n/T.astro";
+import { fill } from "@/i18n/messages/fill";
+import { foundationsTypographyMessages as m } from "@/i18n/messages/foundations-typography";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+
+/** Each style rendered as itself. The class names stay literal so Tailwind sees them. */
+const specimenClass: Record<string, string> = {
+  "display-lg": "text-display-lg",
+  "display-md": "text-display-md",
+  "title-lg": "text-title-lg",
+  "title-md": "text-title-md",
+  "title-sm": "text-title-sm",
+  "body-lg": "text-body-lg",
+  "body-md": "text-body-md",
+  "body-sm": "text-body-sm",
+  "label-lg": "text-label-lg",
+  "label-md": "text-label-md",
+  "label-sm": "text-label-sm",
+  caption: "text-caption",
+  code: "text-code font-mono",
+};
+
 const styles = Object.entries(textStyles);
+const weights = Object.entries(fontWeight)
+  .map(([name, value]) => `${name} ${value}`)
+  .join(", ");
+const fontLine = fill(m.fontBody, {
+  sans: fontFamily.sans[0],
+  mono: fontFamily.mono[0],
+  weights,
+});
 ---
 
 <DocsLayout
-  title="Typography"
-  eyebrow="Foundations"
+  title={m.title}
   section="foundations"
-  description="Pretendard 하나와 코드용 Geist Mono를 씁니다. 글자 스타일은 13개이고, 같은 이름이 플랫폼마다 다른 크기를 가집니다."
+  description={m.description}
 >
-  <h2>서체와 굵기</h2>
-  <p>
-    본문 서체는 <code>{fontFamily.sans[0]}</code>, 코드는 <code>{fontFamily.mono[0]}</code>입니다. 굵기는
-    {" "}{Object.entries(fontWeight).map(([name, value]) => `${name} ${value}`).join(", ")} 네 가지만 씁니다.
-  </p>
+  <h2><T m={m.fontHeading} /></h2>
+  <p><T m={fontLine} /></p>
 
-  <h2>글자 스타일</h2>
-  <p>
-    크기와 줄 높이는 Figma Typography 보드(26:2)의 표를 그대로 옮겼습니다. 웹은 기본값이 Web이고, 데스크톱 앱은
-    <code>data-platform="desktop"</code>, 모바일 웹은 <code>data-platform="mobile"</code>을 상위 요소에 둡니다.
-    자간은 em 단위라 크기가 바뀌어도 비율이 유지됩니다.
-  </p>
-  <div class="not-prose mt-5 overflow-x-auto rounded-xl border border-border-default">
-    <table class="w-full text-left">
-      <thead class="bg-bg-subtle text-caption text-text-secondary">
-        <tr>
-          <th class="px-4 py-2.5 font-medium">스타일</th>
-          {platforms.map((platform) => <th class="px-4 py-2.5 font-medium">{platform}</th>)}
-          <th class="px-4 py-2.5 font-medium">굵기 · 자간</th>
-        </tr>
+  <h2><T m={m.stylesHeading} /></h2>
+  <p><T m={m.stylesBody} /></p>
+  <DataTable className="mt-5">
+    <DataTableTable>
+      <thead>
+        <DataTableRow>
+          <DataTableHead><T m={m.headStyle} /></DataTableHead>
+          {platforms.map((platform) => <DataTableHead>{platform}</DataTableHead>)}
+          <DataTableHead><T m={m.headWeight} /></DataTableHead>
+        </DataTableRow>
       </thead>
       <tbody>
         {
           styles.map(([name, style]) => (
-            <tr class="border-t border-border-default">
-              <td class="px-4 py-3">
-                <span
-                  class="block text-text-primary"
-                  style={`font-size: var(--text-${name}); line-height: var(--text-${name}--line-height); letter-spacing: var(--text-${name}--letter-spacing); font-weight: var(--text-${name}--font-weight);${style.family === "mono" ? " font-family: var(--font-mono);" : ""}`}
-                >
-                  {name}
-                </span>
-              </td>
+            <DataTableRow>
+              <DataTableCell>
+                <span class={specimenClass[name] ?? "text-body-md"}>{name}</span>
+              </DataTableCell>
               {platforms.map((platform) => (
-                <td class="px-4 py-3 font-mono text-caption whitespace-nowrap text-text-secondary">
-                  {style.size[platform]} / {style.lineHeight[platform]}
-                </td>
+                <DataTableCell>
+                  <span class="font-mono text-caption">
+                    {style.size[platform]} / {style.lineHeight[platform]}
+                  </span>
+                </DataTableCell>
               ))}
-              <td class="px-4 py-3 font-mono text-caption whitespace-nowrap text-text-secondary">
-                {fontWeight[style.weight]} · {style.tracking}em
-              </td>
-            </tr>
+              <DataTableCell>
+                <span class="font-mono text-caption">
+                  {fontWeight[style.weight]} · {style.tracking}em
+                </span>
+              </DataTableCell>
+            </DataTableRow>
           ))
         }
       </tbody>
-    </table>
-  </div>
+    </DataTableTable>
+  </DataTable>
 
-  <h2>규칙</h2>
+  <h2><T m={m.rulesHeading} /></h2>
   <ul>
-    <li>13개 스타일만 씁니다. 없는 크기가 필요하면 세 플랫폼 값을 함께 토큰으로 추가합니다.</li>
-    <li>본문 문단 뒤에는 빈 줄 대신 0.75em을 띄웁니다.</li>
-    <li>한국어는 단어 단위로 줄을 바꿉니다(<code>word-break: keep-all</code>).</li>
+    <li><T m={m.ruleStyles} /></li>
+    <li><T m={m.ruleParagraph} /></li>
+    <li><T m={m.ruleWrap} /></li>
   </ul>
 </DocsLayout>

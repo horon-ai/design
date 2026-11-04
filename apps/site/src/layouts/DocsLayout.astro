@@ -1,56 +1,81 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import DocsBreadcrumb from "@/components/site/DocsBreadcrumb";
+import DocsSidebar from "@/components/site/DocsSidebar";
+import DocsToc from "@/components/site/DocsToc";
 import Footer from "@/components/site/Footer.astro";
-import Sidebar from "@/components/site/Sidebar.astro";
-import Toc from "@/components/site/Toc.astro";
+import T from "@/components/i18n/T.astro";
+import { primaryNav } from "@/data/nav";
+import type { Localized } from "@/i18n";
+import { docsMessages } from "@/i18n/messages/docs";
+
+export type DocsSection = "get-started" | "foundations" | "components" | "mascot" | "updates";
 
 interface Props {
-  title: string;
-  description?: string;
-  section: string;
-  eyebrow?: string;
+  /** Page title. A plain string is Korean-only; `Localized` renders both. */
+  title: string | Localized;
+  description?: string | Localized;
+  section: DocsSection;
+  /** `false` leaves the table of contents empty; its column stays so the text does not move. */
   toc?: boolean;
-  breadcrumb?: { label: string; href: string }[];
+  /** Crumbs between the section and the page. Omit to get `Home / Section / Page`. */
+  breadcrumb?: { label: string | Localized; href: string }[];
 }
 
-const { title, description, section, eyebrow, toc = true, breadcrumb } = Astro.props;
-const sidebarSections = ["foundations", "components", "get-started", "updates"];
-const withSidebar = sidebarSections.includes(section);
-const showToc = toc && withSidebar;
-const contentWidth = withSidebar ? "max-w-[56.25rem]" : "max-w-[68.75rem]";
+const { title, description, section, toc = true, breadcrumb } = Astro.props;
+
+const both = (value: string | Localized): Localized =>
+  typeof value === "string" ? { ko: value, en: value } : value;
+
+const currentPath = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const sectionHref = `/${section}`;
+const sectionLabel = primaryNav.find((item) => item.href === sectionHref)?.label ?? both(section);
+
+// Every docs page gets the same header rows (breadcrumb, title, lead), so the
+// title sits at the same height on every page and nothing jumps on navigation.
+const crumbs = [
+  { label: docsMessages.home, href: "/" },
+  ...(breadcrumb
+    ? breadcrumb.map((item) => ({ label: both(item.label), href: item.href }))
+    : [
+        { label: sectionLabel, href: sectionHref },
+        ...(currentPath === sectionHref ? [] : [{ label: both(title), href: currentPath }]),
+      ]),
+];
 ---
 
 <BaseLayout title={title} description={description} footer={false}>
-  <div class:list={[withSidebar ? "docs-grid" : "block"]}>
-    {withSidebar && <Sidebar section={section} />}
-    <article class:list={[withSidebar ? "docs-main" : "docs-main-wide"]}>
-      <div class:list={["mx-auto w-full", contentWidth]}>
-        {
-          breadcrumb && breadcrumb.length > 0 && (
-            <nav
-              aria-label="현재 위치"
-              class="flex flex-wrap items-center gap-2 text-body-sm text-text-secondary"
-            >
-              {breadcrumb.map((item, index) => (
-                <Fragment>
-                  {index > 0 && <span aria-hidden="true">/</span>}
-                  <a href={item.href} class="transition-colors hover:text-text-primary">
-                    {item.label}
-                  </a>
-                </Fragment>
-              ))}
-            </nav>
-          )
-        }
-        {eyebrow && <p class="mt-3 text-body-sm text-text-secondary">{eyebrow}</p>}
-        <h1 class:list={[withSidebar ? "doc-title" : "doc-title doc-title-wide"]}>{title}</h1>
-        {description && <p class="doc-lead mt-4">{description}</p>}
+  <DocsSidebar section={section} currentPath={currentPath} client:load />
+
+  <div class="flex items-start lg:ml-60">
+    <article class="min-w-0 flex-1 px-4 pt-6 pb-16 md:px-6 md:pt-14 md:pb-24">
+      <div class="mx-auto w-full max-w-225">
+        <DocsBreadcrumb items={crumbs} client:load />
+
+        <header>
+          <h1 class="text-display-md text-text-primary text-balance">
+            {typeof title === "string" ? title : <T m={title} />}
+          </h1>
+          {
+            description && (
+              <p class="mt-4 max-w-3xl text-body-lg text-text-secondary">
+                {typeof description === "string" ? description : <T m={description} />}
+              </p>
+            )
+          }
+        </header>
+
         <div class="prose-docs mt-10">
           <slot />
         </div>
+
         <Footer />
       </div>
     </article>
-    {showToc && <Toc />}
+
+    {/* Reserved on every docs page from xl, filled or not, so the text column never shifts. */}
+    <aside class="hidden xl:sticky xl:top-19 xl:block xl:max-h-dvh xl:w-50 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pt-14 xl:pr-4 xl:pb-19">
+      {toc && <DocsToc client:load />}
+    </aside>
   </div>
 </BaseLayout>

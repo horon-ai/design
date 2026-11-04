@@ -135,11 +135,7 @@ class _HoronFileDropState extends State<HoronFileDrop> {
           if (widget.uploading)
             _UploadSpinner(label: theme.strings.uploading)
           else
-            Icon(
-              Icons.file_upload_outlined,
-              size: HoronFileDrop._iconSize,
-              color: colors.textSecondary,
-            ),
+            Icon(Icons.file_upload_outlined, size: HoronFileDrop._iconSize, color: colors.textSecondary),
           SizedBox(width: space.s2),
           Flexible(
             child: Text(
@@ -147,9 +143,7 @@ class _HoronFileDropState extends State<HoronFileDrop> {
               textAlign: TextAlign.center,
               style: theme.text.labelSm.copyWith(
                 fontSize: HoronFileDrop._labelFontSize,
-                height:
-                    HoronFileDrop._labelLineHeight /
-                    HoronFileDrop._labelFontSize,
+                height: HoronFileDrop._labelLineHeight / HoronFileDrop._labelFontSize,
                 fontWeight: HoronFontWeight.medium,
                 color: colors.textSecondary,
               ),
@@ -164,10 +158,7 @@ class _HoronFileDropState extends State<HoronFileDrop> {
     final Widget body = isGlass
         ? DecoratedBox(
             key: const Key('horon-file-drop-fill'),
-            decoration: BoxDecoration(
-              color: colors.glassClear,
-              borderRadius: radius,
-            ),
+            decoration: BoxDecoration(color: colors.glassClear, borderRadius: radius),
             child: HoronLiquidGlass(borderRadius: radius, child: content),
           )
         : DecoratedBox(
@@ -186,45 +177,30 @@ class _HoronFileDropState extends State<HoronFileDrop> {
           child: Opacity(
             opacity: inactive ? HoronFileDrop._disabledOpacity : 1,
             child: MouseRegion(
-              cursor: inactive
-                  ? SystemMouseCursors.basic
-                  : SystemMouseCursors.click,
+              cursor: inactive ? SystemMouseCursors.basic : SystemMouseCursors.click,
               child: Semantics(
                 button: true,
                 enabled: !inactive,
                 label: widget.label,
                 child: DragTarget<Object>(
-                  onWillAcceptWithDetails: (
-                    DragTargetDetails<Object> details,
-                  ) => !inactive,
-                  onMove: (DragTargetDetails<Object> details) =>
-                      _setDragging(true),
+                  onWillAcceptWithDetails: (DragTargetDetails<Object> details) => !inactive,
+                  onMove: (DragTargetDetails<Object> details) => _setDragging(true),
                   onLeave: (Object? data) => _setDragging(false),
                   onAcceptWithDetails: (DragTargetDetails<Object> details) {
                     _setDragging(false);
                     if (!inactive) widget.onDrop?.call(details.data);
                   },
-                  builder:
-                      (
-                        BuildContext context,
-                        List<Object?> candidate,
-                        List<Object?> rejected,
-                      ) {
-                        return GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: inactive ? null : widget.onTap,
-                          child: CustomPaint(
-                            key: ValueKey<String>(
-                              'horon-file-drop-border-$borderState',
-                            ),
-                            painter: _DropBorderPainter(
-                              color: borderColor,
-                              dashed: !solid,
-                            ),
-                            child: body,
-                          ),
-                        );
-                      },
+                  builder: (BuildContext context, List<Object?> candidate, List<Object?> rejected) {
+                    return GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: inactive ? null : widget.onTap,
+                      child: CustomPaint(
+                        key: ValueKey<String>('horon-file-drop-border-$borderState'),
+                        painter: _DropBorderPainter(color: borderColor, dashed: !solid),
+                        child: body,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -263,10 +239,7 @@ class _DropBorderPainter extends CustomPainter {
     for (final PathMetric metric in path.computeMetrics()) {
       double distance = 0;
       while (distance < metric.length) {
-        final double end = math.min(
-          distance + HoronFileDrop._dashLength,
-          metric.length,
-        );
+        final double end = math.min(distance + HoronFileDrop._dashLength, metric.length);
         canvas.drawPath(metric.extractPath(distance, end), paint);
         distance = end + HoronFileDrop._dashGap;
       }
@@ -274,8 +247,7 @@ class _DropBorderPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_DropBorderPainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.dashed != dashed;
+  bool shouldRepaint(_DropBorderPainter oldDelegate) => oldDelegate.color != color || oldDelegate.dashed != dashed;
 }
 
 /// 업로드 중 표시입니다. React `Spinner`의 10% 잉크 고리와 11% 두께를 옮겼습니다.
@@ -293,8 +265,7 @@ class _UploadSpinner extends StatelessWidget {
         width: HoronFileDrop._iconSize,
         height: HoronFileDrop._iconSize,
         child: CircularProgressIndicator(
-          strokeWidth:
-              HoronFileDrop._iconSize * HoronFileDrop._spinnerStrokeFraction,
+          strokeWidth: HoronFileDrop._iconSize * HoronFileDrop._spinnerStrokeFraction,
           color: colors.interactivePrimary,
           backgroundColor: colors.overlayInk10,
         ),

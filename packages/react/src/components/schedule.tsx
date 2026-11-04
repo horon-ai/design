@@ -18,7 +18,7 @@ export type PickerFieldProps = {
   /** Leading 16px icon; the Time field uses a clock. */
   icon?: ReactNode;
   /**
-   * `solid` (default) is the opaque surface field with a default border, `glass` the regular-glass field,
+   * `solid` (default) is the opaque surface field with a default border, `glass` the veil field,
    * `inset` the 4% ink field inside the schedule card.
    */
   surface?: "solid" | "glass" | "inset";
@@ -29,9 +29,9 @@ export type PickerFieldProps = {
 };
 
 const triggerSizeClass: Record<PickerFieldSize, string> = {
-  sm: "h-8 w-36 gap-1.5 px-2.5",
-  md: "h-10 w-40 gap-2 px-3",
-  lg: "h-12 w-44 gap-2.5 px-3.5",
+  sm: "h-8 w-36 gap-1.5 px-3",
+  md: "h-10 w-40 gap-2 px-3.5",
+  lg: "h-12 w-44 gap-2.5 px-5",
 };
 
 const triggerIconSizeClass: Record<PickerFieldSize, string> = {
@@ -40,16 +40,17 @@ const triggerIconSizeClass: Record<PickerFieldSize, string> = {
   lg: "[&>svg]:size-5",
 };
 
+/** The same text rungs as `Input` and `Select` (14/16/18), so a picker and a field line up in a form row. */
 const valueSizeClass: Record<PickerFieldSize, string> = {
   sm: "text-body-sm",
-  md: "text-body-sm",
-  lg: "text-body-md",
+  md: "text-body-md",
+  lg: "text-body-lg",
 };
 
 const caretSizeClass: Record<PickerFieldSize, string> = {
-  sm: "size-3",
-  md: "size-3.5",
-  lg: "size-4",
+  sm: "size-4",
+  md: "size-4",
+  lg: "size-5",
 };
 
 const popupSizeClass: Record<PickerFieldSize, string> = {
@@ -58,19 +59,20 @@ const popupSizeClass: Record<PickerFieldSize, string> = {
   lg: "p-2",
 };
 
+/** The same popup rows as `Select`, so the two pickers share one list style. */
 const itemSizeClass: Record<PickerFieldSize, string> = {
-  sm: "h-8 gap-2 px-2.5 text-label-md",
+  sm: "h-8 gap-2 px-2.5 text-label-sm",
   md: "h-10 gap-2.5 px-3 text-label-md",
-  lg: "h-12 gap-3 px-3.5 text-label-lg",
+  lg: "h-12 gap-3 px-4 text-label-lg",
 };
 
 const itemIndicatorSizeClass: Record<PickerFieldSize, string> = {
   sm: "[&_svg]:size-4",
-  md: "[&_svg]:size-4.5",
+  md: "[&_svg]:size-4",
   lg: "[&_svg]:size-5",
 };
 
-/** Figma `Time field` (Routine schedule 110:765): a 160px, 40px-high picker with body-sm value and a 14px caret. */
+/** Figma `Time field` (Routine schedule 110:765): a 160px picker on the same 32/40/48px and 14/16/18 text rungs as `Input`. */
 export function PickerField({
   items,
   icon,
@@ -86,17 +88,17 @@ export function PickerField({
       <BaseSelect.Trigger
         aria-label={ariaLabel}
         className={cn(
-          "relative flex cursor-pointer items-center rounded-md text-left motion-colors outline-none",
+          "relative flex cursor-pointer items-center rounded-md text-left motion-colors",
+          "focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
           triggerSizeClass[size],
           surface === "glass"
-            ? "group overflow-clip bg-glass-regular"
+            ? "group veil-field"
             : surface === "inset"
               ? "group bg-overlay-ink-4"
               : "group border border-border-default bg-bg-surface",
           className,
         )}
       >
-        {surface === "glass" && <LiquidGlass />}
         <span className={cn("relative flex shrink-0 text-text-secondary", triggerIconSizeClass[size])}>
           {icon ?? <Clock />}
         </span>
@@ -114,11 +116,10 @@ export function PickerField({
           <BaseSelect.Popup
             className={cn(
               "relative max-h-72 min-w-(--anchor-width) motion-popup overflow-y-auto rounded-xl outline-none",
-              surface === "solid" ? "border border-border-default bg-bg-surface shadow-popover" : "bg-glass-thick",
+              surface === "solid" ? "border border-border-default bg-bg-surface shadow-popover" : "veil-overlay",
               popupSizeClass[size],
             )}
           >
-            {surface !== "solid" && <LiquidGlass />}
             <BaseSelect.List className="relative flex flex-col gap-0.5">
               {items.map((item) => (
                 <BaseSelect.Item
@@ -131,7 +132,7 @@ export function PickerField({
                 >
                   <BaseSelect.ItemText className="min-w-0 flex-1">{item.label}</BaseSelect.ItemText>
                   <BaseSelect.ItemIndicator className={cn("flex shrink-0", itemIndicatorSizeClass[size])}>
-                    <Check />
+                    <Check className="animate-pop-in" />
                   </BaseSelect.ItemIndicator>
                 </BaseSelect.Item>
               ))}
@@ -194,7 +195,9 @@ export function WeekdayPicker({
           value={day.value}
           aria-label={day.name}
           className={cn(
-            "flex shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-secondary outline-none data-pressed:bg-interactive-primary data-pressed:text-text-inverse",
+            "flex shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-secondary",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
+            "data-pressed:bg-interactive-primary data-pressed:text-interactive-on-primary",
             weekdayToggleSizeClass[size],
           )}
         >
@@ -218,8 +221,8 @@ export type ScheduleCardProps = {
 };
 
 const cardSizeClass: Record<ControlSize, string> = {
-  sm: "w-85 gap-3 p-3.5",
-  md: "w-95 gap-3.5 p-4.5",
+  sm: "w-85 gap-3 p-4",
+  md: "w-95 gap-4 p-5",
   lg: "w-105 gap-4 p-5",
 };
 
@@ -231,7 +234,7 @@ const cardHeaderSizeClass: Record<ControlSize, string> = {
 
 const cardIconSizeClass: Record<ControlSize, string> = {
   sm: "size-4",
-  md: "size-4.5",
+  md: "size-4",
   lg: "size-5",
 };
 
@@ -243,17 +246,17 @@ const cardTitleSizeClass: Record<ControlSize, string> = {
 
 const nextRunSizeClass: Record<ControlSize, string> = {
   sm: "gap-1.5 px-2.5 py-2 text-label-md",
-  md: "gap-2 px-3 py-2.5 text-label-md",
+  md: "gap-2 px-3 py-2 text-label-md",
   lg: "gap-2.5 px-3.5 py-3 text-label-lg",
 };
 
 const nextRunIconSizeClass: Record<ControlSize, string> = {
   sm: "size-3.5",
   md: "size-4",
-  lg: "size-4.5",
+  lg: "size-5",
 };
 
-/** Figma `Routine schedule card` (110:765): a 380px card, 18px padding, 14px gaps, solid or thick glass. */
+/** Figma `Routine schedule card` (110:765): a 380px card, 20px padding, 16px gaps, solid or thick glass. */
 export function ScheduleCard({
   title,
   nextRun,
@@ -292,10 +295,10 @@ export function ScheduleCard({
   );
 }
 
-/** A captioned block inside the schedule card, such as "Repeat" or "Days". */
+/** A captioned block inside the schedule card, such as "Repeat" or "Days"; the caption-to-control gap is `Field`'s. */
 const sectionSizeClass: Record<ControlSize, string> = {
   sm: "gap-1",
-  md: "gap-1.5",
+  md: "gap-2",
   lg: "gap-2",
 };
 

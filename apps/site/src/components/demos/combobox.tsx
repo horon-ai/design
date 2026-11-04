@@ -26,7 +26,7 @@ function Examples({ surface }: { surface: "solid" | "glass" }) {
         surface={surface}
         multiple
         placeholder="Add bots"
-        defaultValue={["chief", "triage"]}
+        defaultValue={["chief"]}
       />
       <Combobox aria-label="Bots" items={bots} surface={surface} multiple placeholder="Add bots" />
       <Combobox aria-label="Bot" items={bots} surface={surface} invalid placeholder="Search a bot" />

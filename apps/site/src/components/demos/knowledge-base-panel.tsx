@@ -2,12 +2,10 @@ import { KnowledgeBasePanel, SourceRow } from "@horon-ai/react";
 import { EnvelopeSimple, FileText, Globe } from "@phosphor-icons/react";
 import { useState } from "react";
 
-import { Backdrop } from "../demo-backdrop";
-
 export default function KnowledgeBasePanelDemo() {
   const [dropped, setDropped] = useState<string[]>([]);
   return (
-    <Backdrop>
+    <div className="flex w-full justify-center">
       <div className="w-full max-w-200 overflow-x-auto">
         <KnowledgeBasePanel
           className="min-w-112"
@@ -57,6 +55,6 @@ export default function KnowledgeBasePanelDemo() {
           ))}
         </KnowledgeBasePanel>
       </div>
-    </Backdrop>
+    </div>
   );
 }

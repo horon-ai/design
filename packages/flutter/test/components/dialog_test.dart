@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
@@ -262,5 +263,66 @@ void main() {
 
     expect(await openWidth(1440), 420, reason: 'w-105');
     expect(await openWidth(320), 320 - 32, reason: 'max-w-[calc(100vw-2rem)]');
+  });
+
+  // 라우트가 `RawDialogRoute` 서브클래스가 되면서 생긴 동작입니다. 스크린 리더는
+  // `scopesRoute` 경계를 만나면 모달 밖을 읽지 않습니다.
+  testWidgets('the dialog page scopes the route for screen readers', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: Builder(
+            builder: (BuildContext context) => TextButton(
+              onPressed: () => showHoronDialog(context, title: const Text('다이얼로그 제목')),
+              child: const Text('열기'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('열기'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is Semantics && widget.properties.scopesRoute == true),
+      findsWidgets,
+      reason: 'RawDialogRoute가 페이지를 라우트 경계로 감쌉니다',
+    );
+  });
+
+  testWidgets('escape closes a dismissible dialog only', (WidgetTester tester) async {
+    Future<void> open({required bool dismissible}) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: horonTheme(Brightness.light),
+          home: Scaffold(
+            body: Builder(
+              builder: (BuildContext context) => TextButton(
+                onPressed: () => showHoronDialog(context, title: const Text('다이얼로그 제목'), dismissible: dismissible),
+                child: const Text('열기'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('열기'));
+      await tester.pumpAndSettle();
+      expect(find.text('다이얼로그 제목'), findsOneWidget);
+    }
+
+    await open(dismissible: true);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.text('다이얼로그 제목'), findsNothing, reason: 'Escape로 닫힙니다');
+
+    await open(dismissible: false);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.text('다이얼로그 제목'), findsOneWidget, reason: 'dismissible: false는 Escape로 닫히지 않습니다');
+
+    await tester.tapAt(const Offset(5, 5));
+    await tester.pumpAndSettle();
+    expect(find.text('다이얼로그 제목'), findsOneWidget, reason: '스크림을 눌러도 닫히지 않습니다');
   });
 }

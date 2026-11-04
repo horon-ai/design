@@ -39,7 +39,7 @@ export function MarketplaceCard({
   return (
     <div
       className={cn(
-        "relative flex flex-col gap-3 overflow-clip rounded-[20px] p-4",
+        "relative flex flex-col gap-3 overflow-clip rounded-xl p-4",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         className,
       )}
@@ -55,16 +55,16 @@ export function MarketplaceCard({
         </span>
         <span className="flex min-w-0 flex-col gap-0.5">
           <span className="truncate text-label-md text-text-primary">{name}</span>
-          {author && <span className="truncate text-[12px]/[16px] text-text-placeholder">{author}</span>}
+          {author && <span className="truncate text-caption text-text-secondary">{author}</span>}
         </span>
       </div>
-      {description && <p className="relative text-[13px]/[18px] text-text-secondary">{description}</p>}
+      {description && <p className="relative text-body-sm text-text-secondary">{description}</p>}
       {chips && chips.length > 0 && (
         <div className="relative flex flex-wrap gap-1.5">
           {chips.map((chip) => (
             <span
               key={chip.id}
-              className="inline-flex h-5.5 items-center gap-1 rounded-full bg-overlay-ink-6 px-2 text-label-sm text-text-secondary [&_svg]:size-2.75"
+              className="inline-flex h-5.5 items-center gap-1 rounded-full bg-overlay-ink-6 px-2 text-label-sm text-text-secondary [&_svg]:size-3"
             >
               {chip.icon}
               {chip.label}
@@ -72,18 +72,25 @@ export function MarketplaceCard({
           ))}
         </div>
       )}
-      <div className="relative flex items-center gap-1.5 border-t border-border-default pt-2.5">
+      <div className="relative flex items-center gap-1.5 border-t border-border-default pt-3">
         {score && (
           <>
-            <Star aria-hidden weight="fill" className="size-3.25 text-mascot-gold" />
+            <Star aria-hidden weight="fill" className="size-3.5 text-mascot-gold" />
             <span className="text-label-sm text-text-primary">{score}</span>
           </>
         )}
-        {installs && <span className="text-[12px]/[16px] text-text-placeholder">· {installs}</span>}
+        {score && installs && (
+          <span aria-hidden className="text-caption text-text-placeholder">
+            ·
+          </span>
+        )}
+        {installs && <span className="text-caption text-text-secondary">{installs}</span>}
         <span className="flex-1" />
-        <Button variant={surface === "glass" ? "glass" : "solid"} size="sm" onClick={onInstall}>
-          {installLabel}
-        </Button>
+        {onInstall && (
+          <Button variant="solid" size="sm" onClick={onInstall}>
+            {installLabel}
+          </Button>
+        )}
       </div>
     </div>
   );

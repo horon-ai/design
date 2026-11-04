@@ -5,7 +5,6 @@ import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { Calendar, type CalendarProps, type DateRange } from "./calendar";
 import { fieldBoxClass, fieldSizeClass, fieldTextClass, type InputSurface } from "./input";
-import { LiquidGlass } from "./liquid-glass";
 
 export type DateFieldSize = ControlSize;
 export type DateFieldSurface = InputSurface;
@@ -59,11 +58,11 @@ export function DateField({
           fieldBoxClass[surface],
           fieldSizeClass[size],
           "w-70 cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed",
+          surface !== "glass" && "hover:enabled:not-data-invalid:border-border-strong",
           triggerClassName,
         )}
         data-invalid={invalid ? "" : undefined}
       >
-        {surface === "glass" && <LiquidGlass />}
         <span className="relative flex shrink-0 text-text-secondary">
           <CalendarBlank />
         </span>
@@ -78,7 +77,7 @@ export function DateField({
         </span>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Positioner sideOffset={8} align="start">
+        <Popover.Positioner sideOffset={4} align="start" className="z-50 outline-none">
           <Popover.Popup className="motion-popup">
             <Calendar {...calendar} size={size} surface={surface === "glass" ? "glass" : "solid"} />
           </Popover.Popup>

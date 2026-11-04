@@ -3,7 +3,6 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
-import { LiquidGlass } from "./liquid-glass";
 
 export type InputSize = ControlSize;
 export type InputSurface = "glass" | "solid" | "solid-on-page";
@@ -36,12 +35,14 @@ export const fieldTextClass: Record<ControlSize, string> = {
 };
 
 export const fieldBoxClass = {
-  base: "motion-colors relative flex items-center overflow-clip rounded-md border",
-  glass: "border-0 bg-glass-regular",
+  /** The box is the focus target's container, so the ring is drawn on `:focus-within`, not on the inner input. */
+  base: "motion-colors relative flex items-center overflow-clip rounded-md border focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
+  /** The veil field (globals.css `.veil-field`): no liquid layers, so hosts render no `LiquidGlass`. */
+  glass: "veil-field has-[[data-disabled]]:opacity-60 has-[:disabled]:opacity-60",
   solid:
-    "border-border-default bg-bg-surface has-[[data-disabled]]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
+    "border-border-default bg-bg-surface has-[[data-disabled]]:border-border-default has-[:disabled]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[:disabled]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
   "solid-on-page":
-    "border-border-default bg-bg-default has-[[data-disabled]]:border-border-default has-[[data-disabled]]:bg-bg-subtle dark:has-[[data-disabled]]:bg-neutral-800 has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
+    "border-border-default bg-bg-default has-[[data-disabled]]:border-border-default has-[:disabled]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[:disabled]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
   text: "min-w-0 flex-1 bg-transparent text-text-primary outline-none placeholder:text-text-placeholder disabled:cursor-not-allowed disabled:text-text-disabled",
 } as const;
 
@@ -57,15 +58,9 @@ export function Input({
 }: InputProps) {
   return (
     <div
-      className={cn(
-        fieldBoxClass.base,
-        fieldBoxClass[surface],
-        fieldSizeClass[size],
-        className,
-      )}
+      className={cn(fieldBoxClass.base, fieldBoxClass[surface], fieldSizeClass[size], className)}
       data-invalid={invalid ? "" : undefined}
     >
-      {surface === "glass" && <LiquidGlass />}
       {icon && <span className="relative flex shrink-0 text-text-secondary">{icon}</span>}
       <BaseInput
         aria-invalid={invalid || undefined}

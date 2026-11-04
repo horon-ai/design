@@ -1,52 +1,47 @@
 ---
-import DocsLayout from "@/layouts/DocsLayout.astro";
+import { glass } from "@horon-ai/tokens";
+
 import CodeBlock from "@/components/site/CodeBlock.astro";
 import GlassDemo from "@/components/demo-wrappers/liquid-glass.astro";
-import { glass } from "@horon-ai/tokens";
+import T from "@/components/i18n/T.astro";
+import { fill } from "@/i18n/messages/fill";
+import { foundationsGlassMessages as m } from "@/i18n/messages/foundations-glass";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+
+const backdrop = fill(m.backdropItem, { blur: glass.blur, saturate: glass.saturate * 100 });
+const border = fill(m.borderItem, {
+  width: glass.rimWidth,
+  top: glass.rim.light.top,
+  mid: glass.rim.light.mid,
+  bottom: glass.rim.light.bottom,
+});
 
 const usage = `import { LiquidGlass } from "@horon-ai/react";
 
 <div className="relative overflow-clip rounded-xl bg-glass-thick p-5">
   <LiquidGlass />
-  <p className="relative">내용</p>
+  <p className="relative">Content</p>
 </div>`;
 ---
 
 <DocsLayout
-  title="Glass"
-  eyebrow="Foundations"
+  title={m.title}
   section="foundations"
-  description="web, desktop, iOS, Android가 같은 값으로 그리는 유리 표면입니다."
+  description={m.description}
 >
   <div class="not-prose mt-2"><GlassDemo /></div>
 
-  <h2>레이어</h2>
-  <p>
-    아래에서 위로 세 겹입니다. React의 <code>LiquidGlass</code>와 Flutter의 <code>HoronLiquidGlass</code>가
-    <code>@horon-ai/tokens</code>의 같은 값을 읽습니다.
-  </p>
+  <h2><T m={m.layersHeading} /></h2>
+  <p><T m={m.layersBody} /></p>
   <ul>
-    <li>배경: 뒤 내용을 {glass.blur}px 흐리게 하고 채도를 {glass.saturate * 100}%로 올립니다.</li>
-    <li>채움: <code>glass-clear</code>, <code>glass-regular</code>, <code>glass-thick</code> 중 하나입니다. React는 호스트가 칠하고 Flutter는 위젯이 칠합니다.</li>
-    <li>
-      테두리: 가장자리 안쪽 {glass.rimWidth}px 링입니다. 위가 가장 밝고({glass.rim.light.top}), 가운데에서 옅어졌다가
-      ({glass.rim.light.mid}) 아래에서 조금 다시 밝아집니다({glass.rim.light.bottom}). 다크 모드는 더 옅습니다.
-    </li>
+    <li><T m={backdrop} /></li>
+    <li><T m={m.fillItem} /></li>
+    <li><T m={border} /></li>
   </ul>
-  <p>
-    굴절, 혼합 모드, 높이에 따라 바뀌는 값은 쓰지 않습니다. Safari와 macOS 데스크톱 앱(WKWebView)은 배경을 휘게 할 수
-    없어서, 모든 플랫폼이 같은 모습이 되도록 모두가 그릴 수 있는 것만 남겼습니다. 그림자도 재질에 넣지 않고, 떠 있는 표면이
-    <code>shadow</code> 토큰으로 따로 정합니다.
-  </p>
-  <p>
-    호스트에는 자기 테두리를 두지 않습니다. 유리 테두리가 가장자리입니다. 오류 상태(<code>data-invalid</code>)에서는 테두리가
-    위험 색으로 바뀝니다.
-  </p>
-  <p>
-    투명도 줄이기 설정이 켜져 있거나 <code>backdrop-filter</code>를 지원하지 않으면 흐림 대신 <code>glass-fill-frost</code>
-    채움을 쓰고 테두리는 그대로 둡니다.
-  </p>
+  <p><T m={m.compatibilityBody} /></p>
+  <p><T m={m.hostBorderBody} /></p>
+  <p><T m={m.fallbackBody} /></p>
 
-  <h2>쓰는 법</h2>
+  <h2><T m={m.usageHeading} /></h2>
   <CodeBlock code={usage} title="tsx" />
 </DocsLayout>

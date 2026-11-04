@@ -1,93 +1,70 @@
 ---
-import DocsLayout from "@/layouts/DocsLayout.astro";
+import T from "@/components/i18n/T.astro";
 import CodeBlock from "@/components/site/CodeBlock.astro";
+import { ComponentCard } from "@/components/site/ComponentCard";
 import { componentCount } from "@/data/components";
-import { mascotImageUrl } from "@/data/mascots";
+import { externalLinks } from "@/data/nav";
+import { fill } from "@/i18n/messages/fill";
+import { getStartedMessages as m, getStartedSnippets as snippets } from "@/i18n/messages/get-started";
+import DocsLayout from "@/layouts/DocsLayout.astro";
 
-const install = `# 저장소 루트에서
-bun install
-bun run --filter @horon-ai/tokens build   # packages/tokens/theme.css 생성
-bun run site          # http://localhost:4321`;
+// The page follows the shape other design system docs share: pick a path,
+// install, explore the guides, then where to get help.
+const paths = [
+  { href: "/foundations", title: m.designPathTitle, description: m.designPathBody },
+  { href: "#install", title: m.developPathTitle, description: m.developPathBody },
+  { href: "/llms.txt", title: m.aiPathTitle, description: m.aiPathBody },
+];
 
-const consume = `import { Button, Card } from "@horon-ai/react";
-import { Plus } from "@phosphor-icons/react";
-import "@horon-ai/react/globals.css";
+const guides = [
+  { href: "/foundations", title: m.foundationsTitle, description: m.foundationsBody },
+  { href: "/foundations/tokens", title: m.tokensTitle, description: m.tokensBody },
+  { href: "/components", title: m.componentsTitle, description: fill(m.componentsBody, { count: componentCount }) },
+  { href: "/mascot", title: m.mascotTitle, description: m.mascotBody },
+];
 
-export function Example() {
-  return (
-    <Card title="Inbox Manager" description="6 emails need you.">
-      <Button icon={<Plus />}>New bot</Button>
-    </Card>
-  );
-}`;
-
-const apps = `bun run site          # 문서 사이트 → http://localhost:4321`;
+const github = externalLinks.find((link) => link.href.includes("github.com"))?.href ?? "https://github.com/horon-ai/design";
+const help = [
+  { href: github, title: m.githubTitle, description: m.githubBody },
+  { href: "/updates", title: m.updatesTitle, description: m.updatesBody },
+];
 ---
 
-<DocsLayout
-  title="Get Started"
-  section="get-started"
-  description="HORON 디자인 시스템은 하나의 토큰 소스에서 웹 컴포넌트와 문서 사이트의 값을 함께 냅니다. 아래 절차대로 설치하고, 토큰을 생성하고, 컴포넌트를 가져다 쓰면 됩니다."
->
-  <div class="not-prose flex items-start gap-5 rounded-xl bg-bg-subtle/40 px-5 py-5">
-    <img
-      src={mascotImageUrl("wave")}
-      alt="인사하는 Horon 마스코트"
-      width="88"
-      height="88"
-      class="size-[72px] shrink-0 object-contain sm:size-[88px]"
-    />
-    <div class="min-w-0">
-      <p class="text-[14px] font-semibold">처음 오셨나요?</p>
-      <p class="mt-1.5 text-[13px] leading-6 text-text-secondary">
-        설치 세 줄, 토큰 생성 한 줄, 그리고 컴포넌트 import 한 줄이면 시작할 수 있습니다.
-      </p>
-    </div>
+<DocsLayout title={m.title} description={m.description} section="get-started">
+  <h2><T m={m.pathsTitle} /></h2>
+  <div class="grid gap-4 sm:grid-cols-3">
+    {paths.map((path) => <ComponentCard href={path.href} title={path.title} description={path.description} />)}
   </div>
 
-  <h2>무엇인가요</h2>
-  <p>
-    HORON의 UI는 <strong>잉크와 종이, 하늘색 액센트, 리퀴드 글래스</strong>로 정리됩니다. 값은 모두
-    Figma <code>Horon</code> 파일의 변수에서 읽었고, 컴포넌트는 Base UI 위에 그 값만 참조해 만들었습니다.
-  </p>
-  <p>
-    토큰 정본은 <code>@horon-ai/tokens</code> 하나입니다. 이 패키지가 웹용 CSS
-    (<code>theme.css</code>)를 내기 때문에, 컴포넌트와 문서 사이트의 색·간격·타이포가
-    어긋나지 않습니다.
-  </p>
+  <h2 id="install"><T m={m.installTitle} /></h2>
+  <p><T m={m.installNote} /></p>
 
-  <h2>설치</h2>
-  <CodeBlock code={install} lang="bash" title="terminal" />
+  <h3><T m={m.stepRepoTitle} /></h3>
+  <p><T m={m.stepRepoBody} /></p>
+  <CodeBlock code={snippets.repo} lang="bash" title="terminal" />
 
-  <h2>웹에서 쓰기</h2>
-  <p>
-    엔트리에서 <code>@horon-ai/react/globals.css</code>를 한 번 불러오고, 컴포넌트는 배럴 또는 하위
-    경로로 가져옵니다. Tailwind CSS v4가 함께 들어오고, 아이콘은 <code>@phosphor-icons/react</code>를 씁니다.
-  </p>
-  <CodeBlock code={consume} title="example.tsx" />
+  <h3><T m={m.stepStylesTitle} /></h3>
+  <p><T m={m.stepStylesBody} /></p>
+  <CodeBlock code={snippets.styles} lang="tsx" title="main.tsx" />
 
-  <h2>앱에서 확인하기</h2>
-  <p>
-    저장소의 앱은 같은 컴포넌트 레이어를 소비합니다. 문서 사이트는 <code>apps/site</code>이고,
-    컴포넌트의 라이브 프리뷰도 이 사이트의 컴포넌트 페이지에 있습니다.
-  </p>
-  <CodeBlock code={apps} lang="bash" title="terminal" />
+  <h3><T m={m.stepUseTitle} /></h3>
+  <p><T m={m.stepUseBody} /></p>
+  <CodeBlock code={snippets.use} lang="tsx" title="example.tsx" />
 
-  <h2>패키지 경계</h2>
-  <p>
-    컴포넌트는 <code>@horon-ai/react</code> 하나에만 있고, 앱은 그것을 소비합니다. 정적 검사는
-    oxlint가 맡습니다.
-  </p>
-  <ul>
-    <li><code>packages/react</code> — <code>@horon-ai/react</code>, <code>@horon-ai/tokens</code>만</li>
-    <li><code>apps/site</code> — <code>@horon-ai/react</code>, <code>@horon-ai/tokens</code>만</li>
-    <li>스타일 값은 전부 <code>@horon-ai/tokens</code>의 <code>theme.css</code>에서 읽습니다.</li>
-  </ul>
+  <h3><T m={m.stepSiteTitle} /></h3>
+  <p><T m={m.stepSiteBody} /></p>
+  <CodeBlock code={snippets.site} lang="bash" title="terminal" />
 
-  <h2>다음 단계</h2>
-  <ul>
-    <li><a href="/foundations">Foundations</a> — 색, 글자, 간격, 반경, 유리 표면의 값과 규칙</li>
-    <li><a href="/components">Components</a> — {componentCount}개 컴포넌트의 프리뷰와 코드 예시</li>
-    <li><a href="/foundations/tokens">Design Token</a> — 값을 바꿀 때 고치는 파일과 생성 절차</li>
-  </ul>
+  <h2><T m={m.guidesTitle} /></h2>
+  <div class="grid gap-4 sm:grid-cols-2">
+    {guides.map((guide) => <ComponentCard href={guide.href} title={guide.title} description={guide.description} />)}
+  </div>
+
+  <h2><T m={m.boundariesTitle} /></h2>
+  <p><T m={m.boundariesBody} /></p>
+
+  <h2><T m={m.helpTitle} /></h2>
+  <div class="grid gap-4 sm:grid-cols-2">
+    {help.map((item) => <ComponentCard href={item.href} title={item.title} description={item.description} />)}
+  </div>
 </DocsLayout>

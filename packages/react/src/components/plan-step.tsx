@@ -40,24 +40,30 @@ export function PlanStep({
       <div className="flex shrink-0 flex-col items-center gap-1">
         <span
           className={cn(
-            "flex size-6 shrink-0 motion-colors items-center justify-center rounded-md text-label-sm",
+            "flex size-6 shrink-0 items-center justify-center rounded-md text-label-sm motion-colors",
             status === "done" && "bg-status-live text-interactive-on-primary",
             status === "failed" && "bg-bg-danger text-text-danger",
             status === "pending" && "border border-border-default text-text-secondary",
+            status === "running" && "bg-bg-subtle",
           )}
         >
-          {status === "done" && <Check aria-hidden className="size-3.5" />}
-          {status === "running" && <Spinner size={20} />}
-          {status === "failed" && "!"}
-          {status === "pending" && index}
+          <span key={status} className="flex animate-pop-in items-center justify-center">
+            {status === "done" && <Check aria-hidden className="size-3.5" />}
+            {status === "running" && <Spinner size={20} />}
+            {status === "failed" && "!"}
+            {status === "pending" && index}
+          </span>
         </span>
         {!last && (
           <span
-            className={cn("w-0.5 flex-1 motion-colors rounded-[1px]", status === "done" ? "bg-status-live" : "bg-border-default")}
+            className={cn(
+              "w-0.5 flex-1 rounded-[1px] motion-colors",
+              status === "done" ? "bg-status-live" : "bg-border-default",
+            )}
           />
         )}
       </div>
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5 pt-0.5 pb-4.5">
+      <div className="flex min-w-0 flex-1 flex-col pt-0.5 pb-4.5">
         <div className="flex items-start gap-3">
           <p
             className={cn(
@@ -71,7 +77,7 @@ export function PlanStep({
             <span className="shrink-0 text-caption text-text-secondary">{elapsed}</span>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1.5">
           {description && <span className="text-body-sm text-text-secondary">{description}</span>}
           {tool && (
             <span className="rounded-xs bg-bg-subtle px-2 py-0.5 font-mono text-label-md text-text-secondary">
@@ -79,17 +85,24 @@ export function PlanStep({
             </span>
           )}
         </div>
-        {status === "failed" && error && <p className="text-body-sm text-text-danger">{error}</p>}
-        {status === "failed" && onRetry && (
-          <button
-            type="button"
-            onClick={onRetry}
-            className="flex w-fit motion-press cursor-pointer items-center gap-1.5 rounded-[10px] border border-border-default bg-bg-surface px-3 py-[7px] text-label-md text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
-          >
-            <ArrowClockwise aria-hidden className="size-3.5" />
-            Retry from here
-          </button>
-        )}
+        <div className="motion-reveal" data-collapsed={status !== "failed" || undefined}>
+          <div>
+            <div className="mt-1.5 flex flex-col gap-1.5">
+              <p className="text-body-sm text-text-danger">{error}</p>
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  inert={status !== "failed"}
+                  className="flex h-7.5 w-fit motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+                >
+                  <ArrowClockwise aria-hidden className="size-3.5" />
+                  Retry from here
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
