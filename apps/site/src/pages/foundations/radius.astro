@@ -12,7 +12,7 @@ import DocsLayout from "@/layouts/DocsLayout.astro";
   description={m.description}
 >
   <h2><T m={m.radiusHeading} /></h2>
-  <div class="mt-5 flex flex-wrap gap-4">
+  <div class="mt-5 flex flex-wrap gap-4 rounded-xl border border-border-default bg-bg-subtle p-5">
     {
       Object.entries(radius).map(([name, value]) => (
         <div class="flex flex-col items-center gap-2">
@@ -33,7 +33,7 @@ import DocsLayout from "@/layouts/DocsLayout.astro";
   <div class="mt-5 grid gap-6 sm:grid-cols-2">
     {
       Object.entries(shadow).map(([name, value]) => (
-        <div class="rounded-xl bg-bg-subtle p-8">
+        <div class="rounded-xl border border-border-default bg-bg-subtle p-8">
           <div
             class="flex h-24 items-center justify-center rounded-xl bg-bg-surface"
             style={`box-shadow: ${value}`}

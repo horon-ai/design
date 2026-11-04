@@ -1,0 +1,125 @@
+name: Security
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+  schedule:
+    # 매주 월요일 03:00 UTC
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  workflow-lint:
+    name: Workflow lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          # actionlint v1.7.12의 go.mod가 go 1.25.0을 요구합니다.
+          go-version: "1.25"
+          # 루트에 go.sum이 없어 setup-go 기본 모듈 캐시가 무효입니다.
+          cache: false
+
+      - name: Install actionlint
+        run: go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+
+      - name: Run actionlint
+        run: '"$(go env GOPATH)/bin/actionlint" -no-color'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+
+      - name: Run zizmor
+        run: uvx --from zizmor==1.32.0 zizmor --format=github .github/workflows
+
+  # dependency-review-action은 쓰지 않습니다. GitHub 의존성 그래프의 지원 생태계에 Bun이
+  # 없어 이 저장소의 유일한 잠금 파일인 bun.lock을 읽지 못합니다(PR에서 사실상 무동작).
+  # 저장소가 package-lock.json을 쓰게 되면 dependency-review로 되돌립니다.
+  dependency-audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          # package.json의 packageManager(bun@1.4.3)와 맞춥니다.
+          bun-version: 1.4.3
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # bun audit는 취약점이 있으면 종료 코드 1을 냅니다. 현재 astro·sharp·zod 등에
+      # high/critical 취약점이 남아 있어(치명 1, 높음 6) 차단하면 push·PR이 상시
+      # 실패하므로 이 스텝만 continue-on-error로 보고 전용으로 둡니다. 다음 스텝의
+      # `test -s audit.json`은 그대로 실패하므로 도구가 죽어 빈 출력을 남기면 잡이
+      # 빨간불이 됩니다. 메이저 업그레이드로 0건이 되면 이 줄을 지워 차단으로 전환합니다.
+      - name: Run bun audit
+        continue-on-error: true
+        run: bun audit --audit-level=high --json > audit.json
+
+      - name: Check audit output
+        run: test -s audit.json
+
+      - name: Summarize audit
+        run: |
+          jq -r '
+            [to_entries[] | .key as $pkg | .value[] | {pkg: $pkg, severity: .severity, title: .title}] as $all
+            | if ($all | length) == 0 then "취약점 없음"
+              else
+                "| 패키지 | 심각도 | 권고 |\n| --- | --- | --- |\n"
+                + ($all | map("| `\(.pkg)` | \(.severity) | \(.title) |") | join("\n"))
+                + "\n\n총 \($all | length)건: "
+                + ($all | group_by(.severity) | map("\(.[0].severity) \(length)건") | join(", "))
+              end
+          ' audit.json >> "$GITHUB_STEP_SUMMARY"
+
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # 포크 PR에서는 GITHUB_TOKEN이 읽기 전용이라 security-events: write 업로드가 실패해
+    # 외부 기여 PR이 통째로 막힙니다. 그래서 포크 PR은 건너뛰고, main·dev push와
+    # 주간 schedule 분석이 같은 코드를 사후에 덮습니다.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+      security-events: write # CodeQL SARIF 결과를 코드 스캐닝에 업로드합니다.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # languages·queries·build-mode는 init에서만 받습니다.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+          build-mode: none
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3

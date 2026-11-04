@@ -1,15 +1,21 @@
 ---
-import { HoronIcon, HoronWordmark } from "@horon-ai/react";
+import { HoronIcon, HoronWordmark, LiquidGlass } from "@horon-ai/react";
 
-import T from "@/components/i18n/T.astro";
 import { SiteHeaderBar } from "@/components/shell/SiteHeader";
 import { shellMessages as m } from "@/components/shell/messages";
 
 const pathname = Astro.url.pathname;
 ---
 
-<header class="fixed inset-x-0 top-0 z-50 border-b border-border-default bg-bg-default">
-  <div class="flex h-16 items-center gap-3 px-4 md:h-19 md:px-6">
+{/* The same glass bar as the Horon website: `LiquidGlass` owns the rim and the
+ * filtered backdrop, the host keeps the regular fill. Sticky, so the bar stays
+ * in flow and no body padding has to compensate for it. The top padding is the
+ * notch inset; the height token below is `--site-header-h`. */}
+<header
+  class="sticky top-0 z-50 overflow-x-clip border-b border-glass-rim-strong bg-glass-regular pt-[env(safe-area-inset-top)]"
+>
+  <LiquidGlass />
+  <div class="site-shell relative flex h-16 items-center gap-3 lg:h-18">
     {/* The brand link stays in Astro: it is plain navigation with no client
      * state, and the library has no lockup component that carries the wordmark. */}
     <a
@@ -18,8 +24,7 @@ const pathname = Astro.url.pathname;
       class="flex shrink-0 items-center gap-2.5 text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
     >
       <HoronIcon size={24} />
-      <HoronWordmark />
-      <span class="hidden text-body-sm text-text-secondary sm:inline"><T m={m.brandSuffix} /></span>
+      <HoronWordmark title="" aria-hidden="true" className="h-5 w-auto lg:h-6" />
     </a>
     <SiteHeaderBar pathname={pathname} client:load />
   </div>

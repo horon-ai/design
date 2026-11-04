@@ -5,25 +5,35 @@
 @source "../../src/**/*.{astro,ts,tsx}";
 
 @layer base {
-  /* The library only forces `scroll-behavior` back to auto under reduced motion; the smooth default for in-page anchors has no component owner. */
-  html {
-    scroll-behavior: smooth;
+  /* The shell's one measured value: the sticky header's height including the
+   * top safe-area inset. Anything that must clear the header (hash targets,
+   * sticky rails) reads this instead of repeating a pixel value. */
+  :root {
+    --site-header-h: calc(4rem + env(safe-area-inset-top));
   }
 
-  /* The header is fixed (h-16, md:h-19) and no library utility applies to the shared body. */
-  body {
-    padding-top: 4rem;
-  }
-
-  @media (min-width: 768px) {
-    body {
-      padding-top: 4.75rem;
+  @media (min-width: 1024px) {
+    :root {
+      --site-header-h: calc(4.5rem + env(safe-area-inset-top));
     }
   }
 
-  /* A hash target must clear the fixed header; scrolling is a document concern, not a component's. */
+  /* The library only forces `scroll-behavior` back to auto under reduced motion; the smooth default for in-page anchors has no component owner. */
+  html {
+    scroll-behavior: smooth;
+    /* iOS inflates text in landscape when a form control or a wide block is
+     * present; the shell keeps the designed measure instead. */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* The header is sticky, so it stays in flow and the body needs no
+   * compensating padding: the first section starts below the bar at every
+   * width. `--site-header-h` is what fixed-position rails and hash targets
+   * read instead. */
+
+  /* A hash target must clear the sticky header plus one gutter step; scrolling is a document concern, not a component's. */
   :target {
-    scroll-margin-top: 6rem;
+    scroll-margin-top: calc(var(--site-header-h) + 1.25rem);
   }
 
   /* The library never paints selection, and the browser default blue is not a token colour. */
@@ -34,6 +44,47 @@
 }
 
 @layer components {
+  /* The page measure shared by the header row, the footer and page-level
+   * bands: 75rem wide, centred, with a gutter that grows on wider screens.
+   * Every gutter adds the horizontal safe-area insets so landscape iPhones and
+   * rounded-corner devices never clip text against the display edge. */
+  .site-shell {
+    width: 100%;
+    max-width: 75rem;
+    margin-inline: auto;
+    padding-inline: calc(1.25rem + env(safe-area-inset-left)) calc(1.25rem + env(safe-area-inset-right));
+  }
+
+  @media (min-width: 768px) {
+    .site-shell {
+      padding-inline: calc(1.5rem + env(safe-area-inset-left)) calc(1.5rem + env(safe-area-inset-right));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site-shell {
+      padding-inline: calc(2.5rem + env(safe-area-inset-left)) calc(2.5rem + env(safe-area-inset-right));
+    }
+  }
+
+  /* Vertical rhythm for a top-level band of the page. Components inside keep
+   * their own gaps; this only owns the distance between bands. */
+  .site-band {
+    padding-block: 4rem;
+  }
+
+  @media (min-width: 1024px) {
+    .site-band {
+      padding-block: 6rem;
+    }
+  }
+
+  /* The footer's own band: its bottom padding clears the home indicator so the
+   * last link row stays reachable above it. */
+  .site-footer {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
   /* No library component is a demo canvas; the translucent tint is a token mix that no utility expresses. */
   .demo-stage {
     display: flex;

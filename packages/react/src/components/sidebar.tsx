@@ -404,7 +404,7 @@ export type SidebarProjectProps = {
   onOpenChange?: (open: boolean) => void;
   /**
    * The project's "More" control, such as a `MenuTrigger` whose render target is
-   * `<SidebarProjectMore />`. It replaces the chevron while the row is hovered or its menu is open.
+   * `<SidebarProjectMore />`. It replaces the chevron while the project is open.
    */
   actions?: ReactNode;
   /** Chats and documents in the project, shown in a `SidebarTree` when open. */
@@ -414,8 +414,8 @@ export type SidebarProjectProps = {
 
 /**
  * Figma sidebar project row (88:848, Menu=Project 314:12407): tile, name and a
- * 14px chevron (down when open). Hovering the row, or opening its menu, shows the
- * 16px "More" button in place of the chevron, on a 6% ink row.
+ * 14px chevron (down when open). An open project shows the 16px "More" button in
+ * place of the chevron, on a 6% ink row; a collapsed project keeps the chevron.
  */
 export function SidebarProject({
   icon,
@@ -429,11 +429,16 @@ export function SidebarProject({
   className,
 }: SidebarProjectProps) {
   const hasChildren = Children.count(children) > 0;
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
+  const isOpen = open ?? uncontrolledOpen;
+  const handleOpenChange = (next: boolean) => {
+    setUncontrolledOpen(next);
+    onOpenChange?.(next);
+  };
   return (
     <Collapsible.Root
-      defaultOpen={defaultOpen}
-      open={open}
-      onOpenChange={onOpenChange}
+      open={isOpen}
+      onOpenChange={handleOpenChange}
       className={cn("flex flex-col gap-0.5", className)}
     >
       <div
@@ -458,8 +463,8 @@ export function SidebarProject({
             <span
               aria-hidden
               className={cn(
-                "flex size-3.5 shrink-0 opacity-100 transition-opacity duration-150 [&>svg]:size-3.5",
-                actions !== undefined && "group-hover/project:opacity-0 group-has-data-popup-open/project:opacity-0",
+                "flex size-3.5 shrink-0 [&>svg]:size-3.5",
+                actions !== undefined && isOpen && "invisible",
               )}
             >
               <CaretRight className="transition-transform duration-200 ease-out-quint group-data-panel-open/trigger:rotate-90" />
@@ -467,7 +472,12 @@ export function SidebarProject({
           )}
         </Collapsible.Trigger>
         {actions !== undefined && (
-          <span className="absolute right-2.5 flex opacity-0 transition-opacity duration-150 group-focus-within/project:opacity-100 group-hover/project:opacity-100 group-has-data-popup-open/project:opacity-100">
+          <span
+            className={cn(
+              "absolute right-2.5 flex",
+              !hasChildren || isOpen ? "visible" : "invisible",
+            )}
+          >
             {actions}
           </span>
         )}

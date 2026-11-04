@@ -12,6 +12,8 @@ export interface ComponentCardProps {
   children?: ReactNode;
   /** Layout only: grid/flex placement on the card wrapper. */
   className?: string;
+  /** Card material. `frost` is the home board's glass; `solid` stays the docs default. */
+  surface?: "glass" | "frost" | "solid";
 }
 
 /**
@@ -43,13 +45,21 @@ function LocalizedText({ m }: { m: Localized }) {
  * an anchor is invalid HTML, so the parser closes the outer one and the island
  * below it hydrates empty (React error #418).
  */
-export function ComponentCard({ href, title, description, children, className }: ComponentCardProps) {
+export function ComponentCard({
+  href,
+  title,
+  description,
+  children,
+  className,
+  surface,
+}: ComponentCardProps) {
   return (
     <div className={["relative h-full", className].filter(Boolean).join(" ")}>
       <Card
         interactive
         title={<LocalizedText m={title} />}
         description={<LocalizedText m={description} />}
+        surface={surface}
         className="h-full"
       >
         {children}

@@ -3,6 +3,7 @@ import { Badge, Button, Card } from "@horon-ai/react";
 import { createElement, Fragment, type ReactElement, type ReactNode } from "react";
 
 import T from "@/components/i18n/T.astro";
+import { ComponentCard } from "@/components/site/ComponentCard";
 import { componentCount, components, componentGroups, componentsInGroup } from "@/data/components";
 import { mascotImageUrl, mascotSpec } from "@/data/mascots";
 import type { Localized } from "@/i18n";
@@ -59,7 +60,7 @@ function linkTo(href: string): ReactElement {
 
 <BaseLayout>
   <section class="relative overflow-hidden">
-    <div class="mx-auto w-full max-w-275 px-4 py-20 md:px-6 md:py-28">
+    <div class="site-shell site-band">
       <p class="text-body-sm text-text-secondary"><T m={m.eyebrow} /></p>
       <h1 class="mt-6 max-w-4xl text-display-lg text-balance text-text-primary">
         <T m={m.titleLine1} /><br /><T m={m.titleLine2} />
@@ -102,7 +103,7 @@ function linkTo(href: string): ReactElement {
   </section>
 
   <section class="border-t border-border-default">
-    <div class="mx-auto w-full max-w-275 px-4 py-20 md:px-6">
+    <div class="site-shell site-band">
       <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
         <div>
           <p class="text-body-sm text-text-secondary"><T m={m.principlesEyebrow} /></p>
@@ -131,7 +132,7 @@ function linkTo(href: string): ReactElement {
   </section>
 
   <section class="border-t border-border-default">
-    <div class="mx-auto w-full max-w-275 px-4 py-20 md:px-6">
+    <div class="site-shell site-band">
       <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p class="text-body-sm text-text-secondary"><T m={m.componentsEyebrow} /></p>
@@ -185,7 +186,7 @@ function linkTo(href: string): ReactElement {
   </section>
 
   <section class="border-t border-border-default">
-    <div class="mx-auto w-full max-w-275 px-4 py-20 md:px-6">
+    <div class="site-shell site-band">
       <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
         <div>
           <p class="text-body-sm text-text-secondary"><T m={m.mascotEyebrow} /></p>
@@ -220,20 +221,20 @@ function linkTo(href: string): ReactElement {
   </section>
 
   <section class="border-t border-border-default">
-    <div class="mx-auto w-full max-w-275 px-4 py-20 md:px-6">
+    <div class="site-shell site-band">
       <div class="grid gap-4 md:grid-cols-3">
         {
           entryCards.map((card) => (
-            <Card
-              interactive
-              render={linkTo(card.href)}
-              title={localized(card.title)}
-              description={localized(card.body)}
+            <ComponentCard
+              href={card.href}
+              title={card.title}
+              description={card.body}
+              surface="frost"
             >
               <span class="text-caption text-text-secondary">
                 <T m={m.openCard} />
               </span>
-            </Card>
+            </ComponentCard>
           ))
         }
       </div>
