@@ -7,6 +7,7 @@ void main() {
   Future<void> pumpGroup(
     WidgetTester tester, {
     Brightness brightness = Brightness.light,
+    HoronInputSurface surface = HoronInputSurface.glass,
     bool prefix = false,
     bool suffix = false,
     bool invalid = false,
@@ -22,8 +23,9 @@ void main() {
             child: SizedBox(
               width: width,
               child: HoronInputGroup(
-                prefix: prefix ? const Text('+82') : null,
-                suffix: suffix ? const Icon(Icons.attach_money) : null,
+                surface: surface,
+                prefix: prefix ? const HoronInputGroupSegment(child: Text('+82')) : null,
+                suffix: suffix ? const HoronInputGroupSegment(child: Icon(Icons.attach_money)) : null,
                 invalid: invalid,
                 disabled: disabled,
                 hintText: 'Hint',
@@ -48,10 +50,12 @@ void main() {
 
   /// 상자의 테두리 색입니다. 유리 상자는 앞쪽 장식을 읽습니다.
   Color borderOf(WidgetTester tester) {
-    final DecoratedBox box = tester
-        .widgetList<DecoratedBox>(find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(DecoratedBox)))
-        .firstWhere((DecoratedBox box) => box.position == DecorationPosition.foreground);
-    return (box.decoration as BoxDecoration).border!.top.color;
+    final Finder glass = find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronLiquidGlass));
+    if (glass.evaluate().isNotEmpty) {
+      return tester.widget<HoronLiquidGlass>(glass).edgeColor ?? Colors.transparent;
+    }
+    final AnimatedContainer filled = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
+    return (filled.decoration! as BoxDecoration).border!.top.color;
   }
 
   /// 대상 상자의 채움이 글래스 엔진 한 겹인지 확인합니다.

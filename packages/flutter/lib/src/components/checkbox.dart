@@ -8,11 +8,43 @@ import '../tokens/horon_tokens.g.dart';
 /// `border-[1.5px]` — 선택 전 상자의 테두리 두께입니다.
 const double _borderWidth = 1.5;
 
-/// `[&_svg]:size-3.5` — 체크·빼기 아이콘 14px입니다.
-const double _indicatorSize = 14;
+/// `checkbox.tsx`의 `CheckboxSize`입니다.
+enum HoronCheckboxSize {
+  /// `size="sm"` — 18px 상자, 5px 반경, `body-sm`, 아이콘 12px.
+  sm,
 
-/// `rounded-[5px]` — `size="sm"` 상자의 반경입니다. 토큰 단계에 없는 값이라 간격 단위로 계산합니다.
-const double _smallRadiusUnits = 1.25;
+  /// `size="md"` — 20px 상자, 6px 반경, `body-md`, 아이콘 14px. 기본값입니다.
+  md,
+
+  /// `size="lg"` — 24px 상자, 3px 반경, `body-lg`, 아이콘 16px.
+  lg,
+}
+
+typedef _CheckboxMetrics = ({double side, double radius, double gap, double indicator, TextStyle textStyle});
+
+_CheckboxMetrics _metricsOf(HoronCheckboxSize size, HoronThemeData theme) => switch (size) {
+  HoronCheckboxSize.sm => (
+    side: theme.space.step(4.5),
+    radius: theme.space.step(1.25),
+    gap: theme.space.s2,
+    indicator: 12,
+    textStyle: theme.text.bodySm,
+  ),
+  HoronCheckboxSize.md => (
+    side: theme.space.step(5),
+    radius: theme.radius.xs,
+    gap: theme.space.s2_5,
+    indicator: 14,
+    textStyle: theme.text.bodyMd,
+  ),
+  HoronCheckboxSize.lg => (
+    side: theme.space.step(6),
+    radius: theme.space.step(0.75),
+    gap: theme.space.s3,
+    indicator: 16,
+    textStyle: theme.text.bodyLg,
+  ),
+};
 
 /// `has-[[data-disabled]]:opacity-40`입니다.
 const double _disabledOpacity = 0.4;
@@ -24,7 +56,14 @@ const double _disabledOpacity = 0.4;
 /// 쓰는 18px 상자(192:9046)입니다.
 class HoronCheckbox extends StatefulWidget {
   /// 체크박스를 만듭니다.
-  const HoronCheckbox({super.key, this.value, this.onChanged, this.label, this.small = false, this.enabled = true});
+  const HoronCheckbox({
+    super.key,
+    this.value,
+    this.onChanged,
+    this.label,
+    this.size = HoronCheckboxSize.md,
+    this.enabled = true,
+  });
 
   /// 선택 여부입니다. null이면 부분 선택(indeterminate)입니다.
   final bool? value;
@@ -35,8 +74,8 @@ class HoronCheckbox extends StatefulWidget {
   /// 상자 오른쪽 라벨입니다.
   final String? label;
 
-  /// React `size="sm"`(18px 상자)에 대응합니다. 기본값은 `size="md"`(20px)입니다.
-  final bool small;
+  /// 크기입니다. 기본값은 [HoronCheckboxSize.md]입니다.
+  final HoronCheckboxSize size;
 
   /// 거짓이면 줄 전체가 `opacity-40`으로 흐려지고 바뀌지 않습니다.
   final bool enabled;
@@ -66,9 +105,9 @@ class _HoronCheckboxState extends State<HoronCheckbox> {
     final bool interactive = widget.enabled && widget.onChanged != null;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    // size-5 rounded-xs(6) / size-4.5 rounded-[5px].
-    final double side = widget.small ? space.step(4.5) : space.step(5);
-    final double radius = widget.small ? space.step(_smallRadiusUnits) : theme.radius.xs;
+    final _CheckboxMetrics metrics = _metricsOf(widget.size, theme);
+    final double side = metrics.side;
+    final double radius = metrics.radius;
 
     final Color fill = _marked
         ? (_hovered && interactive ? colors.interactivePrimaryHover : colors.interactivePrimary)
@@ -98,7 +137,7 @@ class _HoronCheckboxState extends State<HoronCheckbox> {
                     Transform.scale(scale: scale, child: child),
                 child: Icon(
                   widget.value == null ? Icons.remove : Icons.check,
-                  size: _indicatorSize,
+                  size: metrics.indicator,
                   color: colors.interactiveOnPrimary,
                 ),
               ),
@@ -108,7 +147,7 @@ class _HoronCheckboxState extends State<HoronCheckbox> {
 
     final Widget content = Row(
       mainAxisSize: MainAxisSize.min,
-      spacing: space.s2_5,
+      spacing: metrics.gap,
       children: <Widget>[
         _FocusOutline(
           visible: _focused && interactive,
@@ -120,7 +159,7 @@ class _HoronCheckboxState extends State<HoronCheckbox> {
         ),
         if (widget.label != null)
           Flexible(
-            child: Text(widget.label!, style: theme.text.bodyMd.copyWith(color: colors.textPrimary)),
+            child: Text(widget.label!, style: metrics.textStyle.copyWith(color: colors.textPrimary)),
           ),
       ],
     );

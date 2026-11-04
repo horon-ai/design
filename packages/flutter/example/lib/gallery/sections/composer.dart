@@ -26,6 +26,17 @@ class HoronComposerGallerySection extends StatelessWidget {
             ),
           ),
           _Sample(
+            label: '유리 (glass)',
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: _maxWidth),
+              child: HoronComposer(
+                surface: HoronComposerSurface.glass,
+                onAttach: () {},
+                onVoice: () {},
+              ),
+            ),
+          ),
+          _Sample(
             label: '글이 있는 입력',
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: _maxWidth),

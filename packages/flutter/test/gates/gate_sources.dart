@@ -167,7 +167,55 @@ Map<String, Set<String>> parseReactUnionTypes(String source) {
   for (final match in array.allMatches(code)) {
     result[match.group(1)!] = _literalValues(match.group(2)!);
   }
+  // Aliases: `export type InputSize = ControlSize;` and
+  // `export type SwitchSize = ControlSize | "compact";`. The shared `ControlSize`
+  // lives in `../react/src/lib/size.ts`, so resolve it before reading components.
+  final vocabularies = <String, Set<String>>{..._sharedReactVocabularies(), ...result};
+  final alias = RegExp(r'export\s+type\s+([A-Za-z_]\w*)\s*=\s*([^;]+);');
+  for (final match in alias.allMatches(code)) {
+    final name = match.group(1)!;
+    if (result.containsKey(name)) continue;
+    final terms = match.group(2)!.split('|').map((term) => term.trim()).toList();
+    final values = <String>{};
+    var resolvable = true;
+    for (final term in terms) {
+      if (RegExp(r'^"[^"\n]*"$').hasMatch(term) || RegExp(r"^'[^'\n]*'$").hasMatch(term)) {
+        values.add(normalizeVariantKey(term.substring(1, term.length - 1)));
+      } else if (RegExp(r'^[A-Za-z_]\w*$').hasMatch(term)) {
+        final resolved = vocabularies[term];
+        if (resolved == null) {
+          resolvable = false;
+          break;
+        }
+        values.addAll(resolved);
+      } else {
+        // `Omit<…>`, `Record<…>`, object types: not a closed vocabulary.
+        resolvable = false;
+        break;
+      }
+    }
+    if (resolvable && values.isNotEmpty) result[name] = values;
+  }
   return result;
+}
+
+Map<String, Set<String>>? _sharedVocabulariesCache;
+
+/// Literal vocabularies the shared React files declare, such as
+/// `ControlSize = "sm" | "md" | "lg"` in `../react/src/lib/size.ts`.
+Map<String, Set<String>> _sharedReactVocabularies() {
+  return _sharedVocabulariesCache ??= () {
+    final vocabularies = <String, Set<String>>{};
+    final file = File('../react/src/lib/size.ts');
+    if (!file.existsSync()) return vocabularies;
+    final declaration = RegExp(
+      r'''export\s+type\s+([A-Za-z_]\w*)\s*=\s*((?:"[^"\n]*"|'[^'\n]*')(?:\s*\|\s*(?:"[^"\n]*"|'[^'\n]*'))*)\s*;''',
+    );
+    for (final match in declaration.allMatches(stripComments(file.readAsStringSync()))) {
+      vocabularies[match.group(1)!] = _literalValues(match.group(2)!);
+    }
+    return vocabularies;
+  }();
 }
 
 Set<String> _literalValues(String text) => <String>{

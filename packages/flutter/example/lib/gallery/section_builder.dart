@@ -34,6 +34,7 @@ import 'sections/checkbox.dart';
 import 'sections/chip.dart';
 import 'sections/choice_card.dart';
 import 'sections/code_panel.dart';
+import 'sections/combobox.dart';
 import 'sections/command_palette.dart';
 import 'sections/composer.dart';
 import 'sections/data_table.dart';
@@ -127,6 +128,7 @@ const Map<String, Widget Function()> _builders = <String, Widget Function()>{
   'code_panel': HoronCodePanelGallerySection.new,
   'command_palette': HoronCommandPaletteGallerySection.new,
   'composer': HoronComposerGallerySection.new,
+  'combobox': HoronComboboxGallerySection.new,
   'data_table': HoronDataTableGallerySection.new,
   'date_field': HoronDateFieldGallerySection.new,
   'dialog': HoronDialogGallerySection.new,

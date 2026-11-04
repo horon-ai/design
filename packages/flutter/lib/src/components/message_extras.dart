@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
@@ -73,10 +74,13 @@ class HoronMessageAction {
 /// Figma `Message actions`(109:667): 16px 아이콘의 30px 버튼을 담은 regular 유리 알약입니다.
 class HoronMessageActions extends StatelessWidget {
   /// 알약을 만듭니다.
-  const HoronMessageActions({super.key, required this.actions});
+  const HoronMessageActions({super.key, required this.actions, this.surface = HoronSurface.solid});
 
   /// 동작 목록입니다.
   final List<HoronMessageAction> actions;
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +94,8 @@ class HoronMessageActions extends StatelessWidget {
         child: Stack(
           children: <Widget>[
             Positioned.fill(
-              child: HoronLiquidGlass(
+              child: HoronSurfaceLayer(
+                surface: surface,
                 tier: HoronGlassTier.regular,
                 borderRadius: radius,
                 child: const SizedBox.expand(),

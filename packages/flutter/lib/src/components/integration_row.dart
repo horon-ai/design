@@ -6,8 +6,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -40,7 +41,11 @@ class HoronIntegrationRow extends StatelessWidget {
     this.connectedLabel = 'Connected',
     this.reconnectLabel = 'Reconnect',
     this.connectLabel = 'Connect',
+    this.surface = HoronSurface.solid,
   });
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
 
   /// 타일 안의 20px 아이콘입니다.
   final Widget icon;
@@ -112,18 +117,12 @@ class HoronIntegrationRow extends StatelessWidget {
       ),
     );
 
-    final Widget glass = HoronLiquidGlass(
+    return HoronSurfaceLayer(
+      surface: surface,
       tier: HoronGlassTier.thick,
       borderRadius: BorderRadius.circular(theme.radius.xl2), // rounded-[16px]
+      borderColor: status == HoronIntegrationStatus.reconnect ? theme.colors.borderDanger : null,
       child: body,
-    );
-    if (status != HoronIntegrationStatus.reconnect) return glass;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(theme.radius.xl2),
-        border: Border.all(color: theme.colors.borderDanger), // border-border-danger
-      ),
-      child: glass,
     );
   }
 

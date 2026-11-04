@@ -15,8 +15,7 @@
 // 숫자로 시작하는 조각은 뒤로 옮겨 식별자 첫 글자가 숫자가 되지 않게 합니다
 // (radius '2xl' -> xl2). 간격 키의 '.'은 '_'가 됩니다('1.5' -> s1_5).
 
-import 'dart:math' as math;
-import 'dart:ui' show Color, FontWeight, Offset;
+import 'dart:ui' show Brightness, Color, FontWeight, Offset;
 
 import 'package:flutter/painting.dart' show BoxShadow, TextStyle;
 
@@ -201,15 +200,15 @@ abstract final class HoronDarkColors {
   static const Color interactivePrimaryPressed = Color(0xFFD3D4D6);
   static const Color interactiveSecondaryHover = Color(0xFF434547);
   static const Color statusLive = Color(0xFF95B6CE);
-  static const Color glassClear = Color(0x4D17181A);
-  static const Color glassClearHover = Color(0x6617181A);
-  static const Color glassClearPressed = Color(0x8017181A);
+  static const Color glassClear = Color(0x1AFFFFFF);
+  static const Color glassClearHover = Color(0x24FFFFFF);
+  static const Color glassClearPressed = Color(0x2EFFFFFF);
   static const Color glassFillFrost = Color(0xE517181A);
   static const Color glassFillSolid = Color(0xFF17181A);
-  static const Color glassRegular = Color(0x9917181A);
+  static const Color glassRegular = Color(0x24FFFFFF);
   static const Color glassRim = Color(0x14FFFFFF);
   static const Color glassRimStrong = Color(0x24FFFFFF);
-  static const Color glassThick = Color(0xCC17181A);
+  static const Color glassThick = Color(0x33FFFFFF);
   static const Color overlayInk10 = Color(0x1AFFFFFF);
   static const Color overlayInk12 = Color(0x1FFFFFFF);
   static const Color overlayInk14 = Color(0x24FFFFFF);
@@ -1149,98 +1148,104 @@ final class HoronTextStyles {
   final TextStyle code;
 }
 
-/// `glass.ts`의 리퀴드 글래스 레시피입니다.
+/// 글래스 림(테두리) 그라디언트의 세 색입니다.
 ///
-/// Figma의 `Glass` 그룹은 50% 알파 마스크 아래에 있고, 가장자리 블러와 안쪽 그늘 여백은
-/// 호스트 높이 `H`(px)에 비례합니다. 아래 `*For(H)` 함수가 CSS 규칙을 그대로 계산합니다.
-/// `packages/react/src/styles/globals.css`의 `.liquid-layers` 규칙과 같은 값입니다.
+/// 표면 위에서 아래로 `top` → `mid`(`rimMidStop` 자리) → `bottom` 순서로 칠합니다.
+final class HoronGlassRim {
+  /// 세 색을 받는 생성자입니다.
+  const HoronGlassRim({
+    required this.top,
+    required this.mid,
+    required this.bottom,
+  });
+
+  /// 위쪽(그라디언트 0) 색입니다.
+  final Color top;
+
+  /// `rimMidStop` 자리의 색입니다.
+  final Color mid;
+
+  /// 아래쪽(그라디언트 1) 색입니다.
+  final Color bottom;
+
+  /// 0 → [mid] → 1 순서의 색 목록입니다.
+  List<Color> get colors => <Color>[top, mid, bottom];
+
+  /// [midStop]을 가운데 정지점으로 두는 정지점 목록입니다.
+  List<double> stops(double midStop) => <double>[0.0, midStop, 1.0];
+}
+
+/// `glass.ts`의 글래스 재료입니다.
+///
+/// 웹·데스크톱·모바일이 같은 값을 그리도록 층을 셋으로 줄였습니다. 아래에서 위로
+/// 뒤 배경을 [blur]만큼 흐리고 [saturate]만큼 채도를 올린 다음, 티어 채움
+/// (`glass-clear`/`glass-regular`/`glass-thick`)을 덮고, 표면 안쪽에 [rimWidth]
+/// 두께의 세로 그라디언트 림을 그립니다. 굴절·질감·안쪽 그늘·광택은 없습니다.
 final class HoronGlassTokens {
   /// 모든 글래스 값을 받는 생성자입니다.
   const HoronGlassTokens({
-    this.layerOpacity = 0.5,
-    this.tintColor = const Color(0x1A545454),
-    this.tintBlur = 45.0,
-    this.innerShadeColor = const Color(0x1A000000),
-    this.innerShadeBlur = 4.0,
-    this.innerInsetPerPx = 0.071429,
-    this.innerInsetMaxY = 6.0,
-    this.innerInsetMaxX = 5.0,
-    this.edgeDarkColor = const Color(0xCC000000),
-    this.edgeDarkBlurPerPx = 0.047619,
-    this.edgeDarkMaxBlur = 4.0,
-    this.edgeLightColor = const Color(0xCCFFFFFF),
-    this.edgeLightBlurPerPx = 0.017857,
-    this.edgeLightMinBlur = 0.75,
-    this.edgeLightMaxBlur = 1.5,
-    this.edgeLightSoftColor = const Color(0x33FFFFFF),
+    this.blur = 20.0,
+    this.saturate = 1.8,
+    this.rimWidth = 1.0,
+    this.rimMidStop = 0.5,
   });
 
-  /// Figma의 `Glass` 그룹이 50% 알파 마스크 아래에 놓이기 때문에 모든 레이어에 곱하는 값입니다.
-  final double layerOpacity;
+  /// 뒤 배경에 거는 가우스 블러의 표준편차입니다(논리 픽셀).
+  final double blur;
 
-  /// 색조 레이어의 색입니다.
-  final Color tintColor;
+  /// 뒤 배경에 거는 채도 배율입니다. Filter Effects `saturate()`와 같은 값입니다.
+  final double saturate;
 
-  /// 색조 레이어의 백드롭 블러 반경입니다(논리 픽셀).
-  final double tintBlur;
+  /// 표면 안쪽 가장자리에 그리는 림의 두께입니다(논리 픽셀).
+  final double rimWidth;
 
-  /// 안쪽 그늘 레이어의 색입니다. `overlay` 혼합으로 그립니다.
-  final Color innerShadeColor;
+  /// 림 그라디언트에서 가운데 색이 놓이는 자리입니다(0~1).
+  final double rimMidStop;
 
-  /// 안쪽 그늘 레이어의 백드롭 블러 반경입니다.
-  final double innerShadeBlur;
+  /// 라이트 밝기의 림 색입니다.
+  static const HoronGlassRim rimLight = HoronGlassRim(
+    top: Color(0xB3FFFFFF),
+    mid: Color(0x1FFFFFFF),
+    bottom: Color(0x4DFFFFFF),
+  );
 
-  /// 안쪽 그늘의 안쪽 여백 비율입니다. 호스트 높이에 곱합니다.
-  final double innerInsetPerPx;
+  /// 다크 밝기의 림 색입니다.
+  static const HoronGlassRim rimDark = HoronGlassRim(
+    top: Color(0x38FFFFFF),
+    mid: Color(0x0AFFFFFF),
+    bottom: Color(0x1AFFFFFF),
+  );
 
-  /// 안쪽 그늘 안쪽 여백의 세로 상한입니다.
-  final double innerInsetMaxY;
+  /// 밝기 [brightness]에 맞는 림 색입니다.
+  HoronGlassRim rimFor(Brightness brightness) => brightness == Brightness.dark ? rimDark : rimLight;
 
-  /// 안쪽 그늘 안쪽 여백의 가로 상한입니다.
-  final double innerInsetMaxX;
-
-  /// 어두운 가장자리 레이어의 색입니다.
-  final Color edgeDarkColor;
-
-  /// 어두운 가장자리 블러의 높이 비율입니다. 호스트 높이에 곱합니다.
-  final double edgeDarkBlurPerPx;
-
-  /// 어두운 가장자리 블러의 상한입니다.
-  final double edgeDarkMaxBlur;
-
-  /// 밝은 가장자리 레이어의 색입니다.
-  final Color edgeLightColor;
-
-  /// 밝은 가장자리 블러의 높이 비율입니다. 호스트 높이에 곱합니다.
-  final double edgeLightBlurPerPx;
-
-  /// 밝은 가장자리 블러의 하한입니다.
-  final double edgeLightMinBlur;
-
-  /// 밝은 가장자리 블러의 상한입니다.
-  final double edgeLightMaxBlur;
-
-  /// 부드러운 밝은 가장자리 테두리의 색입니다.
-  final Color edgeLightSoftColor;
-
-  /// 호스트 높이 [hostHeight]에서 어두운 가장자리 블러를 계산합니다.
+  /// [saturate]의 Filter Effects 채도 행렬입니다.
   ///
-  /// CSS는 `min(4, 4H / 84)`이고 `glass.ts`의 `blurPerPx`·`maxBlur`가 같은 값을 냅니다.
-  double edgeDarkBlurFor(double hostHeight) => math.min(edgeDarkMaxBlur, hostHeight * edgeDarkBlurPerPx);
-
-  /// 호스트 높이 [hostHeight]에서 밝은 가장자리 블러를 계산합니다.
-  ///
-  /// CSS는 `clamp(0.75, 1.5H / 84, 1.5)`입니다.
-  double edgeLightBlurFor(double hostHeight) =>
-      (hostHeight * edgeLightBlurPerPx).clamp(edgeLightMinBlur, edgeLightMaxBlur);
-
-  /// 호스트 높이 [hostHeight]에서 안쪽 그늘의 세로 안쪽 여백을 계산합니다.
-  ///
-  /// CSS는 `min(H / 14, 6)`입니다.
-  double innerInsetYFor(double hostHeight) => math.min(hostHeight * innerInsetPerPx, innerInsetMaxY);
-
-  /// 호스트 높이 [hostHeight]에서 안쪽 그늘의 가로 안쪽 여백을 계산합니다.
-  ///
-  /// CSS는 `min(H / 14, 5)`입니다.
-  double innerInsetXFor(double hostHeight) => math.min(hostHeight * innerInsetPerPx, innerInsetMaxX);
+  /// `ColorFilter.matrix`가 받는 20개 값(행 우선, 알파 행은 단위 행렬)입니다.
+  /// CSS `saturate()`와 같은 계수라서 웹과 Flutter가 같은 색을 냅니다.
+  List<double> get saturateMatrix {
+    final double s = saturate;
+    return <double>[
+      0.213 + 0.787 * s,
+      0.715 - 0.715 * s,
+      0.072 - 0.072 * s,
+      0.0,
+      0.0,
+      0.213 - 0.213 * s,
+      0.715 + 0.285 * s,
+      0.072 - 0.072 * s,
+      0.0,
+      0.0,
+      0.213 - 0.213 * s,
+      0.715 - 0.715 * s,
+      0.072 + 0.928 * s,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+    ];
+  }
 }

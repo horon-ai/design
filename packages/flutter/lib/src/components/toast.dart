@@ -3,8 +3,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -21,17 +22,68 @@ enum HoronToastTone {
   danger,
 }
 
-/// `w-90` — 토스트 카드가 더 넓어지지 않는 폭 360입니다.
-const double _toastMaxWidth = 360;
+/// `toast.tsx`의 `ToastSize`입니다.
+enum HoronToastSize {
+  /// `size="sm"` — 폭 320, `label-md`/`body-sm`, 아이콘 16px.
+  sm,
+
+  /// `size="md"` — 폭 360, `label-lg`/`body-sm`, 아이콘 20px. 기본값입니다.
+  md,
+
+  /// `size="lg"` — 폭 400, `label-lg`/`body-md`, 아이콘 24px.
+  lg,
+}
+
+typedef _ToastMetrics = ({
+  double width,
+  double paddingX,
+  double paddingY,
+  double gap,
+  double icon,
+  double close,
+  double contentGap,
+  TextStyle title,
+  TextStyle description,
+});
+
+_ToastMetrics _metricsOf(HoronToastSize size, HoronThemeData theme) => switch (size) {
+  HoronToastSize.sm => (
+    width: 320,
+    paddingX: theme.space.s3,
+    paddingY: theme.space.s2_5,
+    gap: theme.space.s2,
+    icon: 16,
+    close: 14,
+    contentGap: theme.space.s0_5,
+    title: theme.text.labelMd,
+    description: theme.text.bodySm,
+  ),
+  HoronToastSize.md => (
+    width: 360,
+    paddingX: theme.space.s4,
+    paddingY: theme.space.s3_5,
+    gap: theme.space.s3,
+    icon: 20,
+    close: 16,
+    contentGap: theme.space.s0_5,
+    title: theme.text.labelLg,
+    description: theme.text.bodySm,
+  ),
+  HoronToastSize.lg => (
+    width: 400,
+    paddingX: theme.space.s5,
+    paddingY: theme.space.s4,
+    gap: theme.space.s3_5,
+    icon: 24,
+    close: 18,
+    contentGap: theme.space.s1,
+    title: theme.text.labelLg,
+    description: theme.text.bodyMd,
+  ),
+};
 
 /// `data-starting-style:translate-y-4` — 나타날 때 아래에서 올라오는 거리 16입니다.
 const double _enterOffsetY = 16;
-
-/// `[&_svg]:size-5` — 톤 아이콘 20입니다.
-const double _toneIconSize = 20;
-
-/// `[&_svg]:size-4` — 닫기 아이콘 16입니다.
-const double _closeIconSize = 16;
 
 /// `duration-260` — 나타나는 시간입니다.
 const Duration _enterDuration = Duration(milliseconds: 260);
@@ -132,7 +184,15 @@ class HoronToast extends StatelessWidget {
     this.description,
     this.tone = HoronToastTone.neutral,
     this.onDismiss,
+    this.size = HoronToastSize.md,
+    this.surface = HoronSurface.solid,
   });
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
+
+  /// 크기입니다. 기본값은 [HoronToastSize.md]입니다.
+  final HoronToastSize size;
 
   /// 제목입니다. React `Toast.Title`입니다.
   final String title;
@@ -150,8 +210,8 @@ class HoronToast extends StatelessWidget {
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
-    final HoronSpaceSpec space = theme.space;
     final BorderRadius radius = BorderRadius.circular(theme.radius.lg); // rounded-lg
+    final _ToastMetrics metrics = _metricsOf(size, theme);
 
     final (IconData icon, Color iconColor) = switch (tone) {
       HoronToastTone.neutral => (Icons.info_outline, colors.textSecondary),
@@ -159,39 +219,45 @@ class HoronToast extends StatelessWidget {
       HoronToastTone.danger => (Icons.error_outline, colors.textDanger),
     };
 
-    return ClipRRect(
-      borderRadius: radius,
-      child: Stack(
-        children: <Widget>[
-          // bg-glass-regular — 유리는 내용 뒤에 깔립니다.
-          Positioned.fill(
-            child: HoronLiquidGlass(tier: HoronGlassTier.regular, borderRadius: radius, child: const SizedBox.expand()),
-          ),
-          Padding(
-            // px-4 py-3.5
-            padding: EdgeInsets.symmetric(horizontal: space.s4, vertical: space.s3_5),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: space.s3, // gap-3
-              children: <Widget>[
-                Icon(icon, size: _toneIconSize, color: iconColor),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: space.s0_5, // gap-0.5
-                    children: <Widget>[
-                      Text(title, style: theme.text.labelLg.copyWith(color: colors.textPrimary)),
-                      if (description != null)
-                        Text(description!, style: theme.text.bodySm.copyWith(color: colors.textSecondary)),
-                    ],
-                  ),
-                ),
-                _ToastClose(onTap: onDismiss),
-              ],
+    return DecoratedBox(
+      decoration: BoxDecoration(borderRadius: radius, boxShadow: theme.shadows.popover),
+      child: ClipRRect(
+        borderRadius: radius,
+        child: Stack(
+          children: <Widget>[
+            Positioned.fill(
+              child: HoronSurfaceLayer(
+                surface: surface,
+                tier: HoronGlassTier.regular,
+                borderRadius: radius,
+                child: const SizedBox.expand(),
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: metrics.paddingX, vertical: metrics.paddingY),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: metrics.gap,
+                children: <Widget>[
+                  Icon(icon, size: metrics.icon, color: iconColor),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: metrics.contentGap,
+                      children: <Widget>[
+                        Text(title, style: metrics.title.copyWith(color: colors.textPrimary)),
+                        if (description != null)
+                          Text(description!, style: metrics.description.copyWith(color: colors.textSecondary)),
+                      ],
+                    ),
+                  ),
+                  _ToastClose(onTap: onDismiss, size: metrics.close),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -232,10 +298,22 @@ class HoronToastScope extends InheritedNotifier<HoronToastController> {
 /// 각 카드는 새로 생길 때 아래에서 16px 올라오며 0.95배에서 자랍니다.
 class HoronToaster extends StatefulWidget {
   /// 토스터를 만듭니다.
-  const HoronToaster({super.key, this.controller, required this.child});
+  const HoronToaster({
+    super.key,
+    this.controller,
+    this.size = HoronToastSize.md,
+    this.surface = HoronSurface.solid,
+    required this.child,
+  });
+
+  /// 카드 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
 
   /// 쓸 컨트롤러입니다. 없으면 이 위젯이 하나 만들어 스스로 정리합니다.
   final HoronToastController? controller;
+
+  /// 목록의 카드 크기입니다. 기본값은 [HoronToastSize.md]입니다.
+  final HoronToastSize size;
 
   /// 토스트 아래에 깔리는 앱입니다. React `children`입니다.
   final Widget child;
@@ -281,7 +359,12 @@ class _HoronToasterState extends State<HoronToaster> {
         children: <Widget>[
           widget.child,
           // fixed right-6 bottom-6
-          Positioned(left: space.s6, right: space.s6, bottom: space.s6, child: const _ToastList()),
+          Positioned(
+            left: space.s6,
+            right: space.s6,
+            bottom: space.s6,
+            child: _ToastList(size: widget.size, surface: widget.surface),
+          ),
         ],
       ),
     );
@@ -290,7 +373,10 @@ class _HoronToasterState extends State<HoronToaster> {
 
 /// 컨트롤러의 목록을 화면 오른쪽 아래에 그립니다. React `Toast.Viewport`입니다.
 class _ToastList extends StatelessWidget {
-  const _ToastList();
+  const _ToastList({required this.size, required this.surface});
+
+  final HoronToastSize size;
+  final HoronSurface surface;
 
   @override
   Widget build(BuildContext context) {
@@ -300,10 +386,9 @@ class _ToastList extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        // 화면이 360보다 좁으면 남는 폭에 맞춰 줄입니다.
-        final double width = constraints.maxWidth.isFinite
-            ? math.min(_toastMaxWidth, constraints.maxWidth)
-            : _toastMaxWidth;
+        // 화면이 카드 폭보다 좁으면 남는 폭에 맞춰 줄입니다.
+        final double maxWidth = _metricsOf(size, HoronTheme.of(context)).width;
+        final double width = constraints.maxWidth.isFinite ? math.min(maxWidth, constraints.maxWidth) : maxWidth;
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -314,6 +399,8 @@ class _ToastList extends StatelessWidget {
                 width: width,
                 child: _ToastEntrance(
                   child: HoronToast(
+                    size: size,
+                    surface: surface,
                     title: toast.title,
                     description: toast.description,
                     tone: toast.tone,
@@ -358,9 +445,10 @@ class _ToastEntrance extends StatelessWidget {
 
 /// 토스트의 닫기 아이콘입니다. `motion-press`로 눌린 상태를 보여 줍니다.
 class _ToastClose extends StatefulWidget {
-  const _ToastClose({this.onTap});
+  const _ToastClose({this.onTap, this.size = 16});
 
   final VoidCallback? onTap;
+  final double size;
 
   @override
   State<_ToastClose> createState() => _ToastCloseState();
@@ -391,7 +479,7 @@ class _ToastCloseState extends State<_ToastClose> {
           onTapCancel: () {
             if (_pressed) setState(() => _pressed = false);
           },
-          child: Icon(Icons.close, size: _closeIconSize, color: theme.colors.textSecondary),
+          child: Icon(Icons.close, size: widget.size, color: theme.colors.textSecondary),
         ),
       ),
     );

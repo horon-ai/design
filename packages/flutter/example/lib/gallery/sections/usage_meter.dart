@@ -19,6 +19,11 @@ class HoronUsageMeterGallerySection extends StatelessWidget {
         children: <Widget>[
           const HoronUsageMeter(label: '작업', value: 25),
           const HoronUsageMeter(
+            label: '유리 표면',
+            value: 48,
+            surface: HoronSurface.glass,
+          ),
+          const HoronUsageMeter(
             label: '작업',
             value: 64,
             detail: '10,000개 중 6,420개',

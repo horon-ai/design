@@ -31,6 +31,11 @@ class HoronApprovalCardGallerySection extends StatelessWidget {
             title: '외부 링크 공유를 취소했습니다.',
             state: HoronApprovalState.declined,
           ),
+          const HoronApprovalCard(
+            title: '유리 표면 위의 승인 카드',
+            status: 'Needs your yes',
+            surface: HoronApprovalCardSurface.glass,
+          ),
         ],
       ),
     );

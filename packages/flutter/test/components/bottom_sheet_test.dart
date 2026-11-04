@@ -41,7 +41,7 @@ void main() {
   });
 
   testWidgets('the glass surface draws the liquid layer with a 32px top radius', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(const HoronBottomSheet(title: Text('알림 설정'))));
+    await tester.pumpWidget(_host(const HoronBottomSheet(solid: false, title: Text('알림 설정'))));
     final HoronSpaceSpec space = _theme(tester).space;
 
     // Paper `VBH-1`(라이트)은 `--color-glass-fill-frost`(#FFFFFFE5, 90%) + 24px 배경 흐림을,
@@ -304,7 +304,9 @@ void main() {
 
   testWidgets('the dark sheet keeps the thick glass, not the frost fill', (WidgetTester tester) async {
     // Paper `DKE-0`은 라이트 `VBH-1`의 서리 채움 대신 두꺼운 유리를 씁니다.
-    await tester.pumpWidget(_host(const HoronBottomSheet(title: Text('알림 설정')), brightness: Brightness.dark));
+    await tester.pumpWidget(
+      _host(const HoronBottomSheet(solid: false, title: Text('알림 설정')), brightness: Brightness.dark),
+    );
     expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '다크는 유리 엔진이 그립니다');
     final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
     expect(glass.tier, HoronGlassTier.thick, reason: '#17181ACC 80%');

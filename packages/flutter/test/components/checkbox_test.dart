@@ -41,7 +41,7 @@ void main() {
   });
 
   testWidgets('the sm size is the 18px data-table box with a 5px radius', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(HoronCheckbox(value: false, small: true, onChanged: (_) {})));
+    await tester.pumpWidget(_host(HoronCheckbox(value: false, size: HoronCheckboxSize.sm, onChanged: (_) {})));
     expect(tester.getSize(_box()), const Size(18, 18), reason: 'size-4.5');
     expect((_decoration(tester).borderRadius! as BorderRadius).topLeft.x, 5, reason: 'rounded-[5px]');
   });

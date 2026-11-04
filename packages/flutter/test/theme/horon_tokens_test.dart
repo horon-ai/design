@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' show Brightness;
 
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -147,37 +148,29 @@ void main() {
     const glass = HoronGlassTokens();
 
     test('glass.ts의 값을 그대로 드러낸다', () {
-      expect(glass.layerOpacity, 0.5);
-      expect(glass.tintColor, const Color(0x1A545454));
-      expect(glass.tintBlur, 45);
-      expect(glass.innerShadeColor, const Color(0x1A000000));
-      expect(glass.innerShadeBlur, 4);
-      expect(glass.innerInsetPerPx, closeTo(1 / 14, 1e-6));
-      expect(glass.innerInsetMaxY, 6);
-      expect(glass.innerInsetMaxX, 5);
-      expect(glass.edgeDarkColor, const Color(0xCC000000));
-      expect(glass.edgeDarkBlurPerPx, closeTo(4 / 84, 1e-6));
-      expect(glass.edgeDarkMaxBlur, 4);
-      expect(glass.edgeLightColor, const Color(0xCCFFFFFF));
-      expect(glass.edgeLightBlurPerPx, closeTo(1.5 / 84, 1e-6));
-      expect(glass.edgeLightMinBlur, 0.75);
-      expect(glass.edgeLightMaxBlur, 1.5);
-      expect(glass.edgeLightSoftColor, const Color(0x33FFFFFF));
+      expect(glass.blur, 20);
+      expect(glass.saturate, 1.8);
+      expect(glass.rimWidth, 1);
+      expect(glass.rimMidStop, 0.5);
     });
 
-    test('호스트 높이에 따른 블러와 여백이 CSS 규칙과 같다', () {
-      // dark edge blur = min(4, 4H / 84)
-      expect(glass.edgeDarkBlurFor(32), closeTo(32 * 4 / 84, 0.001));
-      expect(glass.edgeDarkBlurFor(200), 4);
-      // light edge blur = clamp(0.75, 1.5H / 84, 1.5)
-      expect(glass.edgeLightBlurFor(32), 0.75);
-      expect(glass.edgeLightBlurFor(84), closeTo(1.5, 0.001));
-      expect(glass.edgeLightBlurFor(300), 1.5);
-      // inner shade inset = min(H / 14, 6) 세로, min(H / 14, 5) 가로
-      expect(glass.innerInsetYFor(32), closeTo(32 / 14, 0.001));
-      expect(glass.innerInsetYFor(120), 6);
-      expect(glass.innerInsetXFor(120), 5);
-      expect(glass.innerInsetXFor(14), closeTo(1, 0.001));
+    test('림 색이 밝기별 토큰과 같다', () {
+      final HoronGlassRim light = glass.rimFor(Brightness.light);
+      expect(light.top, const Color(0xB3FFFFFF));
+      expect(light.mid, const Color(0x1FFFFFFF));
+      expect(light.bottom, const Color(0x4DFFFFFF));
+      final HoronGlassRim dark = glass.rimFor(Brightness.dark);
+      expect(dark.top, const Color(0x38FFFFFF));
+      expect(dark.mid, const Color(0x0AFFFFFF));
+      expect(dark.bottom, const Color(0x1AFFFFFF));
+    });
+
+    test('채도 행렬이 20개 값이고 흰색을 보존한다', () {
+      final List<double> matrix = glass.saturateMatrix;
+      expect(matrix, hasLength(20));
+      expect(matrix[0] + matrix[1] + matrix[2], closeTo(1, 1e-12));
+      expect(matrix[5] + matrix[6] + matrix[7], closeTo(1, 1e-12));
+      expect(matrix[10] + matrix[11] + matrix[12], closeTo(1, 1e-12));
     });
   });
 

@@ -28,6 +28,21 @@ class HoronMarketplaceCardGallerySection extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.start,
             children: <Widget>[
               _Cell(
+                label: 'glass — 유리 표면',
+                width: card,
+                child: HoronMarketplaceCard(
+                  surface: HoronSurface.glass,
+                  initials: 'WB',
+                  name: 'web-search',
+                  author: 'horon',
+                  description: '웹을 검색하고 인용할 수 있는 근거를 모읍니다',
+                  chips: _chips,
+                  score: '4.8',
+                  installs: '12k',
+                  onInstall: () {},
+                ),
+              ),
+              _Cell(
                 label: '별점 · 설치 수 · Install',
                 width: card,
                 child: HoronMarketplaceCard(

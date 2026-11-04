@@ -6,14 +6,45 @@ import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
-/// React `InputSize`와 같은 값 집합입니다.
+/// React `InputSize`(`ControlSize`)와 같은 값 집합입니다.
 enum HoronInputSize {
-  /// `md` — 높이 40, 아이콘 16, body-md.
+  /// `sm` — 높이 32, 아이콘 16, body-sm.
+  sm,
+
+  /// `md` — 높이 40, 아이콘 16, body-md. 기본값입니다.
   md,
 
   /// `lg` — 높이 48, 아이콘 20, body-lg.
   lg,
 }
+
+/// 필드 계열 컨트롤이 공유하는 크기 값입니다. React `fieldSizeClass`·`fieldTextClass`.
+typedef HoronFieldMetrics = ({double height, double paddingX, double gap, double icon, TextStyle textStyle});
+
+/// [HoronInputSize]에 대응하는 필드 값입니다.
+HoronFieldMetrics horonFieldMetrics(HoronInputSize size, HoronThemeData theme) => switch (size) {
+  HoronInputSize.sm => (
+    height: theme.space.step(8),
+    paddingX: theme.space.s3,
+    gap: theme.space.s1_5,
+    icon: 16,
+    textStyle: theme.text.bodySm,
+  ),
+  HoronInputSize.md => (
+    height: theme.space.step(10),
+    paddingX: theme.space.s3_5,
+    gap: theme.space.s2,
+    icon: 16,
+    textStyle: theme.text.bodyMd,
+  ),
+  HoronInputSize.lg => (
+    height: theme.space.step(12),
+    paddingX: theme.space.s5,
+    gap: theme.space.s2_5,
+    icon: 20,
+    textStyle: theme.text.bodyLg,
+  ),
+};
 
 /// React `InputSurface`와 같은 값 집합입니다.
 enum HoronInputSurface {
@@ -33,16 +64,17 @@ enum HoronInputSurface {
 /// 씁니다. React는 클래스 문자열을 export하고, 여기서는 테두리·채움·반경·여백을
 /// 그리는 위젯이 그 자리를 대신합니다.
 ///
-/// 유리 표면은 [HoronLiquidGlass]의 `regular` 티어로 채우고 그 위로 테두리를
-/// 그립니다. 불투명 표면은 React의 `hover:border-border-strong`을 포인터가 있는
-/// 환경의 hover 상태로 옮기고, `focus-within:outline-2`는 상자 안쪽 2px 링으로
-/// 옮겼습니다(outline-offset만큼 밖으로 나가면 레이아웃이 흔들립니다).
+/// 유리 표면은 [HoronLiquidGlass]의 `regular` 티어로 채우고, 상태 테두리(초점·오류)는
+/// 호스트에 겹쳐 그리지 않고 [HoronLiquidGlass.edgeColor]로 림에 칠합니다. 불투명
+/// 표면은 React의 `hover:border-border-strong`을 포인터가 있는 환경의 hover 상태로
+/// 옮기고, `focus-within:outline-2`는 상자 안쪽 2px 링으로 옮겼습니다(outline-offset만큼
+/// 밖으로 나가면 레이아웃이 흔들립니다).
 class HoronFieldBox extends StatefulWidget {
   /// 필드 상자를 만듭니다.
   const HoronFieldBox({
     super.key,
     required this.child,
-    this.surface = HoronInputSurface.glass,
+    this.surface = HoronInputSurface.solid,
     this.invalid = false,
     this.enabled = true,
     this.height,
@@ -79,16 +111,19 @@ class _HoronFieldBoxState extends State<HoronFieldBox> {
   bool _hovered = false;
   bool _focused = false;
 
+  /// 불투명 표면의 테두리 색입니다.
   Color _borderColor(HoronColors colors) {
     if (widget.invalid) return colors.borderDanger;
-    if (widget.surface == HoronInputSurface.glass) {
-      // React: `border-transparent`. 초점 링만 예외로 브랜드 색을 씁니다.
-      return _focused ? colors.textBrand : Colors.transparent;
-    }
     if (!widget.enabled) return colors.borderDefault;
     if (_focused) return colors.textBrand;
     if (_hovered) return colors.borderStrong;
     return colors.borderDefault;
+  }
+
+  /// 유리 표면의 상태 테두리입니다. 호스트 위에 겹쳐 그리지 않고 림 색으로 칠합니다.
+  Color? _glassEdgeColor(HoronColors colors) {
+    if (widget.invalid) return colors.borderDanger;
+    return _focused ? colors.textBrand : null;
   }
 
   Color _fillColor(HoronColors colors) {
@@ -117,13 +152,11 @@ class _HoronFieldBoxState extends State<HoronFieldBox> {
 
     Widget box;
     if (widget.surface == HoronInputSurface.glass) {
-      box = DecoratedBox(
-        position: DecorationPosition.foreground,
-        decoration: BoxDecoration(
-          borderRadius: radius,
-          border: Border.all(color: border, width: ring),
-        ),
-        child: HoronLiquidGlass(tier: HoronGlassTier.regular, borderRadius: radius, child: content),
+      box = HoronLiquidGlass(
+        tier: HoronGlassTier.regular,
+        borderRadius: radius,
+        edgeColor: _glassEdgeColor(horon.colors),
+        child: content,
       );
     } else {
       box = AnimatedContainer(
@@ -173,7 +206,7 @@ class HoronInput extends StatefulWidget {
   const HoronInput({
     super.key,
     this.size = HoronInputSize.md,
-    this.surface = HoronInputSurface.glass,
+    this.surface = HoronInputSurface.solid,
     this.icon,
     this.invalid = false,
     this.controller,
@@ -192,7 +225,8 @@ class HoronInput extends StatefulWidget {
   /// 크기입니다. `sizeClass`의 높이와 아이콘 크기를 고릅니다.
   final HoronInputSize size;
 
-  /// 표면입니다. `glass`만 유리 레이어를 그립니다.
+  /// 표면입니다. 기본값은 불투명 `solid`이고, 이미지나 유리 패널 위에서는
+  /// `glass`를 넘깁니다.
   final HoronInputSurface surface;
 
   /// 선행 아이콘입니다. `IconTheme`으로 크기와 색을 입힙니다.
@@ -253,10 +287,8 @@ class _HoronInputState extends State<HoronInput> {
   Widget build(BuildContext context) {
     final HoronThemeData horon = HoronTheme.of(context);
     final HoronColors colors = horon.colors;
-    final bool isLarge = widget.size == HoronInputSize.lg;
-    final double height = isLarge ? _lgHeight : _mdHeight;
-    final double iconSize = isLarge ? _lgIconSize : _mdIconSize;
-    final TextStyle style = (isLarge ? horon.text.bodyLg : horon.text.bodyMd).copyWith(
+    final HoronFieldMetrics metrics = horonFieldMetrics(widget.size, horon);
+    final TextStyle style = metrics.textStyle.copyWith(
       color: widget.enabled ? colors.textPrimary : colors.textDisabled,
     );
 
@@ -264,17 +296,18 @@ class _HoronInputState extends State<HoronInput> {
       label: widget.semanticLabel,
       textField: true,
       child: SizedBox(
-        height: height,
+        height: metrics.height,
         child: HoronFieldBox(
           surface: widget.surface,
           invalid: widget.invalid,
           enabled: widget.enabled,
+          padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
           child: Row(
-            spacing: horon.space.s2,
+            spacing: metrics.gap,
             children: <Widget>[
               if (widget.icon != null)
                 IconTheme.merge(
-                  data: IconThemeData(size: iconSize, color: colors.textSecondary),
+                  data: IconThemeData(size: metrics.icon, color: colors.textSecondary),
                   child: widget.icon!,
                 ),
               Expanded(
@@ -303,15 +336,3 @@ class _HoronInputState extends State<HoronInput> {
     );
   }
 }
-
-/// `h-10` — MD 필드 높이입니다.
-const double _mdHeight = 40;
-
-/// `h-12` — LG 필드 높이입니다.
-const double _lgHeight = 48;
-
-/// `size-4` — MD 아이콘입니다.
-const double _mdIconSize = 16;
-
-/// `size-5` — LG 아이콘입니다.
-const double _lgIconSize = 20;

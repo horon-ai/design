@@ -22,6 +22,9 @@ enum HoronSegmentedControlSize {
 
 /// React `SegmentedControlSurface`와 같은 값 집합입니다.
 enum HoronSegmentedControlSurface {
+  /// `surface="solid"` — 불투명 `bg-surface` 트랙에 1px 테두리. 기본값입니다.
+  solid,
+
   /// `glass` — 보통 유리 트랙입니다.
   glass,
 
@@ -66,7 +69,7 @@ class HoronSegmentedControl extends StatefulWidget {
     this.defaultValue,
     this.onValueChange,
     this.size = HoronSegmentedControlSize.md,
-    this.surface = HoronSegmentedControlSurface.glass,
+    this.surface = HoronSegmentedControlSurface.solid,
     this.fill,
     this.semanticLabel,
   });
@@ -178,6 +181,7 @@ class _HoronSegmentedControlState extends State<HoronSegmentedControl> {
 
   Widget _track(BuildContext context, HoronThemeData horon, _TrackMetrics metrics, BorderRadius pill, Widget child) {
     final Color fill = switch (widget.surface) {
+      HoronSegmentedControlSurface.solid => horon.colors.bgSurface,
       HoronSegmentedControlSurface.glass => Colors.transparent,
       HoronSegmentedControlSurface.inset => horon.colors.overlayInk5,
       HoronSegmentedControlSurface.insetFaint => horon.colors.overlayInk4,
@@ -188,6 +192,16 @@ class _HoronSegmentedControlState extends State<HoronSegmentedControl> {
 
     if (widget.surface == HoronSegmentedControlSurface.glass) {
       return HoronLiquidGlass(tier: HoronGlassTier.regular, borderRadius: pill, child: sized);
+    }
+    if (widget.surface == HoronSegmentedControlSurface.solid) {
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          color: horon.colors.bgSurface,
+          borderRadius: pill,
+          border: Border.all(color: horon.colors.borderDefault),
+        ),
+        child: sized,
+      );
     }
     return AnimatedContainer(
       duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,

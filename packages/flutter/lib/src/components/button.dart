@@ -15,6 +15,10 @@ enum HoronButtonVariant {
   /// `variant="glass"` — 유리 바탕에 기본 텍스트 색 라벨입니다.
   glass,
 
+  /// `variant="solid"` — 불투명 `bg-surface` 바탕에 `border-default` 1px 테두리,
+  /// 기본 텍스트 색 라벨입니다. hover에서 `bg-subtle`이 깔립니다.
+  solid,
+
   /// `variant="danger"` — 위험 색 바탕에 반대색 라벨입니다.
   danger,
 
@@ -51,10 +55,11 @@ const double _minTapTarget = 44;
 
 /// Figma `Button`(55:339)입니다.
 ///
-/// Primary·Glass·Danger 세 변형과 세 크기, 그리고 크기와 무관한 텍스트 전용
+/// Primary·Glass·Solid·Danger 네 변형과 세 크기, 그리고 크기와 무관한 텍스트 전용
 /// `link` 변형이 있습니다. `link`만 `motion-press` 배율과 44px 터치 영역을 쓰지
 /// 않고, `glass`는 자기 사각형 밖으로 터치 영역을 넓히지 않습니다(React가
-/// `overflow-clip`으로 자르기 때문입니다).
+/// `overflow-clip`으로 자르기 때문입니다). `solid`는 불투명 표면 위에 놓는 변형으로,
+/// 바탕 채움과 1px 테두리를 함께 그립니다.
 class HoronButton extends StatefulWidget {
   /// 버튼을 만듭니다.
   const HoronButton({
@@ -148,6 +153,12 @@ class _HoronButtonState extends State<HoronButton> {
             colors.glassClearPressed,
             colors.textPrimary,
           ),
+          HoronButtonVariant.solid => (
+            colors.bgSurface,
+            colors.bgSubtle,
+            colors.interactiveSecondaryHover,
+            colors.textPrimary,
+          ),
           HoronButtonVariant.danger => (
             colors.interactiveDanger,
             colors.interactiveDangerHover,
@@ -168,6 +179,8 @@ class _HoronButtonState extends State<HoronButton> {
         ? palette.$2
         : palette.$1;
     final Color labelColor = palette.$4;
+    // solid는 채움과 함께 1px 테두리를 그립니다. 나머지 변형은 테두리가 없습니다.
+    final Color? borderColor = widget.variant == HoronButtonVariant.solid ? colors.borderDefault : null;
 
     // React는 glass 변형에서 `<LiquidGlass />`를 깔고 그 위에 라벨을 얹습니다
     // (`button.tsx:54`). Flutter도 같은 순서로, 바탕은 유리 엔진이 그리고
@@ -208,6 +221,7 @@ class _HoronButtonState extends State<HoronButton> {
       decoration: BoxDecoration(
         color: isGlass ? (interactive && (_pressed || _hovered) ? surfaceColor : null) : surfaceColor,
         borderRadius: BorderRadius.circular(surfaceRadius),
+        border: borderColor == null ? null : Border.all(color: borderColor),
       ),
       child: isGlass
           ? Stack(

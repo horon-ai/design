@@ -39,6 +39,7 @@ class HoronSkeletonGallerySection extends StatelessWidget {
           const HoronSkeletonCard.row(),
           const HoronSkeletonCard.card(),
           const HoronSkeletonCard.text(),
+          const HoronSkeletonCard.row(surface: HoronSurface.glass),
         ],
       ),
     );

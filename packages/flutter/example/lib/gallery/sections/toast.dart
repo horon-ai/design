@@ -54,6 +54,17 @@ class HoronToastGallerySection extends StatelessWidget {
                   ),
                 ),
               _Sample(
+                label: '유리 (glass)',
+                child: SizedBox(
+                  width: width,
+                  child: const HoronToast(
+                    title: '동기화가 끝났습니다',
+                    description: '유리 표면 위의 알림입니다.',
+                    surface: HoronSurface.glass,
+                  ),
+                ),
+              ),
+              _Sample(
                 label: 'live · 오른쪽 아래에 쌓입니다',
                 child: SizedBox(
                   width: width,

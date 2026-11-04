@@ -30,7 +30,9 @@ void main() {
   testWidgets('the pill is 56px tall regular glass and the bot avatar is a 32px brand circle', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(_host(const HoronTopBar(title: '연구 도우미', subtitle: '3개 도구 사용 중')));
+    await tester.pumpWidget(
+      _host(const HoronTopBar(title: '연구 도우미', subtitle: '3개 도구 사용 중', surface: HoronSurface.glass)),
+    );
     final HoronThemeData theme = _theme(tester);
 
     expect(tester.getSize(find.byType(HoronTopBar)).height, theme.space.step(14), reason: 'p-2 + h-10 = 56');

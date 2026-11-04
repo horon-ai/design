@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 import 'switch.dart';
@@ -33,10 +34,13 @@ const double _keycapRadius = 6;
 /// Paper `Settings list`(1VD8-0): 16px 라운드의 두꺼운 유리 카드에 구분선이 있는 행을 담습니다.
 class HoronSettingsList extends StatelessWidget {
   /// 목록을 만듭니다.
-  const HoronSettingsList({super.key, required this.children});
+  const HoronSettingsList({super.key, required this.children, this.surface = HoronSurface.solid});
 
   /// 행들입니다.
   final List<Widget> children;
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +50,12 @@ class HoronSettingsList extends StatelessWidget {
       child: Stack(
         children: <Widget>[
           Positioned.fill(
-            child: HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: const SizedBox.expand()),
+            child: HoronSurfaceLayer(
+              surface: surface,
+              tier: HoronGlassTier.thick,
+              borderRadius: radius,
+              child: const SizedBox.expand(),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: _listPaddingX),
