@@ -20,9 +20,9 @@ const double _arrowGap = 1.5;
 ///
 /// `tooltip.tsx`의 `side`는 props 안의 인라인 유니온이라 variant 어휘가 아니므로,
 /// 네 방향을 이름 있는 생성자로 엽니다. 포인터는 호버로, 터치 기기는 길게 누르기로
-/// 열립니다. `MenuAnchor`가 아니라 `OverlayPortal`을 쓰는 이유는 메뉴 패널이 자식의
-/// 고유 크기를 물어 `LayoutBuilder`를 품은 표면을 깨뜨리기 때문입니다.
-class HoronTooltip extends StatefulWidget {
+/// 열립니다. 여는 상태·바깥 탭 닫기·스크린 리더 안내는 `RawTooltip`이 맡고, 지연 0과
+/// 페이드 없음은 그 인자로 맞춥니다.
+class HoronTooltip extends StatelessWidget {
   /// 위쪽에 여는 말풍선입니다.
   const HoronTooltip.top({super.key, required this.label, required this.child}) : _side = _TooltipSide.top;
 
@@ -44,81 +44,79 @@ class HoronTooltip extends StatefulWidget {
   final _TooltipSide _side;
 
   @override
-  State<HoronTooltip> createState() => _HoronTooltipState();
-}
-
-class _HoronTooltipState extends State<HoronTooltip> {
-  final OverlayPortalController _portal = OverlayPortalController();
-  final LayerLink _link = LayerLink();
-
-  void _show() {
-    if (!_portal.isShowing) _portal.show();
-  }
-
-  void _hide() {
-    if (_portal.isShowing) _portal.hide();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    return RawTooltip(
+      semanticsTooltip: label,
+      hoverDelay: Duration.zero,
+      dismissDelay: Duration.zero,
+      touchDelay: Duration.zero,
+      triggerMode: TooltipTriggerMode.longPress,
+      enableFeedback: false,
+      enableTapToDismiss: true,
+      // 말풍선은 페이드 없이 열리고 닫힙니다. SDK 기본값(열기 150ms, 닫기 75ms)이면
+      // 포인터가 빠진 뒤에도 잠깐 남고, 이웃한 트리거로 옮길 때 두 말풍선이 겹칩니다.
+      animationStyle: AnimationStyle.noAnimation,
+      positionDelegate: (TooltipPositionContext position) => _tooltipTopLeft(position, _side),
+      tooltipBuilder: _buildBubble,
+      child: child,
+    );
+  }
+
+  /// 지금의 말풍선과 화살표입니다. `animation`을 쓰지 않으므로 나타날 때 페이드가 없습니다.
+  Widget _buildBubble(BuildContext context, Animation<double> animation) {
     final HoronThemeData theme = HoronTheme.of(context);
     final BorderRadius radius = BorderRadius.circular(theme.radius.sm);
 
-    return OverlayPortal(
-      controller: _portal,
-      overlayChildBuilder: (BuildContext context) {
-        final Widget bubble = DecoratedBox(
-          decoration: BoxDecoration(color: theme.colors.interactivePrimary, borderRadius: radius),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Text(widget.label, style: theme.text.labelSm.copyWith(color: theme.colors.interactiveOnPrimary)),
-          ),
-        );
-
-        final (Alignment target, Alignment follower) = switch (widget._side) {
-          _TooltipSide.top => (Alignment.topCenter, Alignment.bottomCenter),
-          _TooltipSide.bottom => (Alignment.bottomCenter, Alignment.topCenter),
-          _TooltipSide.left => (Alignment.centerLeft, Alignment.centerRight),
-          _TooltipSide.right => (Alignment.centerRight, Alignment.centerLeft),
-        };
-
-        // Paper `TVV-1`은 6px 화살표 상자를 말풍선과 트리거 사이에 둡니다. 두 변이
-        // 모두 같아서(6) 맞닿은 변이 트리거 끝에 바로 붙고, 사이의 1.5px은 삼각형
-        // 안쪽 여백이 만듭니다.
-        final bool vertical = widget._side == _TooltipSide.top || widget._side == _TooltipSide.bottom;
-        final Widget arrow = SizedBox(
-          width: vertical ? _arrowLength : _arrowDepth,
-          height: vertical ? _arrowDepth : _arrowLength,
-          child: ClipPath(
-            clipper: _TooltipArrowClipper(widget._side),
-            child: ColoredBox(color: theme.colors.interactivePrimary),
-          ),
-        );
-        final Widget content = switch (widget._side) {
-          _TooltipSide.top => Column(mainAxisSize: MainAxisSize.min, children: <Widget>[bubble, arrow]),
-          _TooltipSide.bottom => Column(mainAxisSize: MainAxisSize.min, children: <Widget>[arrow, bubble]),
-          _TooltipSide.left => Row(mainAxisSize: MainAxisSize.min, children: <Widget>[bubble, arrow]),
-          _TooltipSide.right => Row(mainAxisSize: MainAxisSize.min, children: <Widget>[arrow, bubble]),
-        };
-
-        return CompositedTransformFollower(
-          link: _link,
-          showWhenUnlinked: false,
-          targetAnchor: target,
-          followerAnchor: follower,
-          child: Align(alignment: Alignment.topLeft, child: content),
-        );
-      },
-      child: CompositedTransformTarget(
-        link: _link,
-        child: MouseRegion(
-          onEnter: (_) => _show(),
-          onExit: (_) => _hide(),
-          child: GestureDetector(onLongPressStart: (_) => _show(), onLongPressEnd: (_) => _hide(), child: widget.child),
-        ),
+    final Widget bubble = DecoratedBox(
+      decoration: BoxDecoration(color: theme.colors.interactivePrimary, borderRadius: radius),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Text(label, style: theme.text.labelSm.copyWith(color: theme.colors.interactiveOnPrimary)),
       ),
     );
+
+    // Paper `TVV-1`은 6px 화살표 상자를 말풍선과 트리거 사이에 둡니다. 두 변이
+    // 모두 같아서(6) 맞닿은 변이 트리거 끝에 바로 붙고, 사이의 1.5px은 삼각형
+    // 안쪽 여백이 만듭니다.
+    final bool vertical = _side == _TooltipSide.top || _side == _TooltipSide.bottom;
+    final Widget arrow = SizedBox(
+      width: vertical ? _arrowLength : _arrowDepth,
+      height: vertical ? _arrowDepth : _arrowLength,
+      child: ClipPath(
+        clipper: _TooltipArrowClipper(_side),
+        child: ColoredBox(color: theme.colors.interactivePrimary),
+      ),
+    );
+
+    return switch (_side) {
+      _TooltipSide.top => Column(mainAxisSize: MainAxisSize.min, children: <Widget>[bubble, arrow]),
+      _TooltipSide.bottom => Column(mainAxisSize: MainAxisSize.min, children: <Widget>[arrow, bubble]),
+      _TooltipSide.left => Row(mainAxisSize: MainAxisSize.min, children: <Widget>[bubble, arrow]),
+      _TooltipSide.right => Row(mainAxisSize: MainAxisSize.min, children: <Widget>[arrow, bubble]),
+    };
   }
+}
+
+/// 지금의 `CompositedTransformTarget`·`Follower` 앵커 짝이 만들던 말풍선 좌상단입니다.
+///
+/// `context.target`은 트리거 중심이라, 앵커 대신 트리거·말풍선 크기의 절반으로 같은 변을
+/// 구합니다. 화면 밖으로 밀거나 뒤집는 처리는 지금도 없으므로 넣지 않습니다.
+Offset _tooltipTopLeft(TooltipPositionContext context, _TooltipSide side) {
+  final Offset target = context.target;
+  final Size targetSize = context.targetSize;
+  final Size tooltipSize = context.tooltipSize;
+  return switch (side) {
+    _TooltipSide.top => Offset(
+      target.dx - tooltipSize.width / 2,
+      target.dy - targetSize.height / 2 - tooltipSize.height,
+    ),
+    _TooltipSide.bottom => Offset(target.dx - tooltipSize.width / 2, target.dy + targetSize.height / 2),
+    _TooltipSide.left => Offset(
+      target.dx - targetSize.width / 2 - tooltipSize.width,
+      target.dy - tooltipSize.height / 2,
+    ),
+    _TooltipSide.right => Offset(target.dx + targetSize.width / 2, target.dy - tooltipSize.height / 2),
+  };
 }
 
 /// 말풍선 화살표를 삼각형으로 오려 낼니다.
