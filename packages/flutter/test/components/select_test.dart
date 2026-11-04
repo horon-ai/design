@@ -1,4 +1,8 @@
+import 'dart:ui' show Tristate;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
@@ -165,6 +169,67 @@ void main() {
   testWidgets('showIndicator false drops the caret', (WidgetTester tester) async {
     await pumpSelect(tester, showIndicator: false);
     expect(find.byIcon(Icons.keyboard_arrow_down), findsNothing);
+  });
+
+  testWidgets('escape closes the open list', (WidgetTester tester) async {
+    await pumpSelect(tester);
+    await open(tester);
+    expect(find.text('Alpha'), findsOneWidget);
+    expect(tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).turns, 0.5);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pump();
+
+    expect(find.text('Alpha'), findsNothing, reason: 'Escape가 목록을 닫습니다');
+    expect(tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).turns, 0);
+  });
+
+  testWidgets('the trigger reports expanded while the list is open', (WidgetTester tester) async {
+    final SemanticsHandle handle = tester.ensureSemantics();
+    await pumpSelect(tester);
+
+    final Finder trigger = find.byWidgetPredicate(
+      (Widget widget) => widget is Semantics && widget.properties.button == true && widget.properties.expanded != null,
+    );
+    SemanticsNode node() => tester.getSemantics(trigger);
+
+    expect(node().flagsCollection.isExpanded, Tristate.isFalse, reason: '닫힌 목록은 접힌 상태로 읽힙니다');
+
+    await open(tester);
+    expect(node().flagsCollection.isExpanded, Tristate.isTrue, reason: '열린 목록은 펼친 상태로 읽힙니다');
+
+    await tester.tap(find.text('Beta'));
+    await tester.pumpAndSettle();
+    expect(node().flagsCollection.isExpanded, Tristate.isFalse, reason: '고르면 다시 접힌 상태로 읽힙니다');
+
+    handle.dispose();
+  });
+
+  testWidgets('scrolling an ancestor closes the list', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: SizedBox(
+              height: 1200,
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: HoronSelect(items: items),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await open(tester);
+    expect(find.text('Alpha'), findsOneWidget);
+
+    await tester.drag(find.byType(HoronSelect), const Offset(0, -80));
+    await tester.pump();
+
+    expect(find.text('Alpha'), findsNothing, reason: '조상 스크롤이 목록을 닫습니다');
   });
 
   testWidgets('at 320 wide the popup still fits the trigger width', (WidgetTester tester) async {
