@@ -48,7 +48,7 @@ void main() {
     expect(button['ButtonSize'], <String>{'sm', 'md', 'lg'});
     expect(button.keys, isNot(contains('ButtonProps')), reason: 'Omit<ComponentProps<...>> is not a literal union');
 
-    expect(reactUnionTypes('badge')['BadgeTone'], <String>{'neutral', 'brand', 'danger', 'solid'});
+    expect(reactUnionTypes('badge')['BadgeTone'], <String>{'neutral', 'brand', 'danger', 'solid', 'surface'});
 
     final icon = reactUnionTypes('horon_icon');
     expect(icon['iconNames'], isNotNull, reason: 'the as-const string array is a vocabulary');

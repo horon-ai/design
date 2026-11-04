@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../surface_group.dart';
+
 /// Menu 갤러리 섹션입니다.
 ///
-/// 세 표면(유리·단색·Paper)을 같은 항목으로 나란히 놓고, 마지막에 실제로 열리는
-/// 트리거를 둡니다. 항목에는 설명, 선택, 위험, 비활성, 단축키가 모두 들어 있습니다.
+/// 같은 항목을 solid와 glass 두 표면에 놓고, Paper 표면과 실제로 열리는 트리거를
+/// 따로 둡니다. 항목에는 설명, 선택, 위험, 비활성, 단축키가 모두 들어 있습니다.
 class HoronMenuGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronMenuGallerySection({super.key});
@@ -14,38 +16,46 @@ class HoronMenuGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: Wrap(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: theme.space.s6,
-        runSpacing: theme.space.s6,
-        crossAxisAlignment: WrapCrossAlignment.start,
         children: <Widget>[
-          _Sample(
-            label: 'glass',
-            child: HoronMenuContent(
-              surface: HoronMenuSurface.glass,
-              children: _items(theme),
-            ),
-          ),
-          _Sample(
-            label: 'solid',
+          SurfaceGroup(
+            label: 'Solid',
             child: HoronMenuContent(
               surface: HoronMenuSurface.solid,
               children: _items(theme),
             ),
           ),
-          _Sample(
-            label: 'paper',
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
             child: HoronMenuContent(
-              surface: HoronMenuSurface.paper,
+              surface: HoronMenuSurface.glass,
               children: _items(theme),
             ),
           ),
-          _Sample(
-            label: '열기',
-            child: HoronMenu(
-              trigger: _Trigger(label: 'Open menu'),
-              content: HoronMenuContent(children: _items(theme)),
-            ),
+          Wrap(
+            spacing: theme.space.s6,
+            runSpacing: theme.space.s6,
+            crossAxisAlignment: WrapCrossAlignment.start,
+            children: <Widget>[
+              _Sample(
+                label: 'paper',
+                child: HoronMenuContent(
+                  surface: HoronMenuSurface.paper,
+                  children: _items(theme),
+                ),
+              ),
+              _Sample(
+                label: '열기',
+                child: HoronMenu(
+                  trigger: _Trigger(label: 'Open menu'),
+                  content: HoronMenuContent(children: _items(theme)),
+                ),
+              ),
+            ],
           ),
         ],
       ),

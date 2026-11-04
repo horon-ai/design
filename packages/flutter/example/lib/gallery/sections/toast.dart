@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../surface_group.dart';
+
 /// 미리보기 상자의 최대 폭입니다. 좁은 화면에서는 남는 폭에 맞춰 줄입니다.
 const double _previewMaxWidth = 360;
 
@@ -12,7 +14,8 @@ final HoronToastController _demoController = HoronToastController();
 
 /// Toast 갤러리 섹션입니다.
 ///
-/// 세 톤의 카드를 나란히 놓고, 실제로 뜨고 닫히는 토스터 하나를 함께 둡니다.
+/// 세 톤의 카드를 solid와 glass 두 표면에 같은 목록으로 놓고, 실제로 뜨고 닫히는
+/// 토스터 하나를 함께 둡니다.
 class HoronToastGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronToastGallerySection({super.key});
@@ -22,85 +25,95 @@ class HoronToastGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double width = constraints.maxWidth < _previewMaxWidth
-              ? constraints.maxWidth
-              : _previewMaxWidth;
-          return Wrap(
-            spacing: theme.space.s4,
-            runSpacing: theme.space.s4,
-            crossAxisAlignment: WrapCrossAlignment.start,
-            children: <Widget>[
-              for (final HoronToastTone tone in HoronToastTone.values)
-                _Sample(
-                  label: tone.name,
-                  child: SizedBox(
-                    width: width,
-                    child: HoronToast(
-                      title: switch (tone) {
-                        HoronToastTone.neutral => '동기화가 끝났습니다',
-                        HoronToastTone.success => '저장했습니다',
-                        HoronToastTone.danger => '업로드에 실패했습니다',
-                      },
-                      description: switch (tone) {
-                        HoronToastTone.neutral => '봇 3개를 다시 읽었습니다.',
-                        HoronToastTone.success => '변경 사항이 반영되었습니다.',
-                        HoronToastTone.danger => '네트워크를 확인하고 다시 시도하세요.',
-                      },
-                      tone: tone,
-                      onDismiss: () {},
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: theme.space.s6,
+        children: <Widget>[
+          SurfaceGroup(
+            label: 'Solid',
+            child: _tones(theme, HoronSurface.solid),
+          ),
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
+            child: _tones(theme, HoronSurface.glass),
+          ),
+          _Sample(
+            label: 'live · 오른쪽 아래에 쌓입니다',
+            child: SizedBox(
+              width: _previewMaxWidth,
+              height: 260,
+              child: HoronToaster(
+                controller: _demoController,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: theme.space.s2,
+                  children: <Widget>[
+                    HoronButton(
+                      label: '성공 알림',
+                      onPressed: () => _demoController.show(
+                        title: '저장했습니다',
+                        description: '변경 사항이 반영되었습니다.',
+                        tone: HoronToastTone.success,
+                      ),
                     ),
-                  ),
-                ),
-              _Sample(
-                label: '유리 (glass)',
-                child: SizedBox(
-                  width: width,
-                  child: const HoronToast(
-                    title: '동기화가 끝났습니다',
-                    description: '유리 표면 위의 알림입니다.',
-                    surface: HoronSurface.glass,
-                  ),
+                    HoronButton(
+                      label: '실패 알림',
+                      variant: HoronButtonVariant.danger,
+                      onPressed: () => _demoController.show(
+                        title: '업로드에 실패했습니다',
+                        description: '네트워크를 확인하고 다시 시도하세요.',
+                        tone: HoronToastTone.danger,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              _Sample(
-                label: 'live · 오른쪽 아래에 쌓입니다',
-                child: SizedBox(
-                  width: width,
-                  height: 260,
-                  child: HoronToaster(
-                    controller: _demoController,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: theme.space.s2,
-                      children: <Widget>[
-                        HoronButton(
-                          label: '성공 알림',
-                          onPressed: () => _demoController.show(
-                            title: '저장했습니다',
-                            description: '변경 사항이 반영되었습니다.',
-                            tone: HoronToastTone.success,
-                          ),
-                        ),
-                        HoronButton(
-                          label: '실패 알림',
-                          variant: HoronButtonVariant.danger,
-                          onPressed: () => _demoController.show(
-                            title: '업로드에 실패했습니다',
-                            description: '네트워크를 확인하고 다시 시도하세요.',
-                            tone: HoronToastTone.danger,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  /// 한 표면의 세 톤 카드입니다. 표면만 바뀌고 내용은 같습니다.
+  Widget _tones(HoronThemeData theme, HoronSurface surface) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double width = constraints.maxWidth < _previewMaxWidth
+            ? constraints.maxWidth
+            : _previewMaxWidth;
+        return Wrap(
+          spacing: theme.space.s4,
+          runSpacing: theme.space.s4,
+          crossAxisAlignment: WrapCrossAlignment.start,
+          children: <Widget>[
+            for (final HoronToastTone tone in HoronToastTone.values)
+              _Sample(
+                label: tone.name,
+                child: SizedBox(
+                  width: width,
+                  child: HoronToast(
+                    title: switch (tone) {
+                      HoronToastTone.neutral => '동기화가 끝났습니다',
+                      HoronToastTone.success => '저장했습니다',
+                      HoronToastTone.danger => '업로드에 실패했습니다',
+                    },
+                    description: switch (tone) {
+                      HoronToastTone.neutral => '봇 3개를 다시 읽었습니다.',
+                      HoronToastTone.success => '변경 사항이 반영되었습니다.',
+                      HoronToastTone.danger => '네트워크를 확인하고 다시 시도하세요.',
+                    },
+                    tone: tone,
+                    surface: surface,
+                    onDismiss: () {},
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }

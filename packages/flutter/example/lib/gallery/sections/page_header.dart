@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../surface_group.dart';
+
 // 통합 스크립트가 배럴에 이 컴포넌트를 넣으면 이 줄은 지워집니다.
 // ignore: implementation_imports
 
 /// Page Header 갤러리 섹션입니다.
 ///
 /// 뒤로 버튼이 있는 기본형, 뒤로 버튼 없이 제목이 들여 쓰인 형, 동작 버튼과 아래 줄
-/// 내용이 있는 형을 놓습니다.
+/// 내용이 있는 형, 긴 제목이 잘리는 형을 solid와 glass 두 표면에 같은 목록으로 놓습니다.
 class HoronPageHeaderGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronPageHeaderGallerySection({super.key});
@@ -17,60 +19,82 @@ class HoronPageHeaderGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: Wrap(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: theme.space.s6,
-        runSpacing: theme.space.s6,
-        crossAxisAlignment: WrapCrossAlignment.start,
         children: <Widget>[
-          _Sample(
-            label: '유리 표면',
-            child: HoronPageHeader(
-              title: '에이전트 설정',
-              surface: HoronSurface.glass,
-              onBack: () {},
-            ),
+          SurfaceGroup(
+            label: 'Solid',
+            child: _headers(theme, HoronSurface.solid),
           ),
-          _Sample(
-            label: '뒤로 버튼',
-            child: HoronPageHeader(title: '에이전트 설정', onBack: () {}),
-          ),
-          _Sample(
-            label: '동작 버튼과 아래 줄',
-            child: HoronPageHeader(
-              title: '지식 베이스',
-              actions: HoronIconButton(
-                icon: const Icon(Icons.search),
-                label: '검색',
-                onPressed: () {},
-              ),
-              child: Row(
-                spacing: theme.space.s2,
-                children: <Widget>[
-                  Text(
-                    '전체 24개',
-                    style: theme.text.labelSm.copyWith(
-                      color: theme.colors.textSecondary,
-                    ),
-                  ),
-                  Text(
-                    '동기화됨',
-                    style: theme.text.labelSm.copyWith(
-                      color: theme.colors.textBrand,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          _Sample(
-            label: '긴 제목 (한 줄 말줄임)',
-            child: HoronPageHeader(
-              title: '아주 긴 에이전트 설정 페이지의 제목입니다',
-              onBack: () {},
-            ),
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
+            child: _headers(theme, HoronSurface.glass),
           ),
         ],
       ),
+    );
+  }
+
+  /// 한 표면의 헤더 표본 목록입니다. 표면만 바뀌고 내용은 같습니다.
+  Widget _headers(HoronThemeData theme, HoronSurface surface) {
+    return Wrap(
+      spacing: theme.space.s6,
+      runSpacing: theme.space.s6,
+      crossAxisAlignment: WrapCrossAlignment.start,
+      children: <Widget>[
+        _Sample(
+          label: '뒤로 버튼',
+          child: HoronPageHeader(
+            title: '에이전트 설정',
+            surface: surface,
+            onBack: () {},
+          ),
+        ),
+        _Sample(
+          label: '제목만 (들여 쓰기)',
+          child: HoronPageHeader(title: '에이전트 설정', surface: surface),
+        ),
+        _Sample(
+          label: '동작 버튼과 아래 줄',
+          child: HoronPageHeader(
+            title: '지식 베이스',
+            surface: surface,
+            actions: HoronIconButton(
+              icon: const Icon(Icons.search),
+              label: '검색',
+              onPressed: () {},
+            ),
+            child: Row(
+              spacing: theme.space.s2,
+              children: <Widget>[
+                Text(
+                  '전체 24개',
+                  style: theme.text.labelSm.copyWith(
+                    color: theme.colors.textSecondary,
+                  ),
+                ),
+                Text(
+                  '동기화됨',
+                  style: theme.text.labelSm.copyWith(
+                    color: theme.colors.textBrand,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        _Sample(
+          label: '긴 제목 (한 줄 말줄임)',
+          child: HoronPageHeader(
+            title: '아주 긴 에이전트 설정 페이지의 제목입니다',
+            surface: surface,
+            onBack: () {},
+          ),
+        ),
+      ],
     );
   }
 }

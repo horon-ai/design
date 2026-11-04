@@ -15,6 +15,9 @@ enum HoronBadgeTone {
 
   /// `tone="solid"` — 잉크 바탕에 반대색 글자입니다.
   solid,
+
+  /// `tone="surface"` — 올라온 흰 알약에 1px 기본 테두리와 기본 글자색입니다.
+  surface,
 }
 
 /// `badge.tsx`의 `BadgeSize`입니다.
@@ -29,31 +32,38 @@ enum HoronBadgeSize {
   lg,
 }
 
-typedef _BadgeMetrics = ({double height, double paddingX, double gap, double dot, TextStyle textStyle});
+typedef _BadgeMetrics = ({
+  double height,
+  double paddingX,
+  double gap,
+  double dot,
+  TextStyle textStyle,
+});
 
-_BadgeMetrics _metricsOf(HoronBadgeSize size, HoronThemeData theme) => switch (size) {
-  HoronBadgeSize.sm => (
-    height: 20,
-    paddingX: theme.space.s1_5,
-    gap: theme.space.s1,
-    dot: 4,
-    textStyle: theme.text.caption,
-  ),
-  HoronBadgeSize.md => (
-    height: 22,
-    paddingX: theme.space.s2,
-    gap: theme.space.s1_5,
-    dot: 6,
-    textStyle: theme.text.labelSm,
-  ),
-  HoronBadgeSize.lg => (
-    height: 26,
-    paddingX: theme.space.s2_5,
-    gap: theme.space.s1_5,
-    dot: 8,
-    textStyle: theme.text.labelMd,
-  ),
-};
+_BadgeMetrics _metricsOf(HoronBadgeSize size, HoronThemeData theme) =>
+    switch (size) {
+      HoronBadgeSize.sm => (
+        height: 20,
+        paddingX: theme.space.s1_5,
+        gap: theme.space.s1,
+        dot: 4,
+        textStyle: theme.text.caption,
+      ),
+      HoronBadgeSize.md => (
+        height: 22,
+        paddingX: theme.space.s2,
+        gap: theme.space.s1_5,
+        dot: 6,
+        textStyle: theme.text.labelSm,
+      ),
+      HoronBadgeSize.lg => (
+        height: 26,
+        paddingX: theme.space.s2_5,
+        gap: theme.space.s1_5,
+        dot: 8,
+        textStyle: theme.text.labelMd,
+      ),
+    };
 
 /// Figma `Badge`(61:283): 22px 반투명 알약에 `label-sm` 글자를 얹은 상태 표시입니다.
 ///
@@ -86,23 +96,46 @@ class HoronBadge extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
 
     final (Color background, Color foreground) = switch (tone) {
-      HoronBadgeTone.neutral => (theme.colors.overlayInk6, theme.colors.textSecondary),
-      HoronBadgeTone.brand => (theme.colors.accentSky500_18, theme.colors.textBrand),
-      HoronBadgeTone.danger => (theme.colors.accentRed500_14, theme.colors.textDanger),
-      HoronBadgeTone.solid => (theme.colors.interactivePrimary, theme.colors.interactiveOnPrimary),
+      HoronBadgeTone.neutral => (
+        theme.colors.overlayInk6,
+        theme.colors.textSecondary,
+      ),
+      HoronBadgeTone.brand => (
+        theme.colors.accentSky500_18,
+        theme.colors.textBrand,
+      ),
+      HoronBadgeTone.danger => (
+        theme.colors.accentRed500_14,
+        theme.colors.textDanger,
+      ),
+      HoronBadgeTone.solid => (
+        theme.colors.interactivePrimary,
+        theme.colors.interactiveOnPrimary,
+      ),
+      HoronBadgeTone.surface => (
+        theme.colors.bgSurface,
+        theme.colors.textPrimary,
+      ),
     };
     final Color dotColor = switch (tone) {
       HoronBadgeTone.neutral => theme.colors.textSecondary,
       HoronBadgeTone.brand => theme.colors.statusLive,
       HoronBadgeTone.danger => theme.colors.textDanger,
       HoronBadgeTone.solid => theme.colors.interactiveOnPrimary,
+      HoronBadgeTone.surface => theme.colors.textPrimary,
     };
 
     final _BadgeMetrics metrics = _metricsOf(size, theme);
     return Container(
       height: metrics.height,
       padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
-      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(theme.radius.full)),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(theme.radius.full),
+        border: tone == HoronBadgeTone.surface
+            ? Border.all(color: theme.colors.borderDefault)
+            : null,
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -110,7 +143,10 @@ class HoronBadge extends StatelessWidget {
             Container(
               width: metrics.dot,
               height: metrics.dot,
-              decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: dotColor,
+                shape: BoxShape.circle,
+              ),
             ),
             SizedBox(width: metrics.gap),
           ],
