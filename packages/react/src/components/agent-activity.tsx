@@ -1,5 +1,5 @@
 import { CaretDown, CaretRight, CheckCircle, WarningCircle, Wrench } from "@phosphor-icons/react";
-import type { ComponentProps, ReactNode } from "react";
+import { type ComponentProps, type ReactNode, useEffect, useRef, useState } from "react";
 
 import { cn } from "../lib/cn";
 import { Spinner } from "./spinner";
@@ -22,18 +22,102 @@ export function ThinkingIndicator({ label = "Thinking", className }: { label?: s
   );
 }
 
-/** Figma `Streaming` (108:660): a flat bot bubble with body-sm text and a 2x16 ink caret. */
-export function StreamingText({ children, className }: { children: ReactNode; className?: string }) {
+/** Characters per second the reveal moves at least; a larger backlog drains faster (about a third of a second). */
+const REVEAL_RATE = 90;
+const BACKLOG_DRAIN = 3;
+
+/** Moves `end` past a high surrogate so an emoji is never cut in half. */
+function codePointEnd(text: string, end: number): number {
+  const code = text.charCodeAt(end - 1);
+  return code >= 0xd800 && code <= 0xdbff ? end + 1 : end;
+}
+
+/**
+ * How much of `text` to show. While `smooth` streaming runs, new characters are revealed a few per frame so
+ * bursty chunks read as steady typing; otherwise, and under reduced motion, everything shows at once.
+ * Text that no longer extends what was shown (a rewrite) restarts from the shared prefix.
+ */
+function useRevealedLength(text: string, smooth: boolean): number {
+  const [shown, setShown] = useState(text.length);
+  const shownRef = useRef(text.length);
+  const previous = useRef(text);
+
+  useEffect(() => {
+    const set = (length: number) => {
+      shownRef.current = length;
+      setShown(length);
+    };
+    let start = Math.min(shownRef.current, text.length);
+    const before = previous.current;
+    previous.current = text;
+    let shared = 0;
+    while (shared < start && text[shared] === before[shared]) shared++;
+    start = shared;
+
+    if (!smooth || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      set(text.length);
+      return undefined;
+    }
+    if (start !== shownRef.current) set(start);
+    if (start >= text.length) return undefined;
+
+    let position = start;
+    let last = performance.now();
+    let frame = requestAnimationFrame(function tick(now) {
+      const seconds = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      const backlog = text.length - position;
+      position = Math.min(text.length, position + Math.max(REVEAL_RATE * seconds, backlog * BACKLOG_DRAIN * seconds));
+      const length = Math.min(text.length, codePointEnd(text, Math.floor(position)));
+      if (length !== shownRef.current) set(length);
+      if (length < text.length) frame = requestAnimationFrame(tick);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [text, smooth]);
+
+  return Math.min(shown, text.length);
+}
+
+export type StreamingTextProps = Omit<ComponentProps<"div">, "className" | "children"> & {
+  /** Everything received so far; pass the growing string as chunks arrive. */
+  text: string;
+  /** True while more text is coming: the caret shows, and the rest is revealed when it turns false. */
+  streaming?: boolean;
+  /** Reveal arriving chunks a few characters per frame instead of in jumps. Off under reduced motion. */
+  smooth?: boolean;
+  className?: string;
+};
+
+/**
+ * Figma `Streaming` (108:660): the bot bubble an answer types into, body-sm text and a 2px ink caret that sits
+ * right after the last character and wraps with it. The caret holds still while characters land and blinks
+ * while waiting for the next chunk; it goes away when the stream ends. Screen readers get the answer once,
+ * when it is complete, instead of every chunk.
+ */
+export function StreamingText({ text, streaming = true, smooth = true, className, ...props }: StreamingTextProps) {
+  const shown = useRevealedLength(text, streaming && smooth);
+  const typing = shown < text.length;
   return (
     <div
-      aria-live="polite"
       className={cn(
-        "flex w-fit items-end gap-2 rounded-xl border border-border-default bg-bg-surface px-4 py-3 text-body-sm text-text-primary",
+        "w-fit max-w-full rounded-xl border border-border-default bg-bg-surface px-4 py-3 text-body-sm wrap-break-word whitespace-pre-wrap text-text-primary",
         className,
       )}
+      {...props}
     >
-      <span>{children}</span>
-      <span aria-hidden className="h-4 w-0.5 shrink-0 animate-caret rounded-[1px] bg-interactive-primary" />
+      <span aria-hidden>{text.slice(0, shown)}</span>
+      {streaming && (
+        <span
+          aria-hidden
+          className={cn(
+            "ml-px inline-block h-[1.15em] w-0.5 rounded-[1px] bg-interactive-primary align-[-0.2em]",
+            !typing && "animate-caret",
+          )}
+        />
+      )}
+      <span className="sr-only" aria-live="polite" aria-busy={streaming}>
+        {streaming ? "" : text}
+      </span>
     </div>
   );
 }
