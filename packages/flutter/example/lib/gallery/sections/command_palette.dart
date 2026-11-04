@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../surface_group.dart';
+
 /// Command Palette 갤러리 섹션입니다.
 ///
-/// 열린 팔레트, 본문만 있는 상태, 결과가 없는 상태를 나란히 보여 줍니다. 열린
-/// 팔레트는 자기 상자 안에서 오버레이로 그려지므로 실제로 Esc나 바깥 누르기로
-/// 닫아 볼 수 있습니다.
+/// 열린 팔레트를 solid와 glass 두 표면에 같은 모습으로 보여 주고, 본문만 있는
+/// 상태와 결과가 없는 상태를 따로 놓습니다. 열린 팔레트는 자기 상자 안에서
+/// 오버레이로 그려지므로 실제로 Esc나 바깥 누르기로 닫아 볼 수 있습니다.
 class HoronCommandPaletteGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronCommandPaletteGallerySection({super.key});
@@ -15,26 +17,47 @@ class HoronCommandPaletteGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: Wrap(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: theme.space.s6,
-        runSpacing: theme.space.s6,
-        crossAxisAlignment: WrapCrossAlignment.start,
         children: <Widget>[
-          const _Sample(label: '열림', child: _PaletteDemo()),
-          _Sample(
-            label: '본문',
-            child: _BodyDemo(groups: _groups(theme)),
-          ),
-          _Sample(
-            label: '결과 없음',
-            child: _BodyDemo(
-              groups: const <HoronCommandGroup>[
-                HoronCommandGroup(
-                  label: 'Results',
-                  items: <HoronCommandItem>[],
-                ),
-              ],
+          SurfaceGroup(
+            label: 'Solid',
+            child: const _Sample(
+              label: '열림',
+              child: _PaletteDemo(surface: HoronSurface.solid),
             ),
+          ),
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
+            child: const _Sample(
+              label: '열림',
+              child: _PaletteDemo(surface: HoronSurface.glass),
+            ),
+          ),
+          Wrap(
+            spacing: theme.space.s6,
+            runSpacing: theme.space.s6,
+            crossAxisAlignment: WrapCrossAlignment.start,
+            children: <Widget>[
+              _Sample(
+                label: '본문',
+                child: _BodyDemo(groups: _groups(theme)),
+              ),
+              _Sample(
+                label: '결과 없음',
+                child: const _BodyDemo(
+                  groups: <HoronCommandGroup>[
+                    HoronCommandGroup(
+                      label: 'Results',
+                      items: <HoronCommandItem>[],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -44,7 +67,9 @@ class HoronCommandPaletteGallerySection extends StatelessWidget {
 
 /// 열린 팔레트를 자기 상자 안에서 보여 주고, 닫으면 다시 열 수 있게 합니다.
 class _PaletteDemo extends StatefulWidget {
-  const _PaletteDemo();
+  const _PaletteDemo({this.surface = HoronSurface.solid});
+
+  final HoronSurface surface;
 
   @override
   State<_PaletteDemo> createState() => _PaletteDemoState();
@@ -67,6 +92,7 @@ class _PaletteDemoState extends State<_PaletteDemo> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(theme.radius.lg),
           child: HoronCommandPalette(
+            surface: widget.surface,
             open: _open,
             onOpenChange: (bool open) => setState(() => _open = open),
             groups: _groups(theme),

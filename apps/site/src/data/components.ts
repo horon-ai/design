@@ -78,8 +78,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Button", en: "Button" },
     group: "inputs",
     description: {
-      ko: "동작을 실행하는 버튼입니다. Primary, Glass, Danger, Link 변형과 세 크기가 있습니다.",
-      en: "Runs an action. Comes in Primary, Glass, Danger, and Link variants at three sizes.",
+      ko: "동작을 실행하는 버튼입니다. Primary, Glass, Solid, Danger, Link 변형과 세 크기가 있습니다.",
+      en: "Runs an action. Comes in Primary, Glass, Solid, Danger, and Link variants at three sizes.",
     },
   },
   {
@@ -87,8 +87,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Icon Button", en: "Icon Button" },
     group: "inputs",
     description: {
-      ko: "아이콘 하나로 동작을 실행하는 원형 버튼입니다.",
-      en: "A round button that runs an action from a single icon.",
+      ko: "아이콘 하나로 동작을 실행하는 원형 버튼입니다. Glass와 Solid 표면이 있습니다.",
+      en: "A round button that runs an action from a single icon, with glass and solid surfaces.",
     },
   },
   {
@@ -105,8 +105,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Textarea", en: "Textarea" },
     group: "inputs",
     description: {
-      ko: "여러 줄 텍스트를 입력받습니다.",
-      en: "Takes text across multiple lines.",
+      ko: "여러 줄 텍스트를 입력받습니다. 유리(Glass)와 불투명(Solid) 표면을 고릅니다.",
+      en: "Takes text across multiple lines. Choose a glass or solid surface.",
     },
   },
   {
@@ -132,8 +132,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Input Group", en: "Input Group" },
     group: "inputs",
     description: {
-      ko: "입력 앞뒤에 선택 영역과 아이콘을 붙여 하나로 묶습니다.",
-      en: "Joins a select and icons to the front or back of an input.",
+      ko: "입력 앞뒤에 국가 코드, 통화 같은 선택 칸(Select 또는 Combobox)을 붙여 하나로 묶습니다.",
+      en: "Joins a select or combobox, such as a country code or currency, to the front or back of an input.",
     },
   },
   {
@@ -145,6 +145,15 @@ export const components: ComponentEntry[] = [
       en: "A dropdown for choosing one item from a list.",
     },
     overlay: true,
+  },
+  {
+    slug: "combobox",
+    title: { ko: "Combobox", en: "Combobox" },
+    group: "inputs",
+    description: {
+      ko: "입력해서 목록을 좁힌 뒤 고르는 검색 선택입니다. 하나만 또는 여러 개를 고를 수 있습니다.",
+      en: "A searchable picker that narrows a list as you type. Choose one item or several.",
+    },
   },
   {
     slug: "checkbox",
@@ -187,8 +196,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Chip", en: "Chip" },
     group: "inputs",
     description: {
-      ko: "필터처럼 눌러서 켜고 끄는 유리 칩입니다.",
-      en: "A glass chip you press to toggle, as in a filter.",
+      ko: "필터처럼 눌러서 켜고 끄는 불투명 칩입니다.",
+      en: "A solid chip you press to toggle, as in a filter.",
     },
   },
   {

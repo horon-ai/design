@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { Kbd } from "./kbd";
-import { LiquidGlass } from "./liquid-glass";
 
 export type CommandItem = {
   value: string;
@@ -34,12 +33,16 @@ export type CommandPaletteProps = {
   /** Footer key hints, such as `[["↑↓", "Move"], ["↵", "Open"]]`. */
   hints?: [ReactNode, string][];
   trigger?: ReactNode;
+  /**
+   * `solid` (default) is an opaque palette with a default border. `glass` puts it on the veil (`veil-overlay`).
+   */
+  surface?: "solid" | "glass";
   className?: string;
 };
 
 /**
- * Figma `Command palette` (110:676): a 560px frosted-glass dialog, 24px radius,
- * with a 48px search row, grouped 44px results and a key-hint footer.
+ * Figma `Command palette` (110:676): a 560px palette, 24px radius, with a 48px search row,
+ * grouped 44px results and a key-hint footer.
  */
 export function CommandPalette({
   open,
@@ -49,6 +52,7 @@ export function CommandPalette({
   empty,
   hints,
   trigger,
+  surface = "solid",
   className,
 }: CommandPaletteProps) {
   return (
@@ -60,12 +64,12 @@ export function CommandPalette({
           <Dialog.Popup
             aria-label={placeholder}
             className={cn(
-              "relative flex w-140 max-w-full motion-popup flex-col overflow-clip rounded-[24px] bg-glass-fill-frost p-1.5 shadow-palette",
+              "relative flex w-140 max-w-full motion-popup flex-col overflow-clip rounded-[24px] p-1.5",
+              surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-palette",
               "duration-240 data-starting-style:translate-y-2",
               className,
             )}
           >
-            <LiquidGlass tier="thick" />
             <CommandPaletteBody
               groups={groups}
               placeholder={placeholder}

@@ -6,6 +6,15 @@ import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 import 'liquid_glass.dart';
 
+/// `breadcrumb.tsx`의 `BreadcrumbSurface`입니다.
+enum HoronBreadcrumbSurface {
+  /// `surface="solid"` — 불투명 `bg-surface`에 1px 테두리. 기본값입니다.
+  solid,
+
+  /// `surface="glass"` — 이미지나 유리 패널 위의 유리 쟁반입니다.
+  glass,
+}
+
 /// `breadcrumb.tsx`의 `focus-visible:outline-2`입니다.
 const double _focusWidth = 2;
 
@@ -16,13 +25,18 @@ const double _focusWidth = 2;
 /// 같은 간격을 유지한 채 [Wrap]으로 줄을 바꿔 모든 조각을 남깁니다.
 class HoronBreadcrumb extends StatelessWidget {
   /// 조각 목록을 받아 빵부스러기를 만듭니다.
-  const HoronBreadcrumb({super.key, required this.children, this.glass = false, this.label = 'Breadcrumb'});
+  const HoronBreadcrumb({
+    super.key,
+    required this.children,
+    this.surface = HoronBreadcrumbSurface.solid,
+    this.label = 'Breadcrumb',
+  });
 
   /// 순서대로 놓을 조각입니다. 보통 [HoronBreadcrumbItem]입니다.
   final List<Widget> children;
 
-  /// 참이면 `surface="glass"`입니다. 조각을 regular 유리 쟁반 안에 넣습니다.
-  final bool glass;
+  /// 표면입니다. 기본값은 [HoronBreadcrumbSurface.solid]입니다.
+  final HoronBreadcrumbSurface surface;
 
   /// 접근성 이름입니다. React의 `aria-label`이고 기본값은 `Breadcrumb`입니다.
   final String label;
@@ -62,16 +76,21 @@ class HoronBreadcrumb extends StatelessWidget {
       ),
     );
 
-    if (!glass) return crumbs;
-
-    // `rounded-xl bg-glass-regular px-4 py-3.5`입니다. 유리는 레이어 엔진이 그립니다.
-    return HoronLiquidGlass(
-      tier: HoronGlassTier.regular,
-      borderRadius: BorderRadius.circular(theme.radius.xl),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: space.s4, vertical: space.s3_5),
-        child: crumbs,
+    final BorderRadius radius = BorderRadius.circular(theme.radius.xl);
+    final Widget padded = Padding(
+      padding: EdgeInsets.symmetric(horizontal: space.s4, vertical: space.s3_5),
+      child: crumbs,
+    );
+    if (surface == HoronBreadcrumbSurface.glass) {
+      return HoronLiquidGlass(tier: HoronGlassTier.regular, borderRadius: radius, child: padded);
+    }
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.bgSurface,
+        borderRadius: radius,
+        border: Border.all(color: colors.borderDefault),
       ),
+      child: padded,
     );
   }
 }

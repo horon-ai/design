@@ -15,19 +15,55 @@ enum HoronBadgeTone {
 
   /// `tone="solid"` — 잉크 바탕에 반대색 글자입니다.
   solid,
+
+  /// `tone="surface"` — 올라온 흰 알약에 1px 기본 테두리와 기본 글자색입니다.
+  surface,
 }
 
-/// `badge.tsx`의 `h-5.5`입니다.
-const double _badgeHeight = 22;
+/// `badge.tsx`의 `BadgeSize`입니다.
+enum HoronBadgeSize {
+  /// `size="sm"` — 높이 20, `caption`, 점 4px.
+  sm,
 
-/// `badge.tsx`의 `px-2`입니다.
-const double _badgePaddingX = 8;
+  /// `size="md"` — 높이 22, `label-sm`, 점 6px. 기본값입니다.
+  md,
 
-/// `badge.tsx`의 `gap-1.5`입니다.
-const double _badgeGap = 6;
+  /// `size="lg"` — 높이 26, `label-md`, 점 8px.
+  lg,
+}
 
-/// `badge.tsx`의 `size-1.5`입니다. 앞 상태 점의 지름입니다.
-const double _dotSize = 6;
+typedef _BadgeMetrics = ({
+  double height,
+  double paddingX,
+  double gap,
+  double dot,
+  TextStyle textStyle,
+});
+
+_BadgeMetrics _metricsOf(HoronBadgeSize size, HoronThemeData theme) =>
+    switch (size) {
+      HoronBadgeSize.sm => (
+        height: 20,
+        paddingX: theme.space.s1_5,
+        gap: theme.space.s1,
+        dot: 4,
+        textStyle: theme.text.caption,
+      ),
+      HoronBadgeSize.md => (
+        height: 22,
+        paddingX: theme.space.s2,
+        gap: theme.space.s1_5,
+        dot: 6,
+        textStyle: theme.text.labelSm,
+      ),
+      HoronBadgeSize.lg => (
+        height: 26,
+        paddingX: theme.space.s2_5,
+        gap: theme.space.s1_5,
+        dot: 8,
+        textStyle: theme.text.labelMd,
+      ),
+    };
 
 /// Figma `Badge`(61:283): 22px 반투명 알약에 `label-sm` 글자를 얹은 상태 표시입니다.
 ///
@@ -35,10 +71,19 @@ const double _dotSize = 6;
 /// 앞에 6px 상태 점이 붙습니다. 반경은 `rounded-full`입니다.
 class HoronBadge extends StatelessWidget {
   /// 배지를 만듭니다.
-  const HoronBadge({super.key, required this.label, this.tone = HoronBadgeTone.neutral, this.dot = false});
+  const HoronBadge({
+    super.key,
+    required this.label,
+    this.tone = HoronBadgeTone.neutral,
+    this.dot = false,
+    this.size = HoronBadgeSize.md,
+  });
 
   /// 표시할 글자입니다.
   final String label;
+
+  /// 크기입니다. 기본값은 [HoronBadgeSize.md]입니다.
+  final HoronBadgeSize size;
 
   /// 색조입니다.
   final HoronBadgeTone tone;
@@ -51,39 +96,66 @@ class HoronBadge extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
 
     final (Color background, Color foreground) = switch (tone) {
-      HoronBadgeTone.neutral => (theme.colors.overlayInk6, theme.colors.textSecondary),
-      HoronBadgeTone.brand => (theme.colors.accentSky500_18, theme.colors.textBrand),
-      HoronBadgeTone.danger => (theme.colors.accentRed500_14, theme.colors.textDanger),
-      HoronBadgeTone.solid => (theme.colors.interactivePrimary, theme.colors.interactiveOnPrimary),
+      HoronBadgeTone.neutral => (
+        theme.colors.overlayInk6,
+        theme.colors.textSecondary,
+      ),
+      HoronBadgeTone.brand => (
+        theme.colors.accentSky500_18,
+        theme.colors.textBrand,
+      ),
+      HoronBadgeTone.danger => (
+        theme.colors.accentRed500_14,
+        theme.colors.textDanger,
+      ),
+      HoronBadgeTone.solid => (
+        theme.colors.interactivePrimary,
+        theme.colors.interactiveOnPrimary,
+      ),
+      HoronBadgeTone.surface => (
+        theme.colors.bgSurface,
+        theme.colors.textPrimary,
+      ),
     };
     final Color dotColor = switch (tone) {
       HoronBadgeTone.neutral => theme.colors.textSecondary,
       HoronBadgeTone.brand => theme.colors.statusLive,
       HoronBadgeTone.danger => theme.colors.textDanger,
       HoronBadgeTone.solid => theme.colors.interactiveOnPrimary,
+      HoronBadgeTone.surface => theme.colors.textPrimary,
     };
 
+    final _BadgeMetrics metrics = _metricsOf(size, theme);
     return Container(
-      height: _badgeHeight,
-      padding: const EdgeInsets.symmetric(horizontal: _badgePaddingX),
-      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(theme.radius.full)),
+      height: metrics.height,
+      padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(theme.radius.full),
+        border: tone == HoronBadgeTone.surface
+            ? Border.all(color: theme.colors.borderDefault)
+            : null,
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           if (dot) ...<Widget>[
             Container(
-              width: _dotSize,
-              height: _dotSize,
-              decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+              width: metrics.dot,
+              height: metrics.dot,
+              decoration: BoxDecoration(
+                color: dotColor,
+                shape: BoxShape.circle,
+              ),
             ),
-            const SizedBox(width: _badgeGap),
+            SizedBox(width: metrics.gap),
           ],
           Text(
             label,
             maxLines: 1,
             softWrap: false,
             overflow: TextOverflow.ellipsis,
-            style: theme.text.labelSm.copyWith(color: foreground),
+            style: metrics.textStyle.copyWith(color: foreground),
           ),
         ],
       ),

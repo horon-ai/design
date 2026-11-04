@@ -26,6 +26,15 @@ const double _approvalPadding = 16;
 /// `approval-card.tsx`의 `gap-3`입니다.
 const double _approvalGap = 12;
 
+/// `approval-card.tsx`의 `ApprovalCardSurface`입니다.
+enum HoronApprovalCardSurface {
+  /// `surface="solid"` — 불투명 `bg-surface`에 1px 테두리. 기본값입니다.
+  solid,
+
+  /// `surface="glass"` — 이미지나 유리 패널 위의 유리 표면입니다.
+  glass,
+}
+
 /// Figma `Approval card`(64:398): 대화에서 유일하게 유리로 그리는 카드입니다. 동작을 묻기 때문입니다.
 ///
 /// `approval-card.tsx`를 옮긴 것입니다. `pending`만 브랜드 테두리와 승인·나중에 두
@@ -43,7 +52,11 @@ class HoronApprovalCard extends StatelessWidget {
     this.onLater,
     this.approveLabel = 'Approve',
     this.laterLabel = 'Later',
+    this.surface = HoronApprovalCardSurface.solid,
   });
+
+  /// 표면입니다. 기본값은 [HoronApprovalCardSurface.solid]입니다.
+  final HoronApprovalCardSurface surface;
 
   /// 상태입니다.
   final HoronApprovalState state;
@@ -80,79 +93,95 @@ class HoronApprovalCard extends StatelessWidget {
     };
     final bool pending = state == HoronApprovalState.pending;
 
-    return SizedBox(
-      width: _approvalWidth,
-      child: ClipRRect(
-        borderRadius: radius,
-        child: Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: const SizedBox.expand()),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: radius,
-                border: pending ? Border.all(color: theme.colors.borderBrand) : null,
+    final Widget body = Padding(
+      padding: const EdgeInsets.all(_approvalPadding),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: _approvalGap,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
               ),
-              padding: const EdgeInsets.all(_approvalPadding),
-              child: Column(
+              const SizedBox(width: 6),
+              Text(status ?? label, style: theme.text.labelSm.copyWith(color: text)),
+            ],
+          ),
+          Text(title, style: theme.text.labelLg.copyWith(color: theme.colors.textPrimary)),
+          if (attachment != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: theme.colors.overlayInk5,
+                borderRadius: BorderRadius.circular(theme.radius.md),
+              ),
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: _approvalGap,
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(status ?? label, style: theme.text.labelSm.copyWith(color: text)),
-                    ],
+                  Icon(Icons.attach_file, size: 14, color: theme.colors.textSecondary),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      attachment!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.text.bodySm.copyWith(color: theme.colors.textPrimary),
+                    ),
                   ),
-                  Text(title, style: theme.text.labelLg.copyWith(color: theme.colors.textPrimary)),
-                  if (attachment != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: theme.colors.overlayInk5,
-                        borderRadius: BorderRadius.circular(theme.radius.md),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Icon(Icons.attach_file, size: 14, color: theme.colors.textSecondary),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              attachment!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.text.bodySm.copyWith(color: theme.colors.textPrimary),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  if (pending)
-                    Row(
-                      children: <Widget>[
-                        HoronButton(label: approveLabel, size: HoronButtonSize.sm, onPressed: onApprove),
-                        const SizedBox(width: 8),
-                        HoronButton(
-                          label: laterLabel,
-                          size: HoronButtonSize.sm,
-                          variant: HoronButtonVariant.glass,
-                          onPressed: onLater,
-                        ),
-                      ],
-                    ),
                 ],
               ),
             ),
-          ],
+          if (pending)
+            Row(
+              children: <Widget>[
+                HoronButton(label: approveLabel, size: HoronButtonSize.sm, onPressed: onApprove),
+                const SizedBox(width: 8),
+                HoronButton(
+                  label: laterLabel,
+                  size: HoronButtonSize.sm,
+                  variant: HoronButtonVariant.glass,
+                  onPressed: onLater,
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+
+    if (surface == HoronApprovalCardSurface.glass) {
+      return SizedBox(
+        width: _approvalWidth,
+        child: ClipRRect(
+          borderRadius: radius,
+          child: Stack(
+            children: <Widget>[
+              Positioned.fill(
+                child: HoronLiquidGlass(
+                  tier: HoronGlassTier.thick,
+                  borderRadius: radius,
+                  edgeColor: pending ? theme.colors.borderBrand : null,
+                  child: const SizedBox.expand(),
+                ),
+              ),
+              body,
+            ],
+          ),
         ),
+      );
+    }
+    return SizedBox(
+      width: _approvalWidth,
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.colors.bgSurface,
+          borderRadius: radius,
+          border: Border.all(color: pending ? theme.colors.borderBrand : theme.colors.borderDefault),
+        ),
+        child: body,
       ),
     );
   }

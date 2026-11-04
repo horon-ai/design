@@ -2,10 +2,16 @@ import { ArrowUp, Microphone, Plus } from "@phosphor-icons/react";
 import { useState, type FormEvent } from "react";
 
 import { cn } from "../lib/cn";
+import type { ControlSize } from "../lib/size";
 import { IconButton } from "./icon-button";
-import { LiquidGlass } from "./liquid-glass";
+
+export type ComposerSize = ControlSize;
+export type ComposerSurface = "solid" | "glass";
 
 export type ComposerProps = {
+  size?: ComposerSize;
+  /** `solid` (default) on raised surfaces, `glass` over imagery and glass panels. */
+  surface?: ComposerSurface;
   placeholder?: string;
   value?: string;
   defaultValue?: string;
@@ -17,12 +23,26 @@ export type ComposerProps = {
   className?: string;
 };
 
+const sizeClass: Record<ComposerSize, string> = {
+  sm: "gap-1.5 p-1.5",
+  md: "gap-2 p-2",
+  lg: "gap-2.5 p-2.5",
+};
+
+const textClass: Record<ComposerSize, string> = {
+  sm: "text-body-sm",
+  md: "text-body-md",
+  lg: "text-body-lg",
+};
+
 /**
  * Figma `Composer` (63:462): a regular-glass pill with an attach button, the
  * message field, and a voice button that turns into the ink send button once
  * there is text.
  */
 export function Composer({
+  size = "md",
+  surface = "solid",
   placeholder = "Message",
   value: valueProp,
   defaultValue = "",
@@ -49,24 +69,29 @@ export function Composer({
     <form
       onSubmit={submit}
       className={cn(
-        "relative flex items-center gap-2 overflow-clip rounded-full bg-glass-regular p-2 motion-colors",
+        "relative flex items-center overflow-clip rounded-full motion-colors",
+        surface === "glass" ? "veil-field" : "border border-border-default bg-bg-surface",
+        sizeClass[size],
         className,
       )}
     >
-      <LiquidGlass tier="regular" />
-      <IconButton type="button" icon={<Plus />} label="Attach" onClick={onAttach} disabled={disabled} />
+      <IconButton type="button" size={size} icon={<Plus />} label="Attach" onClick={onAttach} disabled={disabled} />
       <input
         value={value}
         onChange={(event) => setValue(event.target.value)}
         placeholder={placeholder}
         aria-label={placeholder}
         disabled={disabled}
-        className="relative min-w-0 flex-1 bg-transparent text-body-md text-text-primary outline-none placeholder:text-text-placeholder"
+        className={cn(
+          "relative min-w-0 flex-1 bg-transparent text-text-primary outline-none placeholder:text-text-placeholder",
+          textClass[size],
+        )}
       />
       {value.trim() ? (
         <IconButton
           key="send"
           type="submit"
+          size={size}
           variant="primary"
           icon={<ArrowUp />}
           label="Send"
@@ -77,6 +102,7 @@ export function Composer({
         <IconButton
           key="voice"
           type="button"
+          size={size}
           className="animate-pop-in"
           icon={<Microphone className="text-text-secondary" />}
           label="Voice input"

@@ -45,7 +45,7 @@ void main() {
   });
 
   testWidgets('skeleton card: the row shape shows a round 36px block and two lines', (WidgetTester tester) async {
-    await pumpSkeleton(tester, const HoronSkeletonCard.row());
+    await pumpSkeleton(tester, const HoronSkeletonCard.row(surface: HoronSurface.glass));
     expect(find.byType(HoronSkeleton), findsNWidgets(3));
     expect(find.byType(HoronLiquidGlass), findsOneWidget);
     expect(find.bySemanticsLabel('Loading'), findsWidgets);

@@ -44,6 +44,7 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(slug: 'calendar', title: 'Calendar', group: 'inputs'),
   GallerySection(slug: 'schedule', title: 'Schedule', group: 'inputs'),
   GallerySection(slug: 'composer', title: 'Composer', group: 'inputs'),
+  GallerySection(slug: 'combobox', title: 'Combobox', group: 'inputs'),
   GallerySection(slug: 'split_button', title: 'Split Button', group: 'inputs'),
   GallerySection(
     slug: 'tool_permissions',

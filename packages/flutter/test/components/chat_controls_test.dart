@@ -15,21 +15,24 @@ Future<void> pumpControls(WidgetTester tester, Widget child, {Brightness brightn
 
 void main() {
   testWidgets('jump to latest: 44px clear glass circle with a 20px caret', (WidgetTester tester) async {
-    await pumpControls(tester, const HoronJumpToLatest());
+    await pumpControls(tester, const HoronJumpToLatest(surface: HoronChatControlSurface.glass));
     expect(tester.getSize(find.byType(HoronJumpToLatest)), const Size(44, 44));
     expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass).first).tier, HoronGlassTier.clear);
     expect(tester.widget<Icon>(find.byIcon(Icons.keyboard_arrow_down)).size, 20);
   });
 
   testWidgets('new messages: 40px pill with a 16px caret and the label', (WidgetTester tester) async {
-    await pumpControls(tester, const HoronNewMessagesPill(label: '3 new messages'));
+    await pumpControls(
+      tester,
+      const HoronNewMessagesPill(label: '3 new messages', surface: HoronChatControlSurface.glass),
+    );
     expect(tester.getSize(find.byType(HoronNewMessagesPill)).height, 40);
     expect(find.text('3 new messages'), findsOneWidget);
     expect(tester.widget<Icon>(find.byIcon(Icons.keyboard_arrow_down)).size, 16);
   });
 
   testWidgets('voice input: 240x52 regular glass with a red stop and a timer', (WidgetTester tester) async {
-    await pumpControls(tester, const HoronVoiceInput(elapsed: '0:07'));
+    await pumpControls(tester, const HoronVoiceInput(elapsed: '0:07', surface: HoronChatControlSurface.glass));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronVoiceInput)));
 
     expect(tester.getSize(find.byType(HoronVoiceInput)), const Size(240, 52));
@@ -70,7 +73,11 @@ void main() {
     for (final Brightness brightness in Brightness.values) {
       await pumpControls(tester, const HoronVoiceInput(elapsed: '0:01'), brightness: brightness);
       expect(tester.takeException(), isNull, reason: brightness.name);
-      await pumpControls(tester, const HoronJumpToLatest(), brightness: brightness);
+      await pumpControls(
+        tester,
+        const HoronJumpToLatest(surface: HoronChatControlSurface.glass),
+        brightness: brightness,
+      );
       expect(tester.takeException(), isNull, reason: brightness.name);
     }
   });

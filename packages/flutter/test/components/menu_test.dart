@@ -62,7 +62,10 @@ void main() {
       _host(
         HoronMenu(
           trigger: const Text('열기'),
-          content: const HoronMenuContent(children: <Widget>[HoronMenuItem(label: 'One')]),
+          content: const HoronMenuContent(
+            surface: HoronMenuSurface.glass,
+            children: <Widget>[HoronMenuItem(label: 'One')],
+          ),
         ),
       ),
     );
@@ -134,6 +137,7 @@ void main() {
     await tester.pumpWidget(
       _contentHost(
         const HoronMenuContent(
+          surface: HoronMenuSurface.glass,
           children: <Widget>[
             HoronMenuItem(label: 'Plain', icon: Icon(Icons.copy_outlined)),
             HoronMenuItem(label: 'Described', description: 'Anyone with the link'),
@@ -183,6 +187,7 @@ void main() {
     await tester.pumpWidget(
       _contentHost(
         HoronMenuContent(
+          surface: HoronMenuSurface.glass,
           children: <Widget>[
             HoronMenuItem(
               label: 'Delete',

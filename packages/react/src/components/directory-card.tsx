@@ -13,35 +13,40 @@ export type DirectoryCardProps = Omit<ComponentProps<"div">, "children"> & {
   description?: ReactNode;
   onAdd?: () => void;
   addLabel?: string;
+  /** `solid` (default) on raised surfaces, `glass` over imagery and glass panels. */
+  surface?: "solid" | "glass";
 };
 
-/** Paper `Directory card` (Settings 1VJJ-0): thick glass row, 40px tile, name and one-line description, glass add button. */
+/** Paper `Directory card` (Settings 1VJJ-0): 40px tile, name and one-line description, plus an add button. */
 export function DirectoryCard({
   icon,
   name,
   description,
   onAdd,
   addLabel = "Add",
+  surface = "solid",
   className,
   ...props
 }: DirectoryCardProps) {
   return (
     <div
-      className={cn("relative flex items-center gap-3 overflow-clip rounded-2xl bg-glass-thick py-3 pr-3.5 pl-3", className)}
+      className={cn(
+        "relative flex items-center gap-3 overflow-clip rounded-2xl py-3 pr-3.5 pl-3",
+        surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
+        className,
+      )}
       {...props}
     >
-      <LiquidGlass tier="thick" />
+      {surface === "glass" && <LiquidGlass />}
       <span className="relative flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-500 text-text-inverse [&>svg]:size-5">
         {icon}
       </span>
       <span className="relative flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="truncate text-label-md text-text-primary">{name}</span>
-        {description && (
-          <span className="line-clamp-1 text-[12px]/[16px] text-text-placeholder">{description}</span>
-        )}
+        {description && <span className="line-clamp-1 text-[12px]/[16px] text-text-placeholder">{description}</span>}
       </span>
       <IconButton
-        variant="glass"
+        variant={surface === "glass" ? "glass" : "solid"}
         size="sm"
         label={addLabel}
         icon={<Plus aria-hidden />}

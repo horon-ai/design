@@ -14,7 +14,7 @@ Future<void> pumpMeter(WidgetTester tester, Widget child, {Brightness brightness
 
 void main() {
   testWidgets('usage meter: the card is 300 wide on thick glass', (WidgetTester tester) async {
-    await pumpMeter(tester, const HoronUsageMeter(label: 'Tasks', value: 42));
+    await pumpMeter(tester, const HoronUsageMeter(label: 'Tasks', value: 42, surface: HoronSurface.glass));
     expect(tester.getSize(find.byType(HoronUsageMeter)).width, 300);
     expect(find.byType(HoronLiquidGlass), findsOneWidget);
   });

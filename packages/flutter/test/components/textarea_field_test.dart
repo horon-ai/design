@@ -7,6 +7,7 @@ void main() {
   Future<void> pumpField(
     WidgetTester tester, {
     Brightness brightness = Brightness.light,
+    HoronInputSurface surface = HoronInputSurface.glass,
     String? description,
     String? error,
     int? maxLength,
@@ -22,6 +23,7 @@ void main() {
               width: width,
               child: Center(
                 child: HoronTextareaField(
+                  surface: surface,
                   label: '메모',
                   hint: 'Optional',
                   description: description,
@@ -41,10 +43,12 @@ void main() {
   HoronThemeData themeOf(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronTextareaField)));
 
   Color borderOf(WidgetTester tester) {
-    final DecoratedBox box = tester
-        .widgetList<DecoratedBox>(find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(DecoratedBox)))
-        .firstWhere((DecoratedBox box) => box.position == DecorationPosition.foreground);
-    return (box.decoration as BoxDecoration).border!.top.color;
+    final Finder glass = find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronLiquidGlass));
+    if (glass.evaluate().isNotEmpty) {
+      return tester.widget<HoronLiquidGlass>(glass).edgeColor ?? Colors.transparent;
+    }
+    final AnimatedContainer filled = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
+    return (filled.decoration! as BoxDecoration).border!.top.color;
   }
 
   /// 상자의 채움이 글래스 엔진 한 겹인지 확인합니다.

@@ -41,13 +41,11 @@ void main() {
 
   HoronThemeData themeOf(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronInput)));
 
-  /// 상자의 테두리 색입니다. 유리 표면은 앞쪽 장식, 불투명 표면은 상자 장식입니다.
+  /// 상자의 상태 테두리 색입니다. 유리 표면은 림 색, 불투명 표면은 상자 테두리입니다.
   Color borderOf(WidgetTester tester) {
-    final Iterable<DecoratedBox> boxes = tester.widgetList<DecoratedBox>(
-      find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(DecoratedBox)),
-    );
-    for (final DecoratedBox box in boxes) {
-      if (box.position == DecorationPosition.foreground) return (box.decoration as BoxDecoration).border!.top.color;
+    final Finder glass = find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronLiquidGlass));
+    if (glass.evaluate().isNotEmpty) {
+      return tester.widget<HoronLiquidGlass>(glass).edgeColor ?? Colors.transparent;
     }
     final AnimatedContainer filled = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
     return (filled.decoration! as BoxDecoration).border!.top.color;
@@ -58,6 +56,22 @@ void main() {
     final AnimatedContainer box = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
     return (box.decoration! as BoxDecoration).color!;
   }
+
+  testWidgets('the default surface is solid', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: const Scaffold(
+          body: Center(
+            child: SizedBox(width: 320, child: HoronInput(hintText: 'Hint')),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: '기본 표면은 유리가 아닙니다');
+    expect(fillOf(tester), HoronThemeData.light.colors.bgSurface);
+  });
 
   testWidgets('renders in light and dark without an exception', (WidgetTester tester) async {
     for (final Brightness brightness in Brightness.values) {

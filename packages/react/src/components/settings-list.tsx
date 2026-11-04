@@ -1,13 +1,31 @@
 import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
+import { LiquidGlass } from "./liquid-glass";
 import { Switch, type SwitchProps } from "./switch";
 
 type WithClass<T> = Omit<T, "className"> & { className?: string };
 
-/** Paper `Settings list` (1VD8-0): a 16px-radius thick-glass card of divided rows, 20px inline padding. */
-export function SettingsList({ className, ...props }: WithClass<ComponentProps<"div">>) {
-  return <div className={cn("flex flex-col overflow-clip rounded-2xl bg-glass-thick px-5", className)} {...props} />;
+export type SettingsListProps = WithClass<ComponentProps<"div">> & {
+  /** `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass card. */
+  surface?: "solid" | "glass";
+};
+
+/** Paper `Settings list` (1VD8-0): a 16px-radius card of divided rows, 20px inline padding, solid or thick glass. */
+export function SettingsList({ surface = "solid", className, children, ...props }: SettingsListProps) {
+  return (
+    <div
+      className={cn(
+        "relative flex flex-col overflow-clip rounded-2xl px-5 [&>:not(.liquid-layers)]:relative",
+        surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
+        className,
+      )}
+      {...props}
+    >
+      {surface === "glass" && <LiquidGlass />}
+      {children}
+    </div>
+  );
 }
 
 export type SettingsRowProps = Omit<ComponentProps<"div">, "className" | "title"> & {

@@ -1,43 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
-import '../section_scaffold.dart';
+import '../surface_group.dart';
 
 /// `textarea` 갤러리 섹션입니다.
 ///
-/// 기본 유리 상자와 오류·비활성 상태를 나란히 보여 줍니다.
+/// 상자, 오류, 비활성, 글자 수 제한 상태를 solid와 glass 두 표면에 같은 목록으로
+/// 보여 줍니다.
 class HoronTextareaGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronTextareaGallerySection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GallerySectionScaffold(
-      title: 'Textarea',
-      variants: <Widget>[
-        const _TextareaCell(
-          label: '기본 (112px 유리 상자)',
-          child: HoronTextarea(hintText: '메모를 남겨 주세요'),
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Padding(
+      padding: EdgeInsets.all(theme.space.s6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        spacing: theme.space.s6,
+        children: <Widget>[
+          Text('Textarea', style: theme.text.titleLg),
+          SurfaceGroup(
+            label: 'Solid',
+            child: _textareas(theme, HoronInputSurface.solid),
+          ),
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
+            child: _textareas(theme, HoronInputSurface.glass),
+          ),
+          Text(
+            'Figma `Textarea`(58:137)입니다. 상자는 `min-h-28`(112)에서 시작해 입력이 '
+            '늘면 함께 자라고, 여백은 좌우 14·위아래 12입니다. 글자는 `body-md`, 안내 '
+            '문구는 `text-placeholder`, 오류 테두리는 `border-danger`입니다.',
+            style: theme.text.bodySm.copyWith(
+              color: theme.colors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 한 표면의 텍스트영역 표본 목록입니다. 표면만 바뀌고 내용은 같습니다.
+  Widget _textareas(HoronThemeData theme, HoronInputSurface surface) {
+    return Wrap(
+      spacing: theme.space.s4,
+      runSpacing: theme.space.s4,
+      crossAxisAlignment: WrapCrossAlignment.start,
+      children: <Widget>[
+        _TextareaCell(
+          label: '기본',
+          child: HoronTextarea(surface: surface, hintText: '메모를 남겨 주세요'),
         ),
-        const _TextareaCell(
+        _TextareaCell(
           label: 'Invalid',
-          child: HoronTextarea(invalid: true, hintText: '메모를 남겨 주세요'),
+          child: HoronTextarea(
+            surface: surface,
+            invalid: true,
+            hintText: '메모를 남겨 주세요',
+          ),
         ),
-      ],
-      states: <Widget>[
-        const _TextareaCell(
+        _TextareaCell(
           label: 'Disabled',
-          child: HoronTextarea(enabled: false, hintText: '메모를 남겨 주세요'),
+          child: HoronTextarea(
+            surface: surface,
+            enabled: false,
+            hintText: '메모를 남겨 주세요',
+          ),
         ),
-        const _TextareaCell(
+        _TextareaCell(
           label: '최대 120자',
-          child: HoronTextarea(maxLength: 120, hintText: '메모를 남겨 주세요'),
+          child: HoronTextarea(
+            surface: surface,
+            maxLength: 120,
+            hintText: '메모를 남겨 주세요',
+          ),
         ),
       ],
-      notes:
-          'Figma `Textarea`(58:137)입니다. 상자는 `min-h-28`(112)에서 시작해 입력이 늘면 '
-          '함께 자라고, 여백은 좌우 14·위아래 12입니다. 글자는 `body-md`, 안내 문구는 '
-          '`text-placeholder`, 오류 테두리는 `border-danger`입니다.',
     );
   }
 }

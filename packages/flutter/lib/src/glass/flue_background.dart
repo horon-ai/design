@@ -378,7 +378,7 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
 
   Future<void> _loadShader() async {
     try {
-      final ui.FragmentProgram? program = await HoronGlassProbe.loadProgram(horonFlueAsset);
+      final ui.FragmentProgram? program = await HoronShaderProbe.loadProgram(horonFlueAsset);
       if (!mounted || program == null) return;
       setState(() => _shader = program.fragmentShader());
     } catch (_) {

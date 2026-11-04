@@ -78,6 +78,7 @@ export function ToolPermissions({
           </div>
           <SegmentedControl
             aria-label={`${tool.name} permission`}
+            surface="glass"
             fill={false}
             items={options}
             value={current[tool.name] ?? "ask"}

@@ -54,7 +54,7 @@ export function SourceRow({
         "flex items-center gap-3 px-2 py-3",
         variant === "list"
           ? "relative after:absolute after:inset-x-2 after:bottom-0 after:h-px after:bg-overlay-ink-8 last:after:hidden"
-          : "rounded-[14px] bg-bg-subtle",
+          : "rounded-[14px] border border-border-default bg-bg-surface px-3",
         className,
       )}
     >

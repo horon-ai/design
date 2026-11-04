@@ -2,8 +2,10 @@ import { Field as BaseField } from "@base-ui/react/field";
 import { useState, type ComponentProps, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
-import { fieldBoxClass } from "./input";
-import { LiquidGlass } from "./liquid-glass";
+import type { ControlSize } from "../lib/size";
+import { fieldBoxClass, fieldTextClass, type InputSurface } from "./input";
+
+export type TextareaFieldSize = ControlSize;
 
 export type TextareaFieldProps = Omit<ComponentProps<"textarea">, "className"> & {
   label: ReactNode;
@@ -14,16 +16,45 @@ export type TextareaFieldProps = Omit<ComponentProps<"textarea">, "className"> &
   error?: ReactNode;
   /** Shows a "count / max" counter when set. */
   maxLength?: number;
+  size?: TextareaFieldSize;
+  /** Solid (default) or glass, as on `Input`. */
+  surface?: InputSurface;
   className?: string;
 };
 
-/** Figma `Textarea field` (60:466): label row, 120px glass box, footer with help text and counter. */
+const rootClass: Record<TextareaFieldSize, string> = {
+  sm: "gap-1.5",
+  md: "gap-2",
+  lg: "gap-2.5",
+};
+
+const labelClass: Record<TextareaFieldSize, string> = {
+  sm: "text-label-sm",
+  md: "text-label-md",
+  lg: "text-label-lg",
+};
+
+const metaClass: Record<TextareaFieldSize, string> = {
+  sm: "text-caption",
+  md: "text-caption",
+  lg: "text-body-sm",
+};
+
+const boxClass: Record<TextareaFieldSize, string> = {
+  sm: "h-22 px-3 py-2",
+  md: "h-30 px-3.5 py-3",
+  lg: "h-34 px-4 py-3.5",
+};
+
+/** Figma `Textarea field` (60:466): label row, 88/120/136px glass or solid box, footer with help text and counter. */
 export function TextareaField({
   label,
   hint,
   description,
   error,
   maxLength,
+  size = "md",
+  surface = "solid",
   disabled,
   className,
   defaultValue,
@@ -37,20 +68,19 @@ export function TextareaField({
     <BaseField.Root
       disabled={disabled}
       invalid={invalid}
-      className={cn("flex w-90 flex-col items-start gap-2 data-disabled:opacity-60", className)}
+      className={cn("flex w-90 flex-col items-start data-disabled:opacity-60", rootClass[size], className)}
     >
       <div className="flex w-full items-center">
-        <BaseField.Label className="min-w-0 flex-1 text-label-md text-text-primary">{label}</BaseField.Label>
-        {hint && <span className="shrink-0 text-caption text-text-secondary">{hint}</span>}
+        <BaseField.Label className={cn("min-w-0 flex-1 text-text-primary", labelClass[size])}>{label}</BaseField.Label>
+        {hint && <span className={cn("shrink-0 text-text-secondary", metaClass[size])}>{hint}</span>}
       </div>
       <div
         className={cn(
-          "relative flex h-30 w-full overflow-clip rounded-md border px-3.5 py-3 motion-colors",
-          fieldBoxClass.glass,
-          "focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
+          "relative flex w-full overflow-clip rounded-md border motion-colors",
+          boxClass[size],
+          fieldBoxClass[surface],
         )}
       >
-        <LiquidGlass tier="regular" />
         <BaseField.Control
           render={
             <textarea
@@ -63,21 +93,19 @@ export function TextareaField({
               {...props}
             />
           }
-          className={cn("relative h-full resize-none text-body-md", fieldBoxClass.text)}
+          className={cn("relative h-full resize-none", fieldTextClass[size], fieldBoxClass.text)}
         />
       </div>
       {(description || error || maxLength) && (
         <div
           className={cn(
-            "motion-colors flex w-full items-center gap-2 text-caption",
+            "flex w-full items-center gap-2 motion-colors",
+            metaClass[size],
             invalid ? "text-text-danger" : "text-text-secondary",
           )}
         >
           {invalid ? (
-            <BaseField.Error
-              match
-              className="min-w-0 flex-1 animate-[tab-panel-in_160ms_var(--ease-out-quint)]"
-            >
+            <BaseField.Error match className="min-w-0 flex-1 animate-[tab-panel-in_160ms_var(--ease-out-quint)]">
               {error}
             </BaseField.Error>
           ) : (

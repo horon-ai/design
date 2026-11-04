@@ -12,11 +12,11 @@ void main() {
   const Size hostSize = Size(320, 200);
 
   setUp(() {
-    HoronGlassProbe.reset();
+    HoronShaderProbe.reset();
     horonShaderProgramCacheClear();
   });
 
-  tearDown(HoronGlassProbe.reset);
+  tearDown(HoronShaderProbe.reset);
 
   Future<void> pumpFlue(
     WidgetTester tester, {

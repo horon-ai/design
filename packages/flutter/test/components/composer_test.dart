@@ -41,7 +41,7 @@ void main() {
   });
 
   testWidgets('알약은 regular 유리, 56 높이, 20px 아이콘을 쓴다', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(Brightness.light, const HoronComposer()));
+    await tester.pumpWidget(_host(Brightness.light, const HoronComposer(surface: HoronComposerSurface.glass)));
 
     expect(tester.getSize(find.byKey(const Key('horon-composer'))).height, space.s2 + 40 + space.s2);
     // 바탕은 유리 엔진이 그립니다. React `composer.tsx`의 `<LiquidGlass tier="regular" />`와
@@ -49,7 +49,6 @@ void main() {
     final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
     expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '알약이 유리 표면을 깝니다');
     expect(glass.tier, HoronGlassTier.regular);
-    expect(glass.texture, isFalse, reason: 'React 컴포저는 texture를 넘기지 않습니다');
 
     final Icon attach = tester.widget<Icon>(find.byIcon(Icons.add));
     expect(attach.size, 20);

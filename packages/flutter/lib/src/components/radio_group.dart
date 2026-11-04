@@ -8,8 +8,40 @@ import '../tokens/horon_tokens.g.dart';
 /// `border-[1.5px]` — 선택 전 원의 테두리 두께입니다.
 const double _borderWidth = 1.5;
 
-/// `size-2` — 선택된 원 안의 점 8px입니다.
-const double _dotUnits = 2;
+/// `radio-group.tsx`의 `RadioSize`입니다.
+enum HoronRadioSize {
+  /// `size="sm"` — 16px 원, 6px 점, `body-sm`.
+  sm,
+
+  /// `size="md"` — 20px 원, 8px 점, `body-md`. 기본값입니다.
+  md,
+
+  /// `size="lg"` — 24px 원, 10px 점, `body-lg`.
+  lg,
+}
+
+typedef _RadioMetrics = ({double side, double dot, double gap, TextStyle textStyle});
+
+_RadioMetrics _metricsOf(HoronRadioSize size, HoronThemeData theme) => switch (size) {
+  HoronRadioSize.sm => (
+    side: theme.space.step(4),
+    dot: theme.space.step(1.5),
+    gap: theme.space.s2,
+    textStyle: theme.text.bodySm,
+  ),
+  HoronRadioSize.md => (
+    side: theme.space.step(5),
+    dot: theme.space.step(2),
+    gap: theme.space.s2_5,
+    textStyle: theme.text.bodyMd,
+  ),
+  HoronRadioSize.lg => (
+    side: theme.space.step(6),
+    dot: theme.space.step(2.5),
+    gap: theme.space.s3,
+    textStyle: theme.text.bodyLg,
+  ),
+};
 
 /// `has-[[data-disabled]]:opacity-40`입니다.
 const double _disabledOpacity = 0.4;
@@ -22,10 +54,19 @@ const double _disabledOpacity = 0.4;
 /// 옮깁니다).
 class HoronRadioGroup extends StatelessWidget {
   /// 라디오 그룹을 만듭니다.
-  const HoronRadioGroup({super.key, required this.value, this.onValueChange, required this.children});
+  const HoronRadioGroup({
+    super.key,
+    required this.value,
+    this.onValueChange,
+    this.size = HoronRadioSize.md,
+    required this.children,
+  });
 
   /// 지금 선택된 라디오의 값입니다.
   final String? value;
+
+  /// 그룹 안 라디오의 크기입니다. 기본값은 [HoronRadioSize.md]입니다.
+  final HoronRadioSize size;
 
   /// 다른 라디오를 골랐을 때 부를 콜백입니다.
   final ValueChanged<String>? onValueChange;
@@ -39,6 +80,7 @@ class HoronRadioGroup extends StatelessWidget {
     return _HoronRadioScope(
       value: value,
       onValueChange: onValueChange,
+      size: size,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,10 +97,13 @@ class HoronRadioGroup extends StatelessWidget {
 /// [HoronRadioGroup]의 [HoronRadioGroup.value]와 같은 타입의 값입니다.
 class HoronRadio extends StatefulWidget {
   /// 라디오를 만듭니다.
-  const HoronRadio({super.key, required this.value, this.label, this.enabled = true});
+  const HoronRadio({super.key, required this.value, this.label, this.size, this.enabled = true});
 
   /// 이 라디오의 값입니다.
   final String value;
+
+  /// 그룹 크기를 덮어쓸 때 넘깁니다. 없으면 그룹 값을 씁니다.
+  final HoronRadioSize? size;
 
   /// 원 오른쪽 라벨입니다.
   final String? label;
@@ -84,7 +129,8 @@ class _HoronRadioState extends State<HoronRadio> {
     final bool interactive = widget.enabled && scope?.onValueChange != null;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    final double side = space.step(5);
+    final _RadioMetrics metrics = _metricsOf(widget.size ?? scope?.size ?? HoronRadioSize.md, theme);
+    final double side = metrics.side;
     final Color fill = selected
         ? (_hovered && interactive ? colors.interactivePrimaryHover : colors.interactivePrimary)
         : colors.bgSurface;
@@ -112,8 +158,8 @@ class _HoronRadioState extends State<HoronRadio> {
                 builder: (BuildContext context, double scale, Widget? child) =>
                     Transform.scale(scale: scale, child: child),
                 child: Container(
-                  width: space.step(_dotUnits),
-                  height: space.step(_dotUnits),
+                  width: metrics.dot,
+                  height: metrics.dot,
                   decoration: BoxDecoration(color: colors.interactiveOnPrimary, shape: BoxShape.circle),
                 ),
               ),
@@ -123,7 +169,7 @@ class _HoronRadioState extends State<HoronRadio> {
 
     final Widget content = Row(
       mainAxisSize: MainAxisSize.min,
-      spacing: space.s2_5,
+      spacing: metrics.gap,
       children: <Widget>[
         _FocusOutline(
           visible: _focused && interactive,
@@ -135,7 +181,7 @@ class _HoronRadioState extends State<HoronRadio> {
         ),
         if (widget.label != null)
           Flexible(
-            child: Text(widget.label!, style: theme.text.bodyMd.copyWith(color: colors.textPrimary)),
+            child: Text(widget.label!, style: metrics.textStyle.copyWith(color: colors.textPrimary)),
           ),
       ],
     );
@@ -178,14 +224,15 @@ class _HoronRadioState extends State<HoronRadio> {
 
 /// 그룹의 선택 값과 콜백을 자식 라디오에 내려 줍니다.
 class _HoronRadioScope extends InheritedWidget {
-  const _HoronRadioScope({required this.value, required this.onValueChange, required super.child});
+  const _HoronRadioScope({required this.value, required this.onValueChange, required this.size, required super.child});
 
   final String? value;
   final ValueChanged<String>? onValueChange;
+  final HoronRadioSize size;
 
   @override
   bool updateShouldNotify(_HoronRadioScope oldWidget) =>
-      value != oldWidget.value || onValueChange != oldWidget.onValueChange;
+      value != oldWidget.value || onValueChange != oldWidget.onValueChange || size != oldWidget.size;
 }
 
 /// `focus-visible:outline-2 outline-offset-2 outline-text-brand`을 그립니다.

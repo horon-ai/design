@@ -44,11 +44,11 @@ void main() {
     // Guards against a parser that quietly returns nothing for every file and
     // lets the gate above pass over an empty comparison.
     final button = reactUnionTypes('button');
-    expect(button['ButtonVariant'], <String>{'primary', 'glass', 'danger', 'link'});
+    expect(button['ButtonVariant'], <String>{'primary', 'glass', 'solid', 'danger', 'link'});
     expect(button['ButtonSize'], <String>{'sm', 'md', 'lg'});
     expect(button.keys, isNot(contains('ButtonProps')), reason: 'Omit<ComponentProps<...>> is not a literal union');
 
-    expect(reactUnionTypes('badge')['BadgeTone'], <String>{'neutral', 'brand', 'danger', 'solid'});
+    expect(reactUnionTypes('badge')['BadgeTone'], <String>{'neutral', 'brand', 'danger', 'solid', 'surface'});
 
     final icon = reactUnionTypes('horon_icon');
     expect(icon['iconNames'], isNotNull, reason: 'the as-const string array is a vocabulary');

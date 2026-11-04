@@ -1,68 +1,113 @@
 import { Input as BaseInput } from "@base-ui/react/input";
-import type { ComponentProps, ReactNode } from "react";
+import { createContext, useContext, useMemo, type ComponentProps, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
-import { fieldBoxClass } from "./input";
-import { LiquidGlass } from "./liquid-glass";
+import type { ControlSize } from "../lib/size";
+import { fieldBoxClass, fieldTextClass, type InputSurface } from "./input";
 
-export type InputGroupProps = Omit<ComponentProps<typeof BaseInput>, "className" | "prefix"> & {
-  /** Segment before the input, such as a country code select. */
+export type InputGroupSize = ControlSize;
+
+export type InputGroupProps = Omit<ComponentProps<typeof BaseInput>, "className" | "prefix" | "size"> & {
+  /**
+   * Segment before the input: `<Select variant="segment" />` or `<Combobox variant="segment" />`
+   * for a choice such as a country code, or `<InputGroupSegment>` for fixed text.
+   */
   prefix?: ReactNode;
   /** Segment after the input, such as a currency select. */
   suffix?: ReactNode;
+  size?: InputGroupSize;
   invalid?: boolean;
+  /** Solid (default) or glass, as on `Input`. */
+  surface?: InputSurface;
   className?: string;
 };
 
-const divider =
-  "h-full w-px shrink-0 bg-border-default transition-colors duration-150 group-hover:bg-border-strong group-data-invalid:bg-border-danger";
+type InputGroupContextValue = { size: InputGroupSize; disabled: boolean; surface: InputSurface };
 
-/** Figma `Input group` (60:429): a glass field split into a select segment and an input segment. */
-export function InputGroup({ prefix, suffix, invalid, className, disabled, ...props }: InputGroupProps) {
+/** Lets a segment (select, combobox or fixed text) take the group's size, disabled state and surface. */
+const InputGroupContext = createContext<InputGroupContextValue | null>(null);
+
+/** The group a segment sits in, or null outside an `InputGroup`. */
+export function useInputGroup() {
+  return useContext(InputGroupContext);
+}
+
+const sizeClass: Record<InputGroupSize, string> = {
+  sm: "h-8",
+  md: "h-10",
+  lg: "h-12",
+};
+
+const inputPaddingClass: Record<InputGroupSize, string> = {
+  sm: "px-2.5",
+  md: "px-3",
+  lg: "px-4",
+};
+
+/** The tinted segment look, shared by `InputGroupSegment` and the `segment` variant of `Select` and `Combobox`. */
+export const inputGroupSegmentClass: Record<InputGroupSize, string> = {
+  sm: "relative flex h-full shrink-0 items-center gap-1 bg-overlay-ink-4 px-2.5 text-label-sm text-text-primary [&_svg]:size-3.5 [&_svg]:text-text-secondary",
+  md: "relative flex h-full shrink-0 items-center gap-1 bg-overlay-ink-4 px-3 text-label-md text-text-primary [&_svg]:size-3.5 [&_svg]:text-text-secondary",
+  lg: "relative flex h-full shrink-0 items-center gap-1.5 bg-overlay-ink-4 px-4 text-label-lg text-text-primary [&_svg]:size-4 [&_svg]:text-text-secondary",
+};
+
+const divider = "relative h-full w-px shrink-0 bg-border-default group-data-invalid:bg-border-danger";
+
+/** Figma `Input group` (60:429): a glass or solid field split into a select segment and an input segment, in three sizes. */
+export function InputGroup({
+  prefix,
+  suffix,
+  size = "md",
+  invalid,
+  surface = "solid",
+  className,
+  disabled = false,
+  ...props
+}: InputGroupProps) {
+  const context = useMemo(() => ({ size, disabled, surface }), [size, disabled, surface]);
   return (
-    <div
-      className={cn(
-        "group relative flex h-10 items-center overflow-clip rounded-md border motion-colors",
-        fieldBoxClass.glass,
-        "focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
-        className,
-      )}
-      data-invalid={invalid ? "" : undefined}
-      data-disabled={disabled ? "" : undefined}
-    >
-      <LiquidGlass tier="regular" />
-      {prefix && (
-        <>
-          <InputGroupSegment>{prefix}</InputGroupSegment>
-          <span aria-hidden className={cn("relative", divider)} />
-        </>
-      )}
-      <div className="relative flex h-full min-w-0 flex-1 items-center px-3">
-        <BaseInput
-          disabled={disabled}
-          aria-invalid={invalid || undefined}
-          className={cn(fieldBoxClass.text, "text-body-md")}
-          {...props}
-        />
+    <InputGroupContext value={context}>
+      <div
+        className={cn(
+          "group relative flex items-center overflow-clip rounded-md border motion-colors",
+          sizeClass[size],
+          fieldBoxClass[surface],
+          className,
+        )}
+        data-invalid={invalid ? "" : undefined}
+        data-disabled={disabled ? "" : undefined}
+      >
+        {prefix && (
+          <>
+            {prefix}
+            <span aria-hidden className={divider} />
+          </>
+        )}
+        <div className={cn("relative flex h-full min-w-0 flex-1 items-center", inputPaddingClass[size])}>
+          <BaseInput
+            disabled={disabled}
+            aria-invalid={invalid || undefined}
+            className={cn(fieldBoxClass.text, fieldTextClass[size])}
+            {...props}
+          />
+        </div>
+        {suffix && (
+          <>
+            <span aria-hidden className={divider} />
+            {suffix}
+          </>
+        )}
       </div>
-      {suffix && (
-        <>
-          <span aria-hidden className={cn("relative", divider)} />
-          <InputGroupSegment>{suffix}</InputGroupSegment>
-        </>
-      )}
-    </div>
+    </InputGroupContext>
   );
 }
 
-/** The tinted `Select segment` of an input group: label-md text and a 14px icon. */
+/** A fixed-text segment, such as a unit or a `https://` prefix. Takes the group's size. */
 export function InputGroupSegment({ className, children }: { className?: string; children: ReactNode }) {
+  const group = useInputGroup();
   return (
     <div
-      className={cn(
-        "relative flex h-full shrink-0 items-center gap-1 bg-overlay-ink-4 px-3 text-label-md text-text-primary group-data-disabled:text-text-disabled [&_svg]:size-3.5 [&_svg]:text-text-secondary",
-        className,
-      )}
+      className={cn(inputGroupSegmentClass[group?.size ?? "md"], "group-data-disabled:text-text-disabled", className)}
     >
       {children}
     </div>

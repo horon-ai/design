@@ -119,7 +119,7 @@ export function Sidebar({
   return (
     <nav
       className={cn(
-        "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip border-r border-border-default bg-glass-thick px-3 pt-4 pb-3",
+        "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip bg-glass-thick px-3 pt-4 pb-3",
         surface === "photo" && "bg-sidebar-photo dark:bg-glass-thick dark:bg-none",
         resizable && "md:w-(--sidebar-width)",
         className,
@@ -127,7 +127,7 @@ export function Sidebar({
       style={resizable ? ({ ...style, "--sidebar-width": `${width}px` } as CSSProperties) : style}
       {...props}
     >
-      {surface === "photo" ? null : <LiquidGlass tier="thick" />}
+      {surface === "photo" ? null : <LiquidGlass />}
       {children}
       {resizable && (
         <div

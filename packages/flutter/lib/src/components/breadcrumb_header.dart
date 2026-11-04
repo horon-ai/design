@@ -47,7 +47,11 @@ class HoronBreadcrumbHeader extends StatelessWidget {
     this.onMore,
     this.searchLabel = 'Search',
     this.moreLabel = 'More',
+    this.glass = false,
   });
+
+  /// 참이면 `surface="glass"`입니다. 기본값은 불투명 solid입니다.
+  final bool glass;
 
   /// 순서대로 놓을 조각입니다. 마지막 조각이 현재 페이지입니다.
   final List<HoronBreadcrumbHeaderCrumb> crumbs;
@@ -69,22 +73,29 @@ class HoronBreadcrumbHeader extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronSpaceSpec space = theme.space;
 
-    // `h-13 items-center gap-2 rounded-full bg-glass-regular p-2`입니다.
-    return HoronLiquidGlass(
-      tier: HoronGlassTier.regular,
-      borderRadius: BorderRadius.circular(theme.radius.full),
-      child: Container(
-        constraints: BoxConstraints(minHeight: space.step(13)), // h-13 = 52
-        padding: EdgeInsets.all(space.s2), // p-2
-        child: Row(
-          spacing: space.s2, // gap-2
-          children: <Widget>[
-            Expanded(child: _CrumbRow(crumbs: crumbs)),
-            _HeaderIconButton(icon: const Icon(Icons.search), label: searchLabel, onPressed: onSearch),
-            _HeaderIconButton(icon: const Icon(Icons.more_horiz), label: moreLabel, onPressed: onMore),
-          ],
-        ),
+    final BorderRadius radius = BorderRadius.circular(theme.radius.full);
+    final Widget content = Container(
+      constraints: BoxConstraints(minHeight: space.step(13)), // h-13 = 52
+      padding: EdgeInsets.all(space.s2), // p-2
+      child: Row(
+        spacing: space.s2, // gap-2
+        children: <Widget>[
+          Expanded(child: _CrumbRow(crumbs: crumbs)),
+          _HeaderIconButton(icon: const Icon(Icons.search), label: searchLabel, onPressed: onSearch),
+          _HeaderIconButton(icon: const Icon(Icons.more_horiz), label: moreLabel, onPressed: onMore),
+        ],
       ),
+    );
+    if (glass) {
+      return HoronLiquidGlass(tier: HoronGlassTier.regular, borderRadius: radius, child: content);
+    }
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.colors.bgSurface,
+        borderRadius: radius,
+        border: Border.all(color: theme.colors.borderDefault),
+      ),
+      child: content,
     );
   }
 }

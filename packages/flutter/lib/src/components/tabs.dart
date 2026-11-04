@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../contracts/surface.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -12,8 +14,65 @@ const double _focusWidth = 2;
 /// `data-disabled:opacity-40`입니다.
 const double _disabledOpacity = 0.4;
 
-/// `[&_svg]:size-4` — 탭 아이콘 16px입니다.
-const double _iconSize = 16;
+/// `tabs.tsx`의 `TabsSize`입니다.
+enum HoronTabsSize {
+  /// `size="sm"` — 위아래 6, `label-md`, 아이콘 14px.
+  sm,
+
+  /// `size="md"` — 위아래 10, `label-lg`, 아이콘 16px. 기본값입니다.
+  md,
+
+  /// `size="lg"` — 위아래 14, `label-lg`, 아이콘 20px.
+  lg,
+}
+
+typedef _TabMetrics = ({
+  double paddingY,
+  double plainPaddingX,
+  double richPaddingX,
+  double richGap,
+  double icon,
+  double countHeight,
+  double countPaddingX,
+  TextStyle textStyle,
+  TextStyle countText,
+});
+
+_TabMetrics _metricsOf(HoronTabsSize size, HoronThemeData theme) => switch (size) {
+  HoronTabsSize.sm => (
+    paddingY: theme.space.s1_5,
+    plainPaddingX: theme.space.s1,
+    richPaddingX: theme.space.s2_5,
+    richGap: theme.space.s1,
+    icon: 14,
+    countHeight: theme.space.step(5),
+    countPaddingX: theme.space.s1_5,
+    textStyle: theme.text.labelMd,
+    countText: theme.text.labelSm,
+  ),
+  HoronTabsSize.md => (
+    paddingY: theme.space.s2_5,
+    plainPaddingX: theme.space.s1,
+    richPaddingX: theme.space.s3_5,
+    richGap: theme.space.s1_5,
+    icon: 16,
+    countHeight: theme.space.step(5.5),
+    countPaddingX: theme.space.s2,
+    textStyle: theme.text.labelLg,
+    countText: theme.text.labelSm,
+  ),
+  HoronTabsSize.lg => (
+    paddingY: theme.space.s3_5,
+    plainPaddingX: theme.space.s1_5,
+    richPaddingX: theme.space.s4,
+    richGap: theme.space.s2,
+    icon: 20,
+    countHeight: theme.space.step(6),
+    countPaddingX: theme.space.s2,
+    textStyle: theme.text.labelLg,
+    countText: theme.text.labelMd,
+  ),
+};
 
 /// `animate-[tab-panel-in_200ms_var(--ease-out-quint)]` — 패널 진입 200ms입니다.
 ///
@@ -28,10 +87,20 @@ const Duration _panelInDuration = Duration(milliseconds: 200);
 /// [initialValue]로 시작하고, 없으면 첫 탭이 선택됩니다(React의 Base UI 기본값).
 class HoronTabs extends StatefulWidget {
   /// 탭 묶음을 만듭니다.
-  const HoronTabs({super.key, required this.children, this.initialValue, this.value, this.onChanged});
+  const HoronTabs({
+    super.key,
+    required this.children,
+    this.initialValue,
+    this.value,
+    this.onChanged,
+    this.size = HoronTabsSize.md,
+  });
 
   /// 목록과 패널입니다.
   final List<Widget> children;
+
+  /// 탭 크기입니다. 목록과 탭이 이 값을 함께 읽습니다. 기본값은 [HoronTabsSize.md]입니다.
+  final HoronTabsSize size;
 
   /// 처음 선택할 값입니다. React의 `defaultValue`입니다.
   final String? initialValue;
@@ -80,6 +149,7 @@ class _HoronTabsState extends State<HoronTabs> {
     return _TabsScope(
       selected: _selected,
       onSelect: _select,
+      size: widget.size,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,15 +162,16 @@ class _HoronTabsState extends State<HoronTabs> {
 
 /// 선택 값을 아래로 내리는 통로입니다. React의 Base UI 컨텍스트 자리입니다.
 class _TabsScope extends InheritedWidget {
-  const _TabsScope({required this.selected, required this.onSelect, required super.child});
+  const _TabsScope({required this.selected, required this.onSelect, required this.size, required super.child});
 
   final String? selected;
   final ValueChanged<String> onSelect;
+  final HoronTabsSize size;
 
   static _TabsScope? maybeOf(BuildContext context) => context.dependOnInheritedWidgetOfExactType<_TabsScope>();
 
   @override
-  bool updateShouldNotify(_TabsScope oldWidget) => selected != oldWidget.selected;
+  bool updateShouldNotify(_TabsScope oldWidget) => selected != oldWidget.selected || size != oldWidget.size;
 }
 
 /// Figma `Tabs example`(62:353)의 유리 쟁반입니다.
@@ -110,10 +181,13 @@ class _TabsScope extends InheritedWidget {
 /// 같은 일을 합니다. 좁은 폭에서는 탭이 다음 줄로 넘어가고 표시자도 그 줄을 따라갑니다.
 class HoronTabsList extends StatefulWidget {
   /// 탭 목록을 만듭니다.
-  const HoronTabsList({super.key, required this.children});
+  const HoronTabsList({super.key, required this.children, this.surface = HoronSurface.solid});
 
   /// [HoronTabsTab] 목록입니다.
   final List<Widget> children;
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
 
   @override
   State<HoronTabsList> createState() => _HoronTabsListState();
@@ -140,7 +214,8 @@ class _HoronTabsListState extends State<HoronTabsList> {
     );
     WidgetsBinding.instance.addPostFrameCallback((Duration _) => _measure(activeIndex));
 
-    return HoronLiquidGlass(
+    return HoronSurfaceLayer(
+      surface: widget.surface,
       tier: HoronGlassTier.regular,
       borderRadius: BorderRadius.circular(theme.radius.full),
       child: Padding(
@@ -232,12 +307,12 @@ class _HoronTabsTabState extends State<HoronTabsTab> {
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
-    final HoronSpaceSpec space = theme.space;
     final _TabsScope? scope = _TabsScope.maybeOf(context);
     final bool selected = scope?.selected == widget.value;
     final bool interactive = widget.enabled && scope != null;
     final bool rich = widget.icon != null || widget.count != null;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final _TabMetrics metrics = _metricsOf(scope?.size ?? HoronTabsSize.md, theme);
 
     final Color foreground = selected || _hovered ? colors.textPrimary : colors.textSecondary;
     final Color background = _hovered ? (selected ? colors.overlayInk14 : colors.overlayInk5) : Colors.transparent;
@@ -246,29 +321,29 @@ class _HoronTabsTabState extends State<HoronTabsTab> {
       duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
       curve: HoronMotion.colorsCurve,
       padding: EdgeInsets.symmetric(
-        horizontal: rich ? space.s3_5 : space.s1, // px-3.5 / px-1
-        vertical: space.s2_5, // py-2.5
+        horizontal: rich ? metrics.richPaddingX : metrics.plainPaddingX,
+        vertical: metrics.paddingY,
       ),
       decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(theme.radius.full)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        spacing: space.s1_5, // gap-1.5
+        spacing: metrics.richGap,
         children: <Widget>[
           if (widget.icon != null)
             IconTheme.merge(
-              data: IconThemeData(size: _iconSize, color: foreground),
+              data: IconThemeData(size: metrics.icon, color: foreground),
               child: widget.icon!,
             ),
           Flexible(
             child: Text(
               widget.label,
               // text-label-lg whitespace-nowrap
-              style: theme.text.labelLg.copyWith(color: foreground),
+              style: metrics.textStyle.copyWith(color: foreground),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (widget.count != null) _CountPill(count: widget.count!, selected: selected),
+          if (widget.count != null) _CountPill(count: widget.count!, selected: selected, metrics: metrics),
         ],
       ),
     );
@@ -315,21 +390,21 @@ class _HoronTabsTabState extends State<HoronTabsTab> {
 
 /// `h-5.5 rounded-full bg-overlay-ink-6 px-2 text-label-sm` 개수 알약입니다.
 class _CountPill extends StatelessWidget {
-  const _CountPill({required this.count, required this.selected});
+  const _CountPill({required this.count, required this.selected, required this.metrics});
 
   final int count;
   final bool selected;
+  final _TabMetrics metrics;
 
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
-    final HoronSpaceSpec space = theme.space;
     return AnimatedContainer(
       duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,
       curve: HoronMotion.colorsCurve,
-      height: space.step(5.5), // h-5.5 = 22
-      padding: EdgeInsets.symmetric(horizontal: space.s2), // px-2
+      height: metrics.countHeight,
+      padding: EdgeInsets.symmetric(horizontal: metrics.countPaddingX),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: selected ? colors.interactivePrimary : colors.overlayInk6,
@@ -337,7 +412,7 @@ class _CountPill extends StatelessWidget {
       ),
       child: Text(
         '$count',
-        style: theme.text.labelSm.copyWith(color: selected ? colors.interactiveOnPrimary : colors.textSecondary),
+        style: metrics.countText.copyWith(color: selected ? colors.interactiveOnPrimary : colors.textSecondary),
         maxLines: 1,
       ),
     );

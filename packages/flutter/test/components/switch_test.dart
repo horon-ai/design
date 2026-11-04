@@ -33,6 +33,7 @@ void main() {
         HoronSwitchSize.sm => (const Size(32, 20), 16), // h-5 w-8, size-4
         HoronSwitchSize.compact => (const Size(40, 24), 18), // h-6 w-10, size-[18px]
         HoronSwitchSize.md => (const Size(44, 26), 22), // h-6.5 w-11, size-5.5
+        HoronSwitchSize.lg => (const Size(52, 30), 26), // h-7.5 w-13, size-6.5
       };
       expect(tester.getSize(_track()), track, reason: '$size 트랙');
       expect(tester.getSize(_thumb()), Size(thumb, thumb), reason: '$size 썸');

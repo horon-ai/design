@@ -1,5 +1,4 @@
 ---
-import { Button } from "@horon-ai/react";
 import { glass } from "@horon-ai/tokens";
 
 import CodeBlock from "@/components/site/CodeBlock.astro";
@@ -9,20 +8,18 @@ import { fill } from "@/i18n/messages/fill";
 import { foundationsGlassMessages as m } from "@/i18n/messages/foundations-glass";
 import DocsLayout from "@/layouts/DocsLayout.astro";
 
-const layers = fill(m.layersBody, { opacity: glass.layerOpacity * 100 });
-const tint = fill(m.tintItem, { color: glass.tint.color, blur: glass.tint.blur });
-const innerShade = fill(m.innerShadeItem, {
-  color: glass.innerShade.color,
-  blur: glass.innerShade.blur,
-  maxY: glass.innerShade.maxInsetY,
-  maxX: glass.innerShade.maxInsetX,
+const backdrop = fill(m.backdropItem, { blur: glass.blur, saturate: glass.saturate * 100 });
+const border = fill(m.borderItem, {
+  width: glass.rimWidth,
+  top: glass.rim.light.top,
+  mid: glass.rim.light.mid,
+  bottom: glass.rim.light.bottom,
 });
-const edge = fill(m.edgeItem, { color: glass.edgeLightSoft.color });
 
 const usage = `import { LiquidGlass } from "@horon-ai/react";
 
 <div className="relative overflow-clip rounded-xl bg-glass-thick p-5">
-  <LiquidGlass tier="thick" />
+  <LiquidGlass />
   <p className="relative">Content</p>
 </div>`;
 ---
@@ -33,39 +30,18 @@ const usage = `import { LiquidGlass } from "@horon-ai/react";
   section="foundations"
   description={m.description}
 >
-  <div class="mt-2"><GlassDemo /></div>
+  <div class="not-prose mt-2"><GlassDemo /></div>
 
   <h2><T m={m.layersHeading} /></h2>
-  <p><T m={layers} /></p>
+  <p><T m={m.layersBody} /></p>
   <ul>
-    <li><T m={tint} /></li>
-    <li><T m={innerShade} /></li>
-    <li><T m={edge} /></li>
-    <li><T m={m.textureItem} /></li>
+    <li><T m={backdrop} /></li>
+    <li><T m={m.fillItem} /></li>
+    <li><T m={border} /></li>
   </ul>
-  <p><T m={m.heightNote} /></p>
-
-  <h2><T m={m.refractionHeading} /></h2>
-  <p><T m={m.refractionBody} /></p>
-  <p>
-    <T m={m.refractionFallbackLead} /><Button
-      variant="link"
-      href="https://bugs.webkit.org/show_bug.cgi?id=245510"
-      target="_blank"
-      rel="noreferrer"
-    >WebKit 245510</Button>, <Button
-      variant="link"
-      href="https://bugzilla.mozilla.org/show_bug.cgi?id=1961378"
-      target="_blank"
-      rel="noreferrer"
-    >Gecko 1961378</Button><T m={m.refractionFallbackTail} />
-  </p>
-  <ul>
-    <li><T m={m.ruleLimit} /></li>
-    <li><T m={m.ruleOffscreen} /></li>
-    <li><T m={m.ruleReducedTransparency} /></li>
-    <li><T m={m.ruleRefractOff} /></li>
-  </ul>
+  <p><T m={m.compatibilityBody} /></p>
+  <p><T m={m.hostBorderBody} /></p>
+  <p><T m={m.fallbackBody} /></p>
 
   <h2><T m={m.usageHeading} /></h2>
   <CodeBlock code={usage} title="tsx" />

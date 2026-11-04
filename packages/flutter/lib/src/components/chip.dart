@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -10,27 +8,83 @@ import '../tokens/horon_tokens.g.dart';
 /// `data-disabled:opacity-40`입니다.
 const double _disabledOpacity = 0.4;
 
-/// `size-3.5` — 선택 표시 체크 아이콘 14px입니다.
-const double _checkSize = 14;
+/// `chip.tsx`의 `ChipSize`입니다.
+enum HoronChipSize {
+  /// `size="sm"` — 높이 28, 좌우 10, `label-sm`, 체크 12px.
+  sm,
+
+  /// `size="md"` — 높이 32, 좌우 12, `label-md`, 체크 14px. 기본값입니다.
+  md,
+
+  /// `size="lg"` — 높이 36, 좌우 14, `label-lg`, 체크 16px.
+  lg,
+}
+
+typedef _ChipMetrics = ({
+  double height,
+  double paddingX,
+  double slot,
+  double margin,
+  double check,
+  TextStyle textStyle,
+});
+
+_ChipMetrics _metricsOf(HoronChipSize size, HoronThemeData theme) => switch (size) {
+  HoronChipSize.sm => (
+    height: theme.space.step(7),
+    paddingX: theme.space.s2_5,
+    slot: theme.space.step(4.5),
+    margin: theme.space.s1,
+    check: 12,
+    textStyle: theme.text.labelSm,
+  ),
+  HoronChipSize.md => (
+    height: theme.space.step(8),
+    paddingX: theme.space.s3,
+    slot: theme.space.step(5.5),
+    margin: theme.space.s1_5,
+    check: 14,
+    textStyle: theme.text.labelMd,
+  ),
+  HoronChipSize.lg => (
+    height: theme.space.step(9),
+    paddingX: theme.space.s3_5,
+    slot: theme.space.step(6.5),
+    margin: theme.space.s2,
+    check: 16,
+    textStyle: theme.text.labelLg,
+  ),
+};
 
 /// `transition-[width,margin] duration-150 ease-out`의 시간입니다.
 const Duration _revealDuration = Duration(milliseconds: 150);
 
 /// Figma `Chip`(61:302)입니다.
 ///
-/// 높이 32px의 유리 칩입니다. 선택하면 체크가 나타나고 테두리가
-/// `border-brand`, 바탕이 `glass-clear-pressed`, 글자가 `text-brand`로 바뀝니다.
+/// 높이 32px의 불투명 칩입니다. `bg-surface` 바탕에 `border-default` 1px 테두리를
+/// 두르고, 선택하면 체크가 나타나며 테두리가 `border-brand`, 글자가 `text-brand`로
+/// 바뀝니다. 유리 표면은 쓰지 않습니다.
 /// React의 `Toggle`처럼 [pressed]를 주지 않으면 스스로 선택 상태를 들고, 주면
 /// 부모가 소유합니다.
 class HoronChip extends StatefulWidget {
   /// 칩을 만듭니다.
-  const HoronChip({super.key, required this.label, this.pressed, this.onPressedChange, this.enabled = true});
+  const HoronChip({
+    super.key,
+    required this.label,
+    this.pressed,
+    this.onPressedChange,
+    this.size = HoronChipSize.md,
+    this.enabled = true,
+  });
 
   /// 칩의 문구입니다. React의 `children`입니다.
   final String label;
 
   /// 선택 여부입니다. null이면 위젯이 스스로 상태를 들고 토글합니다.
   final bool? pressed;
+
+  /// 크기입니다. 기본값은 [HoronChipSize.md]입니다.
+  final HoronChipSize size;
 
   /// 선택이 바뀔 때 부를 콜백입니다.
   final ValueChanged<bool>? onPressedChange;
@@ -63,20 +117,22 @@ class _HoronChipState extends State<HoronChip> {
     final bool interactive = widget.enabled && (widget.onPressedChange != null || widget.pressed == null);
     final bool pressed = _pressed;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final _ChipMetrics metrics = _metricsOf(widget.size, theme);
 
-    // React는 칩을 clear 유리로 그리고(`chip.tsx:30`의 `<LiquidGlass texture />`),
-    // 호버·선택 동안에만 토큰 색을 얇게 덧칩니다. 쉬는 상태의 컨테이너 색은 비어 있고,
-    // 바탕은 유리 엔진이 그립니다.
-    final Color? surfaceTint = pressed
-        ? colors.glassClearPressed
-        : (_hovered && interactive ? colors.glassClearHover : null);
+    // 칩은 유리를 쓰지 않는 불투명 표면입니다. React
+    // `border border-border-default bg-bg-surface`에 대응하고, 선택하면 테두리가
+    // `border-brand`, 글자가 `text-brand`로 바뀝니다.
+    final Color background = _hovered && interactive && !pressed ? colors.bgSubtle : colors.bgSurface;
     final Color foreground = pressed ? colors.textBrand : colors.textPrimary;
-    final Color border = pressed ? colors.borderBrand : Colors.transparent;
+    final Color border = pressed ? colors.borderBrand : colors.borderDefault;
 
     // 체크 자리는 `w-0 -mr-1.5`에서 `w-[1.375rem] mr-0`으로 자랍니다. 그래서 선택
     // 전에는 라벨이 왼쪽 여백 12px에서 6px만큼 당겨진 6px에 서고, 선택하면 22px
     // 자리(체크 14px + 8px) 뒤 12px에서 시작합니다.
-    final EdgeInsets padding = EdgeInsets.only(left: pressed ? space.s3 : space.s3 - space.s1_5, right: space.s3);
+    final EdgeInsets padding = EdgeInsets.only(
+      left: pressed ? metrics.paddingX : metrics.paddingX - metrics.margin,
+      right: metrics.paddingX,
+    );
 
     final Widget check = TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
@@ -84,10 +140,10 @@ class _HoronChipState extends State<HoronChip> {
       curve: HoronMotion.popInCurve,
       builder: (BuildContext context, double scale, Widget? child) => Transform.scale(scale: scale, child: child),
       child: SizedBox(
-        width: space.step(5.5),
+        width: metrics.slot,
         child: Align(
           alignment: Alignment.centerLeft,
-          child: Icon(Icons.check, size: _checkSize, color: foreground),
+          child: Icon(Icons.check, size: metrics.check, color: foreground),
         ),
       ),
     );
@@ -126,42 +182,28 @@ class _HoronChipState extends State<HoronChip> {
               child: AnimatedContainer(
                 duration: reduceMotion ? Duration.zero : _revealDuration,
                 curve: Curves.easeOut,
-                height: space.step(8),
+                height: metrics.height,
                 decoration: BoxDecoration(
-                  color: surfaceTint,
+                  color: background,
                   borderRadius: BorderRadius.circular(theme.radius.full),
                   border: Border.all(color: border),
                 ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: <Widget>[
-                    Positioned.fill(
-                      child: HoronLiquidGlass(
-                        tier: HoronGlassTier.clear,
-                        texture: true,
-                        borderRadius: BorderRadius.circular(theme.radius.full),
-                        child: const SizedBox.expand(),
+                child: Padding(
+                  padding: padding,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (pressed) check,
+                      Flexible(
+                        child: Text(
+                          widget.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: metrics.textStyle.copyWith(color: foreground),
+                        ),
                       ),
-                    ),
-                    // 패딩은 내용에만 걸어 유리가 알약 전체를 채우게 합니다.
-                    Padding(
-                      padding: padding,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          if (pressed) check,
-                          Flexible(
-                            child: Text(
-                              widget.label,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.text.labelMd.copyWith(color: foreground),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

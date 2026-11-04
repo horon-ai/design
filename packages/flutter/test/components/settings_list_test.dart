@@ -16,7 +16,13 @@ Future<void> pumpList(WidgetTester tester, Widget child, {Brightness brightness 
 
 void main() {
   testWidgets('settings list: the card is thick glass at the 16px radius', (WidgetTester tester) async {
-    await pumpList(tester, const HoronSettingsList(children: <Widget>[HoronSettingsRow(title: '언어', last: true)]));
+    await pumpList(
+      tester,
+      const HoronSettingsList(
+        surface: HoronSurface.glass,
+        children: <Widget>[HoronSettingsRow(title: '언어', last: true)],
+      ),
+    );
     expect(find.byType(HoronLiquidGlass), findsOneWidget);
     final ClipRRect clip = tester.widget<ClipRRect>(
       find.descendant(of: find.byType(HoronSettingsList), matching: find.byType(ClipRRect)).first,

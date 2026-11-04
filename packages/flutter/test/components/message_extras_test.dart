@@ -29,6 +29,7 @@ void main() {
     await pumpExtras(
       tester,
       HoronMessageActions(
+        surface: HoronSurface.glass,
         actions: <HoronMessageAction>[
           HoronMessageAction(label: 'Copy', icon: const Icon(Icons.copy), onPressed: () => copied++),
           HoronMessageAction(label: 'Retry', icon: const Icon(Icons.refresh)),

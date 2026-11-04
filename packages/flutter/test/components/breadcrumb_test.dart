@@ -66,7 +66,7 @@ void main() {
     await tester.pumpWidget(_host(HoronBreadcrumb(children: _crumbs())));
     expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'surface가 없으면 맨 조각입니다');
 
-    await tester.pumpWidget(_host(HoronBreadcrumb(glass: true, children: _crumbs())));
+    await tester.pumpWidget(_host(HoronBreadcrumb(surface: HoronBreadcrumbSurface.glass, children: _crumbs())));
     final HoronThemeData theme = _theme(tester);
     final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
     expect(glass.tier, HoronGlassTier.regular);

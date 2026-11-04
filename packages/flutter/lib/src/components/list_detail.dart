@@ -12,8 +12,10 @@ import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_glass.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -71,7 +73,11 @@ class HoronListDetail extends StatefulWidget {
     this.defaultValue,
     this.onValueChange,
     this.listWidth = 250,
+    this.surface = HoronSurface.solid,
   });
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
 
   /// 그룹 목록입니다.
   final List<HoronListDetailGroup> groups;
@@ -131,7 +137,8 @@ class _HoronListDetailState extends State<HoronListDetail> {
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: _maxWidth),
-      child: HoronLiquidGlass(
+      child: HoronSurfaceLayer(
+        surface: widget.surface,
         tier: HoronGlassTier.thick,
         borderRadius: BorderRadius.circular(theme.radius.xl2), // rounded-2xl = 16
         child: LayoutBuilder(

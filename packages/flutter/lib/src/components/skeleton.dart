@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 
@@ -105,13 +106,16 @@ class _HoronSkeletonState extends State<HoronSkeleton> with SingleTickerProvider
 /// [HoronSkeletonCard.text]. 표면은 `bg-glass-thick`이라 두꺼운 유리가 깔립니다.
 class HoronSkeletonCard extends StatelessWidget {
   /// 행 모양입니다. 40px 원형과 두 줄이 가로로 놓입니다.
-  const HoronSkeletonCard.row({super.key}) : _kind = _SkeletonCardKind.row;
+  const HoronSkeletonCard.row({super.key, this.surface = HoronSurface.solid}) : _kind = _SkeletonCardKind.row;
 
   /// 카드 모양입니다. 제목 한 줄과 본문 세 줄, 알약 하나가 세로로 쌓입니다.
-  const HoronSkeletonCard.card({super.key}) : _kind = _SkeletonCardKind.card;
+  const HoronSkeletonCard.card({super.key, this.surface = HoronSurface.solid}) : _kind = _SkeletonCardKind.card;
 
   /// 글 모양입니다. 세 줄만 놓입니다.
-  const HoronSkeletonCard.text({super.key}) : _kind = _SkeletonCardKind.text;
+  const HoronSkeletonCard.text({super.key, this.surface = HoronSurface.solid}) : _kind = _SkeletonCardKind.text;
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
 
   final _SkeletonCardKind _kind;
 
@@ -127,7 +131,12 @@ class HoronSkeletonCard extends StatelessWidget {
         child: Stack(
           children: <Widget>[
             Positioned.fill(
-              child: HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: const SizedBox.expand()),
+              child: HoronSurfaceLayer(
+                surface: surface,
+                tier: HoronGlassTier.thick,
+                borderRadius: radius,
+                child: const SizedBox.expand(),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(_skeletonCardPadding),

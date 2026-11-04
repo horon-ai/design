@@ -46,7 +46,9 @@ void main() {
   testWidgets('the card is a 14px regular glass box with 16/14 padding and two text roles', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(_host(const HoronToast(title: '저장했습니다', description: '반영되었습니다')));
+    await tester.pumpWidget(
+      _host(const HoronToast(title: '저장했습니다', description: '반영되었습니다', surface: HoronSurface.glass)),
+    );
     final HoronThemeData theme = _theme(tester);
 
     expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'bg-glass-regular');

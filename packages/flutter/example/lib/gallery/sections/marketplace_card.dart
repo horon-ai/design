@@ -3,10 +3,13 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../surface_group.dart';
+
 /// `marketplace_card` 갤러리 섹션입니다.
 ///
-/// 변형 어휘가 없으므로 상태를 늘어놓습니다. 별점과 설치 수가 있는 기본형, 칩만 있는
-/// 카드, 그리고 이름만 있는 최소형입니다. 폭이 좁으면 카드가 프레임 폭에 맞춰 줄어듭니다.
+/// 변형 어휘가 없으므로 상태를 늘어놓습니다. 별점과 설치 수가 있는 기본형, 칩만
+/// 있는 카드, 이름만 있는 최소형을 solid와 glass 두 표면에 같은 목록으로 보여
+/// 줍니다. 폭이 좁으면 카드가 프레임 폭에 맞춰 줄어듭니다.
 class HoronMarketplaceCardGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronMarketplaceCardGallerySection({super.key});
@@ -16,55 +19,78 @@ class HoronMarketplaceCardGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double available = constraints.maxWidth.isFinite
-              ? constraints.maxWidth
-              : 320;
-          final double card = math.min(available, 320);
-          return Wrap(
-            spacing: theme.space.s4,
-            runSpacing: theme.space.s4,
-            crossAxisAlignment: WrapCrossAlignment.start,
-            children: <Widget>[
-              _Cell(
-                label: '별점 · 설치 수 · Install',
-                width: card,
-                child: HoronMarketplaceCard(
-                  initials: 'WB',
-                  name: 'web-search',
-                  author: 'horon',
-                  description: '웹을 검색하고 인용할 수 있는 근거를 모읍니다',
-                  chips: _chips,
-                  score: '4.8',
-                  installs: '12k',
-                  onInstall: () {},
-                ),
-              ),
-              _Cell(
-                label: '칩만 있는 카드',
-                width: card,
-                child: HoronMarketplaceCard(
-                  initials: 'FS',
-                  name: 'filesystem',
-                  author: 'alpox',
-                  description: '로컬 파일을 읽고 고칩니다',
-                  chips: _chips,
-                  onInstall: () {},
-                ),
-              ),
-              _Cell(
-                label: '최소 — 이름만',
-                width: card,
-                child: const HoronMarketplaceCard(
-                  initials: 'MS',
-                  name: 'mail-sync',
-                ),
-              ),
-            ],
-          );
-        },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: theme.space.s6,
+        children: <Widget>[
+          SurfaceGroup(
+            label: 'Solid',
+            child: _cards(theme, HoronSurface.solid),
+          ),
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
+            child: _cards(theme, HoronSurface.glass),
+          ),
+        ],
       ),
+    );
+  }
+
+  /// 한 표면의 카드 표본 목록입니다. 표면만 바뀌고 내용은 같습니다.
+  Widget _cards(HoronThemeData theme, HoronSurface surface) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double available = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 320;
+        final double card = math.min(available, 320);
+        return Wrap(
+          spacing: theme.space.s4,
+          runSpacing: theme.space.s4,
+          crossAxisAlignment: WrapCrossAlignment.start,
+          children: <Widget>[
+            _Cell(
+              label: '별점 · 설치 수 · Install',
+              width: card,
+              child: HoronMarketplaceCard(
+                surface: surface,
+                initials: 'WB',
+                name: 'web-search',
+                author: 'horon',
+                description: '웹을 검색하고 인용할 수 있는 근거를 모읍니다',
+                chips: _chips,
+                score: '4.8',
+                installs: '12k',
+                onInstall: () {},
+              ),
+            ),
+            _Cell(
+              label: '칩만 있는 카드',
+              width: card,
+              child: HoronMarketplaceCard(
+                surface: surface,
+                initials: 'FS',
+                name: 'filesystem',
+                author: 'alpox',
+                description: '로컬 파일을 읽고 고칩니다',
+                chips: _chips,
+                onInstall: () {},
+              ),
+            ),
+            _Cell(
+              label: '최소 — 이름만',
+              width: card,
+              child: HoronMarketplaceCard(
+                surface: surface,
+                initials: 'MS',
+                name: 'mail-sync',
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

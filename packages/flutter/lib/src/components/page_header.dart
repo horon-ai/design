@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 import 'icon_button.dart';
@@ -24,7 +26,11 @@ class HoronPageHeader extends StatelessWidget {
     this.backLabel = 'Back',
     this.actions,
     this.child,
+    this.surface = HoronSurface.solid,
   });
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
 
   /// 제목입니다. `truncate text-label-lg`로 한 줄입니다.
   final String title;
@@ -48,7 +54,8 @@ class HoronPageHeader extends StatelessWidget {
     final HoronSpaceSpec space = theme.space;
 
     // `flex flex-col gap-1.5 rounded-[28px] bg-glass-regular p-2`입니다.
-    return HoronLiquidGlass(
+    return HoronSurfaceLayer(
+      surface: surface,
       tier: HoronGlassTier.regular,
       borderRadius: BorderRadius.circular(_headerRadius),
       child: Padding(

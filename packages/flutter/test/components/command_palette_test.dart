@@ -63,7 +63,7 @@ void main() {
     expect(find.byType(HoronCommandPaletteBody), findsNothing);
   });
 
-  testWidgets('the popup is a 560px frost surface with the 24px palette radius', (WidgetTester tester) async {
+  testWidgets('the popup is a 560px solid surface with the 24px palette radius', (WidgetTester tester) async {
     await tester.pumpWidget(_host(HoronCommandPalette(open: true, groups: _groups())));
     await tester.pumpAndSettle();
 
@@ -80,17 +80,9 @@ void main() {
         .firstWhere((BoxDecoration decoration) => decoration.boxShadow != null);
     expect(shadowed.boxShadow, theme.shadows.palette, reason: 'shadow-palette');
 
-    final ColoredBox frost = tester
-        .widgetList<ColoredBox>(
-          find.descendant(of: find.byType(HoronCommandPalette), matching: find.byType(ColoredBox)),
-        )
-        .firstWhere((ColoredBox box) => box.color == theme.colors.glassFillFrost);
-    expect(frost.color, theme.colors.glassFillFrost, reason: 'bg-glass-fill-frost');
-    expect(
-      tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass).first).tier,
-      HoronGlassTier.thick,
-      reason: 'LiquidGlass tier="thick"',
-    );
+    final HoronSurfaceLayer layer = tester.widget<HoronSurfaceLayer>(find.byType(HoronSurfaceLayer).first);
+    expect(layer.surface, HoronSurface.solid, reason: '기본 표면은 solid입니다');
+    expect(layer.borderRadius, BorderRadius.circular(24));
   });
 
   testWidgets('the search row is 48px with a 20px icon and the 14px padding', (WidgetTester tester) async {
