@@ -237,7 +237,7 @@ class _HoronDateFieldState extends State<HoronDateField> {
         anchor: info.anchorRect,
         screen: MediaQuery.sizeOf(context),
         safeArea: MediaQuery.paddingOf(context),
-        // `sideOffset={8}` — placeHoronOverlay 가 기본 gap(s1)을 이미 더하므로 그
+        // `sideOffset={8}` — placeHoronOverlay가 기본 gap(s1)을 이미 더하므로 그
         // 차이만 준다. 뒤집히면 주축 성분의 부호가 함께 뒤집혀 위로 8px가 된다.
         position: HoronOverlayPosition(offset: Offset(0, space.s2 - HoronOverlayPosition.gap)),
         // 달력이 자기 유리 판을 그리므로 패널 상자는 아무것도 칠하지 않습니다.
@@ -245,7 +245,8 @@ class _HoronDateFieldState extends State<HoronDateField> {
         // 양쪽 어디에도 달력 높이만 한 자리가 없으면 [HoronOverlayPlacement]가
         // 쓸 수 있는 만큼만 주므로, 그 안으로 줄이고 달력을 스크롤합니다. 예전
         // Material 메뉴는 오버레이 제약 안에서 자식을 줄여 화면 밖으로 나가지
-        // 않았습니다(2026-11-05 검증: 640x360에서 달력 아랫변이 502까지 나감).
+        // 않았습니다. 이 구현의 첫 시도에서는 자르기 전에 달력 높이를 그대로 써서
+        // 640x360일 때 아랫변이 502까지 나갔습니다.
         //
         // 다만 첫 프레임은 오버레이가 패널 크기를 모르는 채로 배치를 계산합니다.
         // 그 결과로 바로 자르면 줄어든 크기가 측정되어 "아래에 들어간다"고

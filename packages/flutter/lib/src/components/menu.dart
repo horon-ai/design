@@ -138,7 +138,7 @@ class _HoronMenuState extends State<HoronMenu> {
     );
   }
 
-  Widget _buildOverlay(BuildContext context, RawMenuOverlayInfo info) {
+  Widget _buildOverlay(BuildContext context, RawMenuOverlayInfo _) {
     final HoronMenuContent content = widget.content;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
