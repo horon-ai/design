@@ -33,9 +33,6 @@ const double _bodyPaddingBottom = 18;
 /// `plan-step.tsx`의 `rounded-[1px]`입니다. 레일 끝의 반경입니다.
 const double _railRadius = 1;
 
-/// 재시도 버튼의 `rounded-[10px]`입니다.
-const double _retryRadius = 10;
-
 /// Figma `Plan step`(Agent plan 191:8296): 2px 레일 위 24px 표식으로 단계를 잇습니다.
 ///
 /// `plan-step.tsx`를 옮긴 것입니다. 완료는 하늘색(`status-live`) 표식과 레일,
@@ -99,6 +96,9 @@ class HoronPlanStep extends StatelessWidget {
             ? theme.colors.statusLive
             : failed
             ? theme.colors.bgDanger
+            // `status === "running" && "bg-bg-subtle"`.
+            : status == HoronPlanStepStatus.running
+            ? theme.colors.bgSubtle
             : Colors.transparent,
         borderRadius: BorderRadius.circular(theme.radius.md),
         border: pending ? Border.all(color: theme.colors.borderDefault) : null,
@@ -187,21 +187,33 @@ class HoronPlanStep extends StatelessWidget {
                 if (failed && onRetry != null)
                   Align(
                     alignment: Alignment.centerLeft,
-                    child: TextButton.icon(
+                    child: TextButton(
                       onPressed: onRetry,
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                        minimumSize: Size.zero,
+                      style: ButtonStyle(
+                        // `h-7.5 px-3 rounded-full bg-overlay-ink-6 hover:bg-overlay-ink-10`.
+                        minimumSize: const WidgetStatePropertyAll<Size>(Size(0, 30)),
+                        padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.symmetric(horizontal: 12)),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        foregroundColor: theme.colors.textPrimary,
-                        backgroundColor: theme.colors.bgSurface,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(_retryRadius),
-                          side: BorderSide(color: theme.colors.borderDefault),
+                        foregroundColor: WidgetStatePropertyAll<Color>(theme.colors.textPrimary),
+                        backgroundColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                          return states.contains(WidgetState.hovered)
+                              ? theme.colors.overlayInk10
+                              : theme.colors.overlayInk6;
+                        }),
+                        overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
+                        shape: WidgetStatePropertyAll<OutlinedBorder>(
+                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(theme.radius.full)),
                         ),
                       ),
-                      icon: const Icon(Icons.refresh, size: 14),
-                      label: Text('Retry from here', style: theme.text.labelMd),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 6,
+                        children: <Widget>[
+                          const Icon(Icons.refresh, size: 14),
+                          // `text-label-sm`.
+                          Text('Retry from here', style: theme.text.labelSm),
+                        ],
+                      ),
                     ),
                   ),
               ],

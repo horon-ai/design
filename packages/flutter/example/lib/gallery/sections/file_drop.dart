@@ -26,7 +26,7 @@ class HoronFileDropGallerySection extends StatelessWidget {
             child: _drops(theme, HoronFileDropSurface.solid),
           ),
           SurfaceGroup(
-            label: 'Glass',
+            label: 'Glass · veil drop',
             glass: true,
             child: _drops(theme, HoronFileDropSurface.glass),
           ),

@@ -83,7 +83,10 @@ void main() {
       EdgeInsets.all(theme.space.s1_5),
       reason: 'p-1.5',
     );
-    expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass).first).tier, HoronGlassTier.thick);
+    final HoronVeil veil = tester.widget<HoronVeil>(
+      find.descendant(of: find.byType(HoronMenuContent), matching: find.byType(HoronVeil)),
+    );
+    expect(veil.kind, HoronVeilKind.overlay, reason: 'glass 메뉴는 veil-overlay입니다');
   });
 
   testWidgets('each surface has its own width, radius and fill', (WidgetTester tester) async {
@@ -115,10 +118,13 @@ void main() {
 
       switch (surface) {
         case HoronMenuSurface.glass:
-          expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'glass는 채움을 유리가 그립니다');
+          final HoronVeil veil = tester.widget<HoronVeil>(
+            find.descendant(of: find.byType(HoronMenuContent), matching: find.byType(HoronVeil)),
+          );
+          expect(veil.kind, HoronVeilKind.overlay, reason: 'glass는 veil-overlay입니다');
+          expect(find.byType(HoronLiquidGlass), findsNothing, reason: '유리 레이어를 겹치지 않습니다');
         case HoronMenuSurface.solid:
-          // React는 solid에도 `LiquidGlass`를 깝니다. 불투명 채움이 그 위를 덮습니다.
-          expect(find.byType(HoronLiquidGlass), findsOneWidget);
+          expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'solid는 veil도 유리도 깔지 않습니다');
           final BoxDecoration decoration = _surfaceDecoration(tester);
           expect(decoration.color, theme.colors.glassFillSolid, reason: 'bg-glass-fill-solid');
           expect(decoration.boxShadow, theme.shadows.popover, reason: 'shadow-popover');
@@ -147,7 +153,7 @@ void main() {
     );
     final HoronThemeData theme = _theme(tester);
     expect(tester.getSize(_item('Plain')).height, 40, reason: 'h-10');
-    expect(tester.getSize(_item('Described')).height, 46, reason: 'h-11.5');
+    expect(tester.getSize(_item('Described')).height, 48, reason: 'h-12');
     expect(tester.getSize(find.byIcon(Icons.copy_outlined)).width, 18, reason: '[&>svg]:size-4.5');
     expect(
       (tester.widget<AnimatedContainer>(_item('Plain')).decoration! as BoxDecoration).color,

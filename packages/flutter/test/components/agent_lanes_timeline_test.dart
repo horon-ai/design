@@ -99,21 +99,33 @@ void main() {
     }
   });
 
-  testWidgets('timeline: the header carries an 18px sparkle, the title and the range pill', (
+  testWidgets('timeline: the header carries an 18px pulse icon, the title and the range pill', (
     WidgetTester tester,
   ) async {
     await pumpTimeline(tester, const HoronAgentLanesTimeline(bots: _bots));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronAgentLanesTimeline)));
-    final Icon sparkle = tester.widget<Icon>(find.byIcon(Icons.auto_awesome));
-    // `Sparkle size-4.5 text-text-primary`.
-    expect(sparkle.size, 18);
-    expect(sparkle.color, theme.colors.textPrimary);
+    // `Pulse size-4.5 text-text-primary`.
+    final Icon pulse = tester.widget<Icon>(find.byIcon(Icons.monitor_heart_outlined));
+    expect(pulse.size, 18);
+    expect(pulse.color, theme.colors.textPrimary);
     // `text-label-lg`.
     expect(_labelColor(tester, 'Bots'), theme.colors.textPrimary);
     // `CaretDown size-3`.
     expect(tester.widget<Icon>(find.byIcon(Icons.keyboard_arrow_down)).size, 12);
     // `text-label-sm`.
     expect(tester.widget<Text>(find.text('Last 30m')).style!.fontSize, 12);
+    // `h-7.5 px-3` — 범위 알약은 높이 30, 좌우 12입니다.
+    final AnimatedContainer pill = tester.widget<AnimatedContainer>(
+      find.ancestor(of: find.text('Last 30m'), matching: find.byType(AnimatedContainer)).first,
+    );
+    expect(pill.padding, const EdgeInsets.symmetric(horizontal: 12));
+    // 좌우 여백 `px-5` — 레인 줄은 왼쪽 20에서 시작합니다.
+    expect(
+      find.byWidgetPredicate(
+        (Widget widget) => widget is AnimatedContainer && widget.padding == const EdgeInsets.only(left: 20),
+      ),
+      findsWidgets,
+    );
   });
 
   testWidgets('timeline: each task tone paints its own bar', (WidgetTester tester) async {
@@ -236,7 +248,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('timeline: narrow widths drop the tick labels and shrink the name column', (WidgetTester tester) async {
+  testWidgets('timeline: narrow widths keep the 700 minimum and scroll instead of shrinking', (
+    WidgetTester tester,
+  ) async {
     await pumpTimeline(tester, const HoronAgentLanesTimeline(bots: _bots), width: 1200);
     // 넓은 쪽은 5분 눈금 라벨이 섭니다.
     expect(find.text('-25m'), findsOneWidget);
@@ -244,9 +258,15 @@ void main() {
 
     await pumpTimeline(tester, const HoronAgentLanesTimeline(bots: _bots), width: 320);
     expect(tester.takeException(), isNull);
-    // 좁은 쪽은 라벨이 사라지고 세로선만 남습니다.
-    expect(find.text('-25m'), findsNothing);
+    // `min-w-175` — 320에서도 시간축은 700을 지키고 바깥에서 가로로 스크롤합니다.
+    final Finder scroller = find.descendant(
+      of: find.byType(HoronAgentLanesTimeline),
+      matching: find.byType(SingleChildScrollView),
+    );
+    expect(scroller, findsOneWidget);
+    expect(tester.getSize(scroller).width, 320);
     expect(find.text('Analyst'), findsOneWidget);
+    expect(find.text('-25m'), findsOneWidget);
   });
 
   testWidgets('timeline: the panel stops at 1010 wide', (WidgetTester tester) async {

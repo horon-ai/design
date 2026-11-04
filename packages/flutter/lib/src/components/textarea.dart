@@ -12,7 +12,7 @@ enum HoronTextareaSize {
   /// `size="md"` — 최소 높이 112, 여백 14/12, `body-md`. 기본값입니다.
   md,
 
-  /// `size="lg"` — 최소 높이 136, 여백 16/14, `body-lg`.
+  /// `size="lg"` — 최소 높이 136, 여백 20/14, `body-lg`.
   lg,
 }
 
@@ -33,7 +33,7 @@ _TextareaMetrics _metricsOf(HoronTextareaSize size, HoronThemeData theme) => swi
   ),
   HoronTextareaSize.lg => (
     minHeight: theme.space.step(34),
-    paddingX: theme.space.s4,
+    paddingX: theme.space.s5,
     paddingY: theme.space.s3_5,
     textStyle: theme.text.bodyLg,
   ),
@@ -41,11 +41,13 @@ _TextareaMetrics _metricsOf(HoronTextareaSize size, HoronThemeData theme) => swi
 
 /// React `Textarea`(Figma 58:137)를 옮긴 여러 줄 입력입니다.
 ///
-/// 상자 안에 14/12px 여백으로 글을 넣습니다. 상자는 `min-h-28`(112)에서
-/// 시작해 입력이 늘면 함께 자라고, 오류 상태면 테두리가 `border-danger`가 됩니다.
+/// 상자 안에 12/14/20px 좌우 여백과 8/12/14px 위아래 여백으로 글을 넣습니다. 상자는
+/// `min-h-28`(112)에서 시작해 입력이 늘면 함께 자라고, 오류 상태면 테두리가
+/// `border-danger`가 됩니다.
 ///
 /// 표면은 [surface]로 고릅니다. 기본값은 React와 같은 불투명 [HoronInputSurface.solid]이고,
-/// 이미지나 유리 패널 위에서는 [HoronInputSurface.glass]를 넘깁니다.
+/// 이미지나 유리 패널 위에서는 [HoronInputSurface.glass]를 넘깁니다. glass는
+/// [HoronFieldBox]가 `.veil-field`로 그리므로 HoronLiquidGlass를 겹치지 않습니다.
 class HoronTextarea extends StatefulWidget {
   /// 여러 줄 입력을 만듭니다.
   const HoronTextarea({
@@ -63,7 +65,7 @@ class HoronTextarea extends StatefulWidget {
     this.semanticLabel,
   });
 
-  /// 표면입니다. 기본값 `solid`는 불투명 `bg-surface`, `glass`는 유리입니다.
+  /// 표면입니다. 기본값 `solid`는 불투명 `bg-surface`, `glass`는 React `.veil-field` 표면입니다.
   final HoronInputSurface surface;
 
   /// 크기입니다. 기본값은 [HoronTextareaSize.md]입니다.

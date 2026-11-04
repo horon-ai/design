@@ -51,11 +51,11 @@ void main() {
     );
     expect(fill.color, colors.interactivePrimary);
 
-    // Paper `1VGK-0`: 라벨은 `text-label-lg`(16px / 22px / 500)입니다.
+    // 32px 알약은 `Button`의 `sm`과 같은 `text-label-md`(14px / 20px / 500)를 씁니다.
     final Text label = tester.widget<Text>(find.text('Run'));
-    final TextStyle paper = HoronThemeData.light.text.labelLg;
-    expect(label.style!.fontSize, paper.fontSize, reason: 'Paper 라벨 16px');
-    expect(label.style!.height, paper.height, reason: 'Paper 줄 높이 22px');
+    final TextStyle paper = HoronThemeData.light.text.labelMd;
+    expect(label.style!.fontSize, paper.fontSize, reason: 'Paper 라벨 14px');
+    expect(label.style!.height, paper.height, reason: 'Paper 줄 높이 20px');
     expect(label.style!.fontWeight, paper.fontWeight);
     expect(label.style!.color, colors.interactiveOnPrimary);
   });

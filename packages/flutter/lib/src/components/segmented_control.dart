@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../glass/glass_geometry.dart';
@@ -13,7 +14,7 @@ enum HoronSegmentedControlSize {
   /// `md` — 트랙 36px, 세그먼트 30px, 좌우 여백 16.
   md,
 
-  /// `lg` — 트랙 44px, 세그먼트 36px, 트랙 좌우 여백 4.
+  /// `lg` — 트랙 44px, 세그먼트 36px, 트랙 안쪽 여백 4.
   lg,
 
   /// `tab` — 세그먼트 32px, 트랙 안쪽 여백 4, 간격 4.
@@ -104,6 +105,7 @@ class HoronSegmentedControl extends StatefulWidget {
 
 class _HoronSegmentedControlState extends State<HoronSegmentedControl> {
   String? _internalValue;
+  int? _hoveredIndex;
 
   bool get _fill => widget.fill ?? widget.size == HoronSegmentedControlSize.md;
 
@@ -213,7 +215,9 @@ class _HoronSegmentedControlState extends State<HoronSegmentedControl> {
 
   Widget _segment(HoronThemeData horon, HoronSegmentedItem item, _TrackMetrics metrics, int index, bool reduceMotion) {
     final bool selected = item.value == _value;
-    final Color color = selected ? horon.colors.textPrimary : horon.colors.textSecondary;
+    // `hover:text-text-primary` — 선택되지 않은 세그먼트도 hover에서 기본 글자색이 됩니다.
+    final bool hovered = !item.disabled && _hoveredIndex == index;
+    final Color color = selected || hovered ? horon.colors.textPrimary : horon.colors.textSecondary;
     final BorderRadius pill = BorderRadius.all(Radius.circular(horon.radius.full));
 
     final Widget label = Text(
@@ -255,6 +259,12 @@ class _HoronSegmentedControlState extends State<HoronSegmentedControl> {
         onTap: item.disabled ? null : () => _select(item),
         child: MouseRegion(
           cursor: item.disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
+          onEnter: (PointerEnterEvent event) {
+            if (!item.disabled && _hoveredIndex != index) setState(() => _hoveredIndex = index);
+          },
+          onExit: (PointerExitEvent event) {
+            if (_hoveredIndex == index) setState(() => _hoveredIndex = null);
+          },
           child: SizedBox(height: metrics.segmentHeight, child: body),
         ),
       ),
@@ -337,10 +347,10 @@ class _TrackMetrics {
         segmentHeight: 30,
         segmentPadding: horon.space.s4,
       ),
-      // `h-11 px-1`, 세그먼트 `h-9 px-4`.
+      // `h-11 p-1`, 세그먼트 `h-9 px-4`.
       HoronSegmentedControlSize.lg => _TrackMetrics(
         height: 44,
-        padding: EdgeInsets.symmetric(horizontal: horon.space.s1),
+        padding: EdgeInsets.all(horon.space.s1),
         gap: horon.space.s0_5,
         segmentHeight: 36,
         segmentPadding: horon.space.s4,

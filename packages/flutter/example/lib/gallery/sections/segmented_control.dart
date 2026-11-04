@@ -74,9 +74,9 @@ class HoronSegmentedControlGallerySection extends StatelessWidget {
           Text(
             'Figma 62:379·110:765·88:723과 Paper 페이지 탭입니다. 선택 표시는 하나의 '
             '알약이고, 채움(fill)이면 알약이 옆 세그먼트로 미끄러지며, 글자 폭에 맞춘 '
-            '트랙에서는 세그먼트 안에서 교차 페이드합니다. glass 트랙의 알약은 두꺼운 '
-            '유리와 1px 림, 0 1 3 8% 그림자를 쓰고, 나머지 표면에서는 10% 잉크(또는 '
-            '흰색)입니다.',
+            '트랙에서는 세그먼트 안에서 교차 페이드합니다. glass 트랙의 알약은 크기와 '
+            '관계없이 두꺼운 유리와 1px 림, 0 1 3 8% 그림자를 쓰고, 나머지 표면에서는 '
+            '10% 잉크(또는 흰색)입니다. 라벨은 선택 전 hover에서도 `text-primary`가 됩니다.',
             style: theme.text.bodySm.copyWith(
               color: theme.colors.textSecondary,
             ),
@@ -111,7 +111,7 @@ class HoronSegmentedControlGallerySection extends StatelessWidget {
           ),
         ),
         _Cell(
-          label: 'lg (트랙 44, 세그먼트 36)',
+          label: 'lg (트랙 44, 세그먼트 36, 여백 4)',
           child: HoronSegmentedControl(
             items: _items,
             size: HoronSegmentedControlSize.lg,

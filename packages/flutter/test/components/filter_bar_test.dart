@@ -62,7 +62,7 @@ void main() {
     expect(tester.widget<Padding>(padding).padding, EdgeInsets.all(theme.space.step(0.75)), reason: 'p-[3px]');
   });
 
-  testWidgets('each option is a 30px pill with px-3 and the 10% indicator sits on the selection', (
+  testWidgets('each option is a 30px pill with px-4 and the 10% indicator sits on the selection', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(_host(const HoronFilterBar(items: _items)));
@@ -72,8 +72,8 @@ void main() {
     expect(tester.getSize(_option('전체')).height, theme.space.step(7.5), reason: 'h-7.5 = 30');
     expect(
       tester.widget<Container>(_option('전체')).padding,
-      EdgeInsets.symmetric(horizontal: theme.space.s3),
-      reason: 'px-3',
+      EdgeInsets.symmetric(horizontal: theme.space.s4),
+      reason: 'px-4',
     );
     expect(_indicator(theme.colors), findsOneWidget);
 
@@ -132,13 +132,13 @@ void main() {
     expect(indicator.width, option.width);
   });
 
-  testWidgets('a disabled option is 50% opaque and does not select', (WidgetTester tester) async {
+  testWidgets('a disabled option is 40% opaque and does not select', (WidgetTester tester) async {
     final List<String> changes = <String>[];
     await tester.pumpWidget(_host(HoronFilterBar(items: _items, onChanged: changes.add)));
     await tester.pump();
 
     final Finder failed = find.ancestor(of: find.text('실패'), matching: find.byType(Opacity)).first;
-    expect(tester.widget<Opacity>(failed).opacity, 0.5, reason: 'disabled:opacity-50');
+    expect(tester.widget<Opacity>(failed).opacity, 0.4, reason: 'disabled:opacity-40');
 
     await tester.tap(find.text('실패'));
     await tester.pump();

@@ -20,21 +20,13 @@ enum HoronChipSize {
   lg,
 }
 
-typedef _ChipMetrics = ({
-  double height,
-  double paddingX,
-  double slot,
-  double margin,
-  double check,
-  TextStyle textStyle,
-});
+typedef _ChipMetrics = ({double height, double paddingX, double slot, double check, TextStyle textStyle});
 
 _ChipMetrics _metricsOf(HoronChipSize size, HoronThemeData theme) => switch (size) {
   HoronChipSize.sm => (
     height: theme.space.step(7),
     paddingX: theme.space.s2_5,
     slot: theme.space.step(4.5),
-    margin: theme.space.s1,
     check: 12,
     textStyle: theme.text.labelSm,
   ),
@@ -42,7 +34,6 @@ _ChipMetrics _metricsOf(HoronChipSize size, HoronThemeData theme) => switch (siz
     height: theme.space.step(8),
     paddingX: theme.space.s3,
     slot: theme.space.step(5.5),
-    margin: theme.space.s1_5,
     check: 14,
     textStyle: theme.text.labelMd,
   ),
@@ -50,7 +41,6 @@ _ChipMetrics _metricsOf(HoronChipSize size, HoronThemeData theme) => switch (siz
     height: theme.space.step(9),
     paddingX: theme.space.s3_5,
     slot: theme.space.step(6.5),
-    margin: theme.space.s2,
     check: 16,
     textStyle: theme.text.labelLg,
   ),
@@ -126,13 +116,10 @@ class _HoronChipState extends State<HoronChip> {
     final Color foreground = pressed ? colors.textBrand : colors.textPrimary;
     final Color border = pressed ? colors.borderBrand : colors.borderDefault;
 
-    // 체크 자리는 `w-0 -mr-1.5`에서 `w-[1.375rem] mr-0`으로 자랍니다. 그래서 선택
-    // 전에는 라벨이 왼쪽 여백 12px에서 6px만큼 당겨진 6px에 서고, 선택하면 22px
-    // 자리(체크 14px + 8px) 뒤 12px에서 시작합니다.
-    final EdgeInsets padding = EdgeInsets.only(
-      left: pressed ? metrics.paddingX : metrics.paddingX - metrics.margin,
-      right: metrics.paddingX,
-    );
+    // 체크 자리는 `w-0`에서 `w-[1.125rem]`(sm)처럼 자랍니다. React가 음수 마진을
+    // 없앴으므로 라벨은 선택 전후 모두 paddingX에서 시작하고, 선택하면 체크 자리만큼
+    // 오른쪽으로 밀립니다.
+    final EdgeInsets padding = EdgeInsets.symmetric(horizontal: metrics.paddingX);
 
     final Widget check = TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),

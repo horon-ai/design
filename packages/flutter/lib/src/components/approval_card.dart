@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../glass/glass_geometry.dart';
 import '../glass/horon_glass.dart';
+import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import 'button.dart';
 
@@ -89,7 +90,8 @@ class HoronApprovalCard extends StatelessWidget {
     final (Color dot, Color text, String label) = switch (state) {
       HoronApprovalState.pending => (theme.colors.statusLive, theme.colors.textBrand, 'Needs your yes'),
       HoronApprovalState.approved => (theme.colors.textSecondary, theme.colors.textSecondary, 'Approved'),
-      HoronApprovalState.declined => (theme.colors.textDanger, theme.colors.textDanger, 'Declined'),
+      // `bg-accent-red-500-90 text-text-danger`.
+      HoronApprovalState.declined => (theme.colors.accentRed500_90, theme.colors.textDanger, 'Declined'),
     };
     final bool pending = state == HoronApprovalState.pending;
 
@@ -98,7 +100,6 @@ class HoronApprovalCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: _approvalGap,
         children: <Widget>[
           Row(
             children: <Widget>[
@@ -111,8 +112,10 @@ class HoronApprovalCard extends StatelessWidget {
               Text(status ?? label, style: theme.text.labelSm.copyWith(color: text)),
             ],
           ),
+          const SizedBox(height: _approvalGap), // mt-3
           Text(title, style: theme.text.labelLg.copyWith(color: theme.colors.textPrimary)),
-          if (attachment != null)
+          if (attachment != null) ...<Widget>[
+            const SizedBox(height: _approvalGap), // mt-3
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -135,19 +138,38 @@ class HoronApprovalCard extends StatelessWidget {
                 ],
               ),
             ),
-          if (pending)
-            Row(
-              children: <Widget>[
-                HoronButton(label: approveLabel, size: HoronButtonSize.sm, onPressed: onApprove),
-                const SizedBox(width: 8),
-                HoronButton(
-                  label: laterLabel,
-                  size: HoronButtonSize.sm,
-                  variant: HoronButtonVariant.glass,
-                  onPressed: onLater,
+          ],
+          // `motion-reveal` — 대기 중에만 펼쳐지고, 아니면 높이 0으로 접힙니다.
+          // 접힌 동안에도 버튼은 트리에 남아 있지만 눌리지 않습니다(React `inert`).
+          _Reveal(
+            collapsed: !pending,
+            child: IgnorePointer(
+              ignoring: !pending,
+              child: ExcludeSemantics(
+                excluding: !pending,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: _approvalGap), // pt-3
+                  // `flex w-full justify-end` — 나중에가 먼저, 승인이 오른쪽 끝입니다.
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        HoronButton(
+                          label: laterLabel,
+                          size: HoronButtonSize.sm,
+                          variant: HoronButtonVariant.glass,
+                          onPressed: onLater,
+                        ),
+                        const SizedBox(width: 8),
+                        HoronButton(label: approveLabel, size: HoronButtonSize.sm, onPressed: onApprove),
+                      ],
+                    ),
+                  ),
                 ),
-              ],
+              ),
             ),
+          ),
         ],
       ),
     );
@@ -182,6 +204,40 @@ class HoronApprovalCard extends StatelessWidget {
           border: Border.all(color: pending ? theme.colors.borderBrand : theme.colors.borderDefault),
         ),
         child: body,
+      ),
+    );
+  }
+}
+
+/// `motion-reveal` — grid 행 `1fr`↔`0fr`과 불투명도로 접고 펴는 래퍼입니다.
+///
+/// React는 `grid-template-rows`를 200ms `ease-out-quint`로, 불투명도를 150ms
+/// `ease-out`으로 바꿉니다. Flutter에는 `0fr`이 없으므로 [Align]의 `heightFactor`를
+/// 0과 1 사이에서 animate 합니다.
+class _Reveal extends StatelessWidget {
+  const _Reveal({required this.collapsed, required this.child});
+
+  final bool collapsed;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    return AnimatedSize(
+      duration: reduceMotion ? Duration.zero : HoronMotion.collapseDuration,
+      curve: HoronMotion.easeOutQuint,
+      alignment: Alignment.topCenter,
+      child: ClipRect(
+        child: Align(
+          alignment: Alignment.topCenter,
+          heightFactor: collapsed ? 0 : 1,
+          child: AnimatedOpacity(
+            opacity: collapsed ? 0 : 1,
+            duration: reduceMotion ? Duration.zero : const Duration(milliseconds: 150),
+            curve: Curves.easeOut,
+            child: child,
+          ),
+        ),
       ),
     );
   }

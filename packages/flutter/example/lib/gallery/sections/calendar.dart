@@ -26,7 +26,7 @@ class HoronCalendarGallerySection extends StatelessWidget {
             child: _calendars(theme, HoronCalendarSurface.solid),
           ),
           SurfaceGroup(
-            label: 'Glass',
+            label: 'Glass · veil overlay',
             glass: true,
             child: _calendars(theme, HoronCalendarSurface.glass),
           ),

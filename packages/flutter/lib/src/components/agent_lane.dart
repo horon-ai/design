@@ -16,12 +16,6 @@ enum HoronAgentLaneStatus {
   failed,
 }
 
-/// `agent-lane.tsx`의 `rounded-[16px]`입니다.
-const double _laneRadius = 16;
-
-/// `agent-lane.tsx`의 `px-3.5`입니다.
-const double _lanePaddingX = 14;
-
 /// `agent-lane.tsx`의 `py-3`입니다.
 const double _lanePaddingY = 12;
 
@@ -85,11 +79,11 @@ class HoronAgentLane extends StatelessWidget {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
-      padding: const EdgeInsets.symmetric(horizontal: _lanePaddingX, vertical: _lanePaddingY),
+      padding: EdgeInsets.symmetric(horizontal: theme.space.s4, vertical: _lanePaddingY),
       decoration: BoxDecoration(
-        color: theme.colors.bgSubtle,
-        borderRadius: BorderRadius.circular(_laneRadius),
-        border: failed ? Border.all(color: theme.colors.borderDanger) : null,
+        color: theme.colors.bgSurface,
+        borderRadius: BorderRadius.circular(theme.radius.xl2),
+        border: Border.all(color: failed ? theme.colors.borderDanger : theme.colors.borderDefault),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -114,13 +108,34 @@ class HoronAgentLane extends StatelessWidget {
                   style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
                 ),
               ),
-              if (status == HoronAgentLaneStatus.running) const HoronSpinner(pixelSize: 12),
-              if (status == HoronAgentLaneStatus.done)
-                Icon(Icons.check_circle, size: 14, color: theme.colors.textSecondary),
-              if (failed) Icon(Icons.error, size: 14, color: theme.colors.textDanger),
+              SizedBox(
+                width: theme.space.s3_5,
+                height: theme.space.s3_5,
+                child: Center(
+                  child: switch (status) {
+                    HoronAgentLaneStatus.running => const HoronSpinner(pixelSize: 12),
+                    HoronAgentLaneStatus.done => Icon(
+                      Icons.check_circle,
+                      size: theme.space.s3_5,
+                      color: theme.colors.textSecondary,
+                    ),
+                    HoronAgentLaneStatus.failed => Icon(
+                      Icons.error,
+                      size: theme.space.s3_5,
+                      color: theme.colors.textDanger,
+                    ),
+                  },
+                ),
+              ),
               if (elapsed != null) ...<Widget>[
                 const SizedBox(width: 6),
-                Text(elapsed!, style: theme.text.caption.copyWith(color: theme.colors.textSecondary)),
+                Text(
+                  elapsed!,
+                  style: theme.text.caption.copyWith(
+                    color: theme.colors.textSecondary,
+                    fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+                  ),
+                ),
               ],
             ],
           ),

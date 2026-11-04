@@ -5,8 +5,9 @@ import '../surface_group.dart';
 
 /// `schedule` 갤러리 섹션입니다.
 ///
-/// 시간 고르기 필드와 루틴 스케줄 카드를 solid와 glass 두 표면에 같은 목록으로
-/// 놓고, 요일 토글을 따로 보여 줍니다. 각 표본은 실제로 눌러 볼 수 있습니다.
+/// 시간 고르기 필드와 루틴 스케줄 카드를 solid와 veil(glass) 두 표면에 같은 목록으로
+/// 놓고, 4% 잉크 inset 필드와 요일 토글을 따로 보여 줍니다. 각 표본은 실제로 눌러 볼
+/// 수 있습니다.
 class HoronScheduleGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronScheduleGallerySection({super.key});
@@ -30,7 +31,7 @@ class HoronScheduleGallerySection extends StatelessWidget {
             ),
           ),
           SurfaceGroup(
-            label: 'Glass',
+            label: 'Glass · veil-field',
             glass: true,
             child: _samples(
               theme,
@@ -58,6 +59,10 @@ class HoronScheduleGallerySection extends StatelessWidget {
         _Sample(
           label: '시간 필드',
           child: _TimePicker(surface: picker),
+        ),
+        _Sample(
+          label: 'Inset 필드 (4% 잉크)',
+          child: _TimePicker(surface: HoronPickerSurface.inset),
         ),
         _Sample(
           label: '루틴 카드',

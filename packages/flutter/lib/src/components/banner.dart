@@ -25,10 +25,10 @@ enum HoronBannerSurface {
 
 /// `banner.tsx`의 `BannerSize`입니다.
 enum HoronBannerSize {
-  /// `size="sm"` — 최소 높이 32, `body-sm`, 아이콘 16px.
+  /// `size="sm"` — 최소 높이 32, `body-sm`, 아이콘 14px.
   sm,
 
-  /// `size="md"` — Figma 기본 띠(48), `body-md`, 아이콘 18px.
+  /// `size="md"` — Figma 기본 띠(48), `body-md`, 아이콘 16px.
   md,
 
   /// `size="lg"` — 높이 56, `body-lg`, 아이콘 20px.
@@ -39,7 +39,7 @@ typedef _BannerMetrics = ({
   double gap,
   double paddingX,
   double paddingY,
-  double icon,
+  double iconSize,
   TextStyle textStyle,
   TextStyle action,
 });
@@ -49,7 +49,7 @@ _BannerMetrics _metricsOf(HoronBannerSize size, HoronThemeData theme) => switch 
     gap: theme.space.s2,
     paddingX: theme.space.s3,
     paddingY: theme.space.s2,
-    icon: 16,
+    iconSize: 14,
     textStyle: theme.text.bodySm,
     action: theme.text.labelMd,
   ),
@@ -57,7 +57,7 @@ _BannerMetrics _metricsOf(HoronBannerSize size, HoronThemeData theme) => switch 
     gap: theme.space.s3,
     paddingX: theme.space.s4,
     paddingY: theme.space.s3,
-    icon: 18,
+    iconSize: 16,
     textStyle: theme.text.bodyMd,
     action: theme.text.labelLg,
   ),
@@ -65,19 +65,13 @@ _BannerMetrics _metricsOf(HoronBannerSize size, HoronThemeData theme) => switch 
     gap: theme.space.s3,
     paddingX: theme.space.s5,
     paddingY: theme.space.s3_5,
-    icon: 20,
+    iconSize: 20,
     textStyle: theme.text.bodyLg,
     action: theme.text.labelLg,
   ),
 };
 
-/// Paper `TYN-1`의 액션 줄 높이입니다. `label-lg`의 22px보다 2px 낮은 20px입니다.
-const double _bannerActionLineHeight = 20;
-
-/// Paper `TYN-1`의 액션 자간입니다. `label-lg`의 -0.08px보다 좁은 -0.04px입니다.
-const double _bannerActionLetterSpacing = -0.04;
-
-/// Figma `Banner`(62:318): 색이 밴 띠를 두른 regular 유리 띠에 18px 아이콘과 밑줄 동작을 얹습니다.
+/// Figma `Banner`(62:318): 색이 밴 띠를 두른 regular 유리 띠에 크기별 아이콘과 밑줄 동작을 얹습니다.
 ///
 /// `banner.tsx`를 옮긴 것입니다. 표면은 `bg-glass-regular`라 [HoronLiquidGlass]가
 /// 뒤에서 칠하고, 테두리·글자는 [tone]이 정합니다. 위험 톤은 화면 낭독기에서
@@ -129,7 +123,7 @@ class HoronBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           IconTheme.merge(
-            data: IconThemeData(size: metrics.icon, color: accent),
+            data: IconThemeData(size: metrics.iconSize, color: accent),
             child: icon ?? Icon(danger ? Icons.error_outline : Icons.info_outline),
           ),
           SizedBox(width: metrics.gap),
@@ -141,8 +135,6 @@ class HoronBanner extends StatelessWidget {
             DefaultTextStyle.merge(
               style: metrics.action.copyWith(
                 color: accent,
-                height: _bannerActionLineHeight / metrics.action.fontSize!,
-                letterSpacing: _bannerActionLetterSpacing,
                 decoration: TextDecoration.underline,
                 decorationColor: accent,
               ),

@@ -79,11 +79,14 @@ void main() {
 
     final Text author = tester.widget<Text>(find.text('horon'));
     expect(author.maxLines, 1);
-    expect(author.style?.fontSize, 12);
-    expect(author.style?.color, theme.colors.textPlaceholder);
+    // `text-caption text-text-secondary`
+    expect(author.style?.fontSize, theme.text.caption.fontSize);
+    expect(author.style?.color, theme.colors.textSecondary);
 
     final Text description = tester.widget<Text>(find.text('웹을 검색하고 인용할 수 있는 근거를 모읍니다'));
-    expect(description.style?.fontSize, 13);
+    // `text-body-sm text-text-secondary`
+    expect(description.style?.fontSize, theme.text.bodySm.fontSize);
+    expect(description.style?.height, theme.text.bodySm.height);
     expect(description.style?.color, theme.colors.textSecondary);
   });
 
@@ -112,17 +115,27 @@ void main() {
     expect(hasRule, isTrue, reason: 'the footer keeps a default-colour rule');
 
     final Icon star = tester.widget<Icon>(find.byIcon(Icons.star));
-    expect(star.size, theme.space.step(3.25));
+    expect(star.size, theme.space.step(3.5), reason: 'Star size-3.5 = 14');
     expect(star.color, HoronPalette.mascotGold);
     expect(tester.widget<Text>(find.text('4.8')).style?.color, theme.colors.textPrimary);
     expect(find.text('· 12k'), findsOneWidget);
 
     expect(find.text('Install'), findsOneWidget);
-    expect(
-      tester.getSize(find.ancestor(of: find.text('Install'), matching: find.byType(SizedBox)).first).height,
-      theme.space.step(8),
-      reason: 'glass sm h-8',
+    // 두 표면 모두 Install은 `Button`의 `solid`·`sm`입니다.
+    final HoronButton install = tester.widget<HoronButton>(find.byType(HoronButton));
+    expect(install.variant, HoronButtonVariant.solid);
+    expect(install.size, HoronButtonSize.sm);
+    final Padding footerPadding = tester.widget<Padding>(
+      find
+          .descendant(
+            of: find.byType(HoronMarketplaceCard),
+            matching: find.byWidgetPredicate(
+              (Widget widget) => widget is Padding && widget.padding == EdgeInsets.only(top: theme.space.s3),
+            ),
+          )
+          .first,
     );
+    expect(footerPadding.padding, EdgeInsets.only(top: theme.space.s3), reason: 'pt-3 = 12');
     expect(tester.takeException(), isNull);
   });
 

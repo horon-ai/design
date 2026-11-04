@@ -41,15 +41,9 @@ void main() {
 
   HoronThemeData themeOf(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronInput)));
 
-  /// 상자의 상태 테두리 색입니다. 유리 표면은 림 색, 불투명 표면은 상자 테두리입니다.
-  Color borderOf(WidgetTester tester) {
-    final Finder glass = find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronLiquidGlass));
-    if (glass.evaluate().isNotEmpty) {
-      return tester.widget<HoronLiquidGlass>(glass).edgeColor ?? Colors.transparent;
-    }
-    final AnimatedContainer filled = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
-    return (filled.decoration! as BoxDecoration).border!.top.color;
-  }
+  /// veil 표면입니다. glass 상자는 [HoronVeil] 한 겹이 채움과 링을 맡습니다.
+  HoronVeil veilOf(WidgetTester tester) =>
+      tester.widget<HoronVeil>(find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronVeil)));
 
   /// 불투명 표면의 채움색입니다.
   Color fillOf(WidgetTester tester) {
@@ -90,27 +84,60 @@ void main() {
     expect(IconTheme.of(tester.element(find.byIcon(Icons.search))).size, 20);
   });
 
-  testWidgets('glass paints the regular glass layer, solid surfaces paint their fill', (WidgetTester tester) async {
+  testWidgets('glass paints the veil field, solid surfaces paint their fill', (WidgetTester tester) async {
     await pumpInput(tester);
-    final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
-    expect(glass.tier, HoronGlassTier.regular);
-    expect(borderOf(tester), Colors.transparent, reason: 'border-transparent');
+    final HoronVeil veil = veilOf(tester);
+    expect(veil.kind, HoronVeilKind.field, reason: '.veil-field');
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'glass는 LiquidGlass를 겹치지 않습니다');
+    expect(veil.focused, isFalse);
+    expect(veil.invalid, isFalse);
 
     await pumpInput(tester, surface: HoronInputSurface.solid);
-    expect(find.byType(HoronLiquidGlass), findsNothing);
+    expect(find.byType(HoronVeil), findsNothing);
     expect(fillOf(tester), themeOf(tester).colors.bgSurface);
 
     await pumpInput(tester, surface: HoronInputSurface.solidOnPage);
     expect(fillOf(tester), themeOf(tester).colors.bgDefault);
   });
 
-  testWidgets('invalid turns the border danger, disabled turns the fill subtle', (WidgetTester tester) async {
+  testWidgets('focus fills the veil field and invalid turns its ring danger', (WidgetTester tester) async {
+    await pumpInput(tester);
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+    expect(veilOf(tester).focused, isTrue, reason: 'focus-within은 field-focus 채움입니다');
+
     await pumpInput(tester, invalid: true);
-    expect(borderOf(tester), themeOf(tester).colors.borderDanger);
+    expect(veilOf(tester).invalid, isTrue, reason: '오류 링은 border-danger입니다');
+  });
+
+  testWidgets('a disabled veil field drops to 60% opacity', (WidgetTester tester) async {
+    await pumpInput(tester, enabled: false);
+    expect(find.byType(HoronVeil), findsOneWidget);
+    final Opacity dim = tester.widget<Opacity>(
+      find.ancestor(of: find.byType(HoronVeil), matching: find.byType(Opacity)).first,
+    );
+    expect(dim.opacity, 0.6, reason: 'has-[[data-disabled]]:opacity-60');
+  });
+
+  testWidgets('invalid turns an opaque border danger, disabled turns the fill subtle', (WidgetTester tester) async {
+    await pumpInput(tester, surface: HoronInputSurface.solid, invalid: true);
+    expect(
+      (tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first).decoration! as BoxDecoration)
+          .border!
+          .top
+          .color,
+      themeOf(tester).colors.borderDanger,
+    );
 
     await pumpInput(tester, surface: HoronInputSurface.solid, enabled: false);
     expect(fillOf(tester), themeOf(tester).colors.bgSubtle);
-    expect(borderOf(tester), themeOf(tester).colors.borderDefault);
+    expect(
+      (tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first).decoration! as BoxDecoration)
+          .border!
+          .top
+          .color,
+      themeOf(tester).colors.borderDefault,
+    );
   });
 
   testWidgets('every size and surface value renders', (WidgetTester tester) async {

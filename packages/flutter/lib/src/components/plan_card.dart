@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
+import '../tokens/horon_tokens.g.dart';
 import 'spinner.dart';
 
 /// `plan-card.tsx`의 `PlanCardStatus`입니다.
@@ -96,7 +97,14 @@ class HoronPlanCard extends StatelessWidget {
                   ),
                   const SizedBox(height: _planGap),
                 ],
-                Text(title, style: theme.text.labelLg.copyWith(color: theme.colors.textPrimary)),
+                Text(
+                  title,
+                  // `text-label-lg font-semibold`.
+                  style: theme.text.labelLg.copyWith(
+                    color: theme.colors.textPrimary,
+                    fontWeight: HoronFontWeight.semibold,
+                  ),
+                ),
               ],
             ),
           ),
@@ -119,7 +127,8 @@ class HoronPlanCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      SizedBox(height: 1, child: ColoredBox(color: theme.colors.borderDefault)),
+                      // `h-px bg-overlay-ink-8`.
+                      SizedBox(height: 1, child: ColoredBox(color: theme.colors.overlayInk8)),
                       Padding(
                         padding: const EdgeInsets.only(left: _planPaddingX, right: _planPaddingX, top: 14, bottom: 16),
                         child: Row(

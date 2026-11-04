@@ -7,6 +7,8 @@ import 'package:horon_ui/horon_ui.dart';
 /// Breadcrumb Header 갤러리 섹션입니다.
 ///
 /// 조각 타일이 있는 기본형과, 조각이 많아 폭에 따라 줄을 바꾸는 예를 놓습니다.
+/// 조각은 [HoronBreadcrumbItem]이 그리므로 이동 경로와 헤더의 조각 모양이 같습니다.
+/// 마지막 예는 유리 표면입니다.
 class HoronBreadcrumbHeaderGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronBreadcrumbHeaderGallerySection({super.key});
@@ -44,6 +46,23 @@ class HoronBreadcrumbHeaderGallerySection extends StatelessWidget {
                 HoronBreadcrumbHeaderCrumb(label: '워크스페이스 설정', onTap: () {}),
                 HoronBreadcrumbHeaderCrumb(label: '지식 베이스 관리', onTap: () {}),
                 const HoronBreadcrumbHeaderCrumb(label: '문서 추출 실행 기록'),
+              ],
+              onSearch: () {},
+              onMore: () {},
+            ),
+          ),
+          _Sample(
+            label: '유리 표면',
+            child: HoronBreadcrumbHeader(
+              glass: true,
+              crumbs: <HoronBreadcrumbHeaderCrumb>[
+                HoronBreadcrumbHeaderCrumb(
+                  label: '워크스페이스',
+                  onTap: () {},
+                  tile: const Icon(Icons.workspace_premium),
+                ),
+                HoronBreadcrumbHeaderCrumb(label: '에이전트', onTap: () {}),
+                const HoronBreadcrumbHeaderCrumb(label: '설정'),
               ],
               onSearch: () {},
               onMore: () {},

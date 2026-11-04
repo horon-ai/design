@@ -1,8 +1,8 @@
 // `marketplace-card`의 Flutter 대응입니다.
 //
 // React는 두꺼운 유리 카드에 40px 잉크 타일 머리, 설명, 역량 칩, 그리고 별점과
-// Install이 있는 바닥을 세로로 쌓습니다. Install은 `button.tsx`(`glass`·`sm`) 자리라
-// 이 파일의 private 위젯이 같은 값으로 그립니다.
+// Install이 있는 바닥을 세로로 쌓습니다. Install은 `button.tsx`의 `solid`·`sm`이라
+// [HoronButton]을 그대로 씁니다.
 //
 // React는 별점·설치 수를 `ReactNode`로 받지만 화면에서는 글자로 그려집니다. 이 파일은
 // 그 자리를 `String`으로 좁혔습니다.
@@ -12,9 +12,9 @@ import 'package:flutter/material.dart';
 import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_surface.dart';
-import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
+import 'button.dart';
 
 /// 역량 칩 하나입니다. React `chips` 원소입니다.
 @immutable
@@ -62,10 +62,10 @@ class HoronMarketplaceCard extends StatelessWidget {
   /// 14/20 이름입니다. 한 줄로 잘립니다.
   final String name;
 
-  /// 이름 아래 12/16 작성자입니다.
+  /// 이름 아래 `caption` 작성자입니다.
   final String? author;
 
-  /// 13/18 설명입니다.
+  /// `body-sm` 설명입니다.
   final String? description;
 
   /// 역량 칩 목록입니다.
@@ -122,8 +122,8 @@ class HoronMarketplaceCard extends StatelessWidget {
                           author!,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          // text-[12px]/[16px] text-text-placeholder
-                          style: theme.text.caption.copyWith(height: 16 / 12, color: theme.colors.textPlaceholder),
+                          // text-caption text-text-secondary
+                          style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
                         ),
                     ],
                   ),
@@ -133,8 +133,8 @@ class HoronMarketplaceCard extends StatelessWidget {
             if (description != null)
               Text(
                 description!,
-                // text-[13px]/[18px] text-text-secondary
-                style: theme.text.bodySm.copyWith(fontSize: 13, height: 18 / 13, color: theme.colors.textSecondary),
+                // text-body-sm text-text-secondary
+                style: theme.text.bodySm.copyWith(color: theme.colors.textSecondary),
               ),
             if (chips != null && chips!.isNotEmpty)
               Wrap(
@@ -202,7 +202,7 @@ class HoronMarketplaceCard extends StatelessWidget {
         border: Border(top: BorderSide(color: theme.colors.borderDefault)), // border-t
       ),
       child: Padding(
-        padding: EdgeInsets.only(top: theme.space.s2_5), // pt-2.5
+        padding: EdgeInsets.only(top: theme.space.s3), // pt-3
         child: Row(
           spacing: theme.space.s1_5, // gap-1.5
           children: <Widget>[
@@ -215,7 +215,7 @@ class HoronMarketplaceCard extends StatelessWidget {
                   if (score != null) ...<Widget>[
                     Icon(
                       Icons.star,
-                      size: theme.space.step(3.25), // size-3.25 = 13
+                      size: theme.space.step(3.5), // size-3.5 = 14
                       color: HoronPalette.mascotGold, // text-mascot-gold
                     ),
                     Text(score!, maxLines: 1, style: theme.text.labelSm.copyWith(color: theme.colors.textPrimary)),
@@ -224,71 +224,19 @@ class HoronMarketplaceCard extends StatelessWidget {
                     Text(
                       '· $installs',
                       maxLines: 1,
-                      // text-[12px]/[16px] text-text-placeholder
-                      style: theme.text.caption.copyWith(height: 16 / 12, color: theme.colors.textPlaceholder),
+                      // text-caption text-text-placeholder
+                      style: theme.text.caption.copyWith(color: theme.colors.textPlaceholder),
                     ),
                 ],
               ),
             ),
-            _GlassButton(label: installLabel, surface: surface, onPressed: onInstall),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// `button.tsx`의 `glass`·`sm` 변형입니다. `h-8`, `px-3`, `text-label-md`입니다.
-class _GlassButton extends StatefulWidget {
-  const _GlassButton({required this.label, required this.surface, this.onPressed});
-
-  final String label;
-  final HoronSurface surface;
-  final VoidCallback? onPressed;
-
-  @override
-  State<_GlassButton> createState() => _GlassButtonState();
-}
-
-class _GlassButtonState extends State<_GlassButton> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final bool reduce = MediaQuery.disableAnimationsOf(context);
-    return Semantics(
-      button: true,
-      enabled: widget.onPressed != null,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: widget.onPressed == null ? null : (TapDownDetails details) => setState(() => _pressed = true),
-        onTapUp: widget.onPressed == null ? null : (TapUpDetails details) => setState(() => _pressed = false),
-        onTapCancel: widget.onPressed == null ? null : () => setState(() => _pressed = false),
-        onTap: widget.onPressed,
-        child: AnimatedScale(
-          scale: _pressed && !reduce ? HoronMotion.pressScale : 1, // motion-press
-          duration: reduce ? Duration.zero : HoronMotion.pressDuration,
-          curve: HoronMotion.pressCurve,
-          child: HoronSurfaceLayer(
-            surface: widget.surface,
-            tier: HoronGlassTier.clear,
-            borderRadius: BorderRadius.circular(theme.radius.full), // rounded-full
-            child: SizedBox(
-              height: theme.space.step(8), // h-8 = 32
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: theme.space.s3), // px-3
-                child: Center(
-                  widthFactor: 1,
-                  child: Text(
-                    widget.label,
-                    maxLines: 1,
-                    style: theme.text.labelMd.copyWith(color: theme.colors.textPrimary),
-                  ),
-                ),
-              ),
+            HoronButton(
+              label: installLabel,
+              variant: HoronButtonVariant.solid, // variant="solid"
+              size: HoronButtonSize.sm, // size="sm"
+              onPressed: onInstall,
             ),
-          ),
+          ],
         ),
       ),
     );

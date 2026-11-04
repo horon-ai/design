@@ -30,7 +30,7 @@ const SECTION_BUILDER = join(PKG, "example/lib/gallery/section_builder.dart");
 
 const CHECK = process.argv.includes("--check");
 const GROUP_ORDER = ["inputs", "display", "navigation", "overlays", "conversation", "agents"];
-const CATALOG_SIZE = 82;
+const CATALOG_SIZE = 84;
 const COMPONENTS_DIR = join(PKG, "lib/src/components");
 const SECTIONS_DIR = join(PKG, "example/lib/gallery/sections");
 const OVERLAY_DIR = join(PKG, "lib/src/overlay");
@@ -41,9 +41,15 @@ const listDart = async (dir) => (existsSync(dir) ? (await readdir(dir)).filter((
 const catalogSource = await readFile(CATALOG, "utf8");
 const catalog = new Map();
 // 항목은 여러 줄에 걸쳐 `slug`, `title`, `group` 키를 차례로 씁니다.
+// `title`은 ko/en 두 벌의 `Localized` 객체입니다(`{ ko: "Button", en: "Button" }`).
+// 갤러리 제목은 두 언어가 같은 제품명이므로 ko 값을 씁니다. 예전의 평문 문자열
+// 형태도 함께 받습니다.
 // `componentGroups`의 항목은 `id` 키로 시작하므로 겹치지 않습니다.
-for (const m of catalogSource.matchAll(/\{\s*slug:\s*"([^"]+)",\s*title:\s*"([^"]+)",\s*group:\s*"([a-z]+)"/g)) {
-  catalog.set(m[1].replaceAll("-", "_"), { title: m[2], group: m[3], order: catalog.size });
+for (const m of catalogSource.matchAll(
+  /\{\s*slug:\s*"([^"]+)",\s*title:\s*(?:\{ ko: "([^"]*)", en: "([^"]*)" \}|"([^"]*)"),\s*group:\s*"([a-z]+)"/g,
+)) {
+  const title = m[2] ?? m[4];
+  catalog.set(m[1].replaceAll("-", "_"), { title, group: m[5], order: catalog.size });
 }
 if (catalog.size !== CATALOG_SIZE) throw new Error(`catalog has ${catalog.size} entries, expected ${CATALOG_SIZE}`);
 const badGroups = [...catalog].filter(([, c]) => !GROUP_ORDER.includes(c.group)).map(([slug, c]) => `${slug}:${c.group}`);
@@ -195,9 +201,12 @@ if (CHECK) console.log("(--check: 아무것도 쓰지 않았습니다)");
 // 하위 경로 import를 지우면 import 블록에 빈 줄이 남고, 여러 줄로 쓴
 // `GallerySection(...)`은 손으로 맞추기 어렵습니다. `dart format`이 CI의 포맷
 // 검사와 같은 도구이므로 여기서 한 번 돌립니다.
+//
+// 대상은 이 스크립트가 쓴 네 파일뿐입니다. 디렉터리를 통째로 넘기면 레인이
+// 아직 정리하지 않은 무관한 파일까지 고쳐 버립니다.
 if (!CHECK) {
   const { spawnSync } = await import("node:child_process");
-  const result = spawnSync("dart", ["format", "lib", "test", "example"], {
+  const result = spawnSync("dart", ["format", BARREL, PENDING, REGISTRY, SECTION_BUILDER], {
     cwd: PKG,
     stdio: "inherit",
   });

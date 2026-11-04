@@ -48,11 +48,25 @@ void main() {
     );
     final TextStyle style = painted.text.style!;
     expect(style.decoration, TextDecoration.underline);
-    // Paper `TYN-1`의 액션은 16px / 20px, 자간 -0.04px, 굵기 500입니다.
-    expect(style.fontSize, 16);
-    expect(style.fontSize! * style.height!, moreOrLessEquals(20));
-    expect(style.letterSpacing, moreOrLessEquals(-0.04));
-    expect(style.fontWeight, HoronFontWeight.medium);
+    // 액션은 `text-label-lg` 토큰을 그대로 씁니다. 크기·줄 높이·자간을 덮지 않습니다.
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronBanner)));
+    final TextStyle token = theme.text.labelLg;
+    expect(style.fontSize, token.fontSize);
+    expect(style.fontSize! * style.height!, moreOrLessEquals(token.fontSize! * token.height!));
+    expect(style.letterSpacing, token.letterSpacing);
+    expect(style.fontWeight, token.fontWeight);
+  });
+
+  testWidgets('banner: the icon is 14, 16 and 20 by size rung', (WidgetTester tester) async {
+    for (final HoronBannerSize size in HoronBannerSize.values) {
+      await pumpBanner(tester, HoronBanner(message: '문구', size: size));
+      final double expected = switch (size) {
+        HoronBannerSize.sm => 14,
+        HoronBannerSize.md => 16,
+        HoronBannerSize.lg => 20,
+      };
+      expect(IconTheme.of(tester.element(find.byIcon(Icons.info_outline))).size, expected, reason: size.name);
+    }
   });
 
   testWidgets('banner: a one-line message makes the 52px strip', (WidgetTester tester) async {

@@ -177,6 +177,7 @@ class HoronThemeData extends ThemeExtension<HoronThemeData> {
     required this.colors,
     required this.text,
     required this.glass,
+    this.veil = const HoronVeilTokens(),
     required this.radius,
     required this.space,
     required this.shadows,
@@ -190,6 +191,7 @@ class HoronThemeData extends ThemeExtension<HoronThemeData> {
     colors: HoronColors.light,
     text: HoronTextStyles(),
     glass: HoronGlassTokens(),
+    veil: HoronVeilTokens(),
     radius: HoronRadiusSpec(),
     space: HoronSpaceSpec(),
     shadows: HoronShadowSpec(),
@@ -203,6 +205,7 @@ class HoronThemeData extends ThemeExtension<HoronThemeData> {
     colors: HoronColors.dark,
     text: HoronTextStyles(),
     glass: HoronGlassTokens(),
+    veil: HoronVeilTokens(),
     radius: HoronRadiusSpec(),
     space: HoronSpaceSpec(),
     shadows: HoronShadowSpec(),
@@ -221,6 +224,11 @@ class HoronThemeData extends ThemeExtension<HoronThemeData> {
 
   /// 리퀴드 글래스 레시피입니다. 호스트 높이에 따른 블러·여백은 토큰의 함수가 계산합니다.
   final HoronGlassTokens glass;
+
+  /// veil 재료입니다. 입력 필드와 떠 있는 오버레이가 쓰는 가벼운 유리입니다.
+  ///
+  /// [glass]와 달리 림 그라디언트가 없고, 1px 링과 soft shadow로 층을 나눕니다.
+  final HoronVeilTokens veil;
 
   /// 반경 단계입니다.
   final HoronRadiusSpec radius;
@@ -243,6 +251,7 @@ class HoronThemeData extends ThemeExtension<HoronThemeData> {
     HoronColors? colors,
     HoronTextStyles? text,
     HoronGlassTokens? glass,
+    HoronVeilTokens? veil,
     HoronRadiusSpec? radius,
     HoronSpaceSpec? space,
     HoronShadowSpec? shadows,
@@ -254,6 +263,7 @@ class HoronThemeData extends ThemeExtension<HoronThemeData> {
       colors: colors ?? this.colors,
       text: text ?? this.text,
       glass: glass ?? this.glass,
+      veil: veil ?? this.veil,
       radius: radius ?? this.radius,
       space: space ?? this.space,
       shadows: shadows ?? this.shadows,
@@ -274,6 +284,7 @@ class HoronThemeData extends ThemeExtension<HoronThemeData> {
       colors: HoronColors.lerp(colors, other.colors, t),
       text: t < 0.5 ? text : other.text,
       glass: t < 0.5 ? glass : other.glass,
+      veil: t < 0.5 ? veil : other.veil,
       radius: t < 0.5 ? radius : other.radius,
       space: t < 0.5 ? space : other.space,
       shadows: t < 0.5 ? shadows : other.shadows,

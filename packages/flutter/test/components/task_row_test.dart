@@ -91,7 +91,30 @@ void main() {
     expect(retries, 1);
   });
 
-  testWidgets('task row: the list variant drops the card fill', (WidgetTester tester) async {
+  testWidgets('task row: the card is a bordered surface at the xl2 radius', (WidgetTester tester) async {
+    await pumpTask(
+      tester,
+      const HoronTaskRow(
+        status: HoronTaskStatus.running,
+        title: '작업',
+        botInitial: 'A',
+        botName: 'Analyst',
+        message: '진행 중',
+      ),
+    );
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronTaskRow)));
+    final Container row = tester.widget<Container>(find.byType(Container).first);
+    final BoxDecoration decoration = row.decoration! as BoxDecoration;
+
+    expect(decoration.color, theme.colors.bgSurface, reason: 'bg-bg-surface');
+    expect(decoration.borderRadius, BorderRadius.circular(theme.radius.xl2), reason: 'rounded-2xl');
+    expect((decoration.border! as Border).top.color, theme.colors.borderDefault, reason: 'border-border-default');
+
+    final Icon folder = tester.widget<Icon>(find.byIcon(Icons.folder_outlined));
+    expect(folder.size, theme.space.step(3.5), reason: 'Folder size-3.5 = 14');
+  });
+
+  testWidgets('task row: the list variant drops the card fill and radius', (WidgetTester tester) async {
     await pumpTask(
       tester,
       const HoronTaskRow(
@@ -105,10 +128,8 @@ void main() {
     );
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronTaskRow)));
     final Container row = tester.widget<Container>(find.byType(Container).first);
-    final BoxDecoration decoration = row.decoration! as BoxDecoration;
-    // Paper WM4-1: 목록 안 행은 배경 없이 아래 모서리만 r16입니다.
-    expect(decoration.color, isNull);
-    expect(decoration.borderRadius, const BorderRadius.vertical(bottom: Radius.circular(16)));
+    // `variant="list"`는 투명 행이라 장식이 없습니다.
+    expect(row.decoration, isNull);
 
     // Paper WM4-1: 목록 안 행은 배경 없이 1px 구분선으로 나뉘고, 구분선은 좌우 16을 들여씁니다.
     final Finder divider = find.byKey(const Key('horon-task-row-divider'));

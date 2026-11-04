@@ -6,17 +6,14 @@ import 'kbd.dart';
 /// `agent-panel.tsx`의 `rounded-[24px]`입니다.
 const double _panelRadius = 24;
 
-/// `agent-panel.tsx`의 `px-4`입니다.
-const double _panelPaddingX = 16;
+/// `agent-panel.tsx`의 `px-5`입니다.
+const double _panelPaddingX = 20;
 
 /// `agent-panel.tsx`의 `rounded-[5px]`입니다. 봇 타일의 반경입니다.
 const double _chipTileRadius = 5;
 
 /// `agent-panel.tsx`의 `h-7.5`입니다. 칩 높이입니다.
 const double _chipHeight = 30;
-
-/// `agent-panel.tsx`의 `rounded-[18px]`입니다. 작성 상자의 반경입니다.
-const double _composerRadius = 18;
 
 /// Figma `Agent panel`(Agent tasks 112:797): 표면 채움과 24 반경의 단단한 판입니다.
 ///
@@ -46,7 +43,11 @@ class HoronAgentPanel extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 12,
-        children: <Widget>[?filter, ...children],
+        children: <Widget>[
+          // React는 `filter`를 폭 채우는 `div`로 감쌉니다.
+          if (filter case final Widget filter) SizedBox(width: double.infinity, child: filter),
+          ...children,
+        ],
       ),
     );
   }
@@ -167,8 +168,9 @@ class _HoronTaskComposerState extends State<HoronTaskComposer> {
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     return Container(
-      padding: const EdgeInsets.only(left: 16, right: 14, top: 14, bottom: 10),
-      decoration: BoxDecoration(color: theme.colors.overlayInk4, borderRadius: BorderRadius.circular(_composerRadius)),
+      // `rounded-xl px-4 pt-3.5 pb-2.5`.
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 14, bottom: 10),
+      decoration: BoxDecoration(color: theme.colors.overlayInk4, borderRadius: BorderRadius.circular(theme.radius.xl)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -200,8 +202,9 @@ class _HoronTaskComposerState extends State<HoronTaskComposer> {
                 child: GestureDetector(
                   onTap: widget.onStart,
                   child: Container(
-                    height: 32,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    // `h-7.5 px-3.5`.
+                    height: theme.space.step(7.5),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: theme.colors.interactivePrimary,

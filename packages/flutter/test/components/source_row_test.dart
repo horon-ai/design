@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
@@ -20,7 +21,29 @@ int _barCount(WidgetTester tester) => tester
     .length;
 
 void main() {
-  testWidgets('source row: the tile is 32px at a 9px radius with a 16px icon', (WidgetTester tester) async {
+  testWidgets('source row: the tile is 32px at a 10px radius with a 16px icon', (WidgetTester tester) async {
+    await pumpRow(
+      tester,
+      const HoronSourceRow(
+        status: HoronSourceStatus.ready,
+        icon: Icon(Icons.description_outlined),
+        name: 'Q3 metrics',
+        detail: '12 pages · 44 chunks',
+      ),
+    );
+    final Container tile = tester.widgetList<Container>(find.byType(Container)).firstWhere((Container box) {
+      final Decoration? decoration = box.decoration;
+      return decoration is BoxDecoration &&
+          decoration.borderRadius != null &&
+          (decoration.borderRadius! as BorderRadius).topLeft.x == 10;
+    });
+    expect(tester.getSize(find.byWidget(tile)), const Size(32, 32));
+    expect(IconTheme.of(tester.element(find.byIcon(Icons.description_outlined))).size, 16);
+    expect(find.byIcon(Icons.check), findsOneWidget);
+    expect(find.text('12 pages · 44 chunks'), findsOneWidget);
+  });
+
+  testWidgets('source row: the card is a bordered surface with 12px inline padding', (WidgetTester tester) async {
     await pumpRow(
       tester,
       const HoronSourceRow(
@@ -31,17 +54,12 @@ void main() {
       ),
     );
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronSourceRow)));
-    final Container tile = tester.widgetList<Container>(find.byType(Container)).firstWhere((Container box) {
-      final Decoration? decoration = box.decoration;
-      return decoration is BoxDecoration &&
-          decoration.borderRadius != null &&
-          (decoration.borderRadius! as BorderRadius).topLeft.x == 9;
-    });
-    expect(tester.getSize(find.byWidget(tile)), const Size(32, 32));
-    expect(IconTheme.of(tester.element(find.byIcon(Icons.description_outlined))).size, 16);
-    expect(find.byIcon(Icons.check), findsOneWidget);
-    expect(find.text('12 pages · 44 chunks'), findsOneWidget);
-    expect(theme.colors.bgSubtle, isNotNull);
+    final Container card = tester.widget<Container>(find.byType(Container).first);
+    final BoxDecoration decoration = card.decoration! as BoxDecoration;
+
+    expect(decoration.color, theme.colors.bgSurface, reason: 'bg-bg-surface');
+    expect((decoration.border! as Border).top.color, theme.colors.borderDefault, reason: 'border-border-default');
+    expect(card.padding, EdgeInsets.symmetric(horizontal: theme.space.s3, vertical: theme.space.s3));
   });
 
   testWidgets('source row: indexing shows the percent and a sky active bar', (WidgetTester tester) async {
@@ -78,6 +96,27 @@ void main() {
     );
     expect(detail.text.style!.color, theme.colors.textDanger);
     expect(find.byIcon(Icons.error_outline), findsOneWidget);
+    final Container retry = tester.widget<Container>(
+      find.ancestor(of: find.text('Retry'), matching: find.byType(Container)).first,
+    );
+    expect(retry.constraints?.maxHeight, theme.space.step(7.5), reason: 'h-7.5 = 30');
+    expect((retry.decoration! as BoxDecoration).color, theme.colors.overlayInk6);
+
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: Offset.zero);
+    addTearDown(pointer.removePointer);
+    await pointer.moveTo(tester.getCenter(find.text('Retry')));
+    await tester.pumpAndSettle();
+    expect(
+      (tester
+                  .widget<Container>(find.ancestor(of: find.text('Retry'), matching: find.byType(Container)).first)
+                  .decoration!
+              as BoxDecoration)
+          .color,
+      theme.colors.overlayInk10,
+      reason: 'hover:bg-overlay-ink-10',
+    );
+
     await tester.tap(find.text('Retry'));
     await tester.pumpAndSettle();
     expect(retries, 1);

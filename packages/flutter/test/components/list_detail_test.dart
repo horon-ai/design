@@ -72,8 +72,12 @@ void main() {
     expect((unselected.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(theme.space.s2_5));
   });
 
-  testWidgets('the shell clips at rounded-2xl and the list sits on the inset surface', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(_listDetail(), width: 900));
+  testWidgets('the shell clips at rounded-2xl and the solid list sits on the inset surface', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(HoronListDetail(groups: _groups(), detailBuilder: _detail, surface: HoronSurface.solid), width: 900),
+    );
     await tester.pumpAndSettle();
     final HoronThemeData theme = _themeOf(tester, find.byType(HoronListDetail));
 
@@ -87,6 +91,28 @@ void main() {
     );
     // Paper `1W94-0`: 목록 팬의 gap 2
     expect(listColumn.spacing, theme.space.s0_5);
+  });
+
+  testWidgets('the glass list is transparent and mutes with text-secondary', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(_listDetail(), width: 900));
+    await tester.pumpAndSettle();
+    final HoronThemeData theme = _themeOf(tester, find.byType(HoronListDetail));
+
+    expect(_decoratedWith(theme.colors.bgInset), findsNothing, reason: 'glass면 bg-transparent');
+
+    final List<DecoratedBox> panes = tester.widgetList<DecoratedBox>(find.byType(DecoratedBox)).where((
+      DecoratedBox box,
+    ) {
+      final Decoration decoration = box.decoration;
+      return decoration is BoxDecoration && decoration.color == Colors.transparent && decoration.border != null;
+    }).toList();
+    expect(panes, isNotEmpty, reason: '목록 팬은 투명 채움에 오른쪽 테두리만 남깁니다');
+    final Border paneBorder = (panes.first.decoration as BoxDecoration).border! as Border;
+    expect(paneBorder.right.color, theme.colors.borderDefault);
+
+    final Text groupLabel = tester.widget<Text>(find.text('Pinned'));
+    expect(groupLabel.style!.color, theme.colors.textSecondary);
+    expect(groupLabel.style!.letterSpacing, (theme.text.labelSm.fontSize ?? 12) * 0.04);
   });
 
   testWidgets('tapping an item reports the id and swaps the detail pane', (WidgetTester tester) async {
@@ -145,7 +171,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the header draws a 40px tile, an 18px icon and a 22px tag pill', (WidgetTester tester) async {
+  testWidgets('the header draws a 40px tile, a 20px icon and a 22px tag pill', (WidgetTester tester) async {
     await tester.pumpWidget(
       _host(
         const HoronListDetailHeader(
@@ -163,7 +189,7 @@ void main() {
       find.byWidgetPredicate((Widget widget) => widget is SizedBox && widget.width == theme.space.step(10)),
       findsOneWidget,
     );
-    expect(IconTheme.of(tester.element(find.byType(Icon))).size, theme.space.step(4.5));
+    expect(IconTheme.of(tester.element(find.byType(Icon))).size, theme.space.step(5));
     expect(IconTheme.of(tester.element(find.byType(Icon))).color, HoronPalette.sky700);
     expect(_decoratedWith(HoronPalette.sky100), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -240,12 +266,30 @@ void main() {
       find.ancestor(of: find.text('AGENTS.md'), matching: find.byType(Container)).first,
     );
     expect(pill.constraints?.maxHeight, theme.space.step(5.5));
+    expect(find.byType(HoronCodePanel), findsOneWidget, reason: '본문은 CodePanel입니다');
     expect(find.textContaining('name:'), findsOneWidget);
+
+    final Finder solidSurface = find.descendant(
+      of: find.byType(HoronListDetailInstructions),
+      matching: find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is DecoratedBox &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration as BoxDecoration).color == theme.colors.bgSurface &&
+            (widget.decoration as BoxDecoration).border != null,
+      ),
+    );
+    expect(solidSurface, findsOneWidget, reason: 'Button solid');
+    expect(
+      (tester.widget<DecoratedBox>(solidSurface).decoration as BoxDecoration).border,
+      Border.all(color: theme.colors.borderDefault),
+    );
 
     await tester.tap(find.text('Edit'));
     await tester.pumpAndSettle();
     expect(find.byType(TextField), findsOneWidget);
     expect(find.text('Done'), findsOneWidget);
+    expect(tester.widget<TextField>(find.byType(TextField)).style!.height, 21 / 12);
 
     await tester.enterText(find.byType(TextField), 'name: beta');
     await tester.pump();

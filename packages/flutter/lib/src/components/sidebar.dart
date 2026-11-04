@@ -88,12 +88,12 @@ const double _dashStroke = 1;
 /// `md` 폭 이상일 때만 트리에 있습니다.
 const Key horonSidebarResizeHandleKey = Key('horon-sidebar-resize-handle');
 
-/// 사이드바 바탕의 세 가지입니다.
+/// 사이드바 바탕의 네 가지입니다.
 ///
-/// React는 `surface: "glass" | "photo"`를 인라인 유니온으로 선언합니다. 이름 붙은
-/// 유니온이 아니라서 variant 게이트가 읽지 않으므로, 이 포트는 공개 enum 대신
-/// 이름 있는 생성자([HoronSidebar.photo], [HoronSidebar.flue])로 같은 선택을 엽니다.
-/// `glass`·`photo`·`flue` 중 `flue`만 Flutter 쪽 추가입니다.
+/// React는 `surface: "glass" | "photo" | "plain"`을 인라인 유니온으로 선언합니다. 이름
+/// 붙은 유니온이 아니라서 variant 게이트가 읽지 않으므로, 이 포트는 공개 enum 대신
+/// 이름 있는 생성자([HoronSidebar.photo], [HoronSidebar.plain], [HoronSidebar.flue])로
+/// 같은 선택을 엽니다. `glass`·`photo`·`plain`·`flue` 중 `flue`만 Flutter 쪽 추가입니다.
 enum _SidebarSurface {
   /// `surface="glass"`, 기본값입니다. 두꺼운 유리 한 겹입니다.
   glass,
@@ -101,16 +101,20 @@ enum _SidebarSurface {
   /// `surface="photo"` — 라이트에서는 Paper 사진 바탕, 다크에서는 두꺼운 유리입니다.
   photo,
 
+  /// `surface="plain"` — 채움도 유리도 없이 뒤 레이아웃의 색을 그대로 쓰고, 오른쪽
+  /// 1px `border-default`로만 경계를 긋습니다.
+  plain,
+
   /// Flutter 전용 — Flue 배경 위에 보통 유리를 얹습니다.
   flue,
 }
 
 /// Figma `Sidebar`(88:848)입니다.
 ///
-/// 280px 두께 유리 기둥에 오른쪽 1px 테두리, 위 16 / 좌우 12 / 아래 12 여백,
-/// 자식 사이 2px 간격을 둡니다. [resizable]이면 오른쪽 가장자리의 8px 손잡이로
-/// 폭을 [minWidth]와 [maxWidth] 사이에서 끕니다. 손잡이는 `md`(768) 폭 이상에서만
-/// 보이고, 그 아래에서는 사이드바가 280 고정입니다.
+/// 280px 기둥에 위 16 / 좌우 12 / 아래 12 여백, 자식 사이 2px 간격을 둡니다.
+/// [resizable]이면 오른쪽 가장자리의 8px 손잡이로 폭을 [minWidth]와 [maxWidth]
+/// 사이에서 끕니다. 손잡이는 `md`(768) 폭 이상에서만 보이고, 그 아래에서는 사이드바가
+/// 280 고정입니다.
 ///
 /// 자식은 [HoronSidebarHeader], [HoronSidebarGroup], [HoronSidebarProject],
 /// [HoronSidebarItem], [HoronSidebarSpacer], [HoronSidebarAddButton],
@@ -142,6 +146,19 @@ class HoronSidebar extends StatefulWidget {
     this.onWidthChange,
     this.resizeLabel = 'Resize sidebar',
   }) : _surface = _SidebarSurface.photo;
+
+  /// `surface="plain"` — 채움과 유리 없이 뒤 레이아웃의 색을 쓰고, 오른쪽 1px
+  /// `border-default`로만 경계를 긋습니다.
+  const HoronSidebar.plain({
+    super.key,
+    required this.children,
+    this.resizable = false,
+    this.defaultWidth = _sidebarWidth,
+    this.minWidth = _sidebarMinWidth,
+    this.maxWidth = _sidebarMaxWidth,
+    this.onWidthChange,
+    this.resizeLabel = 'Resize sidebar',
+  }) : _surface = _SidebarSurface.plain;
 
   /// Flutter 전용 `surface="flue"` — [HoronFlueBackground] 위에 보통 유리를 얹습니다.
   const HoronSidebar.flue({
@@ -256,11 +273,14 @@ class _HoronSidebarState extends State<HoronSidebar> {
         return SizedBox(
           width: width,
           child: DecoratedBox(
-            // border-r border-border-default
+            // `surface="plain"`만 `border-r border-border-default`를 얻습니다. glass와
+            // photo는 테두리 없이 유리나 사진 바탕이 경계를 만듭니다.
             decoration: BoxDecoration(
-              border: Border(
-                right: BorderSide(color: colors.borderDefault, width: _hairline),
-              ),
+              border: widget._surface == _SidebarSurface.plain
+                  ? Border(
+                      right: BorderSide(color: colors.borderDefault, width: _hairline),
+                    )
+                  : null,
             ),
             child: Stack(
               fit: StackFit.passthrough,
@@ -290,18 +310,25 @@ class _HoronSidebarState extends State<HoronSidebar> {
   /// 바탕 레이어입니다. React처럼 내용 뒤에 깔고, 내용은 그 위에 그립니다.
   List<Widget> _background(HoronThemeData theme) {
     final bool dark = theme.brightness == Brightness.dark;
+    final HoronColors colors = theme.colors;
     switch (widget._surface) {
       case _SidebarSurface.glass:
         return <Widget>[_glass(theme, HoronGlassTier.thick)];
       case _SidebarSurface.photo:
-        // `bg-sidebar-photo dark:bg-glass-thick dark:bg-none` — 다크에서는 두꺼운 유리만 남습니다.
-        if (dark) return <Widget>[_glass(theme, HoronGlassTier.thick)];
+        // `bg-sidebar-photo dark:bg-glass-thick dark:bg-none` — 다크에서는 사진이 빠지고
+        // 두꺼운 유리 **색**만 남습니다. React도 이 자리에 LiquidGlass 레이어를 두지 않습니다.
+        if (dark) {
+          return <Widget>[Positioned.fill(child: ColoredBox(color: colors.glassThick))];
+        }
         return <Widget>[
           const Positioned.fill(child: ColoredBox(color: HoronPalette.sky50)),
           Positioned.fill(
             child: ColoredBox(color: HoronPalette.baseWhite.withValues(alpha: _photoVeil)),
           ),
         ];
+      case _SidebarSurface.plain:
+        // 채움도 유리도 없이 뒤 레이아웃의 색이 그대로 비칩니다.
+        return const <Widget>[];
       case _SidebarSurface.flue:
         return <Widget>[
           // 유리 겹이 이미 glass-regular 색조를 얹으므로 Flue 자체 색조는 끕니다.
@@ -596,7 +623,7 @@ class HoronSidebarHeader extends StatelessWidget {
 ///
 /// 32px 행에 12px 반경, 좌우 10px 여백, 10px 간격을 둡니다. [current]인 항목은
 /// 6% 잉크, hover는 4% 잉크입니다. [count]는 오른쪽에, [attention]은 7px 빨간 점으로
-/// 표시합니다.
+/// 표시합니다. [href]가 있으면 React처럼 링크로 읽히고, 없으면 버튼입니다.
 class HoronSidebarItem extends StatefulWidget {
   /// 항목을 만듭니다.
   const HoronSidebarItem({
@@ -606,6 +633,7 @@ class HoronSidebarItem extends StatefulWidget {
     this.count,
     this.attention = false,
     this.current = false,
+    this.href,
     this.onPressed,
   });
 
@@ -624,6 +652,11 @@ class HoronSidebarItem extends StatefulWidget {
 
   /// 지금 보고 있는 항목인지 여부입니다. 참이면 6% 잉크가 남습니다.
   final bool current;
+
+  /// 이 항목이 가리키는 문서의 주소입니다. React의 `href`이고, 값이 있으면 행이
+  /// 링크 시맨틱([Semantics.link])을 얻습니다. 패키지는 주소를 열지 않으므로 실제
+  /// 이동은 [onPressed]가 맡습니다.
+  final Uri? href;
 
   /// 눌렀을 때 부를 콜백입니다.
   final VoidCallback? onPressed;
@@ -652,8 +685,12 @@ class _HoronSidebarItemState extends State<HoronSidebarItem> {
         ? colors.overlayInk4
         : Colors.transparent;
 
+    // React는 `href`가 있으면 `<a>`, 없으면 `<button type="button">`입니다.
+    final bool link = widget.href != null;
+
     return Semantics(
-      button: true,
+      button: !link,
+      link: link,
       selected: widget.current,
       child: FocusableActionDetector(
         enabled: widget.onPressed != null,
@@ -1174,8 +1211,14 @@ class _HoronSidebarProjectState extends State<HoronSidebarProject> {
     final HoronSpaceSpec space = theme.space;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    // current ? bg-overlay-ink-6 : hover:bg-overlay-ink-6, has-data-popup-open:bg-overlay-ink-6
-    final Color rowFill = widget.current || widget.menuOpen || _hovered ? colors.overlayInk6 : Colors.transparent;
+    // `current ? bg-overlay-ink-6 : hover:bg-overlay-ink-4`, `has-data-popup-open:bg-overlay-ink-6`
+    final Color rowFill = widget.menuOpen
+        ? colors.overlayInk6
+        : _hovered
+        ? colors.overlayInk4
+        : widget.current
+        ? colors.overlayInk6
+        : Colors.transparent;
 
     final Widget row = AnimatedContainer(
       duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
@@ -1441,8 +1484,10 @@ class _HoronSidebarAddButtonState extends State<HoronSidebarAddButton> {
                         style: theme.text.labelMd.copyWith(color: colors.textSecondary),
                       ),
                       IconTheme.merge(
-                        // [&>[data-slot=icon]]:size-4
-                        data: IconThemeData(size: space.step(4), color: colors.textSecondary),
+                        // React는 `[&>[data-slot=icon]]:size-4` 규칙을 지웠으므로 아이콘은
+                        // 부모 글자 크기(1em)를 따릅니다. Flutter에는 em 상속이 없어 라벨
+                        // 스타일(`label-md` = 14px)의 글자 크기를 그대로 넘깁니다.
+                        data: IconThemeData(size: theme.text.labelMd.fontSize, color: colors.textSecondary),
                         child:
                             widget.icon ??
                             const Icon(

@@ -75,6 +75,9 @@ void main() {
 
     expect(find.text('ts'), findsOneWidget);
     expect(find.text('Copy'), findsOneWidget);
+    final Text code = tester.widget<Text>(find.text('const a = 1;'));
+    expect(code.style!.fontSize, theme.text.code.fontSize, reason: 'text-code');
+    expect(code.style!.height, theme.text.code.height, reason: 'text-code 행간');
     final bool hasInk = tester.widgetList<ColoredBox>(find.byType(ColoredBox)).any((ColoredBox box) {
       return box.color == theme.colors.surfaceInk;
     });

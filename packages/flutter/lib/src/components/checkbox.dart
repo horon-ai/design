@@ -10,13 +10,13 @@ const double _borderWidth = 1.5;
 
 /// `checkbox.tsx`의 `CheckboxSize`입니다.
 enum HoronCheckboxSize {
-  /// `size="sm"` — 18px 상자, 5px 반경, `body-sm`, 아이콘 12px.
+  /// `size="sm"` — 18px 상자, 6px 반경, `body-sm`, 아이콘 12px.
   sm,
 
   /// `size="md"` — 20px 상자, 6px 반경, `body-md`, 아이콘 14px. 기본값입니다.
   md,
 
-  /// `size="lg"` — 24px 상자, 3px 반경, `body-lg`, 아이콘 16px.
+  /// `size="lg"` — 24px 상자, 6px 반경, `body-lg`, 아이콘 16px.
   lg,
 }
 
@@ -25,7 +25,7 @@ typedef _CheckboxMetrics = ({double side, double radius, double gap, double indi
 _CheckboxMetrics _metricsOf(HoronCheckboxSize size, HoronThemeData theme) => switch (size) {
   HoronCheckboxSize.sm => (
     side: theme.space.step(4.5),
-    radius: theme.space.step(1.25),
+    radius: theme.radius.xs,
     gap: theme.space.s2,
     indicator: 12,
     textStyle: theme.text.bodySm,
@@ -39,7 +39,7 @@ _CheckboxMetrics _metricsOf(HoronCheckboxSize size, HoronThemeData theme) => swi
   ),
   HoronCheckboxSize.lg => (
     side: theme.space.step(6),
-    radius: theme.space.step(0.75),
+    radius: theme.radius.xs,
     gap: theme.space.s3,
     indicator: 16,
     textStyle: theme.text.bodyLg,

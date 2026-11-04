@@ -91,7 +91,19 @@ void main() {
     expect(tester.widget<Icon>(find.byIcon(Icons.add)).size, 14); // Plus size-3.5
     expect(tester.widget<Icon>(find.byIcon(Icons.arrow_drop_down)).size, 12); // CaretDown size-3
     expect(find.text('Add source'), findsOneWidget);
-    expect(theme.space.step(8.5), 34); // h-8.5
+    expect(theme.space.step(7.5), 30); // size-7.5
+
+    final AnimatedContainer settingsPill = tester.widget<AnimatedContainer>(
+      find.ancestor(of: find.byIcon(Icons.tune), matching: find.byType(AnimatedContainer)).first,
+    );
+    expect(settingsPill.constraints!.maxHeight, 30, reason: '설정 단추 size-7.5');
+    expect((settingsPill.decoration! as BoxDecoration).color, theme.colors.overlayInk6);
+
+    final AnimatedContainer addPill = tester.widget<AnimatedContainer>(
+      find.ancestor(of: find.text('Add source'), matching: find.byType(AnimatedContainer)).first,
+    );
+    expect(addPill.constraints!.maxHeight, 30, reason: 'Add source h-7.5');
+    expect((addPill.decoration! as BoxDecoration).color, theme.colors.overlayInk6);
 
     await tester.tap(find.byIcon(Icons.tune));
     await tester.pumpAndSettle();
@@ -110,15 +122,16 @@ void main() {
     );
     final HoronThemeData theme = HoronTheme.of(tester.element(_panel));
 
-    expect(_tabFill(tester, 'sources'), theme.colors.overlayInk10);
-    expect(_tabFill(tester, 'chunks'), Colors.transparent);
-    expect(find.text('12'), findsOneWidget); // the tab count
+    expect(find.byType(HoronPanelPillTabs), findsOneWidget, reason: '공유 알약 탭을 씁니다');
+    expect(_tabFill(tester, 'Sources 12'), theme.colors.overlayInk10);
+    expect(_tabFill(tester, 'Chunks 248'), Colors.transparent);
+    expect(find.text('Sources 12'), findsOneWidget); // the tab label and its count
 
-    await tester.tap(find.text('Chunks'));
+    await tester.tap(find.text('Chunks 248'));
     await tester.pumpAndSettle();
     expect(selected, 'chunks');
-    expect(_tabFill(tester, 'chunks'), theme.colors.overlayInk10);
-    expect(_tabFill(tester, 'sources'), Colors.transparent);
+    expect(_tabFill(tester, 'Chunks 248'), theme.colors.overlayInk10);
+    expect(_tabFill(tester, 'Sources 12'), Colors.transparent);
   });
 
   testWidgets('tabs: a controlled value wins over the tap', (WidgetTester tester) async {
@@ -134,12 +147,12 @@ void main() {
       ),
     );
     final HoronThemeData theme = HoronTheme.of(tester.element(_panel));
-    expect(_tabFill(tester, 'chunks'), theme.colors.overlayInk10);
+    expect(_tabFill(tester, 'Chunks 248'), theme.colors.overlayInk10);
 
-    await tester.tap(find.text('Bots'));
+    await tester.tap(find.text('Bots 3'));
     await tester.pumpAndSettle();
     expect(selected, 'bots');
-    expect(_tabFill(tester, 'chunks'), theme.colors.overlayInk10, reason: 'the host still owns the value');
+    expect(_tabFill(tester, 'Chunks 248'), theme.colors.overlayInk10, reason: 'the host still owns the value');
   });
 
   testWidgets('indexing: the spinner and the count show only above zero', (WidgetTester tester) async {
@@ -150,7 +163,7 @@ void main() {
     );
     expect(find.text('3 indexing'), findsOneWidget);
     expect(find.byType(HoronSpinner), findsOneWidget);
-    expect(tester.getSize(find.byType(HoronSpinner)), const Size(13, 13));
+    expect(tester.getSize(find.byType(HoronSpinner)), const Size(12, 12));
 
     await pumpPanel(tester, const HoronKnowledgeBasePanel(title: 'Knowledge base', tabs: _tabs));
     expect(find.text('3 indexing'), findsNothing);
@@ -255,8 +268,10 @@ void main() {
   });
 }
 
-/// 탭 [id]의 알약 바탕색입니다. 선택되지 않은 탭은 투명입니다.
-Color? _tabFill(WidgetTester tester, String id) {
-  final AnimatedContainer pill = tester.widget<AnimatedContainer>(find.byKey(ValueKey<String>('kb-tab-$id')));
+/// 탭 [label]의 알약 바탕색입니다. 선택되지 않은 탭은 투명입니다.
+Color? _tabFill(WidgetTester tester, String label) {
+  final AnimatedContainer pill = tester.widget<AnimatedContainer>(
+    find.ancestor(of: find.text(label), matching: find.byType(AnimatedContainer)).first,
+  );
   return (pill.decoration! as BoxDecoration).color;
 }

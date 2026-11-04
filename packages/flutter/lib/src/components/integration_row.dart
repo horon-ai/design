@@ -127,10 +127,11 @@ class HoronIntegrationRow extends StatelessWidget {
   }
 
   Widget _tile(HoronThemeData theme) {
-    final Color background = switch (status) {
-      HoronIntegrationStatus.connected => HoronPalette.sky500, // bg-sky-500
-      HoronIntegrationStatus.reconnect => HoronPalette.sky700, // bg-sky-700
-      HoronIntegrationStatus.notConnected => theme.colors.interactivePrimary, // bg-interactive-primary
+    // bg-sky-500 text-neutral-50 / bg-sky-700 text-neutral-50 / bg-bg-subtle text-text-secondary
+    final (Color background, Color foreground) = switch (status) {
+      HoronIntegrationStatus.connected => (HoronPalette.sky500, HoronPalette.neutral50),
+      HoronIntegrationStatus.reconnect => (HoronPalette.sky700, HoronPalette.neutral50),
+      HoronIntegrationStatus.notConnected => (theme.colors.bgSubtle, theme.colors.textSecondary),
     };
     return SizedBox(
       width: theme.space.step(10), // size-10 = 40
@@ -141,8 +142,8 @@ class HoronIntegrationRow extends StatelessWidget {
           borderRadius: BorderRadius.circular(theme.space.s2_5), // rounded-[10px]
         ),
         child: IconTheme.merge(
-          // [&>svg]:size-5, text-text-inverse
-          data: IconThemeData(size: theme.space.step(5), color: theme.colors.textInverse),
+          // [&>svg]:size-5 — 색은 상태별 타일 글자색을 씁니다.
+          data: IconThemeData(size: theme.space.step(5), color: foreground),
           child: Center(child: icon),
         ),
       ),

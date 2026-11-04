@@ -2,8 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_veil.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -11,11 +10,11 @@ import '../tokens/horon_tokens.g.dart';
 /// `w-105` — 다이얼로그가 더 넓어지지 않는 폭 420입니다.
 const double _dialogMaxWidth = 420;
 
-/// `0_0_0_1px_var(--color-overlay-ink-3)` — 유리 다이얼로그 바깥 1px 고리입니다.
-const double _ringWidth = 1;
+/// `size-8` — 닫기 버튼의 32px 히트 영역입니다.
+const double _closeSize = 32;
 
-/// `[&_svg]:size-5` — 닫기 아이콘 20입니다.
-const double _closeIconSize = 20;
+/// `[&_svg]:size-4` — 닫기 아이콘 16입니다.
+const double _closeIconSize = 16;
 
 /// `shadow-[0_24_64]` — 불투명 다이얼로그 그림자의 세로 이동입니다.
 const double _solidShadowOffsetY = 24;
@@ -35,14 +34,11 @@ const double _scrimOpacity = 0.4;
 /// `backdrop-blur-[6px]` — 스크림 뒤 배경 흐림 반경입니다.
 const double _scrimBlur = 6;
 
-/// Paper `UBN-1` 호스트의 `blur(24px)` — 서리 표면의 배경 흐림 반경입니다.
-const double _frostBlur = 24;
-
 /// Figma `Dialog on scrim`(63:329)의 다이얼로그 표면입니다.
 ///
-/// React `DialogContent`를 옮긴 것입니다. 24px 여백, `title-md` 제목, 20px 닫기,
-/// `body-md` 설명으로 이루어지고, [solid]면 Paper 워크스페이스 모달의 불투명
-/// 표면과 0/24/64 그림자를 씁니다.
+/// React `DialogContent`를 옮긴 것입니다. 24px 여백, `title-md` 제목, 32px 닫기
+/// 영역, `body-md` 설명으로 이루어지고, [solid]면 Paper 워크스페이스 모달의 불투명
+/// 표면과 0/24/64 그림자를, 아니면 `veil-overlay`를 씁니다.
 ///
 /// React는 `surface`(`glass` | `solid`)를 컴포넌트 파일 안의 인라인 유니온으로
 /// 선언합니다. 게이트가 읽는 것은 `export type` 선언뿐이라 public enum으로 만들면
@@ -79,8 +75,8 @@ class HoronDialog extends StatelessWidget {
 
   /// 불투명한 기본 채움입니다. React `surface="solid"`입니다.
   ///
-  /// `bg-bg-default`, 20px 반경, 24px 여백, 20px 리듬과 0/24/64 그림자를 쓰고
-  /// 유리를 깔지 않습니다.
+  /// `bg-bg-surface`, 20px 반경, 24px 여백, 16px 리듬과 0/24/64 그림자를 쓰고
+  /// veil을 깔지 않습니다.
   final bool solid;
 
   /// 다이얼로그 본문입니다. React `children`입니다.
@@ -95,29 +91,9 @@ class HoronDialog extends StatelessWidget {
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
 
-    // solid는 gap-5(20), glass는 gap-2(8)입니다.
-    final double gap = solid ? space.s5 : space.s2;
-    final BorderRadius radius = BorderRadius.circular(theme.radius.xl); // rounded-xl / rounded-[20px]
-    // dark:shadow-none — 다크에서는 테두리 고리와 그림자를 모두 끕니다.
-    final bool rings = !solid && theme.brightness != Brightness.dark;
-    // Paper는 라이트 다이얼로그만 `--color-glass-fill-frost`(#FFFFFFE5, 90%)와
-    // 호스트 24px 배경 흐림을 씁니다(`UBN-1`). 다크 보드 `CLU-0`은 두꺼운 유리
-    // `#17181ACC`에 흐림·고리가 없습니다.
-    final bool frost = !solid && theme.brightness == Brightness.light;
-
-    // shadow-[0_24_64_#0A142433] — React의 색은 푸른 기가 도는 검정 20%입니다.
-    // 토큰에 그 색이 없어 같은 불투명도의 overlay-ink-20으로 옮겼습니다.
-    final List<BoxShadow> shadows = solid
-        ? <BoxShadow>[
-            BoxShadow(
-              color: colors.overlayInk20,
-              offset: const Offset(0, _solidShadowOffsetY),
-              blurRadius: _solidShadowBlur,
-            ),
-          ]
-        : rings
-        ? <BoxShadow>[BoxShadow(color: colors.overlayInk3, spreadRadius: _ringWidth)]
-        : const <BoxShadow>[];
+    // 두 표면 모두 16px 리듬(`gap-4`)을 씁니다.
+    final double gap = space.s4;
+    final BorderRadius radius = BorderRadius.circular(theme.radius.xl); // rounded-xl = 20
 
     final Widget header = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,62 +108,58 @@ class HoronDialog extends StatelessWidget {
           ),
         ),
         if (closeLabel != null)
-          _Pressable(
-            onTap: onClose ?? () => Navigator.of(context).maybePop(),
-            semanticLabel: closeLabel,
-            ringRadius: space.s1,
-            child: Icon(Icons.close, size: _closeIconSize, color: colors.textSecondary),
-          ),
+          _DialogClose(label: closeLabel!, onTap: onClose ?? () => Navigator.of(context).maybePop()),
       ],
     );
 
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: solid ? colors.bgDefault : null,
-        borderRadius: radius,
-        // shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost)] — 안쪽 1px 테두리입니다.
-        border: rings ? Border.all(color: colors.glassRimFrost) : null,
-        boxShadow: shadows,
-      ),
-      child: Stack(
+    final Widget body = Padding(
+      padding: EdgeInsets.all(space.s6), // p-6
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: gap,
         children: <Widget>[
-          if (!solid)
-            Positioned.fill(
-              child: frost
-                  ? BackdropFilter(
-                      filter: ui.ImageFilter.blur(sigmaX: _frostBlur, sigmaY: _frostBlur),
-                      child: ColoredBox(color: colors.glassFillFrost),
-                    )
-                  : HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: const SizedBox.expand()),
+          header,
+          if (description != null)
+            DefaultTextStyle(
+              style: theme.text.bodyMd.copyWith(color: colors.textSecondary),
+              child: description!,
             ),
-          Padding(
-            padding: EdgeInsets.all(space.s6), // p-6
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: gap,
-              children: <Widget>[
-                header,
-                if (description != null)
-                  DefaultTextStyle(
-                    style: theme.text.bodyMd.copyWith(color: colors.textSecondary),
-                    child: description!,
-                  ),
-                ?child,
-              ],
-            ),
+          ?child,
+        ],
+      ),
+    );
+
+    if (!solid) {
+      // React `veil-overlay` — 74% 채움, 1px 링, 0 6 24 그림자를 스스로 그립니다.
+      return HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: body);
+    }
+
+    // shadow-[0_24_64_#0A142433] — React의 색은 푸른 기가 도는 검정 20%입니다.
+    // 토큰에 그 색이 없어 같은 불투명도의 overlay-ink-20으로 옮겼습니다.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.bgSurface,
+        borderRadius: radius,
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: colors.overlayInk20,
+            offset: const Offset(0, _solidShadowOffsetY),
+            blurRadius: _solidShadowBlur,
           ),
         ],
       ),
+      child: ClipRRect(borderRadius: radius, child: body),
     );
   }
 }
 
 /// `dialog.tsx`의 `DialogFooter`입니다.
 ///
-/// 오른쪽으로 붙는 동작 줄입니다. React는 `mt-4 flex justify-end gap-2` 한 줄이지만,
-/// 폭이 좁아지면 버튼이 넘치므로 [Wrap]으로 줄을 바꿉니다.
+/// `w-full flex-wrap items-center justify-end gap-2` — 폭을 채우고 오른쪽에 붙는
+/// 동작 줄입니다. React는 위 여백 `mt-4`를 없애고 본문 리듬(gap-4)에 맡깁니다.
+/// `justify-end`는 Wrap의 `WrapAlignment.end`로 옮겼습니다. Row의
+/// `MainAxisAlignment.end`와 같은 정렬이고, 좁아지면 줄을 바꿀 수 있습니다.
 class HoronDialogFooter extends StatelessWidget {
   /// 동작 줄을 만듭니다.
   const HoronDialogFooter({super.key, required this.children});
@@ -198,9 +170,15 @@ class HoronDialogFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronSpaceSpec space = HoronTheme.of(context).space;
-    return Padding(
-      padding: EdgeInsets.only(top: space.s4), // mt-4
-      child: Wrap(alignment: WrapAlignment.end, spacing: space.s2, runSpacing: space.s2, children: children),
+    return SizedBox(
+      width: double.infinity,
+      child: Wrap(
+        alignment: WrapAlignment.end,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: space.s2,
+        runSpacing: space.s2,
+        children: children,
+      ),
     );
   }
 }
@@ -325,33 +303,42 @@ class _HoronDialogRoute extends RawDialogRoute<void> {
        );
 }
 
-/// `motion-press`(scale .97)와 누름 콜백을 한 자리에 묶습니다.
-class _Pressable extends StatefulWidget {
-  const _Pressable({required this.child, this.onTap, this.semanticLabel, this.ringRadius});
+/// 다이얼로그 닫기 버튼입니다.
+///
+/// React `size-8 ... rounded-full hover:bg-overlay-ink-6 hover:text-text-primary` —
+/// 32px 원 히트 영역, hover 시 6% 잉크 원과 본문 색 아이콘, 2px 포커스 링을 씁니다.
+class _DialogClose extends StatefulWidget {
+  const _DialogClose({required this.label, required this.onTap});
 
-  final Widget child;
-  final VoidCallback? onTap;
-  final String? semanticLabel;
-  final double? ringRadius;
+  final String label;
+  final VoidCallback onTap;
 
   @override
-  State<_Pressable> createState() => _PressableState();
+  State<_DialogClose> createState() => _DialogCloseState();
 }
 
-class _PressableState extends State<_Pressable> {
-  bool _pressed = false;
+class _DialogCloseState extends State<_DialogClose> {
+  bool _hovered = false;
   bool _focused = false;
+  bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final bool enabled = widget.onTap != null;
 
-    Widget content = widget.child;
-    final double? ringRadius = widget.ringRadius;
-    if (_focused && enabled && ringRadius != null) {
+    Widget content = AnimatedContainer(
+      duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+      curve: HoronMotion.colorsCurve,
+      width: _closeSize,
+      height: _closeSize,
+      decoration: BoxDecoration(color: _hovered ? colors.overlayInk6 : Colors.transparent, shape: BoxShape.circle),
+      child: Icon(Icons.close, size: _closeIconSize, color: _hovered ? colors.textPrimary : colors.textSecondary),
+    );
+
+    if (_focused) {
       // focus-visible:outline-2 — 레이아웃을 밀지 않도록 바깥에 겹쳐 그립니다.
       final double gap = space.s0_5;
       content = Stack(
@@ -365,8 +352,8 @@ class _PressableState extends State<_Pressable> {
             child: IgnorePointer(
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(ringRadius),
-                  border: Border.all(color: theme.colors.textBrand, width: space.s0_5),
+                  borderRadius: BorderRadius.circular(theme.radius.full),
+                  border: Border.all(color: colors.textBrand, width: space.s0_5),
                 ),
               ),
             ),
@@ -377,29 +364,30 @@ class _PressableState extends State<_Pressable> {
     }
 
     return AnimatedScale(
-      scale: _pressed && enabled ? HoronMotion.pressScale : 1,
+      scale: _pressed ? HoronMotion.pressScale : 1,
       duration: reduceMotion ? Duration.zero : HoronMotion.pressDuration,
       curve: HoronMotion.pressCurve,
       child: Semantics(
         button: true,
-        label: widget.semanticLabel,
+        label: widget.label,
         child: FocusableActionDetector(
-          enabled: enabled,
-          mouseCursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+          mouseCursor: SystemMouseCursors.click,
           onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onTap,
-            onTapDown: (TapDownDetails details) {
-              if (enabled) setState(() => _pressed = true);
-            },
-            onTapUp: (TapUpDetails details) {
-              if (_pressed) setState(() => _pressed = false);
-            },
-            onTapCancel: () {
-              if (_pressed) setState(() => _pressed = false);
-            },
-            child: content,
+          child: MouseRegion(
+            onEnter: (_) => setState(() => _hovered = true),
+            onExit: (_) => setState(() => _hovered = false),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: widget.onTap,
+              onTapDown: (TapDownDetails details) => setState(() => _pressed = true),
+              onTapUp: (TapUpDetails details) {
+                if (_pressed) setState(() => _pressed = false);
+              },
+              onTapCancel: () {
+                if (_pressed) setState(() => _pressed = false);
+              },
+              child: content,
+            ),
           ),
         ),
       ),

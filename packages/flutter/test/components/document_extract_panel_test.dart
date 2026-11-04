@@ -94,7 +94,7 @@ List<BoxDecoration> decorations(WidgetTester tester) => <BoxDecoration>[
 double? radiusOf(BoxDecoration decoration) =>
     decoration.borderRadius is BorderRadius ? (decoration.borderRadius! as BorderRadius).topLeft.x : null;
 
-/// 확인이 필요한 값 상자는 `bg-overlay-ink-12`에 `border-red-500/90`입니다.
+/// 확인이 필요한 값 상자는 `bg-overlay-ink-12`에 `border-border-danger`입니다.
 BoxDecoration checkedBox(WidgetTester tester, HoronThemeData theme) => decorations(tester).firstWhere(
   (BoxDecoration decoration) =>
       decoration.color == theme.colors.overlayInk12 && radiusOf(decoration) == 10 && decoration.border != null,
@@ -143,7 +143,7 @@ void main() {
     await pumpPanel(tester, panel());
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronDocumentExtractPanel)));
     final BoxDecoration checked = checkedBox(tester, theme);
-    expect(checked.border!.top.color, HoronPalette.red500.withValues(alpha: 0.9), reason: 'border-red-500/90');
+    expect(checked.border!.top.color, theme.colors.borderDanger, reason: 'border-border-danger');
     expect(find.text('Check'), findsNWidgets(2));
     expect(find.text('2 of 4 filled · 2 to check'), findsOneWidget);
 
@@ -247,6 +247,47 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Check'), findsNothing);
     expect(find.text('4 of 4 filled · 0 to check'), findsOneWidget);
+  });
+
+  testWidgets('document extract panel: the audited sizes land on the surfaces', (WidgetTester tester) async {
+    await pumpPanel(tester, panel());
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronDocumentExtractPanel)));
+    final List<BoxDecoration> painted = decorations(tester);
+
+    expect(
+      painted.where((BoxDecoration d) => d.color == theme.colors.overlayInk5 && radiusOf(d) == 10),
+      isNotEmpty,
+      reason: '파일 타일 rounded-[10px]',
+    );
+    expect(
+      painted.where((BoxDecoration d) => d.border?.top.color == theme.colors.overlayInk10 && radiusOf(d) == 10),
+      isNotEmpty,
+      reason: '표 상자 rounded-[10px]',
+    );
+
+    final AnimatedContainer extract = tester.widget<AnimatedContainer>(
+      find.ancestor(of: find.text('Extract'), matching: find.byType(AnimatedContainer)).first,
+    );
+    expect(extract.constraints!.maxHeight, 30, reason: 'Extract h-7.5');
+    final AnimatedContainer accept = tester.widget<AnimatedContainer>(
+      find.ancestor(of: find.text('Accept all'), matching: find.byType(AnimatedContainer)).first,
+    );
+    expect(accept.constraints!.maxHeight, 30, reason: 'Accept all h-7.5');
+
+    await tester.tap(find.text('JSON'));
+    await tester.pumpAndSettle();
+    expect(
+      decorations(tester).where((BoxDecoration d) => d.color == theme.colors.overlayInk4 && radiusOf(d) == 10),
+      isNotEmpty,
+      reason: 'JSON pre rounded-[10px]',
+    );
+
+    await tester.tap(find.text('Schema'));
+    await tester.pumpAndSettle();
+    final SizedBox label = tester.widget<SizedBox>(
+      find.ancestor(of: find.text('Vendor'), matching: find.byType(SizedBox)).first,
+    );
+    expect(label.width, 100, reason: '스키마 라벨 w-25');
   });
 
   testWidgets('document extract panel: one column below 1024 and two columns above', (WidgetTester tester) async {

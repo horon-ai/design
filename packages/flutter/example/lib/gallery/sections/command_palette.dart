@@ -5,9 +5,11 @@ import '../surface_group.dart';
 
 /// Command Palette 갤러리 섹션입니다.
 ///
-/// 열린 팔레트를 solid와 glass 두 표면에 같은 모습으로 보여 주고, 본문만 있는
-/// 상태와 결과가 없는 상태를 따로 놓습니다. 열린 팔레트는 자기 상자 안에서
-/// 오버레이로 그려지므로 실제로 Esc나 바깥 누르기로 닫아 볼 수 있습니다.
+/// 열린 팔레트를 solid와 veil(glass) 두 표면에 같은 모습으로 보여 주고, 본문만 있는
+/// 상태와 결과가 없는 상태를 따로 놓습니다. glass는 palette 그림자 없이
+/// `veil-overlay`의 그림자만 쓰고, 결과가 없으면 기본 문구 "No results"를 보여 줍니다.
+/// 열린 팔레트는 자기 상자 안에서 오버레이로 그려지므로 실제로 Esc나 바깥 누르기로
+/// 닫아 볼 수 있습니다.
 class HoronCommandPaletteGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronCommandPaletteGallerySection({super.key});
@@ -30,7 +32,7 @@ class HoronCommandPaletteGallerySection extends StatelessWidget {
             ),
           ),
           SurfaceGroup(
-            label: 'Glass',
+            label: 'Glass · veil-overlay',
             glass: true,
             child: const _Sample(
               label: '열림',
@@ -47,7 +49,7 @@ class HoronCommandPaletteGallerySection extends StatelessWidget {
                 child: _BodyDemo(groups: _groups(theme)),
               ),
               _Sample(
-                label: '결과 없음',
+                label: '결과 없음 · 기본 "No results"',
                 child: const _BodyDemo(
                   groups: <HoronCommandGroup>[
                     HoronCommandGroup(

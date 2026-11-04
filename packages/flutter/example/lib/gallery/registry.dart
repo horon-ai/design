@@ -30,6 +30,7 @@ const List<GallerySection> gallerySections = <GallerySection>[
   ),
   GallerySection(slug: 'input_group', title: 'Input Group', group: 'inputs'),
   GallerySection(slug: 'select', title: 'Select', group: 'inputs'),
+  GallerySection(slug: 'combobox', title: 'Combobox', group: 'inputs'),
   GallerySection(slug: 'checkbox', title: 'Checkbox', group: 'inputs'),
   GallerySection(slug: 'radio_group', title: 'Radio Group', group: 'inputs'),
   GallerySection(slug: 'switch', title: 'Switch', group: 'inputs'),
@@ -44,7 +45,6 @@ const List<GallerySection> gallerySections = <GallerySection>[
   GallerySection(slug: 'calendar', title: 'Calendar', group: 'inputs'),
   GallerySection(slug: 'schedule', title: 'Schedule', group: 'inputs'),
   GallerySection(slug: 'composer', title: 'Composer', group: 'inputs'),
-  GallerySection(slug: 'combobox', title: 'Combobox', group: 'inputs'),
   GallerySection(slug: 'split_button', title: 'Split Button', group: 'inputs'),
   GallerySection(
     slug: 'tool_permissions',
@@ -121,6 +121,7 @@ const List<GallerySection> gallerySections = <GallerySection>[
   ),
   GallerySection(slug: 'filter_bar', title: 'Filter Bar', group: 'navigation'),
   GallerySection(slug: 'dialog', title: 'Dialog', group: 'overlays'),
+  GallerySection(slug: 'modal', title: 'Modal', group: 'overlays'),
   GallerySection(
     slug: 'bottom_sheet',
     title: 'Bottom Sheet',

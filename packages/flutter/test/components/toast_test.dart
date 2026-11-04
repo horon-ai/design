@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
@@ -43,20 +44,15 @@ void main() {
     }
   });
 
-  testWidgets('the card is a 14px regular glass box with 16/14 padding and two text roles', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('the card is a 14px veil overlay with 16/14 padding and two text roles', (WidgetTester tester) async {
     await tester.pumpWidget(
       _host(const HoronToast(title: '저장했습니다', description: '반영되었습니다', surface: HoronSurface.glass)),
     );
     final HoronThemeData theme = _theme(tester);
 
-    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: 'bg-glass-regular');
-    expect(
-      tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier,
-      HoronGlassTier.regular,
-      reason: 'LiquidGlass tier="regular"',
-    );
+    final HoronVeil veil = tester.widget<HoronVeil>(find.byType(HoronVeil).first);
+    expect(veil.kind, HoronVeilKind.overlay, reason: 'React veil-overlay');
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: '유리 레이어를 겹치지 않습니다');
     expect(
       find.byWidgetPredicate(
         (Widget widget) => widget is Padding && widget.padding == EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -79,7 +75,9 @@ void main() {
     );
   });
 
-  testWidgets('the close button is a 16px glyph that calls onDismiss', (WidgetTester tester) async {
+  testWidgets('the close button is a 16px glyph in a 32px hit area that hovers to text-primary', (
+    WidgetTester tester,
+  ) async {
     int dismissed = 0;
     await tester.pumpWidget(_host(HoronToast(title: '알림', onDismiss: () => dismissed += 1)));
     final HoronThemeData theme = _theme(tester);
@@ -87,9 +85,27 @@ void main() {
     final Icon close = tester.widget<Icon>(find.byIcon(Icons.close));
     expect(close.size, 16, reason: '[&_svg]:size-4');
     expect(close.color, theme.colors.textSecondary);
+    expect(tester.getSize(find.byIcon(Icons.close)).width, 16);
+    expect(
+      tester.getSize(find.ancestor(of: find.byIcon(Icons.close), matching: find.byType(SizedBox)).first).width,
+      32,
+      reason: 'after:-inset-2 → 32px 히트 영역',
+    );
+
+    final TestGesture hover = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await hover.addPointer(location: tester.getCenter(find.byIcon(Icons.close)));
+    await tester.pumpAndSettle();
+    expect(tester.widget<Icon>(find.byIcon(Icons.close)).color, theme.colors.textPrimary, reason: 'hover:text-primary');
+    await hover.removePointer();
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.close));
     expect(dismissed, 1);
+  });
+
+  testWidgets('the lg close glyph is 20px', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(const HoronToast(title: '알림', size: HoronToastSize.lg)));
+    expect(tester.widget<Icon>(find.byIcon(Icons.close)).size, 20, reason: 'lg [&_svg]:size-5');
   });
 
   testWidgets('the toaster shows, dismisses and clears toasts through the controller', (WidgetTester tester) async {

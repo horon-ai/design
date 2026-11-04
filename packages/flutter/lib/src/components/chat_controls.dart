@@ -7,8 +7,8 @@ import '../glass/horon_glass.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
-/// `chat-controls.tsx`의 `size-11`입니다. 최신으로 가는 원형 버튼입니다.
-const double _jumpSide = 44;
+/// `chat-controls.tsx`의 `size-10`입니다. 최신으로 가는 원형 버튼입니다.
+const double _jumpSide = 40;
 
 /// `chat-controls.tsx`의 `[&_svg]:size-5`입니다.
 const double _jumpIcon = 20;
@@ -71,7 +71,7 @@ class _ChatSurface extends StatelessWidget {
 /// Figma 파형의 막대 높이(px)입니다.
 const List<double> _waveform = <double>[8, 14, 22, 12, 26, 18, 10, 20, 28, 16, 9, 18, 24, 12, 7, 15, 21, 11];
 
-/// Figma `Jump to latest`(Chat controls 88:659): 44px 옅은 유리 원에 20px 캐럿입니다.
+/// Figma `Jump to latest`(Chat controls 88:659): 40px 옅은 유리 원에 20px 캐럿입니다.
 class HoronJumpToLatest extends StatelessWidget {
   /// 버튼을 만듭니다.
   const HoronJumpToLatest({

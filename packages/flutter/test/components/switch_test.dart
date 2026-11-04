@@ -66,10 +66,20 @@ void main() {
     );
   });
 
-  testWidgets('the thumb is surface coloured in dark mode', (WidgetTester tester) async {
+  testWidgets('the thumb keeps the ink colours in dark mode', (WidgetTester tester) async {
+    final HoronColors colors = HoronThemeData.dark.colors;
+
+    await tester.pumpWidget(_host(HoronSwitch(value: false, onChanged: (_) {}), brightness: Brightness.dark));
+    await tester.pumpAndSettle();
+    expect(_thumbDecoration(tester).color, colors.textOnInk, reason: 'bg-text-on-ink, 다크 예외 없음');
+
     await tester.pumpWidget(_host(HoronSwitch(value: true, onChanged: (_) {}), brightness: Brightness.dark));
     await tester.pumpAndSettle();
-    expect(_thumbDecoration(tester).color, HoronThemeData.dark.colors.bgDefault, reason: 'dark:bg-bg-default');
+    expect(
+      _thumbDecoration(tester).color,
+      colors.interactiveOnPrimary,
+      reason: 'data-checked:bg-interactive-on-primary',
+    );
   });
 
   testWidgets('tapping the control or the label toggles the value', (WidgetTester tester) async {

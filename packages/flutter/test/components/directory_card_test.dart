@@ -17,7 +17,6 @@ Future<void> pumpCard(WidgetTester tester, Widget child, {Brightness brightness 
 void main() {
   testWidgets('directory card: the tile is 40px ink at a 10px radius', (WidgetTester tester) async {
     await pumpCard(tester, const HoronDirectoryCard(icon: Icon(Icons.folder_outlined), name: 'Docs'));
-    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronDirectoryCard)));
 
     final Container tile = tester.widget<Container>(
       find.descendant(of: find.byType(HoronDirectoryCard), matching: find.byType(Container)).first,
@@ -29,7 +28,8 @@ void main() {
     expect((decoration.borderRadius! as BorderRadius).topLeft.x, closeTo(10, 0.01));
     expect(tester.getSize(find.byType(Container).first), const Size(40, 40));
     expect(find.byIcon(Icons.folder_outlined), findsOneWidget);
-    expect(IconTheme.of(tester.element(find.byIcon(Icons.folder_outlined))).color, theme.colors.textInverse);
+    // `text-neutral-50` — 반대색이 아니라 neutral-50입니다.
+    expect(IconTheme.of(tester.element(find.byIcon(Icons.folder_outlined))).color, HoronPalette.neutral50);
   });
 
   testWidgets('directory card: the name is label-md and the description clamps to one line', (
@@ -52,6 +52,10 @@ void main() {
     expect(nameStyle.fontWeight, HoronFontWeight.semibold);
     expect(description.maxLines, 1);
     expect(description.overflow, TextOverflow.ellipsis);
+    // `text-caption text-text-secondary` — 12/16 오버라이드 없이 토큰을 씁니다.
+    expect(description.style?.fontSize, theme.text.caption.fontSize);
+    expect(description.style?.height, theme.text.caption.height);
+    expect(description.style?.color, theme.colors.textSecondary);
   });
 
   testWidgets('directory card: the glass add button calls onAdd', (WidgetTester tester) async {

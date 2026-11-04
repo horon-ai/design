@@ -49,6 +49,21 @@ void main() {
     expect(tester.widget<Icon>(carets.first).color, theme.colors.textSecondary);
   });
 
+  testWidgets('the separator caret never shrinks and sits outside the flexible crumb', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronBreadcrumb(children: _crumbs())));
+    final HoronThemeData theme = _theme(tester);
+    final Finder carets = find.byIcon(Icons.chevron_right);
+
+    expect(
+      find.ancestor(of: carets.first, matching: find.byType(Flexible)),
+      findsNothing,
+      reason: 'React는 캐럿을 `shrink-0`으로 Flexible 밖에 둡니다',
+    );
+    for (int index = 0; index < 2; index++) {
+      expect(tester.getSize(carets.at(index)), Size.square(theme.space.s3_5));
+    }
+  });
+
   testWidgets('the leading tile is a 20px ink box with label-sm inverse text', (WidgetTester tester) async {
     await tester.pumpWidget(_host(HoronBreadcrumb(children: _crumbs())));
     final HoronThemeData theme = _theme(tester);

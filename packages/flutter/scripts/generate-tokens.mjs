@@ -15,7 +15,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { darkColors, lightColors, primitives } from "../../tokens/src/color.ts";
-import { glass } from "../../tokens/src/glass.ts";
+import { glass, veil } from "../../tokens/src/glass.ts";
 import { radius, shadow, spacing } from "../../tokens/src/scale.ts";
 import { fontFamily, fontWeight, textStyles } from "../../tokens/src/typography.ts";
 
@@ -364,6 +364,19 @@ function textStylesClass() {
   });
 }
 
+/**
+ * 생성자 하나를 `dart format`과 같은 모양으로 씁니다.
+ *
+ * 매개변수를 모두 한 줄에 붙였을 때 120칸을 넘지 않으면 한 줄로, 넘으면 한 줄에 하나씩
+ * 씁니다. 페이지 폭은 `analysis_options.yaml`의 `formatter.page_width`(120)입니다.
+ */
+function dartConstructor(name, params, indent = "  ") {
+  const inline = params.join(" ").replace(/,$/, "");
+  const oneLine = `${indent}const ${name}({${inline}});`;
+  if (oneLine.length <= 120) return oneLine;
+  return [`${indent}const ${name}({`, ...params.map((param) => `${indent}  ${param}`), `${indent}});`].join("\n");
+}
+
 /** 림(테두리) 그라디언트 세 색을 담는 클래스입니다. */
 function glassRimClass() {
   return dartClass({
@@ -375,11 +388,7 @@ function glassRimClass() {
     ],
     members: [
       "  /// 세 색을 받는 생성자입니다.",
-      "  const HoronGlassRim({",
-      "    required this.top,",
-      "    required this.mid,",
-      "    required this.bottom,",
-      "  });",
+      dartConstructor("HoronGlassRim", ["required this.top,", "required this.mid,", "required this.bottom,"]),
       "",
       "  /// 위쪽(그라디언트 0) 색입니다.",
       "  final Color top;",
@@ -405,6 +414,7 @@ function glassClass() {
   const members = [
     "  /// 모든 글래스 값을 받는 생성자입니다.",
     "  const HoronGlassTokens({",
+    "    // 네 값 모두 `glass.ts`에서 생성됩니다.",
     `    this.blur = ${dartDouble(blur)},`,
     `    this.saturate = ${dartDouble(saturate)},`,
     `    this.rimWidth = ${dartDouble(rimWidth)},`,
@@ -480,6 +490,139 @@ function glassClass() {
   });
 }
 
+/** veil 그림자의 색과 고정 오프셋·블러를 `BoxShadow` 인자로 씁니다. */
+function veilShadow(color, offsetY, blur) {
+  return `BoxShadow(color: ${rgbaColor(color)}, offset: Offset(0.0, ${dartDouble(offsetY)}), blurRadius: ${dartDouble(blur)})`;
+}
+
+/** veil의 밝기별 색 묶음입니다. */
+function veilSchemeClass() {
+  return dartClass({
+    name: "final class HoronVeilScheme",
+    docs: [
+      "`glass.ts` `veil.scheme` 한 밝기의 색입니다.",
+      "",
+      "`ring`은 1px 링, `field`·`fieldFocus`는 입력 필드 채움, `overlay`는 74% 오버레이",
+      "채움입니다. 그림자는 CSS `0 2px 10px`·`0 6px 24px`의 오프셋과 블러를 그대로",
+      "옮기고 색만 토큰에서 받습니다.",
+    ],
+    members: [
+      "  /// 여섯 값을 받는 생성자입니다.",
+      "  const HoronVeilScheme({",
+      "    required this.ring,",
+      "    required this.field,",
+      "    required this.fieldFocus,",
+      "    required this.fieldShadow,",
+      "    required this.overlay,",
+      "    required this.overlayShadow,",
+      "  });",
+      "",
+      "  /// 표면 가장자리의 1px 링 색입니다.",
+      "  final Color ring;",
+      "",
+      "  /// 입력 필드의 기본 채움입니다.",
+      "  final Color field;",
+      "",
+      "  /// 입력 필드가 포커스를 받을 때의 채움입니다.",
+      "  final Color fieldFocus;",
+      "",
+      "  /// 필드의 soft shadow입니다(`0 2px 10px`).",
+      "  final List<BoxShadow> fieldShadow;",
+      "",
+      "  /// 오버레이(메뉴·시트·다이얼로그·토스트)의 74% 채움입니다.",
+      "  final Color overlay;",
+      "",
+      "  /// 오버레이의 soft shadow입니다(`0 6px 24px`).",
+      "  final List<BoxShadow> overlayShadow;",
+    ],
+  });
+}
+
+function veilClass() {
+  const { blur, saturate, ringWidth, scheme } = veil;
+  const schemeMembers = (name) => [
+    `    ring: ${rgbaColor(scheme[name].ring)},`,
+    `    field: ${rgbaColor(scheme[name].field)},`,
+    `    fieldFocus: ${rgbaColor(scheme[name].fieldFocus)},`,
+    `    fieldShadow: <BoxShadow>[${veilShadow(scheme[name].fieldShadow, 2, 10)}],`,
+    `    overlay: ${rgbaColor(scheme[name].overlay)},`,
+    `    overlayShadow: <BoxShadow>[${veilShadow(scheme[name].overlayShadow, 6, 24)}],`,
+  ];
+  const members = [
+    "  /// 모든 veil 값을 받는 생성자입니다.",
+    dartConstructor("HoronVeilTokens", [
+      `this.blur = ${dartDouble(blur)},`,
+      `this.saturate = ${dartDouble(saturate)},`,
+      `this.ringWidth = ${dartDouble(ringWidth)},`,
+    ]),
+    "",
+    "  /// 뒤 배경에 거는 가우스 블러의 표준편차입니다(논리 픽셀).",
+    "  final double blur;",
+    "",
+    "  /// 뒤 배경에 거는 채도 배율입니다. Filter Effects `saturate()`와 같은 값입니다.",
+    "  final double saturate;",
+    "",
+    "  /// 표면 가장자리에 그리는 링의 두께입니다(논리 픽셀).",
+    "  final double ringWidth;",
+    "",
+    "  /// 라이트 밝기의 veil 색입니다.",
+    "  static const HoronVeilScheme light = HoronVeilScheme(",
+    ...schemeMembers("light"),
+    "  );",
+    "",
+    "  /// 다크 밝기의 veil 색입니다.",
+    "  static const HoronVeilScheme dark = HoronVeilScheme(",
+    ...schemeMembers("dark"),
+    "  );",
+    "",
+    "  /// 밝기 [brightness]에 맞는 veil 색입니다.",
+    "  HoronVeilScheme forBrightness(Brightness brightness) => brightness == Brightness.dark ? dark : light;",
+    "",
+    "  /// [saturate]의 Filter Effects 채도 행렬입니다.",
+    "  ///",
+    "  /// `ColorFilter.matrix`가 받는 20개 값(행 우선, 알파 행은 단위 행렬)입니다.",
+    "  /// CSS `saturate()`와 같은 계수라서 웹과 Flutter가 같은 색을 냅니다.",
+    "  List<double> get saturateMatrix {",
+    "    final double s = saturate;",
+    "    return <double>[",
+    "      0.213 + 0.787 * s,",
+    "      0.715 - 0.715 * s,",
+    "      0.072 - 0.072 * s,",
+    "      0.0,",
+    "      0.0,",
+    "      0.213 - 0.213 * s,",
+    "      0.715 + 0.285 * s,",
+    "      0.072 - 0.072 * s,",
+    "      0.0,",
+    "      0.0,",
+    "      0.213 - 0.213 * s,",
+    "      0.715 - 0.715 * s,",
+    "      0.072 + 0.928 * s,",
+    "      0.0,",
+    "      0.0,",
+    "      0.0,",
+    "      0.0,",
+    "      0.0,",
+    "      1.0,",
+    "      0.0,",
+    "    ];",
+    "  }",
+  ];
+  return dartClass({
+    name: "final class HoronVeilTokens",
+    docs: [
+      "`glass.ts` `veil`의 가벼운 글래스 재료입니다.",
+      "",
+      "입력 필드(`field`)와 떠 있는 오버레이(`overlay`)가 씁니다. 아래에서 위로 뒤 배경을",
+      "[blur]만큼 흐리고 [saturate]만큼 채도를 올린 다음, 상태별 채움을 덮고,",
+      "[ringWidth] 두께의 링과 soft shadow를 그립니다. 림 그라디언트는 없습니다.",
+      "뒤 배경을 필터할 수 없을 때(동작 줄이기 설정)는 `glass-fill-frost` 한 겹으로",
+      "내려갑니다.",
+    ],
+    members,
+  });
+}
+
 /**
  * 커밋할 Dart 소스 한 벌을 문자열로 만듭니다.
  *
@@ -505,6 +648,8 @@ export function buildDartTokens() {
     textStylesClass(),
     glassRimClass(),
     glassClass(),
+    veilSchemeClass(),
+    veilClass(),
   ].join("\n\n") + "\n";
 }
 

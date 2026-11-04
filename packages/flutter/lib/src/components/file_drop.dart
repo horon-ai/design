@@ -3,7 +3,7 @@ import 'dart:ui' show PathMetric;
 
 import 'package:flutter/material.dart';
 
-import '../glass/horon_glass.dart';
+import '../glass/horon_veil.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
@@ -12,14 +12,14 @@ enum HoronFileDropSurface {
   /// `surface="solid"` — 불투명 `bg-surface` 채움에 점선 테두리. 기본값입니다.
   solid,
 
-  /// `surface="glass"` — `bg-glass-clear` 위에 LiquidGlass 레이어를 깝니다.
+  /// `surface="glass"` — `.veil-drop` 표면 위에 놓습니다. 점선 테두리가 유일한 윤곽입니다.
   glass,
 }
 
 /// 파일을 끌어다 놓거나 눌러서 고르는 영역입니다.
 ///
-/// React `FileDrop`: 1.5px 점선 테두리의 둥근 상자에 16px 아이콘과 13/18 500 라벨을
-/// 가운데로 놓습니다. 끌어오는 동안 점선이 1px 브랜드 테두리와 투명 유리 배경으로 바뀌고,
+/// React `FileDrop`: 1.5px 점선 테두리의 둥근 상자에 16px 아이콘과 `label-md` 라벨을
+/// 가운데로 놓습니다. 끌어오는 동안 점선이 1px 브랜드 테두리로 바뀌고,
 /// 거부된 파일은 위험 테두리로 바뀝니다. 흔들림이나 튀는 움직임은 없습니다.
 ///
 /// React는 `<input type="file">`을 품은 `<label>`이라 클릭이 곧 파일 선택입니다. Flutter에는
@@ -81,12 +81,6 @@ class HoronFileDrop extends StatefulWidget {
   /// `opacity-40` — 비활성이거나 업로드 중일 때의 불투명도입니다.
   static const double _disabledOpacity = 0.4;
 
-  /// `text-[13px]/[18px]` — 토큰에 13px 단계가 없어 `text.code`(13/20)에서 줄 높이만 바꿉니다.
-  static const double _labelFontSize = 13;
-
-  /// 위 글자 크기에 대응하는 줄 높이 18입니다.
-  static const double _labelLineHeight = 18;
-
   /// Spinner의 `stroke-width="11"`(viewBox 100 기준)을 옮긴 선 두께 비율입니다.
   static const double _spinnerStrokeFraction = 0.11;
 
@@ -112,7 +106,7 @@ class _HoronFileDropState extends State<HoronFileDrop> {
     // `data-dragging:border-solid border-border-brand`와
     // `data-rejected:border-solid border-border-danger`. 둘 다 켜지면 React의 규칙 순서대로
     // 거부가 이깁니다. 채움은 표면이 정합니다: solid는 `bg-surface`, 끌어오는 동안
-    // `bg-subtle`, glass는 `bg-glass-clear` 위에 LiquidGlass 레이어입니다.
+    // `bg-subtle`, glass는 `.veil-drop`입니다.
     final bool isGlass = widget.surface == HoronFileDropSurface.glass;
     final Color fill = _dragging ? colors.bgSubtle : colors.bgSurface;
     final (Color borderColor, bool solid) = widget.rejected
@@ -135,41 +129,23 @@ class _HoronFileDropState extends State<HoronFileDrop> {
           if (widget.uploading)
             _UploadSpinner(label: theme.strings.uploading)
           else
-            Icon(
-              Icons.file_upload_outlined,
-              size: HoronFileDrop._iconSize,
-              color: colors.textSecondary,
-            ),
+            Icon(Icons.file_upload_outlined, size: HoronFileDrop._iconSize, color: colors.textSecondary),
           SizedBox(width: space.s2),
           Flexible(
             child: Text(
               widget.label,
               textAlign: TextAlign.center,
-              style: theme.text.labelSm.copyWith(
-                fontSize: HoronFileDrop._labelFontSize,
-                height:
-                    HoronFileDrop._labelLineHeight /
-                    HoronFileDrop._labelFontSize,
-                fontWeight: HoronFontWeight.medium,
-                color: colors.textSecondary,
-              ),
+              style: theme.text.labelMd.copyWith(color: colors.textSecondary),
             ),
           ),
         ],
       ),
     );
 
-    // glass는 `bg-glass-clear` 위에 LiquidGlass 레이어를 깝니다. 점선 테두리는
-    // 그대로 두고, 끌어오기·거부 때만 테두리가 바뀝니다.
+    // glass는 `.veil-drop` 한 겹입니다. 링이 없어 점선 테두리가 유일한 윤곽이고,
+    // 끌어오기·거부 때만 테두리가 바뀝니다. HoronLiquidGlass는 겹치지 않습니다.
     final Widget body = isGlass
-        ? DecoratedBox(
-            key: const Key('horon-file-drop-fill'),
-            decoration: BoxDecoration(
-              color: colors.glassClear,
-              borderRadius: radius,
-            ),
-            child: HoronLiquidGlass(borderRadius: radius, child: content),
-          )
+        ? HoronVeil(kind: HoronVeilKind.drop, borderRadius: radius, child: content)
         : DecoratedBox(
             key: const Key('horon-file-drop-fill'),
             decoration: BoxDecoration(color: fill, borderRadius: radius),
@@ -186,45 +162,30 @@ class _HoronFileDropState extends State<HoronFileDrop> {
           child: Opacity(
             opacity: inactive ? HoronFileDrop._disabledOpacity : 1,
             child: MouseRegion(
-              cursor: inactive
-                  ? SystemMouseCursors.basic
-                  : SystemMouseCursors.click,
+              cursor: inactive ? SystemMouseCursors.basic : SystemMouseCursors.click,
               child: Semantics(
                 button: true,
                 enabled: !inactive,
                 label: widget.label,
                 child: DragTarget<Object>(
-                  onWillAcceptWithDetails: (
-                    DragTargetDetails<Object> details,
-                  ) => !inactive,
-                  onMove: (DragTargetDetails<Object> details) =>
-                      _setDragging(true),
+                  onWillAcceptWithDetails: (DragTargetDetails<Object> details) => !inactive,
+                  onMove: (DragTargetDetails<Object> details) => _setDragging(true),
                   onLeave: (Object? data) => _setDragging(false),
                   onAcceptWithDetails: (DragTargetDetails<Object> details) {
                     _setDragging(false);
                     if (!inactive) widget.onDrop?.call(details.data);
                   },
-                  builder:
-                      (
-                        BuildContext context,
-                        List<Object?> candidate,
-                        List<Object?> rejected,
-                      ) {
-                        return GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: inactive ? null : widget.onTap,
-                          child: CustomPaint(
-                            key: ValueKey<String>(
-                              'horon-file-drop-border-$borderState',
-                            ),
-                            painter: _DropBorderPainter(
-                              color: borderColor,
-                              dashed: !solid,
-                            ),
-                            child: body,
-                          ),
-                        );
-                      },
+                  builder: (BuildContext context, List<Object?> candidate, List<Object?> rejected) {
+                    return GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: inactive ? null : widget.onTap,
+                      child: CustomPaint(
+                        key: ValueKey<String>('horon-file-drop-border-$borderState'),
+                        painter: _DropBorderPainter(color: borderColor, dashed: !solid),
+                        child: body,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -263,10 +224,7 @@ class _DropBorderPainter extends CustomPainter {
     for (final PathMetric metric in path.computeMetrics()) {
       double distance = 0;
       while (distance < metric.length) {
-        final double end = math.min(
-          distance + HoronFileDrop._dashLength,
-          metric.length,
-        );
+        final double end = math.min(distance + HoronFileDrop._dashLength, metric.length);
         canvas.drawPath(metric.extractPath(distance, end), paint);
         distance = end + HoronFileDrop._dashGap;
       }
@@ -274,8 +232,7 @@ class _DropBorderPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_DropBorderPainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.dashed != dashed;
+  bool shouldRepaint(_DropBorderPainter oldDelegate) => oldDelegate.color != color || oldDelegate.dashed != dashed;
 }
 
 /// 업로드 중 표시입니다. React `Spinner`의 10% 잉크 고리와 11% 두께를 옮겼습니다.
@@ -293,8 +250,7 @@ class _UploadSpinner extends StatelessWidget {
         width: HoronFileDrop._iconSize,
         height: HoronFileDrop._iconSize,
         child: CircularProgressIndicator(
-          strokeWidth:
-              HoronFileDrop._iconSize * HoronFileDrop._spinnerStrokeFraction,
+          strokeWidth: HoronFileDrop._iconSize * HoronFileDrop._spinnerStrokeFraction,
           color: colors.interactivePrimary,
           backgroundColor: colors.overlayInk10,
         ),

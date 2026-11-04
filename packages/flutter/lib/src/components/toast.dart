@@ -4,8 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../contracts/surface.dart';
-import '../glass/glass_geometry.dart';
-import '../glass/horon_surface.dart';
+import '../glass/horon_veil.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -75,12 +74,15 @@ _ToastMetrics _metricsOf(HoronToastSize size, HoronThemeData theme) => switch (s
     paddingY: theme.space.s4,
     gap: theme.space.s3_5,
     icon: 24,
-    close: 18,
+    close: 20,
     contentGap: theme.space.s1,
     title: theme.text.labelLg,
     description: theme.text.bodyMd,
   ),
 };
+
+/// `after:-inset-2` — 닫기 아이콘 바깥으로 넓히는 히트 영역 8입니다.
+const double _closeHitPadding = 8;
 
 /// `data-starting-style:translate-y-4` — 나타날 때 아래에서 올라오는 거리 16입니다.
 const double _enterOffsetY = 16;
@@ -174,8 +176,8 @@ class HoronToastController extends ChangeNotifier {
 /// 알림 카드 하나입니다. Figma `Toast`(62:307)입니다.
 ///
 /// React의 토스트 항목(`Toast.Root` + 제목·설명·닫기)을 옮겼습니다. 360px까지
-/// 넓어지는 `regular` 유리 카드이고, 톤 아이콘 20px, `label-lg` 제목,
-/// `body-sm` 설명, 16px 닫기 아이콘으로 이루어집니다.
+/// 넓어지는 카드이고, 톤 아이콘 20px, `label-lg` 제목, `body-sm` 설명,
+/// 16px 닫기 아이콘과 32px 히트 영역으로 이루어집니다.
 class HoronToast extends StatelessWidget {
   /// 카드 하나를 만듭니다.
   const HoronToast({
@@ -219,46 +221,44 @@ class HoronToast extends StatelessWidget {
       HoronToastTone.danger => (Icons.error_outline, colors.textDanger),
     };
 
-    return DecoratedBox(
-      decoration: BoxDecoration(borderRadius: radius, boxShadow: theme.shadows.popover),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: HoronSurfaceLayer(
-                surface: surface,
-                tier: HoronGlassTier.regular,
-                borderRadius: radius,
-                child: const SizedBox.expand(),
-              ),
+    final Widget body = Padding(
+      padding: EdgeInsets.symmetric(horizontal: metrics.paddingX, vertical: metrics.paddingY),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: metrics.gap,
+        children: <Widget>[
+          Icon(icon, size: metrics.icon, color: iconColor),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: metrics.contentGap,
+              children: <Widget>[
+                Text(title, style: metrics.title.copyWith(color: colors.textPrimary)),
+                if (description != null)
+                  Text(description!, style: metrics.description.copyWith(color: colors.textSecondary)),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: metrics.paddingX, vertical: metrics.paddingY),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: metrics.gap,
-                children: <Widget>[
-                  Icon(icon, size: metrics.icon, color: iconColor),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: metrics.contentGap,
-                      children: <Widget>[
-                        Text(title, style: metrics.title.copyWith(color: colors.textPrimary)),
-                        if (description != null)
-                          Text(description!, style: metrics.description.copyWith(color: colors.textSecondary)),
-                      ],
-                    ),
-                  ),
-                  _ToastClose(onTap: onDismiss, size: metrics.close),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+          _ToastClose(onTap: onDismiss, size: metrics.close),
+        ],
       ),
+    );
+
+    if (surface == HoronSurface.glass || surface == HoronSurface.veilOverlay) {
+      // React `veil-overlay` — 그림자와 링을 veil이 스스로 그립니다.
+      return HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: body);
+    }
+
+    // React `border border-border-default bg-bg-surface shadow-popover`.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.bgSurface,
+        borderRadius: radius,
+        border: Border.all(color: colors.borderDefault),
+        boxShadow: theme.shadows.popover,
+      ),
+      child: ClipRRect(borderRadius: radius, child: body),
     );
   }
 }
@@ -456,30 +456,48 @@ class _ToastClose extends StatefulWidget {
 
 class _ToastCloseState extends State<_ToastClose> {
   bool _pressed = false;
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
+    final bool enabled = widget.onTap != null;
     return AnimatedScale(
-      scale: _pressed && widget.onTap != null ? HoronMotion.pressScale : 1,
+      scale: _pressed && enabled ? HoronMotion.pressScale : 1,
       duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.pressDuration,
       curve: HoronMotion.pressCurve,
       child: Semantics(
         button: true,
         label: theme.strings.close,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: widget.onTap,
-          onTapDown: (TapDownDetails details) {
-            if (widget.onTap != null) setState(() => _pressed = true);
-          },
-          onTapUp: (TapUpDetails details) {
-            if (_pressed) setState(() => _pressed = false);
-          },
-          onTapCancel: () {
-            if (_pressed) setState(() => _pressed = false);
-          },
-          child: Icon(Icons.close, size: widget.size, color: theme.colors.textSecondary),
+        child: MouseRegion(
+          cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+          onEnter: (_) => setState(() => _hovered = true),
+          onExit: (_) => setState(() => _hovered = false),
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: widget.onTap,
+            onTapDown: (TapDownDetails details) {
+              if (enabled) setState(() => _pressed = true);
+            },
+            onTapUp: (TapUpDetails details) {
+              if (_pressed) setState(() => _pressed = false);
+            },
+            onTapCancel: () {
+              if (_pressed) setState(() => _pressed = false);
+            },
+            // React `after:-inset-2` — 아이콘 16px에 좌우 8px를 더한 32px 히트 영역.
+            child: SizedBox(
+              width: widget.size + _closeHitPadding * 2,
+              height: widget.size + _closeHitPadding * 2,
+              child: Center(
+                child: Icon(
+                  Icons.close,
+                  size: widget.size,
+                  color: _hovered ? theme.colors.textPrimary : theme.colors.textSecondary,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
