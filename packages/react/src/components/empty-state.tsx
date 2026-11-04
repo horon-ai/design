@@ -16,16 +16,13 @@ export type EmptyStateProps = {
 export function EmptyState({ illustration, title, description, action, className }: EmptyStateProps) {
   return (
     <div
-      className={cn(
-        "flex w-full max-w-90 animate-[tab-panel-in_240ms_var(--ease-out-quint)] flex-col items-center gap-3 px-6 py-8 text-center",
-        className,
-      )}
+      className={cn("flex w-full max-w-90 motion-rise flex-col items-center gap-3 px-6 py-8 text-center", className)}
     >
       {illustration && (
         <div className="flex size-35 shrink-0 items-center justify-center [&>*]:size-full">{illustration}</div>
       )}
-      <p className="text-title-md text-text-primary">{title}</p>
-      {description && <p className="self-stretch text-body-md text-text-secondary">{description}</p>}
+      <p className="text-title-md text-balance text-text-primary">{title}</p>
+      {description && <p className="self-stretch text-body-md text-pretty text-text-secondary">{description}</p>}
       {action && <div className="mt-4 flex">{action}</div>}
     </div>
   );

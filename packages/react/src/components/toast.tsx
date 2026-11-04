@@ -63,10 +63,10 @@ function ToastList({ size, surface }: { size: ToastSize; surface: "solid" | "gla
         key={toast.id}
         toast={toast}
         className={cn(
-          "relative flex items-start overflow-clip rounded-lg",
+          "relative mt-3 flex h-[var(--toast-height)] items-start overflow-clip rounded-lg data-ending-style:mt-0 data-ending-style:h-0",
           surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-popover",
           sizeClass[size],
-          "transition-[opacity,translate,scale] duration-260 ease-out-quint data-ending-style:translate-x-6 data-ending-style:opacity-0 data-ending-style:duration-180 data-ending-style:ease-in data-starting-style:translate-y-4 data-starting-style:scale-95 data-starting-style:opacity-0",
+          "transition-[height,margin-top,opacity,translate,scale] duration-240 ease-out-quint data-ending-style:translate-x-6 data-ending-style:opacity-0 data-ending-style:duration-180 data-ending-style:ease-in data-starting-style:translate-y-4 data-starting-style:scale-95 data-starting-style:opacity-0",
         )}
       >
         <span className={cn("relative flex shrink-0", iconSizeClass[size])}>{toneIcon[tone]}</span>
@@ -110,7 +110,7 @@ export function Toaster({ children, size = "md", surface = "solid", className }:
     <BaseToast.Provider>
       {children}
       <BaseToast.Portal>
-        <BaseToast.Viewport className={cn("fixed right-6 bottom-6 z-50 flex flex-col items-end gap-3", className)}>
+        <BaseToast.Viewport className={cn("fixed right-6 bottom-6 z-50 flex flex-col items-end gap-0", className)}>
           <ToastList size={size} surface={surface} />
         </BaseToast.Viewport>
       </BaseToast.Portal>

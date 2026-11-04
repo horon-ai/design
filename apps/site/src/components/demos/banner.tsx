@@ -16,7 +16,7 @@ function Examples({ surface }: { surface: "solid" | "glass" }) {
       >
         Couldn&apos;t reach Gmail. Reconnect to keep Inbox Manager running.
       </Banner>
-      <div className="flex w-full flex-wrap items-start justify-center gap-3">
+      <div className="flex w-full flex-col items-center gap-3">
         <Banner surface={surface} size="sm" className="w-full max-w-96">
           Small banner, still readable.
         </Banner>

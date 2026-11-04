@@ -51,16 +51,24 @@ export function BottomSheetContent({
       >
         <Drawer.Popup
           className={cn(
-            "relative flex w-full flex-col items-stretch overflow-clip px-4 pt-2 outline-none",
-            solid ? "rounded-t-xl bg-bg-default pb-6" : "veil-overlay rounded-t-[32px] pb-5",
+            "relative flex max-h-[calc(100dvh-2rem)] w-full flex-col items-stretch overflow-clip px-4 pt-2 outline-none",
+            solid ? "rounded-t-xl bg-bg-surface pb-6" : "veil-overlay rounded-t-[32px] pb-5",
             "transition-[translate] duration-320 ease-out-quint data-ending-style:translate-y-full data-ending-style:duration-220 data-ending-style:ease-in data-starting-style:translate-y-full",
             detail ? "gap-4.5" : floating ? "gap-3" : "max-w-93.5 gap-1",
             className,
           )}
           {...props}
         >
-          <span aria-hidden className="relative mx-auto h-[5px] w-9 rounded-[3px] bg-overlay-ink-20" />
-          <Drawer.Content className={cn("relative flex flex-col", detail ? "gap-4.5" : floating ? "gap-3" : "gap-1")}>
+          <span
+            aria-hidden
+            className="relative mx-auto h-[5px] w-9 cursor-grab touch-none rounded-[3px] bg-overlay-ink-20 active:cursor-grabbing"
+          />
+          <Drawer.Content
+            className={cn(
+              "relative flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain",
+              detail ? "gap-4.5" : floating ? "gap-3" : "gap-1",
+            )}
+          >
             <div className={cn("flex gap-2", detail ? "items-start" : "items-center pt-2.5 pb-2 pl-2")}>
               <Drawer.Title className={cn("min-w-0 flex-1 text-text-primary", detail ? "flex" : "text-label-lg")}>
                 {title}
@@ -87,7 +95,7 @@ export function BottomSheetRow({ icon, value, className, children, ...props }: B
     <button
       type="button"
       className={cn(
-        "flex h-12 w-full motion-press cursor-pointer items-center gap-3 rounded-lg px-2 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
+        "flex h-12 w-full motion-press cursor-pointer items-center gap-3 rounded-lg px-2 text-left hover:bg-overlay-ink-4 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
         className,
       )}
       {...props}
