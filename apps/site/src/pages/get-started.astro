@@ -1,75 +1,70 @@
 ---
-import { Button, Card } from "@horon-ai/react";
-import { createElement, Fragment, type ReactNode } from "react";
-
 import T from "@/components/i18n/T.astro";
 import CodeBlock from "@/components/site/CodeBlock.astro";
+import { ComponentCard } from "@/components/site/ComponentCard";
 import { componentCount } from "@/data/components";
-import { mascotImageUrl } from "@/data/mascots";
-import type { Localized } from "@/i18n";
+import { externalLinks } from "@/data/nav";
+import { fill } from "@/i18n/messages/fill";
 import { getStartedMessages as m, getStartedSnippets as snippets } from "@/i18n/messages/get-started";
 import DocsLayout from "@/layouts/DocsLayout.astro";
 
-/** React nodes for library props, using the same two-span markup as `T.astro`. */
-function localized(entry: Localized): ReactNode {
-  return createElement(
-    Fragment,
-    null,
-    createElement("span", { "data-locale-text": "ko", lang: "ko" }, entry.ko),
-    createElement("span", { "data-locale-text": "en", lang: "en" }, entry.en),
-  );
-}
+// The page follows the shape other design system docs share: pick a path,
+// install, explore the guides, then where to get help.
+const paths = [
+  { href: "/foundations", title: m.designPathTitle, description: m.designPathBody },
+  { href: "#install", title: m.developPathTitle, description: m.developPathBody },
+  { href: "/llms.txt", title: m.aiPathTitle, description: m.aiPathBody },
+];
 
-const welcomeTitle = createElement(
-  "span",
-  { className: "flex items-center gap-3" },
-  createElement("img", {
-    src: mascotImageUrl("wave"),
-    alt: m.welcomeMascotAlt.ko,
-    width: 48,
-    height: 48,
-    className: "size-12 shrink-0 object-contain",
-  }),
-  localized(m.welcomeTitle),
-);
+const guides = [
+  { href: "/foundations", title: m.foundationsTitle, description: m.foundationsBody },
+  { href: "/foundations/tokens", title: m.tokensTitle, description: m.tokensBody },
+  { href: "/components", title: m.componentsTitle, description: fill(m.componentsBody, { count: componentCount }) },
+  { href: "/mascot", title: m.mascotTitle, description: m.mascotBody },
+];
+
+const github = externalLinks.find((link) => link.href.includes("github.com"))?.href ?? "https://github.com/horon-ai/design";
+const help = [
+  { href: github, title: m.githubTitle, description: m.githubBody },
+  { href: "/updates", title: m.updatesTitle, description: m.updatesBody },
+];
 ---
 
-<DocsLayout title={m.title} section="get-started" description={m.description}>
-  <Card className="my-6" title={welcomeTitle} description={localized(m.welcomeBody)} />
+<DocsLayout title={m.title} description={m.description} section="get-started">
+  <h2><T m={m.pathsTitle} /></h2>
+  <div class="grid gap-4 sm:grid-cols-3">
+    {paths.map((path) => <ComponentCard href={path.href} title={path.title} description={path.description} />)}
+  </div>
 
-  <h2><T m={m.whatIsTitle} /></h2>
-  <p><T m={m.whatIsLead} /><strong><T m={m.whatIsKeywords} /></strong><T m={m.whatIsMid} /><code>Horon</code><T m={m.whatIsTail} /></p>
-  <p><T m={m.tokenLead} /><code>@horon-ai/tokens</code><T m={m.tokenMid} /><code>theme.css</code><T m={m.tokenTail} /></p>
+  <h2 id="install"><T m={m.installTitle} /></h2>
+  <p><T m={m.installNote} /></p>
 
-  <h2><T m={m.installTitle} /></h2>
-  <CodeBlock code={snippets.install} lang="bash" title="terminal" />
+  <h3><T m={m.stepRepoTitle} /></h3>
+  <p><T m={m.stepRepoBody} /></p>
+  <CodeBlock code={snippets.repo} lang="bash" title="terminal" />
 
-  <h2><T m={m.webTitle} /></h2>
-  <p><T m={m.webLead} /><code>@horon-ai/react/globals.css</code><T m={m.webMid} /><code>@phosphor-icons/react</code><T m={m.webTail} /></p>
-  <CodeBlock code={snippets.consume} title="example.tsx" />
+  <h3><T m={m.stepStylesTitle} /></h3>
+  <p><T m={m.stepStylesBody} /></p>
+  <CodeBlock code={snippets.styles} lang="tsx" title="main.tsx" />
 
-  <h2><T m={m.appsTitle} /></h2>
-  <p><T m={m.appsLead} /><code>apps/site</code><T m={m.appsTail} /></p>
-  <CodeBlock code={snippets.apps} lang="bash" title="terminal" />
+  <h3><T m={m.stepUseTitle} /></h3>
+  <p><T m={m.stepUseBody} /></p>
+  <CodeBlock code={snippets.use} lang="tsx" title="example.tsx" />
+
+  <h3><T m={m.stepSiteTitle} /></h3>
+  <p><T m={m.stepSiteBody} /></p>
+  <CodeBlock code={snippets.site} lang="bash" title="terminal" />
+
+  <h2><T m={m.guidesTitle} /></h2>
+  <div class="grid gap-4 sm:grid-cols-2">
+    {guides.map((guide) => <ComponentCard href={guide.href} title={guide.title} description={guide.description} />)}
+  </div>
 
   <h2><T m={m.boundariesTitle} /></h2>
-  <p><T m={m.boundariesLead} /><code>@horon-ai/react</code><T m={m.boundariesMid} /></p>
-  <ul>
-    <li><code>packages/react</code> — <code>@horon-ai/react</code>, <code>@horon-ai/tokens</code><T m={m.only} /></li>
-    <li><code>apps/site</code> — <code>@horon-ai/react</code>, <code>@horon-ai/tokens</code><T m={m.only} /></li>
-    <li><T m={m.boundaryStyle} /></li>
-  </ul>
+  <p><T m={m.boundariesBody} /></p>
 
-  <h2><T m={m.nextTitle} /></h2>
-  <ul>
-    <li>
-      <Button variant="link" href="/foundations"><T m={m.foundationsLabel} /></Button><T m={m.nextFoundationsBody} />
-    </li>
-    <li>
-      <Button variant="link" href="/components"><T m={m.componentsLabel} /></Button><T m={m.nextComponentsLead} />{componentCount}<T m={m.nextComponentsTail} />
-    </li>
-    <li>
-      <Button variant="link" href="/foundations/tokens"><T m={m.tokensLabel} /></Button><T m={m.nextTokensBody} />
-    </li>
-  </ul>
+  <h2><T m={m.helpTitle} /></h2>
+  <div class="grid gap-4 sm:grid-cols-2">
+    {help.map((item) => <ComponentCard href={item.href} title={item.title} description={item.description} />)}
+  </div>
 </DocsLayout>
