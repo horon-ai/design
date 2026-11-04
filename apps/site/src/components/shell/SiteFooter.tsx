@@ -1,4 +1,4 @@
-import { Button, HoronIcon, HoronWordmark } from "@horon-ai/react";
+import { Button, HoronWordmark } from "@horon-ai/react";
 
 import { externalLinks, foundationsNav, primaryNav } from "@/data/nav";
 import type { Localized } from "@/i18n";
@@ -38,59 +38,88 @@ function FooterLink({ link }: { link: { href: string; label: Localized } }) {
   );
 }
 
+/** Column titles are set in mono, uppercase: the website footer's label style. */
+function ColumnLabel({ entry }: { entry: Localized }) {
+  return (
+    <p className="font-mono text-label-sm font-semibold tracking-[0.08em] uppercase">
+      <LocalizedText entry={entry} />
+    </p>
+  );
+}
+
 export interface SiteFooterProps {
   /** Current year, computed once in `Footer.astro`; a build-time constant. */
   year: number;
 }
 
 /**
- * Site footer: brand lockup, blurb, primary menu and the secondary links
- * column. Rendered statically (no client island) — links are library link
+ * Site footer: the website's footer band. The band paints `bg-bg-subtle` with a
+ * top border, the wordmark is set at `h-8`, the brand line is the brand link,
+ * and each column carries a mono uppercase label. `.site-shell` supplies the
+ * page measure and safe insets; `.site-footer` adds the bottom home-indicator
+ * inset. Rendered statically (no client island) — links are library link
  * Buttons and the text carries both locales.
  */
 export function SiteFooter({ year }: SiteFooterProps) {
   const more = [...externalLinks, ...foundationsNav.slice(0, 4)];
 
   return (
-    <footer className="mt-12 border-t border-border-default pt-10">
-      <div className="flex flex-col gap-10 md:flex-row md:justify-between">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2.5 text-text-primary">
-            <HoronIcon size={24} />
-            <HoronWordmark />
+    <footer className="site-footer mt-12 border-t border-border-default bg-bg-subtle lg:mt-16">
+      <div className="site-shell flex flex-col gap-8 pt-10 pb-6">
+        <div className="flex flex-col gap-10 md:flex-row md:justify-between">
+          <div className="flex flex-col gap-4">
+            <Button
+              variant="link"
+              href="/"
+              aria-label={m.home.ko}
+              className="w-fit rounded-sm px-0 text-text-primary hover:text-text-primary [&_svg]:h-8 [&_svg]:w-auto"
+            >
+              <HoronWordmark title="" aria-hidden />
+            </Button>
+            <Button
+              variant="link"
+              href="/"
+              className="w-fit px-0 text-title-md text-text-brand hover:text-text-brand hover:underline"
+            >
+              <LocalizedText entry={m.brandLine} />
+            </Button>
+            <p className="max-w-xs text-body-sm text-text-secondary">
+              <LocalizedText entry={m.footerBlurb} />
+            </p>
           </div>
-          <p className="max-w-xs text-body-sm text-text-secondary">
-            <LocalizedText entry={m.footerBlurb} />
-          </p>
-          <p className="text-caption text-text-secondary">© {year} HORON. All rights reserved.</p>
+
+          <nav aria-label={m.footerNav.ko} className="grid grid-cols-2 gap-x-12 gap-y-8">
+            <div className="flex flex-col gap-3">
+              <ColumnLabel entry={m.footerMenu} />
+              <ul className="flex flex-col gap-2">
+                {primaryNav.map((link) => (
+                  <li key={link.href}>
+                    <FooterLink link={link} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex flex-col gap-3">
+              <ColumnLabel entry={m.footerMore} />
+              <ul className="flex flex-col gap-2">
+                {more.map((link) => (
+                  <li key={link.href}>
+                    <FooterLink link={link} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </nav>
         </div>
 
-        <nav aria-label={m.footerNav.ko} className="grid grid-cols-2 gap-x-12 gap-y-8">
-          <div className="flex flex-col gap-3">
-            <p className="text-caption text-text-secondary">
-              <LocalizedText entry={m.footerMenu} />
-            </p>
-            <ul className="flex flex-col gap-2">
-              {primaryNav.map((link) => (
-                <li key={link.href}>
-                  <FooterLink link={link} />
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="flex flex-col gap-3">
-            <p className="text-caption text-text-secondary">
-              <LocalizedText entry={m.footerMore} />
-            </p>
-            <ul className="flex flex-col gap-2">
-              {more.map((link) => (
-                <li key={link.href}>
-                  <FooterLink link={link} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </nav>
+        <div className="flex flex-col gap-1 border-t border-border-default pt-4 lg:flex-row lg:items-center lg:gap-10">
+          <p className="font-mono text-caption tracking-[0.04em] text-text-secondary">
+            © {year} HORON. All rights reserved.
+          </p>
+          <p className="font-mono text-caption tracking-[0.04em] text-text-secondary">
+            <LocalizedText entry={m.footerAvailability} />
+          </p>
+        </div>
       </div>
     </footer>
   );

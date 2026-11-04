@@ -142,7 +142,7 @@ export default function DocsSidebar({ section, currentPath }: DocsSidebarProps) 
     <>
       <div
         ref={scroller}
-        className="hidden lg:fixed lg:top-19 lg:bottom-0 lg:left-0 lg:z-10 lg:block lg:w-60 lg:overflow-y-auto"
+        className="hidden lg:fixed lg:top-(--site-header-h) lg:bottom-0 lg:left-0 lg:z-10 lg:block lg:w-60 lg:overflow-y-auto lg:pl-[env(safe-area-inset-left)]"
       >
         <Sidebar aria-label={label} surface="plain" className="min-h-full w-full">
           {blocks.map((block) => renderBlock(block, true))}
