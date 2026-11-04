@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../glass/glass_geometry.dart';
 import '../glass/horon_glass.dart';
+import '../overlay/horon_menu_anchor.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -108,80 +108,60 @@ class HoronMenu extends StatefulWidget {
 
 class _HoronMenuState extends State<HoronMenu> {
   final LayerLink _link = LayerLink();
-  final OverlayPortalController _portal = OverlayPortalController();
-  bool _open = false;
+  final MenuController _controller = MenuController();
 
-  void _setOpen(bool value) {
-    if (_open == value) return;
-    setState(() => _open = value);
-    if (value) {
-      _portal.show();
+  void _toggle() {
+    if (_controller.isOpen) {
+      _controller.close();
     } else {
-      _portal.hide();
+      _controller.open();
     }
-    widget.onOpenChange?.call(value);
   }
 
   @override
   Widget build(BuildContext context) {
-    return CompositedTransformTarget(
-      link: _link,
-      child: OverlayPortal(
-        controller: _portal,
-        overlayChildBuilder: _buildOverlay,
+    return HoronMenuAnchor(
+      controller: _controller,
+      // 메뉴는 뒤 화면을 누르지 못하게 하던 자리라 바깥 탭을 삼킵니다.
+      absorbOutsideTaps: true,
+      onOpen: () => widget.onOpenChange?.call(true),
+      onClose: () => widget.onOpenChange?.call(false),
+      overlayBuilder: _buildOverlay,
+      child: CompositedTransformTarget(
+        link: _link,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: () => _setOpen(!_open),
+          onTap: _toggle,
           child: AbsorbPointer(child: widget.trigger),
         ),
       ),
     );
   }
 
-  Widget _buildOverlay(BuildContext context) {
+  Widget _buildOverlay(BuildContext context, RawMenuOverlayInfo info) {
     final HoronMenuContent content = widget.content;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    // 바깥을 누르면 닫는 자리입니다. 투명한 전체 화면 막을 팝업 아래에 깔아, 팝업
-    // 밖의 포인터를 모두 메뉴가 받습니다(`TapRegion`은 팝업 위젯의 상자가 오버레이
-    // 전체로 늘어나 바깥 판정이 어긋납니다).
-    return Stack(
-      children: <Widget>[
-        Positioned.fill(
-          child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () => _setOpen(false)),
-        ),
-        CompositedTransformFollower(
-          link: _link,
-          showWhenUnlinked: false,
-          targetAnchor: content._targetAnchor,
-          followerAnchor: content._followerAnchor,
-          offset: content._offset,
-          child: Focus(
-            autofocus: true,
-            onKeyEvent: (FocusNode node, KeyEvent event) {
-              if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
-                _setOpen(false);
-                return KeyEventResult.handled;
-              }
-              return KeyEventResult.ignored;
-            },
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0, end: 1),
-              duration: reduceMotion ? Duration.zero : HoronMotion.popupEnterDuration,
-              curve: HoronMotion.easeEmphasized,
-              // `motion-popup` — 0.95배에서 1배로 자라며 나타납니다.
-              builder: (BuildContext context, double t, Widget? child) => Opacity(
-                opacity: t,
-                child: Transform.scale(
-                  scale: HoronMotion.popupEnterScale + (1 - HoronMotion.popupEnterScale) * t,
-                  child: child,
-                ),
-              ),
-              child: _MenuDismissScope(dismiss: () => _setOpen(false), child: content),
-            ),
+    return CompositedTransformFollower(
+      link: _link,
+      showWhenUnlinked: false,
+      targetAnchor: content._targetAnchor,
+      followerAnchor: content._followerAnchor,
+      offset: content._offset,
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0, end: 1),
+        duration: reduceMotion ? Duration.zero : HoronMotion.popupEnterDuration,
+        curve: HoronMotion.easeEmphasized,
+        // `motion-popup` — 0.95배에서 1배로 자라며 나타납니다.
+        builder: (BuildContext context, double t, Widget? child) => Opacity(
+          opacity: t,
+          child: Transform.scale(
+            scale: HoronMotion.popupEnterScale + (1 - HoronMotion.popupEnterScale) * t,
+            child: child,
           ),
         ),
-      ],
+        child: _MenuDismissScope(dismiss: _controller.close, child: content),
+      ),
     );
   }
 }
