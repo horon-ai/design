@@ -100,6 +100,63 @@ void main() {
     expect(await gapOf(detail: true), space.step(4.5), reason: 'detail: gap-4.5');
   });
 
+  testWidgets('the sheet caps at the screen minus 32 and scrolls its title and body together', (
+    WidgetTester tester,
+  ) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.binding.setSurfaceSize(const Size(400, 600));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.bottomCenter,
+            child: HoronBottomSheet(
+              title: const Text('긴 시트'),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[for (int index = 0; index < 40; index += 1) Text('행 $index')],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // `max-h-[calc(100dvh-2rem)]`.
+    expect(tester.getSize(find.byType(HoronBottomSheet)).height, lessThanOrEqualTo(600 - 32));
+
+    // `Drawer.Content`의 `min-h-0 flex-1 overflow-y-auto` — 제목 줄과 본문이 함께
+    // 스크롤하고 그랩바는 위에 남습니다.
+    final Finder scroll = find.descendant(
+      of: find.byType(HoronBottomSheet),
+      matching: find.byType(SingleChildScrollView),
+    );
+    expect(scroll, findsOneWidget);
+    final double titleBefore = tester.getRect(find.text('긴 시트')).top;
+    final Rect grabber = tester.getRect(find.byType(Container).first);
+    await tester.dragFrom(tester.getRect(scroll).center, const Offset(0, -120));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(find.text('긴 시트')).top, lessThan(titleBefore), reason: '제목이 본문과 같이 스크롤합니다');
+    expect(tester.getRect(find.byType(Container).first), grabber, reason: '그랩바는 제자리에 남습니다');
+  });
+
+  testWidgets('the grabber shows the grab cursor', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(const HoronBottomSheet(title: Text('알림 설정'))));
+    expect(
+      tester
+          .widgetList<MouseRegion>(
+            find.descendant(of: find.byType(HoronBottomSheet), matching: find.byType(MouseRegion)),
+          )
+          .any((MouseRegion region) => region.cursor == SystemMouseCursors.grab),
+      isTrue,
+      reason: 'cursor-grab',
+    );
+  });
+
   testWidgets('the sheet has no close button and its title starts 8px in', (WidgetTester tester) async {
     await tester.pumpWidget(_host(const HoronBottomSheet(title: Text('시트'))));
     expect(find.byIcon(Icons.close), findsNothing, reason: 'React는 닫기 버튼을 없앴습니다');

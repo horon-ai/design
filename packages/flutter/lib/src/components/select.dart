@@ -315,6 +315,11 @@ class _HoronSelectState extends State<HoronSelect> {
     );
   }
 
+  /// `hover:not-data-disabled:not-data-invalid:border-border-strong` — 불투명 표면의
+  /// 필드는 포인터가 올라오면 `borderStrong` 테두리로 바뀝니다. 유리 표면은
+  /// `veil-field`가 hover 테두리를 그리지 않으므로 React처럼 제외합니다. 그 규칙은
+  /// [HoronFieldBox]가 들고 있고(포커스가 우선, 오류·비활성은 불변), 이 트리거는
+  /// 그 상자를 그대로 씁니다.
   Widget _buildFieldTrigger(BuildContext context, bool open) {
     final HoronThemeData horon = HoronTheme.of(context);
     final _SelectMetrics metrics = _metricsOf(widget.size, horon);

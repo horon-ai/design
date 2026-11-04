@@ -274,7 +274,13 @@ class _HoronOrchestratorPanelState extends State<HoronOrchestratorPanel> {
                 _LeadRow(lead: widget.lead),
                 if (widget.plan != null && widget.plan!.isNotEmpty) _plan(theme, widget.plan!),
                 if (widget.children.isNotEmpty) _lanes(widget.children),
-                if (widget.summary != null) _summary(theme, widget.summary!, widget.children.length),
+                // `motion-reveal` — 요약이 없으면 이 자리가 높이 0으로 접힙니다.
+                HoronReveal(
+                  collapsed: widget.summary == null,
+                  child: widget.summary == null
+                      ? const SizedBox(width: double.infinity)
+                      : _summary(theme, widget.summary!, widget.children.length),
+                ),
               ],
             ),
           ),
@@ -324,7 +330,9 @@ class _HoronOrchestratorPanelState extends State<HoronOrchestratorPanel> {
         spacing: space.s2_5, // gap-2.5
         children: <Widget>[
           for (int index = 0; index < lanes.length; index++)
+            // `key` — 레인의 키를 그대로 써서 순서가 바뀌어도 상태가 따라갑니다.
             _Rise(
+              key: lanes[index].key ?? ValueKey<int>(index),
               index: index,
               child: _LaneBranch(last: index == lanes.length - 1, child: lanes[index]),
             ),
@@ -663,7 +671,7 @@ class _ElbowPainter extends CustomPainter {
 
 /// `motion-rise` — opacity 0→1, translate 0 4px→0을 220ms에 재생합니다.
 class _Rise extends StatefulWidget {
-  const _Rise({required this.child, this.index = 0});
+  const _Rise({super.key, required this.child, this.index = 0});
 
   final Widget child;
   final int index;

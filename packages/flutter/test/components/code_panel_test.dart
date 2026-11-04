@@ -30,9 +30,13 @@ void main() {
     expect((decoration.border! as Border).top.color, theme.colors.borderDefault);
   });
 
-  testWidgets('code panel: dark swaps the fill to neutral-800', (WidgetTester tester) async {
+  testWidgets('code panel: dark swaps the fill to neutral-800 and the hairline to border-strong', (
+    WidgetTester tester,
+  ) async {
     await pumpPanel(tester, const HoronCodePanel(code: 'key: value'), brightness: Brightness.dark);
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronCodePanel)));
     expect(_decoration(tester).color, HoronPalette.neutral800);
+    expect((_decoration(tester).border! as Border).top.color, theme.colors.borderStrong);
   });
 
   testWidgets('code panel: the text is 12px mono on a 21px pitch', (WidgetTester tester) async {

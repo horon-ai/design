@@ -67,16 +67,28 @@ void main() {
     expect(textColorOf(tester, '이름'), themeOf(tester).colors.textDisabled);
   });
 
-  testWidgets('the error slides in: transparent first, opaque once settled', (WidgetTester tester) async {
+  testWidgets('the error opens its row from zero height as it fades in', (WidgetTester tester) async {
     await pumpField(tester, withError: true);
     double opacityOf() {
       final Finder wrapper = find.ancestor(of: find.text('값이 필요합니다'), matching: find.byType(Opacity)).first;
       return tester.widget<Opacity>(wrapper).opacity;
     }
 
+    double revealOf() => tester
+        .widget<Align>(find.ancestor(of: find.text('값이 필요합니다'), matching: find.byType(Align)).first)
+        .heightFactor!;
+
+    // `motion-reveal`은 grid rows를 0에서 열고 불투명도를 함께 올립니다.
+    expect(revealOf(), 0);
     expect(opacityOf(), 0);
     await tester.pumpAndSettle();
+    expect(revealOf(), 1);
     expect(opacityOf(), 1);
+  });
+
+  testWidgets('the description spans the field width instead of hugging its text', (WidgetTester tester) async {
+    await pumpField(tester);
+    expect(tester.getSize(find.text('도움말')).width, tester.getSize(find.byType(HoronField)).width, reason: 'w-full');
   });
 
   testWidgets('at 320 wide the label and help text still fit', (WidgetTester tester) async {

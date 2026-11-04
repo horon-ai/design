@@ -73,7 +73,6 @@ class HoronTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
 
     // `flex items-center gap-2 rounded-full bg-glass-regular p-2`입니다.
@@ -86,41 +85,73 @@ class HoronTopBar extends StatelessWidget {
         child: Row(
           spacing: space.s2, // gap-2
           children: <Widget>[
-            SizedBox(
-              width: space.step(_iconButtonSide),
-              height: space.step(_iconButtonSide),
-              child: HoronIconButton(icon: const Icon(Icons.chevron_left), label: backLabel, onPressed: onBack),
-            ),
+            // React는 `onBack`이 있을 때만 뒤로 버튼을 그립니다.
+            if (onBack != null)
+              SizedBox(
+                width: space.step(_iconButtonSide),
+                height: space.step(_iconButtonSide),
+                child: HoronIconButton(icon: const Icon(Icons.chevron_left), label: backLabel, onPressed: onBack),
+              ),
             _BotAvatar(live: live),
             Expanded(
               // `min-w-0 flex-1 flex-col overflow-clip`입니다.
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    title,
-                    style: theme.text.labelLg.copyWith(color: colors.textPrimary),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (subtitle != null)
-                    Text(
-                      subtitle!,
-                      style: theme.text.caption.copyWith(color: colors.textSecondary),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                ],
+              child: _TitleBlock(title: title, subtitle: subtitle),
+            ),
+            // React는 `onMore`가 있을 때만 더 보기 버튼을 그립니다.
+            if (onMore != null)
+              SizedBox(
+                width: space.step(_iconButtonSide),
+                height: space.step(_iconButtonSide),
+                child: HoronIconButton(icon: const Icon(Icons.more_horiz), label: moreLabel, onPressed: onMore),
               ),
-            ),
-            SizedBox(
-              width: space.step(_iconButtonSide),
-              height: space.step(_iconButtonSide),
-              child: HoronIconButton(icon: const Icon(Icons.more_horiz), label: moreLabel, onPressed: onMore),
-            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// 제목·부제 두 줄입니다.
+///
+/// React는 제목 문자열이나 부제가 바뀔 때 `key`를 갈아 `animate-fade-in`을 다시
+/// 재생합니다. Flutter 판은 같은 값 쌍을 키로 써서, 값이 바뀌면 새 상태를 만들어
+/// 160ms 페이드를 다시 시작합니다.
+class _TitleBlock extends StatelessWidget {
+  const _TitleBlock({required this.title, required this.subtitle});
+
+  final String title;
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+
+    return TweenAnimationBuilder<double>(
+      key: ValueKey<String>('$title|${subtitle ?? ''}'),
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: reduceMotion ? Duration.zero : HoronMotion.fadeInDuration,
+      curve: HoronMotion.fadeInCurve,
+      builder: (BuildContext context, double opacity, Widget? child) => Opacity(opacity: opacity, child: child),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            title,
+            style: theme.text.labelLg.copyWith(color: colors.textPrimary),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          if (subtitle != null && subtitle!.isNotEmpty)
+            Text(
+              subtitle!,
+              style: theme.text.caption.copyWith(color: colors.textSecondary),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+        ],
       ),
     );
   }

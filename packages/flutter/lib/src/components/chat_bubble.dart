@@ -31,7 +31,7 @@ _BubbleMetrics _metricsOf(HoronChatBubbleSize size, HoronThemeData theme) => swi
 /// `chat-bubble.tsx`를 옮긴 것입니다. `from`은 props 안의 인라인 유니온이라
 /// variant 어휘가 아니므로 [fromMe] 플래그로 받습니다. 내 쪽은 잉크 바탕에 반대색
 /// 글자, 봇 쪽은 옅은 표면입니다. 유리는 쓰지 않습니다. 등장할 때 React의
-/// `tab-panel-in 220ms`와 같은 페이드·이동을 씁니다.
+/// `motion-rise`와 같은 페이드·이동을 씁니다.
 class HoronChatBubble extends StatelessWidget {
   /// 말풍선을 만듭니다.
   const HoronChatBubble({super.key, required this.child, this.fromMe = true, this.size = HoronChatBubbleSize.md});
@@ -69,11 +69,11 @@ class HoronChatBubble extends StatelessWidget {
 
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 220),
-      curve: HoronMotion.easeOutQuint,
+      duration: HoronMotion.riseDuration,
+      curve: HoronMotion.riseCurve,
       builder: (BuildContext context, double t, Widget? child) => Opacity(
         opacity: t,
-        child: Transform.translate(offset: Offset(0, 4 * (1 - t)), child: child),
+        child: Transform.translate(offset: Offset(0, HoronMotion.riseOffset * (1 - t)), child: child),
       ),
       child: aligned,
     );

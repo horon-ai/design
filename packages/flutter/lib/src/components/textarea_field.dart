@@ -127,6 +127,15 @@ class _HoronTextareaFieldState extends State<HoronTextareaField> {
 
   TextEditingController get _controller => widget.controller ?? (_owned ??= TextEditingController());
 
+  /// 카운터가 읽을 글자 수입니다.
+  ///
+  /// React는 `value !== undefined`이면(부모가 값을 소유하면) 입력 이벤트 없이 값이
+  /// 바뀔 수 있으므로 매번 `String(value).length`를 다시 셉니다(폼 초기화, 부모가 값을
+  /// 다시 쓴 경우). Flutter에서 값 소유는 [HoronTextareaField.controller]로 표현되므로,
+  /// 컨트롤러가 있으면 그 텍스트를 그때그때 세고, 없으면 이 위젯이 들고 있는
+  /// [_count]를 씁니다.
+  int get _length => widget.controller == null ? _count : widget.controller!.text.characters.length;
+
   @override
   void initState() {
     super.initState();
@@ -227,7 +236,7 @@ class _HoronTextareaFieldState extends State<HoronTextareaField> {
                 Expanded(child: footerMessage),
                 if (widget.maxLength != null)
                   Text(
-                    '$_count / ${widget.maxLength}',
+                    '$_length / ${widget.maxLength}',
                     style: metrics.meta.copyWith(color: invalid ? colors.textDanger : colors.textSecondary),
                   ),
               ],

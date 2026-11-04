@@ -36,7 +36,9 @@ class HoronTextareaFieldGallerySection extends StatelessWidget {
             '아래 푸터로 이루어집니다. 상자 높이는 88/112/136이고 좌우 여백은 '
             '12/14/20입니다. React는 폭을 `w-90`(360)으로 고정하지만, 여기서는 '
             '360까지 늘고 좁은 화면에서는 부모 폭을 따릅니다. 오류가 있으면 테두리와 '
-            '푸터가 `text-danger`로 바뀌고, 카운터는 `현재 / 최대`로 갱신됩니다.',
+            '푸터가 `text-danger`로 바뀌고, 카운터는 `현재 / 최대`로 갱신됩니다. 값의 '
+            '소유자가 있으면(컨트롤러를 넘기면) 카운터가 입력 이벤트 없이 바뀐 값도 그대로 '
+            '셉니다 — 폼 초기화처럼 부모가 값을 다시 쓰는 경우입니다.',
             style: theme.text.bodySm.copyWith(
               color: theme.colors.textSecondary,
             ),
@@ -63,13 +65,8 @@ class HoronTextareaFieldGallerySection extends StatelessWidget {
           ),
         ),
         _Cell(
-          label: '글자 수',
-          child: HoronTextareaField(
-            label: '메모',
-            maxLength: 120,
-            surface: surface,
-            description: '팀에게 공유할 내용을 적어 주세요.',
-          ),
+          label: '글자 수 (컨트롤러 소유)',
+          child: _ControlledField(surface: surface),
         ),
         _Cell(
           label: '오류 (도움말 자리를 대신합니다)',
@@ -91,6 +88,40 @@ class HoronTextareaFieldGallerySection extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// 값을 호스트가 들고 있는 표본입니다. React의 `value` prop처럼, 컨트롤러 텍스트를
+/// 바꾸면 입력 이벤트 없이도 카운터가 새 값을 셉니다.
+class _ControlledField extends StatefulWidget {
+  const _ControlledField({required this.surface});
+
+  final HoronInputSurface surface;
+
+  @override
+  State<_ControlledField> createState() => _ControlledFieldState();
+}
+
+class _ControlledFieldState extends State<_ControlledField> {
+  final TextEditingController _controller = TextEditingController(
+    text: '이미 적힌 메모',
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return HoronTextareaField(
+      label: '메모',
+      maxLength: 120,
+      surface: widget.surface,
+      controller: _controller,
+      description: '팀에게 공유할 내용을 적어 주세요.',
     );
   }
 }

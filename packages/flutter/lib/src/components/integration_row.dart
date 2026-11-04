@@ -74,7 +74,7 @@ class HoronIntegrationRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final Widget tile = _tile(theme);
+    final Widget tile = _tile(theme, MediaQuery.disableAnimationsOf(context));
     final Widget text = _textColumn(theme);
     final Widget control = _control(theme);
 
@@ -126,17 +126,26 @@ class HoronIntegrationRow extends StatelessWidget {
     );
   }
 
-  Widget _tile(HoronThemeData theme) {
+  Widget _tile(HoronThemeData theme, bool reduceMotion) {
     // bg-sky-500 text-neutral-50 / bg-sky-700 text-neutral-50 / bg-bg-subtle text-text-secondary
-    final (Color background, Color foreground) = switch (status) {
-      HoronIntegrationStatus.connected => (HoronPalette.sky500, HoronPalette.neutral50),
-      HoronIntegrationStatus.reconnect => (HoronPalette.sky700, HoronPalette.neutral50),
-      HoronIntegrationStatus.notConnected => (theme.colors.bgSubtle, theme.colors.textSecondary),
-    };
+    // 유리 표면의 미연결 타일만 `bg-overlay-ink-6 text-text-secondary`로 물러납니다.
+    final (
+      Color background,
+      Color foreground,
+    ) = surface == HoronSurface.glass && status == HoronIntegrationStatus.notConnected
+        ? (theme.colors.overlayInk6, theme.colors.textSecondary)
+        : switch (status) {
+            HoronIntegrationStatus.connected => (HoronPalette.sky500, HoronPalette.neutral50),
+            HoronIntegrationStatus.reconnect => (HoronPalette.sky700, HoronPalette.neutral50),
+            HoronIntegrationStatus.notConnected => (theme.colors.bgSubtle, theme.colors.textSecondary),
+          };
+    final Duration colorsDuration = reduceMotion ? Duration.zero : HoronMotion.colorsDuration;
     return SizedBox(
       width: theme.space.step(10), // size-10 = 40
       height: theme.space.step(10),
-      child: DecoratedBox(
+      child: AnimatedContainer(
+        duration: colorsDuration, // motion-colors
+        curve: HoronMotion.colorsCurve,
         decoration: BoxDecoration(
           color: background,
           borderRadius: BorderRadius.circular(theme.space.s2_5), // rounded-[10px]
@@ -177,31 +186,37 @@ class HoronIntegrationRow extends StatelessWidget {
   }
 
   Widget _control(HoronThemeData theme) {
-    if (status == HoronIntegrationStatus.connected) {
-      return Container(
-        height: theme.space.step(7.5), // h-7.5 = 30
-        padding: EdgeInsets.symmetric(horizontal: theme.space.s3), // px-3
-        decoration: BoxDecoration(
-          color: theme.colors.accentSky500_18, // bg-accent-sky-500-18
-          borderRadius: BorderRadius.circular(theme.radius.full), // rounded-full
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          spacing: theme.space.s1_5, // gap-1.5
-          children: <Widget>[
-            SizedBox(
-              width: theme.space.s1_5, // size-1.5 = 6
-              height: theme.space.s1_5,
-              child: const DecoratedBox(
-                decoration: BoxDecoration(color: HoronPalette.sky500, shape: BoxShape.circle),
-              ),
-            ),
-            Text(connectedLabel, maxLines: 1, style: theme.text.labelSm.copyWith(color: theme.colors.textPrimary)),
-          ],
-        ),
-      );
-    }
+    final bool connected = status == HoronIntegrationStatus.connected;
+    // `motion-swap` — 연결 알약과 동작 버튼이 같은 칸에서 교차 전환합니다.
+    return HoronSwap(hidden: connected, hiddenChild: _connectedPill(theme), child: _actionPill(theme));
+  }
 
+  Widget _connectedPill(HoronThemeData theme) {
+    return Container(
+      height: theme.space.step(7.5), // h-7.5 = 30
+      padding: EdgeInsets.symmetric(horizontal: theme.space.s3), // px-3
+      decoration: BoxDecoration(
+        color: theme.colors.accentSky500_18, // bg-accent-sky-500-18
+        borderRadius: BorderRadius.circular(theme.radius.full), // rounded-full
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: theme.space.s1_5, // gap-1.5
+        children: <Widget>[
+          SizedBox(
+            width: theme.space.s1_5, // size-1.5 = 6
+            height: theme.space.s1_5,
+            child: const DecoratedBox(
+              decoration: BoxDecoration(color: HoronPalette.sky500, shape: BoxShape.circle),
+            ),
+          ),
+          Text(connectedLabel, maxLines: 1, style: theme.text.labelSm.copyWith(color: theme.colors.textPrimary)),
+        ],
+      ),
+    );
+  }
+
+  Widget _actionPill(HoronThemeData theme) {
     final bool reconnect = status == HoronIntegrationStatus.reconnect;
     return _ActionPill(
       label: reconnect ? reconnectLabel : connectLabel,

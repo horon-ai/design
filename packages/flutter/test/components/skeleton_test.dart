@@ -51,15 +51,15 @@ void main() {
     expect(find.bySemanticsLabel('Loading'), findsWidgets);
   });
 
-  testWidgets('skeleton card: rounded-2xl shell with p-4, gap-3 and a 248px first bar', (WidgetTester tester) async {
+  testWidgets('skeleton card: rounded-xl shell with p-4, gap-3 and a 248px first bar', (WidgetTester tester) async {
     await pumpSkeleton(tester, const HoronSkeletonCard.card());
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronSkeletonCard)));
 
     final ClipRRect clip = tester.widget<ClipRRect>(
       find.descendant(of: find.byType(HoronSkeletonCard), matching: find.byType(ClipRRect)).first,
     );
-    expect((clip.borderRadius as BorderRadius).topLeft.x, theme.radius.xl2, reason: 'rounded-2xl');
-    expect(theme.radius.xl2, 16);
+    expect((clip.borderRadius as BorderRadius).topLeft.x, theme.radius.xl, reason: 'rounded-xl');
+    expect(theme.radius.xl, 20);
 
     expect(
       find.descendant(

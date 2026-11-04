@@ -76,6 +76,31 @@ void main() {
     expect(find.text('40%'), findsOneWidget);
     expect(_barCount(tester), 4);
     expect(find.byType(FractionallySizedBox), findsOneWidget);
+
+    // `w-9 text-right tabular-nums` — 36px 상자에서 오른쪽 정렬, 숫자 폭 고정.
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronSourceRow)));
+    final Text percent = tester.widget<Text>(find.text('40%'));
+    expect(percent.textAlign, TextAlign.right);
+    expect(percent.style?.fontFeatures, contains(const FontFeature.tabularFigures()));
+    expect(
+      tester.getSize(find.ancestor(of: find.text('40%'), matching: find.byType(SizedBox)).first).width,
+      theme.space.step(9),
+    );
+  });
+
+  testWidgets('source row: the failed stage paints the 90% accent red', (WidgetTester tester) async {
+    await pumpRow(
+      tester,
+      const HoronSourceRow(
+        status: HoronSourceStatus.failed,
+        icon: Icon(Icons.description_outlined),
+        name: 'Broken PDF',
+        detail: '파싱에 실패했습니다',
+      ),
+    );
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronSourceRow)));
+    final Iterable<ColoredBox> bars = tester.widgetList<ColoredBox>(find.byType(ColoredBox));
+    expect(bars.where((ColoredBox box) => box.color == theme.colors.accentRed500_90), isNotEmpty);
   });
 
   testWidgets('source row: failed paints the danger detail and a retry button', (WidgetTester tester) async {

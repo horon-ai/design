@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import 'spinner.dart';
 
@@ -103,15 +104,20 @@ class HoronPlanStep extends StatelessWidget {
         borderRadius: BorderRadius.circular(theme.radius.md),
         border: pending ? Border.all(color: theme.colors.borderDefault) : null,
       ),
-      child: switch (status) {
-        HoronPlanStepStatus.done => Icon(Icons.check, size: 14, color: theme.colors.interactiveOnPrimary),
-        HoronPlanStepStatus.running => const HoronSpinner(pixelSize: 20),
-        HoronPlanStepStatus.failed => Text('!', style: theme.text.labelSm.copyWith(color: theme.colors.textDanger)),
-        HoronPlanStepStatus.pending => Text(
-          '$index',
-          style: theme.text.labelSm.copyWith(color: theme.colors.textSecondary),
-        ),
-      },
+      // `key={status}` + `animate-pop-in` — 상태가 바뀌면 표식 글리프가 0.6에서
+      // 1로 220ms에 걸쳐 커지며 갈아 끼워집니다.
+      child: _PopIn(
+        key: ValueKey<HoronPlanStepStatus>(status),
+        child: switch (status) {
+          HoronPlanStepStatus.done => Icon(Icons.check, size: 14, color: theme.colors.interactiveOnPrimary),
+          HoronPlanStepStatus.running => const HoronSpinner(pixelSize: 20),
+          HoronPlanStepStatus.failed => Text('!', style: theme.text.labelSm.copyWith(color: theme.colors.textDanger)),
+          HoronPlanStepStatus.pending => Text(
+            '$index',
+            style: theme.text.labelSm.copyWith(color: theme.colors.textSecondary),
+          ),
+        },
+      ),
     );
 
     return Row(
@@ -140,7 +146,6 @@ class HoronPlanStep extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 6,
               children: <Widget>[
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,69 +163,115 @@ class HoronPlanStep extends StatelessWidget {
                   ],
                 ),
                 if (description != null || tool != null)
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 6,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: <Widget>[
-                      if (description != null)
-                        Text(description!, style: theme.text.bodySm.copyWith(color: theme.colors.textSecondary)),
-                      if (tool != null)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: theme.colors.bgSubtle,
-                            borderRadius: BorderRadius.circular(theme.radius.xs),
-                          ),
-                          child: Text(
-                            tool!,
-                            style: theme.text.labelMd.copyWith(
-                              fontFamily: theme.text.code.fontFamily,
-                              color: theme.colors.textSecondary,
+                  Padding(
+                    // `mt-1.5` — 설명 줄이 제목과 6만큼 떨어집니다.
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: <Widget>[
+                        if (description != null)
+                          Text(description!, style: theme.text.bodySm.copyWith(color: theme.colors.textSecondary)),
+                        if (tool != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: theme.colors.bgSubtle,
+                              borderRadius: BorderRadius.circular(theme.radius.xs),
+                            ),
+                            child: Text(
+                              tool!,
+                              style: theme.text.labelMd.copyWith(
+                                fontFamily: theme.text.code.fontFamily,
+                                color: theme.colors.textSecondary,
+                              ),
                             ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
-                if (failed && error != null)
-                  Text(error!, style: theme.text.bodySm.copyWith(color: theme.colors.textDanger)),
-                if (failed && onRetry != null)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton(
-                      onPressed: onRetry,
-                      style: ButtonStyle(
-                        // `h-7.5 px-3 rounded-full bg-overlay-ink-6 hover:bg-overlay-ink-10`.
-                        minimumSize: const WidgetStatePropertyAll<Size>(Size(0, 30)),
-                        padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.symmetric(horizontal: 12)),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        foregroundColor: WidgetStatePropertyAll<Color>(theme.colors.textPrimary),
-                        backgroundColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
-                          return states.contains(WidgetState.hovered)
-                              ? theme.colors.overlayInk10
-                              : theme.colors.overlayInk6;
-                        }),
-                        overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-                        shape: WidgetStatePropertyAll<OutlinedBorder>(
-                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(theme.radius.full)),
+                // `motion-reveal` — 실패가 아니면 이 묶음이 높이 0으로 접힙니다.
+                HoronReveal(
+                  collapsed: !failed,
+                  child: ExcludeFocus(
+                    excluding: !failed,
+                    child: IgnorePointer(
+                      ignoring: !failed,
+                      child: Padding(
+                        // `mt-1.5 gap-1.5` — 오류 문구와 재시도가 6씩 떨어집니다.
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 6,
+                          children: <Widget>[
+                            if (error != null)
+                              Text(error!, style: theme.text.bodySm.copyWith(color: theme.colors.textDanger)),
+                            if (onRetry != null)
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: TextButton(
+                                  onPressed: onRetry,
+                                  style: ButtonStyle(
+                                    // `h-7.5 px-3 rounded-full bg-overlay-ink-6 hover:bg-overlay-ink-10`.
+                                    minimumSize: const WidgetStatePropertyAll<Size>(Size(0, 30)),
+                                    padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
+                                      EdgeInsets.symmetric(horizontal: 12),
+                                    ),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    foregroundColor: WidgetStatePropertyAll<Color>(theme.colors.textPrimary),
+                                    backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                                      (Set<WidgetState> states) => states.contains(WidgetState.hovered)
+                                          ? theme.colors.overlayInk10
+                                          : theme.colors.overlayInk6,
+                                    ),
+                                    overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
+                                    shape: WidgetStatePropertyAll<OutlinedBorder>(
+                                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(theme.radius.full)),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    spacing: 6,
+                                    children: <Widget>[
+                                      const Icon(Icons.refresh, size: 14),
+                                      // `text-label-sm`.
+                                      Text('Retry from here', style: theme.text.labelSm),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 6,
-                        children: <Widget>[
-                          const Icon(Icons.refresh, size: 14),
-                          // `text-label-sm`.
-                          Text('Retry from here', style: theme.text.labelSm),
-                        ],
                       ),
                     ),
                   ),
+                ),
               ],
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+/// `animate-pop-in` — 표식 글리프가 0.6에서 1로 220ms에 걸쳐 커집니다.
+class _PopIn extends StatelessWidget {
+  const _PopIn({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
+      duration: HoronMotion.popInDuration,
+      curve: HoronMotion.popInCurve,
+      builder: (BuildContext context, double scale, Widget? child) => Transform.scale(scale: scale, child: child),
+      child: child,
     );
   }
 }

@@ -42,7 +42,8 @@ void main() {
       (Widget widget) => widget is Row && widget.mainAxisAlignment == MainAxisAlignment.end,
     );
     expect(actions, findsOneWidget);
-    expect(tester.getSize(actions).width, 360 - 32);
+    // `w-90`(360)는 border-box라 1px 테두리 두 줄과 `p-4`(32)를 뺀 326이 내용 폭입니다.
+    expect(tester.getSize(actions).width, 360 - 32 - 2);
   });
 
   testWidgets('approval card: the two actions report back', (WidgetTester tester) async {

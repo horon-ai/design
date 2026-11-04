@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
+import 'package:horon_ui/src/theme/horon_motion.dart';
 
 const List<HoronKnowledgeBaseTab> _tabs = <HoronKnowledgeBaseTab>[
   HoronKnowledgeBaseTab(id: 'sources', label: 'Sources', count: 12),
@@ -149,13 +150,13 @@ void main() {
     final HoronThemeData theme = HoronTheme.of(tester.element(_panel));
     expect(_tabFill(tester, 'Chunks 248'), theme.colors.overlayInk10);
 
-    await tester.tap(find.text('Bots 3'));
+    await tester.tap(find.text('Bots'));
     await tester.pumpAndSettle();
     expect(selected, 'bots');
     expect(_tabFill(tester, 'Chunks 248'), theme.colors.overlayInk10, reason: 'the host still owns the value');
   });
 
-  testWidgets('indexing: the spinner and the count show only above zero', (WidgetTester tester) async {
+  testWidgets('indexing: the reveal opens above zero and collapses at zero', (WidgetTester tester) async {
     await pumpPanel(
       tester,
       const HoronKnowledgeBasePanel(title: 'Knowledge base', tabs: _tabs, indexing: 3),
@@ -164,10 +165,14 @@ void main() {
     expect(find.text('3 indexing'), findsOneWidget);
     expect(find.byType(HoronSpinner), findsOneWidget);
     expect(tester.getSize(find.byType(HoronSpinner)), const Size(12, 12));
+    expect(tester.widget<HoronReveal>(find.byType(HoronReveal).last).collapsed, isFalse);
+    expect(tester.getSize(find.byType(HoronReveal).last).width, greaterThan(0));
 
+    // React `motion-reveal-x`는 0일 때 자리를 접습니다(자식은 트리에 남고 잘립니다).
     await pumpPanel(tester, const HoronKnowledgeBasePanel(title: 'Knowledge base', tabs: _tabs));
-    expect(find.text('3 indexing'), findsNothing);
-    expect(find.byType(HoronSpinner), findsNothing);
+    expect(tester.widget<HoronReveal>(find.byType(HoronReveal).last).collapsed, isTrue);
+    expect(tester.getSize(find.byType(HoronReveal).last).width, 0);
+    expect(find.byType(HoronSpinner), findsNothing, reason: '보이지 않는 자리에는 도는 스피너를 두지 않습니다');
   });
 
   testWidgets('table head: hidden under sm, shown from 640 up', (WidgetTester tester) async {

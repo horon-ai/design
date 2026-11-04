@@ -57,8 +57,10 @@ class HoronInputGroupGallerySection extends StatelessWidget {
             'Figma `Input group`(60:429)입니다. 40px 상자를 앞 칸·입력·뒤 칸으로 '
             '나누고 사이에 1px 구분선을 둡니다. 칸은 진짜 Select·Combobox(segment)이거나 '
             '고정 글자를 담은 HoronInputGroupSegment입니다. 입력 여백은 독립 Input과 같은 '
-            '12/14/20이고, 칸은 `body-sm`/`body-md`/`body-lg`와 16/16/20px 아이콘을 씁니다. '
-            '구분선은 hover에서 `border-strong`, 오류에서 `border-danger`가 됩니다.',
+            '12/14/20이고, 칸 여백은 12/12/16이며 `body-sm`/`body-md`/`body-lg`와 '
+            '16/16/20px 아이콘을 씁니다. 상자는 독립 Input과 같은 필드 상자를 쓰므로 '
+            '포커스에서 바깥 2px 브랜드 링이 돕니다. 구분선은 hover에서 `border-strong`, '
+            '오류에서 `border-danger`, 비활성에서 `border-default` 60%가 됩니다.',
             style: theme.text.bodySm.copyWith(
               color: theme.colors.textSecondary,
             ),

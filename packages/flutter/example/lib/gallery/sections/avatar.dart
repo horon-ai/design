@@ -3,7 +3,7 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `avatar`의 갤러리 섹션입니다.
 ///
-/// 네 크기, 세 모양, sky 색조, 상태 점을 한 번에 보여 줍니다.
+/// 네 크기, 세 모양, sky 색조, 상태 점과 상태 점 테두리 색을 한 번에 보여 줍니다.
 class HoronAvatarGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronAvatarGallerySection({super.key});
@@ -63,6 +63,16 @@ class HoronAvatarGallerySection extends StatelessWidget {
               'MJ',
               size: HoronAvatarSize.lg,
               live: true,
+            ),
+          ),
+          labelled(
+            'live + 색조 테두리',
+            HoronAvatar.initials(
+              'MJ',
+              size: HoronAvatarSize.lg,
+              live: true,
+              // 유리 패널이나 색조 바탕 위에서는 뒤 표면 색을 넘깁니다.
+              liveRingColor: theme.colors.bgSubtle,
             ),
           ),
         ],

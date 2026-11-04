@@ -50,17 +50,28 @@ void main() {
     );
 
     await tester.pumpWidget(_host(HoronCheckbox(value: false, size: HoronCheckboxSize.lg, onChanged: (_) {})));
+    // 같은 위젯을 다시 쓰므로 AnimatedContainer가 18→24로 이어 그립니다. 중간값을
+    // 재지 않도록 애니메이션이 끝날 때까지 기다립니다.
+    await tester.pumpAndSettle();
     expect(tester.getSize(_box()), const Size(24, 24), reason: 'size-6');
     expect((_decoration(tester).borderRadius! as BorderRadius).topLeft.x, _theme(tester).radius.xs);
   });
 
-  testWidgets('checked and indeterminate fill with ink and draw a 14px indicator', (WidgetTester tester) async {
+  testWidgets('checked and indeterminate fill with ink, keep the 1.5px rim and draw a 14px indicator', (
+    WidgetTester tester,
+  ) async {
     final HoronColors colors = HoronThemeData.light.colors;
 
     await tester.pumpWidget(_host(HoronCheckbox(value: true, onChanged: (_) {})));
     await tester.pumpAndSettle();
     expect(_decoration(tester).color, colors.interactivePrimary, reason: 'data-checked:bg-interactive-primary');
-    expect(_decoration(tester).border!.top.width, 0, reason: 'data-checked:border-0');
+    // React `data-checked:border-interactive-primary` — 두께는 그대로 두고 색만 바꿉니다.
+    expect(_decoration(tester).border!.top.width, 1.5, reason: 'border-[1.5px]');
+    expect(
+      _decoration(tester).border!.top.color,
+      colors.interactivePrimary,
+      reason: 'data-checked:border-interactive-primary',
+    );
     final Icon check = tester.widget<Icon>(find.byIcon(Icons.check));
     expect(check.size, 14, reason: '[&_svg]:size-3.5');
     expect(check.color, colors.interactiveOnPrimary, reason: 'text-interactive-on-primary');

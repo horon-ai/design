@@ -30,6 +30,15 @@ class HoronDateFieldGallerySection extends StatelessWidget {
             glass: true,
             child: _fields(theme, HoronSurface.glass),
           ),
+          Text(
+            'Figma `Date field`(60:244) 280px 필드입니다. 불투명 표면은 포인터를 올리면 '
+            '테두리가 `border-strong`으로 짙어지고, 유리 표면은 `veil-field`라 hover '
+            '테두리가 없습니다. 달력은 `sideOffset={4}`로 필드에서 4px 떨어져 열리고, '
+            '아래에 자리가 모자라면 같은 4px을 두고 위로 뒤집힙니다.',
+            style: theme.text.bodySm.copyWith(
+              color: theme.colors.textSecondary,
+            ),
+          ),
         ],
       ),
     );

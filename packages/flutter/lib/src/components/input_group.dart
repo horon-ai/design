@@ -42,7 +42,7 @@ typedef HoronSegmentMetrics = ({double paddingX, double gap, double icon, TextSt
 
 /// [size]의 칸 값을 계산합니다.
 HoronSegmentMetrics horonSegmentMetrics(HoronInputGroupSize size, HoronThemeData theme) => switch (size) {
-  HoronInputGroupSize.sm => (paddingX: theme.space.s2_5, gap: theme.space.s1, icon: 16, textStyle: theme.text.bodySm),
+  HoronInputGroupSize.sm => (paddingX: theme.space.s3, gap: theme.space.s1, icon: 16, textStyle: theme.text.bodySm),
   HoronInputGroupSize.md => (paddingX: theme.space.s3, gap: theme.space.s1, icon: 16, textStyle: theme.text.bodyMd),
   HoronInputGroupSize.lg => (paddingX: theme.space.s4, gap: theme.space.s1_5, icon: 20, textStyle: theme.text.bodyLg),
 };
@@ -128,6 +128,9 @@ class _HoronInputGroupState extends State<HoronInputGroup> {
 
   Color _dividerColor(HoronColors colors) {
     if (widget.invalid) return colors.borderDanger;
+    // React `group-data-disabled:bg-border-default/60` — 비활성이면 기본 테두리를
+    // 60% 불투명도로 낮춥니다. hover는 비활성에서 오지 않습니다.
+    if (widget.disabled) return colors.borderDefault.withValues(alpha: 0.6);
     if (_hovered) return colors.borderStrong;
     return colors.borderDefault;
   }

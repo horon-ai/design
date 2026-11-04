@@ -110,6 +110,18 @@ void main() {
     await pointer.moveTo(tester.getCenter(find.text('대기')));
     await tester.pump();
     expect(colorOf('대기'), colors.textPrimary, reason: 'hover:text-text-primary');
+
+    // `hover:bg-overlay-ink-5` — 선택되지 않은 옵션만 hover에서 5% 잉크를 깝니다.
+    Color? fillOf(String label) =>
+        (tester
+                    .widget<AnimatedContainer>(
+                      find.ancestor(of: find.text(label), matching: find.byType(AnimatedContainer)).first,
+                    )
+                    .decoration!
+                as BoxDecoration)
+            .color;
+    expect(fillOf('대기'), colors.overlayInk5);
+    expect(fillOf('전체'), Colors.transparent, reason: '선택된 옵션은 표시자가 바탕을 맡습니다');
   });
 
   testWidgets('tapping an option selects it and calls back once', (WidgetTester tester) async {

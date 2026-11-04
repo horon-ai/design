@@ -16,6 +16,9 @@ const double _arrowBase = 8.66;
 /// 삼각형 밑변과 말풍선 사이의 거리입니다. Paper `TVV-1`의 1.5입니다.
 const double _arrowGap = 1.5;
 
+/// `max-w-64` — 말풍선이 더 넓어지지 않는 폭 256입니다.
+const double _maxWidth = 256;
+
 /// Figma `Tooltip`(62:282): 잉크 말풍선에 10/6 여백, 8 반경, 10x6 화살표를 붙인 안내입니다.
 ///
 /// `tooltip.tsx`의 `side`는 props 안의 인라인 유니온이라 variant 어휘가 아니므로,
@@ -67,11 +70,21 @@ class HoronTooltip extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     final BorderRadius radius = BorderRadius.circular(theme.radius.sm);
 
-    final Widget bubble = DecoratedBox(
-      decoration: BoxDecoration(color: theme.colors.interactivePrimary, borderRadius: radius),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        child: Text(label, style: theme.text.labelSm.copyWith(color: theme.colors.interactiveOnPrimary)),
+    // `max-w-64` — 긴 안내도 256px을 넘지 않고 여러 줄로 접힙니다.
+    final Widget bubble = ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: _maxWidth),
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: theme.colors.interactivePrimary, borderRadius: radius),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          // React `text-balance`는 줄 길이를 고르게 나누는 CSS 전용 기능입니다.
+          // Flutter에는 같은 조판 옵션이 없어 가운데 정렬로 같은 인상을 냅니다.
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: theme.text.labelSm.copyWith(color: theme.colors.interactiveOnPrimary),
+          ),
+        ),
       ),
     );
 

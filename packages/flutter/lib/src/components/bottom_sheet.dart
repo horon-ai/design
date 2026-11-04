@@ -132,9 +132,17 @@ class HoronBottomSheet extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        // 높이 상한이 있는 자리(시트 라우트, 갤러리 미리보기)에서는 본문을 스크롤에
-        // 넣어 화면보다 긴 내용도 잘리지 않게 합니다. 상한이 없으면 그냥 쌓습니다.
+        // 높이 상한이 있는 자리(시트 라우트, 갤러리 미리보기)에서는 제목 줄과 본문을
+        // 함께 스크롤에 넣어 화면보다 긴 내용도 잘리지 않게 합니다. React도
+        // `Drawer.Content`(`min-h-0 flex-1 overflow-y-auto`)가 제목과 본문을 함께
+        // 감쌉니다. 상한이 없으면 그냥 쌓습니다.
         final bool bounded = constraints.hasBoundedHeight;
+        final Widget content = Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: gap,
+          children: <Widget>[header, ?child],
+        );
         final Widget body = Padding(
           // px-4 pt-2, 아래는 pb-5(veil) 또는 pb-6(불투명)입니다.
           padding: EdgeInsets.only(left: space.s4, right: space.s4, top: space.s2, bottom: solid ? space.s6 : space.s5),
@@ -144,35 +152,43 @@ class HoronBottomSheet extends StatelessWidget {
             spacing: gap,
             children: <Widget>[
               // h-[5px] w-9 rounded-[3px] bg-overlay-ink-20 그랩바입니다.
-              Center(
-                child: Container(
-                  width: _grabberWidth,
-                  height: _grabberHeight,
-                  decoration: BoxDecoration(
-                    color: colors.overlayInk20,
-                    borderRadius: BorderRadius.circular(_grabberRadius),
+              // `cursor-grab touch-none active:cursor-grabbing` — 시트를 끌어 내리는
+              // 자리임을 포인터로 알립니다.
+              MouseRegion(
+                cursor: SystemMouseCursors.grab,
+                child: Center(
+                  child: Container(
+                    width: _grabberWidth,
+                    height: _grabberHeight,
+                    decoration: BoxDecoration(
+                      color: colors.overlayInk20,
+                      borderRadius: BorderRadius.circular(_grabberRadius),
+                    ),
                   ),
                 ),
               ),
-              header,
-              if (child != null)
-                if (bounded) Flexible(child: SingleChildScrollView(child: child)) else child!,
+              if (bounded) Flexible(child: SingleChildScrollView(child: content)) else content,
             ],
           ),
         );
 
-        if (veil) {
-          // React `veil-overlay` — 링과 0 6 24 그림자를 스스로 그립니다.
-          return HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: body);
-        }
-        if (solid) {
-          // React `rounded-t-xl bg-bg-surface`.
-          return ClipRRect(
-            borderRadius: radius,
-            child: ColoredBox(color: colors.bgSurface, child: body),
-          );
-        }
-        return body;
+        final Widget surface = veil
+            // React `veil-overlay` — 링과 0 6 24 그림자를 스스로 그립니다.
+            ? HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: body)
+            : solid
+            // React `rounded-t-xl bg-bg-surface`.
+            ? ClipRRect(
+                borderRadius: radius,
+                child: ColoredBox(color: colors.bgSurface, child: body),
+              )
+            : body;
+
+        // `max-h-[calc(100dvh-2rem)]` — 화면 높이에서 16px 여백을 뺀 만큼만 커집니다.
+        final double maxHeight = (MediaQuery.sizeOf(context).height - space.s4 * 2).clamp(0, double.infinity);
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: maxHeight),
+          child: surface,
+        );
       },
     );
   }

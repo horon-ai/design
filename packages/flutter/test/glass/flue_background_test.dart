@@ -158,10 +158,12 @@ void main() {
       final HoronFlueConfig light = HoronFlueConfig.resolve(brightness: Brightness.light, variant: variant);
       expect(light.width, 1.9);
       expect(light.spread, 1.3);
-      expect(light.density, 2.0);
-      expect(light.midpoint, 0.74);
-      expect(light.glow, 0.45);
-      expect(light.vignette, 0.18);
+      // dev React `8354345`의 auth 라이트 튜닝입니다. 셰이더 비네트는 검정으로 어두워지므로
+      // 라이트는 비네트 없이 옅은 하늘을 지킵니다.
+      expect(light.density, 1.85);
+      expect(light.midpoint, 0.8);
+      expect(light.glow, 0.3);
+      expect(light.vignette, 0);
 
       final HoronFlueConfig dark = HoronFlueConfig.resolve(brightness: Brightness.dark, variant: variant);
       expect(dark.midpoint, 0.76);
@@ -276,7 +278,9 @@ void main() {
   });
 
   group('variants', () {
-    testWidgets('the sidebar variant tunes the sky palette and lays no tint', (WidgetTester tester) async {
+    testWidgets('the sidebar variant tunes the sky palette and veils it with thick glass in light', (
+      WidgetTester tester,
+    ) async {
       await pumpFlue(tester, variant: HoronFlueVariant.sidebar);
       final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
       final HoronFlueConfig config = state.resolvedConfig;
@@ -293,25 +297,27 @@ void main() {
         find.byWidgetPredicate(
           (Widget widget) =>
               widget is ColoredBox &&
-              widget.color == HoronTheme.of(tester.element(find.byType(HoronFlueBackground))).colors.glassRegular,
+              widget.color == HoronTheme.of(tester.element(find.byType(HoronFlueBackground))).colors.glassThick,
         ),
-        findsNothing,
-        reason: '사이드바 유리가 바탕을 채우므로 색조를 얹지 않습니다',
+        findsOneWidget,
+        reason: '연기가 사이드바 유리 채움보다 위에 그려지므로 라이트에서는 80% 유리를 직접 얹습니다',
       );
       await drain(tester);
     });
 
-    testWidgets('the auth variant widens the plume on the base palette', (WidgetTester tester) async {
+    testWidgets('the auth variant widens the plume and keeps the light sky free of the vignette', (
+      WidgetTester tester,
+    ) async {
       await pumpFlue(tester, variant: HoronFlueVariant.auth);
       final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
       final HoronFlueConfig config = state.resolvedConfig;
 
       expect(config.width, 1.9);
       expect(config.spread, 1.3);
-      expect(config.density, 2.0);
-      expect(config.midpoint, 0.74);
-      expect(config.glow, 0.45);
-      expect(config.vignette, 0.18);
+      expect(config.density, 1.85);
+      expect(config.midpoint, 0.8);
+      expect(config.glow, 0.3);
+      expect(config.vignette, 0, reason: '라이트는 비네트로 하늘을 회색으로 만들지 않습니다');
       expect(state.resolvedConfig.speed, HoronFlueConfig.sky.speed, reason: 'auth는 속도를 바꾸지 않습니다');
       await drain(tester);
     });
@@ -434,6 +440,41 @@ void main() {
       await drain(tester);
     });
 
+    testWidgets('reduced motion switched on while running freezes the frame and resumes the clock', (
+      WidgetTester tester,
+    ) async {
+      await pumpFlue(tester);
+      final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
+      expect(state.ticker.isActive, isTrue);
+
+      await tester.pump(const Duration(milliseconds: 32));
+      final double running = state.frame.time;
+      expect(running, greaterThan(0));
+
+      // React는 열려 있는 동안 켜진 모션 축소에 `cancelAnimationFrame`만 하고 시계를 12로
+      // 되돌리지 않습니다. Flutter도 같은 자리에서 멈춰야 합니다. 축소로 다시 `pumpWidget`
+      // 하는 프레임에서 티커가 한 번 더 진행하므로(0.032 → 0.036167) 비교 기준은 32ms에서
+      // 읽은 값이 아니라 실제로 멈춘 프레임입니다.
+      await pumpFlue(tester, animations: false);
+      expect(state.ticker.isActive, isFalse);
+      final double frozen = state.frame.time;
+      expect(frozen, greaterThanOrEqualTo(running), reason: '켜지는 순간의 프레임에서 멈춥니다');
+      // 감쇠는 한 프레임을 50ms로 자르므로, 다시 그리는 프레임에서 늘어날 수 있는 최대가 한 프레임입니다.
+      expect(frozen, lessThan(running + 0.05), reason: '멈추기 전에 한 프레임 넘게 진행하지 않습니다');
+      expect(frozen, lessThan(12), reason: '정지 시계 12초로 되돌리지 않습니다');
+      expect(state.frame.time, frozen, reason: '켜지는 순간의 프레임에서 멈춥니다');
+
+      await tester.pump(const Duration(milliseconds: 32));
+      expect(state.frame.time, frozen, reason: '켜지는 순간의 프레임에서 멈춥니다');
+
+      await pumpFlue(tester);
+      expect(state.ticker.isActive, isTrue);
+      await tester.pump(const Duration(milliseconds: 32));
+      expect(state.frame.time, greaterThan(frozen), reason: '같은 시계에서 이어 갑니다');
+
+      await drain(tester);
+    });
+
     testWidgets('a paused app stops the ticker and resuming starts it again', (WidgetTester tester) async {
       await pumpFlue(tester);
       final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
@@ -451,7 +492,9 @@ void main() {
     });
 
     testWidgets('pointer steering aims the damping at the normalized position', (WidgetTester tester) async {
-      await pumpFlue(tester);
+      // React의 `FLUE_SKY.cursor`는 0이라 기본값은 포인터를 받지 않습니다. 여기서는
+      // 정규화 식만 검증하려고 `cursor`를 켠 설정을 넣습니다.
+      await pumpFlue(tester, config: HoronFlueConfig.sky.copyWith(cursor: 1));
       final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
       final Rect rect = tester.getRect(find.byType(HoronFlueBackground));
 

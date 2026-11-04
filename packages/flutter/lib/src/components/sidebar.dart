@@ -33,6 +33,25 @@ const double _resizeLineWidth = 2;
 /// `border-r` — 사이드바 오른쪽 테두리 1px입니다.
 const double _hairline = 1;
 
+/// `transition-[width] duration-200 ease-out-quint` — 폭 전이 200ms입니다.
+///
+/// React는 `resizable`일 때 폭을 전이하고, 끄는 동안에는 `data-resizing`으로
+/// 전이를 끕니다(포인터를 1:1로 따라가야 하므로).
+const Duration _widthDuration = Duration(milliseconds: 200);
+
+/// `after:min-h-11 after:min-w-11` — 터치 영역 44px입니다.
+///
+/// React는 `::after`로 보이는 상자 밖까지 히트 영역을 넓힙니다. 다만 헤더 행이
+/// `h-9`(36)이고 사이드바 `nav`가 `overflow-clip`이라 세로로는 36px까지만 닿습니다.
+/// Flutter 판은 행 높이를 넘지 않는 상자로 같은 히트 영역을 냅니다.
+const double _minTapTarget = 44;
+
+/// 프로젝트 행 "더 보기"의 히트 영역이 보이는 16px 상자 밖으로 나가는 폭입니다.
+///
+/// React는 `after:min-w-11`로 좌우 14px씩 넓히므로, 44px 상자를 14px 왼쪽으로
+/// 옮겨야 보이는 아이콘이 `right-2.5` 자리에 그대로 남습니다.
+const double _projectMoreHitInset = (_minTapTarget - 16) / 2;
+
 /// `rounded-[10px]` — 워크스페이스 스위치·계정 아바타·추가 버튼의 10px 반경입니다.
 const double _radius10 = 10;
 
@@ -269,9 +288,16 @@ class _HoronSidebarState extends State<HoronSidebar> {
         final double available = constraints.hasBoundedWidth ? constraints.maxWidth : MediaQuery.sizeOf(context).width;
         final bool showHandle = widget.resizable && available >= theme.breakpoints.md;
         final double width = showHandle ? _width : _sidebarWidth;
+        // `transition-[width] duration-200 data-resizing:transition-none`입니다. 끄는
+        // 동안에는 전이를 끄고, 키보드·더블 탭처럼 값이 뛰는 경우에만 미끄러집니다.
+        final bool animateWidth = widget.resizable && !_dragging;
 
-        return SizedBox(
-          width: width,
+        return TweenAnimationBuilder<double>(
+          tween: Tween<double>(end: width),
+          duration: animateWidth && !MediaQuery.disableAnimationsOf(context) ? _widthDuration : Duration.zero,
+          curve: HoronMotion.easeOutQuint,
+          builder: (BuildContext context, double animatedWidth, Widget? child) =>
+              SizedBox(width: animatedWidth, child: child),
           child: DecoratedBox(
             // `surface="plain"`만 `border-r border-border-default`를 얻습니다. glass와
             // photo는 테두리 없이 유리나 사진 바탕이 경계를 만듭니다.
@@ -533,7 +559,8 @@ class _HoronSidebarWorkspaceSwitchState extends State<HoronSidebarWorkspaceSwitc
 /// Figma 사이드바 머리입니다.
 ///
 /// 워크스페이스 전환 버튼과, [onCollapse]가 있을 때만 보이는 28px 접기 버튼을
-/// 한 줄(36px)에 두고 아래로 10px 띄웁니다.
+/// 한 줄(36px)에 두고 아래로 10px 띄웁니다. 접기 버튼은 React처럼 보이는 상자
+/// 28px 밖으로 히트 영역을 넓히고, hover는 6% 잉크, 누르면 10% 잉크를 씁니다.
 class HoronSidebarHeader extends StatelessWidget {
   /// 머리를 만듭니다.
   const HoronSidebarHeader({
@@ -563,7 +590,6 @@ class HoronSidebarHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
 
     return Padding(
@@ -572,47 +598,117 @@ class HoronSidebarHeader extends StatelessWidget {
       child: SizedBox(
         // h-9
         height: space.step(9),
-        child: Row(
-          // gap-1.5
-          spacing: space.s1_5,
+        // React의 `::after`는 레이아웃을 차지하지 않고 보이는 상자 양옆으로 8px씩
+        // 넓어집니다. 그래서 전환 버튼은 28px 자리를 그대로 예약하고, 접기 버튼의
+        // 히트 영역만 `Positioned`로 겹쳐 놓습니다.
+        child: Stack(
           children: <Widget>[
-            Expanded(
-              child: switchSlot ?? HoronSidebarWorkspaceSwitch(initial: initial, name: name),
+            Row(
+              // gap-1.5
+              spacing: space.s1_5,
+              children: <Widget>[
+                Expanded(
+                  child: switchSlot ?? HoronSidebarWorkspaceSwitch(initial: initial, name: name),
+                ),
+                if (onCollapse != null) SizedBox(width: space.step(7)),
+              ],
             ),
             if (onCollapse != null)
-              SizedBox(
-                // size-7
-                width: space.step(7),
-                height: space.step(7),
-                child: FocusableActionDetector(
-                  mouseCursor: SystemMouseCursors.click,
-                  shortcuts: const <ShortcutActivator, Intent>{
-                    SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-                  },
-                  actions: <Type, Action<Intent>>{
-                    ActivateIntent: CallbackAction<ActivateIntent>(
-                      onInvoke: (ActivateIntent intent) {
-                        onCollapse!.call();
-                        return null;
-                      },
-                    ),
-                  },
-                  child: Semantics(
-                    button: true,
-                    label: collapseLabel,
-                    child: GestureDetector(
-                      onTap: onCollapse,
-                      child: Icon(
-                        // @phosphor-icons/react CaretLeft
-                        Icons.chevron_left,
-                        size: _caretLarge,
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                  ),
-                ),
+              Positioned(
+                // `after:min-w-11` — 보이는 28px 상자 중심으로 8px씩 넓힌 44px입니다.
+                // 오른쪽 8px는 React처럼 부모가 잘라 내므로 36px만 닿습니다.
+                top: 0,
+                bottom: 0,
+                right: -space.s2,
+                width: _minTapTarget,
+                child: _CollapseButton(label: collapseLabel, onPressed: onCollapse!),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// `SidebarHeader`의 접기 버튼입니다.
+///
+/// 보이는 상자는 `size-7`(28)이고, React의 `after:min-h-11 after:min-w-11` 히트
+/// 영역을 담은 44×행 높이(36) 슬롯 가운데에 놓입니다. hover는 6% 잉크, 누르면 10%
+/// 잉크이고 라벨은 hover에서 `text-primary`로 올라갑니다.
+class _CollapseButton extends StatefulWidget {
+  const _CollapseButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  State<_CollapseButton> createState() => _CollapseButtonState();
+}
+
+class _CollapseButtonState extends State<_CollapseButton> {
+  bool _hovered = false;
+  bool _pressed = false;
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final HoronSpaceSpec space = theme.space;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+
+    // `hover:bg-overlay-ink-6 active:bg-overlay-ink-10 motion-colors`입니다.
+    final Color fill = _pressed
+        ? colors.overlayInk10
+        : _hovered
+        ? colors.overlayInk6
+        : Colors.transparent;
+
+    return FocusableActionDetector(
+      mouseCursor: SystemMouseCursors.click,
+      onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
+      onShowFocusHighlight: (bool value) => setState(() => _focused = value),
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+        SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+      },
+      actions: <Type, Action<Intent>>{
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (ActivateIntent intent) {
+            widget.onPressed();
+            return null;
+          },
+        ),
+      },
+      child: Semantics(
+        button: true,
+        label: widget.label,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onPressed,
+          onTapDown: (TapDownDetails details) => setState(() => _pressed = true),
+          onTapUp: (TapUpDetails details) => setState(() => _pressed = false),
+          onTapCancel: () => setState(() => _pressed = false),
+          child: Center(
+            child: AnimatedContainer(
+              duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+              curve: HoronMotion.colorsCurve,
+              // size-7 rounded-sm
+              width: space.step(7),
+              height: space.step(7),
+              decoration: BoxDecoration(color: fill, borderRadius: BorderRadius.circular(theme.radius.sm)),
+              foregroundDecoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(theme.radius.sm),
+                border: Border.all(color: _focused ? colors.textBrand : Colors.transparent, width: space.s0_5),
+              ),
+              child: Icon(
+                // @phosphor-icons/react CaretLeft
+                Icons.chevron_left,
+                size: _caretLarge,
+                color: _hovered ? colors.textPrimary : colors.textSecondary,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -834,6 +930,7 @@ class HoronSidebarGroup extends StatefulWidget {
 
 class _HoronSidebarGroupState extends State<HoronSidebarGroup> {
   late bool _open = widget.defaultOpen;
+  bool _hovered = false;
   bool _focused = false;
 
   void _toggle() {
@@ -847,6 +944,8 @@ class _HoronSidebarGroupState extends State<HoronSidebarGroup> {
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    // `motion-colors hover:text-text-primary` — 라벨과 캐럿이 함께 올라갑니다.
+    final Color foreground = _hovered ? colors.textPrimary : colors.textSecondary;
 
     return Padding(
       // mt-3.5
@@ -858,6 +957,7 @@ class _HoronSidebarGroupState extends State<HoronSidebarGroup> {
         children: <Widget>[
           FocusableActionDetector(
             mouseCursor: SystemMouseCursors.click,
+            onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
             onShowFocusHighlight: (bool value) => setState(() => _focused = value),
             shortcuts: const <ShortcutActivator, Intent>{
               SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
@@ -892,11 +992,11 @@ class _HoronSidebarGroupState extends State<HoronSidebarGroup> {
                       // gap-1
                       spacing: space.s1,
                       children: <Widget>[
-                        Text(
-                          widget.label,
-                          maxLines: 1,
-                          // text-label-md text-text-secondary
-                          style: theme.text.labelMd.copyWith(color: colors.textSecondary),
+                        AnimatedDefaultTextStyle(
+                          duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+                          curve: HoronMotion.colorsCurve,
+                          style: theme.text.labelMd.copyWith(color: foreground),
+                          child: Text(widget.label, maxLines: 1),
                         ),
                         AnimatedRotation(
                           // group-not-data-panel-open:-rotate-90 group-data-panel-open:rotate-0
@@ -907,7 +1007,7 @@ class _HoronSidebarGroupState extends State<HoronSidebarGroup> {
                             // @phosphor-icons/react CaretDown
                             Icons.expand_more,
                             size: _caretSmall,
-                            color: colors.textSecondary,
+                            color: foreground,
                           ),
                         ),
                       ],
@@ -1267,22 +1367,25 @@ class _HoronSidebarProjectState extends State<HoronSidebarProject> {
                         ),
                       ),
                       if (_hasChildren)
-                        Visibility(
-                          // group-hover/project:invisible — 자리는 남기고 숨깁니다.
-                          visible: !(widget.actions != null && _showActions),
-                          maintainSize: true,
-                          maintainAnimation: true,
-                          maintainState: true,
-                          child: AnimatedRotation(
-                            // group-data-panel-open/trigger:rotate-90
-                            turns: _isOpen ? 0.25 : 0,
-                            duration: reduceMotion ? Duration.zero : HoronMotion.popupEnterDuration,
-                            curve: HoronMotion.easeOutQuint,
-                            child: Icon(
-                              // @phosphor-icons/react CaretRight
-                              Icons.chevron_right,
-                              size: _caretSmall,
-                              color: colors.textPrimary,
+                        AnimatedOpacity(
+                          // `opacity-100 transition-opacity duration-150
+                          //  group-hover/project:opacity-0` — 자리는 남기고 투명해집니다.
+                          opacity: widget.actions != null && _showActions ? 0 : 1,
+                          duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+                          curve: HoronMotion.colorsCurve,
+                          child: IgnorePointer(
+                            ignoring: widget.actions != null && _showActions,
+                            child: AnimatedRotation(
+                              // group-data-panel-open/trigger:rotate-90
+                              turns: _isOpen ? 0.25 : 0,
+                              duration: reduceMotion ? Duration.zero : HoronMotion.popupEnterDuration,
+                              curve: HoronMotion.easeOutQuint,
+                              child: Icon(
+                                // @phosphor-icons/react CaretRight
+                                Icons.chevron_right,
+                                size: _caretSmall,
+                                color: colors.textPrimary,
+                              ),
                             ),
                           ),
                         ),
@@ -1294,10 +1397,11 @@ class _HoronSidebarProjectState extends State<HoronSidebarProject> {
           ),
           if (widget.actions != null)
             Positioned(
-              // absolute right-2.5 inset-y-0
+              // absolute right-2.5 inset-y-0 — 히트 영역이 넓어진 만큼 왼쪽으로
+              // 옮겨, 보이는 아이콘은 `right-2.5` 자리에 남깁니다.
               top: 0,
               bottom: 0,
-              right: space.s2_5,
+              right: space.s2_5 - _projectMoreHitInset,
               child: Center(
                 child: AnimatedOpacity(
                   duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
@@ -1348,6 +1452,7 @@ class HoronSidebarProjectMore extends StatefulWidget {
 }
 
 class _HoronSidebarProjectMoreState extends State<HoronSidebarProjectMore> {
+  bool _hovered = false;
   bool _focused = false;
 
   @override
@@ -1355,6 +1460,7 @@ class _HoronSidebarProjectMoreState extends State<HoronSidebarProjectMore> {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     return Semantics(
       button: true,
@@ -1362,6 +1468,7 @@ class _HoronSidebarProjectMoreState extends State<HoronSidebarProjectMore> {
       child: FocusableActionDetector(
         enabled: widget.onPressed != null,
         mouseCursor: widget.onPressed != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
         onShowFocusHighlight: (bool value) => setState(() => _focused = value),
         shortcuts: const <ShortcutActivator, Intent>{SingleActivator(LogicalKeyboardKey.enter): ActivateIntent()},
         actions: <Type, Action<Intent>>{
@@ -1375,22 +1482,33 @@ class _HoronSidebarProjectMoreState extends State<HoronSidebarProjectMore> {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: widget.onPressed,
+          // React `after:min-h-11 after:min-w-11` — 보이는 16px 밖으로 히트 영역을
+          // 넓힙니다. 행 높이가 32라 세로로는 그 안까지만 닿습니다.
           child: SizedBox(
-            // size-4 rounded-xs
-            width: space.step(4),
-            height: space.step(4),
-            child: DecoratedBox(
-              // focus-visible:outline-2 focus-visible:outline-text-brand
-              position: DecorationPosition.foreground,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(theme.radius.xs),
-                border: Border.all(color: _focused ? colors.textBrand : Colors.transparent, width: space.s0_5),
-              ),
-              child: Icon(
-                // @phosphor-icons/react DotsThree
-                Icons.more_horiz,
-                size: space.step(4),
-                color: colors.textPrimary,
+            width: _minTapTarget,
+            height: space.step(8),
+            child: Center(
+              child: AnimatedContainer(
+                duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+                curve: HoronMotion.colorsCurve,
+                // size-4 rounded-xs, `hover:bg-overlay-ink-6`
+                width: space.step(4),
+                height: space.step(4),
+                decoration: BoxDecoration(
+                  color: _hovered && widget.onPressed != null ? colors.overlayInk6 : Colors.transparent,
+                  borderRadius: BorderRadius.circular(theme.radius.xs),
+                ),
+                foregroundDecoration: BoxDecoration(
+                  // focus-visible:outline-2 focus-visible:outline-text-brand
+                  borderRadius: BorderRadius.circular(theme.radius.xs),
+                  border: Border.all(color: _focused ? colors.textBrand : Colors.transparent, width: space.s0_5),
+                ),
+                child: Icon(
+                  // @phosphor-icons/react DotsThree
+                  Icons.more_horiz,
+                  size: space.step(4),
+                  color: colors.textPrimary,
+                ),
               ),
             ),
           ),

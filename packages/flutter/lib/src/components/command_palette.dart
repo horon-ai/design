@@ -146,7 +146,8 @@ class HoronCommandPalette extends StatelessWidget {
 
     return Stack(
       children: <Widget>[
-        // Dialog.Backdrop: `fixed inset-0 bg-bg-scrim motion-fade opacity-40`.
+        // Dialog.Backdrop: `fixed inset-0 z-50 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]`.
+        // 겹침 순서는 오버레이 삽입 순서가 정하므로(z) 이 스택의 첫 자리가 배경입니다.
         Positioned.fill(
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,

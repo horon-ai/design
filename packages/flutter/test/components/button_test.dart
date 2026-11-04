@@ -84,6 +84,36 @@ void main() {
     }
   });
 
+  testWidgets('glass keeps the 44px reach like every filled variant, and lg and link do not', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(_host(HoronButton(label: '저장', variant: HoronButtonVariant.glass, onPressed: () {})));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(find.byType(HoronButton)).height, 44, reason: 'after:min-h-11 — glass도 히트 영역은 44');
+
+    await tester.pumpWidget(
+      _host(HoronButton(label: '저장', variant: HoronButtonVariant.glass, size: HoronButtonSize.lg, onPressed: () {})),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.getSize(find.byType(HoronButton)).height, 48, reason: 'lg는 48이라 reach가 필요 없습니다');
+
+    await tester.pumpWidget(_host(HoronButton(label: '저장', variant: HoronButtonVariant.link, onPressed: () {})));
+    await tester.pumpAndSettle();
+    expect(tester.getSize(find.byType(HoronButton)).height, lessThan(44), reason: 'link는 reach를 쓰지 않습니다');
+  });
+
+  testWidgets('danger returns to the base danger colour while pressed', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronButton(label: '삭제', variant: HoronButtonVariant.danger, onPressed: () {})));
+    final HoronColors colors = _theme(tester).colors;
+
+    final TestGesture press = await tester.startGesture(tester.getCenter(find.byType(HoronButton)));
+    // 탭 인식기는 누른 뒤 100ms가 지나야 `onTapDown`을 부르고, 색 전환은 150ms입니다.
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(_decoration(tester).color, colors.interactiveDanger, reason: 'active:bg-interactive-danger');
+    await press.up();
+    await tester.pumpAndSettle();
+  });
+
   testWidgets('the link variant ignores size and uses label-sm with no fill', (WidgetTester tester) async {
     await tester.pumpWidget(
       _host(HoronButton(label: '자세히', variant: HoronButtonVariant.link, size: HoronButtonSize.lg)),
@@ -164,8 +194,9 @@ void main() {
   });
 
   testWidgets('href turns the button into a link and current paints the link label', (WidgetTester tester) async {
+    // `addTearDown`은 테스트 본문이 끝난 뒤(의미 트리 누수 검사 뒤)에 실행되므로,
+    // 검사 전에 직접 닫습니다.
     final SemanticsHandle handle = tester.ensureSemantics();
-    addTearDown(handle.dispose);
     final Uri href = Uri.parse('https://horon.example/docs');
 
     await tester.pumpWidget(
@@ -189,5 +220,6 @@ void main() {
 
     await tester.pumpWidget(_host(HoronButton(label: '저장', onPressed: () {})));
     expect(link, findsNothing, reason: 'href가 없으면 링크가 아닙니다');
+    handle.dispose();
   });
 }

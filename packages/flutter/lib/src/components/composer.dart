@@ -119,13 +119,23 @@ class _HoronComposerState extends State<HoronComposer> {
     _ownsController = widget.controller == null;
     _controller = widget.controller ?? TextEditingController(text: widget.initialValue);
     _controller.addListener(_onTextChanged);
+    _focusNode.addListener(_onFocusChanged);
   }
 
   @override
   void dispose() {
     _controller.removeListener(_onTextChanged);
+    _focusNode.removeListener(_onFocusChanged);
+    _focusNode.dispose();
     if (_ownsController) _controller.dispose();
     super.dispose();
+  }
+
+  /// `has-[input:focus-visible]` — 입력칸이 포커스를 받았는지입니다.
+  final FocusNode _focusNode = FocusNode();
+
+  void _onFocusChanged() {
+    if (mounted) setState(() {});
   }
 
   void _onTextChanged() {
@@ -149,6 +159,7 @@ class _HoronComposerState extends State<HoronComposer> {
     final _ComposerMetrics metrics = _metricsOf(widget.size, theme);
 
     final BorderRadius radius = BorderRadius.circular(theme.radius.full);
+    final bool focused = _focusNode.hasFocus;
     final Widget content = Padding(
       padding: EdgeInsets.all(metrics.padding),
       child: Row(
@@ -158,12 +169,14 @@ class _HoronComposerState extends State<HoronComposer> {
             label: 'Attach',
             size: metrics.button,
             iconSize: metrics.icon,
+            iconColor: colors.textSecondary, // Plus className="text-text-secondary"
             onPressed: disabled ? null : widget.onAttach,
           ),
           SizedBox(width: metrics.gap),
           Expanded(
             child: TextField(
               controller: _controller,
+              focusNode: _focusNode,
               enabled: !disabled,
               maxLines: 1,
               style: metrics.textStyle.copyWith(color: disabled ? colors.textDisabled : colors.textPrimary),
@@ -186,47 +199,44 @@ class _HoronComposerState extends State<HoronComposer> {
             ),
           ),
           SizedBox(width: metrics.gap),
-          AnimatedSwitcher(
-            duration: animate ? HoronMotion.popInDuration : Duration.zero,
-            switchInCurve: HoronMotion.popInCurve,
-            switchOutCurve: HoronMotion.popOutCurve,
-            transitionBuilder: (Widget child, Animation<double> animation) => ScaleTransition(
-              scale: animation.drive(
-                Tween<double>(begin: HoronMotion.popInScale, end: 1).chain(CurveTween(curve: HoronMotion.popInCurve)),
-              ),
-              child: child,
+          // React `motion-swap`: 음성·전송 버튼을 같은 칸에 겹쳐 두고 교차 전환합니다.
+          // 숨은 쪽은 포인터·포커스·낭독에서 빠지므로(React `inert`·`tabIndex={-1}`)
+          // 지금 눌리는 버튼만 남습니다.
+          HoronSwap(
+            hidden: hasText,
+            hiddenChild: _ComposerIconButton(
+              key: const ValueKey<String>('horon-composer-send'),
+              icon: Icons.arrow_upward,
+              label: 'Send',
+              primary: true,
+              size: metrics.button,
+              iconSize: metrics.icon,
+              onPressed: disabled ? null : _submit,
             ),
-            child: hasText
-                ? _ComposerIconButton(
-                    key: const ValueKey<String>('horon-composer-send'),
-                    icon: Icons.arrow_upward,
-                    label: 'Send',
-                    primary: true,
-                    size: metrics.button,
-                    iconSize: metrics.icon,
-                    onPressed: disabled ? null : _submit,
-                  )
-                : _ComposerIconButton(
-                    key: const ValueKey<String>('horon-composer-voice'),
-                    icon: Icons.mic_none,
-                    label: 'Voice input',
-                    iconColor: colors.textSecondary,
-                    size: metrics.button,
-                    iconSize: metrics.icon,
-                    onPressed: disabled ? null : widget.onVoice,
-                  ),
+            child: _ComposerIconButton(
+              key: const ValueKey<String>('horon-composer-voice'),
+              icon: Icons.mic_none,
+              label: 'Voice input',
+              iconColor: colors.textSecondary,
+              size: metrics.button,
+              iconSize: metrics.icon,
+              onPressed: disabled ? null : widget.onVoice,
+            ),
           ),
         ],
       ),
     );
 
     final Widget surfaceBody = widget.surface == HoronComposerSurface.glass
-        ? HoronVeil(kind: HoronVeilKind.field, borderRadius: radius, child: content)
-        : DecoratedBox(
+        ? HoronVeil(kind: HoronVeilKind.field, focused: focused, borderRadius: radius, child: content)
+        : AnimatedContainer(
+            duration: animate ? HoronMotion.colorsDuration : Duration.zero, // motion-colors
+            curve: HoronMotion.colorsCurve,
             decoration: BoxDecoration(
               color: colors.bgSurface,
               borderRadius: radius,
-              border: Border.all(color: colors.borderDefault),
+              // has-[input:focus-visible]:border-border-strong
+              border: Border.all(color: focused ? colors.borderStrong : colors.borderDefault),
             ),
             child: content,
           );

@@ -132,6 +132,39 @@ void main() {
     expect(dividerBoxes(tester).map((ColoredBox box) => box.color), <Color>[themeOf(tester).colors.borderDanger]);
   });
 
+  testWidgets('a disabled group draws the divider at 60% of the default border', (WidgetTester tester) async {
+    await pumpGroup(tester, prefix: true, disabled: true);
+    final HoronColors colors = themeOf(tester).colors;
+    final Color divider = dividerBoxes(tester).single.color;
+    expect(divider.a, closeTo(0.6, 0.001), reason: 'group-data-disabled:bg-border-default/60');
+    expect(divider.withValues(alpha: 1), colors.borderDefault);
+  });
+
+  testWidgets('the 12px sm segment padding matches the React sm rung', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 320,
+              child: HoronInputGroup(
+                size: HoronInputGroupSize.sm,
+                prefix: const HoronInputGroupSegment(child: Text('+82')),
+                hintText: 'Hint',
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    final Padding pad = tester.widget<Padding>(
+      find.ancestor(of: find.text('+82'), matching: find.byType(Padding)).first,
+    );
+    expect(pad.padding, EdgeInsets.symmetric(horizontal: themeOf(tester).space.s3), reason: 'sm: px-3');
+  });
+
   testWidgets('typing reaches onChanged and disabled turns the field off', (WidgetTester tester) async {
     final List<String> seen = <String>[];
     await pumpGroup(tester, onChanged: seen.add);

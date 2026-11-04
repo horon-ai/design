@@ -109,6 +109,23 @@ void main() {
     expect(current, 0, reason: 'current면 링크가 아닙니다');
   });
 
+  testWidgets('a crumb keeps 6px right padding and draws no underline', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronBreadcrumb(children: _crumbs())));
+    final HoronThemeData theme = _theme(tester);
+
+    final Padding padding = tester.widget<Padding>(
+      find.ancestor(of: find.text('에이전트'), matching: find.byType(Padding)).first,
+    );
+    expect(
+      padding.padding,
+      EdgeInsets.only(top: theme.space.s1, bottom: theme.space.s1, right: theme.space.s1_5, left: theme.space.s1_5),
+      reason: 'py-1 pr-1.5 pl-1.5',
+    );
+
+    final DefaultTextStyle style = DefaultTextStyle.of(tester.element(find.text('에이전트')));
+    expect(style.style.decoration, TextDecoration.none, reason: 'no-underline');
+  });
+
   testWidgets('narrow widths wrap the crumbs instead of clipping them', (WidgetTester tester) async {
     final Widget crumbs = HoronBreadcrumb(
       children: <Widget>[

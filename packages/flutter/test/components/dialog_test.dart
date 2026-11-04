@@ -97,8 +97,10 @@ void main() {
     final HoronSpaceSpec space = HoronThemeData.light.space;
 
     await tester.pumpWidget(_host(const HoronDialog(solid: false, title: Text('제목'), description: Text('설명'))));
+    // 16px 리듬은 머리글 상자와 설명 사이입니다. 제목 글자 상자는 32px 닫기 버튼이
+    // 만든 머리글 높이 안에서 위에 붙으므로, 글자 사이를 재면 리듬이 아니게 됩니다.
     expect(
-      tester.getRect(find.text('설명')).top - tester.getRect(find.text('제목')).bottom,
+      tester.getRect(find.text('설명')).top - tester.getRect(find.byKey(const Key('horon-dialog-header'))).bottom,
       space.s4,
       reason: 'veil: gap-4',
     );
@@ -106,7 +108,7 @@ void main() {
     await tester.pumpWidget(_host(const HoronDialog(title: Text('제목'), description: Text('설명'), solid: true)));
     final HoronThemeData theme = _theme(tester);
     expect(
-      tester.getRect(find.text('설명')).top - tester.getRect(find.text('제목')).bottom,
+      tester.getRect(find.text('설명')).top - tester.getRect(find.byKey(const Key('horon-dialog-header'))).bottom,
       space.s4,
       reason: 'solid: gap-4',
     );
@@ -160,6 +162,36 @@ void main() {
       expect(find.byIcon(Icons.close), findsNothing, reason: 'closeLabel이 null이면 닫기를 숨깁니다');
     },
   );
+
+  testWidgets('a body taller than the screen scrolls inside the dialog box', (WidgetTester tester) async {
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.binding.setSurfaceSize(const Size(800, 600));
+
+    await tester.pumpWidget(
+      _host(
+        HoronDialog(
+          title: const Text('긴 본문'),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[for (int index = 0; index < 40; index += 1) Text('줄 $index')],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // `max-h-[calc(100dvh-2rem)]` — 화면 높이에서 32px을 뺀 만큼만 커집니다.
+    final Rect box = tester.getRect(find.byType(HoronDialog));
+    expect(box.height, lessThanOrEqualTo(600 - 32));
+    final Finder scroll = find.descendant(of: find.byType(HoronDialog), matching: find.byType(SingleChildScrollView));
+    expect(scroll, findsOneWidget, reason: 'overflow-y-auto');
+
+    final double before = tester.getRect(find.text('줄 0')).top;
+    await tester.dragFrom(tester.getRect(scroll).center, const Offset(0, -200));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(find.text('줄 0')).top, lessThan(before), reason: '상자 안에서만 스크롤합니다');
+    expect(tester.getRect(find.byType(HoronDialog)), box, reason: '상자 자체는 제자리에 남습니다');
+  });
 
   testWidgets('leading sits 14px before the title', (WidgetTester tester) async {
     final HoronSpaceSpec space = HoronThemeData.light.space;

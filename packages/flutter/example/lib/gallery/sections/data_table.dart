@@ -6,7 +6,8 @@ import 'package:horon_ui/horon_ui.dart';
 /// 같은 표를 데스크톱 폭과 모바일 폭으로 나란히 놓았습니다. 여백이 24px에서 18px로
 /// 줄고, 모바일 카드에서는 표 본문이 카드 안에서 가로로 스크롤합니다(카드 밖의 조작
 /// 요소는 스크롤하지 않습니다). 정렬 가능한 열, 선택 열, 태그, 검색, 쪽 나눔, 바닥글이
-/// 모두 보입니다.
+/// 모두 보입니다. 정렬 화살표는 방향이 바뀔 때마다 페이드로 갈아 끼우고, 행은 30ms씩
+/// 늦게 아래에서 올라오며 나타나며, 선택된 행은 hover에서 6% 잉크로 짙어집니다.
 class HoronDataTableGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronDataTableGallerySection({super.key});

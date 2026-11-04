@@ -173,6 +173,38 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('md draws the field and chip icons at 16 and 14, lg at 20 and 16', (WidgetTester tester) async {
+    // `md [&_svg]:size-4` — md 단계는 검색·캐럿 아이콘을 16으로 그립니다.
+    await tester.pumpWidget(_host());
+    await tester.pump();
+    expect(tester.widget<Icon>(find.byIcon(Icons.keyboard_arrow_down).first).size, 16, reason: 'md size-4');
+    expect(tester.widget<Icon>(find.byIcon(Icons.search).first).size, 16, reason: 'md [&_svg]:size-4');
+
+    await tester.pumpWidget(_host(multiple: true));
+    await tester.pump();
+    await _open(tester);
+    await tester.tap(find.text('South Korea'));
+    await tester.pumpAndSettle();
+    expect(tester.widget<Icon>(find.byIcon(Icons.close).first).size, 14, reason: 'chip md [&_svg]:size-3.5');
+
+    // `lg` 단계는 한 칸씩 큽니다.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: const Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: HoronCombobox(items: _items, size: HoronComboboxSize.lg),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.widget<Icon>(find.byIcon(Icons.keyboard_arrow_down).first).size, 20, reason: 'lg size-5');
+    expect(tester.widget<Icon>(find.byIcon(Icons.search).first).size, 20, reason: 'lg [&_svg]:size-5');
+  });
+
   testWidgets('escape and an outside tap close the list', (WidgetTester tester) async {
     await tester.pumpWidget(_host());
 

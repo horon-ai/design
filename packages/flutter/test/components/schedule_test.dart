@@ -234,21 +234,37 @@ void main() {
     expect(item, findsNothing, reason: '바깥 탭이 목록을 닫습니다');
   });
 
-  testWidgets('a focused picker row picks its value with Enter', (WidgetTester tester) async {
+  testWidgets('the picker opens with the current row focused and Enter picks it', (WidgetTester tester) async {
     final List<String?> changes = <String?>[];
     await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00', onChanged: changes.add)));
 
     await tester.tap(_trigger());
     await tester.pumpAndSettle();
 
-    // 패널이 포커스를 받은 뒤 Tab이 첫 줄로 옮깁니다.
-    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-    await tester.pump();
+    // Base UI Select처럼 목록은 지금 값에 강조를 두고 열립니다. 그래서 Tab 없이
+    // Enter가 그 값을 바로 고릅니다.
+    expect(find.byIcon(Icons.check), findsOneWidget, reason: '고른 줄에 체크가 붙습니다');
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pumpAndSettle();
 
     expect(changes, <String?>['09:00'], reason: '포커스된 줄이 Enter로 골라집니다');
     expect(find.byKey(const ValueKey<String>('horon-picker-item-09:00')), findsNothing, reason: '고르면 목록이 닫힙니다');
+  });
+
+  testWidgets('Tab moves to the next picker row and Enter picks that one', (WidgetTester tester) async {
+    final List<String?> changes = <String?>[];
+    await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00', onChanged: changes.add)));
+
+    await tester.tap(_trigger());
+    await tester.pumpAndSettle();
+
+    // 패널은 `FocusTraversalGroup`으로 묶여 있어 Tab이 읽기 순서(다음 줄)로 갑니다.
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+
+    expect(changes, <String?>['12:30'], reason: 'Tab이 옮긴 줄이 Enter로 골라집니다');
   });
 
   testWidgets('the weekday picker is 36px round toggles that report display order', (WidgetTester tester) async {

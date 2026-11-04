@@ -278,6 +278,16 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
     );
   }
 
+  /// 목록을 열 때 포커스를 받을 줄의 자리입니다. 지금 값이 있으면 그 줄, 없으면 첫
+  /// 줄입니다(React Base UI Select의 초기 강조와 같습니다).
+  int _initialFocusIndex(HoronPickerItem? selected) {
+    if (selected == null) return 0;
+    for (final (int index, HoronPickerItem item) in widget.items.indexed) {
+      if (item.value == selected.value) return index;
+    }
+    return 0;
+  }
+
   /// 목록 패널입니다. 배경·패딩·반경·테두리를 테마 토큰으로 직접 그립니다.
   ///
   /// 배치가 고른 쪽에 들어가는 높이([HoronOverlayPlacement.maxHeight])를 넘으면
@@ -308,28 +318,36 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
           // `max-h-72 overflow-y-auto`. 자리가 모자라면 목록이 그 안에서
           // 스크롤합니다.
           constraints: BoxConstraints(maxHeight: math.min(_maxPopupHeight, contentMaxHeight)),
-          child: SingleChildScrollView(
-            // 패널이 포커스를 받을 때 스크롤 위치를 바꾸지 않도록 자체
-            // 컨트롤러를 씁니다.
-            primary: false,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              // `gap-0.5`.
-              spacing: theme.space.s0_5,
-              children: <Widget>[
-                for (final HoronPickerItem item in widget.items)
-                  _PickerRow(
-                    key: ValueKey<String>('horon-picker-item-${item.value}'),
-                    height: metrics.itemHeight,
-                    paddingX: metrics.itemPaddingX,
-                    gap: metrics.itemGap,
-                    checkSize: metrics.check,
-                    style: metrics.item,
-                    selected: item.value == _value,
-                    onActivate: () => _select(item),
-                    label: item.label,
-                  ),
-              ],
+          // Tab이 목록 안에서만 읽기 순서로 돌도록 묶습니다. React는 Base UI
+          // Select가 목록을 포커스 스코프 하나로 다루는 것과 같습니다.
+          child: FocusTraversalGroup(
+            policy: ReadingOrderTraversalPolicy(),
+            child: SingleChildScrollView(
+              // 패널이 포커스를 받을 때 스크롤 위치를 바꾸지 않도록 자체
+              // 컨트롤러를 씁니다.
+              primary: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                // `gap-0.5`.
+                spacing: theme.space.s0_5,
+                children: <Widget>[
+                  for (final (int index, HoronPickerItem item) in widget.items.indexed)
+                    _PickerRow(
+                      key: ValueKey<String>('horon-picker-item-${item.value}'),
+                      height: metrics.itemHeight,
+                      paddingX: metrics.itemPaddingX,
+                      gap: metrics.itemGap,
+                      checkSize: metrics.check,
+                      style: metrics.item,
+                      selected: item.value == _value,
+                      // React는 목록을 열 때 지금 값(없으면 첫 줄)에 강조를 둡니다.
+                      // 그래야 열자마자 Enter가 그 값을 고릅니다.
+                      autofocus: index == _initialFocusIndex(selected),
+                      onActivate: () => _select(item),
+                      label: item.label,
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -491,6 +509,7 @@ class _PickerRow extends StatefulWidget {
     required this.checkSize,
     required this.style,
     required this.selected,
+    required this.autofocus,
     required this.onActivate,
     required this.label,
   });
@@ -513,6 +532,9 @@ class _PickerRow extends StatefulWidget {
   /// 지금 고른 줄인지 정합니다.
   final bool selected;
 
+  /// 목록을 열 때 이 줄이 포커스를 받는지 정합니다.
+  final bool autofocus;
+
   /// 줄을 누르거나 활성화했을 때 부릅니다.
   final VoidCallback onActivate;
 
@@ -528,6 +550,26 @@ class _PickerRowState extends State<_PickerRow> {
   bool _focused = false;
   bool _pressed = false;
 
+  /// 이 줄의 포커스 노드입니다. 첫 줄(또는 지금 값)은 목록이 열린 프레임 뒤에 직접
+  /// 포커스를 받습니다. React도 Base UI Select가 목록을 열 때 그 항목으로 이동합니다.
+  late final FocusNode _node = FocusNode(debugLabel: 'horon-picker-row');
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.autofocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _node.requestFocus();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _node.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
@@ -537,6 +579,7 @@ class _PickerRowState extends State<_PickerRow> {
     final bool lit = _hovered || _focused || _pressed;
 
     return FocusableActionDetector(
+      focusNode: _node,
       onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
       onShowFocusHighlight: (bool value) => setState(() => _focused = value),
       shortcuts: const <ShortcutActivator, Intent>{
@@ -585,7 +628,8 @@ class _PickerRowState extends State<_PickerRow> {
                     child: widget.label,
                   ),
                 ),
-                if (widget.selected) Icon(Icons.check, size: widget.checkSize, color: colors.textPrimary),
+                if (widget.selected)
+                  _PickerCheck(reduceMotion: reduceMotion, size: widget.checkSize, color: colors.textPrimary),
               ],
             ),
           ),
@@ -922,6 +966,29 @@ class HoronScheduleSection extends StatelessWidget {
         ),
         ...children,
       ],
+    );
+  }
+}
+
+/// 고른 줄의 체크입니다. React `Check className="animate-pop-in"`.
+///
+/// 줄이 열릴 때 체크가 0.6배에서 제 크기로 커지며 나타납니다. 목록을 다시 열어도
+/// 체크는 새로 만들어지므로 같은 동작이 한 번 더 보입니다.
+class _PickerCheck extends StatelessWidget {
+  const _PickerCheck({required this.reduceMotion, required this.size, required this.color});
+
+  final bool reduceMotion;
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
+      duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
+      curve: HoronMotion.popInCurve,
+      builder: (BuildContext context, double scale, Widget? child) => Transform.scale(scale: scale, child: child),
+      child: Icon(Icons.check, size: size, color: color),
     );
   }
 }

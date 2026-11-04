@@ -117,6 +117,36 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  testWidgets('tooltip: a long label wraps inside 256px', (WidgetTester tester) async {
+    await pumpTooltip(
+      tester,
+      const HoronTooltip.top(
+        label: '아주 긴 안내 문구가 이어져도 말풍선은 256px을 넘지 않고 여러 줄로 접힙니다 그리고 계속됩니다',
+        child: SizedBox(key: Key('trigger'), width: 40, height: 40),
+      ),
+    );
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: tester.getCenter(find.byKey(const Key('trigger'))));
+    await tester.pumpAndSettle();
+
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronTooltip)));
+    final Finder bubble = find
+        .byWidgetPredicate(
+          (Widget widget) =>
+              widget is DecoratedBox &&
+              widget.decoration is BoxDecoration &&
+              (widget.decoration as BoxDecoration).color == theme.colors.interactivePrimary,
+        )
+        .first;
+    expect(tester.getSize(bubble).width, lessThanOrEqualTo(256), reason: 'max-w-64');
+    final Text label = tester.widget<Text>(find.textContaining('아주 긴 안내 문구'));
+    expect(label.textAlign, TextAlign.center, reason: 'text-balance 대응');
+    expect(tester.getSize(find.textContaining('아주 긴 안내 문구')).height, greaterThan(theme.text.labelSm.fontSize! * 1.5));
+
+    await pointer.removePointer();
+    await tester.pumpAndSettle();
+  });
+
   testWidgets('tooltip: holding on a touch screen opens it without an exception', (WidgetTester tester) async {
     await pumpTooltip(tester, const HoronTooltip.top(label: '길게', child: SizedBox(width: 40, height: 40)));
     final TestGesture hold = await holdOpen(tester);

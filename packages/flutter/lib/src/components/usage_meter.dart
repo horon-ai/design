@@ -95,7 +95,12 @@ class HoronUsageMeter extends StatelessWidget {
                         ),
                         Text(
                           '${value.round()}%',
-                          style: theme.text.labelMd.copyWith(color: theme.colors.textSecondary),
+                          maxLines: 1,
+                          // `tabular-nums` — 자릿수가 같아 값이 바뀌어도 폭이 흔들리지 않습니다.
+                          style: theme.text.labelMd.copyWith(
+                            color: theme.colors.textSecondary,
+                            fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+                          ),
                         ),
                       ],
                     ),

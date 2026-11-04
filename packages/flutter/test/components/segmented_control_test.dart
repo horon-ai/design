@@ -119,6 +119,22 @@ void main() {
     }
   });
 
+  testWidgets('the subtle pill is bg-default in light and overlay-ink-10 in dark', (WidgetTester tester) async {
+    await pumpControl(tester, surface: HoronSegmentedControlSurface.subtle, value: 'a');
+    AnimatedContainer pill() => tester.widget<AnimatedContainer>(
+      find.descendant(of: find.byType(FractionallySizedBox), matching: find.byType(AnimatedContainer)),
+    );
+    expect((pill().decoration! as BoxDecoration).color, themeOf(tester).colors.bgDefault, reason: 'bg-bg-default');
+
+    await pumpControl(tester, surface: HoronSegmentedControlSurface.subtle, value: 'a', brightness: Brightness.dark);
+    await tester.pumpAndSettle();
+    expect(
+      (pill().decoration! as BoxDecoration).color,
+      themeOf(tester).colors.overlayInk10,
+      reason: 'dark:bg-overlay-ink-10',
+    );
+  });
+
   testWidgets('the lg track insets all four sides by 4', (WidgetTester tester) async {
     await pumpControl(tester, size: HoronSegmentedControlSize.lg, value: 'a');
     final Finder trackPadding = find.descendant(

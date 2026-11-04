@@ -190,11 +190,11 @@ class HoronPluginRow extends StatelessWidget {
               Text(
                 version!,
                 maxLines: 1,
-                // font-mono text-label-sm text-text-placeholder
+                // font-mono text-label-sm text-text-secondary
                 style: theme.text.labelSm.copyWith(
                   fontFamily: theme.text.code.fontFamily,
                   fontFamilyFallback: theme.text.code.fontFamilyFallback,
-                  color: theme.colors.textPlaceholder,
+                  color: theme.colors.textSecondary,
                 ),
               ),
             if (updateBadge != null)
@@ -289,13 +289,24 @@ class HoronPluginRow extends StatelessWidget {
       runSpacing: theme.space.s2,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
-        if (onUpdate != null)
-          HoronButton(
-            label: updateLabel,
-            size: HoronButtonSize.sm, // size="sm"
-            icon: const Icon(Icons.arrow_upward, size: 14), // ArrowUp size-3.5
-            onPressed: onUpdate,
+        // `motion-reveal-x` — 업데이트가 생기면 버튼이 가로로 자리를 열며 나타납니다.
+        HoronReveal(
+          axis: Axis.horizontal,
+          collapsed: onUpdate == null,
+          child: IgnorePointer(
+            ignoring: onUpdate == null,
+            child: ExcludeFocus(
+              excluding: onUpdate == null,
+              child: HoronButton(
+                label: updateLabel,
+                variant: HoronButtonVariant.solid, // variant="solid"
+                size: HoronButtonSize.sm, // size="sm"
+                icon: const Icon(Icons.arrow_upward, size: 14), // ArrowUp size-3.5
+                onPressed: onUpdate,
+              ),
+            ),
           ),
+        ),
         _ToggleSwitch(checked: enabled, label: toggleLabel, onChanged: onEnabledChange),
         if (onMenuPressed != null)
           HoronIconButton(

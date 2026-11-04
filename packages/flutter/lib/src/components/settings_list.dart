@@ -4,7 +4,6 @@ import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_surface.dart';
 import '../theme/horon_theme.dart';
-import '../tokens/horon_tokens.g.dart';
 import 'switch.dart';
 
 /// `settings-list.tsx`의 `rounded-2xl`입니다.
@@ -177,7 +176,11 @@ class HoronSettingsSwitch extends StatelessWidget {
   }
 }
 
-/// 설정 행의 키캡 하나입니다. 26px 높이, 6px 반경, neutral-50 바탕에 헤어라인입니다.
+/// 설정 행의 키캡 하나입니다. 26px 높이, 6px 반경, `bg-subtle` 바탕에 헤어라인입니다.
+///
+/// React는 글자를 `text-trim`(`text-box: trim-both cap alphabetic`)으로 감싸 위아래
+/// 빈 공간을 잘라 냅니다. Flutter에는 같은 CSS 속성이 없으므로 글자 줄 높이를
+/// [TextHeightBehavior]로 트림해 같은 자리를 만듭니다.
 class HoronSettingsKey extends StatelessWidget {
   /// 키캡을 만듭니다.
   const HoronSettingsKey({super.key, required this.label});
@@ -188,17 +191,21 @@ class HoronSettingsKey extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final bool isDark = theme.brightness == Brightness.dark;
     return Container(
       height: 26,
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        color: isDark ? HoronPalette.neutral800 : HoronPalette.neutral50,
+        color: theme.colors.bgSubtle, // bg-bg-subtle
         borderRadius: BorderRadius.circular(theme.radius.xs), // rounded-xs
         border: Border.all(color: theme.colors.borderDefault),
       ),
-      child: Text(label, style: theme.text.labelSm.copyWith(color: theme.colors.textPrimary)),
+      child: Text(
+        label,
+        style: theme.text.labelSm.copyWith(color: theme.colors.textPrimary),
+        // `text-trim` — 위아래 빈 공간을 잘라 26px 상자 안에서 글자가 가운데 놓입니다.
+        textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
+      ),
     );
   }
 }

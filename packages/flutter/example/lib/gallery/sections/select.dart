@@ -41,7 +41,9 @@ class HoronSelectGallerySection extends StatelessWidget {
             'Figma `Select`(58:162) 트리거와 `Select list`(88:495) 목록입니다. glass 표면은 '
             '`veil-field`이고, 목록은 모든 표면에서 `veil-overlay`(반경 20, 안쪽 여백 6)를 '
             '씁니다. 행은 40px, 선택 행은 `overlay-ink-6`과 16px 체크입니다. 값 글자는 '
-            '`Input`과 같은 14/16/18 단계이고, 칩은 `label-md` 32px 알약입니다. React의 '
+            '`Input`과 같은 14/16/18 단계이고, 칩은 `label-md` 32px 알약입니다. 불투명 '
+            '표면의 필드는 포인터를 올리면 테두리가 `border-strong`으로 짙어지고, 유리 '
+            '표면은 `veil-field`라 hover 테두리를 그리지 않습니다. React의 '
             '`variant="chip"`은 `export type` 유니온이 아니라서 Flutter에서는 `chip` '
             '불리언으로 받습니다.',
             style: theme.text.bodySm.copyWith(

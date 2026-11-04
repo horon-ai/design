@@ -90,17 +90,35 @@ void main() {
     await drain(tester);
   });
 
-  testWidgets('sidebar and auth lay no tint of their own', (WidgetTester tester) async {
-    for (final HoronFlueVariant variant in <HoronFlueVariant>[HoronFlueVariant.sidebar, HoronFlueVariant.auth]) {
-      await pumpFlue(tester, variant: variant);
-      final HoronThemeData horon = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
+  testWidgets('sidebar veils the light smoke with thick glass and auth lays no tint', (WidgetTester tester) async {
+    // React `bg-glass-thick dark:bg-transparent`: 연기가 유리 채움 위에 그려지므로 사이드바는
+    // 라이트에서 80% 흰 유리를 직접 얹습니다.
+    await pumpFlue(tester, variant: HoronFlueVariant.sidebar);
+    final HoronThemeData sidebarTheme = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == sidebarTheme.colors.glassThick),
+      findsOneWidget,
+      reason: 'sidebar light',
+    );
+    expect(
+      find.byWidgetPredicate(
+        (Widget widget) => widget is ColoredBox && widget.color == sidebarTheme.colors.glassRegular,
+      ),
+      findsNothing,
+      reason: 'sidebar light',
+    );
+    await drain(tester);
+
+    await pumpFlue(tester, variant: HoronFlueVariant.auth);
+    final HoronThemeData authTheme = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
+    for (final Color tint in <Color>[authTheme.colors.glassRegular, authTheme.colors.glassThick]) {
       expect(
-        find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == horon.colors.glassRegular),
+        find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == tint),
         findsNothing,
-        reason: variant.name,
+        reason: 'auth light',
       );
-      await drain(tester);
     }
+    await drain(tester);
   });
 
   testWidgets('dark theme paints the night palette with no light tint', (WidgetTester tester) async {

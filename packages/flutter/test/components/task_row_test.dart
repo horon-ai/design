@@ -100,6 +100,8 @@ void main() {
         botInitial: 'A',
         botName: 'Analyst',
         message: '진행 중',
+        // React도 project가 있어야 Folder 아이콘을 그립니다.
+        project: 'Q3 board',
       ),
     );
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronTaskRow)));

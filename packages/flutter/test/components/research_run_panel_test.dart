@@ -25,6 +25,13 @@ Future<void> pumpPanel(WidgetTester tester, Widget child, {Brightness brightness
 
 HoronThemeData themeOf(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronResearchRunPanel)));
 
+/// `motion-swap`은 두 아이콘을 트리에 남기고 숨은 쪽만 낭독·포커스에서 뺍니다.
+/// 그래서 지금 보이는 아이콘인지 [ExcludeSemantics]로 확인합니다.
+bool swapVisible(WidgetTester tester, IconData icon) {
+  final Finder slot = find.ancestor(of: find.byIcon(icon), matching: find.byType(ExcludeSemantics)).first;
+  return !tester.widget<ExcludeSemantics>(slot).excluding;
+}
+
 Container panelOf(WidgetTester tester) => tester.widget<Container>(
   find.descendant(of: find.byType(HoronResearchRunPanel), matching: find.byType(Container)).first,
 );
@@ -85,8 +92,8 @@ void main() {
     await pumpPanel(tester, const HoronResearchRunPanel(question: 'What changed?', running: false));
 
     expect(find.text('Researching'), findsNothing);
-    expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
-    expect(find.byIcon(Icons.stop), findsNothing);
+    expect(swapVisible(tester, Icons.arrow_upward), isTrue);
+    expect(swapVisible(tester, Icons.stop), isFalse);
     expect(tester.widget<Icon>(find.byIcon(Icons.arrow_upward)).size, 16);
   });
 

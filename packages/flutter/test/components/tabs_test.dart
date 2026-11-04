@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
+import 'package:horon_ui/src/theme/horon_motion.dart';
 
 /// 테마가 적용된 화면에 위젯 하나를 놓습니다.
 Widget _host(Widget child, {Brightness brightness = Brightness.light, double width = 1024}) => MaterialApp(
@@ -165,12 +166,17 @@ void main() {
   });
 
   testWidgets('hover lifts the label colour and adds no background', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(_tabs()));
-    await tester.pump();
-    final HoronThemeData theme = _theme(tester);
+    // 마우스 포인터를 위젯보다 먼저 붙여야 합니다. 테스트는 `FLUTTER_TEST` 아래에서
+    // 기본 플랫폼이 android이고, android의 하이라이트 모드는 마우스가 연결돼 있을
+    // 때만 traditional입니다. `FocusableActionDetector`는 첫 프레임 뒤에 모드를 한 번
+    // 읽으므로, 위젯을 먼저 세우면 touch로 굳어 `onShowHoverHighlight`가 오지 않습니다.
     final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
     await pointer.addPointer(location: Offset.zero);
     addTearDown(pointer.removePointer);
+
+    await tester.pumpWidget(_host(_tabs()));
+    await tester.pump();
+    final HoronThemeData theme = _theme(tester);
 
     BoxDecoration decorationOf(String label) =>
         tester
@@ -206,6 +212,12 @@ void main() {
   testWidgets('variant="underline" drops the tray, the padding and draws a 2px primary bar', (
     WidgetTester tester,
   ) async {
+    // 기본 테스트 창은 800이라 `_host`의 1024 폭이 800으로 잘립니다. React의
+    // `w-full`을 재려면 창 자체를 1024로 넓혀야 합니다.
+    tester.view.physicalSize = const Size(1024, 600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
     await tester.pumpWidget(_host(_tabs(variant: HoronTabsListVariant.underline)));
     await tester.pump();
     final HoronThemeData theme = _theme(tester);
@@ -224,8 +236,11 @@ void main() {
     );
     expect(tab.constraints?.maxHeight, 30, reason: '단계 높이는 그대로입니다');
 
+    // 라이트에서 `textPrimary == interactivePrimary`라 색 술어만으로는 선택 탭의
+    // 카운트 알약까지 잡힙니다. 밑줄은 목록의 표시자 슬롯(`AnimatedPositioned`)
+    // 안에만 있으므로 그 자리로 한정합니다(underline 목록에는 표시자가 하나뿐).
     final Finder bar = find.descendant(
-      of: find.byType(HoronTabsList),
+      of: find.byType(AnimatedPositioned),
       matching: find.byWidgetPredicate(
         (Widget widget) =>
             widget is DecoratedBox && (widget.decoration as BoxDecoration).color == theme.colors.textPrimary,
@@ -249,6 +264,20 @@ void main() {
       findsOneWidget,
       reason: 'border-b border-border-default',
     );
+  });
+
+  testWidgets('the new panel rises 4px from below (animate-swap-move)', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(_tabs()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('멤버 관리'));
+    await tester.pump();
+    final double firstTop = tester.getTopLeft(find.text('멤버 패널')).dy;
+    await tester.pumpAndSettle();
+    final double settledTop = tester.getTopLeft(find.text('멤버 패널')).dy;
+
+    // `swap-move`: translate 0 4px → 0, 불투명도는 바뀌지 않습니다.
+    expect(firstTop - settledTop, closeTo(HoronMotion.swapMoveOffset, 0.5), reason: '4px 상승');
   });
 
   testWidgets('a disabled tab is 40% opaque and does not select', (WidgetTester tester) async {

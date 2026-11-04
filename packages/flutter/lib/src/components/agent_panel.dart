@@ -15,6 +15,15 @@ const double _chipTileRadius = 5;
 /// `agent-panel.tsx`의 `h-7.5`입니다. 칩 높이입니다.
 const double _chipHeight = 30;
 
+/// `agent-panel.tsx`의 `max-h-40`입니다. 작성 상자가 자라는 한계 높이 160입니다.
+const double _composerMaxHeight = 160;
+
+/// `agent-panel.tsx`의 `min-h-5.5`입니다. 작성 상자의 한 줄 높이 22입니다.
+const double _composerLineHeight = 22;
+
+/// 작성 상자가 자랄 수 있는 줄 수입니다. 160을 22로 나눈 몫입니다(7줄).
+const int _composerMaxLines = _composerMaxHeight ~/ _composerLineHeight;
+
 /// Figma `Agent panel`(Agent tasks 112:797): 표면 채움과 24 반경의 단단한 판입니다.
 ///
 /// `agent-panel.tsx`를 옮긴 것입니다. 위쪽에 필터 슬롯을 두고, 아래에 에이전트
@@ -151,15 +160,22 @@ class HoronTaskComposer extends StatefulWidget {
 
 class _HoronTaskComposerState extends State<HoronTaskComposer> {
   late final TextEditingController _controller = TextEditingController(text: widget.initialValue ?? '');
+  final FocusNode _focus = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(() => widget.onValueChange?.call(_controller.text));
+    _focus.addListener(_onFocusChange);
   }
+
+  void _onFocusChange() => setState(() {});
 
   @override
   void dispose() {
+    _focus
+      ..removeListener(_onFocusChange)
+      ..dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -167,7 +183,11 @@ class _HoronTaskComposerState extends State<HoronTaskComposer> {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    return Container(
+    // `focus-within:outline-2 outline-offset-2 outline-text-brand` — 쓰는 동안 상자
+    // 바깥 2px에 브랜드 테두리를 두릅니다.
+    final double ringOffset = theme.space.step(0.5);
+    final bool focused = _focus.hasFocus;
+    final Widget box = Container(
       // `rounded-xl px-4 pt-3.5 pb-2.5`.
       padding: const EdgeInsets.only(left: 16, right: 16, top: 14, bottom: 10),
       decoration: BoxDecoration(color: theme.colors.overlayInk4, borderRadius: BorderRadius.circular(theme.radius.xl)),
@@ -178,8 +198,11 @@ class _HoronTaskComposerState extends State<HoronTaskComposer> {
         children: <Widget>[
           TextField(
             controller: _controller,
+            focusNode: _focus,
             minLines: 1,
-            maxLines: 4,
+            // `field-sizing-content max-h-40 min-h-5.5` — 내용만큼 자라고 160px에서
+            // 멈춥니다. bodySm의 줄 높이가 22라서 7줄이 160 안에 들어갑니다.
+            maxLines: _composerMaxLines,
             style: theme.text.bodySm.copyWith(color: theme.colors.textPrimary),
             decoration: InputDecoration(
               isCollapsed: true,
@@ -218,6 +241,28 @@ class _HoronTaskComposerState extends State<HoronTaskComposer> {
           ),
         ],
       ),
+    );
+
+    if (!focused) return box;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        box,
+        Positioned(
+          left: -ringOffset,
+          top: -ringOffset,
+          right: -ringOffset,
+          bottom: -ringOffset,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(theme.radius.xl + ringOffset),
+                border: Border.all(color: theme.colors.textBrand, width: 2),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

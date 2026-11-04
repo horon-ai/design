@@ -23,8 +23,17 @@ Widget _host(Brightness brightness, Widget child, {double width = 600}) {
   );
 }
 
-Key? _visibleButtonKey(WidgetTester tester) =>
-    tester.widget<AnimatedSwitcher>(find.byType(AnimatedSwitcher)).child?.key;
+Key? _visibleButtonKey(WidgetTester tester) => _liveIcon(tester, Icons.arrow_upward)
+    ? const ValueKey<String>('horon-composer-send')
+    : const ValueKey<String>('horon-composer-voice');
+
+/// [icon]을 그린 버튼이 지금 눌리는지 여부입니다. `HoronSwap`은 숨은 쪽을
+/// `IgnorePointer`로 감싸 두므로(React `inert`), 가장 가까운 `IgnorePointer`의
+/// `ignoring`으로 지금 보이는 쪽을 가릅니다.
+bool _liveIcon(WidgetTester tester, IconData icon) {
+  final Finder ignore = find.ancestor(of: find.byIcon(icon), matching: find.byType(IgnorePointer)).first;
+  return !tester.widget<IgnorePointer>(ignore).ignoring;
+}
 
 void main() {
   final HoronColors colors = HoronThemeData.light.colors;
@@ -36,7 +45,9 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.byIcon(Icons.add), findsOneWidget);
       expect(find.byIcon(Icons.mic_none), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_upward), findsNothing);
+      // React `motion-swap`은 두 버튼을 모두 트리에 두고 숨은 쪽만 막습니다.
+      expect(_liveIcon(tester, Icons.mic_none), isTrue);
+      expect(_liveIcon(tester, Icons.arrow_upward), isFalse);
     }
   });
 
@@ -51,7 +62,7 @@ void main() {
 
     final Icon attach = tester.widget<Icon>(find.byIcon(Icons.add));
     expect(attach.size, 20);
-    expect(attach.color, colors.textPrimary);
+    expect(attach.color, colors.textSecondary); // Plus className="text-text-secondary"
     final Icon voice = tester.widget<Icon>(find.byIcon(Icons.mic_none));
     expect(voice.size, 20);
     expect(voice.color, colors.textSecondary);
@@ -66,6 +77,27 @@ void main() {
     expect(field.decoration!.hintText, 'Message to bot');
     expect(field.decoration!.hintStyle!.fontSize, 16);
     expect(field.decoration!.hintStyle!.color, colors.textPlaceholder);
+  });
+
+  testWidgets('입력칸이 포커스를 받으면 solid 알약 테두리가 border-strong이 된다', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(Brightness.light, const HoronComposer()));
+
+    BoxDecoration surface() =>
+        tester
+                .widget<AnimatedContainer>(
+                  find
+                      .descendant(of: find.byKey(const Key('horon-composer')), matching: find.byType(AnimatedContainer))
+                      .first,
+                )
+                .decoration!
+            as BoxDecoration;
+
+    expect((surface().border! as Border).top.color, colors.borderDefault);
+
+    // has-[input:focus-visible]:border-border-strong
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    expect((surface().border! as Border).top.color, colors.borderStrong);
   });
 
   testWidgets('글이 생기면 음성 버튼이 전송 버튼으로 바뀐다', (WidgetTester tester) async {

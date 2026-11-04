@@ -69,6 +69,12 @@ void main() {
     expect(find.text('140%'), findsOneWidget);
   });
 
+  testWidgets('usage meter: the percent uses tabular figures', (WidgetTester tester) async {
+    await pumpMeter(tester, const HoronUsageMeter(label: 'Tasks', value: 64));
+    final Text percent = tester.widget<Text>(find.text('64%'));
+    expect(percent.style?.fontFeatures, contains(const FontFeature.tabularFigures()));
+  });
+
   testWidgets('usage meter: both brightnesses render', (WidgetTester tester) async {
     for (final Brightness brightness in Brightness.values) {
       await pumpMeter(tester, const HoronUsageMeter(label: 'Tasks', value: 50), brightness: brightness);

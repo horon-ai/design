@@ -279,8 +279,8 @@ class HoronBotSummary {
 ///
 /// 24px 반경 표면에 봇 머리말, Instructions / Example 탭, `{{변수}}` 칩이 섞인 지시문,
 /// 그리고 시험 실행 블록을 담습니다. React의 세 버튼(버전 알약, 봇 알약, Run)은 실제
-/// 콜백이 있는 자리이므로 [onVersionTap]·[onBotTap]·[onRun]으로 받습니다. 콜백이 없으면
-/// 같은 모양을 그대로 두고 눌림만 없앱니다.
+/// 콜백이 있는 자리이므로 [onVersionClick]·[onBotClick]·[onRun]으로 받습니다. 콜백이
+/// 없으면 같은 모양을 그대로 두고 캐럿과 눌림만 없앱니다(React `onVersionClick`).
 class HoronBotInstructionsPanel extends StatefulWidget {
   /// 패널을 만듭니다.
   const HoronBotInstructionsPanel({
@@ -297,8 +297,8 @@ class HoronBotInstructionsPanel extends StatefulWidget {
     this.defaultScenario,
     this.onRun,
     this.output,
-    this.onVersionTap,
-    this.onBotTap,
+    this.onVersionClick,
+    this.onBotClick,
   });
 
   /// 머리말 제목입니다.
@@ -337,11 +337,13 @@ class HoronBotInstructionsPanel extends StatefulWidget {
   /// 마지막 실행의 출력입니다.
   final Widget? output;
 
-  /// 버전 알약을 눌렀을 때 부릅니다.
-  final VoidCallback? onVersionTap;
+  /// 버전 알약을 눌렀을 때 부릅니다. React `onVersionClick`과 같습니다. 넘기지 않으면
+  /// 알약은 캐럿 없는 라벨이 됩니다.
+  final VoidCallback? onVersionClick;
 
-  /// 봇 알약을 눌렀을 때 부릅니다.
-  final VoidCallback? onBotTap;
+  /// 봇 알약을 눌렀을 때 부릅니다. React `onBotClick`과 같습니다. 넘기지 않으면
+  /// 알약은 캐럿 없는 라벨이 됩니다.
+  final VoidCallback? onBotClick;
 
   @override
   State<HoronBotInstructionsPanel> createState() => _HoronBotInstructionsPanelState();
@@ -388,27 +390,35 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
               const _PanelDivider(),
               _body(theme, space, colors),
               if (showVariables) ...<Widget>[const _PanelDivider(), _testBlock(theme, space, colors)],
-              if (widget.output != null)
-                // `key={runCount}` + `motion-rise` — 실행할 때마다 출력이 다시 올라옵니다.
-                KeyedSubtree(
-                  key: ValueKey<int>(_runCount),
-                  child: _Rise(
-                    child: Container(
-                      width: double.infinity,
-                      color: colors.overlayInk3, // bg-overlay-ink-3
-                      padding: EdgeInsets.fromLTRB(
-                        space.s5, // px-5 = 20
-                        space.s3_5, // pt-3.5 = 14
-                        space.s5, // px-5 = 20
-                        space.s4, // pb-4 = 16
-                      ),
-                      child: DefaultTextStyle.merge(
-                        style: theme.text.bodySm.copyWith(color: colors.textSecondary),
-                        child: widget.output!,
-                      ),
-                    ),
-                  ),
+              // `motion-reveal` — 출력이 없으면 이 자리가 높이 0으로 접힙니다.
+              HoronReveal(
+                collapsed: widget.output == null,
+                child: ExcludeFocus(
+                  excluding: widget.output == null,
+                  child: widget.output == null
+                      ? const SizedBox(width: double.infinity)
+                      // `key={runCount}` + `motion-rise` — 실행할 때마다 출력이 다시 올라옵니다.
+                      : KeyedSubtree(
+                          key: ValueKey<int>(_runCount),
+                          child: _Rise(
+                            child: Container(
+                              width: double.infinity,
+                              color: colors.overlayInk3, // bg-overlay-ink-3
+                              padding: EdgeInsets.fromLTRB(
+                                space.s5, // px-5 = 20
+                                space.s3_5, // pt-3.5 = 14
+                                space.s5, // px-5 = 20
+                                space.s4, // pb-4 = 16
+                              ),
+                              child: DefaultTextStyle.merge(
+                                style: theme.text.bodySm.copyWith(color: colors.textSecondary),
+                                child: widget.output!,
+                              ),
+                            ),
+                          ),
+                        ),
                 ),
+              ),
             ],
           ),
         ),
@@ -465,7 +475,7 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
     final String version = widget.version!;
     final String? status = widget.versionStatus;
     return _PressSurface(
-      onTap: widget.onVersionTap,
+      onTap: widget.onVersionClick,
       radius: theme.radius.full,
       height: space.step(7.5), // h-7.5 = 30
       padding: EdgeInsets.symmetric(horizontal: space.s2_5), // px-2.5 = 10
@@ -477,15 +487,13 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
         children: <Widget>[
           Text(version, maxLines: 1, style: theme.text.labelSm.copyWith(color: colors.textPrimary)),
           if (status != null) ...<Widget>[
-            Container(
-              width: space.s1_5, // size-1.5 = 6
-              height: space.s1_5,
-              decoration: BoxDecoration(color: HoronPalette.sky500, shape: BoxShape.circle), // bg-sky-500
-            ),
+            // `size-1.5 animate-live-pulse rounded-full bg-status-live` — 라이브 점이
+            // 2초마다 고리를 그립니다.
+            _PulseDot(size: space.s1_5, color: colors.statusLive),
             Text(status, maxLines: 1, style: theme.text.labelSm.copyWith(color: colors.textSecondary)),
           ],
           // 처리기가 없으면 React처럼 캐럿 없는 라벨입니다.
-          if (widget.onVersionTap != null)
+          if (widget.onVersionClick != null)
             Icon(Icons.expand_more, size: _caretSize, color: colors.textSecondary), // CaretDown size-3
         ],
       ),
@@ -497,7 +505,7 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: space.step(45)), // 이름이 길어도 머리말을 넘지 않습니다.
       child: _PressSurface(
-        onTap: widget.onBotTap,
+        onTap: widget.onBotClick,
         radius: theme.radius.full,
         height: space.step(7.5),
         padding: EdgeInsets.only(left: space.s1_5, right: space.s2_5),
@@ -526,7 +534,7 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
               ),
             ),
             // 처리기가 없으면 React처럼 캐럿 없는 라벨입니다.
-            if (widget.onBotTap != null) Icon(Icons.expand_more, size: _caretSize, color: colors.textSecondary),
+            if (widget.onBotClick != null) Icon(Icons.expand_more, size: _caretSize, color: colors.textSecondary),
           ],
         ),
       ),
@@ -827,6 +835,67 @@ class _PartText extends StatelessWidget {
 }
 
 /// `Divider` — `h-px self-stretch bg-overlay-ink-8`입니다.
+/// `size-1.5 animate-live-pulse rounded-full bg-status-live` 라이브 점입니다.
+///
+/// React는 `live-pulse` 키프레임으로 2초마다 점 둘레에 옅은 고리를 그립니다. Flutter는
+/// 점 바깥에 퍼지는 원을 [BoxShadow]로 그려 같은 그림을 만듭니다.
+class _PulseDot extends StatefulWidget {
+  const _PulseDot({required this.size, required this.color});
+
+  final double size;
+  final Color color;
+
+  @override
+  State<_PulseDot> createState() => _PulseDotState();
+}
+
+class _PulseDotState extends State<_PulseDot> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(vsync: this, duration: HoronMotion.livePulseDuration);
+
+  @override
+  void initState() {
+    super.initState();
+    _pulse.repeat();
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget dot = SizedBox(
+      width: widget.size,
+      height: widget.size,
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: widget.color, shape: BoxShape.circle),
+      ),
+    );
+    if (MediaQuery.disableAnimationsOf(context)) return dot;
+    return AnimatedBuilder(
+      animation: _pulse,
+      builder: (BuildContext context, Widget? child) {
+        final double t = HoronMotion.livePulseCurve.transform(_pulse.value);
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: widget.color.withValues(alpha: 0.45 * (1 - t)),
+                spreadRadius: 4 * t,
+              ),
+            ],
+          ),
+          child: child,
+        );
+      },
+      child: dot,
+    );
+  }
+}
+
 class _PanelDivider extends StatelessWidget {
   const _PanelDivider();
 

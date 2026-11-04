@@ -517,7 +517,25 @@ class HoronDataTableHead extends StatelessWidget {
             child: child,
           ),
         ),
-        if (sortable) _SortCaret(ascending: ascending, descending: descending, colors: colors),
+        if (sortable)
+          // `key={sorted || "none"}` + `animate-fade-in` — 방향이 바뀔 때마다 화살표가
+          // 새로 나타납니다.
+          AnimatedSwitcher(
+            duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.fadeInDuration,
+            switchInCurve: HoronMotion.fadeInCurve,
+            child: _SortCaret(
+              key: ValueKey<String>(
+                ascending
+                    ? 'asc'
+                    : descending
+                    ? 'desc'
+                    : 'none',
+              ),
+              ascending: ascending,
+              descending: descending,
+              colors: colors,
+            ),
+          ),
       ],
     );
 
@@ -530,18 +548,25 @@ class HoronDataTableHead extends StatelessWidget {
 
 /// Figma `Data table`의 본문 행입니다.
 ///
-/// 높이 52px, 아래 테두리, 포인터가 있으면 `hover:bg-overlay-ink-3`가 깔립니다.
+/// 높이 52px, 아래 테두리, 포인터가 있으면 `hover:bg-overlay-ink-4`가 깔립니다.
+/// 선택된 행은 `overlay-ink-4`를 유지하고 hover에서 `overlay-ink-6`으로 짙어집니다.
 /// [cells]의 각 항목은 행 안에서 폭을 나눠야 하므로 [HoronDataTableCell]처럼
 /// `Expanded`로 감싼 위젯을 넘깁니다.
+///
+/// [revealIndex]가 있으면 `motion-rise`로 30ms씩 늦게 나타납니다(React의
+/// `animation-delay: calc(var(--i) * 30ms)`).
 class HoronDataTableRow extends StatefulWidget {
   /// 행을 만듭니다.
-  const HoronDataTableRow({super.key, required this.cells, this.selected = false});
+  const HoronDataTableRow({super.key, required this.cells, this.selected = false, this.revealIndex});
 
   /// 행의 셀입니다.
   final List<Widget> cells;
 
-  /// 선택된 행인지 여부입니다. 접근성 상태로만 쓰입니다.
+  /// 선택된 행인지 여부입니다. 접근성 상태로 함께 쓰입니다.
   final bool selected;
+
+  /// 입장 지연을 정하는 행 순번입니다. React `--i`입니다. 없으면 바로 그립니다.
+  final int? revealIndex;
 
   @override
   State<HoronDataTableRow> createState() => _HoronDataTableRowState();
@@ -557,8 +582,14 @@ class _HoronDataTableRowState extends State<HoronDataTableRow> {
     final HoronSpaceSpec space = theme.space;
     final double gutter = _gutterFor(_DataTableDeviceScope.of(context), space);
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final Color fill = _hovered
+        ? (widget.selected ? colors.overlayInk6 : colors.overlayInk4) // hover:bg-overlay-ink-4 / 선택 hover ink-6
+        : widget.selected
+        ? colors
+              .overlayInk4 // data-selected:[&>td]:bg-overlay-ink-4
+        : Colors.transparent;
 
-    return Semantics(
+    final Widget row = Semantics(
       selected: widget.selected,
       child: MouseRegion(
         onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
@@ -569,12 +600,75 @@ class _HoronDataTableRowState extends State<HoronDataTableRow> {
           height: _rowHeight, // h-13
           padding: EdgeInsets.symmetric(horizontal: gutter), // first:pl-6 last:pr-6
           decoration: BoxDecoration(
-            color: _hovered ? colors.overlayInk3 : Colors.transparent, // hover:bg-overlay-ink-3
+            color: fill,
             border: Border(bottom: BorderSide(color: colors.borderDefault)), // border-b
           ),
           child: Row(spacing: _cellGap, children: widget.cells),
         ),
       ),
+    );
+
+    final int? index = widget.revealIndex;
+    if (index == null) return row;
+    return _RiseRow(index: index, child: row);
+  }
+}
+
+/// `motion-rise` + `animation-delay: calc(var(--i) * 30ms)` — 행이 아래에서 4px 올라오며
+/// 차례로 나타납니다. 부모가 행 key에 페이지·정렬을 넣어 주면 상태가 새로 만들어지며 다시
+/// 재생됩니다.
+class _RiseRow extends StatefulWidget {
+  const _RiseRow({required this.index, required this.child});
+
+  final int index;
+  final Widget child;
+
+  @override
+  State<_RiseRow> createState() => _RiseRowState();
+}
+
+class _RiseRowState extends State<_RiseRow> with SingleTickerProviderStateMixin {
+  /// 지연은 별도 타이머 대신 컨트롤러 길이에 접어 넣습니다. 타이머·커브 상수 없이
+  /// `animation-delay`와 같은 순서를 만들고, 위젯이 사라질 때 함께 정리됩니다.
+  static const Duration _stagger = Duration(milliseconds: 30);
+
+  late final Duration _delay = _stagger * widget.index;
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: _delay + HoronMotion.riseDuration,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Animation<double> _progress() {
+    final double total = (_delay + HoronMotion.riseDuration).inMicroseconds.toDouble();
+    final double start = total == 0 ? 0 : _delay.inMicroseconds / total;
+    return _controller.drive(CurveTween(curve: Interval(start, 1, curve: HoronMotion.riseCurve)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return widget.child;
+    final Animation<double> t = _progress();
+    return AnimatedBuilder(
+      animation: t,
+      builder: (BuildContext context, Widget? child) {
+        return Opacity(
+          opacity: t.value,
+          child: Transform.translate(offset: Offset(0, HoronMotion.riseOffset * (1 - t.value)), child: child),
+        );
+      },
+      child: widget.child,
     );
   }
 }
@@ -866,7 +960,14 @@ class HoronDataTableView<T> extends StatelessWidget {
                 children: <Widget>[
                   for (int index = 0; index < rows.length; index++)
                     HoronDataTableRow(
+                      // React는 행 key에 페이지·정렬을 넣어 바뀔 때마다 다시 나타나게 합니다.
+                      key: ValueKey<String>(
+                        '${controller.page}:'
+                        '${controller.sort.columnId ?? ''}${controller.sort.ascending ? 'a' : 'd'}:'
+                        '$index',
+                      ),
                       selected: controller.selected.contains(rows[index]),
+                      revealIndex: index,
                       cells: <Widget>[
                         if (selectColumn != null)
                           SizedBox(
@@ -1151,7 +1252,7 @@ class _SortButtonState extends State<_SortButton> {
 
 /// 정렬 방향 화살표입니다. React `CaretUp`·`CaretDown`·`CaretUpDown`의 자리입니다.
 class _SortCaret extends StatelessWidget {
-  const _SortCaret({required this.ascending, required this.descending, required this.colors});
+  const _SortCaret({super.key, required this.ascending, required this.descending, required this.colors});
 
   final bool ascending;
   final bool descending;

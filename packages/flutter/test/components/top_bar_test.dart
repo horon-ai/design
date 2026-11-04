@@ -31,10 +31,13 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      _host(const HoronTopBar(title: '연구 도우미', subtitle: '3개 도구 사용 중', surface: HoronSurface.glass)),
+      _host(
+        HoronTopBar(title: '연구 도우미', subtitle: '3개 도구 사용 중', surface: HoronSurface.glass, onBack: () {}, onMore: () {}),
+      ),
     );
     final HoronThemeData theme = _theme(tester);
 
+    // React는 두 아이콘 버튼이 있을 때만 행이 40px이 되어 알약이 56px입니다.
     expect(tester.getSize(find.byType(HoronTopBar)).height, theme.space.step(14), reason: 'p-2 + h-10 = 56');
     final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
     expect(glass.tier, HoronGlassTier.regular);
@@ -66,10 +69,16 @@ void main() {
     expect(subtitle.style?.color, theme.colors.textSecondary);
   });
 
-  testWidgets('back and more are labelled buttons that call back', (WidgetTester tester) async {
+  testWidgets('back and more are labelled buttons that call back, and appear only when given', (
+    WidgetTester tester,
+  ) async {
     final SemanticsHandle handle = tester.ensureSemantics();
     int backs = 0;
     int mores = 0;
+    await tester.pumpWidget(_host(const HoronTopBar(title: '연구 도우미')));
+    expect(find.bySemanticsLabel('Back'), findsNothing, reason: 'onBack이 없으면 뒤로 버튼도 없습니다');
+    expect(find.bySemanticsLabel('More'), findsNothing, reason: 'onMore가 없으면 더 보기 버튼도 없습니다');
+
     await tester.pumpWidget(_host(HoronTopBar(title: '연구 도우미', onBack: () => backs += 1, onMore: () => mores += 1)));
 
     expect(find.bySemanticsLabel('Back'), findsOneWidget);
@@ -83,6 +92,30 @@ void main() {
     expect(backs, 1);
     expect(mores, 1);
     handle.dispose();
+  });
+
+  testWidgets('a title change replays the 160ms fade', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(const HoronTopBar(title: '연구 도우미')));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<Opacity>(find.ancestor(of: find.text('연구 도우미'), matching: find.byType(Opacity)).first).opacity,
+      1,
+    );
+
+    await tester.pumpWidget(_host(const HoronTopBar(title: '문서 추출')));
+    await tester.pump();
+    expect(
+      tester.widget<Opacity>(find.ancestor(of: find.text('문서 추출'), matching: find.byType(Opacity)).first).opacity,
+      0,
+      reason: 'animate-fade-in은 0에서 시작합니다',
+    );
+
+    await tester.pump(const Duration(milliseconds: 160));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<Opacity>(find.ancestor(of: find.text('문서 추출'), matching: find.byType(Opacity)).first).opacity,
+      1,
+    );
   });
 
   testWidgets('live draws a 9px status dot on the avatar corner', (WidgetTester tester) async {

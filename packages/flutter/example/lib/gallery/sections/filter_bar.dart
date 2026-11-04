@@ -7,7 +7,7 @@ import 'package:horon_ui/horon_ui.dart';
 /// Filter Bar 갤러리 섹션입니다.
 ///
 /// 개수가 붙은 필터와 글자만 있는 필터를 나란히 놓습니다. 옵션을 누르면 10% 잉크
-/// 표시자가 그 자리로 옮겨 갑니다.
+/// 표시자가 그 자리로 옮겨 가고, 선택되지 않은 옵션은 hover에서 5% 잉크를 깝니다.
 class HoronFilterBarGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronFilterBarGallerySection({super.key});

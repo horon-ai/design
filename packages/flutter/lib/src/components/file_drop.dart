@@ -19,8 +19,10 @@ enum HoronFileDropSurface {
 /// 파일을 끌어다 놓거나 눌러서 고르는 영역입니다.
 ///
 /// React `FileDrop`: 1.5px 점선 테두리의 둥근 상자에 16px 아이콘과 `label-md` 라벨을
-/// 가운데로 놓습니다. 끌어오는 동안 점선이 1px 브랜드 테두리로 바뀌고,
-/// 거부된 파일은 위험 테두리로 바뀝니다. 흔들림이나 튀는 움직임은 없습니다.
+/// 가운데로 놓습니다. 테두리 모양은 `border-style` 전환이 안 되므로 점선 그대로 두고,
+/// 끌어오는 동안 브랜드 1px 안쪽 링을 더합니다. 거부된 파일은 위험 테두리와 위험
+/// 글자, 위험 안쪽 링을 씁니다. 업로드 중에는 라벨만 60%로 낮추고 상자는 흐리지
+/// 않습니다(비활성만 40%).
 ///
 /// React는 `<input type="file">`을 품은 `<label>`이라 클릭이 곧 파일 선택입니다. Flutter에는
 /// 브라우저의 파일 선택 창이 없으므로 선택은 [onTap]으로 호스트에 넘기고, 끌어다 놓기는
@@ -78,8 +80,14 @@ class HoronFileDrop extends StatefulWidget {
   /// `size-4` — 아이콘과 진행 표시의 크기입니다.
   static const double _iconSize = 16;
 
-  /// `opacity-40` — 비활성이거나 업로드 중일 때의 불투명도입니다.
+  /// `opacity-40` — 비활성 상태의 불투명도입니다.
   static const double _disabledOpacity = 0.4;
+
+  /// 업로드 중 라벨의 `opacity-60`입니다.
+  static const double _uploadingLabelOpacity = 0.6;
+
+  /// `shadow-[inset_0_0_0_1px_...]` — 끌어오기·거부 상태의 안쪽 링 두께입니다.
+  static const double _insetRingWidth = 1;
 
   /// Spinner의 `stroke-width="11"`(viewBox 100 기준)을 옮긴 선 두께 비율입니다.
   static const double _spinnerStrokeFraction = 0.11;
@@ -101,24 +109,34 @@ class _HoronFileDropState extends State<HoronFileDrop> {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
+    // uploading은 라벨 불투명도만 낮추고 상자는 그대로 둡니다. 누르기와 끌어오기는
+    // 업로드 중에도 막습니다(React는 `uploading`에서 포인터를 받지 않습니다).
     final bool inactive = widget.disabled || widget.uploading;
 
-    // `data-dragging:border-solid border-border-brand`와
-    // `data-rejected:border-solid border-border-danger`. 둘 다 켜지면 React의 규칙 순서대로
-    // 거부가 이깁니다. 채움은 표면이 정합니다: solid는 `bg-surface`, 끌어오는 동안
-    // `bg-subtle`, glass는 `.veil-drop`입니다.
+    // 테두리 모양은 `border-style` 전환이 되지 않으므로 점선을 유지하고, 끌어오기·거부는
+    // `shadow-[inset_0_0_0_1px_...]` 안쪽 링과 색으로 알립니다. 둘 다 켜지면 React의
+    // 규칙 순서대로 거부가 이깁니다. 채움은 표면이 정합니다: solid는 `bg-surface`,
+    // 끌어오는 동안 `bg-subtle`, glass는 `.veil-drop`입니다.
     final bool isGlass = widget.surface == HoronFileDropSurface.glass;
     final Color fill = _dragging ? colors.bgSubtle : colors.bgSurface;
-    final (Color borderColor, bool solid) = widget.rejected
-        ? (colors.borderDanger, true)
+    final Color borderColor = widget.rejected
+        ? colors.borderDanger
         : _dragging
-        ? (colors.borderBrand, true)
-        : (colors.borderDashed, false);
+        ? colors.borderBrand
+        : colors.borderDashed;
+    // 거부는 글자도 `text-danger`가 됩니다.
+    final Color labelColor = widget.rejected ? colors.textDanger : colors.textSecondary;
     final String borderState = widget.rejected
         ? 'rejected'
         : _dragging
         ? 'dragging'
         : 'idle';
+    // 점선은 그대로 두고, 끌어오기·거부에는 안쪽 1px 링을 더합니다(CSS inset shadow).
+    final Color? borderInset = widget.rejected
+        ? colors.borderDanger
+        : _dragging
+        ? colors.textBrand
+        : null;
 
     final BorderRadius radius = BorderRadius.circular(HoronFileDrop._radius);
     final Widget content = Padding(
@@ -132,10 +150,13 @@ class _HoronFileDropState extends State<HoronFileDrop> {
             Icon(Icons.file_upload_outlined, size: HoronFileDrop._iconSize, color: colors.textSecondary),
           SizedBox(width: space.s2),
           Flexible(
-            child: Text(
-              widget.label,
-              textAlign: TextAlign.center,
-              style: theme.text.labelMd.copyWith(color: colors.textSecondary),
+            child: Opacity(
+              opacity: widget.uploading ? HoronFileDrop._uploadingLabelOpacity : 1,
+              child: Text(
+                widget.label,
+                textAlign: TextAlign.center,
+                style: theme.text.labelMd.copyWith(color: labelColor),
+              ),
             ),
           ),
         ],
@@ -159,17 +180,22 @@ class _HoronFileDropState extends State<HoronFileDrop> {
             : HoronFileDrop._maxWidth;
         return SizedBox(
           width: width,
+          // React는 비활성일 때만 상자를 `opacity-40`으로 흐립니다. 업로드 중에는
+          // 라벨만 60%이고 상자·테두리는 그대로입니다.
           child: Opacity(
-            opacity: inactive ? HoronFileDrop._disabledOpacity : 1,
+            opacity: widget.disabled ? HoronFileDrop._disabledOpacity : 1,
             child: MouseRegion(
-              cursor: inactive ? SystemMouseCursors.basic : SystemMouseCursors.click,
+              cursor: widget.disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
               child: Semantics(
                 button: true,
                 enabled: !inactive,
                 label: widget.label,
                 child: DragTarget<Object>(
-                  onWillAcceptWithDetails: (DragTargetDetails<Object> details) => !inactive,
-                  onMove: (DragTargetDetails<Object> details) => _setDragging(true),
+                  // React는 비활성일 때만 끌어오기 강조를 막습니다(업로드 중에도 강조는 뜹니다).
+                  onWillAcceptWithDetails: (DragTargetDetails<Object> details) => !widget.disabled,
+                  onMove: (DragTargetDetails<Object> details) {
+                    if (!widget.disabled) _setDragging(true);
+                  },
                   onLeave: (Object? data) => _setDragging(false),
                   onAcceptWithDetails: (DragTargetDetails<Object> details) {
                     _setDragging(false);
@@ -181,7 +207,7 @@ class _HoronFileDropState extends State<HoronFileDrop> {
                       onTap: inactive ? null : widget.onTap,
                       child: CustomPaint(
                         key: ValueKey<String>('horon-file-drop-border-$borderState'),
-                        painter: _DropBorderPainter(color: borderColor, dashed: !solid),
+                        painter: _DropBorderPainter(color: borderColor, inset: borderInset),
                         child: body,
                       ),
                     );
@@ -196,29 +222,27 @@ class _HoronFileDropState extends State<HoronFileDrop> {
   }
 }
 
-/// 테두리 한 겹을 그립니다. React의 `border-dashed`는 Flutter에 없어 직접 그립니다.
+/// 점선 테두리 한 겹을 그립니다. React의 `border-dashed`는 Flutter에 없어 직접 그립니다.
+///
+/// [inset]이 있으면 그 색으로 안쪽 1px 링을 한 겹 더 그립니다. CSS의
+/// `shadow-[inset_0_0_0_1px_...]`처럼 테두리 안쪽에만 칠합니다.
 class _DropBorderPainter extends CustomPainter {
-  const _DropBorderPainter({required this.color, required this.dashed});
+  const _DropBorderPainter({required this.color, this.inset});
 
   final Color color;
-  final bool dashed;
+  final Color? inset;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final double inset = HoronFileDrop._strokeWidth / 2;
+    final double edge = HoronFileDrop._strokeWidth / 2;
     final RRect rrect = RRect.fromRectAndRadius(
-      (Offset.zero & size).deflate(inset),
+      (Offset.zero & size).deflate(edge),
       const Radius.circular(HoronFileDrop._radius),
     );
     final Paint paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = HoronFileDrop._strokeWidth
       ..color = color;
-
-    if (!dashed) {
-      canvas.drawRRect(rrect, paint);
-      return;
-    }
 
     final Path path = Path()..addRRect(rrect);
     for (final PathMetric metric in path.computeMetrics()) {
@@ -229,10 +253,23 @@ class _DropBorderPainter extends CustomPainter {
         distance = end + HoronFileDrop._dashGap;
       }
     }
+
+    final Color? ring = inset;
+    if (ring == null) return;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        (Offset.zero & size).deflate(HoronFileDrop._strokeWidth + HoronFileDrop._insetRingWidth / 2),
+        Radius.circular(HoronFileDrop._radius - HoronFileDrop._strokeWidth),
+      ),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = HoronFileDrop._insetRingWidth
+        ..color = ring,
+    );
   }
 
   @override
-  bool shouldRepaint(_DropBorderPainter oldDelegate) => oldDelegate.color != color || oldDelegate.dashed != dashed;
+  bool shouldRepaint(_DropBorderPainter oldDelegate) => oldDelegate.color != color || oldDelegate.inset != inset;
 }
 
 /// 업로드 중 표시입니다. React `Spinner`의 10% 잉크 고리와 11% 두께를 옮겼습니다.

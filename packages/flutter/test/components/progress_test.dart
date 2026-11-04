@@ -50,6 +50,34 @@ void main() {
     expect(fill.widthFactor, closeTo(0.25, 0.001));
   });
 
+  testWidgets('progress: an omitted value sweeps a third-width bar', (WidgetTester tester) async {
+    // 불확정 막대는 끝없이 도므로 pumpAndSettle 대신 프레임을 직접 넘깁니다.
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: const Scaffold(body: Center(child: HoronProgress())),
+      ),
+    );
+    await tester.pump();
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronProgress)));
+
+    // `data-indeterminate:w-1/3` — 채움은 트랙의 3분의 1입니다.
+    final FractionallySizedBox fill = tester.widget<FractionallySizedBox>(find.byType(FractionallySizedBox));
+    expect(fill.widthFactor, closeTo(1 / 3, 0.001));
+    final ColoredBox box = tester.widget<ColoredBox>(
+      find.descendant(of: find.byType(HoronProgress), matching: find.byType(ColoredBox)).last,
+    );
+    expect(box.color, theme.colors.interactivePrimary);
+
+    // `sweep` — 1.4초 동안 왼쪽 바깥에서 오른쪽 바깥으로 흐릅니다.
+    // MaterialApp의 화면 전환도 FractionalTranslation을 쓰므로 트리 안으로 좁힙니다.
+    final Finder sweep = find.descendant(of: find.byType(HoronProgress), matching: find.byType(FractionalTranslation));
+    final FractionalTranslation before = tester.widget<FractionalTranslation>(sweep);
+    await tester.pump(const Duration(milliseconds: 700));
+    final FractionalTranslation after = tester.widget<FractionalTranslation>(sweep);
+    expect(after.translation.dx, greaterThan(before.translation.dx));
+  });
+
   testWidgets('progress: both brightnesses render', (WidgetTester tester) async {
     for (final Brightness brightness in Brightness.values) {
       await pumpProgress(tester, const HoronProgress(value: 0.6), brightness: brightness);

@@ -220,6 +220,7 @@ class HoronDocumentExtractPanel extends StatefulWidget {
     this.bot,
     this.onExtract,
     this.onAcceptAll,
+    this.onOpenFile,
   });
 
   /// 뷰어 머리말의 파일 이름입니다.
@@ -245,6 +246,9 @@ class HoronDocumentExtractPanel extends StatefulWidget {
 
   /// `Accept all`을 눌렀을 때 부릅니다.
   final VoidCallback? onAcceptAll;
+
+  /// 파일 이름을 누를 수 있게 만듭니다. 없으면 이름은 그냥 라벨입니다. React `onOpenFile`.
+  final VoidCallback? onOpenFile;
 
   @override
   State<HoronDocumentExtractPanel> createState() => _HoronDocumentExtractPanelState();
@@ -373,22 +377,38 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
                   ),
                   SizedBox(width: space.s2),
                   Expanded(
-                    child: Row(
-                      children: <Widget>[
-                        Flexible(
-                          child: Text(
-                            widget.fileName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis, // truncate
-                            style: theme.text.labelMd.copyWith(color: colors.textPrimary),
-                          ),
-                        ),
-                        Icon(
-                          Icons.expand_more,
-                          size: _smallIconSize,
-                          color: colors.textSecondary,
-                        ), // CaretDown size-3.5
-                      ],
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: widget.onOpenFile == null
+                          ? Text(
+                              widget.fileName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis, // truncate
+                              style: theme.text.labelMd.copyWith(color: colors.textPrimary),
+                            )
+                          : _TapSurface(
+                              onTap: widget.onOpenFile,
+                              radius: theme.radius.md, // rounded-md
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                spacing: space.s1, // gap-1
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Text(
+                                      widget.fileName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis, // truncate
+                                      style: theme.text.labelMd.copyWith(color: colors.textPrimary),
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.expand_more,
+                                    size: _smallIconSize,
+                                    color: colors.textSecondary,
+                                  ), // CaretDown size-3.5
+                                ],
+                              ),
+                            ),
                     ),
                   ),
                 ],
@@ -458,7 +478,8 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
                   width: sheetWidth,
                   padding: EdgeInsets.fromLTRB(space.step(6.5), space.step(6.5), space.step(6.5), space.s5),
                   decoration: BoxDecoration(
-                    color: colors.bgSurface, // bg-bg-surface
+                    color: HoronPalette.neutral50, // bg-neutral-50
+                    border: Border.all(color: colors.overlayInk8), // ring-1 ring-overlay-ink-8
                     boxShadow: <BoxShadow>[
                       // [filter:drop-shadow(0_2px_4px_#00000014)]
                       BoxShadow(
@@ -474,7 +495,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
                     spacing: space.s3_5, // gap-3.5 = 14
                     children: <Widget>[
                       DefaultTextStyle.merge(
-                        style: theme.text.bodyMd.copyWith(color: colors.textPrimary), // text-text-primary
+                        style: theme.text.bodyMd.copyWith(color: HoronPalette.neutral900), // text-neutral-900
                         child: widget.sheet,
                       ),
                     ],
@@ -488,11 +509,11 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
     );
   }
 
-  /// 확대 컨트롤 — `h-7.5 gap-0.5 rounded-full bg-overlay-ink-5 px-1`입니다.
+  /// 확대 컨트롤 — `h-7.5 gap-0.5 rounded-full bg-overlay-ink-5 p-[3px]`입니다.
   Widget _zoomTrack(HoronThemeData theme, HoronSpaceSpec space, HoronColors colors) {
     return Container(
       height: space.step(7.5),
-      padding: EdgeInsets.symmetric(horizontal: space.s1), // px-1 = 4
+      padding: EdgeInsets.all(space.step(0.75)), // p-[3px] = 3
       decoration: BoxDecoration(color: colors.overlayInk5, borderRadius: BorderRadius.circular(theme.radius.full)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -617,8 +638,9 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
             key: ValueKey<String>('${_view.name}-$_run'),
             child: switch (_view) {
               _ExtractView.fields => _fields(theme, space, colors, flat, total),
-              _ExtractView.json => _jsonView(theme, space, colors, flat),
-              _ExtractView.schema => _schema(theme, space, colors, flat),
+              // React `animate-slide-shift-next` — 200ms 동안 12px 오른쪽에서 제자리로 옵니다.
+              _ExtractView.json => _SlideShift(child: _jsonView(theme, space, colors, flat)),
+              _ExtractView.schema => _SlideShift(child: _schema(theme, space, colors, flat)),
             },
           ),
         ),
@@ -641,7 +663,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: space.s1_5, // gap-1.5 = 6
       children: <Widget>[
-        Text('$total fields filled from this document', style: theme.text.bodySm.copyWith(color: colors.textSecondary)),
+        Text('$total fields read from this document', style: theme.text.bodySm.copyWith(color: colors.textSecondary)),
         for (final HoronExtractGroup group in widget.groups)
           Column(
             mainAxisSize: MainAxisSize.min,
@@ -696,42 +718,36 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
         ),
         SizedBox(width: space.s3), // gap-3 = 12
         Expanded(
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: space.step(75)), // max-w-75 = 300
-              child: _TapSurface(
-                onTap: needsCheck ? () => _resolve(field.id) : null,
-                radius: _fieldRadius,
-                height: space.step(9), // h-9 = 36
-                padding: EdgeInsets.symmetric(horizontal: space.s3), // px-3
-                color: needsCheck ? colors.overlayInk12 : colors.overlayInk4,
-                hoverColor: needsCheck ? colors.overlayInk14 : null,
-                borderColor: needsCheck ? colors.borderDanger : Colors.transparent, // border-border-danger
-                child: Row(
-                  spacing: space.s2, // gap-2 = 8
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        field.value,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis, // truncate
-                        style: theme.text.bodySm.copyWith(color: colors.textPrimary),
-                      ),
-                    ),
-                    if (needsCheck)
-                      Text(
-                        'Check',
-                        maxLines: 1,
-                        style: theme.text.caption.copyWith(color: colors.textDanger), // text-text-danger
-                      )
-                    else
-                      _PopIn(
-                        child: Icon(Icons.check, size: _smallIconSize, color: colors.textSecondary), // Check size-3.5
-                      ),
-                  ],
+          child: _TapSurface(
+            onTap: needsCheck ? () => _resolve(field.id) : null,
+            radius: _fieldRadius,
+            height: space.step(9), // h-9 = 36
+            padding: EdgeInsets.symmetric(horizontal: space.s3), // px-3
+            color: needsCheck ? colors.overlayInk12 : colors.overlayInk4,
+            hoverColor: needsCheck ? colors.overlayInk14 : null,
+            borderColor: needsCheck ? colors.borderDanger : Colors.transparent, // border-border-danger
+            child: Row(
+              spacing: space.s2, // gap-2 = 8
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    field.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis, // truncate
+                    style: theme.text.bodySm.copyWith(color: colors.textPrimary),
+                  ),
                 ),
-              ),
+                if (needsCheck)
+                  Text(
+                    'Check',
+                    maxLines: 1,
+                    style: theme.text.caption.copyWith(color: colors.textDanger), // text-text-danger
+                  )
+                else
+                  _PopIn(
+                    child: Icon(Icons.check, size: _smallIconSize, color: colors.textSecondary), // Check size-3.5
+                  ),
+              ],
             ),
           ),
         ),
@@ -1055,6 +1071,30 @@ class _PanelDivider extends StatelessWidget {
     return SizedBox(
       height: _hairline,
       child: ColoredBox(color: HoronTheme.of(context).colors.overlayInk8),
+    );
+  }
+}
+
+/// `animate-slide-shift-next` — 200ms 동안 오른쪽 12px에서 제자리로 옵니다.
+///
+/// React는 보기(JSON·Schema)가 바뀔 때 새 내용에 이 클래스를 붙입니다. Flutter에서는
+/// 부모의 `KeyedSubtree` 키가 보기·추출 회차로 바뀌므로 이 위젯이 새로 만들어지고,
+/// 처음부터 한 번 재생됩니다.
+class _SlideShift extends StatelessWidget {
+  const _SlideShift({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: reduceMotion ? Duration.zero : HoronMotion.slideShiftDuration,
+      curve: HoronMotion.slideShiftCurve,
+      builder: (BuildContext context, double value, Widget? child) =>
+          Transform.translate(offset: Offset((1 - value) * HoronMotion.slideShiftOffset, 0), child: child),
+      child: child,
     );
   }
 }

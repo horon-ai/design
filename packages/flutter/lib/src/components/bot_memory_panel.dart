@@ -20,8 +20,8 @@ const double _meterHeight = 5;
 /// `w-20` — 메모리 미터의 폭 80입니다.
 const double _meterWidth = 80;
 
-/// `transition-[width] duration-400` — 미터가 채워지는 시간입니다.
-const Duration _meterDuration = Duration(milliseconds: 400);
+/// `transition-[width] duration-280 ease-emphasized` — 미터가 채워지는 시간입니다.
+const Duration _meterDuration = HoronMotion.indicatorDuration;
 
 /// `h-7` — 알약 탭의 높이 28입니다.
 const double _pillHeight = 28;
@@ -300,23 +300,31 @@ class _HoronBotMemoryPanelState extends State<HoronBotMemoryPanel> {
                     ],
                   ),
                 ),
-                if (widget.toast != null && !_toastDismissed)
-                  Padding(
-                    // px-5 py-1.5
-                    padding: EdgeInsets.symmetric(horizontal: space.s5, vertical: space.s1_5),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: _MemoryToast(
-                        key: ObjectKey(widget.toast),
-                        toast: widget.toast!,
-                        onDismissed: () {
-                          if (!mounted) return;
-                          setState(() => _toastDismissed = true);
-                          widget.onToastDismiss?.call();
-                        },
+                // `motion-reveal` — 알약이 없으면 이 자리가 높이 0으로 접힙니다.
+                HoronReveal(
+                  collapsed: widget.toast == null || _toastDismissed,
+                  child: ExcludeFocus(
+                    excluding: widget.toast == null || _toastDismissed,
+                    child: Padding(
+                      // px-5 py-1.5
+                      padding: EdgeInsets.symmetric(horizontal: space.s5, vertical: space.s1_5),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: widget.toast == null || _toastDismissed
+                            ? const SizedBox(width: double.infinity)
+                            : _MemoryToast(
+                                key: ObjectKey(widget.toast),
+                                toast: widget.toast!,
+                                onDismissed: () {
+                                  if (!mounted) return;
+                                  setState(() => _toastDismissed = true);
+                                  widget.onToastDismiss?.call();
+                                },
+                              ),
                       ),
                     ),
                   ),
+                ),
                 KeyedSubtree(
                   key: ValueKey<String>('memory-groups-$_filter'),
                   child: Column(
@@ -445,7 +453,7 @@ class _MemoryMeter extends StatelessWidget {
         child: TweenAnimationBuilder<double>(
           tween: Tween<double>(begin: 0, end: percent / 100),
           duration: reduceMotion ? Duration.zero : _meterDuration,
-          curve: HoronMotion.easeOutQuint,
+          curve: HoronMotion.indicatorCurve,
           builder: (BuildContext context, double value, Widget? child) => Align(
             alignment: Alignment.centerLeft,
             child: FractionallySizedBox(

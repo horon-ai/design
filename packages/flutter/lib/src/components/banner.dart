@@ -56,7 +56,7 @@ _BannerMetrics _metricsOf(HoronBannerSize size, HoronThemeData theme) => switch 
   HoronBannerSize.md => (
     gap: theme.space.s3,
     paddingX: theme.space.s4,
-    paddingY: theme.space.s3,
+    paddingY: theme.space.s2_5, // py-2.5
     iconSize: 16,
     textStyle: theme.text.bodyMd,
     action: theme.text.labelLg,
@@ -64,7 +64,7 @@ _BannerMetrics _metricsOf(HoronBannerSize size, HoronThemeData theme) => switch 
   HoronBannerSize.lg => (
     gap: theme.space.s3,
     paddingX: theme.space.s5,
-    paddingY: theme.space.s3_5,
+    paddingY: theme.space.s3, // py-3
     iconSize: 20,
     textStyle: theme.text.bodyLg,
     action: theme.text.labelLg,
@@ -74,9 +74,10 @@ _BannerMetrics _metricsOf(HoronBannerSize size, HoronThemeData theme) => switch 
 /// Figma `Banner`(62:318): 색이 밴 띠를 두른 regular 유리 띠에 크기별 아이콘과 밑줄 동작을 얹습니다.
 ///
 /// `banner.tsx`를 옮긴 것입니다. 표면은 `bg-glass-regular`라 [HoronLiquidGlass]가
-/// 뒤에서 칠하고, 테두리·글자는 [tone]이 정합니다. 위험 톤은 화면 낭독기에서
-/// `alert`로, 정보 톤은 `status`로 읽힙니다. 등장할 때 React의
-/// `tab-panel-in 220ms`와 같은 페이드·이동을 씁니다.
+/// 뒤에서 칠하고, 테두리는 [tone]이 정합니다. 본문은 React의 `text-text-primary`대로
+/// 기본 글자색을 쓰고, 아이콘과 밑줄 동작만 톤 색을 입습니다. 위험 톤은 화면
+/// 낭독기에서 `alert`로, 정보 톤은 `status`로 읽힙니다. 등장할 때 React의
+/// `motion-rise`(220ms)와 같은 페이드·이동을 씁니다.
 class HoronBanner extends StatelessWidget {
   /// 띠를 만듭니다.
   const HoronBanner({
@@ -128,7 +129,8 @@ class HoronBanner extends StatelessWidget {
           ),
           SizedBox(width: metrics.gap),
           Expanded(
-            child: Text(message, style: metrics.textStyle.copyWith(color: accent)),
+            // `text-text-primary` — 톤 색은 아이콘·동작에만 남습니다.
+            child: Text(message, style: metrics.textStyle.copyWith(color: theme.colors.textPrimary)),
           ),
           if (action != null) ...<Widget>[
             SizedBox(width: metrics.gap),
@@ -146,18 +148,25 @@ class HoronBanner extends StatelessWidget {
     );
 
     final Widget surfaceBody = surface == HoronBannerSurface.glass
-        ? Stack(
-            children: <Widget>[
-              Positioned.fill(
-                child: HoronLiquidGlass(
-                  tier: HoronGlassTier.regular,
-                  borderRadius: radius,
-                  edgeColor: edge,
-                  child: const SizedBox.expand(),
+        ? Container(
+            // `border border-transparent` — solid와 같은 1px 띠를 차지해 높이를 맞춥니다.
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              border: Border.all(color: Colors.transparent),
+            ),
+            child: Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: HoronLiquidGlass(
+                    tier: HoronGlassTier.regular,
+                    borderRadius: radius,
+                    edgeColor: edge,
+                    child: const SizedBox.expand(),
+                  ),
                 ),
-              ),
-              content,
-            ],
+                content,
+              ],
+            ),
           )
         : Container(
             decoration: BoxDecoration(
@@ -178,12 +187,12 @@ class HoronBanner extends StatelessWidget {
     if (!animate) return body;
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 220),
-      curve: HoronMotion.easeOutQuint,
+      duration: HoronMotion.riseDuration,
+      curve: HoronMotion.riseCurve,
       builder: (BuildContext context, double t, Widget? child) {
         return Opacity(
           opacity: t,
-          child: Transform.translate(offset: Offset(0, 4 * (1 - t)), child: child),
+          child: Transform.translate(offset: Offset(0, HoronMotion.riseOffset * (1 - t)), child: child),
         );
       },
       child: body,
