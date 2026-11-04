@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
@@ -77,15 +76,20 @@ class HoronRadioGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronSpaceSpec space = HoronTheme.of(context).space;
-    return _HoronRadioScope(
-      value: value,
-      onValueChange: onValueChange,
-      size: size,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: space.s3,
-        children: children,
+    return RadioGroup<String>(
+      groupValue: value,
+      onChanged: (String? next) {
+        if (next != null) onValueChange?.call(next);
+      },
+      child: _HoronRadioSizeScope(
+        size: size,
+        enabled: onValueChange != null,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: space.s3,
+          children: children,
+        ),
       ),
     );
   }
@@ -116,123 +120,121 @@ class HoronRadio extends StatefulWidget {
 }
 
 class _HoronRadioState extends State<HoronRadio> {
-  bool _hovered = false;
-  bool _focused = false;
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
-    final HoronSpaceSpec space = theme.space;
-    final _HoronRadioScope? scope = context.dependOnInheritedWidgetOfExactType<_HoronRadioScope>();
-    final bool selected = scope?.value == widget.value;
-    final bool interactive = widget.enabled && scope?.onValueChange != null;
+    final _HoronRadioSizeScope? scope = context.dependOnInheritedWidgetOfExactType<_HoronRadioSizeScope>();
+    final RadioGroupRegistry<String>? registry = RadioGroup.maybeOf<String>(context);
+    final bool enabled = registry != null && widget.enabled && (scope?.enabled ?? false);
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     final _RadioMetrics metrics = _metricsOf(widget.size ?? scope?.size ?? HoronRadioSize.md, theme);
-    final double side = metrics.side;
-    final Color fill = selected
-        ? (_hovered && interactive ? colors.interactivePrimaryHover : colors.interactivePrimary)
-        : colors.bgSurface;
-    final Color borderColor = selected
-        ? Colors.transparent
-        : (_hovered && interactive ? colors.textSecondary : colors.borderStrong);
 
-    final Widget circle = AnimatedContainer(
-      duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
-      curve: HoronMotion.colorsCurve,
-      width: side,
-      height: side,
-      decoration: BoxDecoration(
-        color: fill,
-        shape: BoxShape.circle,
-        // data-checked:border-0 — 선택되면 테두리가 사라집니다.
-        border: Border.all(color: borderColor, width: selected ? 0 : _borderWidth),
-      ),
-      child: selected
-          ? Center(
-              child: TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
-                duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
-                curve: HoronMotion.popInCurve,
-                builder: (BuildContext context, double scale, Widget? child) =>
-                    Transform.scale(scale: scale, child: child),
-                child: Container(
-                  width: metrics.dot,
-                  height: metrics.dot,
-                  decoration: BoxDecoration(color: colors.interactiveOnPrimary, shape: BoxShape.circle),
-                ),
-              ),
-            )
-          : null,
-    );
-
-    final Widget content = Row(
-      mainAxisSize: MainAxisSize.min,
-      spacing: metrics.gap,
-      children: <Widget>[
-        _FocusOutline(
-          visible: _focused && interactive,
-          radius: theme.radius.full,
-          gap: space.s0_5,
-          width: space.s0_5,
-          color: colors.textBrand,
-          child: circle,
+    // 라벨이 접근성 이름이 되도록 라디오의 시맨틱과 라벨을 한 노드로 합칩니다.
+    return MergeSemantics(
+      child: RawRadio<String>(
+        value: widget.value,
+        mouseCursor: WidgetStateProperty.resolveWith(
+          (Set<WidgetState> states) =>
+              states.contains(WidgetState.disabled) ? SystemMouseCursors.basic : SystemMouseCursors.click,
         ),
-        if (widget.label != null)
-          Flexible(
-            child: Text(widget.label!, style: metrics.textStyle.copyWith(color: colors.textPrimary)),
-          ),
-      ],
-    );
+        toggleable: false,
+        focusNode: _focusNode,
+        autofocus: false,
+        groupRegistry: registry,
+        enabled: enabled,
+        builder: (BuildContext context, ToggleableStateMixin state) {
+          final HoronColors colors = theme.colors;
+          final HoronSpaceSpec space = theme.space;
+          final double side = metrics.side;
+          final bool selected = state.value ?? false;
+          final bool hovered = state.states.contains(WidgetState.hovered);
+          final bool focused = state.states.contains(WidgetState.focused);
+          final Color fill = selected
+              ? (hovered ? colors.interactivePrimaryHover : colors.interactivePrimary)
+              : colors.bgSurface;
+          final Color borderColor = selected
+              ? Colors.transparent
+              : (hovered ? colors.textSecondary : colors.borderStrong);
 
-    return Opacity(
-      opacity: widget.enabled ? 1 : _disabledOpacity,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: interactive ? () => scope?.onValueChange?.call(widget.value) : null,
-        child: MergeSemantics(
-          child: Semantics(
-            inMutuallyExclusiveGroup: true,
-            checked: selected,
-            enabled: interactive,
-            child: FocusableActionDetector(
-              enabled: interactive,
-              mouseCursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
-              onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
-              onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-              shortcuts: const <ShortcutActivator, Intent>{
-                SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-                SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
-              },
-              actions: <Type, Action<Intent>>{
-                ActivateIntent: CallbackAction<ActivateIntent>(
-                  onInvoke: (ActivateIntent intent) {
-                    scope?.onValueChange?.call(widget.value);
-                    return null;
-                  },
-                ),
-              },
-              child: content,
+          final Widget circle = AnimatedContainer(
+            duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+            curve: HoronMotion.colorsCurve,
+            width: side,
+            height: side,
+            decoration: BoxDecoration(
+              color: fill,
+              shape: BoxShape.circle,
+              // data-checked:border-0 — 선택되면 테두리가 사라집니다.
+              border: Border.all(color: borderColor, width: selected ? 0 : _borderWidth),
             ),
-          ),
-        ),
+            child: selected
+                ? Center(
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
+                      duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
+                      curve: HoronMotion.popInCurve,
+                      builder: (BuildContext context, double scale, Widget? child) =>
+                          Transform.scale(scale: scale, child: child),
+                      child: Container(
+                        width: metrics.dot,
+                        height: metrics.dot,
+                        decoration: BoxDecoration(color: colors.interactiveOnPrimary, shape: BoxShape.circle),
+                      ),
+                    ),
+                  )
+                : null,
+          );
+
+          final Widget content = Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: metrics.gap,
+            children: <Widget>[
+              _FocusOutline(
+                visible: focused,
+                radius: theme.radius.full,
+                gap: space.s0_5,
+                width: space.s0_5,
+                color: colors.textBrand,
+                child: circle,
+              ),
+              if (widget.label != null)
+                Flexible(
+                  child: Text(widget.label!, style: metrics.textStyle.copyWith(color: colors.textPrimary)),
+                ),
+            ],
+          );
+
+          // `ColoredBox`는 투명해도 히트 테스트를 하므로 행 전체가 탭 영역이 됩니다.
+          return Opacity(
+            opacity: widget.enabled ? 1 : _disabledOpacity,
+            child: ColoredBox(color: Colors.transparent, child: content),
+          );
+        },
       ),
     );
   }
 }
 
-/// 그룹의 선택 값과 콜백을 자식 라디오에 내려 줍니다.
-class _HoronRadioScope extends InheritedWidget {
-  const _HoronRadioScope({required this.value, required this.onValueChange, required this.size, required super.child});
+/// 그룹의 크기와 활성 여부를 자식 라디오에 내려 줍니다.
+///
+/// 선택 값과 키보드 이동은 위쪽 [RadioGroup]이 나릅니다.
+class _HoronRadioSizeScope extends InheritedWidget {
+  const _HoronRadioSizeScope({required this.size, required this.enabled, required super.child});
 
-  final String? value;
-  final ValueChanged<String>? onValueChange;
   final HoronRadioSize size;
+  final bool enabled;
 
   @override
-  bool updateShouldNotify(_HoronRadioScope oldWidget) =>
-      value != oldWidget.value || onValueChange != oldWidget.onValueChange || size != oldWidget.size;
+  bool updateShouldNotify(_HoronRadioSizeScope oldWidget) => size != oldWidget.size || enabled != oldWidget.enabled;
 }
 
 /// `focus-visible:outline-2 outline-offset-2 outline-text-brand`을 그립니다.

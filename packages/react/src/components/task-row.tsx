@@ -1,4 +1,4 @@
-import { Archive, ArrowClockwise, CaretDown, CheckCircle, Folder, Stop, WarningCircle } from "@phosphor-icons/react";
+import { Archive, ArrowClockwise, CheckCircle, Folder, Stop, WarningCircle } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
@@ -28,10 +28,10 @@ export type TaskRowProps = {
 };
 
 const botTile: Record<TaskStatus, string> = {
-  running: "bg-interactive-primary",
-  done: "bg-interactive-primary",
-  review: "bg-sky-500",
-  failed: "bg-sky-700",
+  running: "bg-interactive-primary text-interactive-on-primary",
+  done: "bg-interactive-primary text-interactive-on-primary",
+  review: "bg-sky-500 text-sky-50",
+  failed: "bg-sky-700 text-sky-50",
 };
 
 const pill =
@@ -58,63 +58,88 @@ export function TaskRow({
       className={cn(
         "flex flex-col gap-2 px-4 py-3.5",
         variant === "list"
-          ? "relative rounded-b-[16px] after:absolute after:inset-x-4 after:bottom-0 after:h-px after:bg-overlay-ink-8 last:after:hidden"
-          : "rounded-[16px] bg-bg-subtle",
+          ? "relative after:absolute after:inset-x-4 after:bottom-0 after:h-px after:bg-overlay-ink-8 last:after:hidden"
+          : "rounded-2xl border border-border-default bg-bg-surface",
         className,
       )}
     >
       <div className="flex items-center gap-2">
         <p className="min-w-0 flex-1 truncate text-label-lg text-text-primary">{title}</p>
         {elapsed && <span className="shrink-0 text-caption text-text-secondary">{elapsed}</span>}
-        <CaretDown aria-hidden className="size-3.5 shrink-0 text-text-secondary" />
       </div>
       <div className="flex items-center gap-1.5 text-caption text-text-secondary">
         <span
           className={cn(
-            "flex size-4.5 shrink-0 items-center justify-center rounded-[5px] text-label-sm text-text-inverse",
-            bot.tileClassName ?? botTile[status],
+            "flex size-4.5 shrink-0 items-center justify-center rounded-[5px] text-label-sm",
+            bot.tileClassName ? cn("text-text-inverse", bot.tileClassName) : botTile[status],
           )}
         >
-          {bot.initial}
+          <span className="text-trim">{bot.initial}</span>
         </span>
         <span className="whitespace-nowrap">{bot.name}</span>
         {project && (
           <>
             <span aria-hidden>·</span>
-            <Folder aria-hidden className="size-[13px] shrink-0" />
+            <Folder aria-hidden className="size-3.5 shrink-0" />
             <span className="truncate">{project}</span>
           </>
         )}
       </div>
       <div className="flex items-center gap-2 pt-0.5">
-        {status === "running" && <Spinner size={15} />}
-        {status === "review" && <CheckCircle aria-hidden className="size-4 shrink-0 text-text-primary" />}
-        {status === "done" && <CheckCircle aria-hidden className="size-4 shrink-0 text-text-secondary" />}
-        {status === "failed" && <WarningCircle aria-hidden className="size-4 shrink-0 text-text-danger" />}
+        <span className="flex size-4 shrink-0 items-center justify-center">
+          {status === "running" && <Spinner key="running" size={15} className="animate-pop-in" />}
+          {status === "review" && (
+            <CheckCircle key="review" aria-hidden className="size-4 animate-pop-in text-text-primary" />
+          )}
+          {status === "done" && (
+            <CheckCircle key="done" aria-hidden className="size-4 animate-pop-in text-text-secondary" />
+          )}
+          {status === "failed" && (
+            <WarningCircle key="failed" aria-hidden className="size-4 animate-pop-in text-text-danger" />
+          )}
+        </span>
         <span
+          key={status}
           className={cn(
-            "shrink-0 text-label-md whitespace-nowrap motion-colors",
+            "shrink-0 animate-fade-in text-label-md whitespace-nowrap motion-colors",
             status === "failed" ? "text-text-danger" : status === "done" ? "text-text-secondary" : "text-text-primary",
           )}
         >
           {message}
         </span>
-        {detail && <span className="min-w-0 truncate text-caption text-text-secondary">{detail}</span>}
+        {detail && (
+          <>
+            <span aria-hidden>·</span>
+            <span className="min-w-0 truncate text-caption text-text-secondary">{detail}</span>
+          </>
+        )}
         <span className="flex-1" />
         {status === "running" && (
-          <button type="button" onClick={onCancel} className={cn(pill, "bg-overlay-ink-6 text-text-primary")}>
+          <button
+            type="button"
+            onClick={onCancel}
+            className={cn(pill, "animate-pop-in bg-overlay-ink-6 text-text-primary")}
+          >
             <Stop aria-hidden className="size-3.5" />
             Cancel
           </button>
         )}
         {status === "failed" && (
-          <button type="button" onClick={onRetry} className={cn(pill, "bg-overlay-ink-6 text-text-primary")}>
+          <button
+            type="button"
+            onClick={onRetry}
+            className={cn(pill, "animate-pop-in bg-overlay-ink-6 text-text-primary")}
+          >
             <ArrowClockwise aria-hidden className="size-3.5" />
             Retry
           </button>
         )}
         {status === "review" && (
-          <button type="button" onClick={onReview} className={cn(pill, "bg-interactive-primary text-text-inverse")}>
+          <button
+            type="button"
+            onClick={onReview}
+            className={cn(pill, "animate-pop-in bg-interactive-primary text-text-inverse")}
+          >
             Review
           </button>
         )}
@@ -123,7 +148,7 @@ export function TaskRow({
             type="button"
             aria-label="Archive"
             onClick={onArchive}
-            className="flex size-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex size-7.5 shrink-0 motion-press animate-pop-in cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             <Archive aria-hidden className="size-4" />
           </button>

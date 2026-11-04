@@ -23,9 +23,9 @@ export type IntegrationRowProps = {
 };
 
 const tileClass: Record<IntegrationStatus, string> = {
-  connected: "bg-sky-500",
-  reconnect: "bg-sky-700",
-  "not-connected": "bg-interactive-primary",
+  connected: "bg-sky-500 text-neutral-50",
+  reconnect: "bg-sky-700 text-neutral-50",
+  "not-connected": "bg-bg-subtle text-text-secondary",
 };
 
 /** Figma `Integration row` (Integrations 110:883): 40px tile, status pill on the right, solid or thick glass. */
@@ -44,7 +44,7 @@ export function IntegrationRow({
   return (
     <div
       className={cn(
-        "relative flex items-center gap-3 overflow-clip rounded-[16px] py-3 pr-3.5 pl-3",
+        "relative flex items-center gap-3 overflow-clip rounded-2xl py-3 pr-3.5 pl-3",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         status === "reconnect" &&
           (surface === "glass" ? "[--glass-edge:var(--color-border-danger)]" : "border-border-danger"),
@@ -54,8 +54,10 @@ export function IntegrationRow({
       {surface === "glass" && <LiquidGlass />}
       <span
         className={cn(
-          "relative flex size-10 shrink-0 items-center justify-center rounded-[10px] text-text-inverse [&>svg]:size-5",
-          tileClass[status],
+          "relative flex size-10 shrink-0 items-center justify-center rounded-[10px] motion-colors [&>svg]:size-5",
+          surface === "glass" && status === "not-connected"
+            ? "bg-overlay-ink-6 text-text-secondary"
+            : tileClass[status],
         )}
       >
         {icon}
@@ -70,17 +72,23 @@ export function IntegrationRow({
           </span>
         )}
       </span>
-      {status === "connected" ? (
-        <span className="relative flex h-7.5 shrink-0 items-center gap-1.5 rounded-full bg-accent-sky-500-18 px-3 text-label-sm text-text-primary">
+      <span className="motion-swap relative shrink-0">
+        <span
+          data-hidden={status !== "connected" || undefined}
+          aria-hidden={status !== "connected" || undefined}
+          className="flex h-7.5 items-center justify-center gap-1.5 rounded-full bg-accent-sky-500-18 px-3 text-label-sm whitespace-nowrap text-text-primary"
+        >
           <span aria-hidden className="size-1.5 rounded-full bg-status-live" />
           {connectedLabel}
         </span>
-      ) : (
         <button
           type="button"
           onClick={onAction}
+          data-hidden={status === "connected" || undefined}
+          aria-hidden={status === "connected" || undefined}
+          tabIndex={status === "connected" ? -1 : undefined}
           className={cn(
-            "relative flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full px-3 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
+            "flex h-7.5 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full px-3 text-label-sm whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
             status === "reconnect"
               ? "bg-accent-red-500-14 text-text-danger"
               : "bg-interactive-primary text-text-inverse",
@@ -89,7 +97,7 @@ export function IntegrationRow({
           {status === "not-connected" && <Plug aria-hidden className="size-3.5" />}
           {status === "reconnect" ? reconnectLabel : connectLabel}
         </button>
-      )}
+      </span>
     </div>
   );
 }

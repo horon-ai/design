@@ -20,7 +20,7 @@ export function Slider({ className, "aria-label": ariaLabel, ...props }: SliderP
           <BaseSlider.Indicator className="rounded-full bg-interactive-primary" />
           <BaseSlider.Thumb
             aria-label={ariaLabel}
-            className="size-[18px] rounded-full border border-border-default bg-bg-default shadow-[0_1px_3px_#0000001f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+            className="size-[18px] cursor-grab rounded-full border border-border-default bg-bg-default shadow-[0_1px_3px_#0000001f] transition-[scale,box-shadow] duration-120 ease-out-quint hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand active:scale-110"
           />
         </BaseSlider.Track>
       </BaseSlider.Control>

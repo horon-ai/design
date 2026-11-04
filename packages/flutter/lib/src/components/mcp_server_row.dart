@@ -16,6 +16,20 @@ import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
+/// `mcp-server-row.tsx`의 `McpServerStatusTone`입니다.
+///
+/// 상태 알약의 바탕색과 점 색을 고릅니다.
+enum HoronMcpServerStatusTone {
+  /// `connected` — 잉크 바탕에 기본 글자, 파란 라이브 점입니다. 기본값입니다.
+  connected,
+
+  /// `warning` — 붉은 기운의 바탕에 위험 글자와 점입니다.
+  warning,
+
+  /// `neutral` — 잉크 바탕에 보조 글자와 흐린 점입니다.
+  neutral,
+}
+
 /// Paper `MCP server row`입니다.
 ///
 /// 40px 타일, 이름과 태그 알약, 설명, `·`로 이은 메타 줄, 오른쪽 상태 알약과
@@ -32,6 +46,7 @@ class HoronMcpServerRow extends StatelessWidget {
     this.description,
     this.meta,
     this.statusLabel = 'Connected',
+    this.statusTone = HoronMcpServerStatusTone.connected,
     this.configureLabel = 'Configure',
     this.onConfigure,
     this.menuLabel = 'More',
@@ -58,6 +73,9 @@ class HoronMcpServerRow extends StatelessWidget {
 
   /// 오른쪽 상태 알약 글자입니다.
   final String statusLabel;
+
+  /// 상태 알약의 색입니다. 기본값은 [HoronMcpServerStatusTone.connected]입니다.
+  final HoronMcpServerStatusTone statusTone;
 
   /// Configure 버튼 글자입니다.
   final String configureLabel;
@@ -213,10 +231,58 @@ class HoronMcpServerRow extends StatelessWidget {
       runSpacing: theme.space.s3_5,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
-        _pill(theme, background: theme.colors.accentSky500_18, foreground: theme.colors.textBrand, label: statusLabel),
+        _statusPill(theme),
         _GlassButton(label: configureLabel, icon: const Icon(Icons.settings_outlined), onPressed: onConfigure),
         if (onMenuPressed != null) _GhostIconButton(label: menuLabel, onPressed: onMenuPressed!),
       ],
+    );
+  }
+
+  /// `statusToneClass`: 알약 바탕·글자와 6px 점 색을 함께 고릅니다.
+  Widget _statusPill(HoronThemeData theme) {
+    final (Color background, Color foreground, Color dot) = switch (statusTone) {
+      HoronMcpServerStatusTone.connected => (
+        theme.colors.overlayInk6, // bg-overlay-ink-6
+        theme.colors.textPrimary,
+        theme.colors.statusLive, // bg-status-live
+      ),
+      HoronMcpServerStatusTone.warning => (
+        theme.colors.accentRed500_14, // bg-accent-red-500-14
+        theme.colors.textDanger,
+        theme.colors.textDanger, // bg-text-danger
+      ),
+      HoronMcpServerStatusTone.neutral => (
+        theme.colors.overlayInk6,
+        theme.colors.textSecondary,
+        theme.colors.textPlaceholder, // bg-text-placeholder
+      ),
+    };
+    return Container(
+      height: theme.space.step(5.5), // h-5.5 = 22
+      padding: EdgeInsets.symmetric(horizontal: theme.space.s2), // px-2
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(theme.radius.full), // rounded-full
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: theme.space.s1_5, // gap-1.5
+        children: <Widget>[
+          SizedBox(
+            width: theme.space.step(1.5), // size-1.5 = 6
+            height: theme.space.step(1.5),
+            child: DecoratedBox(
+              decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
+            ),
+          ),
+          Text(
+            statusLabel,
+            maxLines: 1,
+            // text-[12px]/[16px] font-medium
+            style: theme.text.labelSm.copyWith(height: 16 / 12, color: foreground),
+          ),
+        ],
+      ),
     );
   }
 

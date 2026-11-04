@@ -39,6 +39,18 @@ import { Plus } from "@phosphor-icons/react";
 
 하위 경로도 됩니다: `@horon-ai/react/components/button`.
 
+## 커서 잔상
+
+마우스나 트랙패드처럼 정밀한 포인터가 있는 데스크톱 환경에서는 화살표 뒤로 흐려지는 잔상 5개가 따라옵니다.
+`@horon-ai/react`를 한 번이라도 import하면 페이지마다 한 번 자동으로 붙습니다. React 컴포넌트를 쓰지 않는
+페이지에서는 `import "@horon-ai/react/cursor-ghost";` 한 줄로 붙입니다.
+
+- 시스템 커서는 숨기지 않습니다. 잔상은 클릭·포커스를 받지 않는 맨 위 겹 레이어이고 `aria-hidden`입니다.
+- 터치·펜처럼 거친 포인터, 동작 줄이기(`prefers-reduced-motion: reduce`) 설정에서는 붙지 않고, 설정이 바뀌면 다시 판단합니다.
+- 흰색을 `difference`로 섞어서 어두운 화면에서는 밝게, 밝은 화면에서는 어둡게 보입니다.
+- 끄려면 그 import보다 먼저 `<html data-horon-cursor="off">`를 둡니다. 값을 바꾸려면 끈 뒤
+  `mountCursorGhost({ ghosts, size, headFollow, smear, color })`를 직접 부르고, 돌려받은 함수로 떼어 냅니다.
+
 ## 유리 표면
 
 `LiquidGlass`가 `@horon-ai/tokens`의 `glass.ts` 재질을 그립니다. Flutter의 `HoronLiquidGlass`도 같은 값을 읽으므로
@@ -70,8 +82,8 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 | `bot-memory-panel` | ZO2-1 | Bot memory grouped by category. |
 | `bottom-sheet` | 88:808 | Thick-glass bottom sheet; the light board adds frost. |
 | `breadcrumb` | 110:948 | Breadcrumb with workspace tile. |
-| `breadcrumb-header` | U8H-1 | Glass header row with a breadcrumb and two icon buttons. |
-| `button` | 55:339 | Primary, Glass, Danger and Link in three sizes. |
+| `breadcrumb-header` | U8H-1 | Glass header row with a breadcrumb and optional search and more buttons. |
+| `button` | 55:339 | Primary, Glass, Danger and Link in three sizes; `href` renders a real link. |
 | `calendar` | 60:245 | Month grid with single and range selection. |
 | `card` | 63:310 | Thick-glass card: Default, Interactive, Selected. |
 | `chat-bubble` | 64:359 | Flat Me and Bot chat bubbles. |
@@ -80,12 +92,12 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 | `chip` | 61:302 | Clear-glass toggle chip. |
 | `choice-card` | 1VXM-0 | Radio card that picks one of two options. |
 | `code-panel` | 1VV9-0 | Light code panel for settings screens. |
-| `command-palette` | 110:676 | Frosted command palette. |
+| `command-palette` | 110:676 | Frosted command palette; `empty` is the no-match slot. |
 | `composer` | 63:462 | Glass message composer. |
 | `data-table` | 192:9046 | Solid data table with header, tags and footer. |
 | `date-field` | 60:244 | Glass field that opens the calendar. |
 | `dialog` | 63:329 | Thick-glass dialog on a scrim; the light board adds frost. |
-| `directory-card` | 1VJJ-0 | Directory card with a description and an add button. |
+| `directory-card` | 1VJJ-0 | Directory card with a description; the add button shows when `onAdd` is passed. |
 | `document-extract-panel` | YUT-1 | Document viewer beside the extracted fields. |
 | `empty-state` | 64:485 | Mascot empty state. |
 | `field` | 58:163 | Label, control, help and error text. |
@@ -101,7 +113,7 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 | `knowledge-base-panel` | XVM-1 | Indexing state of each knowledge source. |
 | `liquid-glass` | 55:339 | The liquid glass layer stack. |
 | `list-detail` | 1W6P-0 | Two-pane layout with a list on the left and detail on the right. |
-| `marketplace-card` | 1VMY-0 | Marketplace card with a description and an install button. |
+| `marketplace-card` | 1VMY-0 | Marketplace card with a description; the install button shows when `onInstall` is passed. |
 | `mcp-server-row` | 1VHS-0 | Connected MCP server row with name, tags and state. |
 | `menu` | 88:495 | Glass menu and solid account/workspace menu. |
 | `message-extras` | 109:667 | Message actions, date separator, attachment, code block. |
@@ -133,7 +145,7 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 | `tool-calls-header` | XDG-1 | Title row and tool chips for a group of tool calls. |
 | `tool-permissions` | 1VT5-0 | Per-tool permission list: allow, confirm or off. |
 | `tooltip` | 62:282 | Ink tooltip with an arrow. |
-| `top-bar` | UR5-1 | Mobile app bar with back, bot avatar, title and subtitle, and overflow. |
+| `top-bar` | UR5-1 | Mobile app bar with bot avatar, title and subtitle, plus back and overflow when their handlers are passed. |
 | `usage-meter` | 109:733 | Glass usage meter card. |
 | `workspace-menu` | V56-1 | Solid menu to pick a workspace or create one. |
 

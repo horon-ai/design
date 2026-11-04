@@ -1,6 +1,7 @@
 import { Check, GearSix, PlusCircle } from "@phosphor-icons/react";
 import type { ComponentProps, ReactNode } from "react";
 
+import { cn } from "../lib/cn";
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTile, MenuTrigger } from "./menu";
 
 export type WorkspaceMenuItem = {
@@ -51,8 +52,13 @@ export function WorkspaceMenu({
             key={workspace.id}
             icon={<MenuTile>{workspace.initial ?? workspace.name.charAt(0).toUpperCase()}</MenuTile>}
             description={workspace.meta}
-            trailing={workspace.id === value ? <Check weight="bold" className="animate-pop-in" /> : undefined}
-            className={workspace.id === value ? "bg-overlay-ink-6" : undefined}
+            selected={workspace.id === value}
+            trailing={
+              <Check
+                weight="bold"
+                className={cn("transition-opacity duration-150", workspace.id === value ? "opacity-100" : "opacity-0")}
+              />
+            }
             onClick={() => onValueChange?.(workspace.id)}
           >
             {workspace.name}

@@ -4,7 +4,6 @@ import { createContext, useContext, useMemo, type ComponentProps, type ReactNode
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { fieldBoxClass, fieldTextClass, type InputSurface } from "./input";
-import { LiquidGlass } from "./liquid-glass";
 
 export type InputGroupSize = ControlSize;
 
@@ -39,20 +38,22 @@ const sizeClass: Record<InputGroupSize, string> = {
   lg: "h-12",
 };
 
+/** The input's own padding, the same 12/14/20px as a standalone `Input`. */
 const inputPaddingClass: Record<InputGroupSize, string> = {
-  sm: "px-2.5",
-  md: "px-3",
-  lg: "px-4",
+  sm: "px-3",
+  md: "px-3.5",
+  lg: "px-5",
 };
 
 /** The tinted segment look, shared by `InputGroupSegment` and the `segment` variant of `Select` and `Combobox`. */
 export const inputGroupSegmentClass: Record<InputGroupSize, string> = {
-  sm: "relative flex h-full shrink-0 items-center gap-1 bg-overlay-ink-4 px-2.5 text-label-sm text-text-primary [&_svg]:size-3.5 [&_svg]:text-text-secondary",
-  md: "relative flex h-full shrink-0 items-center gap-1 bg-overlay-ink-4 px-3 text-label-md text-text-primary [&_svg]:size-3.5 [&_svg]:text-text-secondary",
-  lg: "relative flex h-full shrink-0 items-center gap-1.5 bg-overlay-ink-4 px-4 text-label-lg text-text-primary [&_svg]:size-4 [&_svg]:text-text-secondary",
+  sm: "relative flex h-full shrink-0 items-center gap-1 bg-overlay-ink-4 px-3 text-body-sm text-text-primary [&_svg]:size-4 [&_svg]:text-text-secondary",
+  md: "relative flex h-full shrink-0 items-center gap-1 bg-overlay-ink-4 px-3 text-body-md text-text-primary [&_svg]:size-4 [&_svg]:text-text-secondary",
+  lg: "relative flex h-full shrink-0 items-center gap-1.5 bg-overlay-ink-4 px-4 text-body-lg text-text-primary [&_svg]:size-5 [&_svg]:text-text-secondary",
 };
 
-const divider = "relative h-full w-px shrink-0 bg-border-default group-data-invalid:bg-border-danger";
+const divider =
+  "relative h-full w-px shrink-0 bg-border-default group-data-invalid:bg-border-danger group-data-disabled:bg-border-default/60";
 
 /** Figma `Input group` (60:429): a glass or solid field split into a select segment and an input segment, in three sizes. */
 export function InputGroup({
@@ -69,16 +70,10 @@ export function InputGroup({
   return (
     <InputGroupContext value={context}>
       <div
-        className={cn(
-          "group relative flex items-center overflow-clip rounded-md border motion-colors",
-          sizeClass[size],
-          fieldBoxClass[surface],
-          className,
-        )}
+        className={cn(fieldBoxClass.base, "group", sizeClass[size], fieldBoxClass[surface], className)}
         data-invalid={invalid ? "" : undefined}
         data-disabled={disabled ? "" : undefined}
       >
-        {surface === "glass" && <LiquidGlass />}
         {prefix && (
           <>
             {prefix}

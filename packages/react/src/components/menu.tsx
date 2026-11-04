@@ -2,7 +2,6 @@ import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { createContext, useContext, type ComponentProps, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
-import { LiquidGlass } from "./liquid-glass";
 
 type WithClass<T> = Omit<T, "className"> & { className?: string };
 
@@ -15,7 +14,7 @@ export const MenuTrigger = BaseMenu.Trigger;
 
 export type MenuContentProps = WithClass<ComponentProps<typeof BaseMenu.Popup>> & {
   /**
-   * `glass` is the Figma `Menu` (thick glass, 20px radius, 40px rows).
+   * `glass` is the Figma `Menu` on the veil (20px radius, 40px rows).
    * `solid` is the Account / Workspace menu that opens over glass chrome
    * (opaque fill, 18px radius, soft shadow, 36px rows).
    * `paper` is the Paper workspace switcher: default fill, 1px default border, 14px radius,
@@ -29,7 +28,7 @@ export type MenuContentProps = WithClass<ComponentProps<typeof BaseMenu.Popup>> 
 };
 
 export const menuPopupClass = {
-  glass: "rounded-xl bg-glass-thick",
+  glass: "rounded-xl veil-overlay",
   solid: "rounded-[18px] bg-glass-fill-solid shadow-popover",
   paper: "rounded-[14px] border border-border-default bg-bg-default shadow-[0_12px_32px_#0A142424]",
 } as const;
@@ -63,7 +62,6 @@ export function MenuContent({
           )}
           {...props}
         >
-          {surface === "paper" ? null : <LiquidGlass />}
           <SurfaceContext value={surface}>{children}</SurfaceContext>
         </BaseMenu.Popup>
       </BaseMenu.Positioner>
@@ -99,7 +97,7 @@ export function MenuItem({
       className={cn(
         "relative flex w-full cursor-pointer items-center gap-2.5 motion-colors outline-none select-none data-disabled:cursor-not-allowed data-disabled:opacity-40 data-highlighted:bg-overlay-ink-6",
         surface === "glass" ? "rounded-md px-3" : "rounded-[10px] px-2.5",
-        description ? "h-11.5 pl-2" : surface === "glass" ? "h-10" : "h-9",
+        description ? "h-12" : surface === "glass" ? "h-10" : "h-9",
         selected && "bg-bg-brand data-highlighted:bg-bg-brand",
         className,
       )}
@@ -116,8 +114,10 @@ export function MenuItem({
         </span>
       )}
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className={cn("text-label-md", danger ? "text-text-danger" : "text-text-primary")}>{children}</span>
-        {description && <span className="text-caption text-text-secondary">{description}</span>}
+        <span className={cn("truncate text-label-md", danger ? "text-text-danger" : "text-text-primary")}>
+          {children}
+        </span>
+        {description && <span className="truncate text-caption text-text-secondary">{description}</span>}
       </span>
       {trailing && (
         <span className="flex shrink-0 text-caption text-text-secondary [&>svg]:size-4 [&>svg]:text-text-primary">

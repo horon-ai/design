@@ -36,7 +36,7 @@ function Lists({ surface }: { surface: "solid" | "glass" }) {
         </TabsList>
       </Tabs>
       <Tabs defaultValue="mcp">
-        <TabsList className="gap-1" surface={surface}>
+        <TabsList surface={surface}>
           <TabsTab value="skills" count={6}>
             Skills
           </TabsTab>
@@ -66,6 +66,21 @@ export default function TabsDemo() {
         <Backdrop className="flex-col">
           <Lists surface="glass" />
         </Backdrop>
+      </div>
+      <div className="flex flex-col gap-3">
+        <p className="text-caption text-text-secondary">Underline</p>
+        <Tabs defaultValue="command" size="lg">
+          <TabsList variant="underline">
+            <TabsTab value="command">Command</TabsTab>
+            <TabsTab value="manual">Manual</TabsTab>
+          </TabsList>
+          <TabsPanel value="command" className="text-body-md text-text-primary">
+            bun add @horon-ai/react
+          </TabsPanel>
+          <TabsPanel value="manual" className="text-body-md text-text-primary">
+            Copy the component source into your project.
+          </TabsPanel>
+        </Tabs>
       </div>
     </div>
   );

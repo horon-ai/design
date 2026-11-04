@@ -5,12 +5,12 @@
 @source "../../src/**/*.{astro,ts,tsx}";
 
 @layer base {
+  /* The library only forces `scroll-behavior` back to auto under reduced motion; the smooth default for in-page anchors has no component owner. */
   html {
     scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
   }
 
+  /* The header is fixed (h-16, md:h-19) and no library utility applies to the shared body. */
   body {
     padding-top: 4rem;
   }
@@ -21,10 +21,12 @@
     }
   }
 
+  /* A hash target must clear the fixed header; scrolling is a document concern, not a component's. */
   :target {
     scroll-margin-top: 6rem;
   }
 
+  /* The library never paints selection, and the browser default blue is not a token colour. */
   ::selection {
     background: var(--color-text-brand);
     color: var(--color-bg-default);
@@ -32,233 +34,47 @@
 }
 
 @layer components {
-  .site-shell {
-    width: 100%;
-    margin-inline: auto;
-    padding-inline: 1rem;
-  }
-
-  @media (min-width: 768px) {
-    .site-shell {
-      padding-inline: 1.5rem;
-    }
-  }
-
-  .docs-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    align-items: start;
-  }
-
-  @media (min-width: 1024px) {
-    .docs-grid {
-      grid-template-columns: 15rem minmax(0, 1fr);
-    }
-  }
-
-  @media (min-width: 1280px) {
-    .docs-grid:has(.docs-toc) {
-      grid-template-columns: 15rem minmax(0, 1fr) 12.5rem;
-    }
-  }
-
-  .docs-sidebar {
-    padding: 0.75rem;
-  }
-
-  @media (min-width: 1024px) {
-    .docs-sidebar {
-      position: sticky;
-      top: 4.75rem;      height: calc(100vh - 4.75rem);
-      overflow-y: auto;
-      scrollbar-width: none;
-    }
-
-    .docs-sidebar::-webkit-scrollbar {
-      display: none;
-    }
-  }
-
-  .docs-main {
-    min-width: 0;
-    padding: 1.5rem 1rem 4rem;
-  }
-
-  .docs-main-wide {
-    min-width: 0;
-    padding: 1.5rem 1rem 4rem;
-  }
-
-  @media (min-width: 768px) {
-    .docs-main {
-      padding: 3.5rem 2rem 6rem;
-    }
-
-    .docs-main-wide {
-      padding: 4rem 2rem 6rem;
-    }
-  }
-
-  .docs-toc {
-    display: none;
-    padding: 3.5rem 1rem 2rem 0;
-  }
-  @media (min-width: 1280px) {
-    .docs-toc {
-      display: block;
-      position: sticky;
-      top: 4.75rem;
-      max-height: calc(100vh - 4.75rem);
-      overflow-y: auto;
-      scrollbar-width: none;
-    }
-
-    .docs-toc::-webkit-scrollbar {
-      display: none;
-    }
-  }
-
-  .nav-item {
-    display: flex;
-    align-items: center;
-    height: 2.5rem;
-    padding-inline: 0.5rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    color: var(--color-text-secondary);
-    transition:
-      color 120ms ease,
-      background-color 120ms ease;
-  }
-
-  .nav-item:hover {
-    color: var(--color-text-primary);
-  }
-
-  .nav-item[aria-current="page"] {
-    background: var(--color-bg-subtle);
-    color: var(--color-text-primary);
-  }
-
-  .nav-group-label {
-    margin-top: 1.5rem;
-    padding-inline: 0.5rem;
-    padding-bottom: 0.25rem;
-    font-size: 0.75rem;
-    line-height: 1.625rem;
-    color: var(--color-text-secondary);
-  }
-
-  .toc-item {
-    display: block;
-    padding-left: 1.25rem;
-    border-left: 1px solid var(--color-border-default);
-    font-size: 0.75rem;
-    line-height: 2rem;
-    color: var(--color-text-secondary);
-    transition: color 120ms ease;
-  }
-
-  .toc-item:hover {
-    color: var(--color-text-primary);
-  }
-
-  .toc-item[data-level="3"] {
-    padding-left: 2rem;
-  }
-
-  .toc-item[aria-current="true"] {
-    color: var(--color-text-primary);
-  }
-
-  .doc-title {
-    font-size: 2.25rem;
-    line-height: 1.1;
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    text-wrap: balance;
-  }
-
-  .doc-title-wide {
-    font-size: 2rem;
-  }
-
-  @media (min-width: 768px) {
-    .doc-title {
-      font-size: 3.75rem;
-      letter-spacing: -0.025em;
-    }
-
-    .doc-title-wide {
-      font-size: 2.5rem;
-      letter-spacing: -0.02em;
-    }
-  }
-
-  .doc-title-wide {
-    font-size: 2rem;
-  }
-
-  @media (min-width: 768px) {
-    .doc-title-wide {
-      font-size: 2.5rem;
-    }
-  }
-
-  .doc-lead {
-    max-width: 48rem;
-    font-size: 1rem;
-    line-height: 1.75rem;
-    color: var(--color-text-secondary);
-    text-wrap: pretty;
-  }
-
+  /* No library component is a demo canvas; the translucent tint is a token mix that no utility expresses. */
   .demo-stage {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
+    gap: calc(var(--spacing) * 3);
     min-height: 26rem;
-    padding: 2rem;
-    border-radius: 1rem;
+    padding: calc(var(--spacing) * 8);
+    border-radius: var(--radius-2xl);
     background: color-mix(in oklab, var(--color-bg-subtle) 60%, transparent);
     color: var(--color-text-primary);
   }
 
+  /* The grid variant of the same stage; no library grid is tied to demo previews. */
   .demo-stage-grid {
-    align-items: stretch;
     display: grid;
+    align-items: stretch;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   }
 
-  /* Overlay previews keep a fixed-height stage so the trigger sits centered
-   * and the page below does not jump when the panel opens. */
+  /* Overlay demos need a fixed-height positioning context so opening the panel does not move the page. */
   .demo-stage-overlay {
     position: relative;
     align-content: center;
     justify-content: center;
   }
 
+  /* Index previews are cropped to 16:9 on their own surface; no library component owns that frame. */
   .demo-tile {
+    position: relative;
     display: grid;
     place-items: center;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
+    padding: calc(var(--spacing) * 6);
+    border-radius: var(--radius-sm);
     background: color-mix(in oklab, var(--color-bg-subtle) 60%, transparent);
   }
 
-  /* A demo rendered inside an index tile keeps its own controls but drops the
-   * full-page stage: the tile supplies the surface and the fixed aspect ratio. */
-  .demo-tile {
-    position: relative;
-  }
-
-  /* Index previews keep their natural size and are scaled to the tile by the
-   * script in ComponentGroupSection.astro. */
+  /* ComponentGroupSection scales each preview through --demo-fit; this is the box the script transforms. */
   .demo-fit {
     position: absolute;
     top: 50%;
@@ -269,84 +85,76 @@
     transform-origin: center;
   }
 
+  /* Inside a tile the stage has nothing to supply: the tile owns surface, ratio and padding. */
   .demo-tile .demo-stage {
     min-height: 0;
     padding: 0;
-    background: transparent;
     border-radius: 0;
+    background: transparent;
   }
 
-  .card-link {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: 0.875rem 1.25rem;
-    border-radius: 0.75rem;
-    background: var(--color-bg-subtle);
-    transition: background-color 120ms ease;
-  }
-
-  .card-link:hover {
-    background: color-mix(in oklab, var(--color-bg-subtle) 70%, var(--color-text-primary) 8%);
-  }
-
+  /* DocsLayout wraps page prose in this slot, so headings, lists and inline code are styled by descendant selectors no library component exposes; every value below is a token. */
   .prose-docs {
-    font-size: 1rem;
-    line-height: 1.75rem;
-    color: color-mix(in oklab, var(--color-text-primary) 90%, transparent);
+    font-size: var(--text-body-md);
+    line-height: var(--text-body-md--line-height);
+    letter-spacing: var(--text-body-md--letter-spacing);
+    font-weight: var(--text-body-md--font-weight);
+    color: var(--color-text-secondary);
   }
 
+  /* Flow spacing between blocks is the design's paragraph token, not a page margin. */
   .prose-docs > * + * {
-    margin-top: 1rem;
+    margin-top: var(--paragraph-body-md);
   }
 
   .prose-docs h2:not(.demo-stage *) {
-    margin-top: 4rem;
-    margin-bottom: 1.5rem;
-    font-size: 1.5rem;
-    line-height: 2rem;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-    color: var(--color-text-primary);
+    margin-top: calc(var(--spacing) * 16);
+    margin-bottom: calc(var(--spacing) * 6);
+    font-size: var(--text-title-md);
+    line-height: var(--text-title-md--line-height);
+    letter-spacing: var(--text-title-md--letter-spacing);
+    font-weight: var(--text-title-md--font-weight);
     text-wrap: balance;
-    scroll-margin-top: 6rem;
   }
 
+  /* A page that starts with a section must not push its title down. */
   .prose-docs h2:first-child {
     margin-top: 0;
   }
 
   .prose-docs h3:not(.demo-stage *) {
-    margin-top: 2.5rem;
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-    font-weight: 500;
+    margin-top: calc(var(--spacing) * 10);
+    margin-bottom: calc(var(--spacing) * 4);
+    font-size: var(--text-title-sm);
+    line-height: var(--text-title-sm--line-height);
+    letter-spacing: var(--text-title-sm--letter-spacing);
+    font-weight: var(--text-title-sm--font-weight);
+  }
+
+  /* Headings keep the ink colour of the surrounding prose; the library only sets it on its own components. */
+  .prose-docs h2:not(.demo-stage *),
+  .prose-docs h3:not(.demo-stage *) {
     color: var(--color-text-primary);
-    scroll-margin-top: 6rem;
   }
 
-  .prose-docs p,
-  .prose-docs li {
-    color: var(--color-text-secondary);
-  }
-
+  /* Bold prose runs read as ink and semibold; the library never styles bare <strong>. */
   .prose-docs strong {
     color: var(--color-text-primary);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 
+  /* Preflight resets links to inherit, so page prose restores the brand underline; the library only styles its own link buttons. */
   .prose-docs a {
     color: var(--color-text-primary);
-    text-decoration: underline;
+    text-decoration-line: underline;
     text-decoration-color: var(--color-text-brand);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
+    text-underline-offset: calc(var(--spacing) * 0.75);
   }
 
+  /* Preflight strips list markers and indentation; document lists keep both. */
   .prose-docs ul,
   .prose-docs ol {
-    padding-left: 1.25rem;
+    padding-left: calc(var(--spacing) * 5);
   }
 
   .prose-docs ul {
@@ -357,15 +165,18 @@
     list-style: decimal;
   }
 
+  /* Items need a tighter gap than the block rhythm. */
   .prose-docs li + li {
-    margin-top: 0.375rem;
+    margin-top: calc(var(--spacing) * 1.5);
   }
 
+  /* Inline code keeps prose colour and backtick-like padding; fenced code belongs to CodePanel. */
   .prose-docs code:not(pre code) {
     font-family: var(--font-mono);
-    font-size: 0.875rem;
-    padding: 0.125rem 0.375rem;
-    border-radius: 0.375rem;
+    font-size: var(--text-code);
+    line-height: var(--text-code--line-height);
+    padding: calc(var(--spacing) * 0.5) calc(var(--spacing) * 1.5);
+    border-radius: var(--radius-xs);
     background: var(--color-bg-subtle);
     color: var(--color-text-primary);
   }

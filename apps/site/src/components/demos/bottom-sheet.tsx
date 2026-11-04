@@ -2,6 +2,7 @@ import {
   BottomSheet,
   BottomSheetAction,
   BottomSheetActions,
+  BottomSheetClose,
   BottomSheetContent,
   BottomSheetRow,
   BottomSheetTrigger,
@@ -22,7 +23,7 @@ export default function BottomSheetDemo() {
         </BottomSheetRow>
         <BottomSheetRow icon={<GearSix />}>Bot settings</BottomSheetRow>
         <BottomSheetActions>
-          <BottomSheetAction>Pause</BottomSheetAction>
+          <BottomSheetClose render={<BottomSheetAction />}>Cancel</BottomSheetClose>
           <BottomSheetAction variant="primary">Open chat</BottomSheetAction>
         </BottomSheetActions>
       </BottomSheetContent>

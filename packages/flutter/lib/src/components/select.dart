@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../glass/glass_geometry.dart';
 import '../glass/horon_glass.dart';
+import '../overlay/horon_menu_anchor.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -172,14 +173,10 @@ class HoronSelect extends StatefulWidget {
 }
 
 class _HoronSelectState extends State<HoronSelect> {
-  final OverlayPortalController _portal = OverlayPortalController();
+  final MenuController _controller = MenuController();
   final LayerLink _link = LayerLink();
-  final GlobalKey _triggerKey = GlobalKey();
-  final Object _tapGroup = Object();
 
   String? _internalValue;
-  double _anchorWidth = 0;
-  bool _open = false;
 
   String? get _value => widget.value ?? _internalValue;
 
@@ -189,71 +186,51 @@ class _HoronSelectState extends State<HoronSelect> {
 
   bool get _disabled => widget.disabled || (widget.segment && (_group?.disabled ?? false));
 
-  @override
-  void initState() {
-    super.initState();
-    _scheduleMeasure();
-  }
-
-  void _scheduleMeasure() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final RenderBox? box = _triggerKey.currentContext?.findRenderObject() as RenderBox?;
-      if (box == null || !box.hasSize) return;
-      if (box.size.width == _anchorWidth) return;
-      setState(() => _anchorWidth = box.size.width);
-    });
-  }
-
   void _toggle() {
     if (_disabled) return;
-    if (_open) {
-      _close();
+    if (_controller.isOpen) {
+      _controller.close();
     } else {
-      _portal.show();
-      _scheduleMeasure();
-      setState(() => _open = true);
+      _controller.open();
     }
-  }
-
-  void _close() {
-    if (!_open) return;
-    _portal.hide();
-    setState(() => _open = false);
   }
 
   void _select(HoronSelectItem item) {
     if (item.disabled) return;
     if (widget.value == null) setState(() => _internalValue = item.value);
-    _close();
+    _controller.close();
     widget.onChanged?.call(item.value);
   }
 
   @override
   Widget build(BuildContext context) {
-    return OverlayPortal(
-      controller: _portal,
-      overlayChildBuilder: _buildPopup,
-      child: CompositedTransformTarget(
-        link: _link,
-        child: TapRegion(
-          groupId: _tapGroup,
-          child: Semantics(
-            button: true,
-            label: widget.semanticLabel,
-            value: _labelOf(_value) ?? widget.placeholder,
-            child: GestureDetector(
-              key: _triggerKey,
-              behavior: HitTestBehavior.opaque,
-              onTap: _toggle,
-              child: widget.chip
-                  ? _buildChipTrigger(context)
-                  : widget.segment
-                  ? _buildSegmentTrigger(context)
-                  : _buildFieldTrigger(context),
+    return HoronMenuAnchor(
+      controller: _controller,
+      overlayBuilder: _buildPopup,
+      // RawMenuAnchor의 열림 상태 스코프 안에서 빌드되므로, 열림 값을 여기서 읽어
+      // 시맨틱과 캐럿에 씁니다.
+      child: Builder(
+        builder: (BuildContext context) {
+          final bool open = MenuController.maybeIsOpenOf(context) ?? false;
+          return CompositedTransformTarget(
+            link: _link,
+            child: Semantics(
+              button: true,
+              label: widget.semanticLabel,
+              value: _labelOf(_value) ?? widget.placeholder,
+              expanded: open,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: _toggle,
+                child: widget.chip
+                    ? _buildChipTrigger(context, open)
+                    : widget.segment
+                    ? _buildSegmentTrigger(context, open)
+                    : _buildFieldTrigger(context, open),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -302,9 +279,9 @@ class _HoronSelectState extends State<HoronSelect> {
     );
   }
 
-  Widget _caret(HoronThemeData horon) {
+  Widget _caret(HoronThemeData horon, bool open) {
     return AnimatedRotation(
-      turns: _open ? 0.5 : 0,
+      turns: open ? 0.5 : 0,
       duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : _caretDuration,
       curve: HoronMotion.easeOutQuint,
       child: IconTheme.merge(
@@ -319,7 +296,7 @@ class _HoronSelectState extends State<HoronSelect> {
     );
   }
 
-  Widget _buildFieldTrigger(BuildContext context) {
+  Widget _buildFieldTrigger(BuildContext context, bool open) {
     final HoronThemeData horon = HoronTheme.of(context);
     final _SelectMetrics metrics = _metricsOf(widget.size, horon);
     return SizedBox(
@@ -334,14 +311,14 @@ class _HoronSelectState extends State<HoronSelect> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Expanded(child: _valueText(horon)),
-            if (widget.showIndicator) _caret(horon),
+            if (widget.showIndicator) _caret(horon, open),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSegmentTrigger(BuildContext context) {
+  Widget _buildSegmentTrigger(BuildContext context, bool open) {
     final HoronThemeData horon = HoronTheme.of(context);
     final HoronInputGroupSize groupSize = _group?.size ?? HoronInputGroupSize.md;
     final HoronSegmentMetrics metrics = horonSegmentMetrics(groupSize, horon);
@@ -356,7 +333,7 @@ class _HoronSelectState extends State<HoronSelect> {
             spacing: metrics.gap,
             children: <Widget>[
               Flexible(child: _valueText(horon)),
-              if (widget.showIndicator) _caret(horon),
+              if (widget.showIndicator) _caret(horon, open),
             ],
           ),
         ),
@@ -364,7 +341,7 @@ class _HoronSelectState extends State<HoronSelect> {
     );
   }
 
-  Widget _buildChipTrigger(BuildContext context) {
+  Widget _buildChipTrigger(BuildContext context, bool open) {
     final HoronThemeData horon = HoronTheme.of(context);
     return AnimatedContainer(
       duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,
@@ -380,13 +357,13 @@ class _HoronSelectState extends State<HoronSelect> {
         spacing: horon.space.s1,
         children: <Widget>[
           Flexible(child: _valueText(horon)),
-          if (widget.showIndicator) _caret(horon),
+          if (widget.showIndicator) _caret(horon, open),
         ],
       ),
     );
   }
 
-  Widget _buildPopup(BuildContext context) {
+  Widget _buildPopup(BuildContext context, RawMenuOverlayInfo info) {
     final HoronThemeData horon = HoronTheme.of(context);
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
     final BorderRadius radius = BorderRadius.all(Radius.circular(horon.radius.xl));
@@ -407,29 +384,25 @@ class _HoronSelectState extends State<HoronSelect> {
       offset: const Offset(0, _popupOffset),
       child: Align(
         alignment: Alignment.topLeft,
-        child: TapRegion(
-          groupId: _tapGroup,
-          onTapOutside: (_) => _close(),
-          child: TweenAnimationBuilder<double>(
-            tween: Tween<double>(begin: 0, end: 1),
-            duration: reduceMotion ? Duration.zero : HoronMotion.popupEnterDuration,
-            curve: HoronMotion.easeOutQuint,
-            builder: (BuildContext context, double value, Widget? child) {
-              return Opacity(
-                opacity: value,
-                child: Transform.scale(
-                  scale: HoronMotion.popupEnterScale + (1 - HoronMotion.popupEnterScale) * value,
-                  alignment: Alignment.topLeft,
-                  child: child,
-                ),
-              );
-            },
-            child: SizedBox(
-              width: math.max(_anchorWidth, _minPopupWidth),
-              child: ClipRRect(
-                borderRadius: radius,
-                child: HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: list),
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0, end: 1),
+          duration: reduceMotion ? Duration.zero : HoronMotion.popupEnterDuration,
+          curve: HoronMotion.easeOutQuint,
+          builder: (BuildContext context, double value, Widget? child) {
+            return Opacity(
+              opacity: value,
+              child: Transform.scale(
+                scale: HoronMotion.popupEnterScale + (1 - HoronMotion.popupEnterScale) * value,
+                alignment: Alignment.topLeft,
+                child: child,
               ),
+            );
+          },
+          child: SizedBox(
+            width: math.max(info.anchorRect.width, _minPopupWidth),
+            child: ClipRRect(
+              borderRadius: radius,
+              child: HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: list),
             ),
           ),
         ),

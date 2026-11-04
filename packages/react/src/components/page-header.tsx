@@ -42,7 +42,7 @@ export function PageHeader({
         <h1 className={cn("min-w-0 flex-1 truncate text-label-lg text-text-primary", !onBack && "pl-2")}>{title}</h1>
         {actions}
       </div>
-      {children && <div className="relative">{children}</div>}
+      {children && <div className="relative animate-swap-move">{children}</div>}
     </header>
   );
 }

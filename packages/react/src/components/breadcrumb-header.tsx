@@ -2,6 +2,7 @@ import { CaretRight, DotsThree, MagnifyingGlass } from "@phosphor-icons/react";
 import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
+import { BreadcrumbItem } from "./breadcrumb";
 import { IconButton } from "./icon-button";
 import { LiquidGlass } from "./liquid-glass";
 
@@ -23,9 +24,6 @@ export type BreadcrumbHeaderProps = Omit<ComponentProps<"header">, "className"> 
   surface?: "solid" | "glass";
   className?: string;
 };
-
-const crumbClass =
-  "flex items-center gap-1.5 rounded-sm py-1 pr-2 pl-1.5 text-label-md whitespace-nowrap motion-colors";
 
 /** Paper `Header with breadcrumb`: a 52px regular-glass pill with a crumb row, search and more buttons. */
 export function BreadcrumbHeader({
@@ -52,44 +50,38 @@ export function BreadcrumbHeader({
         <ol className="flex items-center gap-1.5">
           {crumbs.map((crumb, index) => {
             const current = index === crumbs.length - 1;
-            const Element = crumb.href && !current ? "a" : "span";
             return (
-              <li key={crumb.label} className="flex items-center gap-1.5">
+              <li key={crumb.label} className={cn("flex items-center gap-1.5", current && "min-w-0")}>
                 {index > 0 && <CaretRight aria-hidden className="size-3.5 shrink-0 text-text-secondary" />}
-                <Element
-                  href={Element === "a" ? crumb.href : undefined}
-                  aria-current={current ? "page" : undefined}
-                  className={cn(
-                    crumbClass,
-                    current ? "text-text-primary" : "text-text-secondary",
-                    Element === "a" &&
-                      "hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand",
-                  )}
+                <BreadcrumbItem
+                  current={current}
+                  tile={crumb.tile}
+                  href={crumb.href}
+                  className={current ? "min-w-0" : undefined}
                 >
-                  {crumb.tile && (
-                    <span className="flex size-5 shrink-0 items-center justify-center rounded-xs bg-interactive-primary text-label-sm text-text-inverse">
-                      {crumb.tile}
-                    </span>
-                  )}
-                  {crumb.label}
-                </Element>
+                  <span className="min-w-0 truncate">{crumb.label}</span>
+                </BreadcrumbItem>
               </li>
             );
           })}
         </ol>
       </nav>
-      <IconButton
-        icon={<MagnifyingGlass />}
-        label={searchLabel}
-        onClick={onSearch}
-        className="relative size-9 [&_svg]:size-4.5"
-      />
-      <IconButton
-        icon={<DotsThree weight="bold" />}
-        label={moreLabel}
-        onClick={onMore}
-        className="relative size-9 [&_svg]:size-4.5"
-      />
+      {onSearch && (
+        <IconButton
+          icon={<MagnifyingGlass />}
+          label={searchLabel}
+          onClick={onSearch}
+          className="relative size-9 [&_svg]:size-4.5"
+        />
+      )}
+      {onMore && (
+        <IconButton
+          icon={<DotsThree weight="bold" />}
+          label={moreLabel}
+          onClick={onMore}
+          className="relative size-9 [&_svg]:size-4.5"
+        />
+      )}
     </header>
   );
 }

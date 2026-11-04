@@ -2,8 +2,6 @@ import { AgentLanesTimeline, type LaneBot } from "@horon-ai/react";
 import { Envelope, FileText, Folder, Warning, WarningCircle } from "@phosphor-icons/react";
 import { useState } from "react";
 
-import { Backdrop } from "../demo-backdrop";
-
 const bots: LaneBot[] = [
   {
     id: "researcher",
@@ -64,7 +62,7 @@ const bots: LaneBot[] = [
 export default function AgentLanesTimelineDemo() {
   const [cursor, setCursor] = useState(0);
   return (
-    <Backdrop className="flex-col">
+    <div className="flex w-full flex-col items-center gap-6">
       <AgentLanesTimeline
         statuses={[
           { id: "running", tone: "live", label: "2 running" },
@@ -91,6 +89,6 @@ export default function AgentLanesTimelineDemo() {
           aria-label="Minutes before now"
         />
       </label>
-    </Backdrop>
+    </div>
   );
 }

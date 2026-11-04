@@ -13,7 +13,7 @@ type ButtonProps = Omit<ComponentProps<"button">, "className"> & {
 };
 
 const controlBase =
-  "motion-press relative flex animate-[tab-panel-in_220ms_var(--ease-out-quint)] cursor-pointer items-center overflow-clip rounded-full text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
+  "motion-press relative flex motion-rise cursor-pointer items-center overflow-clip rounded-full text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
 
 const surfaceClass: Record<ChatControlSurface, string> = {
   glass: "bg-glass-clear hover:bg-glass-clear-hover active:bg-glass-clear-pressed",
@@ -97,23 +97,22 @@ export function VoiceInput({
         type="button"
         aria-label={stopLabel}
         onClick={onStop}
-        className="relative flex size-9 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+        className="relative flex size-9 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
       >
-        <span className="size-3 rounded-[3px] bg-bg-surface" />
+        <span className="size-3 rounded-[3px] bg-interactive-on-danger" />
       </button>
       <div aria-hidden className="relative flex min-w-0 flex-1 items-center gap-[3px] overflow-hidden">
         {bars.map((bar, position) => (
           <span
             key={bar.id}
-            className={cn(
-              "w-[3px] shrink-0 rounded-[2px] bg-interactive-primary-75",
-              recording && "animate-wave motion-reduce:animate-none",
-            )}
+            className={cn("w-[3px] shrink-0 rounded-[2px] bg-interactive-primary-75", recording && "animate-wave")}
             style={{ height: bar.height, animationDelay: recording ? `${position * 120}ms` : undefined }}
           />
         ))}
       </div>
-      <span className="relative shrink-0 text-label-md whitespace-nowrap text-text-secondary">{elapsed}</span>
+      <span className="relative w-10 shrink-0 text-right text-label-md whitespace-nowrap text-text-secondary tabular-nums">
+        {elapsed}
+      </span>
     </div>
   );
 }

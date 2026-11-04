@@ -13,9 +13,9 @@ function Fields({ surface }: { surface: "solid" | "glass" }) {
   return (
     <>
       <div className="flex flex-wrap items-end justify-center gap-3">
-        <Select aria-label="Bot" items={items} surface={surface} size="sm" placeholder="Small" className="max-w-44" />
-        <Select aria-label="Bot" items={items} surface={surface} placeholder="Medium" className="max-w-44" />
-        <Select aria-label="Bot" items={items} surface={surface} size="lg" placeholder="Large" className="max-w-44" />
+        <Select aria-label="Bot" items={items} surface={surface} size="sm" placeholder="Small" className="w-44" />
+        <Select aria-label="Bot" items={items} surface={surface} placeholder="Medium" className="w-44" />
+        <Select aria-label="Bot" items={items} surface={surface} size="lg" placeholder="Large" className="w-44" />
       </div>
       <Select aria-label="Bot" items={items} surface={surface} placeholder="Select a bot" />
       <Select

@@ -31,28 +31,29 @@ export function DirectoryCard({
   return (
     <div
       className={cn(
-        "relative flex items-center gap-3 overflow-clip rounded-2xl py-3 pr-3.5 pl-3",
+        "relative flex items-center gap-3 overflow-clip rounded-2xl py-3 pr-3 pl-3",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
     >
       {surface === "glass" && <LiquidGlass />}
-      <span className="relative flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-500 text-text-inverse [&>svg]:size-5">
+      <span className="relative flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-500 text-neutral-50 [&>svg]:size-5">
         {icon}
       </span>
       <span className="relative flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="truncate text-label-md text-text-primary">{name}</span>
-        {description && <span className="line-clamp-1 text-[12px]/[16px] text-text-placeholder">{description}</span>}
+        {description && <span className="line-clamp-1 text-caption text-text-secondary">{description}</span>}
       </span>
-      <IconButton
-        variant={surface === "glass" ? "glass" : "solid"}
-        size="sm"
-        label={addLabel}
-        icon={<Plus aria-hidden />}
-        onClick={onAdd}
-        className="relative [&_svg]:size-3.5"
-      />
+      {onAdd && (
+        <IconButton
+          variant={surface === "glass" ? "glass" : "solid"}
+          size="sm"
+          label={addLabel}
+          icon={<Plus aria-hidden />}
+          onClick={onAdd}
+        />
+      )}
     </div>
   );
 }

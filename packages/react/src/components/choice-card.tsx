@@ -21,7 +21,7 @@ export function ChoiceCard({ title, description, badge, badgeTone = "brand", cla
   return (
     <BaseRadio.Root
       className={cn(
-        "group relative flex w-[252px] cursor-pointer items-start gap-3 overflow-clip rounded-2xl border border-border-default bg-bg-surface p-3.5 text-left motion-colors data-checked:border-border-brand",
+        "group relative flex w-[252px] cursor-pointer items-start gap-3 overflow-clip rounded-2xl border border-border-default bg-bg-surface p-3.5 text-left motion-colors data-checked:border-border-brand data-unchecked:hover:border-border-strong",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
         "data-disabled:cursor-not-allowed data-disabled:opacity-40",
         className,
@@ -30,17 +30,17 @@ export function ChoiceCard({ title, description, badge, badgeTone = "brand", cla
     >
       <span
         aria-hidden
-        className="relative mt-px flex size-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-border-dashed motion-colors group-data-checked:border-[5px] group-data-checked:border-interactive-primary"
+        className="relative mt-px flex size-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-border-dashed motion-colors group-data-checked:border-interactive-primary group-data-checked:shadow-[inset_0_0_0_3.5px_var(--color-interactive-primary)]"
       >
         <BaseRadio.Indicator className="size-2 animate-pop-in rounded-full bg-interactive-on-primary data-unchecked:hidden" />
       </span>
-      <span className="relative flex min-w-0 flex-1 flex-col gap-[3px]">
+      <span className="relative flex min-w-0 flex-1 flex-col gap-1">
         <span className="flex items-center gap-2.5">
-          <span className="min-w-0 flex-1 text-[14px]/5 font-semibold text-text-primary">{title}</span>
+          <span className="min-w-0 flex-1 text-label-md font-semibold text-text-primary">{title}</span>
           {badge && (
             <span
               className={cn(
-                "inline-flex h-[22px] shrink-0 items-center rounded-full px-2 text-[12px]/4 font-medium",
+                "inline-flex h-[22px] shrink-0 items-center rounded-full px-2 text-label-sm",
                 badgeTone === "brand" ? "bg-accent-sky-500-18 text-text-brand" : "bg-overlay-ink-6 text-text-secondary",
               )}
             >
@@ -48,7 +48,7 @@ export function ChoiceCard({ title, description, badge, badgeTone = "brand", cla
             </span>
           )}
         </span>
-        {description && <span className="text-[12px]/4 text-text-secondary">{description}</span>}
+        {description && <span className="text-caption text-text-secondary">{description}</span>}
       </span>
     </BaseRadio.Root>
   );

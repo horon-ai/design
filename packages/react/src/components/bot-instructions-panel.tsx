@@ -3,6 +3,7 @@ import { type ComponentProps, type KeyboardEvent, type ReactNode, useRef, useSta
 
 import { cn } from "../lib/cn";
 import { useActiveIndicator } from "../lib/use-active-indicator";
+import { Kbd } from "./kbd";
 
 type WithClass<T> = Omit<T, "className"> & { className?: string };
 
@@ -64,7 +65,7 @@ export function PanelPillTabs({ items, value, defaultValue, onValueChange, class
             tabIndex={active ? 0 : -1}
             onClick={() => select(item.value)}
             className={cn(
-              "relative flex h-7 cursor-pointer items-center rounded-full px-3 text-label-md whitespace-nowrap motion-colors",
+              "relative flex h-7.5 cursor-pointer items-center rounded-full px-3 text-label-md whitespace-nowrap motion-colors",
               "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-text-brand",
               active ? "text-text-primary" : "text-text-secondary hover:text-text-primary",
             )}
@@ -80,9 +81,9 @@ export function PanelPillTabs({ items, value, defaultValue, onValueChange, class
 export type InstructionVariableTone = "sky" | "brand" | "neutral";
 
 const variableToneClass: Record<InstructionVariableTone, string> = {
-  sky: "bg-accent-sky-500-18",
-  brand: "bg-accent-sky-700-18",
-  neutral: "bg-text-placeholder-18",
+  sky: "bg-accent-sky-500-18 ring-accent-sky-500-90/40",
+  brand: "bg-accent-sky-700-18 ring-accent-sky-700-90/40",
+  neutral: "bg-text-placeholder-18 ring-text-placeholder-90/40",
 };
 
 const variableDotClass: Record<InstructionVariableTone, string> = {
@@ -115,6 +116,10 @@ export type BotInstructionsPanelProps = WithClass<Omit<ComponentProps<"section">
   onRun?: (scenario: string | undefined) => void;
   /** The last run's output, or a hint until there is one. */
   output?: ReactNode;
+  /** Makes the version pill actionable; without it the pill is a plain label. */
+  onVersionClick?: () => void;
+  /** Makes the bot pill actionable; without it the pill is a plain label. */
+  onBotClick?: () => void;
 };
 
 function partKey(part: InstructionPart) {
@@ -130,7 +135,11 @@ function VariableChip({
   className?: string;
   children: ReactNode;
 }) {
-  return <span className={cn("rounded-xs px-1.5 py-px", variableToneClass[tone], className)}>{children}</span>;
+  return (
+    <span className={cn("rounded-xs px-1.5 py-px ring-1 ring-inset", variableToneClass[tone], className)}>
+      {children}
+    </span>
+  );
 }
 
 function Divider() {
@@ -154,12 +163,14 @@ export function BotInstructionsPanel({
   defaultScenario,
   onRun,
   output,
+  onVersionClick,
+  onBotClick,
   className,
   ...props
 }: BotInstructionsPanelProps) {
   const [tab, setTab] = useState("instructions");
   const [scenario, setScenario] = useState(defaultScenario ?? scenarios?.[0]);
-  const [running, setRunning] = useState(false);
+  const [runCount, setRunCount] = useState(0);
 
   return (
     <section
@@ -169,37 +180,66 @@ export function BotInstructionsPanel({
       )}
       {...props}
     >
-      <header className="flex items-center gap-2 pt-3.5 pr-3.5 pb-3 pl-4.5">
+      <header className="flex items-center gap-2 px-5 pt-4 pb-3.5">
         <h3 className="text-label-lg text-text-primary">{title}</h3>
         {version ? (
-          <button
-            type="button"
-            className="flex h-7 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-5 px-2.5 text-label-sm text-text-primary hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
-          >
-            {version}
-            {versionStatus ? (
-              <>
-                <span aria-hidden className="size-1.5 rounded-full bg-sky-500" />
-                <span className="text-text-secondary">{versionStatus}</span>
-              </>
-            ) : null}
-            <CaretDown aria-hidden className="size-3 text-text-secondary" />
-          </button>
+          onVersionClick ? (
+            <button
+              type="button"
+              onClick={onVersionClick}
+              className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+            >
+              {version}
+              {versionStatus ? (
+                <>
+                  <span
+                    aria-hidden
+                    className="size-1.5 animate-live-pulse rounded-full bg-status-live text-status-live"
+                  />
+                  <span className="text-text-secondary">{versionStatus}</span>
+                </>
+              ) : null}
+              <CaretDown aria-hidden className="size-3 text-text-secondary" />
+            </button>
+          ) : (
+            <span className="flex h-7.5 shrink-0 items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 text-label-sm text-text-primary">
+              {version}
+              {versionStatus ? (
+                <>
+                  <span
+                    aria-hidden
+                    className="size-1.5 animate-live-pulse rounded-full bg-status-live text-status-live"
+                  />
+                  <span className="text-text-secondary">{versionStatus}</span>
+                </>
+              ) : null}
+            </span>
+          )
         ) : null}
         <span className="min-w-0 flex-1" />
-        <button
-          type="button"
-          className="flex h-7 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-5 pr-2.5 pl-1.5 text-label-sm text-text-primary hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
-        >
-          <span className="flex size-4.5 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
-            {bot.initial}
+        {onBotClick ? (
+          <button
+            type="button"
+            onClick={onBotClick}
+            className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+          >
+            <span className="flex size-4.5 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
+              {bot.initial}
+            </span>
+            {bot.name}
+            <CaretDown aria-hidden className="size-3 text-text-secondary" />
+          </button>
+        ) : (
+          <span className="flex h-7.5 shrink-0 items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5 text-label-sm text-text-primary">
+            <span className="flex size-4.5 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
+              {bot.initial}
+            </span>
+            {bot.name}
           </span>
-          {bot.name}
-          <CaretDown aria-hidden className="size-3 text-text-secondary" />
-        </button>
+        )}
       </header>
       <Divider />
-      <div className="flex flex-col gap-1 pt-3 pr-4.5 pb-3.5 pl-4.5">
+      <div className="flex flex-col gap-1 px-5 pt-3 pb-3.5">
         <div className="flex items-center gap-2 pb-2">
           <PanelPillTabs
             aria-label="Instructions view"
@@ -228,9 +268,13 @@ export function BotInstructionsPanel({
                 key={line.map(partKey).join("|")}
                 className="flex flex-wrap items-center gap-1 text-body-sm text-text-primary"
               >
+                {/* A lone period after a `{{variable}}` is its own flex item; pull it back
+                    so the 4px gap between items does not open before the punctuation. */}
                 {line.map((part) =>
                   typeof part === "string" ? (
-                    <span key={part}>{part}</span>
+                    <span key={part} className={cn(/^[,.;:!?%)\]]/.test(part) && "-ml-1")}>
+                      {part}
+                    </span>
                   ) : (
                     <VariableChip key={part.variable} tone={part.tone}>
                       {part.variable}
@@ -256,7 +300,7 @@ export function BotInstructionsPanel({
       {variables || scenarios ? (
         <>
           <Divider />
-          <div className="flex flex-col gap-2.5 pt-3 pr-4.5 pb-3.5 pl-4.5">
+          <div className="flex flex-col gap-2.5 px-5 pt-3 pb-3.5">
             {variables ? (
               <div className="flex flex-wrap gap-2">
                 {variables.map((variable) => (
@@ -268,7 +312,7 @@ export function BotInstructionsPanel({
                       />
                       {variable.name}
                     </div>
-                    <div className="flex h-9.5 items-center rounded-xl bg-overlay-ink-5 px-3 text-body-sm text-text-primary">
+                    <div className="flex h-10 items-center rounded-md bg-overlay-ink-5 px-3 text-body-sm text-text-primary">
                       {variable.value}
                     </div>
                   </div>
@@ -288,32 +332,31 @@ export function BotInstructionsPanel({
               <button
                 type="button"
                 onClick={() => {
-                  setRunning(true);
+                  setRunCount((count) => count + 1);
                   onRun?.(scenario);
                 }}
-                className="flex h-8 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full bg-interactive-primary pr-3.5 pl-3 text-label-sm text-text-inverse hover:bg-interactive-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+                className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full bg-interactive-primary pr-3 pl-3.5 text-label-sm text-text-inverse hover:bg-interactive-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
               >
                 <Play aria-hidden className="size-3.5" />
                 Run
-                <kbd className="rounded-md bg-overlay-ink-6 px-1.5 py-px font-sans text-caption text-text-secondary">
-                  ⌘↵
-                </kbd>
+                <Kbd className="bg-bg-surface-6 text-text-inverse/80">⌘↵</Kbd>
               </button>
             </div>
           </div>
         </>
       ) : null}
-      {output === undefined ? null : (
-        <div
-          key={running ? "ran" : "idle"}
-          className={cn(
-            "bg-overlay-ink-3 pt-3.5 pr-4.5 pb-4 pl-4.5 text-body-sm text-text-secondary",
-            running && "motion-rise",
+      <div className="motion-reveal" data-collapsed={output === undefined || undefined}>
+        <div>
+          {output === undefined ? null : (
+            <div
+              key={runCount}
+              className="motion-rise bg-overlay-ink-3 px-5 pt-3.5 pb-4 text-body-sm text-text-secondary"
+            >
+              {output}
+            </div>
           )}
-        >
-          {output}
         </div>
-      )}
+      </div>
     </section>
   );
 }

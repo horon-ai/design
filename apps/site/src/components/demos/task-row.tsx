@@ -1,8 +1,33 @@
-import { TaskRow } from "@horon-ai/react";
+import { TaskRow, type TaskStatus } from "@horon-ai/react";
+import { useEffect, useState } from "react";
+
+function InteractiveTaskRow() {
+  const [status, setStatus] = useState<TaskStatus>("failed");
+  useEffect(() => {
+    if (status !== "running") return undefined;
+    const timer = setTimeout(() => setStatus("done"), 1600);
+    return () => clearTimeout(timer);
+  }, [status]);
+  return (
+    <TaskRow
+      status={status}
+      title="Book interviews for next week"
+      elapsed="3m 12s"
+      bot={{ initial: "R", name: "Recruiter" }}
+      project="Q4 hiring"
+      message={status === "failed" ? "Failed" : status === "running" ? "Retrying" : "Booked 5 interviews"}
+      detail={status === "failed" ? "Google Calendar needs to be reconnected" : "5 holds · 2 confirmed"}
+      onRetry={() => setStatus("running")}
+      onCancel={() => setStatus("done")}
+      onArchive={() => setStatus("failed")}
+    />
+  );
+}
 
 export default function TaskRowDemo() {
   return (
     <div className="flex w-full max-w-160 flex-col gap-3">
+      <InteractiveTaskRow />
       <TaskRow
         status="review"
         title="Draft replies to the investor thread"

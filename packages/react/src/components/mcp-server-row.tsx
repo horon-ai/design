@@ -6,7 +6,15 @@ import { Button } from "./button";
 import { IconButton } from "./icon-button";
 import { Menu, MenuContent, MenuTrigger } from "./menu";
 
-const pillClass = "inline-flex h-5.5 items-center rounded-full px-2 text-[12px]/[16px] font-medium";
+const pillClass = "inline-flex h-5.5 items-center rounded-full px-2 text-label-sm";
+
+export type McpServerStatusTone = "connected" | "warning" | "neutral";
+
+const statusToneClass: Record<McpServerStatusTone, { pill: string; dot: string }> = {
+  connected: { pill: "bg-overlay-ink-6 text-text-primary", dot: "bg-status-live" },
+  warning: { pill: "bg-accent-red-500-14 text-text-danger", dot: "bg-text-danger" },
+  neutral: { pill: "bg-overlay-ink-6 text-text-secondary", dot: "bg-text-placeholder" },
+};
 
 /** Suffixes repeated values with their occurrence so duplicate tags never share a React key. */
 const withKeys = (values: string[] | undefined) => {
@@ -30,6 +38,8 @@ export type McpServerRowProps = Omit<ComponentProps<"div">, "className" | "title
   /** Meta line, joined by "·". */
   meta?: string[];
   statusLabel?: ReactNode;
+  /** Colour of the status pill: a live dot by default, a danger tint for a warning, a muted dot for a neutral state. */
+  statusTone?: McpServerStatusTone;
   configureLabel?: ReactNode;
   onConfigure?: () => void;
   /** Overflow menu items (`MenuItem`). Hides the overflow button when absent. */
@@ -47,6 +57,7 @@ export function McpServerRow({
   description,
   meta,
   statusLabel = "Connected",
+  statusTone = "connected",
   configureLabel = "Configure",
   onConfigure,
   menu,
@@ -59,14 +70,14 @@ export function McpServerRow({
       className={cn("flex items-center gap-3.5 border-b border-border-default py-4 last:border-b-0", className)}
       {...props}
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-interactive-primary text-[14px]/[20px] font-semibold text-interactive-on-primary">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-500 text-label-md text-neutral-50">
         {initials ?? name.slice(0, 2).toUpperCase()}
       </span>
-      <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[14px]/[20px] font-semibold text-text-primary">{name}</span>
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className="max-w-full min-w-0 truncate text-label-md text-text-primary">{name}</span>
           {withKeys(tags).map(({ value, key }) => (
-            <span key={key} className={cn(pillClass, "bg-overlay-ink-6 text-text-secondary dark:bg-bg-surface-6")}>
+            <span key={key} className={cn(pillClass, "bg-overlay-ink-6 text-text-secondary")}>
               {value}
             </span>
           ))}
@@ -76,9 +87,9 @@ export function McpServerRow({
             </span>
           ))}
         </div>
-        {description && <span className="text-[13px]/[18px] text-text-secondary">{description}</span>}
+        {description && <span className="text-body-sm text-text-secondary">{description}</span>}
         {meta && meta.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5 text-[12px]/[16px] text-text-placeholder">
+          <div className="flex flex-wrap items-center gap-1.5 text-label-sm text-text-secondary">
             {withKeys(meta).map(({ value, key }, i) => (
               <span key={key} className="inline-flex items-center gap-1.5">
                 {i > 0 && <span aria-hidden>·</span>}
@@ -88,8 +99,11 @@ export function McpServerRow({
           </div>
         )}
       </div>
-      <span className={cn(pillClass, "shrink-0 bg-accent-sky-500-18 text-text-brand")}>{statusLabel}</span>
-      <Button variant="glass" size="sm" icon={<GearSix aria-hidden className="size-3.5" />} onClick={onConfigure}>
+      <span className={cn(pillClass, "shrink-0 gap-1.5", statusToneClass[statusTone].pill)}>
+        <span aria-hidden className={cn("size-1.5 rounded-full", statusToneClass[statusTone].dot)} />
+        {statusLabel}
+      </span>
+      <Button variant="solid" size="sm" icon={<GearSix aria-hidden className="size-3.5" />} onClick={onConfigure}>
         {configureLabel}
       </Button>
       {menu && (

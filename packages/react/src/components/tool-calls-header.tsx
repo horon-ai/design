@@ -35,13 +35,13 @@ export function ToolCallsHeader({
       defaultOpen={defaultOpen}
       open={open}
       onOpenChange={onOpenChange}
-      className={cn("flex w-full flex-col", className)}
+      className={cn("flex w-full flex-col rounded-xl border border-border-default bg-bg-surface p-3", className)}
     >
       <Collapsible.Trigger className="group flex w-full cursor-pointer items-center gap-2.5 pb-1 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand">
         {chips.length > 0 && (
           <span className="flex items-center">
             {Children.map(chips, (icon) => (
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-sm border border-border-default bg-bg-surface text-text-secondary not-first:-ml-1.5 [&>svg]:size-3.5">
+              <span className="-ml-2 flex size-7 shrink-0 items-center justify-center rounded-[10px] bg-bg-subtle text-text-secondary ring-2 ring-bg-surface first:ml-0 [&>svg]:size-3.5">
                 {icon}
               </span>
             ))}
@@ -51,7 +51,7 @@ export function ToolCallsHeader({
         {elapsed && <span className="text-label-md text-text-secondary">· {elapsed}</span>}
         <CaretDown
           aria-hidden
-          className="size-3.5 shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-panel-open:rotate-180"
+          className="ml-auto size-4 shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-panel-open:rotate-180"
         />
       </Collapsible.Trigger>
       <Collapsible.Panel className="motion-collapse">

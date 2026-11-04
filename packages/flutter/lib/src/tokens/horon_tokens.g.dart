@@ -1153,11 +1153,7 @@ final class HoronTextStyles {
 /// 표면 위에서 아래로 `top` → `mid`(`rimMidStop` 자리) → `bottom` 순서로 칠합니다.
 final class HoronGlassRim {
   /// 세 색을 받는 생성자입니다.
-  const HoronGlassRim({
-    required this.top,
-    required this.mid,
-    required this.bottom,
-  });
+  const HoronGlassRim({required this.top, required this.mid, required this.bottom});
 
   /// 위쪽(그라디언트 0) 색입니다.
   final Color top;
@@ -1183,12 +1179,7 @@ final class HoronGlassRim {
 /// 두께의 세로 그라디언트 림을 그립니다. 굴절·질감·안쪽 그늘·광택은 없습니다.
 final class HoronGlassTokens {
   /// 모든 글래스 값을 받는 생성자입니다.
-  const HoronGlassTokens({
-    this.blur = 20.0,
-    this.saturate = 1.8,
-    this.rimWidth = 1.0,
-    this.rimMidStop = 0.5,
-  });
+  const HoronGlassTokens({this.blur = 20.0, this.saturate = 1.8, this.rimWidth = 1.0, this.rimMidStop = 0.5});
 
   /// 뒤 배경에 거는 가우스 블러의 표준편차입니다(논리 픽셀).
   final double blur;

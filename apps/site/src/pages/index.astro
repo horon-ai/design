@@ -1,7 +1,13 @@
 ---
-import BaseLayout from "@/layouts/BaseLayout.astro";
+import { Badge, Button, Card } from "@horon-ai/react";
+import { createElement, Fragment, type ReactElement, type ReactNode } from "react";
+
+import T from "@/components/i18n/T.astro";
 import { componentCount, components, componentGroups, componentsInGroup } from "@/data/components";
 import { mascotImageUrl, mascotSpec } from "@/data/mascots";
+import type { Localized } from "@/i18n";
+import { homeMessages as m } from "@/i18n/messages/home";
+import BaseLayout from "@/layouts/BaseLayout.astro";
 import { demoCount } from "@/lib/demos";
 
 const featured = ["button", "card", "input", "dialog", "tabs", "select", "sidebar", "tool-call"];
@@ -9,63 +15,85 @@ const showcase = featured
   .map((slug) => components.find((component) => component.slug === slug))
   .filter((component): component is NonNullable<typeof component> => Boolean(component));
 
-const stats = [
-  { label: "Components", value: componentCount },
-  { label: "Live previews", value: demoCount() },
-  { label: "Mascot cuts", value: mascotSpec.count },
-  { label: "Platforms", value: "Web · Native" },
+const stats: { label: Localized; value: Localized | number }[] = [
+  { label: m.statComponents, value: componentCount },
+  { label: m.statPreviews, value: demoCount() },
+  { label: m.statCuts, value: mascotSpec.count },
+  { label: m.statPlatforms, value: m.platformValue },
 ];
+
+const principles = [
+  { title: m.principleInkTitle, body: m.principleInkBody },
+  { title: m.principleGlassTitle, body: m.principleGlassBody },
+  { title: m.principleSourceTitle, body: m.principleSourceBody },
+];
+
+const mascotCuts = ["main", "cheer", "think", "wave", "success", "lost"];
+
+const entryCards = [
+  { title: m.foundationsTitle, body: m.foundationsBody, href: "/foundations" },
+  { title: m.getStartedTitle, body: m.getStartedBody, href: "/get-started" },
+  { title: m.componentsTitle, body: m.componentsBody, href: "/components" },
+];
+
+/**
+ * Library components take React nodes for `title` and `description`, which
+ * Astro cannot pass as props. Building the same two-span markup `T.astro`
+ * renders keeps the static locale switch without a client island.
+ */
+function localized(entry: Localized): ReactNode {
+  return createElement(
+    Fragment,
+    null,
+    createElement("span", { "data-locale-text": "ko", lang: "ko" }, entry.ko),
+    createElement("span", { "data-locale-text": "en", lang: "en" }, entry.en),
+  );
+}
+
+/** Anchor for `Card`'s `render` prop; library Buttons take `href` directly. */
+function linkTo(href: string): ReactElement {
+  return createElement("a", { href });
+}
+
 ---
 
 <BaseLayout>
   <section class="relative overflow-hidden">
-    <div
-      class="pointer-events-none absolute inset-0 -z-10 opacity-70"
-      style="background:
-        radial-gradient(52rem 28rem at 12% -10%, var(--color-bg-subtle), transparent 60%),
-        radial-gradient(38rem 24rem at 88% 8%, color-mix(in oklch, var(--color-text-brand) 14%, transparent), transparent 62%);"
-    >
-    </div>
-    <div class="site-shell py-20 md:py-28">
-      <p class="text-body-sm text-text-secondary">Horon Design System</p>
-      <h1
-        class="mt-6 max-w-4xl text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.04em] text-balance md:text-[4.5rem]"
-      >
-        Seed to Root,<br />Root to Execute.
+    <div class="mx-auto w-full max-w-275 px-4 py-20 md:px-6 md:py-28">
+      <p class="text-body-sm text-text-secondary"><T m={m.eyebrow} /></p>
+      <h1 class="mt-6 max-w-4xl text-display-lg text-balance text-text-primary">
+        <T m={m.titleLine1} /><br /><T m={m.titleLine2} />
       </h1>
-      <p class="mt-7 max-w-xl text-body-md leading-7 text-text-secondary text-pretty md:text-body-lg">
-        데이터를 이해하는 것에서 끝나지 않고 실행과 결과까지 연결하는 시스템. 그 시스템을 지탱하는
-        토큰과 컴포넌트를 하나의 기준으로 정의합니다. 디자인과 코드가 같은 값을 바라봅니다.
-      </p>
+      <p class="mt-7 max-w-xl text-body-lg text-text-secondary text-pretty"><T m={m.body} /></p>
       <div class="mt-9 flex flex-wrap items-center gap-3">
-        <a
-          href="/get-started"
-          class="inline-flex h-[37px] items-center rounded-md bg-interactive-primary px-5 text-[13.5px] font-semibold text-interactive-on-primary transition-opacity hover:opacity-85"
-        >
-          시작하기
-        </a>
-        <a
-          href="/components"
-          class="inline-flex h-[37px] items-center rounded-md border border-border-default px-5 text-[13.5px] font-medium transition-colors hover:bg-bg-subtle"
-        >
-          컴포넌트 둘러보기
-        </a>
+        <Button variant="primary" href="/get-started">
+          <T m={m.start} />
+        </Button>
+        <Button variant="glass" href="/components">
+          <T m={m.browseComponents} />
+        </Button>
       </div>
 
       <img
         src={mascotImageUrl("main")}
-        alt="Horon 마스코트"
+        alt={m.mascotAlt.ko}
         width="320"
         height="320"
-        class="pointer-events-none absolute right-6 bottom-6 hidden size-[260px] object-contain lg:block xl:right-16 xl:size-[320px]"
+        class="pointer-events-none absolute right-6 bottom-6 hidden size-64 object-contain lg:block xl:right-16 xl:size-80"
       />
 
-      <dl class="mt-16 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-6 border-t border-border-default pt-8 sm:grid-cols-4">
+      <dl
+        class="mt-16 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-6 border-t border-border-default pt-8 sm:grid-cols-4"
+      >
         {
           stats.map((stat) => (
             <div>
-              <dt class="text-caption text-text-secondary">{stat.label}</dt>
-              <dd class="mt-1.5 text-title-md font-semibold">{stat.value}</dd>
+              <dt class="text-caption text-text-secondary">
+                <T m={stat.label} />
+              </dt>
+              <dd class="mt-1.5 text-title-md text-text-primary">
+                {typeof stat.value === "number" ? stat.value : <T m={stat.value} />}
+              </dd>
             </div>
           ))
         }
@@ -74,30 +102,25 @@ const stats = [
   </section>
 
   <section class="border-t border-border-default">
-    <div class="site-shell py-20">
-      <div class="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
+    <div class="mx-auto w-full max-w-275 px-4 py-20 md:px-6">
+      <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
         <div>
-          <p class="text-body-sm text-text-secondary">Principles</p>
-          <h2 class="mt-4 text-[1.75rem] md:text-[2rem] font-medium tracking-[-0.02em]">
-            세 가지 원칙
-          </h2>
-          <p class="mt-4 max-w-md text-[14px] leading-7 text-text-secondary">
-            HORON의 UI는 잉크와 종이 위에 하늘색 액센트 하나만 얹습니다. 떠 있는 표면은 유리로, 계층과
-            상태는 글자와 여백으로 드러냅니다.
-          </p>
+          <p class="text-body-sm text-text-secondary"><T m={m.principlesEyebrow} /></p>
+          <h2 class="mt-4 text-title-md text-text-primary"><T m={m.principlesTitle} /></h2>
+          <p class="mt-4 max-w-md text-body-sm text-text-secondary"><T m={m.principlesBody} /></p>
         </div>
         <ol class="divide-y divide-border-default border-y border-border-default">
           {
-            [
-              ["Ink and paper", "표면은 흰 종이, 글자와 버튼은 잉크입니다. 계층은 색보다 글자와 여백으로 드러냅니다."],
-              ["Liquid glass", "떠 있는 표면은 유리입니다. 흐림과 경계선이 표면 높이에 비례해 Figma와 같은 질감을 냅니다."],
-              ["Same source", "값은 Figma 변수에서 읽어 토큰 한 곳에 둡니다. 디자인과 코드가 같은 이름, 같은 값을 씁니다."],
-            ].map(([title, body], i) => (
+            principles.map((principle, index) => (
               <li class="flex gap-5 py-6">
-                <span class="mt-0.5 font-mono text-[11px] text-text-secondary">0{i + 1}</span>
+                <Badge tone="neutral">{String(index + 1).padStart(2, "0")}</Badge>
                 <div>
-                  <p class="text-[14px] font-semibold">{title}</p>
-                  <p class="mt-1.5 text-[13.5px] leading-6 text-text-secondary">{body}</p>
+                  <p class="text-label-lg text-text-primary">
+                    <T m={principle.title} />
+                  </p>
+                  <p class="mt-1.5 text-body-sm text-text-secondary">
+                    <T m={principle.body} />
+                  </p>
                 </div>
               </li>
             ))
@@ -108,37 +131,38 @@ const stats = [
   </section>
 
   <section class="border-t border-border-default">
-    <div class="site-shell py-20">
+    <div class="mx-auto w-full max-w-275 px-4 py-20 md:px-6">
       <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p class="text-body-sm text-text-secondary">Components</p>
-          <h2 class="mt-4 text-[1.75rem] md:text-[2rem] font-medium tracking-[-0.02em]">
-            {componentCount}개 컴포넌트, {componentGroups.length}개 그룹
+          <p class="text-body-sm text-text-secondary"><T m={m.componentsEyebrow} /></p>
+          <h2 class="mt-4 text-title-md text-text-primary">
+            {componentCount}<T m={m.componentsUnit} />, {componentGroups.length}<T m={m.groupsUnit} />
           </h2>
         </div>
-        <a href="/components" class="text-[13px] text-text-secondary transition-colors hover:text-text-primary">
-          전체 목록 →
-        </a>
+        <Button variant="link" href="/components">
+          <T m={m.allComponents} />
+        </Button>
       </div>
 
-      <div class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {
           componentGroups.map((group) => (
-            <a
-              href="/components"
-              class="group flex flex-col justify-between gap-6 rounded-xl bg-bg-subtle/40 px-5 py-5 transition-colors hover:bg-bg-subtle/70"
+            <Card
+              interactive
+              render={linkTo("/components")}
+              title={localized(group.title)}
+              description={localized(group.description)}
             >
-              <div>
-                <p class="text-[14px] font-semibold">{group.title}</p>
-                <p class="mt-1.5 text-[12.5px] leading-5 text-text-secondary">{group.description}</p>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-caption text-text-secondary">{componentsInGroup(group.id).length} components</span>
-                <span class="text-[12px] text-text-secondary transition-colors group-hover:text-text-primary">
-                  보기 →
+              <div class="flex w-full items-center justify-between gap-3">
+                <Badge tone="neutral">
+                  {componentsInGroup(group.id).length}
+                  <T m={m.groupCountUnit} />
+                </Badge>
+                <span class="text-caption text-text-secondary">
+                  <T m={m.openGroup} />
                 </span>
               </div>
-            </a>
+            </Card>
           ))
         }
       </div>
@@ -147,12 +171,12 @@ const stats = [
         {
           showcase.map((component) => (
             <li>
-              <a
+              <Button
+                variant="link"
                 href={`/components/${component.slug}`}
-                class="text-[12.5px] text-text-secondary transition-colors hover:text-text-primary"
               >
-                {component.title}
-              </a>
+                <T m={component.title} />
+              </Button>
             </li>
           ))
         }
@@ -161,31 +185,27 @@ const stats = [
   </section>
 
   <section class="border-t border-border-default">
-    <div class="site-shell py-20">
-      <div class="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:gap-16">
+    <div class="mx-auto w-full max-w-275 px-4 py-20 md:px-6">
+      <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
         <div>
-          <p class="text-body-sm text-text-secondary">Mascot</p>
-          <h2 class="mt-4 text-[1.75rem] md:text-[2rem] font-medium tracking-[-0.02em]">
-            둥근 병아리, {mascotSpec.count}가지 표정
+          <p class="text-body-sm text-text-secondary"><T m={m.mascotEyebrow} /></p>
+          <h2 class="mt-4 text-title-md text-text-primary">
+            <T m={m.mascotTitleLead} />{mascotSpec.count}<T m={m.mascotTitleTail} />
           </h2>
-          <p class="mt-4 max-w-md text-[14px] leading-7 text-text-secondary">
-            Horus + ON에서 온 마스코트입니다. 빈 상태, 오류, 로딩처럼 화면이 말을 걸어야 할 때 대신
-            표정을 짓습니다. 1254 × 1254 투명 PNG로 모든 컷을 내려받을 수 있습니다.
-          </p>
-          <a
-            href="/mascot"
-            class="mt-6 inline-flex h-[37px] items-center rounded-md border border-border-default px-5 text-[13.5px] font-medium transition-colors hover:bg-bg-subtle"
-          >
-            마스코트 보기
-          </a>
+          <p class="mt-4 max-w-md text-body-sm text-text-secondary"><T m={m.mascotBody} /></p>
+          <div class="mt-6">
+            <Button variant="glass" href="/mascot">
+              <T m={m.viewMascot} />
+            </Button>
+          </div>
         </div>
         <div class="grid grid-cols-3 gap-2">
           {
-            ["main", "cheer", "think", "wave", "success", "lost"].map((slug) => (
-              <div class="flex aspect-square items-center justify-center rounded-xl bg-bg-subtle/40 p-2">
+            mascotCuts.map((slug) => (
+              <div class="flex aspect-square items-center justify-center rounded-xl bg-bg-subtle p-2">
                 <img
                   src={mascotImageUrl(slug)}
-                  alt={`Horon 마스코트 ${slug} 컷`}
+                  alt={`${m.mascotAlt.ko} ${slug} ${m.cutSuffix.ko}`}
                   width="160"
                   height="160"
                   loading="lazy"
@@ -200,24 +220,20 @@ const stats = [
   </section>
 
   <section class="border-t border-border-default">
-    <div class="site-shell py-20">
-      <div class="grid gap-10 md:grid-cols-3">
+    <div class="mx-auto w-full max-w-275 px-4 py-20 md:px-6">
+      <div class="grid gap-4 md:grid-cols-3">
         {
-          [
-            ["Foundations", "색, 글자, 간격, 반경, 유리 표면까지 모든 시각 결정의 값과 규칙.", "/foundations"],
-            ["Get Started", "설치하고 첫 화면을 만드는 데 필요한 최소 절차.", "/get-started"],
-            ["Components", "컴포넌트 목록과 라이브 프리뷰, 코드 예시.", "/components"],
-          ].map(([title, body, href]) => (
-            <a
-              href={href}
-              class="group rounded-xl bg-bg-subtle/40 px-5 py-5 transition-colors hover:bg-bg-subtle/70"
+          entryCards.map((card) => (
+            <Card
+              interactive
+              render={linkTo(card.href)}
+              title={localized(card.title)}
+              description={localized(card.body)}
             >
-              <p class="text-[14px] font-semibold">{title}</p>
-              <p class="mt-2 text-[13px] leading-6 text-text-secondary">{body}</p>
-              <span class="mt-4 inline-block text-[12px] text-text-secondary transition-colors group-hover:text-text-primary">
-                열기 →
+              <span class="text-caption text-text-secondary">
+                <T m={m.openCard} />
               </span>
-            </a>
+            </Card>
           ))
         }
       </div>

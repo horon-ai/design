@@ -12,6 +12,7 @@ function Bars({ surface }: { surface: "solid" | "glass" }) {
         subtitle="Online"
         live
         onBack={() => undefined}
+        onMore={() => undefined}
       />
       <TopBar
         className="w-full max-w-97.5"
@@ -19,12 +20,14 @@ function Bars({ surface }: { surface: "solid" | "glass" }) {
         title="Chief of staff"
         subtitle="Last active 2h ago"
         onBack={() => undefined}
+        onMore={() => undefined}
       />
       <TopBar
         className="w-full max-w-97.5"
         surface={surface}
         title="Quarterly planning with the whole hiring team"
         onBack={() => undefined}
+        onMore={() => undefined}
       />
     </>
   );

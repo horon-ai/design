@@ -1,43 +1,41 @@
 ---
-import DocsLayout from "@/layouts/DocsLayout.astro";
 import { darkColors, lightColors, primitives } from "@horon-ai/tokens";
 
+import T from "@/components/i18n/T.astro";
+import { foundationsColorMessages as m } from "@/i18n/messages/foundations-color";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+
 const groups = [
-  ["Background", "bg-"],
-  ["Surface", "surface-"],
-  ["Text", "text-"],
-  ["Border", "border-"],
-  ["Interactive", "interactive-"],
-  ["Status", "status-"],
-  ["Glass", "glass-"],
-  ["Overlay", "overlay-"],
-  ["Accent", "accent-"],
-  ["Syntax", "syntax-"],
-] as const;
+  { title: m.backgroundGroup, prefix: "bg-" },
+  { title: m.surfaceGroup, prefix: "surface-" },
+  { title: m.textGroup, prefix: "text-" },
+  { title: m.borderGroup, prefix: "border-" },
+  { title: m.interactiveGroup, prefix: "interactive-" },
+  { title: m.statusGroup, prefix: "status-" },
+  { title: m.glassGroup, prefix: "glass-" },
+  { title: m.overlayGroup, prefix: "overlay-" },
+  { title: m.accentGroup, prefix: "accent-" },
+  { title: m.syntaxGroup, prefix: "syntax-" },
+];
 
 const names = Object.keys(lightColors) as (keyof typeof lightColors)[];
 const dark = darkColors as Record<string, string>;
 ---
 
 <DocsLayout
-  title="Color"
-  eyebrow="Foundations"
+  title={m.title}
   section="foundations"
-  description="잉크와 흰 종이를 백본으로 두고, 하늘색(sky)을 브랜드 액센트로 씁니다. 위험은 낮춘 붉은색 하나로 표시합니다."
+  description={m.description}
 >
-  <p>
-    색은 두 층입니다. <strong>프리미티브</strong>는 Figma Primitives 컬렉션의 원시 값이고,
-    <strong>시맨틱</strong>은 컴포넌트가 실제로 참조하는 변수입니다. 다크 모드에서 바뀌는 것은 시맨틱 층뿐입니다.
-    견본의 왼쪽 반은 라이트, 오른쪽 반은 다크 값입니다.
-  </p>
+  <p><T m={m.intro} /></p>
 
-  <h2>Primitives</h2>
-  <p>컴포넌트가 직접 쓰는 프리미티브는 이것뿐입니다. 아바타 타일, 프로젝트 타일, 진행 막대처럼 시맨틱 이름이 없는 자리에 씁니다.</p>
-  <div class="not-prose mt-5 grid grid-cols-2 overflow-hidden rounded-xl border border-border-default sm:grid-cols-4">
+  <h2><T m={m.primitivesHeading} /></h2>
+  <p><T m={m.primitivesBody} /></p>
+  <div class="mt-5 grid grid-cols-2 overflow-hidden rounded-xl border border-border-default sm:grid-cols-4">
     {
       Object.entries(primitives).map(([name, value]) => (
         <div class="border-r border-b border-border-default">
-          <div class="h-14" style={`background: ${value}`} />
+          <div class="h-14" style={`background: ${value}`} aria-hidden="true" />
           <div class="px-3 py-2">
             <p class="font-mono text-caption text-text-primary">{name}</p>
             <p class="font-mono text-caption text-text-secondary">{value}</p>
@@ -48,20 +46,25 @@ const dark = darkColors as Record<string, string>;
   </div>
 
   {
-    groups.map(([title, prefix]) => (
-      <Fragment>
-        <h2>{title}</h2>
-        <div class="not-prose mt-5 grid gap-2 sm:grid-cols-2">
+    groups.map((group) => (
+      <>
+        <h2><T m={group.title} /></h2>
+        <div class="mt-5 grid gap-2 sm:grid-cols-2">
           {names
-            .filter((name) => name.startsWith(prefix))
+            .filter((name) => name.startsWith(group.prefix))
             .map((name) => (
               <div class="flex items-center gap-3 rounded-lg bg-bg-subtle px-3 py-2">
-                <span class="flex size-8 shrink-0 overflow-hidden rounded-xs border border-border-default">
+                <span
+                  class="flex size-8 shrink-0 overflow-hidden rounded-xs border border-border-default"
+                  aria-hidden="true"
+                >
                   <span class="flex-1" style={`background: ${lightColors[name]}`} />
                   <span class="flex-1" style={`background: ${dark[name] ?? lightColors[name]}`} />
                 </span>
                 <span class="min-w-0">
-                  <span class="block truncate font-mono text-caption text-text-primary">--color-{name}</span>
+                  <span class="block truncate font-mono text-caption text-text-primary">
+                    --color-{name}
+                  </span>
                   <span class="block font-mono text-caption text-text-secondary">
                     {lightColors[name]} · {dark[name] ?? "—"}
                   </span>
@@ -69,7 +72,7 @@ const dark = darkColors as Record<string, string>;
               </div>
             ))}
         </div>
-      </Fragment>
+      </>
     ))
   }
 </DocsLayout>

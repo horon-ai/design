@@ -32,7 +32,7 @@ const defaultStages: Record<SourceStatus, SourceStages> = {
   failed: ["done", "done", "failed", "todo"],
 };
 
-const stageFill = { done: "bg-overlay-ink-35", todo: "bg-overlay-ink-8", failed: "bg-red-500" } as const;
+const stageFill = { done: "bg-overlay-ink-35", todo: "bg-overlay-ink-8", failed: "bg-accent-red-500-90" } as const;
 const stage = (state: keyof typeof stageFill) =>
   cn("h-[3px] w-11 overflow-clip rounded-full transition-colors duration-150", stageFill[state]);
 
@@ -54,11 +54,11 @@ export function SourceRow({
         "flex items-center gap-3 px-2 py-3",
         variant === "list"
           ? "relative after:absolute after:inset-x-2 after:bottom-0 after:h-px after:bg-overlay-ink-8 last:after:hidden"
-          : "rounded-[14px] bg-bg-subtle",
+          : "rounded-[14px] border border-border-default bg-bg-surface px-3",
         className,
       )}
     >
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-overlay-ink-5 text-text-primary [&>svg]:size-4">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-overlay-ink-5 text-text-primary [&>svg]:size-4">
         {icon}
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -79,7 +79,7 @@ export function SourceRow({
           return state === "active" ? (
             <span key={stageName} className={stage("todo")}>
               <span
-                className="block h-full rounded-full bg-sky-500 transition-[width] duration-400 ease-out-quint"
+                className="block h-full rounded-full bg-status-live transition-[width] duration-400 ease-out-quint"
                 style={{ width: `${progress}%` }}
               />
             </span>
@@ -90,12 +90,18 @@ export function SourceRow({
       </span>
       <span className="flex h-7.5 w-18 shrink-0 items-center justify-end">
         {status === "ready" && <Check aria-label="Ready" className="size-4 text-text-secondary" />}
-        {status === "indexing" && <span className="text-label-md text-text-secondary">{progress}%</span>}
+        {status === "indexing" && (
+          <span className="w-9 text-right text-label-md text-text-secondary tabular-nums">
+            <span key={progress} className="inline-block animate-fade-in">
+              {progress}%
+            </span>
+          </span>
+        )}
         {status === "failed" && (
           <button
             type="button"
             onClick={onRetry}
-            className="flex h-7 motion-press cursor-pointer items-center rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex h-7.5 motion-press cursor-pointer items-center rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             Retry
           </button>

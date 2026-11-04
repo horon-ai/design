@@ -21,9 +21,9 @@ const sizeClass: Record<ChipSize, string> = {
 
 /** The slot is 0px wide until pressed, then opens to icon + the label gap (6 / 8 / 10px). */
 const checkSlotClass: Record<ChipSize, string> = {
-  sm: "-mr-1 group-data-pressed:w-[1.125rem]",
-  md: "-mr-1.5 group-data-pressed:w-[1.375rem]",
-  lg: "-mr-2 group-data-pressed:w-[1.625rem]",
+  sm: "group-data-pressed:w-[1.125rem]",
+  md: "group-data-pressed:w-[1.375rem]",
+  lg: "group-data-pressed:w-[1.625rem]",
 };
 
 const checkIconClass: Record<ChipSize, string> = {
@@ -56,19 +56,19 @@ export function Chip({ size = "md", className, children, onPressedChange, ...pro
       <span
         aria-hidden
         className={cn(
-          "relative flex w-0 shrink-0 overflow-hidden transition-[width,margin] duration-150 ease-out group-data-pressed:mr-0",
+          "relative flex w-0 shrink-0 overflow-hidden transition-[width] duration-150 ease-out",
           checkSlotClass[size],
         )}
       >
         <Check
           className={cn(
-            "opacity-0 group-data-pressed:animate-pop-in",
-            checkIconClass[size],
+            "opacity-0 group-data-pressed:opacity-100",
             toggled && "animate-pop-out group-data-pressed:animate-pop-in",
+            checkIconClass[size],
           )}
         />
       </span>
-      <span className="relative">{children}</span>
+      <span className="relative text-trim">{children}</span>
     </Toggle>
   );
 }

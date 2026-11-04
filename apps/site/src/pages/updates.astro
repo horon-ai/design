@@ -1,61 +1,47 @@
 ---
+import T from "@/components/i18n/T.astro";
+import type { Localized } from "@/i18n";
+import { updatesMessages as m } from "@/i18n/messages/updates";
 import DocsLayout from "@/layouts/DocsLayout.astro";
 
-const releases = [
+const releases: { date: string; title: Localized; items: Localized[] }[] = [
   {
     date: "2026-10-26",
-    title: "Figma 기준으로 처음부터 다시 만듦",
-    items: [
-      "토큰을 Figma Horon 파일의 변수에서 다시 읽었습니다. 라이트·다크 색, 13개 글자 스타일의 Web·Desktop·Mobile 크기, 반경, 그림자가 바뀌었습니다.",
-      "shadcn/ui를 걷어내고 Base UI만으로 컴포넌트 55개를 새로 만들었습니다. 대화와 에이전트 블록이 새 그룹으로 들어왔습니다.",
-      "유리 표면이 Figma의 Liquid layers를 그대로 따르며, 흐림이 표면 높이에 비례합니다.",
-      "아이콘을 Lucide에서 Phosphor로 바꿨습니다.",
-    ],
+    title: m.figmaTitle,
+    items: [m.figmaItem1, m.figmaItem2, m.figmaItem3, m.figmaItem4],
   },
   {
     date: "2026-10-20",
-    title: "design.horon.ai 공개",
-    items: [
-      "Astro + React로 만든 문서 사이트를 새로 열었습니다.",
-      "컴포넌트 75개를 5개 그룹으로 정리하고, 40개에 라이브 프리뷰를 붙였습니다.",
-      "Foundations 8개 문서가 토큰 패키지에서 값을 직접 읽어 그립니다.",
-    ],
+    title: m.publicTitle,
+    items: [m.publicItem1, m.publicItem2, m.publicItem3],
   },
   {
     date: "2026-10-14",
-    title: "컴포넌트 패리티 완료",
-    items: [
-      "@horon-ai/react에 빠져 있던 49개 컴포넌트를 추가해 총 75개가 됐습니다.",
-      "모든 렌더 노드에 data-slot을 붙여 스타일·테스트가 노드를 찾을 수 있게 했습니다.",
-      "chart, data-table, resizable 같은 무거운 컴포넌트도 포함했습니다.",
-    ],
+    title: m.parityTitle,
+    items: [m.parityItem1, m.parityItem2, m.parityItem3],
   },
   {
     date: "2026-10-14",
-    title: "캔버스 → 코드 이관",
-    items: [
-      "토큰 값을 pen 캔버스 00 Tokens 보드에 맞춰 전면 재작성했습니다.",
-      "컴포넌트 22개를 캔버스 마스터에 맞춰 재스타일하고 Spinner·Menu·Glass Surface를 추가했습니다.",
-      "LiquidGlass를 baalda 헤더 레시피로 추가했습니다.",
-    ],
+    title: m.canvasTitle,
+    items: [m.canvasItem1, m.canvasItem2, m.canvasItem3],
   },
 ];
 ---
 
-<DocsLayout
-  title="Updates"
-  section="updates"
-  description="디자인 시스템이 바뀐 기록입니다. 값이 바뀌었는지, 어떤 컴포넌트가 늘었는지 시간순으로 남깁니다."
->
-  <ol class="not-prose mt-2 list-none space-y-10 pl-0">
+<DocsLayout title={m.title} section="updates" description={m.description}>
+  <ol class="mt-2 list-none space-y-10 pl-0">
     {
       releases.map((release) => (
         <li class="border-l border-border-default pl-6">
           <p class="text-caption text-text-secondary">{release.date}</p>
-          <h2 class="mt-2 text-[1.125rem] font-semibold tracking-[-0.01em]">{release.title}</h2>
+          <h2 class="mt-2 text-title-sm">
+            <T m={release.title} />
+          </h2>
           <ul class="mt-3 space-y-1.5">
             {release.items.map((item) => (
-              <li class="text-[13.5px] leading-6 text-text-secondary">{item}</li>
+              <li class="text-body-sm text-text-secondary">
+                <T m={item} />
+              </li>
             ))}
           </ul>
         </li>

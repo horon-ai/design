@@ -1,10 +1,8 @@
 import { BotInstructionsPanel } from "@horon-ai/react";
 
-import { Backdrop } from "../demo-backdrop";
-
 export default function BotInstructionsPanelDemo() {
   return (
-    <Backdrop>
+    <div className="flex w-full justify-center">
       <BotInstructionsPanel
         title="Morning brief"
         version="v4"
@@ -27,6 +25,6 @@ export default function BotInstructionsPanelDemo() {
         scenarios={["Busy Monday", "Quiet day", "Travel day"]}
         output="Run Busy Monday to see the brief here."
       />
-    </Backdrop>
+    </div>
   );
 }

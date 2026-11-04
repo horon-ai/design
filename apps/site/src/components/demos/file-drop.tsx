@@ -16,12 +16,14 @@ function Examples({ surface }: { surface: FileDropSurface }) {
 export default function FileDropDemo() {
   return (
     <div className="flex w-full flex-col gap-6">
-      <p className="text-caption text-text-secondary">Solid</p>
-      <div className="flex justify-center">
-        <Examples surface="solid" />
+      <div className="flex flex-col gap-4">
+        <p className="text-caption text-text-secondary">Solid</p>
+        <div className="flex justify-center">
+          <Examples surface="solid" />
+        </div>
       </div>
-      <p className="text-caption text-text-secondary">Glass</p>
-      <Backdrop>
+      <Backdrop className="flex-col">
+        <p className="text-caption text-text-secondary">Glass</p>
         <Examples surface="glass" />
       </Backdrop>
     </div>

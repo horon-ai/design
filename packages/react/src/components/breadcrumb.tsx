@@ -1,5 +1,5 @@
 import { CaretRight } from "@phosphor-icons/react";
-import { Children, type ComponentProps, type ReactNode } from "react";
+import { Children, Fragment, type ComponentProps, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
@@ -33,14 +33,14 @@ export function Breadcrumb({
       {surface === "glass" && <LiquidGlass />}
       <ol className="relative flex items-center gap-1.5">
         {Children.map(children, (item, index) => (
-          <>
+          <Fragment key={index}>
             {index > 0 && (
-              <li aria-hidden className="flex">
-                <CaretRight className="size-3.5 text-text-secondary" />
+              <li aria-hidden className="flex shrink-0">
+                <CaretRight className="size-3.5 shrink-0 text-text-secondary" />
               </li>
             )}
             <li className="flex">{item}</li>
-          </>
+          </Fragment>
         ))}
       </ol>
     </nav>
@@ -62,7 +62,7 @@ export function BreadcrumbItem({ current, tile, href, className, children, ...pr
       href={Element === "a" ? href : undefined}
       aria-current={current ? "page" : undefined}
       className={cn(
-        "flex items-center gap-1.5 rounded-sm py-1 pr-2 pl-1.5 text-label-md whitespace-nowrap motion-colors",
+        "flex items-center gap-1.5 rounded-sm py-1 pr-1.5 pl-1.5 text-label-md whitespace-nowrap no-underline motion-colors",
         current ? "text-text-primary" : "text-text-secondary",
         Element === "a" && "hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand",
         className,

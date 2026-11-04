@@ -31,3 +31,40 @@ export const glass = {
     dark: { top: "rgba(255, 255, 255, 0.22)", mid: "rgba(255, 255, 255, 0.04)", bottom: "rgba(255, 255, 255, 0.1)" },
   },
 } as const;
+
+/**
+ * The veil: a lighter glass for fields and overlays, drawn the same on every
+ * platform. The backdrop is blurred by `blur` and saturated by `saturate`, then
+ * filled, then a `ringWidth` ring and a soft drop shadow, with no rim gradient.
+ *
+ * - `field` is a faint wash for inputs that sit on imagery; `fieldFocus` while
+ *   typing. `fieldShadow` is `0 2px 10px`.
+ * - `overlay` is the elevated surface at 74% so menus, popups and dialogs stay
+ *   readable over any content. `overlayShadow` is `0 6px 24px`.
+ *
+ * Where the backdrop cannot be filtered (reduced transparency, no
+ * backdrop-filter), fields and overlays fall back to `glass-fill-frost`.
+ */
+export const veil = {
+  blur: 8,
+  saturate: 1.6,
+  ringWidth: 1,
+  scheme: {
+    light: {
+      ring: "rgba(23, 24, 26, 0.06)",
+      field: "rgba(23, 24, 26, 0.06)",
+      fieldFocus: "rgba(23, 24, 26, 0.09)",
+      fieldShadow: "rgba(23, 24, 26, 0.06)",
+      overlay: "rgba(255, 255, 255, 0.74)",
+      overlayShadow: "rgba(23, 24, 26, 0.1)",
+    },
+    dark: {
+      ring: "rgba(255, 255, 255, 0.06)",
+      field: "rgba(255, 255, 255, 0.09)",
+      fieldFocus: "rgba(255, 255, 255, 0.12)",
+      fieldShadow: "rgba(0, 0, 0, 0.06)",
+      overlay: "rgba(23, 24, 26, 0.74)",
+      overlayShadow: "rgba(0, 0, 0, 0.3)",
+    },
+  },
+} as const;
