@@ -68,6 +68,7 @@ export function Select({
   const segment = variant === "segment";
   const field = variant === "field";
   const size = segment && group ? group.size : ownSize;
+  const popupSurface = segment && group ? group.surface : surface;
   return (
     <BaseSelect.Root items={items} disabled={disabled ?? (segment ? group?.disabled : undefined)} {...props}>
       <BaseSelect.Trigger
@@ -119,8 +120,13 @@ export function Select({
       </BaseSelect.Trigger>
       <BaseSelect.Portal>
         <BaseSelect.Positioner sideOffset={4} alignItemWithTrigger={false} className="z-50 outline-none">
-          <BaseSelect.Popup className="relative min-w-(--anchor-width) motion-popup overflow-clip rounded-xl bg-glass-thick p-1.5 outline-none">
-            <LiquidGlass />
+          <BaseSelect.Popup
+            className={cn(
+              "relative min-w-(--anchor-width) motion-popup overflow-clip rounded-xl p-1.5 outline-none",
+              popupSurface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface shadow-popover",
+            )}
+          >
+            {popupSurface === "glass" && <LiquidGlass />}
             <BaseSelect.List className="relative flex flex-col gap-0.5">
               {items.map((item) => (
                 <BaseSelect.Item
