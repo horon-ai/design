@@ -1,5 +1,5 @@
 import { ArrowUp, CaretDown, Check, MagnifyingGlass, Plus, Stop } from "@phosphor-icons/react";
-import { type CSSProperties, type ComponentProps, type ReactNode, useRef } from "react";
+import { Fragment, type CSSProperties, type ComponentProps, type ReactNode, useRef } from "react";
 
 import { cn } from "../lib/cn";
 import { ChatBubble } from "./chat-bubble";
@@ -30,6 +30,10 @@ export type ResearchRunPanelProps = Omit<ComponentProps<"section">, "title"> & {
   /** Initials for the stacked source avatars under the queries. */
   sources?: string[];
   onStop?: () => void;
+  /** Makes the sources pill actionable; without it the pill is a plain label. */
+  onOpenSources?: () => void;
+  /** Makes the running status line expandable; without it the row carries no caret. */
+  onToggleStatus?: () => void;
   followUpPlaceholder?: string;
   onFollowUp?: (value: string) => void;
 };
@@ -50,6 +54,8 @@ export function ResearchRunPanel({
   queries,
   sources,
   onStop,
+  onOpenSources,
+  onToggleStatus,
   followUpPlaceholder = "Ask a follow-up",
   onFollowUp,
   className,
@@ -57,6 +63,25 @@ export function ResearchRunPanel({
 }: ResearchRunPanelProps) {
   const field = useRef<HTMLInputElement>(null);
   const count = read !== undefined && total !== undefined ? `${read} of ${total} read` : undefined;
+  const meta = [
+    { id: "elapsed", value: elapsed },
+    { id: "count", value: count },
+  ].filter((entry) => entry.value !== undefined);
+  const sourcesLabel =
+    read !== undefined && total !== undefined ? `${read} of ${total} sources read` : `${sources?.length ?? 0} sources`;
+  const avatarStack = (
+    <span className="flex shrink-0">
+      {sources?.map((initial, index) => (
+        <span
+          key={initial}
+          className="flex size-7 shrink-0 items-center justify-center rounded-full bg-sky-700 text-label-sm text-text-on-ink ring-2 ring-bg-surface"
+          style={{ marginLeft: index === 0 ? 0 : -6 }}
+        >
+          {initial}
+        </span>
+      ))}
+    </span>
+  );
   return (
     <section
       className={cn(
@@ -82,20 +107,49 @@ export function ResearchRunPanel({
         <ChatBubble from="me" className="max-w-[85%] self-end">
           {question}
         </ChatBubble>
-        {running && (
-          <div className="flex items-center gap-1.5" aria-live="polite">
-            <Spinner size={14} />
-            <span className="text-label-md text-text-primary">{statusLabel}</span>
-            <span aria-hidden className="h-3 w-0.5 shrink-0 animate-caret rounded-[1px] bg-interactive-primary" />
-            {(elapsed !== undefined || count !== undefined) && (
-              <span className="text-caption text-text-secondary">
-                {elapsed !== undefined && <span>· {elapsed}</span>}
-                {count !== undefined && <span> · {count}</span>}
-              </span>
+        <div className="motion-reveal" data-collapsed={!running || undefined}>
+          <div>
+            {onToggleStatus ? (
+              <button
+                type="button"
+                onClick={onToggleStatus}
+                aria-live="polite"
+                className="flex w-full cursor-pointer items-center gap-1.5 rounded-md text-left focus-visible:outline-2 focus-visible:outline-text-brand"
+              >
+                <Spinner size={14} />
+                <span className="text-label-md text-text-primary">{statusLabel}</span>
+                <span aria-hidden className="h-3 w-0.5 shrink-0 animate-caret rounded-[1px] bg-interactive-primary" />
+                {meta.length > 0 && (
+                  <span className="text-caption text-text-secondary tabular-nums">
+                    {meta.map((entry, index) => (
+                      <Fragment key={entry.id}>
+                        {index > 0 && " · "}
+                        {entry.value}
+                      </Fragment>
+                    ))}
+                  </span>
+                )}
+                <CaretDown aria-hidden className="size-3 shrink-0 text-text-secondary" />
+              </button>
+            ) : (
+              <div aria-live="polite" className="flex items-center gap-1.5">
+                <Spinner size={14} />
+                <span className="text-label-md text-text-primary">{statusLabel}</span>
+                <span aria-hidden className="h-3 w-0.5 shrink-0 animate-caret rounded-[1px] bg-interactive-primary" />
+                {meta.length > 0 && (
+                  <span className="text-caption text-text-secondary tabular-nums">
+                    {meta.map((entry, index) => (
+                      <Fragment key={entry.id}>
+                        {index > 0 && " · "}
+                        {entry.value}
+                      </Fragment>
+                    ))}
+                  </span>
+                )}
+              </div>
             )}
-            <CaretDown aria-hidden className="size-3 shrink-0 text-text-secondary" />
           </div>
-        )}
+        </div>
         {queries && queries.length > 0 && (
           <ul className="relative flex flex-col gap-2.5 py-0.5 pl-3.5">
             <span aria-hidden className="absolute top-0 bottom-0 left-0 w-[1.5px] rounded-full bg-overlay-ink-14" />
@@ -122,22 +176,23 @@ export function ResearchRunPanel({
           </ul>
         )}
         {sources && sources.length > 0 && (
-          <div className="flex h-9 w-fit items-center gap-2 rounded-full bg-overlay-ink-5 pr-3 pl-1">
-            <span className="flex shrink-0">
-              {sources.map((initial, index) => (
-                <span
-                  key={initial}
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-sky-700 text-label-sm text-text-on-ink ring-2 ring-bg-surface"
-                  style={{ marginLeft: index === 0 ? 0 : -6 }}
-                >
-                  {initial}
-                </span>
-              ))}
-            </span>
-            <span className="text-label-md text-text-primary">
-              {read} of {total} sources read
-            </span>
-            <CaretDown aria-hidden className="size-3 text-text-secondary" />
+          <div className="animate-pop-in">
+            {onOpenSources ? (
+              <button
+                type="button"
+                onClick={onOpenSources}
+                className="flex h-9 w-fit motion-press cursor-pointer items-center gap-2 rounded-full bg-overlay-ink-5 pr-3 pl-1 hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
+              >
+                {avatarStack}
+                <span className="text-label-md text-text-primary tabular-nums">{sourcesLabel}</span>
+                <CaretDown aria-hidden className="size-3 text-text-secondary" />
+              </button>
+            ) : (
+              <div className="flex h-9 w-fit items-center gap-2 rounded-full bg-overlay-ink-5 pr-3 pl-1">
+                {avatarStack}
+                <span className="text-label-md text-text-primary tabular-nums">{sourcesLabel}</span>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -165,11 +220,10 @@ export function ResearchRunPanel({
             aria-label={running ? "Stop" : "Send"}
             className="flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-primary text-text-inverse focus-visible:outline-2 focus-visible:outline-text-brand"
           >
-            {running ? (
-              <Stop aria-hidden weight="fill" className="size-3.5" />
-            ) : (
-              <ArrowUp aria-hidden className="size-4" />
-            )}
+            <span className="motion-swap size-8 place-items-center">
+              <Stop aria-hidden weight="fill" data-hidden={!running || undefined} className="size-3.5" />
+              <ArrowUp aria-hidden data-hidden={running || undefined} className="size-4" />
+            </span>
           </button>
         </div>
       </form>

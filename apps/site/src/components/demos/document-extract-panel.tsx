@@ -1,17 +1,17 @@
 import { DocumentExtractPanel, ExtractHighlight } from "@horon-ai/react";
 
-const muted = "text-caption text-text-secondary";
-const plain = "text-caption text-text-primary";
+const muted = "text-caption text-neutral-500";
+const plain = "text-caption text-neutral-900";
 
 function InvoiceSheet() {
   return (
     <>
       <div className="flex items-center">
         <ExtractHighlight>
-          <span className="text-label-lg text-text-primary">larkspur studio</span>
+          <span className="text-label-lg text-neutral-900">larkspur studio</span>
         </ExtractHighlight>
         <span className="min-w-0 flex-1" />
-        <span className="text-label-lg text-text-primary">Invoice</span>
+        <span className="text-label-lg text-neutral-900">Invoice</span>
       </div>
       <div className="flex gap-6">
         <div className="flex flex-1 flex-col gap-0.5">
@@ -27,7 +27,7 @@ function InvoiceSheet() {
           <span className={plain}>Seefeldstrasse 45</span>
         </div>
       </div>
-      <div className="h-px self-stretch bg-overlay-ink-8" />
+      <div className="h-px self-stretch bg-neutral-900/10" />
       <div className="flex gap-2">
         <ExtractHighlight className="flex-1">
           <span className={muted}>Invoice no.</span>

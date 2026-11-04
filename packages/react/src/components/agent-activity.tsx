@@ -172,7 +172,7 @@ export function WorkLog({
     <details
       open
       className={cn(
-        "group flex w-85 flex-col rounded-[16px] border border-border-default bg-bg-surface p-1.5",
+        "group flex w-85 flex-col motion-details rounded-[16px] border border-border-default bg-bg-surface p-1.5",
         className,
       )}
     >

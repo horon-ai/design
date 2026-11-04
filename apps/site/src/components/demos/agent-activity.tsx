@@ -9,9 +9,9 @@ const chunks = answer.match(/\S+\s*/g) ?? [];
 
 /** Plays the answer once from mount, as if a model were writing it; remount it to play again. */
 function LiveAnswer({ onDone }: { onDone: () => void }) {
-  const [received, setReceived] = useState(0);
+  const [received, setReceived] = useState(1);
   useEffect(() => {
-    let index = 0;
+    let index = 1;
     let timer = 0;
     const next = () => {
       index += 1 + Math.floor(Math.random() * 3);
@@ -19,7 +19,7 @@ function LiveAnswer({ onDone }: { onDone: () => void }) {
       if (index < chunks.length) timer = window.setTimeout(next, 80 + Math.random() * 320);
       else onDone();
     };
-    timer = window.setTimeout(next, 600);
+    timer = window.setTimeout(next, 120);
     return () => window.clearTimeout(timer);
   }, [onDone]);
   return <StreamingText text={chunks.slice(0, received).join("")} streaming={received < chunks.length} />;
