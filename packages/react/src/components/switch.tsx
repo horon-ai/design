@@ -34,7 +34,11 @@ const labelClass: Record<SwitchSize, string> = {
   compact: "gap-3 text-body-sm",
 };
 
-/** Switch: MD 44x26 and SM 32x20 tracks with a white thumb 2px in; LG is 52x30; COMPACT 40x24 with an 18px thumb 3px in (Paper bot memory). */
+/**
+ * Switch: MD 44x26 and SM 32x20 tracks with a white thumb 2px in; LG is 52x30; COMPACT 40x24 with an
+ * 18px thumb 3px in (Paper bot memory). The thumb stays white on the grey track in both themes and
+ * takes the inverse of the ink fill when checked, so the checked state reads the same in dark.
+ */
 export function Switch({ size = "md", label, className, ...props }: SwitchProps) {
   const control = (
     <BaseSwitch.Root
@@ -50,7 +54,7 @@ export function Switch({ size = "md", label, className, ...props }: SwitchProps)
     >
       <BaseSwitch.Thumb
         className={cn(
-          "rounded-full bg-text-on-ink transition-[translate,background-color] duration-220 ease-spring data-checked:bg-interactive-on-primary dark:bg-bg-default dark:data-checked:bg-bg-default",
+          "rounded-full bg-text-on-ink transition-[translate,background-color] duration-220 ease-spring data-checked:bg-interactive-on-primary",
           thumbClass[size],
         )}
       />

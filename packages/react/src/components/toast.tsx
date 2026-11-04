@@ -47,7 +47,7 @@ const contentGapClass: Record<ToastSize, string> = {
 const closeSizeClass: Record<ToastSize, string> = {
   sm: "[&_svg]:size-3.5",
   md: "[&_svg]:size-4",
-  lg: "[&_svg]:size-4.5",
+  lg: "[&_svg]:size-5",
 };
 
 function isTone(value: string | undefined): value is ToastTone {
@@ -76,7 +76,11 @@ function ToastList({ size, surface }: { size: ToastSize; surface: "solid" | "gla
         </BaseToast.Content>
         <BaseToast.Close
           aria-label="Close"
-          className={cn("relative flex shrink-0 motion-press cursor-pointer text-text-secondary", closeSizeClass[size])}
+          className={cn(
+            "relative flex shrink-0 motion-press cursor-pointer text-text-secondary motion-colors hover:text-text-primary",
+            "after:absolute after:-inset-2 after:content-['']",
+            closeSizeClass[size],
+          )}
         >
           <X />
         </BaseToast.Close>

@@ -83,7 +83,7 @@ export function Composer({
         aria-label={placeholder}
         disabled={disabled}
         className={cn(
-          "relative min-w-0 flex-1 bg-transparent text-text-primary outline-none placeholder:text-text-placeholder",
+          "relative min-w-0 flex-1 bg-transparent text-text-primary outline-none placeholder:text-text-placeholder disabled:text-text-disabled",
           textClass[size],
         )}
       />

@@ -3,6 +3,7 @@ import { type ComponentProps, type ReactNode, useState } from "react";
 
 import { cn } from "../lib/cn";
 import { Button } from "./button";
+import { CodePanel } from "./code-panel";
 import { LiquidGlass } from "./liquid-glass";
 
 export type ListDetailItem = {
@@ -47,6 +48,7 @@ export function ListDetail({
   const [inner, setInner] = useState(defaultValue ?? all[0]?.id);
   const selectedId = value ?? inner;
   const selected = all.find((item) => item.id === selectedId) ?? all[0];
+  const mutedClass = surface === "glass" ? "text-text-secondary" : "text-text-placeholder";
   return (
     <div
       className={cn(
@@ -60,11 +62,14 @@ export function ListDetail({
       <div
         role="listbox"
         aria-label="Items"
-        className="relative flex w-62.5 shrink-0 flex-col gap-3 border-r border-border-default bg-bg-inset p-2.5"
+        className={cn(
+          "relative flex w-62.5 shrink-0 flex-col gap-3 border-r border-border-default p-2.5",
+          surface === "glass" ? "bg-transparent" : "bg-bg-inset",
+        )}
       >
         {groups.map((group) => (
           <div key={group.id} className="flex flex-col gap-0.5">
-            <span className="px-3 py-1 text-[11px]/[14px] font-semibold tracking-[0.4px] text-text-placeholder">
+            <span className={cn("px-3 py-1 text-label-sm font-semibold tracking-[0.04em]", mutedClass)}>
               {group.label}
             </span>
             {group.items.map((item) => (
@@ -81,12 +86,10 @@ export function ListDetail({
                 }}
               >
                 <span className="flex items-center gap-2">
-                  <span aria-hidden className="size-1.75 shrink-0 rounded-full bg-sky-500" />
-                  <span className="min-w-0 truncate font-mono text-[13px]/[18px] font-medium text-text-primary">
-                    {item.title}
-                  </span>
+                  <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-sky-500" />
+                  <span className="min-w-0 truncate font-mono text-label-md text-text-primary">{item.title}</span>
                 </span>
-                {item.meta && <span className="pl-3.75 text-[12px]/[16px] text-text-placeholder">{item.meta}</span>}
+                {item.meta && <span className={cn("pl-3.5 text-label-sm", mutedClass)}>{item.meta}</span>}
               </button>
             ))}
           </div>
@@ -113,13 +116,13 @@ export function ListDetailHeader({ icon, title, description, actions, className,
   return (
     <div className={cn("flex items-center gap-3", className)} {...props}>
       {icon && (
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 [&_svg]:size-4.5">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 [&_svg]:size-5">
           {icon}
         </span>
       )}
       <div className="flex min-w-0 flex-1 flex-col">
-        <span className="font-mono text-[16px]/[22px] font-semibold text-text-primary">{title}</span>
-        {description && <span className="text-[13px]/[18px] text-text-secondary">{description}</span>}
+        <span className="font-mono text-label-lg font-semibold text-text-primary">{title}</span>
+        {description && <span className="text-body-sm text-text-secondary">{description}</span>}
       </div>
       {actions && <div className="flex shrink-0 items-center gap-3">{actions}</div>}
     </div>
@@ -143,8 +146,8 @@ export function ListDetailMeta({ items, className, ...props }: ListDetailMetaPro
     >
       {items.map((item) => (
         <div key={item.id} className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <dt className="text-[12px]/[16px] font-medium text-text-placeholder">{item.label}</dt>
-          <dd className="m-0 truncate text-[14px]/[20px] font-medium text-text-primary">{item.value}</dd>
+          <dt className="text-label-sm text-text-placeholder">{item.label}</dt>
+          <dd className="m-0 truncate text-label-md text-text-primary">{item.value}</dd>
         </div>
       ))}
     </dl>
@@ -205,27 +208,25 @@ export function ListDetailInstructions({
   return (
     <div className={cn("flex flex-col gap-2", className)} {...props}>
       <div className="flex items-center gap-2">
-        <span className="text-[13px]/[18px] font-semibold text-text-primary">{title}</span>
+        <span className="text-label-md font-semibold text-text-primary">{title}</span>
         {tag && (
-          <span className="inline-flex h-5.5 items-center rounded-full bg-overlay-ink-6 px-2 text-[12px]/[16px] font-medium text-text-secondary">
+          <span className="inline-flex h-5.5 items-center rounded-full bg-overlay-ink-6 px-2 text-label-sm text-text-secondary">
             {tag}
           </span>
         )}
         <span className="flex-1" />
-        <Button variant="glass" size="sm" aria-pressed={editing} onClick={() => setEditing((open) => !open)}>
+        <Button variant="solid" size="sm" aria-pressed={editing} onClick={() => setEditing((open) => !open)}>
           {editing ? "Done" : "Edit"}
         </Button>
       </div>
-      <pre className="font-normal m-0 overflow-x-auto rounded-[10px] border border-border-default bg-neutral-50 px-4 py-3.5 font-mono text-[12px]/[19px] whitespace-pre text-syntax-string dark:bg-neutral-800">
-        {renderInstructions(text)}
-      </pre>
+      <CodePanel>{renderInstructions(text)}</CodePanel>
       <Collapsible.Root open={editing} onOpenChange={setEditing}>
         <Collapsible.Panel className="motion-collapse">
           <textarea
             aria-label="Edit instructions"
             value={text}
             rows={6}
-            className="mt-1 block w-full resize-y rounded-[10px] border border-border-default bg-bg-inset px-4 py-3 font-mono text-[12px]/[19px] text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+            className="mt-1 block w-full resize-y rounded-[10px] border border-border-default bg-bg-inset px-4 py-3.5 font-mono text-[12px]/[21px] text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
             onChange={(event) => {
               setInner(event.target.value);
               onValueChange?.(event.target.value);
@@ -239,7 +240,7 @@ export function ListDetailInstructions({
 
 export type ListDetailFilesProps = Omit<ComponentProps<"div">, "className"> & {
   label?: ReactNode;
-  /** Chips, usually `Button` with `variant="glass"` and an icon. */
+  /** Chips, usually a small `Button` with an icon. */
   children: ReactNode;
   className?: string;
 };
@@ -248,7 +249,7 @@ export type ListDetailFilesProps = Omit<ComponentProps<"div">, "className"> & {
 export function ListDetailFiles({ label = "Files", children, className, ...props }: ListDetailFilesProps) {
   return (
     <div className={cn("flex flex-col gap-2", className)} {...props}>
-      <span className="text-[13px]/[18px] font-semibold text-text-primary">{label}</span>
+      <span className="text-label-md font-semibold text-text-primary">{label}</span>
       <div className="flex flex-wrap gap-1.5">{children}</div>
     </div>
   );

@@ -4,7 +4,7 @@ import { Backdrop } from "../demo-backdrop";
 
 export default function ToolPermissionsDemo() {
   return (
-    <Backdrop>
+    <Backdrop className="flex-col">
       <ToolPermissions
         title="Read-only"
         className="rounded-2xl bg-glass-thick p-2"

@@ -1,7 +1,8 @@
 import { CaretDown, Plus, SlidersHorizontal, UploadSimple } from "@phosphor-icons/react";
-import { type ComponentProps, type DragEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
+import { type ComponentProps, type DragEvent, type ReactNode, useState } from "react";
 
 import { cn } from "../lib/cn";
+import { PanelPillTabs } from "./bot-instructions-panel";
 import { Spinner } from "./spinner";
 
 export type KnowledgeBaseTab = {
@@ -60,17 +61,7 @@ export function KnowledgeBasePanel({
 }: KnowledgeBasePanelProps) {
   const [inner, setInner] = useState(defaultValue ?? tabs[0]?.id);
   const selectedId = value ?? inner;
-  const trayRef = useRef<HTMLDivElement>(null);
-  const [pill, setPill] = useState<{ left: number; width: number } | null>(null);
   const [dragging, setDragging] = useState(false);
-
-  useLayoutEffect(() => {
-    const index = tabs.findIndex((tab) => tab.id === selectedId);
-    const active = trayRef.current?.querySelectorAll<HTMLElement>('[role="tab"]')[index];
-    if (!active) return;
-    const next = { left: active.offsetLeft, width: active.offsetWidth };
-    setPill((prev) => (prev && prev.left === next.left && prev.width === next.width ? prev : next));
-  }, [tabs, selectedId]);
 
   const select = (id: string) => {
     setInner(id);
@@ -105,14 +96,14 @@ export function KnowledgeBasePanel({
           type="button"
           aria-label="Knowledge base settings"
           onClick={onSettings}
-          className="flex size-8.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-5 text-text-primary hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
+          className="flex size-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
         >
           <SlidersHorizontal aria-hidden />
         </button>
         <button
           type="button"
           onClick={onAddSource}
-          className="flex h-8.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-5 pr-3 pl-2.5 text-label-sm text-text-primary hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
         >
           <Plus aria-hidden className="size-3.5" />
           Add source
@@ -121,38 +112,24 @@ export function KnowledgeBasePanel({
       </div>
 
       <div className="flex items-center gap-2">
-        <div ref={trayRef} role="tablist" className="relative flex items-center gap-0.5 rounded-full bg-overlay-ink-5 p-0.75">
-          {pill && (
-            <span
-              aria-hidden
-              className="absolute top-0.75 bottom-0.75 left-0 rounded-full bg-overlay-ink-10 motion-indicator"
-              style={{ translate: `${pill.left}px 0`, width: pill.width }}
-            />
-          )}
-          {tabs.map((tab) => {
-            const selected = tab.id === selectedId;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                onClick={() => select(tab.id)}
-                className={cn(
-                  "relative flex h-7.5 cursor-pointer items-center gap-1.5 rounded-full px-3 text-label-md motion-colors focus-visible:outline-2 focus-visible:outline-text-brand",
-                  selected ? "text-text-primary" : "text-text-secondary hover:text-text-primary",
-                )}
-              >
+        <PanelPillTabs
+          aria-label="Sources"
+          value={selectedId}
+          onValueChange={select}
+          items={tabs.map((tab) => ({
+            value: tab.id,
+            label: (
+              <span className="flex items-center gap-1.5">
                 {tab.label}
                 {tab.count !== undefined && <span className="text-caption text-text-secondary">{tab.count}</span>}
-              </button>
-            );
-          })}
-        </div>
+              </span>
+            ),
+          }))}
+        />
         <span className="flex-1" />
         {indexing > 0 && (
           <span className="flex items-center gap-2 text-caption text-text-secondary">
-            <Spinner size={13} label="Indexing" />
+            <Spinner size={12} label="Indexing" />
             {indexing} indexing
           </span>
         )}

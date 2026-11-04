@@ -32,7 +32,7 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
   return (
     <div
       className={cn(
-        "flex flex-col gap-1.5 rounded-[16px] border bg-bg-surface px-3.5 py-3 motion-colors",
+        "flex flex-col gap-1.5 rounded-2xl border bg-bg-surface px-4 py-3 motion-colors",
         status === "failed" ? "border-border-danger" : "border-border-default",
         className,
       )}

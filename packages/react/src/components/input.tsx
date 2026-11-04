@@ -41,7 +41,7 @@ export const fieldBoxClass = {
   solid:
     "border-border-default bg-bg-surface has-[[data-disabled]]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
   "solid-on-page":
-    "border-border-default bg-bg-default has-[[data-disabled]]:border-border-default has-[[data-disabled]]:bg-bg-subtle dark:has-[[data-disabled]]:bg-neutral-800 has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
+    "border-border-default bg-bg-default has-[[data-disabled]]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
   text: "min-w-0 flex-1 bg-transparent text-text-primary outline-none placeholder:text-text-placeholder disabled:cursor-not-allowed disabled:text-text-disabled",
 } as const;
 
@@ -57,12 +57,7 @@ export function Input({
 }: InputProps) {
   return (
     <div
-      className={cn(
-        fieldBoxClass.base,
-        fieldBoxClass[surface],
-        fieldSizeClass[size],
-        className,
-      )}
+      className={cn(fieldBoxClass.base, fieldBoxClass[surface], fieldSizeClass[size], className)}
       data-invalid={invalid ? "" : undefined}
     >
       {icon && <span className="relative flex shrink-0 text-text-secondary">{icon}</span>}

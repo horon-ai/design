@@ -77,7 +77,7 @@ export type ToolCallProps = {
   className?: string;
 };
 
-function Section({ label, children }: { label: string; children: ReactNode }) {
+function Section({ label, children, footer }: { label: string; children: ReactNode; footer?: ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center text-label-sm text-text-secondary">
@@ -85,6 +85,7 @@ function Section({ label, children }: { label: string; children: ReactNode }) {
         <Copy aria-hidden className="size-3.5" />
       </div>
       <div className="rounded-[10px] bg-bg-subtle px-3.5 py-3">{children}</div>
+      {footer}
     </div>
   );
 }
@@ -108,7 +109,7 @@ export function ToolCall({
     <Collapsible.Root
       defaultOpen={defaultOpen}
       className={cn(
-        "flex flex-col overflow-clip rounded-lg border bg-bg-surface",
+        "flex flex-col overflow-clip rounded-2xl border bg-bg-surface",
         status === "failed" ? "border-border-danger" : "border-border-default",
         className,
       )}
@@ -125,7 +126,7 @@ export function ToolCall({
         {elapsed && <span className="shrink-0 text-caption text-text-secondary">{elapsed}</span>}
         <CaretDown
           aria-hidden
-          className="size-4 shrink-0 text-text-secondary motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out-quint group-data-panel-open:rotate-180"
+          className="size-4 shrink-0 text-text-secondary group-data-panel-open:rotate-180 motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out-quint"
         />
       </Collapsible.Trigger>
       <Collapsible.Panel className="motion-collapse">
@@ -138,7 +139,7 @@ export function ToolCall({
                 <button
                   type="button"
                   onClick={onRetry}
-                  className="flex shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-sm border border-border-default bg-bg-surface px-2.5 py-1.5 text-label-sm text-text-primary"
+                  className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full border border-border-default bg-bg-surface px-2.5 text-label-sm text-text-primary"
                 >
                   <ArrowClockwise aria-hidden className="size-3.5" />
                   Retry
@@ -152,18 +153,20 @@ export function ToolCall({
             </Section>
           )}
           {status !== "failed" && (
-            <Section label="Result">
+            <Section
+              label="Result"
+              footer={
+                truncated && result !== undefined && status !== "running" ? (
+                  <Button variant="link" className="self-start px-0" onClick={onShowAll}>
+                    Show all
+                  </Button>
+                ) : undefined
+              }
+            >
               {status === "running" || result === undefined ? (
                 <p className="text-body-sm text-text-secondary">Waiting for result…</p>
               ) : (
-                <div className="flex flex-col items-start gap-2">
-                  <JsonCode value={result} className="self-stretch" />
-                  {truncated && (
-                    <Button variant="link" onClick={onShowAll}>
-                      Show all
-                    </Button>
-                  )}
-                </div>
+                <JsonCode value={result} />
               )}
             </Section>
           )}

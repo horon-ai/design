@@ -76,7 +76,7 @@ export function DateField({
         </span>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Positioner sideOffset={8} align="start">
+        <Popover.Positioner sideOffset={4} align="start">
           <Popover.Popup className="motion-popup">
             <Calendar {...calendar} size={size} surface={surface === "glass" ? "glass" : "solid"} />
           </Popover.Popup>

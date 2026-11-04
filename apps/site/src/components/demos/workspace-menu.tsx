@@ -15,7 +15,7 @@ export default function WorkspaceMenuDemo() {
       workspaces={workspaces}
       value={value}
       onValueChange={setValue}
-      trigger={<Button variant="glass" />}
+      trigger={<Button variant="solid" />}
       triggerChildren={current?.name}
     />
   );

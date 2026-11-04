@@ -61,7 +61,12 @@ export function ExtractHighlight({
   className,
   ...props
 }: WithClass<ComponentProps<"div">> & { tone?: keyof typeof highlightTone }) {
-  return <div className={cn("flex flex-col gap-px rounded-sm border-[1.2px] px-1 py-0.5", highlightTone[tone], className)} {...props} />;
+  return (
+    <div
+      className={cn("flex flex-col gap-px rounded-sm border-[1.2px] px-1 py-0.5", highlightTone[tone], className)}
+      {...props}
+    />
+  );
 }
 
 function isTable(field: ExtractField | ExtractTable): field is ExtractTable {
@@ -73,7 +78,12 @@ function isChecked(field: ExtractField, resolved: Set<string>) {
 }
 
 function Divider({ vertical }: { vertical?: boolean }) {
-  return <div role="separator" className={cn("shrink-0 bg-overlay-ink-8", vertical ? "w-px self-stretch" : "h-px self-stretch")} />;
+  return (
+    <div
+      role="separator"
+      className={cn("shrink-0 bg-overlay-ink-8", vertical ? "w-px self-stretch" : "h-px self-stretch")}
+    />
+  );
 }
 
 function stepClass() {
@@ -133,8 +143,8 @@ export function DocumentExtractPanel({
     >
       <div className="flex flex-col @4xl:flex-row">
         <div className="flex min-w-0 shrink-0 flex-col @4xl:w-135">
-          <div className="flex items-center gap-2 py-3 pr-3 pl-3.5">
-            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-overlay-ink-5 text-text-danger">
+          <div className="flex items-center gap-2 px-5 py-3">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-[10px] bg-overlay-ink-5 text-text-danger">
               <FilePdf aria-hidden className="size-4" />
             </span>
             <span className="min-w-0 truncate text-label-md text-text-primary">{fileName}</span>
@@ -165,14 +175,14 @@ export function DocumentExtractPanel({
             <button
               type="button"
               onClick={() => setZoom(ZOOM_FIT)}
-              className="flex h-7.5 shrink-0 cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 pr-3.5 pl-3 text-label-sm text-text-primary motion-press hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
+              className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 pr-3.5 pl-3 text-label-sm text-text-primary hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
             >
               Fit
             </button>
           </div>
           <div className="flex min-h-120 flex-1 justify-center overflow-hidden bg-overlay-ink-7 px-6 py-5">
             <div
-              className="flex h-fit w-117.5 shrink-0 origin-top flex-col gap-3.5 bg-bg-surface px-6.5 pt-6.5 pb-5 text-text-primary transition-[scale] duration-220 ease-out-quint [filter:drop-shadow(0_2px_4px_#00000014)]"
+              className="flex h-fit w-117.5 shrink-0 origin-top flex-col gap-3.5 bg-bg-surface px-6.5 pt-6.5 pb-5 text-text-primary [filter:drop-shadow(0_2px_4px_#00000014)] transition-[scale] duration-220 ease-out-quint"
               style={{ scale: zoom / ZOOM_FIT }}
             >
               {sheet}
@@ -181,7 +191,7 @@ export function DocumentExtractPanel({
         </div>
         <Divider vertical />
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex items-center gap-2 py-3 pr-3.5 pl-4">
+          <div className="flex items-center gap-2 px-5 py-3">
             <PanelPillTabs
               aria-label="Extraction view"
               value={view}
@@ -199,14 +209,14 @@ export function DocumentExtractPanel({
                 setRun((value) => value + 1);
                 onExtract?.();
               }}
-              className="flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 pr-3.5 pl-3 text-label-sm text-text-primary motion-press hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
+              className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 pr-3 pl-3.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
             >
               <Scan aria-hidden className="size-3.5" />
               Extract
             </button>
           </div>
           <Divider />
-          <div key={`${view}-${run}`} className="flex flex-col gap-1.5 pt-3.5 pr-4.5 pb-4 pl-4.5">
+          <div key={`${view}-${run}`} className="flex flex-col gap-1.5 px-5 pt-3.5 pb-4">
             {view === "fields" ? (
               <>
                 <p className="text-body-sm text-text-secondary">{total} fields filled from this document</p>
@@ -220,26 +230,47 @@ export function DocumentExtractPanel({
                       const delay = { animationDelay: `${rowIndex++ * 30}ms` };
                       if (isTable(field)) {
                         return (
-                          <div key={field.id} className="motion-rise flex flex-col gap-1.5" style={delay}>
+                          <div key={field.id} className="flex motion-rise flex-col gap-1.5" style={delay}>
                             <div className="flex items-center gap-3">
                               <span className="w-25 shrink-0 text-body-sm text-text-secondary">{field.label}</span>
                               <span className="min-w-0 flex-1" />
-                              {field.type ? <span className="w-14 shrink-0 text-end text-caption text-text-secondary">{field.type}</span> : null}
+                              {field.type ? (
+                                <span className="w-14 shrink-0 text-end text-caption text-text-secondary">
+                                  {field.type}
+                                </span>
+                              ) : null}
                             </div>
-                            <div className="flex flex-col rounded-xl border border-overlay-ink-10 px-3 py-0.5">
+                            <div className="flex flex-col rounded-[10px] border border-overlay-ink-10 px-3 py-0.5">
                               <div className="flex items-center gap-2 py-2 text-caption text-text-secondary">
                                 {field.columns.map((column) => (
-                                  <span key={column.label} className={cn(column.width ? "shrink-0" : "min-w-0 flex-1", column.align === "end" && "text-end")} style={column.width ? { width: column.width } : undefined}>
+                                  <span
+                                    key={column.label}
+                                    className={cn(
+                                      column.width ? "shrink-0" : "min-w-0 flex-1",
+                                      column.align === "end" && "text-end",
+                                    )}
+                                    style={column.width ? { width: column.width } : undefined}
+                                  >
                                     {column.label}
                                   </span>
                                 ))}
                               </div>
                               {field.rows.map((row) => (
-                                <div key={row.join("|")} className="flex items-center gap-2 py-2 text-caption text-text-primary">
+                                <div
+                                  key={row.join("|")}
+                                  className="flex items-center gap-2 py-2 text-caption text-text-primary"
+                                >
                                   {row.map((cell, index) => {
                                     const column = field.columns[index];
                                     return (
-                                      <span key={column?.label ?? cell} className={cn(column?.width ? "shrink-0" : "min-w-0 flex-1", column?.align === "end" && "text-end")} style={column?.width ? { width: column.width } : undefined}>
+                                      <span
+                                        key={column?.label ?? cell}
+                                        className={cn(
+                                          column?.width ? "shrink-0" : "min-w-0 flex-1",
+                                          column?.align === "end" && "text-end",
+                                        )}
+                                        style={column?.width ? { width: column.width } : undefined}
+                                      >
                                         {cell}
                                       </span>
                                     );
@@ -252,7 +283,7 @@ export function DocumentExtractPanel({
                       }
                       const needsCheck = isChecked(field, resolved);
                       return (
-                        <div key={field.id} className="motion-rise flex items-center gap-3" style={delay}>
+                        <div key={field.id} className="flex motion-rise items-center gap-3" style={delay}>
                           <span className="w-25 shrink-0 text-body-sm text-text-secondary">{field.label}</span>
                           <button
                             type="button"
@@ -260,20 +291,30 @@ export function DocumentExtractPanel({
                             onClick={() => resolve(field.id)}
                             aria-label={needsCheck ? `Confirm ${field.label}` : undefined}
                             className={cn(
-                              "flex h-9 w-full min-w-0 max-w-75 items-center gap-2 rounded-[10px] border px-3 text-start motion-colors",
+                              "flex h-9 w-full max-w-75 min-w-0 items-center gap-2 rounded-[10px] border px-3 text-start motion-colors",
                               needsCheck
-                                ? "cursor-pointer border-red-500/90 bg-overlay-ink-12 hover:bg-overlay-ink-14 focus-visible:outline-2 focus-visible:outline-text-brand"
+                                ? "cursor-pointer border-border-danger bg-overlay-ink-12 hover:bg-overlay-ink-14 focus-visible:outline-2 focus-visible:outline-text-brand"
                                 : "cursor-default border-transparent bg-overlay-ink-4",
                             )}
                           >
-                            <span className="min-w-0 flex-1 truncate text-body-sm text-text-primary">{field.value}</span>
+                            <span className="min-w-0 flex-1 truncate text-body-sm text-text-primary">
+                              {field.value}
+                            </span>
                             {needsCheck ? (
                               <span className="shrink-0 text-caption text-text-danger">Check</span>
                             ) : (
-                              <Check aria-hidden weight="bold" className="size-3.5 shrink-0 animate-pop-in text-text-secondary" />
+                              <Check
+                                aria-hidden
+                                weight="bold"
+                                className="size-3.5 shrink-0 animate-pop-in text-text-secondary"
+                              />
                             )}
                           </button>
-                          {field.type ? <span className="w-14 shrink-0 text-end text-caption text-text-secondary">{field.type}</span> : null}
+                          {field.type ? (
+                            <span className="w-14 shrink-0 text-end text-caption text-text-secondary">
+                              {field.type}
+                            </span>
+                          ) : null}
                         </div>
                       );
                     })}
@@ -282,14 +323,18 @@ export function DocumentExtractPanel({
               </>
             ) : null}
             {view === "json" ? (
-              <pre className="overflow-x-auto rounded-xl bg-overlay-ink-4 p-3 font-mono text-caption whitespace-pre text-text-primary">{json}</pre>
+              <pre className="overflow-x-auto rounded-[10px] bg-overlay-ink-4 p-3 font-mono text-caption whitespace-pre text-text-primary">
+                {json}
+              </pre>
             ) : null}
             {view === "schema" ? (
               <ul className="flex flex-col gap-1.5">
                 {flat.map((field) => (
                   <li key={field.id} className="flex items-center gap-3 text-body-sm text-text-primary">
-                    <span className="w-35 shrink-0 text-text-secondary">{field.label}</span>
-                    <span className="rounded-md bg-overlay-ink-6 px-1.5 py-px text-caption text-text-secondary">{field.type ?? "Text"}</span>
+                    <span className="w-25 shrink-0 text-text-secondary">{field.label}</span>
+                    <span className="rounded-md bg-overlay-ink-6 px-1.5 py-px text-caption text-text-secondary">
+                      {field.type ?? "Text"}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -298,7 +343,7 @@ export function DocumentExtractPanel({
         </div>
       </div>
       <Divider />
-      <div className="flex flex-wrap items-center gap-3 py-3 pr-3.5 pl-4.5">
+      <div className="flex flex-wrap items-center gap-3 px-5 py-3">
         <div className="flex items-center gap-1" aria-hidden>
           {flat.map((field) => (
             <span
@@ -316,7 +361,9 @@ export function DocumentExtractPanel({
         <span className="min-w-0 flex-1" />
         {bot ? (
           <>
-            <span className="flex size-5 items-center justify-center rounded-md bg-interactive-primary text-label-sm text-text-inverse">{bot.initial}</span>
+            <span className="flex size-5 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
+              {bot.initial}
+            </span>
             <span className="text-caption text-text-secondary">
               {bot.name}
               {bot.elapsed ? ` · ${bot.elapsed}` : ""}
@@ -326,7 +373,7 @@ export function DocumentExtractPanel({
         <button
           type="button"
           onClick={acceptAll}
-          className="flex h-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-interactive-primary pr-3.5 pl-3 text-label-sm text-text-inverse motion-press hover:bg-interactive-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+          className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-primary pr-3 pl-3.5 text-label-sm text-text-inverse hover:bg-interactive-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
         >
           Accept all
         </button>

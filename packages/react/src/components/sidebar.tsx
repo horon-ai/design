@@ -435,7 +435,7 @@ export function SidebarProject({
         className={cn(
           "group/project relative flex h-8 items-center rounded-md has-data-popup-open:bg-overlay-ink-6",
           "motion-colors",
-          current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-6",
+          current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-4",
         )}
       >
         <Collapsible.Trigger
@@ -510,7 +510,7 @@ export function SidebarAddButton({ icon = addIcon, className, children, ...props
       type="button"
       className={cn(
         "relative mt-2 flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-[10px] text-label-md text-text-secondary motion-colors hover:bg-overlay-ink-4",
-        "focus-visible:outline-2 focus-visible:outline-text-brand [&>[data-slot=icon]]:size-4",
+        "focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}
       {...props}

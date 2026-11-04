@@ -1,5 +1,5 @@
 import { Drawer } from "@base-ui/react/drawer";
-import { CaretRight, X } from "@phosphor-icons/react";
+import { CaretRight } from "@phosphor-icons/react";
 import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
@@ -10,12 +10,9 @@ export const BottomSheetClose = Drawer.Close;
 
 export type BottomSheetContentProps = Omit<ComponentProps<typeof Drawer.Popup>, "className" | "title"> & {
   title: ReactNode;
-  /** Label for the close button; hides it when `null` (Paper workspace sheets have none). */
-  closeLabel?: string | null;
   /**
-   * `panel` is the Figma panel sheet (374px max, label-lg title, 6% ink close). `detail` is the Paper
-   * detail sheet: full width, 18px rhythm, a caller-built header (tile, title, description) set flush
-   * left and a transparent 32px close with an 18px glyph.
+   * `panel` is the Figma panel sheet (374px max, label-lg title). `detail` is the Paper detail sheet:
+   * full width, 18px rhythm, a caller-built header (tile, title, description) set flush left.
    */
   variant?: "panel" | "detail";
   /** `glass` is the veil sheet (`veil-overlay`); `solid` is the Paper workspace sheet: opaque default fill, 20px top corners, 8/24/16 padding. */
@@ -28,12 +25,12 @@ export type BottomSheetContentProps = Omit<ComponentProps<typeof Drawer.Popup>, 
 };
 
 /**
- * Figma `Bottom sheet` (Panels 88:808): the veil with 32px top corners, a
- * 36x5 grabber, a label-lg title and a 32px 6% ink close button.
+ * Figma `Bottom sheet` (Panels 88:808): the veil with 32px top corners, a 36x5 grabber and a
+ * label-lg title. There is no close button: the sheet closes on the scrim, on Escape, on a
+ * downward drag of the grabber, or through the caller's own bottom action row.
  */
 export function BottomSheetContent({
   title,
-  closeLabel = "Close",
   variant = "panel",
   surface = "solid",
   backdrop = true,
@@ -55,7 +52,7 @@ export function BottomSheetContent({
         <Drawer.Popup
           className={cn(
             "relative flex w-full flex-col items-stretch overflow-clip px-4 pt-2 outline-none",
-            solid ? "rounded-t-[20px] bg-bg-default pb-6" : "veil-overlay rounded-t-[32px] pb-5",
+            solid ? "rounded-t-xl bg-bg-default pb-6" : "veil-overlay rounded-t-[32px] pb-5",
             "transition-[translate] duration-320 ease-out-quint data-ending-style:translate-y-full data-ending-style:duration-220 data-ending-style:ease-in data-starting-style:translate-y-full",
             detail ? "gap-4.5" : floating ? "gap-3" : "max-w-93.5 gap-1",
             className,
@@ -64,21 +61,10 @@ export function BottomSheetContent({
         >
           <span aria-hidden className="relative mx-auto h-[5px] w-9 rounded-[3px] bg-overlay-ink-20" />
           <Drawer.Content className={cn("relative flex flex-col", detail ? "gap-4.5" : floating ? "gap-3" : "gap-1")}>
-            <div className={cn("flex gap-2", detail ? "items-start" : "items-center pt-2.5 pb-2 pl-1")}>
+            <div className={cn("flex gap-2", detail ? "items-start" : "items-center pt-2.5 pb-2 pl-2")}>
               <Drawer.Title className={cn("min-w-0 flex-1 text-text-primary", detail ? "flex" : "text-label-lg")}>
                 {title}
               </Drawer.Title>
-              {closeLabel === null ? null : (
-                <Drawer.Close
-                  aria-label={closeLabel}
-                  className={cn(
-                    "flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand",
-                    detail ? "bg-transparent" : "bg-overlay-ink-6",
-                  )}
-                >
-                  <X aria-hidden className={detail ? "size-[18px]" : "size-4"} />
-                </Drawer.Close>
-              )}
             </div>
             {children}
           </Drawer.Content>
@@ -114,11 +100,14 @@ export function BottomSheetRow({ icon, value, className, children, ...props }: B
   );
 }
 
+/** The action row: secondary first, the primary action at the right edge, 8px apart. */
 export function BottomSheetActions({
   className,
   ...props
 }: Omit<ComponentProps<"div">, "className"> & { className?: string }) {
-  return <div className={cn("flex items-center gap-2 pt-3", className)} {...props} />;
+  return (
+    <div className={cn("relative flex w-full flex-wrap items-center justify-end gap-2 pt-3", className)} {...props} />
+  );
 }
 
 export type BottomSheetActionProps = Omit<ComponentProps<"button">, "className"> & {

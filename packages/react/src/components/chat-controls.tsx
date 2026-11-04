@@ -31,7 +31,7 @@ export function JumpToLatest({
     <button
       type="button"
       aria-label={ariaLabel}
-      className={cn(controlBase, surfaceClass[surface], "size-11 justify-center", className)}
+      className={cn(controlBase, surfaceClass[surface], "size-10 justify-center", className)}
       {...props}
     >
       {surface === "glass" && <LiquidGlass />}

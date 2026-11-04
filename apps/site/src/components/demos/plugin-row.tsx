@@ -5,7 +5,7 @@ import { useState } from "react";
 export default function PluginRowDemo() {
   const [enabled, setEnabled] = useState(true);
   return (
-    <div className="w-full max-w-190 rounded-2xl bg-bg-default px-4">
+    <div className="w-full max-w-190 rounded-2xl border border-border-default bg-bg-surface px-5">
       <PluginRow
         initials="GH"
         name="GitHub tools"

@@ -43,7 +43,7 @@ export type BotMemoryPanelProps = WithClass<Omit<ComponentProps<"section">, "tit
 
 function Divider({ inset }: { inset?: boolean }) {
   return (
-    <div className={cn("flex self-stretch", inset && "px-4.5")}>
+    <div className={cn("flex self-stretch", inset && "px-5")}>
       <div role="separator" className="h-px flex-1 bg-overlay-ink-8" />
     </div>
   );
@@ -83,7 +83,7 @@ export function BotMemoryPanel({
       )}
       {...props}
     >
-      <header className="flex items-center gap-2.5 px-4.5 pt-4 pb-3">
+      <header className="flex items-center gap-2.5 px-5 pt-4 pb-3">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <h3 className="text-label-lg text-text-primary">{title}</h3>
           {subtitle ? <p className="text-caption text-text-secondary">{subtitle}</p> : null}
@@ -108,7 +108,7 @@ export function BotMemoryPanel({
       {settings?.map((setting, index) => (
         <div key={setting.id} className="flex flex-col">
           {index > 0 ? <Divider inset /> : null}
-          <div className="flex items-center gap-3 px-4.5 py-2.5">
+          <div className="flex items-center gap-3 px-5 py-2.5">
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span className="text-label-md text-text-primary">{setting.label}</span>
               {setting.description ? (
@@ -125,7 +125,7 @@ export function BotMemoryPanel({
         </div>
       ))}
       <Divider />
-      <div className="flex items-center gap-2 pt-3 pr-3.5 pb-1.5 pl-3.5">
+      <div className="flex items-center gap-2 px-5 pt-3 pb-1.5">
         <PanelPillTabs
           aria-label="Memory filter"
           value={filter}
@@ -142,7 +142,7 @@ export function BotMemoryPanel({
         </button>
       </div>
       {toast && !dismissed ? (
-        <div className="px-3.5 py-1.5">
+        <div className="px-5 py-1.5">
           <div
             role="status"
             onAnimationEnd={() => {
@@ -177,7 +177,7 @@ export function BotMemoryPanel({
           const items = memories.filter((memory) => memory.group === group);
           return (
             <div key={group} className="flex flex-col">
-              <div className="flex items-center gap-1.5 px-4.5 pt-3 pb-1">
+              <div className="flex items-center gap-1.5 px-5 pt-3 pb-1">
                 <span className="text-label-sm text-text-secondary">{group}</span>
                 <span className="text-caption text-text-secondary">{items.length}</span>
               </div>
@@ -185,7 +185,7 @@ export function BotMemoryPanel({
                 <div
                   key={memory.id}
                   className={cn(
-                    "flex motion-rise flex-col gap-0.5 px-4.5 py-2 motion-colors",
+                    "flex motion-rise flex-col gap-0.5 px-5 py-2 motion-colors",
                     memory.fresh && "bg-accent-sky-500-10",
                   )}
                   style={{ animationDelay: `${rowIndex++ * 30}ms` }}
@@ -201,7 +201,7 @@ export function BotMemoryPanel({
       <button
         type="button"
         onClick={onAdd}
-        className="flex cursor-pointer items-center gap-2 px-4.5 pt-3 pb-4 text-label-md text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+        className="flex cursor-pointer items-center gap-2 px-5 pt-3 pb-4 text-label-md text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
       >
         <Plus aria-hidden className="size-3.5" />
         Add memory

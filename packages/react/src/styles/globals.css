@@ -278,6 +278,15 @@
   }
 }
 
+/* Optical centering for one-line labels in fixed-height pills and controls: the label box is trimmed to the
+ * cap height and the alphabetic baseline, so `items-center` centres the letters instead of the font's
+ * ascent/descent box, whatever the font. Put it on the label element (a flex item), not the container: an
+ * anonymous text run is not trimmed. Only inside a fixed height, since it shrinks the label box. Browsers
+ * without `text-box` keep the plain line box. */
+@utility text-trim {
+  text-box: trim-both cap alphabetic;
+}
+
 /* Panel, lane and row entrance; stagger with animation-delay: calc(var(--i) * 30ms). */
 @utility motion-rise {
   animation: tab-panel-in 220ms var(--ease-out-quint) both;

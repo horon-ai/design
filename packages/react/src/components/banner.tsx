@@ -27,8 +27,8 @@ const sizeClass: Record<BannerSize, string> = {
 };
 
 const iconSizeClass: Record<BannerSize, string> = {
-  sm: "[&_svg]:size-4",
-  md: "[&_svg]:size-4.5",
+  sm: "[&_svg]:size-3.5",
+  md: "[&_svg]:size-4",
   lg: "[&_svg]:size-5",
 };
 
@@ -91,7 +91,7 @@ export function Banner({
       {action && (
         <span
           className={cn(
-            "relative shrink-0 leading-5 tracking-[-0.04px] whitespace-nowrap underline [&_a]:cursor-pointer [&_button]:cursor-pointer",
+            "relative shrink-0 whitespace-nowrap underline [&_a]:cursor-pointer [&_button]:cursor-pointer",
             actionSizeClass[size],
           )}
         >

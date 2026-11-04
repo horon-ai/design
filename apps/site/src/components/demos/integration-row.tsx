@@ -10,7 +10,7 @@ export default function IntegrationRowDemo() {
         <p className="text-caption text-text-secondary">Solid</p>
         <div className="flex w-full flex-wrap items-center justify-center gap-4">
           <IntegrationRow
-            className="max-w-110"
+            className="w-full max-w-110"
             surface="solid"
             icon={<EnvelopeSimple />}
             name="Gmail"
@@ -18,7 +18,7 @@ export default function IntegrationRowDemo() {
             status="connected"
           />
           <IntegrationRow
-            className="max-w-110"
+            className="w-full max-w-110"
             surface="solid"
             icon={<CalendarBlank />}
             name="Google Calendar"
@@ -26,7 +26,7 @@ export default function IntegrationRowDemo() {
             status="reconnect"
           />
           <IntegrationRow
-            className="max-w-110"
+            className="w-full max-w-110"
             surface="solid"
             icon={<ChatCircle />}
             name="Slack"
@@ -39,7 +39,7 @@ export default function IntegrationRowDemo() {
         <p className="text-caption text-text-secondary">Glass</p>
         <Backdrop className="flex-col">
           <IntegrationRow
-            className="max-w-110"
+            className="w-full max-w-110"
             surface="glass"
             icon={<EnvelopeSimple />}
             name="Gmail"
@@ -47,7 +47,7 @@ export default function IntegrationRowDemo() {
             status="connected"
           />
           <IntegrationRow
-            className="max-w-110"
+            className="w-full max-w-110"
             surface="glass"
             icon={<CalendarBlank />}
             name="Google Calendar"
@@ -55,7 +55,7 @@ export default function IntegrationRowDemo() {
             status="reconnect"
           />
           <IntegrationRow
-            className="max-w-110"
+            className="w-full max-w-110"
             surface="glass"
             icon={<ChatCircle />}
             name="Slack"

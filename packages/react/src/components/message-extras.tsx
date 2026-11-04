@@ -131,7 +131,7 @@ export function CodeBlock({
           {copied ? copiedLabel : copyLabel}
         </button>
       </div>
-      <pre className="overflow-x-auto px-3.5 pt-3 pb-3.5 font-mono text-[13px] leading-[22px] text-text-on-ink">
+      <pre className="overflow-x-auto px-3.5 pt-3 pb-3.5 font-mono text-code text-text-on-ink">
         <code>{code}</code>
       </pre>
     </div>

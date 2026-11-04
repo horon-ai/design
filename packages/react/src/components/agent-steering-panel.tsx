@@ -52,7 +52,7 @@ function Marker({ status }: { status: SteeringStepStatus }) {
     );
   }
   if (status === "active") return <Spinner size={18} label="Running" />;
-  return <span aria-label="Waiting" className="size-4.25 rounded-full border border-dashed border-border-dashed" />;
+  return <span aria-label="Waiting" className="size-4.5 rounded-full border border-dashed border-border-dashed" />;
 }
 
 /**
@@ -92,7 +92,7 @@ export function AgentSteeringPanel({
       )}
       {...props}
     >
-      <div className="flex items-center gap-2.5 pt-4 pr-4 pb-3.5 pl-4.5">
+      <div className="flex items-center gap-2.5 px-5 pt-4 pb-3.5">
         <Sparkle aria-hidden className="size-4.5 shrink-0 text-text-primary" />
         <div className="flex min-w-0 flex-1 flex-col">
           <h3 className="truncate text-label-lg text-text-primary">{title}</h3>
@@ -101,7 +101,7 @@ export function AgentSteeringPanel({
         <span
           aria-hidden
           className={cn(
-            "size-1.75 shrink-0 rounded-full bg-status-live text-status-live",
+            "size-1.5 shrink-0 rounded-full bg-status-live text-status-live",
             !paused && "animate-live-pulse",
           )}
         />
@@ -111,14 +111,14 @@ export function AgentSteeringPanel({
           aria-label={paused ? "Resume" : "Pause"}
           aria-pressed={paused}
           onClick={() => onPausedChange?.(!paused)}
-          className="flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-[10px] bg-overlay-ink-6 text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
+          className="flex size-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
         >
           {paused ? <Play aria-hidden weight="fill" /> : <Pause aria-hidden weight="fill" />}
         </button>
       </div>
-      <div className="h-px bg-overlay-ink-12" />
+      <div className="h-px bg-overlay-ink-8" />
 
-      <ol className="flex flex-col gap-3 px-4.5 py-3">
+      <ol className="flex flex-col gap-3 px-5 py-3">
         {steps.map((step, index) => (
           <li key={step.id} style={indexStyle(index)} className="flex min-h-6.5 motion-rise items-center gap-3">
             <span className="relative flex h-6.5 w-5 shrink-0 items-center justify-center">
@@ -145,9 +145,9 @@ export function AgentSteeringPanel({
           </li>
         ))}
       </ol>
-      <div className="h-px bg-overlay-ink-12" />
+      <div className="h-px bg-overlay-ink-8" />
 
-      <div className="flex flex-col gap-2.5 px-4.5 py-3.5">
+      <div className="flex flex-col gap-2.5 px-5 py-3.5">
         {notes.length > 0 && (
           <>
             <p className="flex items-center gap-2 text-caption text-text-secondary uppercase">
@@ -192,7 +192,7 @@ export function AgentSteeringPanel({
           </>
         )}
 
-        <div className="flex h-11 items-center gap-2 rounded-[14px] bg-overlay-ink-5 pr-1.5 pl-3.5">
+        <div className="flex h-11 items-center gap-2 rounded-full bg-overlay-ink-5 pr-1.5 pl-4">
           <input
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
@@ -211,7 +211,7 @@ export function AgentSteeringPanel({
             type="button"
             aria-label="Send"
             onClick={() => submit(false)}
-            className="flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-[10px] bg-interactive-primary text-text-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+            className="flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-primary text-text-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
           >
             <ArrowUp aria-hidden className="size-4" />
           </button>

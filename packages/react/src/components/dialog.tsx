@@ -19,7 +19,8 @@ export type DialogContentProps = Omit<ComponentProps<typeof BaseDialog.Popup>, "
   leading?: ReactNode;
   /**
    * `glass` is the veil dialog (`veil-overlay`). `solid` is the Paper workspace modal:
-   * opaque default fill, 20px radius, 24px padding, 20px gap and a 0 24 64 shadow, no glass layer.
+   * opaque default fill, 20px radius, 24px padding and a 0 24 64 shadow, no glass layer.
+   * Both surfaces share the 16px block rhythm between title, description and actions.
    */
   surface?: "glass" | "solid";
   className?: string;
@@ -27,7 +28,7 @@ export type DialogContentProps = Omit<ComponentProps<typeof BaseDialog.Popup>, "
 
 /**
  * Figma `Dialog on scrim` (63:329): a 40% scrim and a 420px veil dialog,
- * 24px padding, title-md heading with a 20px close icon, body-md description.
+ * 24px padding, title-md heading with a 32px close target, body-md description.
  */
 export function DialogContent({
   title,
@@ -47,10 +48,8 @@ export function DialogContent({
       <BaseDialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <BaseDialog.Popup
           className={cn(
-            "relative flex w-105 max-w-[calc(100vw-2rem)] flex-col items-start overflow-clip p-6 outline-none",
-            solid
-              ? "gap-5 rounded-[20px] bg-bg-default shadow-[0_24px_64px_#0A142433]"
-              : "veil-overlay gap-2 rounded-xl",
+            "relative flex w-105 max-w-[calc(100vw-2rem)] flex-col items-start gap-4 overflow-clip rounded-xl p-6 outline-none",
+            solid ? "bg-bg-default shadow-[0_24px_64px_#0A142433]" : "veil-overlay",
             "motion-popup duration-240 data-starting-style:translate-y-2",
             className,
           )}
@@ -63,7 +62,7 @@ export function DialogContent({
               <BaseDialog.Close
                 aria-label={closeLabel}
                 data-slot={closeSlot}
-                className="flex shrink-0 motion-press cursor-pointer text-text-secondary [&_svg]:size-5"
+                className="relative -mt-1 -mr-2 flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary motion-colors hover:bg-overlay-ink-6 hover:text-text-primary [&_svg]:size-4"
               >
                 <X />
               </BaseDialog.Close>
@@ -81,10 +80,13 @@ export function DialogContent({
   );
 }
 
-/** The right-aligned action row, 16px below the description. */
+/**
+ * The action row: secondary first, the primary action at the right edge, 8px apart.
+ * `w-full` is what right-aligns it — the dialog popup stacks children at their content width.
+ */
 export function DialogFooter({
   className,
   ...props
 }: Omit<ComponentProps<"div">, "className"> & { className?: string }) {
-  return <div className={cn("relative mt-4 flex justify-end gap-2", className)} {...props} />;
+  return <div className={cn("relative flex w-full flex-wrap items-center justify-end gap-2", className)} {...props} />;
 }

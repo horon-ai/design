@@ -1,6 +1,6 @@
-import { FilterBar } from "@horon-ai/react";
+import { FilterBar, type FilterBarItem } from "@horon-ai/react";
 
-const items = [
+const items: FilterBarItem[] = [
   { value: "all", label: "All", count: 4 },
   { value: "running", label: "Running", count: 1 },
   { value: "review", label: "Needs review", count: 1 },
@@ -8,14 +8,18 @@ const items = [
   { value: "done", label: "Done", count: 1 },
 ];
 
+const withDisabled = items.map((item) => (item.value === "failed" ? { ...item, disabled: true } : item));
+
 export default function FilterBarDemo() {
   return (
-    <div className="flex w-full flex-col items-center gap-4 rounded-2xl bg-bg-surface p-4 sm:p-8">
-      <div className="max-w-full overflow-x-auto rounded-full">
+    <div className="flex w-full flex-col items-center gap-8 rounded-2xl bg-bg-surface p-4 sm:p-8">
+      <div className="flex flex-col items-center gap-3">
+        <p className="text-caption text-text-secondary">Default</p>
         <FilterBar items={items} defaultValue="all" />
       </div>
-      <div className="max-w-full overflow-x-auto rounded-full">
-        <FilterBar items={items} defaultValue="review" />
+      <div className="flex flex-col items-center gap-3">
+        <p className="text-caption text-text-secondary">Selected with a disabled option</p>
+        <FilterBar items={withDisabled} defaultValue="review" />
       </div>
     </div>
   );

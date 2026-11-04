@@ -112,7 +112,7 @@ export function TabsTab({
       {...props}
     >
       {icon}
-      {children}
+      <span className="text-trim">{children}</span>
       {count !== undefined && (
         <span
           className={cn(
@@ -120,7 +120,7 @@ export function TabsTab({
             countClass[size],
           )}
         >
-          {count}
+          <span className="text-trim">{count}</span>
         </span>
       )}
     </BaseTabs.Tab>

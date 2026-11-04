@@ -58,7 +58,7 @@ export function SourceRow({
         className,
       )}
     >
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-overlay-ink-5 text-text-primary [&>svg]:size-4">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-overlay-ink-5 text-text-primary [&>svg]:size-4">
         {icon}
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -95,7 +95,7 @@ export function SourceRow({
           <button
             type="button"
             onClick={onRetry}
-            className="flex h-7 motion-press cursor-pointer items-center rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex h-7.5 motion-press cursor-pointer items-center rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             Retry
           </button>

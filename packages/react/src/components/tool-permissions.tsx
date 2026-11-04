@@ -30,7 +30,7 @@ const options: { value: ToolPermission; label: string }[] = [
 ];
 
 /**
- * Paper `Tool permissions` (1VT5-0): a neutral-50 group header with a count pill and an "Allow all" text button,
+ * Paper `Tool permissions` (1VT5-0): a subtle group header with a count pill and an "Allow all" text button,
  * then one divided row per tool with a mono name, a description and an Allow / Ask / Off segmented control.
  */
 export function ToolPermissions({
@@ -52,15 +52,15 @@ export function ToolPermissions({
   };
   return (
     <div className={cn("flex w-full max-w-130.25 flex-col", className)} {...props}>
-      <div className="flex items-center gap-2 rounded-sm bg-neutral-50 px-3 py-2 dark:bg-neutral-800">
-        <span className="text-[13px]/[18px] font-semibold text-text-primary">{title}</span>
-        <span className="inline-flex h-5.5 items-center rounded-full bg-overlay-ink-6 px-2 text-[12px]/[16px] font-medium text-text-secondary">
+      <div className="flex items-center gap-2 rounded-t-md bg-bg-subtle px-3 py-2">
+        <span className="text-label-md font-semibold text-text-primary">{title}</span>
+        <span className="inline-flex h-5.5 items-center rounded-full bg-overlay-ink-6 px-2 text-label-sm text-text-secondary">
           {tools.length}
         </span>
         <span className="flex-1" />
         <button
           type="button"
-          className="cursor-pointer rounded-sm text-[12px]/[16px] font-medium text-text-placeholder motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+          className="cursor-pointer rounded-sm text-label-sm text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
           onClick={() => update(Object.fromEntries(tools.map((tool) => [tool.name, "allow" as const])))}
         >
           {allowAllLabel}
@@ -69,12 +69,12 @@ export function ToolPermissions({
       {tools.map((tool, index) => (
         <div
           key={tool.name}
-          className="flex motion-rise items-center gap-3 border-b border-border-default py-[11px] pr-1 pl-3 last:border-b-0"
+          className="flex motion-rise items-center gap-3 border-b border-border-default px-3 py-3 last:border-b-0"
           style={{ animationDelay: `${index * 30}ms` }}
         >
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <span className="truncate font-mono text-[13px]/[18px] font-medium text-text-primary">{tool.name}</span>
-            {tool.description && <span className="text-[12px]/[16px] text-text-placeholder">{tool.description}</span>}
+            <span className="truncate font-mono text-code font-medium text-text-primary">{tool.name}</span>
+            {tool.description && <span className="text-caption text-text-secondary">{tool.description}</span>}
           </div>
           <SegmentedControl
             aria-label={`${tool.name} permission`}

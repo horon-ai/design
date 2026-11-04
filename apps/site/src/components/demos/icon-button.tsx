@@ -27,7 +27,7 @@ export default function IconButtonDemo() {
         <p className="text-caption text-text-secondary">Solid</p>
         <Examples variant="solid" />
       </div>
-      <Backdrop className="flex-col gap-3!">
+      <Backdrop className="flex-col">
         <p className="text-caption text-text-secondary">Glass</p>
         <Examples variant="glass" />
       </Backdrop>

@@ -19,7 +19,7 @@ export type SplitButtonProps = Omit<ComponentProps<typeof BaseButton>, "classNam
 const halfClass =
   "relative inline-flex h-full cursor-pointer items-center motion-press select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed data-disabled:opacity-40";
 
-/** Paper `Split button` (1VGK-0): one primary pill, two hit areas split by a 1x18 bar. */
+/** Paper `Split button` (1VGK-0): one primary pill on `Button`'s 32px rung, two hit areas split by a 1x18 bar. */
 export function SplitButton({
   children,
   icon,
@@ -32,7 +32,7 @@ export function SplitButton({
   return (
     <div
       className={cn(
-        "inline-flex h-8 shrink-0 items-center rounded-full bg-interactive-primary text-label-lg text-interactive-on-primary",
+        "inline-flex h-8 shrink-0 items-center rounded-full bg-interactive-primary text-label-md text-interactive-on-primary",
         className,
       )}
     >

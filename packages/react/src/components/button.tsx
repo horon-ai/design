@@ -59,7 +59,7 @@ export function Button({ variant = "primary", size = "md", icon, className, chil
     <>
       {variant === "glass" && <LiquidGlass />}
       {icon && <span className="relative flex shrink-0">{icon}</span>}
-      <span className="relative">{children}</span>
+      <span className={cn("relative", variant !== "link" && "text-trim")}>{children}</span>
     </>
   );
 

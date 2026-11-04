@@ -40,13 +40,14 @@ const metaClass: Record<TextareaFieldSize, string> = {
   lg: "text-body-sm",
 };
 
+/** The same box heights and padding as `Textarea` (88/112/136px, 12/14/20px), so one size reads the same in both. */
 const boxClass: Record<TextareaFieldSize, string> = {
   sm: "h-22 px-3 py-2",
-  md: "h-30 px-3.5 py-3",
-  lg: "h-34 px-4 py-3.5",
+  md: "h-28 px-3.5 py-3",
+  lg: "h-34 px-5 py-3.5",
 };
 
-/** Figma `Textarea field` (60:466): label row, 88/120/136px glass or solid box, footer with help text and counter. */
+/** Figma `Textarea field` (60:466): label row, glass or solid box, footer with help text and counter. */
 export function TextareaField({
   label,
   hint,

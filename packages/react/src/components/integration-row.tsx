@@ -23,9 +23,9 @@ export type IntegrationRowProps = {
 };
 
 const tileClass: Record<IntegrationStatus, string> = {
-  connected: "bg-sky-500",
-  reconnect: "bg-sky-700",
-  "not-connected": "bg-interactive-primary",
+  connected: "bg-sky-500 text-neutral-50",
+  reconnect: "bg-sky-700 text-neutral-50",
+  "not-connected": "bg-bg-subtle text-text-secondary",
 };
 
 /** Figma `Integration row` (Integrations 110:883): 40px tile, status pill on the right, solid or thick glass. */
@@ -44,7 +44,7 @@ export function IntegrationRow({
   return (
     <div
       className={cn(
-        "relative flex items-center gap-3 overflow-clip rounded-[16px] py-3 pr-3.5 pl-3",
+        "relative flex items-center gap-3 overflow-clip rounded-2xl py-3 pr-3.5 pl-3",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         status === "reconnect" &&
           (surface === "glass" ? "[--glass-edge:var(--color-border-danger)]" : "border-border-danger"),
@@ -54,7 +54,7 @@ export function IntegrationRow({
       {surface === "glass" && <LiquidGlass />}
       <span
         className={cn(
-          "relative flex size-10 shrink-0 items-center justify-center rounded-[10px] text-text-inverse [&>svg]:size-5",
+          "relative flex size-10 shrink-0 items-center justify-center rounded-[10px] [&>svg]:size-5",
           tileClass[status],
         )}
       >

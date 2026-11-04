@@ -14,14 +14,7 @@ function Header({ surface }: { surface: "solid" | "glass" }) {
       onBack={() => undefined}
       actions={<IconButton icon={<MagnifyingGlass />} label="Search" />}
     >
-      <SegmentedControl
-        aria-label="Status"
-        surface="inset-faint"
-        fill={false}
-        className="h-9 px-[3px]"
-        defaultValue="running"
-        items={filters}
-      />
+      <SegmentedControl aria-label="Status" surface="inset-faint" fill={false} defaultValue="running" items={filters} />
     </PageHeader>
   );
 }

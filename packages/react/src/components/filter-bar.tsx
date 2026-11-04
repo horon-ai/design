@@ -62,12 +62,12 @@ export function FilterBar({
               onValueChange?.(item.value);
             }}
             className={cn(
-              "motion-colors relative flex h-7.5 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 whitespace-nowrap focus-visible:outline-2 focus-visible:outline-text-brand disabled:cursor-not-allowed disabled:opacity-50",
+              "relative flex h-7.5 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-4 whitespace-nowrap motion-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand disabled:cursor-not-allowed disabled:opacity-40",
               active ? "text-text-primary" : "text-text-secondary hover:text-text-primary",
             )}
           >
-            <span className="text-[14px]/[20px] font-medium">{item.label}</span>
-            {item.count !== undefined && <span className="text-[12px]/[18px] text-text-secondary">{item.count}</span>}
+            <span className="text-label-md">{item.label}</span>
+            {item.count !== undefined && <span className="text-caption text-text-secondary">{item.count}</span>}
           </button>
         );
       })}

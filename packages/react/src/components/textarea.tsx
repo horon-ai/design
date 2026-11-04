@@ -19,10 +19,10 @@ export type TextareaProps = Omit<ComponentProps<"textarea">, "className"> & {
 const sizeClass: Record<TextareaSize, string> = {
   sm: "min-h-22 px-3 py-2",
   md: "min-h-28 px-3.5 py-3",
-  lg: "min-h-34 px-4 py-3.5",
+  lg: "min-h-34 px-5 py-3.5",
 };
 
-/** Figma `Textarea` (58:137): an 88/112/136px glass or solid box with 12/14px padding. */
+/** Figma `Textarea` (58:137): an 88/112/136px glass or solid box with 12/14/20px padding, the same field rungs as `Input`. */
 export function Textarea({
   size = "md",
   invalid,

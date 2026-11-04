@@ -42,10 +42,10 @@ export function PlanCard({ label, title, children, status, statusLabel, elapsed,
       <div className="flex flex-col px-6 pt-1.5 pb-1">{children}</div>
       <Collapsible.Root open={status !== undefined}>
         <Collapsible.Panel keepMounted className="motion-collapse">
-          <div className="h-px bg-border-default" />
+          <div className="h-px bg-overlay-ink-8" />
           <div
             className={cn(
-              "motion-colors flex items-center gap-2 px-6 pt-3.5 pb-4 text-label-md",
+              "flex items-center gap-2 px-6 pt-3.5 pb-4 text-label-md motion-colors",
               status === "failed" ? "text-text-danger" : "text-text-primary",
             )}
           >

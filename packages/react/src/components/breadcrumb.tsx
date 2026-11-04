@@ -35,8 +35,8 @@ export function Breadcrumb({
         {Children.map(children, (item, index) => (
           <>
             {index > 0 && (
-              <li aria-hidden className="flex">
-                <CaretRight className="size-3.5 text-text-secondary" />
+              <li aria-hidden className="flex shrink-0">
+                <CaretRight className="size-3.5 shrink-0 text-text-secondary" />
               </li>
             )}
             <li className="flex">{item}</li>
