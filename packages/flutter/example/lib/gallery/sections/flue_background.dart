@@ -3,9 +3,10 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `flue_background` 갤러리 섹션입니다.
 ///
-/// 기본 하늘 팔레트와 팔레트 덮어쓰기를 나란히 두고, 그 위에 내용을 얹어 배경이
-/// 내용 뒤에 남는지 보여 줍니다. 갤러리에서는 티커를 끄고 12초 시점의 한 프레임만
-/// 그립니다. 그래야 스크롤하는 동안 매 프레임 다시 그리지 않습니다.
+/// 기본 하늘 팔레트, 팔레트 덮어쓰기, 그리고 세 가지 변형(기본·사이드바·인증)을 나란히
+/// 두고, 그 위에 내용을 얹어 배경이 내용 뒤에 남는지 보여 줍니다. 갤러리에서는 티커를
+/// 끄고 12초 시점의 한 프레임만 그립니다. 그래야 스크롤하는 동안 매 프레임 다시 그리지
+/// 않습니다.
 ///
 /// 셰이더는 Impeller가 있는 기기에서만 돕니다. 시뮬레이터나 테스트처럼 셰이더를 읽지
 /// 못하는 환경에서는 [HoronFlueConfig.bgColor] 단색과 색조만 남습니다.
@@ -29,6 +30,14 @@ class HoronFlueBackgroundGallerySection extends StatelessWidget {
             runSpacing: theme.space.s4,
             children: <Widget>[
               const _FlueCell(label: 'Sky (기본 팔레트)'),
+              const _FlueCell(
+                label: '사이드바 · sidebar',
+                variant: HoronFlueVariant.sidebar,
+              ),
+              const _FlueCell(
+                label: '인증 화면 · auth',
+                variant: HoronFlueVariant.auth,
+              ),
               const _FlueCell(
                 label: '팔레트 덮어쓰기',
                 config: HoronFlueConfig(
@@ -61,12 +70,14 @@ class HoronFlueBackgroundGallerySection extends StatelessWidget {
 class _FlueCell extends StatelessWidget {
   const _FlueCell({
     required this.label,
-    this.config = HoronFlueConfig.sky,
+    this.variant = HoronFlueVariant.defaultValue,
+    this.config,
     this.tint,
   });
 
   final String label;
-  final HoronFlueConfig config;
+  final HoronFlueVariant variant;
+  final HoronFlueConfig? config;
   final Color? tint;
 
   @override
@@ -90,7 +101,11 @@ class _FlueCell extends StatelessWidget {
                   // 정지 프레임: 갤러리에서 티커를 돌리지 않습니다.
                   TickerMode(
                     enabled: false,
-                    child: HoronFlueBackground(config: config, tint: tint),
+                    child: HoronFlueBackground(
+                      variant: variant,
+                      config: config,
+                      tint: tint,
+                    ),
                   ),
                   Center(
                     child: Padding(

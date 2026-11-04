@@ -29,14 +29,16 @@ void main() {
 
   Future<void> pumpFlue(
     WidgetTester tester, {
-    HoronFlueConfig config = HoronFlueConfig.sky,
+    HoronFlueConfig? config,
+    HoronFlueVariant variant = HoronFlueVariant.defaultValue,
     Color? tint,
     bool animations = true,
     bool tickerMode = true,
+    Brightness brightness = Brightness.light,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
-        theme: horonTheme(Brightness.light),
+        theme: horonTheme(brightness),
         home: MediaQuery(
           data: MediaQueryData(size: hostSize, disableAnimations: !animations),
           child: TickerMode(
@@ -45,7 +47,7 @@ void main() {
               body: SizedBox(
                 width: hostSize.width,
                 height: hostSize.height,
-                child: HoronFlueBackground(config: config, tint: tint),
+                child: HoronFlueBackground(variant: variant, config: config, tint: tint),
               ),
             ),
           ),
@@ -61,6 +63,22 @@ void main() {
   }
 
   group('HoronFlueConfig', () {
+    test('mirrors FLUE_NIGHT field for field', () {
+      const HoronFlueConfig night = HoronFlueConfig.night;
+      expect(night.bgColor, const Color(0xFF050608));
+      expect(night.colorA, const Color(0xFF07090D));
+      expect(night.colorB, const Color(0xFF0C1A2C));
+      expect(night.colorC, const Color(0xFF1F4A78));
+      expect(night.colorD, const Color(0xFF4F8FD0));
+      expect(night.glow, 0.35);
+      // 나머지 필드는 FLUE_SKY와 같습니다.
+      const HoronFlueConfig sky = HoronFlueConfig.sky;
+      expect(night.speed, sky.speed);
+      expect(night.smokeScale, sky.smokeScale);
+      expect(night.midpoint, sky.midpoint);
+      expect(night.vignette, sky.vignette);
+    });
+
     test('mirrors FLUE_SKY field for field', () {
       const HoronFlueConfig sky = HoronFlueConfig.sky;
       expect(sky.bgColor, const Color(0xFFEEF3F8));
@@ -174,6 +192,70 @@ void main() {
       expect(damping.x, closeTo(0.8, 1e-3));
       expect(damping.y, closeTo(0.5, 1e-3));
       expect(damping.wakeX, closeTo(0.8, 1e-2));
+    });
+  });
+
+  group('variants', () {
+    testWidgets('the sidebar variant tunes the sky palette and lays no tint', (WidgetTester tester) async {
+      await pumpFlue(tester, variant: HoronFlueVariant.sidebar);
+      final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
+      final HoronFlueConfig config = state.resolvedConfig;
+
+      expect(config.speed, 0.22, reason: '더 느리게 흐릅니다');
+      expect(config.smokeScale, 1.9);
+      expect(config.density, 1.85);
+      expect(config.contrast, 1.45, reason: '밝은 모드 조정');
+      expect(config.midpoint, 0.8);
+      expect(config.glow, 0.3);
+      expect(config.vignette, 0, reason: '사이드바는 모서리를 어둡게 하지 않습니다');
+      expect(config.bgColor, HoronFlueConfig.sky.bgColor, reason: '팔레트 위에 조정만 얹습니다');
+      expect(
+        find.byWidgetPredicate(
+          (Widget widget) =>
+              widget is ColoredBox &&
+              widget.color == HoronTheme.of(tester.element(find.byType(HoronFlueBackground))).colors.glassRegular,
+        ),
+        findsNothing,
+        reason: '사이드바 유리가 바탕을 채우므로 색조를 얹지 않습니다',
+      );
+      await drain(tester);
+    });
+
+    testWidgets('the auth variant widens the plume on the base palette', (WidgetTester tester) async {
+      await pumpFlue(tester, variant: HoronFlueVariant.auth);
+      final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
+      final HoronFlueConfig config = state.resolvedConfig;
+
+      expect(config.width, 1.9);
+      expect(config.spread, 1.3);
+      expect(config.density, 2.0);
+      expect(config.midpoint, 0.74);
+      expect(config.glow, 0.45);
+      expect(config.vignette, 0.18);
+      expect(state.resolvedConfig.speed, HoronFlueConfig.sky.speed, reason: 'auth는 속도를 바꾸지 않습니다');
+      await drain(tester);
+    });
+
+    testWidgets('an explicit config wins over the variant tuning', (WidgetTester tester) async {
+      await pumpFlue(tester, variant: HoronFlueVariant.sidebar, config: HoronFlueConfig.sky);
+      final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
+      expect(state.resolvedConfig.speed, HoronFlueConfig.sky.speed);
+      expect(state.resolvedConfig.vignette, HoronFlueConfig.sky.vignette);
+      await drain(tester);
+    });
+
+    testWidgets('dark mode starts from the night palette', (WidgetTester tester) async {
+      await pumpFlue(tester, brightness: Brightness.dark);
+      final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
+      expect(state.resolvedConfig.bgColor, HoronFlueConfig.night.bgColor);
+      expect(state.resolvedConfig.glow, HoronFlueConfig.night.glow);
+      expect(
+        find.byWidgetPredicate(
+          (Widget widget) => widget is ColoredBox && widget.color == HoronFlueConfig.night.bgColor,
+        ),
+        findsOneWidget,
+      );
+      await drain(tester);
     });
   });
 
