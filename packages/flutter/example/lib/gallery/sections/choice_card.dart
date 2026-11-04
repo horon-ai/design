@@ -3,7 +3,8 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `choice_card` 갤러리 섹션입니다.
 ///
-/// 꺼짐, 켜짐, 중립 배지, 설명만 있는 카드, 비활성 다섯 상태를 나란히 보여 줍니다.
+/// 카드는 solid 표면 하나입니다. 꺼짐, 켜짐, 중립 배지, 설명만 있는 카드, 비활성
+/// 다섯 상태를 나란히 보여 줍니다.
 class HoronChoiceCardGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronChoiceCardGallerySection({super.key});
@@ -24,16 +25,6 @@ class HoronChoiceCardGallerySection extends StatelessWidget {
               title: const Text('Workspace connection'),
               description: const Text('Share this workspace with the bot'),
               badge: const Text('Recommended'),
-              onTap: () {},
-            ),
-          ),
-          _Sample(
-            label: '유리 (glass)',
-            child: HoronChoiceCard(
-              title: const Text('Workspace connection'),
-              description: const Text('Share this workspace with the bot'),
-              badge: const Text('Recommended'),
-              surface: HoronChoiceCardSurface.glass,
               onTap: () {},
             ),
           ),

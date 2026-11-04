@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../surface_group.dart';
+
 /// `composer` 갤러리 섹션입니다.
 ///
-/// 빈 입력(음성 버튼), 글이 있는 입력(전송 버튼), 다른 안내 문구, 비활성 네 상태를 보여 줍니다.
+/// 빈 입력(음성 버튼), 글이 있는 입력(전송 버튼), 다른 안내 문구, 비활성 네 상태를
+/// solid와 glass 두 표면에 같은 목록으로 보여 줍니다.
 class HoronComposerGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronComposerGallerySection({super.key});
@@ -13,64 +16,80 @@ class HoronComposerGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: Wrap(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: theme.space.s6,
-        runSpacing: theme.space.s6,
-        crossAxisAlignment: WrapCrossAlignment.start,
         children: <Widget>[
-          _Sample(
-            label: '빈 입력',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _maxWidth),
-              child: HoronComposer(onAttach: () {}, onVoice: () {}),
-            ),
+          SurfaceGroup(
+            label: 'Solid',
+            child: _composers(theme, HoronComposerSurface.solid),
           ),
-          _Sample(
-            label: '유리 (glass)',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _maxWidth),
-              child: HoronComposer(
-                surface: HoronComposerSurface.glass,
-                onAttach: () {},
-                onVoice: () {},
-              ),
-            ),
-          ),
-          _Sample(
-            label: '글이 있는 입력',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _maxWidth),
-              child: HoronComposer(
-                initialValue: 'Design tokens are ready to review',
-                onAttach: () {},
-                onSubmit: (_) {},
-              ),
-            ),
-          ),
-          _Sample(
-            label: '다른 안내 문구',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _maxWidth),
-              child: HoronComposer(
-                placeholder: 'Ask the bot anything',
-                onAttach: () {},
-                onVoice: () {},
-              ),
-            ),
-          ),
-          _Sample(
-            label: '비활성',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _maxWidth),
-              child: HoronComposer(
-                disabled: true,
-                onAttach: () {},
-                onVoice: () {},
-              ),
-            ),
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
+            child: _composers(theme, HoronComposerSurface.glass),
           ),
         ],
       ),
+    );
+  }
+
+  /// 한 표면의 컴포저 표본 목록입니다. 표면만 바뀌고 내용은 같습니다.
+  Widget _composers(HoronThemeData theme, HoronComposerSurface surface) {
+    return Wrap(
+      spacing: theme.space.s6,
+      runSpacing: theme.space.s6,
+      crossAxisAlignment: WrapCrossAlignment.start,
+      children: <Widget>[
+        _Sample(
+          label: '빈 입력',
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _maxWidth),
+            child: HoronComposer(
+              surface: surface,
+              onAttach: () {},
+              onVoice: () {},
+            ),
+          ),
+        ),
+        _Sample(
+          label: '글이 있는 입력',
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _maxWidth),
+            child: HoronComposer(
+              surface: surface,
+              initialValue: 'Design tokens are ready to review',
+              onAttach: () {},
+              onSubmit: (_) {},
+            ),
+          ),
+        ),
+        _Sample(
+          label: '다른 안내 문구',
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _maxWidth),
+            child: HoronComposer(
+              surface: surface,
+              placeholder: 'Ask the bot anything',
+              onAttach: () {},
+              onVoice: () {},
+            ),
+          ),
+        ),
+        _Sample(
+          label: '비활성',
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _maxWidth),
+            child: HoronComposer(
+              surface: surface,
+              disabled: true,
+              onAttach: () {},
+              onVoice: () {},
+            ),
+          ),
+        ),
+      ],
     );
   }
 

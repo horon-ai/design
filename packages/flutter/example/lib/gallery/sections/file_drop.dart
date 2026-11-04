@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../surface_group.dart';
+
 /// `file_drop` 갤러리 섹션입니다.
 ///
-/// 기본, 거부된 파일, 업로드 중, 비활성 네 상태를 나란히 보여 줍니다.
+/// 기본, 거부된 파일, 업로드 중, 비활성 네 상태를 solid와 glass 두 표면에 같은
+/// 목록으로 보여 줍니다.
 class HoronFileDropGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronFileDropGallerySection({super.key});
@@ -13,47 +16,69 @@ class HoronFileDropGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: Wrap(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: theme.space.s6,
-        runSpacing: theme.space.s6,
-        crossAxisAlignment: WrapCrossAlignment.start,
         children: <Widget>[
-          _Sample(
-            label: '기본',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _maxWidth),
-              child: const HoronFileDrop(),
-            ),
+          SurfaceGroup(
+            label: 'Solid',
+            child: _drops(theme, HoronFileDropSurface.solid),
           ),
-          _Sample(
-            label: '거부된 파일',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _maxWidth),
-              child: const HoronFileDrop(
-                label: 'report.csv is not allowed',
-                rejected: true,
-              ),
-            ),
-          ),
-          _Sample(
-            label: '업로드 중',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _maxWidth),
-              child: const HoronFileDrop(
-                label: 'Uploading design-notes.pdf',
-                uploading: true,
-              ),
-            ),
-          ),
-          _Sample(
-            label: '비활성',
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _maxWidth),
-              child: const HoronFileDrop(disabled: true),
-            ),
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
+            child: _drops(theme, HoronFileDropSurface.glass),
           ),
         ],
       ),
+    );
+  }
+
+  /// 한 표면의 드롭 영역 표본 목록입니다. 표면만 바뀌고 내용은 같습니다.
+  Widget _drops(HoronThemeData theme, HoronFileDropSurface surface) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: theme.space.s6,
+      children: <Widget>[
+        _Sample(
+          label: '기본',
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _maxWidth),
+            child: HoronFileDrop(surface: surface),
+          ),
+        ),
+        _Sample(
+          label: '거부된 파일',
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _maxWidth),
+            child: HoronFileDrop(
+              label: 'report.csv is not allowed',
+              surface: surface,
+              rejected: true,
+            ),
+          ),
+        ),
+        _Sample(
+          label: '업로드 중',
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _maxWidth),
+            child: HoronFileDrop(
+              label: 'Uploading design-notes.pdf',
+              surface: surface,
+              uploading: true,
+            ),
+          ),
+        ),
+        _Sample(
+          label: '비활성',
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _maxWidth),
+            child: HoronFileDrop(surface: surface, disabled: true),
+          ),
+        ),
+      ],
     );
   }
 
