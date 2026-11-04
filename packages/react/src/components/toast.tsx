@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
-import { LiquidGlass } from "./liquid-glass";
 
 export type ToastTone = "neutral" | "success" | "danger";
 export type ToastSize = ControlSize;
@@ -65,12 +64,11 @@ function ToastList({ size, surface }: { size: ToastSize; surface: "solid" | "gla
         toast={toast}
         className={cn(
           "relative flex items-start overflow-clip rounded-lg",
-          surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface shadow-popover",
+          surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-popover",
           sizeClass[size],
           "transition-[opacity,translate,scale] duration-260 ease-out-quint data-ending-style:translate-x-6 data-ending-style:opacity-0 data-ending-style:duration-180 data-ending-style:ease-in data-starting-style:translate-y-4 data-starting-style:scale-95 data-starting-style:opacity-0",
         )}
       >
-        {surface === "glass" && <LiquidGlass />}
         <span className={cn("relative flex shrink-0", iconSizeClass[size])}>{toneIcon[tone]}</span>
         <BaseToast.Content className={cn("relative flex min-w-0 flex-1 flex-col", contentGapClass[size])}>
           <BaseToast.Title className={cn("text-text-primary", titleSizeClass[size])} />
@@ -92,7 +90,7 @@ export type ToasterProps = {
   /** Toast size: `sm` 320px, `md` 360px (default), `lg` 400px; applies to every toast this provider shows. */
   size?: ToastSize;
   /**
-   * `solid` (default) is an opaque surface card with a default border; `glass` is the regular glass card.
+   * `solid` (default) is an opaque surface card with a default border; `glass` puts it on the veil (`veil-overlay`).
    * Applies to every toast this provider shows.
    */
   surface?: "solid" | "glass";
@@ -100,7 +98,7 @@ export type ToasterProps = {
 };
 
 /**
- * Figma `Toast` (62:307): a 360px card, solid or regular glass. Wrap the app once; call
+ * Figma `Toast` (62:307): a 360px card, solid or the veil. Wrap the app once; call
  * `useToast().add({ title, description, type: "success" })` to show one.
  */
 export function Toaster({ children, size = "md", surface = "solid", className }: ToasterProps) {

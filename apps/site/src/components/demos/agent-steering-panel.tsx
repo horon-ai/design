@@ -1,8 +1,6 @@
 import { AgentSteeringPanel, type SteeringNote, type SteeringStep } from "@horon-ai/react";
 import { useState } from "react";
 
-import { Backdrop } from "../demo-backdrop";
-
 const initialSteps: SteeringStep[] = [
   { id: "read", label: "Read 41 new emails", status: "done", time: "1.4s" },
   { id: "sort", label: "Sort the 6 that need you", status: "active", time: "4.5s" },
@@ -17,7 +15,7 @@ export default function AgentSteeringPanelDemo() {
     { id: "n1", text: "Keep replies under 120 words, the investors read on phones" },
   ]);
   return (
-    <Backdrop>
+    <div className="flex w-full justify-center">
       <AgentSteeringPanel
         title="Triage overnight email"
         subtitle="Chief of staff · Step 2 of 5"
@@ -26,12 +24,14 @@ export default function AgentSteeringPanelDemo() {
         onPausedChange={setPaused}
         steps={initialSteps}
         notes={notes}
-        onApplyNow={(id) => setNotes((list) => list.map((note) => (note.id === id ? { ...note, applied: true } : note)))}
+        onApplyNow={(id) =>
+          setNotes((list) => list.map((note) => (note.id === id ? { ...note, applied: true } : note)))
+        }
         onRemoveNote={(id) => setNotes((list) => list.filter((note) => note.id !== id))}
         onSteer={(text, interrupt) =>
           setNotes((list) => [...list, { id: `n${list.length + 1}-${Date.now()}`, text, applied: interrupt }])
         }
       />
-    </Backdrop>
+    </div>
   );
 }

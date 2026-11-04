@@ -4,7 +4,6 @@ import type { ComponentProps } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { fieldBoxClass, fieldTextClass, type InputSurface } from "./input";
-import { LiquidGlass } from "./liquid-glass";
 
 export type TextareaSize = ControlSize;
 
@@ -24,7 +23,15 @@ const sizeClass: Record<TextareaSize, string> = {
 };
 
 /** Figma `Textarea` (58:137): an 88/112/136px glass or solid box with 12/14px padding. */
-export function Textarea({ size = "md", invalid, surface = "solid", className, textareaClassName, rows = 3, ...props }: TextareaProps) {
+export function Textarea({
+  size = "md",
+  invalid,
+  surface = "solid",
+  className,
+  textareaClassName,
+  rows = 3,
+  ...props
+}: TextareaProps) {
   return (
     <div
       className={cn(
@@ -35,7 +42,6 @@ export function Textarea({ size = "md", invalid, surface = "solid", className, t
       )}
       data-invalid={invalid ? "" : undefined}
     >
-      {surface === "glass" && <LiquidGlass />}
       <Field.Control
         render={<textarea rows={rows} {...props} />}
         aria-invalid={invalid || undefined}

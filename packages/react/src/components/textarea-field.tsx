@@ -4,7 +4,6 @@ import { useState, type ComponentProps, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { fieldBoxClass, fieldTextClass, type InputSurface } from "./input";
-import { LiquidGlass } from "./liquid-glass";
 
 export type TextareaFieldSize = ControlSize;
 
@@ -82,7 +81,6 @@ export function TextareaField({
           fieldBoxClass[surface],
         )}
       >
-        {surface === "glass" && <LiquidGlass />}
         <BaseField.Control
           render={
             <textarea
@@ -101,16 +99,13 @@ export function TextareaField({
       {(description || error || maxLength) && (
         <div
           className={cn(
-            "motion-colors flex w-full items-center gap-2",
+            "flex w-full items-center gap-2 motion-colors",
             metaClass[size],
             invalid ? "text-text-danger" : "text-text-secondary",
           )}
         >
           {invalid ? (
-            <BaseField.Error
-              match
-              className="min-w-0 flex-1 animate-[tab-panel-in_160ms_var(--ease-out-quint)]"
-            >
+            <BaseField.Error match className="min-w-0 flex-1 animate-[tab-panel-in_160ms_var(--ease-out-quint)]">
               {error}
             </BaseField.Error>
           ) : (

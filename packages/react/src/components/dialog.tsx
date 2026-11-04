@@ -3,7 +3,6 @@ import { X } from "@phosphor-icons/react";
 import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
-import { LiquidGlass } from "./liquid-glass";
 
 export const Dialog = BaseDialog.Root;
 export const DialogTrigger = BaseDialog.Trigger;
@@ -19,7 +18,7 @@ export type DialogContentProps = Omit<ComponentProps<typeof BaseDialog.Popup>, "
   /** Tile or icon set before the title (Paper settings modals). */
   leading?: ReactNode;
   /**
-   * `glass` is the thick glass dialog with a palette shadow. `solid` is the Paper workspace modal:
+   * `glass` is the veil dialog (`veil-overlay`). `solid` is the Paper workspace modal:
    * opaque default fill, 20px radius, 24px padding, 20px gap and a 0 24 64 shadow, no glass layer.
    */
   surface?: "glass" | "solid";
@@ -27,7 +26,7 @@ export type DialogContentProps = Omit<ComponentProps<typeof BaseDialog.Popup>, "
 };
 
 /**
- * Figma `Dialog on scrim` (63:329): a 40% scrim and a 420px thick-glass dialog,
+ * Figma `Dialog on scrim` (63:329): a 40% scrim and a 420px veil dialog,
  * 24px padding, title-md heading with a 20px close icon, body-md description.
  */
 export function DialogContent({
@@ -51,13 +50,12 @@ export function DialogContent({
             "relative flex w-105 max-w-[calc(100vw-2rem)] flex-col items-start overflow-clip p-6 outline-none",
             solid
               ? "gap-5 rounded-[20px] bg-bg-default shadow-[0_24px_64px_#0A142433]"
-              : "gap-2 rounded-xl bg-glass-thick shadow-palette",
+              : "veil-overlay gap-2 rounded-xl",
             "motion-popup duration-240 data-starting-style:translate-y-2",
             className,
           )}
           {...props}
         >
-          {solid ? null : <LiquidGlass />}
           <div className={cn("relative flex w-full items-start", leading ? "gap-3.5" : "gap-2")}>
             {leading}
             <BaseDialog.Title className="min-w-0 flex-1 text-title-md text-text-primary">{title}</BaseDialog.Title>

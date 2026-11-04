@@ -6,7 +6,6 @@ import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { fieldBoxClass, fieldSizeClass, fieldTextClass, type InputSurface } from "./input";
 import { inputGroupSegmentClass, useInputGroup } from "./input-group";
-import { LiquidGlass } from "./liquid-glass";
 
 export type SelectSize = ControlSize;
 export type SelectItemData = {
@@ -48,7 +47,7 @@ const itemIconClass: Record<SelectSize, string> = {
 /**
  * Figma `Select` (58:162) trigger with the `Select list` (88:495) popup: a
  * 40px field with a 16px caret; Solid uses the 18px body-lg value, Glass body-md.
- * The popup is thick glass, 20px radius, 40px rows; the chosen row is 6% ink with a check.
+ * The popup is the veil (`veil-overlay`), 20px radius, 40px rows; the chosen row is 6% ink with a check.
  * `variant="chip"` keeps its single 32px chip size; `variant="segment"` follows its `InputGroup`.
  */
 export function Select({
@@ -86,7 +85,6 @@ export function Select({
           className,
         )}
       >
-        {field && surface === "glass" && <LiquidGlass />}
         <BaseSelect.Value
           className={cn(
             "relative min-w-0 truncate data-placeholder:text-text-placeholder",
@@ -123,10 +121,9 @@ export function Select({
           <BaseSelect.Popup
             className={cn(
               "relative min-w-(--anchor-width) motion-popup overflow-clip rounded-xl p-1.5 outline-none",
-              popupSurface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface shadow-popover",
+              popupSurface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-popover",
             )}
           >
-            {popupSurface === "glass" && <LiquidGlass />}
             <BaseSelect.List className="relative flex flex-col gap-0.5">
               {items.map((item) => (
                 <BaseSelect.Item

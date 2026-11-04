@@ -36,7 +36,7 @@ function Lists({ surface }: { surface: "solid" | "glass" }) {
         </TabsList>
       </Tabs>
       <Tabs defaultValue="mcp">
-        <TabsList className="gap-1" surface={surface}>
+        <TabsList surface={surface}>
           <TabsTab value="skills" count={6}>
             Skills
           </TabsTab>

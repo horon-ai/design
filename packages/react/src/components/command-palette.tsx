@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { Kbd } from "./kbd";
-import { LiquidGlass } from "./liquid-glass";
 
 export type CommandItem = {
   value: string;
@@ -33,7 +32,7 @@ export type CommandPaletteProps = {
   hints?: [ReactNode, string][];
   trigger?: ReactNode;
   /**
-   * `solid` (default) is an opaque palette with a default border. `glass` is the frosted Figma palette.
+   * `solid` (default) is an opaque palette with a default border. `glass` puts it on the veil (`veil-overlay`).
    */
   surface?: "solid" | "glass";
   className?: string;
@@ -62,13 +61,12 @@ export function CommandPalette({
           <Dialog.Popup
             aria-label={placeholder}
             className={cn(
-              "relative flex w-140 max-w-full motion-popup flex-col overflow-clip rounded-[24px] p-1.5 shadow-palette",
-              surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
+              "relative flex w-140 max-w-full motion-popup flex-col overflow-clip rounded-[24px] p-1.5",
+              surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-palette",
               "duration-240 data-starting-style:translate-y-2",
               className,
             )}
           >
-            {surface === "glass" && <LiquidGlass />}
             <CommandPaletteBody
               groups={groups}
               placeholder={placeholder}
