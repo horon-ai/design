@@ -3,6 +3,7 @@ import { CodePanel } from "@horon-ai/react";
 
 import { CopyButton } from "@/components/site/CopyButton";
 import type { Localized } from "@/i18n";
+import { type CodeTone, highlight } from "@/lib/highlight";
 
 interface Props {
   /** One sample for both locales, or one per locale when the comments differ. */
@@ -13,6 +14,22 @@ interface Props {
 
 const { code, lang = "tsx", title } = Astro.props;
 const label = title ?? lang;
+
+// Token utilities only: the syntax colors and secondary text switch with the theme on their own.
+const toneClass: Record<CodeTone, string | undefined> = {
+  plain: undefined,
+  key: "text-syntax-key",
+  value: "text-syntax-number",
+  muted: "text-syntax-punctuation",
+  comment: "text-text-secondary",
+};
+
+const samples =
+  typeof code === "string"
+    ? [{ locale: undefined, lines: await highlight(code.trim(), lang) }]
+    : await Promise.all(
+        (["ko", "en"] as const).map(async (locale) => ({ locale, lines: await highlight(code[locale].trim(), lang) })),
+      );
 ---
 
 <figure class="not-prose flex flex-col gap-2">
@@ -21,17 +38,17 @@ const label = title ?? lang;
     <CopyButton client:visible code={code} />
   </figcaption>
   {
-    typeof code === "string" ? (
-      <CodePanel>{code.trim()}</CodePanel>
-    ) : (
-      <>
-        <div data-locale-text="ko" lang="ko">
-          <CodePanel>{code.ko.trim()}</CodePanel>
-        </div>
-        <div data-locale-text="en" lang="en">
-          <CodePanel>{code.en.trim()}</CodePanel>
-        </div>
-      </>
-    )
+    samples.map(({ locale, lines }) => (
+      <div data-locale-text={locale} lang={locale}>
+        <CodePanel>
+          {lines.map((line, index) => (
+            <Fragment>
+              {index > 0 && "\n"}
+              {line.map((token) => (toneClass[token.tone] ? <span class={toneClass[token.tone]}>{token.content}</span> : token.content))}
+            </Fragment>
+          ))}
+        </CodePanel>
+      </div>
+    ))
   }
 </figure>

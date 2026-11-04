@@ -34,7 +34,7 @@ const crumbs = breadcrumb.map((item) => ({
   <div class="flex flex-col items-stretch lg:flex-row lg:items-start">
     {withSidebar && <DocsSidebar section={section} currentPath={currentPath} client:load />}
 
-    <article class="min-w-0 flex-1 px-4 pt-6 pb-16 md:px-6 md:pt-14 md:pb-24">
+    <article class:list={["min-w-0 flex-1 px-4 pt-6 pb-16 md:px-6 md:pt-14 md:pb-24", withSidebar && "lg:ml-60"]}>
       <div class:list={["mx-auto w-full", contentWidth]}>
         {crumbs.length > 0 && <DocsBreadcrumb items={crumbs} client:load />}
 
