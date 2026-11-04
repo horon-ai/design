@@ -2,12 +2,14 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_glass.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 import 'calendar.dart';
+import 'input.dart';
 
 /// 날짜를 고르는 40px 유리 필드입니다. 누르면 달력이 아래에 열립니다.
 ///
@@ -17,6 +19,30 @@ import 'calendar.dart';
 ///
 /// [HoronCalendar]의 속성을 그대로 받아 팝업 안의 달력에 넘깁니다. React처럼
 /// 날짜 하나와 범위를 모두 다루되, 값은 [value]/[onValueChange] 또는
+/// `date-field.tsx`의 `DateFieldSize`(`ControlSize`)입니다.
+enum HoronDateFieldSize {
+  /// `size="sm"` — 높이 32, `body-sm`, 칸 32.
+  sm,
+
+  /// `size="md"` — 높이 40, `body-md`, 칸 40. 기본값입니다.
+  md,
+
+  /// `size="lg"` — 높이 48, `body-lg`, 칸 48.
+  lg,
+}
+
+HoronCalendarSize _calendarSizeOf(HoronDateFieldSize size) => switch (size) {
+  HoronDateFieldSize.sm => HoronCalendarSize.sm,
+  HoronDateFieldSize.md => HoronCalendarSize.md,
+  HoronDateFieldSize.lg => HoronCalendarSize.lg,
+};
+
+HoronInputSize _inputSizeOf(HoronDateFieldSize size) => switch (size) {
+  HoronDateFieldSize.sm => HoronInputSize.sm,
+  HoronDateFieldSize.md => HoronInputSize.md,
+  HoronDateFieldSize.lg => HoronInputSize.lg,
+};
+
 /// [range]/[onRangeChange] 중 한 쪽만 넘깁니다.
 class HoronDateField extends StatefulWidget {
   /// 필드를 만듭니다.
@@ -38,6 +64,8 @@ class HoronDateField extends StatefulWidget {
     this.weekStartsOn = 0,
     this.today,
     this.popover = false,
+    this.size = HoronDateFieldSize.md,
+    this.surface = HoronSurface.solid,
   }) : assert(
          range == null && onRangeChange == null || value == null && onValueChange == null,
          'single 모드(value)와 range 모드(range)를 함께 넘길 수 없습니다.',
@@ -91,6 +119,12 @@ class HoronDateField extends StatefulWidget {
   /// 팝업 안의 달력을 팝오버 모양으로 그립니다. React `variant: "popover"`.
   final bool popover;
 
+  /// 크기입니다. 기본값은 [HoronDateFieldSize.md]입니다.
+  final HoronDateFieldSize size;
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
+
   @override
   State<HoronDateField> createState() => _HoronDateFieldState();
 }
@@ -98,12 +132,6 @@ class HoronDateField extends StatefulWidget {
 class _HoronDateFieldState extends State<HoronDateField> {
   /// `w-70` — 필드의 폭입니다. 부모가 더 좁으면 그 폭을 따릅니다.
   static const double _width = 280;
-
-  /// `h-10` — 필드의 높이입니다.
-  static const double _height = 40;
-
-  /// `[&_svg]:size-4` — 앞 달력 아이콘입니다.
-  static const double _iconSize = 16;
 
   /// `size-10` 일곱 칸 + `p-4` 좌우 — 기본 달력의 자연 폭입니다.
   static const double _calendarWidth = 7 * 40 + 2 * 16;
@@ -130,6 +158,7 @@ class _HoronDateFieldState extends State<HoronDateField> {
     final HoronSpaceSpec space = theme.space;
     final BorderRadius radius = BorderRadius.circular(theme.radius.md);
     final String text = _label(MaterialLocalizations.of(context));
+    final HoronFieldMetrics metrics = horonFieldMetrics(_inputSizeOf(widget.size), theme);
     // 달력은 자기 LayoutBuilder로 폭을 정합니다. 메뉴 패널은 자식의 고유 폭을 묻기
     // 때문에(LayoutBuilder는 그 질문에 답할 수 없습니다), 팝업 폭은 화면 폭과
     // 달력의 자연 폭으로 미리 정합니다.
@@ -143,6 +172,7 @@ class _HoronDateFieldState extends State<HoronDateField> {
         : text.isNotEmpty
         ? colors.textPrimary
         : colors.textPlaceholder;
+    final TextStyle valueStyle = metrics.textStyle.copyWith(color: textColor);
 
     // 메뉴 패널은 앵커 자식에게 고유 폭을 묻습니다. LayoutBuilder 는 그 질문에 답하지
     // 못하므로("LayoutBuilder does not support returning intrinsic dimensions"), 폭은
@@ -179,6 +209,8 @@ class _HoronDateFieldState extends State<HoronDateField> {
               weekStartsOn: widget.weekStartsOn,
               today: widget.today,
               popover: widget.popover,
+              size: _calendarSizeOf(widget.size),
+              surface: widget.surface == HoronSurface.glass ? HoronCalendarSurface.glass : HoronCalendarSurface.solid,
             ),
           ),
         ),
@@ -194,46 +226,50 @@ class _HoronDateFieldState extends State<HoronDateField> {
               key: const Key('horon-date-field-trigger'),
               behavior: HitTestBehavior.opaque,
               onTap: widget.disabled ? null : () => controller.isOpen ? controller.close() : controller.open(),
-              child: HoronLiquidGlass(
-                tier: HoronGlassTier.regular,
-                borderRadius: radius,
-                child: DecoratedBox(
-                  key: const Key('horon-date-field-surface'),
-                  decoration: BoxDecoration(
-                    borderRadius: radius,
-                    // `border-glass-rim-strong` / `data-invalid:border-border-danger`.
-                    border: Border.all(color: widget.invalid ? colors.borderDanger : colors.glassRimStrong),
-                  ),
-                  child: SizedBox(
-                    height: _height,
-                    // `items-center gap-2 px-3.5`.
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: space.s3_5),
-                      child: Row(
-                        spacing: space.s2,
-                        children: <Widget>[
-                          Icon(Icons.calendar_today_outlined, size: _iconSize, color: colors.textSecondary),
-                          Expanded(
-                            child: Text(
-                              text.isEmpty ? widget.placeholder : text,
-                              key: const Key('horon-date-field-value'),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.left,
-                              // `text-body-md`.
-                              style: theme.text.bodyMd.copyWith(color: textColor),
-                            ),
-                          ),
-                        ],
+              child: SizedBox(
+                key: const Key('horon-date-field-surface'),
+                height: metrics.height,
+                child: widget.surface == HoronSurface.glass
+                    ? HoronLiquidGlass(
+                        tier: HoronGlassTier.regular,
+                        borderRadius: radius,
+                        edgeColor: widget.invalid ? colors.borderDanger : null,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
+                          child: _row(colors, metrics, text, valueStyle),
+                        ),
+                      )
+                    : HoronFieldBox(
+                        surface: HoronInputSurface.solid,
+                        invalid: widget.invalid,
+                        enabled: !widget.disabled,
+                        padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
+                        child: _row(colors, metrics, text, valueStyle),
                       ),
-                    ),
-                  ),
-                ),
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _row(HoronColors colors, HoronFieldMetrics metrics, String text, TextStyle valueStyle) {
+    return Row(
+      spacing: metrics.gap,
+      children: <Widget>[
+        Icon(Icons.calendar_today_outlined, size: metrics.icon, color: colors.textSecondary),
+        Expanded(
+          child: Text(
+            text.isEmpty ? widget.placeholder : text,
+            key: const Key('horon-date-field-value'),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.left,
+            style: valueStyle,
+          ),
+        ),
+      ],
     );
   }
 }

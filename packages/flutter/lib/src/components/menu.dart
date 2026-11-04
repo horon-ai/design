@@ -64,7 +64,7 @@ class _MenuSurfaceScope extends InheritedWidget {
   final HoronMenuSurface surface;
 
   static HoronMenuSurface of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_MenuSurfaceScope>()?.surface ?? HoronMenuSurface.glass;
+      context.dependOnInheritedWidgetOfExactType<_MenuSurfaceScope>()?.surface ?? HoronMenuSurface.solid;
 
   @override
   bool updateShouldNotify(_MenuSurfaceScope oldWidget) => oldWidget.surface != surface;
@@ -194,7 +194,7 @@ class HoronMenuContent extends StatelessWidget {
   /// 팝업을 만듭니다.
   const HoronMenuContent({
     super.key,
-    this.surface = HoronMenuSurface.glass,
+    this.surface = HoronMenuSurface.solid,
     this.side = AxisDirection.down,
     this.align = Alignment.centerLeft,
     this.sideOffset = 8,
@@ -202,7 +202,7 @@ class HoronMenuContent extends StatelessWidget {
     required this.children,
   });
 
-  /// 표면입니다(React `surface`). 기본값은 `glass`입니다.
+  /// 표면입니다(React `surface`). 기본값은 불투명 `solid`입니다.
   final HoronMenuSurface surface;
 
   /// 트리거 기준 어느 쪽에 열지입니다(React `side`). 기본값은 아래입니다.

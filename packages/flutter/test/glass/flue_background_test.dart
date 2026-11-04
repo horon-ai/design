@@ -21,11 +21,11 @@ void main() {
   });
 
   setUp(() {
-    HoronGlassProbe.reset();
+    HoronShaderProbe.reset();
     horonShaderProgramCacheClear();
   });
 
-  tearDown(HoronGlassProbe.reset);
+  tearDown(HoronShaderProbe.reset);
 
   Future<void> pumpFlue(
     WidgetTester tester, {
@@ -268,7 +268,7 @@ void main() {
       }
       // 읽어 둔 프로그램을 위젯에 넣고 한 프레임 그립니다. 픽셀은 볼 수 없지만,
       // 캔버스가 붙고 유니폼이 채워진 채로 예외 없이 그려지는지는 여기서 확인합니다.
-      HoronGlassProbe.loadProgram = (String asset) async => flueProgram;
+      HoronShaderProbe.loadProgram = (String asset) async => flueProgram;
 
       await pumpFlue(tester);
       await tester.pump(const Duration(milliseconds: 16));

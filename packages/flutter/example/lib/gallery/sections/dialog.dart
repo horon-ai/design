@@ -32,6 +32,7 @@ class HoronDialogGallerySection extends StatelessWidget {
                 child: SizedBox(
                   width: width,
                   child: HoronDialog(
+                    solid: false,
                     title: const Text('워크스페이스 삭제'),
                     description: const Text(
                       '이 작업은 되돌릴 수 없습니다. 멤버와 봇이 모두 접근을 잃습니다.',

@@ -21,7 +21,10 @@ class HoronChatControlsGallerySection extends StatelessWidget {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              HoronJumpToLatest(onPressed: () {}),
+              HoronJumpToLatest(
+                surface: HoronChatControlSurface.glass,
+                onPressed: () {},
+              ),
               SizedBox(height: theme.space.s2),
               Text(
                 '최신으로',

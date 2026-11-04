@@ -22,14 +22,14 @@ class HoronSelectGallerySection extends StatelessWidget {
       title: 'Select',
       variants: <Widget>[
         const _Cell(
-          label: '필드 · glass (body-md)',
+          label: '필드 · solid (기본)',
           child: HoronSelect(items: _items, placeholder: '언어'),
         ),
         const _Cell(
-          label: '필드 · solid (body-lg)',
+          label: '필드 · glass (body-md)',
           child: HoronSelect(
             items: _items,
-            surface: HoronInputSurface.solid,
+            surface: HoronInputSurface.glass,
             placeholder: '언어',
           ),
         ),

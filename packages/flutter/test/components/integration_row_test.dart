@@ -12,13 +12,19 @@ Widget _host(Widget child, {Brightness brightness = Brightness.light, double? wi
   );
 }
 
-HoronIntegrationRow _row(HoronIntegrationStatus status, {VoidCallback? onAction, String? detail = 'alpox@gmail.com'}) {
+HoronIntegrationRow _row(
+  HoronIntegrationStatus status, {
+  VoidCallback? onAction,
+  String? detail = 'alpox@gmail.com',
+  HoronSurface surface = HoronSurface.solid,
+}) {
   return HoronIntegrationRow(
     icon: const Icon(Icons.cloud_outlined),
     name: 'Google Drive',
     detail: detail,
     status: status,
     onAction: onAction,
+    surface: surface,
   );
 }
 
@@ -50,7 +56,7 @@ void main() {
   });
 
   testWidgets('each status paints its own tile and control', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(_row(HoronIntegrationStatus.connected), width: 720));
+    await tester.pumpWidget(_host(_row(HoronIntegrationStatus.connected, surface: HoronSurface.glass), width: 720));
     final HoronThemeData theme = _themeOf(tester);
 
     for (final HoronIntegrationStatus status in HoronIntegrationStatus.values) {
@@ -95,13 +101,14 @@ void main() {
     );
   });
 
-  testWidgets('reconnect draws the danger border and the danger detail and button', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(_row(HoronIntegrationStatus.reconnect, onAction: () {}), width: 720));
+  testWidgets('reconnect draws the danger rim and the danger detail and button', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      _host(_row(HoronIntegrationStatus.reconnect, onAction: () {}, surface: HoronSurface.glass), width: 720),
+    );
     final HoronThemeData theme = _themeOf(tester);
 
-    final DecoratedBox border = tester.widget<DecoratedBox>(_borderedBox());
-    expect(((border.decoration as BoxDecoration).border! as Border).top.color, theme.colors.borderDanger);
-    expect((border.decoration as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.xl2));
+    final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
+    expect(glass.edgeColor, theme.colors.borderDanger, reason: '상태 테두리는 림 색으로 표시합니다');
 
     final Text detail = tester.widget<Text>(find.text('alpox@gmail.com'));
     expect(detail.style?.color, theme.colors.textDanger);
@@ -126,7 +133,12 @@ void main() {
     expect((button.decoration! as BoxDecoration).color, theme.colors.interactivePrimary);
     expect(tester.widget<Text>(find.text('Connect')).style?.color, theme.colors.textInverse);
     expect(IconTheme.of(tester.element(find.byIcon(Icons.power))).size, theme.space.s3_5);
-    expect(_borderedBox(), findsNothing);
+    final DecoratedBox shell = tester.widget<DecoratedBox>(_borderedBox());
+    expect(
+      ((shell.decoration as BoxDecoration).border! as Border).top.color,
+      theme.colors.borderDefault,
+      reason: 'solid 표면은 border-default 1px을 두릅니다',
+    );
   });
 
   testWidgets('the action button calls back', (WidgetTester tester) async {
@@ -139,7 +151,7 @@ void main() {
   });
 
   testWidgets('the glass shell clips at 16px', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(_row(HoronIntegrationStatus.connected), width: 720));
+    await tester.pumpWidget(_host(_row(HoronIntegrationStatus.connected, surface: HoronSurface.glass), width: 720));
     final HoronThemeData theme = _themeOf(tester);
     final ClipRRect clip = tester.widget<ClipRRect>(find.byType(ClipRRect).first);
     expect((clip.borderRadius as BorderRadius).topLeft.x, theme.radius.xl2);

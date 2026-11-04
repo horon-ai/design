@@ -22,6 +22,16 @@ class HoronTopBarGallerySection extends StatelessWidget {
         crossAxisAlignment: WrapCrossAlignment.start,
         children: <Widget>[
           _Sample(
+            label: '유리 표면',
+            child: HoronTopBar(
+              title: '연구 도우미',
+              subtitle: '3개 도구 사용 중',
+              surface: HoronSurface.glass,
+              onBack: () {},
+              onMore: () {},
+            ),
+          ),
+          _Sample(
             label: '부제 + 라이브',
             child: HoronTopBar(
               title: '연구 도우미',

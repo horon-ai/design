@@ -4,18 +4,66 @@ import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 import 'input.dart';
 
+/// `input-group.tsx`의 `InputGroupSize`입니다.
+enum HoronInputGroupSize {
+  /// `size="sm"` — 높이 32, 입력 여백 10.
+  sm,
+
+  /// `size="md"` — 높이 40, 입력 여백 12. 기본값입니다.
+  md,
+
+  /// `size="lg"` — 높이 48, 입력 여백 16.
+  lg,
+}
+
+/// 그룹의 크기와 비활성 상태를 칸(Select·Combobox·고정 글자)에 내려 줍니다.
+///
+/// React `InputGroupContext`의 Flutter 대응입니다. 그룹 밖에서는 null입니다.
+class HoronInputGroupScope extends InheritedWidget {
+  /// 값을 그대로 받는 생성자입니다.
+  const HoronInputGroupScope({super.key, required this.size, required this.disabled, required super.child});
+
+  /// 그룹 크기입니다.
+  final HoronInputGroupSize size;
+
+  /// 그룹의 비활성 상태입니다.
+  final bool disabled;
+
+  /// 가장 가까운 그룹 범위입니다. 없으면 null입니다.
+  static HoronInputGroupScope? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<HoronInputGroupScope>();
+
+  @override
+  bool updateShouldNotify(HoronInputGroupScope oldWidget) => size != oldWidget.size || disabled != oldWidget.disabled;
+}
+
+/// 칸 하나의 값입니다. React `inputGroupSegmentClass`.
+typedef HoronSegmentMetrics = ({double paddingX, double gap, double icon, TextStyle textStyle});
+
+/// [size]의 칸 값을 계산합니다.
+HoronSegmentMetrics horonSegmentMetrics(HoronInputGroupSize size, HoronThemeData theme) => switch (size) {
+  HoronInputGroupSize.sm => (paddingX: theme.space.s2_5, gap: theme.space.s1, icon: 14, textStyle: theme.text.labelSm),
+  HoronInputGroupSize.md => (paddingX: theme.space.s3, gap: theme.space.s1, icon: 14, textStyle: theme.text.labelMd),
+  HoronInputGroupSize.lg => (paddingX: theme.space.s4, gap: theme.space.s1_5, icon: 16, textStyle: theme.text.labelLg),
+};
+
 /// React `InputGroup`(Figma 60:429)를 옮긴 나눠진 입력 필드입니다.
 ///
-/// 유리 상자 하나를 [prefix]·입력·[suffix] 세 칸으로 나눕니다. 칸 사이의 1px
-/// 구분선은 hover에서 `border-strong`, 오류에서 `border-danger`가 됩니다. React의
+/// 상자 하나를 [prefix]·입력·[suffix] 세 칸으로 나눕니다. 칸 사이의 1px 구분선은
+/// hover에서 `border-strong`, 오류에서 `border-danger`가 됩니다. React의
 /// `group-hover`·`group-data-invalid`를 Flutter에서는 이 위젯이 직접 들고 있는
 /// hover·invalid 상태로 옮겼습니다.
+///
+/// 표면은 [surface]로 고릅니다. 기본값은 React와 같은 불투명 [HoronInputSurface.solid]이고,
+/// 이미지나 유리 패널 위에서는 [HoronInputSurface.glass]를 넘깁니다.
 class HoronInputGroup extends StatefulWidget {
   /// 나눠진 입력 필드를 만듭니다.
   const HoronInputGroup({
     super.key,
     this.prefix,
     this.suffix,
+    this.surface = HoronInputSurface.solid,
+    this.size = HoronInputGroupSize.md,
     this.invalid = false,
     this.disabled = false,
     this.controller,
@@ -31,6 +79,12 @@ class HoronInputGroup extends StatefulWidget {
 
   /// 입력 뒤의 칸입니다. 통화 셀렉트처럼 씁니다.
   final Widget? suffix;
+
+  /// 표면입니다. 기본값 `solid`는 불투명 `bg-surface`, `glass`는 유리입니다.
+  final HoronInputSurface surface;
+
+  /// 크기입니다. 칸에도 이 값이 내려갑니다. 기본값은 [HoronInputGroupSize.md]입니다.
+  final HoronInputGroupSize size;
 
   /// 오류 상태입니다. 구분선과 테두리가 `border-danger`가 됩니다.
   final bool invalid;
@@ -83,6 +137,12 @@ class _HoronInputGroupState extends State<HoronInputGroup> {
     final HoronThemeData horon = HoronTheme.of(context);
     final HoronColors colors = horon.colors;
     final Color divider = _dividerColor(colors);
+    final HoronSegmentMetrics metrics = horonSegmentMetrics(widget.size, horon);
+    final double height = switch (widget.size) {
+      HoronInputGroupSize.sm => horon.space.step(8),
+      HoronInputGroupSize.md => horon.space.step(10),
+      HoronInputGroupSize.lg => horon.space.step(12),
+    };
     final TextStyle style = horon.text.bodyMd.copyWith(
       color: widget.disabled ? colors.textDisabled : colors.textPrimary,
     );
@@ -93,43 +153,42 @@ class _HoronInputGroupState extends State<HoronInputGroup> {
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
         child: SizedBox(
-          height: _height,
+          height: height,
           child: HoronFieldBox(
+            surface: widget.surface,
             invalid: widget.invalid,
             enabled: !widget.disabled,
             padding: EdgeInsets.zero,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                if (widget.prefix != null) ...<Widget>[
-                  HoronInputGroupSegment(disabled: widget.disabled, child: widget.prefix!),
-                  _Divider(color: divider),
-                ],
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: horon.space.s3),
-                    child: Center(
-                      child: TextField(
-                        controller: _controller,
-                        focusNode: widget.focusNode,
-                        enabled: !widget.disabled,
-                        keyboardType: widget.keyboardType,
-                        onChanged: widget.onChanged,
-                        style: style,
-                        cursorColor: colors.textPrimary,
-                        decoration: InputDecoration.collapsed(
-                          hintText: widget.hintText,
-                          hintStyle: style.copyWith(color: colors.textPlaceholder),
+            child: HoronInputGroupScope(
+              size: widget.size,
+              disabled: widget.disabled,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  if (widget.prefix != null) ...<Widget>[widget.prefix!, _Divider(color: divider)],
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
+                      child: Center(
+                        child: TextField(
+                          controller: _controller,
+                          focusNode: widget.focusNode,
+                          enabled: !widget.disabled,
+                          keyboardType: widget.keyboardType,
+                          onChanged: widget.onChanged,
+                          style: style,
+                          cursorColor: colors.textPrimary,
+                          decoration: InputDecoration.collapsed(
+                            hintText: widget.hintText,
+                            hintStyle: style.copyWith(color: colors.textPlaceholder),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                if (widget.suffix != null) ...<Widget>[
-                  _Divider(color: divider),
-                  HoronInputGroupSegment(disabled: widget.disabled, child: widget.suffix!),
+                  if (widget.suffix != null) ...<Widget>[_Divider(color: divider), widget.suffix!],
                 ],
-              ],
+              ),
             ),
           ),
         ),
@@ -143,30 +202,33 @@ class _HoronInputGroupState extends State<HoronInputGroup> {
 /// `bg-overlay-ink-4` 바탕에 `label-md` 글자, 14px 아이콘을 담습니다.
 class HoronInputGroupSegment extends StatelessWidget {
   /// 칸을 만듭니다.
-  const HoronInputGroupSegment({super.key, required this.child, this.disabled = false});
+  const HoronInputGroupSegment({super.key, required this.child, this.disabled});
 
   /// 칸 안에 넣을 내용입니다.
   final Widget child;
 
-  /// 비활성 상태입니다. 글자가 `text-disabled`가 됩니다.
-  final bool disabled;
+  /// 비활성 상태입니다. 없으면 그룹 값을 씁니다.
+  final bool? disabled;
 
   @override
   Widget build(BuildContext context) {
     final HoronThemeData horon = HoronTheme.of(context);
     final HoronColors colors = horon.colors;
+    final HoronInputGroupScope? group = HoronInputGroupScope.maybeOf(context);
+    final bool off = disabled ?? group?.disabled ?? false;
+    final HoronSegmentMetrics metrics = horonSegmentMetrics(group?.size ?? HoronInputGroupSize.md, horon);
     return ColoredBox(
       color: colors.overlayInk4,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horon.space.s3),
+        padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          spacing: horon.space.s1,
+          spacing: metrics.gap,
           children: <Widget>[
             IconTheme.merge(
-              data: IconThemeData(size: _iconSize, color: colors.textSecondary),
+              data: IconThemeData(size: metrics.icon, color: colors.textSecondary),
               child: DefaultTextStyle.merge(
-                style: horon.text.labelMd.copyWith(color: disabled ? colors.textDisabled : colors.textPrimary),
+                style: metrics.textStyle.copyWith(color: off ? colors.textDisabled : colors.textPrimary),
                 child: child,
               ),
             ),
@@ -191,12 +253,6 @@ class _Divider extends StatelessWidget {
     );
   }
 }
-
-/// `h-10` — 그룹 높이입니다.
-const double _height = 40;
-
-/// `size-3.5` — 칸 아이콘입니다.
-const double _iconSize = 14;
 
 /// `w-px` — 구분선 두께입니다.
 const double _dividerWidth = 1;

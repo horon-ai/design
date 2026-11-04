@@ -15,30 +15,50 @@ class HoronSettingsListGallerySection extends StatelessWidget {
       padding: EdgeInsets.all(theme.space.s4),
       child: SizedBox(
         width: 460,
-        child: HoronSettingsList(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            HoronSettingsRow(
-              title: '알림',
-              description: '봇이 작업을 마치면 알려 줍니다',
-              leading: const HoronSettingsRowIcon(
-                icon: Icon(Icons.notifications_outlined),
-              ),
-              control: HoronSettingsSwitch(value: true, onChanged: (_) {}),
+            HoronSettingsList(
+              children: <Widget>[
+                HoronSettingsRow(
+                  title: '알림',
+                  description: '봇이 작업을 마치면 알려 줍니다',
+                  leading: const HoronSettingsRowIcon(
+                    icon: Icon(Icons.notifications_outlined),
+                  ),
+                  control: HoronSettingsSwitch(value: true, onChanged: (_) {}),
+                ),
+                HoronSettingsRow(
+                  title: '자동 실행',
+                  description: '승인 없이 도구를 실행합니다',
+                  leading: const HoronSettingsRowIcon(
+                    icon: Icon(Icons.bolt_outlined),
+                  ),
+                  control: HoronSettingsSwitch(value: false, onChanged: (_) {}),
+                ),
+                const HoronSettingsRow(
+                  title: '명령 팔레트',
+                  description: '어디서나 열 수 있습니다',
+                  control: HoronSettingsKeys(keys: <String>['⌘', 'K']),
+                ),
+                const HoronSettingsRow(
+                  title: '언어',
+                  description: '한국어',
+                  last: true,
+                ),
+              ],
             ),
-            HoronSettingsRow(
-              title: '자동 실행',
-              description: '승인 없이 도구를 실행합니다',
-              leading: const HoronSettingsRowIcon(
-                icon: Icon(Icons.bolt_outlined),
-              ),
-              control: HoronSettingsSwitch(value: false, onChanged: (_) {}),
+            SizedBox(height: theme.space.s4),
+            const HoronSettingsList(
+              surface: HoronSurface.glass,
+              children: <Widget>[
+                HoronSettingsRow(
+                  title: '유리 표면',
+                  description: '이미지 위에 얹는 목록입니다',
+                  last: true,
+                ),
+              ],
             ),
-            const HoronSettingsRow(
-              title: '명령 팔레트',
-              description: '어디서나 열 수 있습니다',
-              control: HoronSettingsKeys(keys: <String>['⌘', 'K']),
-            ),
-            const HoronSettingsRow(title: '언어', description: '한국어', last: true),
           ],
         ),
       ),

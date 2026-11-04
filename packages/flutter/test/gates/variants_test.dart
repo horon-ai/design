@@ -44,7 +44,7 @@ void main() {
     // Guards against a parser that quietly returns nothing for every file and
     // lets the gate above pass over an empty comparison.
     final button = reactUnionTypes('button');
-    expect(button['ButtonVariant'], <String>{'primary', 'glass', 'danger', 'link'});
+    expect(button['ButtonVariant'], <String>{'primary', 'glass', 'solid', 'danger', 'link'});
     expect(button['ButtonSize'], <String>{'sm', 'md', 'lg'});
     expect(button.keys, isNot(contains('ButtonProps')), reason: 'Omit<ComponentProps<...>> is not a literal union');
 

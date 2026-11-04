@@ -23,6 +23,22 @@ class HoronTabsGallerySection extends StatelessWidget {
         crossAxisAlignment: WrapCrossAlignment.start,
         children: <Widget>[
           _Sample(
+            label: '유리 (glass)',
+            child: HoronTabs(
+              children: <Widget>[
+                HoronTabsList(
+                  surface: HoronSurface.glass,
+                  children: const <Widget>[
+                    HoronTabsTab(value: 'overview', label: '개요'),
+                    HoronTabsTab(value: 'members', label: '멤버'),
+                  ],
+                ),
+                const HoronTabsPanel(value: 'overview', child: Text('개요 패널')),
+                const HoronTabsPanel(value: 'members', child: Text('멤버 패널')),
+              ],
+            ),
+          ),
+          _Sample(
             label: '아이콘과 개수',
             child: HoronTabs(
               children: <Widget>[

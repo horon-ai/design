@@ -34,6 +34,14 @@ class HoronDirectoryCardGallerySection extends StatelessWidget {
             name: 'Plugins',
             description: '추가 버튼이 비활성인 상태입니다',
           ),
+          SizedBox(height: theme.space.s3),
+          HoronDirectoryCard(
+            icon: const Icon(Icons.cloud_outlined),
+            name: '유리 표면',
+            description: '이미지 위에 얹는 glass 카드입니다',
+            surface: HoronSurface.glass,
+            onAdd: () {},
+          ),
         ],
       ),
     );

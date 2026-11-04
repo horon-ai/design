@@ -15,6 +15,9 @@ enum HoronSwitchSize {
 
   /// `size="md"` — 44x26 트랙에 22px 썸입니다. 기본값입니다.
   md,
+
+  /// `size="lg"` — 52x30 트랙에 26px 썸입니다.
+  lg,
 }
 
 /// `data-disabled:opacity-40`입니다.
@@ -76,6 +79,7 @@ class _HoronSwitchState extends State<HoronSwitch> {
       HoronSwitchSize.sm => (space.step(5), space.step(8), space.s0_5, space.step(4)),
       HoronSwitchSize.compact => (space.step(6), space.step(10), space.step(0.75), space.step(4.5)),
       HoronSwitchSize.md => (space.step(6.5), space.step(11), space.s0_5, space.step(5.5)),
+      HoronSwitchSize.lg => (space.step(7.5), space.step(13), space.s0_5, space.step(6.5)),
     };
 
     final Color trackColor = widget.value

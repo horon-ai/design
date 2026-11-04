@@ -29,7 +29,7 @@ void main() {
   });
 
   testWidgets('the pill is 52px tall regular glass with rounded-full', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(HoronBreadcrumbHeader(crumbs: _crumbs())));
+    await tester.pumpWidget(_host(HoronBreadcrumbHeader(crumbs: _crumbs(), glass: true)));
     final HoronThemeData theme = _theme(tester);
 
     expect(tester.getSize(find.byType(HoronBreadcrumbHeader)).height, theme.space.step(13), reason: 'h-13 = 52');
