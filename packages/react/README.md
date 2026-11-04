@@ -82,7 +82,7 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 | `bot-memory-panel` | ZO2-1 | Bot memory grouped by category. |
 | `bottom-sheet` | 88:808 | Thick-glass bottom sheet; the light board adds frost. |
 | `breadcrumb` | 110:948 | Breadcrumb with workspace tile. |
-| `breadcrumb-header` | U8H-1 | Glass header row with a breadcrumb and two icon buttons. |
+| `breadcrumb-header` | U8H-1 | Glass header row with a breadcrumb and optional search and more buttons. |
 | `button` | 55:339 | Primary, Glass, Danger and Link in three sizes; `href` renders a real link. |
 | `calendar` | 60:245 | Month grid with single and range selection. |
 | `card` | 63:310 | Thick-glass card: Default, Interactive, Selected. |
@@ -97,7 +97,7 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 | `data-table` | 192:9046 | Solid data table with header, tags and footer. |
 | `date-field` | 60:244 | Glass field that opens the calendar. |
 | `dialog` | 63:329 | Thick-glass dialog on a scrim; the light board adds frost. |
-| `directory-card` | 1VJJ-0 | Directory card with a description and an add button. |
+| `directory-card` | 1VJJ-0 | Directory card with a description; the add button shows when `onAdd` is passed. |
 | `document-extract-panel` | YUT-1 | Document viewer beside the extracted fields. |
 | `empty-state` | 64:485 | Mascot empty state. |
 | `field` | 58:163 | Label, control, help and error text. |
@@ -113,7 +113,7 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 | `knowledge-base-panel` | XVM-1 | Indexing state of each knowledge source. |
 | `liquid-glass` | 55:339 | The liquid glass layer stack. |
 | `list-detail` | 1W6P-0 | Two-pane layout with a list on the left and detail on the right. |
-| `marketplace-card` | 1VMY-0 | Marketplace card with a description and an install button. |
+| `marketplace-card` | 1VMY-0 | Marketplace card with a description; the install button shows when `onInstall` is passed. |
 | `mcp-server-row` | 1VHS-0 | Connected MCP server row with name, tags and state. |
 | `menu` | 88:495 | Glass menu and solid account/workspace menu. |
 | `message-extras` | 109:667 | Message actions, date separator, attachment, code block. |
@@ -145,7 +145,7 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 | `tool-calls-header` | XDG-1 | Title row and tool chips for a group of tool calls. |
 | `tool-permissions` | 1VT5-0 | Per-tool permission list: allow, confirm or off. |
 | `tooltip` | 62:282 | Ink tooltip with an arrow. |
-| `top-bar` | UR5-1 | Mobile app bar with back, bot avatar, title and subtitle, and overflow. |
+| `top-bar` | UR5-1 | Mobile app bar with bot avatar, title and subtitle, plus back and overflow when their handlers are passed. |
 | `usage-meter` | 109:733 | Glass usage meter card. |
 | `workspace-menu` | V56-1 | Solid menu to pick a workspace or create one. |
 
