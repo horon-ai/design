@@ -401,13 +401,15 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
         glow: dark ? 0.22 : 0.3,
         vignette: 0,
       ),
+      // 셰이더 비네트는 검정 쪽으로 어둡게 하므로 라이트는 비네트 없이 옅은 하늘을 지키고,
+      // 다크는 비네트로 모서리를 밤 바탕에 가라앉힙니다.
       HoronFlueVariant.auth => base._tuned(
         width: 1.9,
         spread: 1.3,
-        density: 2.0,
-        midpoint: dark ? 0.76 : 0.74,
-        glow: 0.45,
-        vignette: dark ? 0.45 : 0.18,
+        density: dark ? 2.0 : 1.85,
+        midpoint: dark ? 0.76 : 0.8,
+        glow: dark ? 0.45 : 0.3,
+        vignette: dark ? 0.45 : 0,
       ),
     };
   }
