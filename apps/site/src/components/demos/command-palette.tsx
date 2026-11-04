@@ -2,6 +2,8 @@ import { Button, CommandPalette, Kbd } from "@horon-ai/react";
 import { Folder, Plus } from "@phosphor-icons/react";
 import { useState } from "react";
 
+import { Backdrop } from "../demo-backdrop";
+
 const groups = [
   {
     label: "Bots",
@@ -55,28 +57,35 @@ export default function CommandPaletteDemo() {
   const [glassOpen, setGlassOpen] = useState(false);
   const [solidOpen, setSolidOpen] = useState(false);
   return (
-    <div className="flex flex-wrap gap-3">
-      <Button variant="glass" onClick={() => setGlassOpen(true)}>
-        Search ⌘K
-      </Button>
-      <Button variant="solid" onClick={() => setSolidOpen(true)}>
-        Search (solid)
-      </Button>
-      <CommandPalette
-        surface="glass"
-        open={glassOpen}
-        onOpenChange={setGlassOpen}
-        groups={groups}
-        placeholder="Search bots, projects and routines"
-        hints={hints}
-      />
-      <CommandPalette
-        open={solidOpen}
-        onOpenChange={setSolidOpen}
-        groups={groups}
-        placeholder="Search bots, projects and routines"
-        hints={hints}
-      />
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex flex-col items-center gap-4">
+        <p className="text-caption text-text-secondary">Solid</p>
+        <Button variant="solid" onClick={() => setSolidOpen(true)}>
+          Search ⌘K
+        </Button>
+        <CommandPalette
+          surface="solid"
+          open={solidOpen}
+          onOpenChange={setSolidOpen}
+          groups={groups}
+          placeholder="Search bots, projects and routines"
+          hints={hints}
+        />
+      </div>
+      <Backdrop className="flex-col">
+        <p className="text-caption text-text-secondary">Glass</p>
+        <Button variant="glass" onClick={() => setGlassOpen(true)}>
+          Search ⌘K
+        </Button>
+        <CommandPalette
+          surface="glass"
+          open={glassOpen}
+          onOpenChange={setGlassOpen}
+          groups={groups}
+          placeholder="Search bots, projects and routines"
+          hints={hints}
+        />
+      </Backdrop>
     </div>
   );
 }

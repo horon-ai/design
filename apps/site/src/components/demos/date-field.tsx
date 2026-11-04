@@ -7,15 +7,27 @@ export default function DateFieldDemo() {
   const [date, setDate] = useState<Date | null>(new Date(2026, 9, 20));
   const [range, setRange] = useState<DateRange>({ start: null, end: null });
   return (
-    <Backdrop className="flex-col">
-      <div className="flex flex-wrap items-end justify-center gap-3">
-        <DateField surface="glass" size="sm" value={date} onValueChange={setDate} triggerClassName="max-w-44" />
-        <DateField surface="glass" value={date} onValueChange={setDate} triggerClassName="max-w-44" />
-        <DateField surface="glass" size="lg" value={date} onValueChange={setDate} triggerClassName="max-w-44" />
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex w-full flex-col items-center gap-4">
+        <p className="text-caption text-text-secondary">Solid</p>
+        <div className="flex flex-wrap items-end justify-center gap-3">
+          <DateField surface="solid" size="sm" value={date} onValueChange={setDate} triggerClassName="max-w-44" />
+          <DateField surface="solid" value={date} onValueChange={setDate} triggerClassName="max-w-44" />
+          <DateField surface="solid" size="lg" value={date} onValueChange={setDate} triggerClassName="max-w-44" />
+        </div>
+        <DateField surface="solid" value={date} onValueChange={setDate} />
+        <DateField surface="solid" mode="range" value={range} onValueChange={setRange} />
       </div>
-      <DateField surface="glass" value={date} onValueChange={setDate} />
-      <DateField surface="glass" mode="range" value={range} onValueChange={setRange} />
-      <DateField value={date} onValueChange={setDate} />
-    </Backdrop>
+      <Backdrop className="flex-col">
+        <p className="text-caption text-text-secondary">Glass</p>
+        <div className="flex flex-wrap items-end justify-center gap-3">
+          <DateField surface="glass" size="sm" value={date} onValueChange={setDate} triggerClassName="max-w-44" />
+          <DateField surface="glass" value={date} onValueChange={setDate} triggerClassName="max-w-44" />
+          <DateField surface="glass" size="lg" value={date} onValueChange={setDate} triggerClassName="max-w-44" />
+        </div>
+        <DateField surface="glass" value={date} onValueChange={setDate} />
+        <DateField surface="glass" mode="range" value={range} onValueChange={setRange} />
+      </Backdrop>
+    </div>
   );
 }

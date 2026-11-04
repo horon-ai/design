@@ -23,23 +23,26 @@ const currencies = [
   { value: "JPY", label: "JPY" },
 ];
 
-export default function InputGroupDemo() {
+function Examples({ surface }: { surface: "solid" | "glass" }) {
   return (
-    <Backdrop className="flex-col">
+    <div className="flex w-full flex-col items-center gap-3">
       <div className="flex flex-wrap items-end justify-center gap-3">
         <InputGroup
           className="w-52"
+          surface={surface}
           size="sm"
           placeholder="Small"
           prefix={<Select variant="segment" aria-label="Country code" items={dialCodes} defaultValue="KR" />}
         />
         <InputGroup
           className="w-52"
+          surface={surface}
           placeholder="Medium"
           prefix={<Select variant="segment" aria-label="Country code" items={dialCodes} defaultValue="KR" />}
         />
         <InputGroup
           className="w-52"
+          surface={surface}
           size="lg"
           placeholder="Large"
           prefix={<Select variant="segment" aria-label="Country code" items={dialCodes} defaultValue="KR" />}
@@ -47,6 +50,7 @@ export default function InputGroupDemo() {
       </div>
       <InputGroup
         className="w-80"
+        surface={surface}
         placeholder="Phone number"
         prefix={
           <Combobox
@@ -60,27 +64,39 @@ export default function InputGroupDemo() {
       />
       <InputGroup
         className="w-80"
-        surface="glass"
-        placeholder="Phone number"
-        prefix={<Select variant="segment" aria-label="Country code" items={dialCodes} defaultValue="KR" />}
-      />
-      <InputGroup
-        className="w-80"
+        surface={surface}
         placeholder="Amount"
         suffix={<Select variant="segment" aria-label="Currency" items={currencies} defaultValue="KRW" />}
       />
       <InputGroup
         className="w-80"
+        surface={surface}
         invalid
         defaultValue="12"
         suffix={<Select variant="segment" aria-label="Currency" items={currencies} defaultValue="KRW" />}
       />
       <InputGroup
         className="w-80"
+        surface={surface}
         disabled
         placeholder="Phone number"
         prefix={<Select variant="segment" aria-label="Country code" items={dialCodes} defaultValue="KR" />}
       />
-    </Backdrop>
+    </div>
+  );
+}
+
+export default function InputGroupDemo() {
+  return (
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex w-full flex-col gap-4">
+        <p className="text-caption text-text-secondary">Solid</p>
+        <Examples surface="solid" />
+      </div>
+      <Backdrop className="flex-col">
+        <p className="text-caption text-text-secondary">Glass</p>
+        <Examples surface="glass" />
+      </Backdrop>
+    </div>
   );
 }
