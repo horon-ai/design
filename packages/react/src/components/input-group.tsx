@@ -23,9 +23,9 @@ export type InputGroupProps = Omit<ComponentProps<typeof BaseInput>, "className"
   className?: string;
 };
 
-type InputGroupContextValue = { size: InputGroupSize; disabled: boolean };
+type InputGroupContextValue = { size: InputGroupSize; disabled: boolean; surface: InputSurface };
 
-/** Lets a segment (select, combobox or fixed text) take the group's size and disabled state. */
+/** Lets a segment (select, combobox or fixed text) take the group's size, disabled state and surface. */
 const InputGroupContext = createContext<InputGroupContextValue | null>(null);
 
 /** The group a segment sits in, or null outside an `InputGroup`. */
@@ -65,7 +65,7 @@ export function InputGroup({
   disabled = false,
   ...props
 }: InputGroupProps) {
-  const context = useMemo(() => ({ size, disabled }), [size, disabled]);
+  const context = useMemo(() => ({ size, disabled, surface }), [size, disabled, surface]);
   return (
     <InputGroupContext value={context}>
       <div

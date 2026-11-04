@@ -81,8 +81,10 @@ const multiFieldClass: Record<ComboboxSize, string> = {
   lg: "min-h-12 flex-wrap gap-2 px-3 py-2 [&_svg]:size-5",
 };
 
-const popupClass =
-  "relative max-h-80 min-w-(--anchor-width) motion-popup overflow-clip rounded-xl bg-glass-thick p-1.5 outline-none";
+/** The popup follows the field's surface (a segment takes its group's): glass stays glass, every solid kind is solid. */
+const popupClass = "relative max-h-80 min-w-(--anchor-width) motion-popup overflow-clip rounded-xl p-1.5 outline-none";
+const popupSurfaceClass = (surface: InputSurface) =>
+  surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface shadow-popover";
 
 const findItem = (items: readonly ComboboxItemData[], value: string | null | undefined) =>
   value == null ? null : (items.find((item) => item.value === value) ?? null);
@@ -113,6 +115,7 @@ export function Combobox(props: ComboboxProps) {
   const group = useInputGroup();
   const segment = variant === "segment";
   const size = segment && group ? group.size : ownSize;
+  const popupSurface = segment && group ? group.surface : surface;
   const anchor = useRef<HTMLDivElement>(null);
 
   const list = (
@@ -123,8 +126,10 @@ export function Combobox(props: ComboboxProps) {
         align="start"
         className="z-50 outline-none"
       >
-        <BaseCombobox.Popup className={cn(popupClass, segment && "flex w-64 flex-col gap-1")}>
-          <LiquidGlass />
+        <BaseCombobox.Popup
+          className={cn(popupClass, popupSurfaceClass(popupSurface), segment && "flex w-64 flex-col gap-1")}
+        >
+          {popupSurface === "glass" && <LiquidGlass />}
           {segment && (
             <div className={cn(fieldBoxClass.base, fieldBoxClass.solid, fieldSizeClass[size], "shrink-0")}>
               <MagnifyingGlass aria-hidden className="relative shrink-0 text-text-secondary" />
