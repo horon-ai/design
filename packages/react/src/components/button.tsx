@@ -30,11 +30,11 @@ const variantClass: Record<ButtonVariant, string> = {
   primary:
     "bg-interactive-primary text-interactive-on-primary hover:not-data-disabled:bg-interactive-primary-hover active:not-data-disabled:bg-interactive-primary-pressed",
   glass:
-    "overflow-clip bg-glass-clear text-text-primary hover:not-data-disabled:bg-glass-clear-hover active:not-data-disabled:bg-glass-clear-pressed",
+    "bg-glass-clear text-text-primary hover:not-data-disabled:bg-glass-clear-hover active:not-data-disabled:bg-glass-clear-pressed",
   solid:
     "border border-border-default bg-bg-surface text-text-primary hover:not-data-disabled:bg-bg-subtle active:not-data-disabled:bg-interactive-secondary-hover",
   danger:
-    "bg-interactive-danger text-interactive-on-danger hover:not-data-disabled:bg-interactive-danger-hover active:not-data-disabled:bg-interactive-danger-hover",
+    "bg-interactive-danger text-interactive-on-danger hover:not-data-disabled:bg-interactive-danger-hover active:not-data-disabled:bg-interactive-danger",
   link: "h-auto gap-1.5 rounded-sm px-1 text-label-sm text-text-secondary motion-colors hover:not-data-disabled:text-text-primary aria-[current=page]:text-text-primary aria-[current=true]:text-text-primary [&_svg]:size-3.5",
 };
 
@@ -46,9 +46,8 @@ export function Button({ variant = "primary", size = "md", icon, className, chil
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed data-disabled:opacity-40",
     variant !== "link" && sizeClass[size],
     // Paper's small buttons are 32px tall. Paint the 44px reach without moving the control;
-    // glass clips to its own box, so it keeps its visible size as the only target.
+    // the reach is an invisible box, so it never needs clipping.
     variant !== "link" &&
-      variant !== "glass" &&
       size !== "lg" &&
       "relative after:absolute after:top-1/2 after:left-1/2 after:min-h-11 after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-['']",
     variantClass[variant],

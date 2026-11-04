@@ -58,6 +58,7 @@ export function DateField({
           fieldBoxClass[surface],
           fieldSizeClass[size],
           "w-70 cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed",
+          surface !== "glass" && "hover:enabled:not-data-invalid:border-border-strong",
           triggerClassName,
         )}
         data-invalid={invalid ? "" : undefined}
@@ -76,7 +77,7 @@ export function DateField({
         </span>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Positioner sideOffset={4} align="start">
+        <Popover.Positioner sideOffset={4} align="start" className="z-50 outline-none">
           <Popover.Popup className="motion-popup">
             <Calendar {...calendar} size={size} surface={surface === "glass" ? "glass" : "solid"} />
           </Popover.Popup>

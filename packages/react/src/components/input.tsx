@@ -35,13 +35,14 @@ export const fieldTextClass: Record<ControlSize, string> = {
 };
 
 export const fieldBoxClass = {
-  base: "motion-colors relative flex items-center overflow-clip rounded-md border",
+  /** The box is the focus target's container, so the ring is drawn on `:focus-within`, not on the inner input. */
+  base: "motion-colors relative flex items-center overflow-clip rounded-md border focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
   /** The veil field (globals.css `.veil-field`): no liquid layers, so hosts render no `LiquidGlass`. */
-  glass: "veil-field has-[[data-disabled]]:opacity-60",
+  glass: "veil-field has-[[data-disabled]]:opacity-60 has-[:disabled]:opacity-60",
   solid:
-    "border-border-default bg-bg-surface has-[[data-disabled]]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
+    "border-border-default bg-bg-surface has-[[data-disabled]]:border-border-default has-[:disabled]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[:disabled]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
   "solid-on-page":
-    "border-border-default bg-bg-default has-[[data-disabled]]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
+    "border-border-default bg-bg-default has-[[data-disabled]]:border-border-default has-[:disabled]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[:disabled]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
   text: "min-w-0 flex-1 bg-transparent text-text-primary outline-none placeholder:text-text-placeholder disabled:cursor-not-allowed disabled:text-text-disabled",
 } as const;
 

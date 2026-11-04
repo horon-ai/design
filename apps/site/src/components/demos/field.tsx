@@ -1,6 +1,26 @@
 import { Field, FieldDescription, FieldError, FieldLabel, Input } from "@horon-ai/react";
+import { useState } from "react";
 
 import { Backdrop } from "../demo-backdrop";
+
+/** Type one or two characters: the message appears and the field below makes room for it. */
+function LiveField({ surface }: { surface?: "glass" }) {
+  const [value, setValue] = useState("");
+  const invalid = value.length > 0 && value.length < 3;
+  return (
+    <Field className="w-64" invalid={invalid}>
+      <FieldLabel>Handle</FieldLabel>
+      <Input
+        className="w-full"
+        surface={surface}
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        placeholder="Two letters is too short"
+      />
+      <FieldError match={invalid}>Use at least 3 characters.</FieldError>
+    </Field>
+  );
+}
 
 function Fields({ surface }: { surface?: "glass" }) {
   return (
@@ -33,6 +53,7 @@ function Fields({ surface }: { surface?: "glass" }) {
           <Input className="w-full" surface={surface} defaultValue="Inbox Manager" />
           <FieldError match>Name is already used by another bot.</FieldError>
         </Field>
+        <LiveField surface={surface} />
       </div>
     </>
   );
