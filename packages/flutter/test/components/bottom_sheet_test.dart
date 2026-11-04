@@ -311,4 +311,60 @@ void main() {
     final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
     expect(glass.tier, HoronGlassTier.thick, reason: '#17181ACC 80%');
   });
+
+  // 라우트가 `RawDialogRoute` 서브클래스가 되면서 생긴 동작입니다. 스크린 리더는
+  // `scopesRoute` 경계를 만나면 모달 밖을 읽지 않습니다.
+  testWidgets('the sheet page scopes the route for screen readers', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: Builder(
+            builder: (BuildContext context) => TextButton(
+              onPressed: () => showHoronBottomSheet(context, title: const Text('시트 제목')),
+              child: const Text('열기'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('열기'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is Semantics && widget.properties.scopesRoute == true),
+      findsWidgets,
+      reason: 'RawDialogRoute가 페이지를 라우트 경계로 감쌉니다',
+    );
+  });
+
+  testWidgets('the sheet reverses in 220ms', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: Builder(
+            builder: (BuildContext context) => TextButton(
+              onPressed: () => showHoronBottomSheet(context, title: const Text('시트 제목')),
+              child: const Text('열기'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('열기'));
+    await tester.pumpAndSettle();
+
+    final ModalRoute<dynamic> route = ModalRoute.of(tester.element(find.byType(HoronBottomSheet)))!;
+    expect(route.reverseTransitionDuration, const Duration(milliseconds: 220), reason: 'motion-popup exit');
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 110));
+    expect(find.byType(HoronBottomSheet), findsOneWidget, reason: '220ms 나가기의 중간입니다');
+
+    await tester.pump(const Duration(milliseconds: 210));
+    await tester.pumpAndSettle();
+    expect(find.byType(HoronBottomSheet), findsNothing, reason: '220ms가 지나면 라우트가 사라집니다');
+  });
 }
