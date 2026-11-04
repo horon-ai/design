@@ -112,8 +112,10 @@ class _HoronCheckboxState extends State<HoronCheckbox> {
     final Color fill = _marked
         ? (_hovered && interactive ? colors.interactivePrimaryHover : colors.interactivePrimary)
         : colors.bgSurface;
+    // React `data-checked:border-interactive-primary` — 선택해도 테두리 두께 1.5는 남고
+    // 색만 잉크색으로 바뀝니다. 꺼짐은 `border-border-strong`(hover에서 `text-secondary`)입니다.
     final Color borderColor = _marked
-        ? Colors.transparent
+        ? (_hovered && interactive ? colors.interactivePrimaryHover : colors.interactivePrimary)
         : (_hovered && interactive ? colors.textSecondary : colors.borderStrong);
 
     final Widget box = AnimatedContainer(
@@ -124,25 +126,33 @@ class _HoronCheckboxState extends State<HoronCheckbox> {
       decoration: BoxDecoration(
         color: fill,
         borderRadius: BorderRadius.circular(radius),
-        // data-checked:border-0 data-indeterminate:border-0 — 선택되면 테두리가 사라집니다.
-        border: Border.all(color: borderColor, width: _marked ? 0 : _borderWidth),
+        border: Border.all(color: borderColor, width: _borderWidth),
       ),
-      child: _marked
-          ? Center(
-              child: TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
-                duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
-                curve: HoronMotion.popInCurve,
-                builder: (BuildContext context, double scale, Widget? child) =>
-                    Transform.scale(scale: scale, child: child),
-                child: Icon(
+      child: Center(
+        // React는 `animate-pop-in`으로 들어오고 `data-ending-style:animate-scale-out`으로
+        // 나갑니다. AnimatedSwitcher의 reverseDuration이 나가는 쪽 시간을 나릅니다.
+        child: AnimatedSwitcher(
+          duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
+          reverseDuration: reduceMotion ? Duration.zero : HoronMotion.scaleOutDuration,
+          switchInCurve: HoronMotion.popInCurve,
+          switchOutCurve: HoronMotion.scaleOutCurve,
+          transitionBuilder: (Widget child, Animation<double> animation) => FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: HoronMotion.popInScale, end: 1).animate(animation),
+              child: child,
+            ),
+          ),
+          child: _marked
+              ? Icon(
                   widget.value == null ? Icons.remove : Icons.check,
+                  key: ValueKey<String>(widget.value == null ? 'indeterminate' : 'checked'),
                   size: metrics.indicator,
                   color: colors.interactiveOnPrimary,
-                ),
-              ),
-            )
-          : null,
+                )
+              : const SizedBox.shrink(key: ValueKey<String>('unchecked')),
+        ),
+      ),
     );
 
     final Widget content = Row(

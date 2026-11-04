@@ -19,8 +19,8 @@ const double _cardPaddingY = 12;
 /// `directory-card.tsx`의 `pl-3`입니다.
 const double _cardPaddingLeft = 12;
 
-/// `directory-card.tsx`의 `pr-3.5`입니다.
-const double _cardPaddingRight = 14;
+/// `directory-card.tsx`의 `pr-3`입니다.
+const double _cardPaddingRight = 12;
 
 /// `directory-card.tsx`의 `gap-3`입니다.
 const double _cardGap = 12;
@@ -29,7 +29,8 @@ const double _cardGap = 12;
 ///
 /// `directory-card.tsx`를 옮긴 것입니다. 반경은 `rounded-2xl`(16), 타일은 Paper가
 /// 그리는 잉크 바탕(`#17181A`)에 neutral-50 20px 아이콘, 설명은 `line-clamp-1`이라 한
-/// 줄로 잘립니다. 추가 버튼은 [HoronIconButton]의 glass 변형입니다.
+/// 줄로 잘립니다. 추가 버튼은 [onAdd]가 있을 때만 그리는 [HoronIconButton]의 glass
+/// 변형입니다.
 class HoronDirectoryCard extends StatelessWidget {
   /// 디렉터리 카드를 만듭니다.
   const HoronDirectoryCard({
@@ -127,14 +128,18 @@ class HoronDirectoryCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: _cardGap),
-                HoronIconButton(
-                  variant: surface == HoronSurface.glass ? HoronIconButtonVariant.glass : HoronIconButtonVariant.solid,
-                  size: HoronIconButtonSize.sm,
-                  label: addLabel,
-                  icon: const Icon(Icons.add, size: 14),
-                  onPressed: onAdd,
-                ),
+                if (onAdd != null) ...<Widget>[
+                  const SizedBox(width: _cardGap),
+                  HoronIconButton(
+                    variant: surface == HoronSurface.glass
+                        ? HoronIconButtonVariant.glass
+                        : HoronIconButtonVariant.solid,
+                    size: HoronIconButtonSize.sm,
+                    label: addLabel,
+                    icon: const Icon(Icons.add, size: 14),
+                    onPressed: onAdd,
+                  ),
+                ],
               ],
             ),
           ),

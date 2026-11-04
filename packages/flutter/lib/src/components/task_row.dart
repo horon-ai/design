@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 import 'spinner.dart';
@@ -103,12 +104,24 @@ class HoronTaskRow extends StatelessWidget {
   /// 목록 변형에서 마지막 행이면 구분선을 감춥니다.
   final bool last;
 
-  Color _tile(HoronThemeData theme) => switch (status) {
-    HoronTaskStatus.running => theme.colors.interactivePrimary,
-    HoronTaskStatus.done => theme.colors.interactivePrimary,
-    HoronTaskStatus.review => HoronPalette.sky500,
-    HoronTaskStatus.failed => HoronPalette.sky700,
+  /// `botTile`: 바탕과 글자색을 함께 정합니다. React dev가 상태별 글자색을 더했습니다.
+  (Color, Color) _tile(HoronThemeData theme) => switch (status) {
+    HoronTaskStatus.running => (theme.colors.interactivePrimary, theme.colors.interactiveOnPrimary),
+    HoronTaskStatus.done => (theme.colors.interactivePrimary, theme.colors.interactiveOnPrimary),
+    HoronTaskStatus.review => (HoronPalette.sky500, HoronPalette.sky50),
+    HoronTaskStatus.failed => (HoronPalette.sky700, HoronPalette.sky50),
   };
+
+  /// 상태 아이콘입니다. React dev는 모두 `animate-pop-in`으로 나타납니다.
+  Widget _statusIcon(HoronThemeData theme) {
+    final Widget icon = switch (status) {
+      HoronTaskStatus.running => const HoronSpinner(pixelSize: 15),
+      HoronTaskStatus.review => Icon(Icons.check_circle, size: 16, color: theme.colors.textPrimary),
+      HoronTaskStatus.done => Icon(Icons.check_circle, size: 16, color: theme.colors.textSecondary),
+      HoronTaskStatus.failed => Icon(Icons.error, size: 16, color: theme.colors.textDanger),
+    };
+    return _PopIn(key: ValueKey<HoronTaskStatus>(status), child: icon);
+  }
 
   Color _messageColor(HoronThemeData theme) => switch (status) {
     HoronTaskStatus.failed => theme.colors.textDanger,
@@ -158,8 +171,6 @@ class HoronTaskRow extends StatelessWidget {
                         style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
                       ),
                     ],
-                    const SizedBox(width: 8),
-                    Icon(Icons.expand_more, size: 14, color: theme.colors.textSecondary),
                   ],
                 ),
                 Row(
@@ -169,10 +180,18 @@ class HoronTaskRow extends StatelessWidget {
                       height: _botTile,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: _tile(theme),
+                        color: _tile(theme).$1,
                         borderRadius: BorderRadius.circular(_botTileRadius),
                       ),
-                      child: Text(botInitial, style: theme.text.labelSm.copyWith(color: theme.colors.textInverse)),
+                      // `text-trim` — 18px 타일 안에서 이니셜 위아래 여백을 잘라 냅니다.
+                      child: Text(
+                        botInitial,
+                        style: theme.text.labelSm.copyWith(color: _tile(theme).$2),
+                        textHeightBehavior: const TextHeightBehavior(
+                          applyHeightToFirstAscent: false,
+                          applyHeightToLastDescent: false,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 6),
                     Flexible(
@@ -202,22 +221,30 @@ class HoronTaskRow extends StatelessWidget {
                 ),
                 Row(
                   children: <Widget>[
-                    switch (status) {
-                      HoronTaskStatus.running => const HoronSpinner(pixelSize: 15),
-                      HoronTaskStatus.review => Icon(Icons.check_circle, size: 16, color: theme.colors.textPrimary),
-                      HoronTaskStatus.done => Icon(Icons.check_circle, size: 16, color: theme.colors.textSecondary),
-                      HoronTaskStatus.failed => Icon(Icons.error, size: 16, color: theme.colors.textDanger),
-                    },
+                    // `flex size-4` 슬롯 — 상태가 바뀌어도 아이콘 자리가 흔들리지 않습니다.
+                    SizedBox(
+                      width: theme.space.step(4),
+                      height: theme.space.step(4),
+                      child: Center(child: _statusIcon(theme)),
+                    ),
                     const SizedBox(width: 8),
                     Flexible(
-                      child: Text(
-                        message,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.text.labelMd.copyWith(color: _messageColor(theme)),
+                      // `key={status}` + `animate-fade-in` — 상태가 바뀌면 라벨이 새로 나타납니다.
+                      child: AnimatedSwitcher(
+                        duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.fadeInDuration,
+                        switchInCurve: HoronMotion.fadeInCurve,
+                        child: Text(
+                          message,
+                          key: ValueKey<HoronTaskStatus>(status),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.text.labelMd.copyWith(color: _messageColor(theme)),
+                        ),
                       ),
                     ),
                     if (detail != null) ...<Widget>[
+                      const SizedBox(width: 8),
+                      Text('·', maxLines: 1, style: theme.text.caption.copyWith(color: theme.colors.textSecondary)),
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(
@@ -229,12 +256,22 @@ class HoronTaskRow extends StatelessWidget {
                       ),
                     ],
                     const Spacer(),
+                    // `animate-pop-in` — 동작 알약이 상태와 함께 자라납니다.
                     if (status == HoronTaskStatus.running)
-                      _RowPill(label: 'Cancel', icon: Icons.stop, onPressed: onCancel),
+                      _PopIn(
+                        key: const ValueKey<String>('cancel'),
+                        child: _RowPill(label: 'Cancel', icon: Icons.stop, onPressed: onCancel),
+                      ),
                     if (status == HoronTaskStatus.failed)
-                      _RowPill(label: 'Retry', icon: Icons.refresh, onPressed: onRetry),
+                      _PopIn(
+                        key: const ValueKey<String>('retry'),
+                        child: _RowPill(label: 'Retry', icon: Icons.refresh, onPressed: onRetry),
+                      ),
                     if (status == HoronTaskStatus.review)
-                      _RowPill(label: 'Review', icon: Icons.check, primary: true, onPressed: onReview),
+                      _PopIn(
+                        key: const ValueKey<String>('review'),
+                        child: _RowPill(label: 'Review', icon: Icons.check, primary: true, onPressed: onReview),
+                      ),
                     if (status == HoronTaskStatus.review || status == HoronTaskStatus.done) ...<Widget>[
                       const SizedBox(width: 4),
                       Semantics(
@@ -267,6 +304,25 @@ class HoronTaskRow extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// `animate-pop-in` — 0.6에서 1로 자라며 나타나는 래퍼입니다.
+class _PopIn extends StatelessWidget {
+  const _PopIn({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
+      duration: HoronMotion.popInDuration,
+      curve: HoronMotion.popInCurve,
+      builder: (BuildContext context, double scale, Widget? child) => Transform.scale(scale: scale, child: child),
+      child: child,
     );
   }
 }

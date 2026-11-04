@@ -96,6 +96,8 @@ class HoronDialog extends StatelessWidget {
     final BorderRadius radius = BorderRadius.circular(theme.radius.xl); // rounded-xl = 20
 
     final Widget header = Row(
+      // 테스트가 16px 리듬을 머리글 상자 기준으로 재도록 키를 둡니다.
+      key: const Key('horon-dialog-header'),
       crossAxisAlignment: CrossAxisAlignment.start,
       // leading이 있으면 gap-3.5(14), 없으면 gap-2(8)입니다.
       spacing: leading != null ? space.s3_5 : space.s2,
@@ -112,44 +114,55 @@ class HoronDialog extends StatelessWidget {
       ],
     );
 
-    final Widget body = Padding(
-      padding: EdgeInsets.all(space.s6), // p-6
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: gap,
-        children: <Widget>[
-          header,
-          if (description != null)
-            DefaultTextStyle(
-              style: theme.text.bodyMd.copyWith(color: colors.textSecondary),
-              child: description!,
-            ),
-          ?child,
-        ],
+    // `max-h-[calc(100dvh-2rem)] overflow-y-auto` — 화면보다 긴 내용은 다이얼로그
+    // 상자 안에서 스크롤합니다. 표면이 상자를 자르므로 스크롤은 그 안에서 일어납니다.
+    final double maxHeight = (MediaQuery.sizeOf(context).height - space.s4 * 2).clamp(0, double.infinity);
+    final Widget body = SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(space.s6), // p-6
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: gap,
+          children: <Widget>[
+            header,
+            if (description != null)
+              DefaultTextStyle(
+                style: theme.text.bodyMd.copyWith(color: colors.textSecondary),
+                child: description!,
+              ),
+            ?child,
+          ],
+        ),
       ),
     );
 
     if (!solid) {
       // React `veil-overlay` — 74% 채움, 1px 링, 0 6 24 그림자를 스스로 그립니다.
-      return HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: body);
+      return ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: body),
+      );
     }
 
     // shadow-[0_24_64_#0A142433] — React의 색은 푸른 기가 도는 검정 20%입니다.
     // 토큰에 그 색이 없어 같은 불투명도의 overlay-ink-20으로 옮겼습니다.
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.bgSurface,
-        borderRadius: radius,
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: colors.overlayInk20,
-            offset: const Offset(0, _solidShadowOffsetY),
-            blurRadius: _solidShadowBlur,
-          ),
-        ],
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.bgSurface,
+          borderRadius: radius,
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: colors.overlayInk20,
+              offset: const Offset(0, _solidShadowOffsetY),
+              blurRadius: _solidShadowBlur,
+            ),
+          ],
+        ),
+        child: ClipRRect(borderRadius: radius, child: body),
       ),
-      child: ClipRRect(borderRadius: radius, child: body),
     );
   }
 }
@@ -259,24 +272,23 @@ class _HoronDialogRoute extends RawDialogRoute<void> {
                        constraints: const BoxConstraints(maxWidth: _dialogMaxWidth),
                        child: SizedBox(
                          width: double.infinity,
-                         // 화면보다 큰 내용도 잘리지 않게 세로로만 스크롤합니다.
-                         child: SingleChildScrollView(
-                           child: AnimatedBuilder(
-                             animation: progress,
-                             builder: (BuildContext context, Widget? child) => Transform.translate(
-                               // data-starting-style:translate-y-2 — 8px 아래에서 올라옵니다.
-                               offset: Offset(0, (1 - progress.value) * _enterOffset),
-                               child: Opacity(opacity: progress.value, child: child),
-                             ),
-                             child: HoronDialog(
-                               title: title,
-                               description: description,
-                               closeLabel: closeLabel,
-                               leading: leading,
-                               solid: solid,
-                               onClose: onClose,
-                               child: child,
-                             ),
+                         // 화면보다 긴 내용은 [HoronDialog]가 자기 상자 안에서
+                         // 스크롤합니다(React `max-h` + `overflow-y-auto`).
+                         child: AnimatedBuilder(
+                           animation: progress,
+                           builder: (BuildContext context, Widget? child) => Transform.translate(
+                             // data-starting-style:translate-y-2 — 8px 아래에서 올라옵니다.
+                             offset: Offset(0, (1 - progress.value) * _enterOffset),
+                             child: Opacity(opacity: progress.value, child: child),
+                           ),
+                           child: HoronDialog(
+                             title: title,
+                             description: description,
+                             closeLabel: closeLabel,
+                             leading: leading,
+                             solid: solid,
+                             onClose: onClose,
+                             child: child,
                            ),
                          ),
                        ),
@@ -335,7 +347,10 @@ class _DialogCloseState extends State<_DialogClose> {
       width: _closeSize,
       height: _closeSize,
       decoration: BoxDecoration(color: _hovered ? colors.overlayInk6 : Colors.transparent, shape: BoxShape.circle),
-      child: Icon(Icons.close, size: _closeIconSize, color: _hovered ? colors.textPrimary : colors.textSecondary),
+      // `[&_svg]:size-4` — 32px 히트 영역 안의 아이콘 상자는 16으로 남깁니다.
+      child: Center(
+        child: Icon(Icons.close, size: _closeIconSize, color: _hovered ? colors.textPrimary : colors.textSecondary),
+      ),
     );
 
     if (_focused) {

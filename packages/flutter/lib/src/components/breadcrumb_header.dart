@@ -82,8 +82,12 @@ class HoronBreadcrumbHeader extends StatelessWidget {
         spacing: space.s2, // gap-2
         children: <Widget>[
           Expanded(child: _CrumbRow(crumbs: crumbs)),
-          _HeaderIconButton(icon: const Icon(Icons.search), label: searchLabel, onPressed: onSearch),
-          _HeaderIconButton(icon: const Icon(Icons.more_horiz), label: moreLabel, onPressed: onMore),
+          // React는 `onSearch`·`onMore`가 있을 때만 아이콘 버튼을 그립니다. 없으면
+          // 자리도 차지하지 않습니다.
+          if (onSearch != null)
+            _HeaderIconButton(icon: const Icon(Icons.search), label: searchLabel, onPressed: onSearch),
+          if (onMore != null)
+            _HeaderIconButton(icon: const Icon(Icons.more_horiz), label: moreLabel, onPressed: onMore),
         ],
       ),
     );

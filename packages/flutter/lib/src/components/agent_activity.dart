@@ -481,41 +481,55 @@ class _HoronWorkLogState extends State<HoronWorkLog> {
               ),
             ),
           ),
-          if (_open)
-            for (final HoronWorkLogStep step in widget.steps)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                child: Row(
-                  children: <Widget>[
-                    if (step.running)
-                      const HoronSpinner(pixelSize: 14)
-                    else
-                      Icon(Icons.check_circle, size: 14, color: theme.colors.textSecondary),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            step.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.text.labelSm.copyWith(color: theme.colors.textPrimary),
+          // `motion-details` — `details`의 block-size 전환을 옮깁니다. React는 240ms
+          // `ease-out-quint`로 펼치고 접으므로, 같은 길이의 [AnimatedSize]를 씁니다.
+          AnimatedSize(
+            duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.collapseDuration,
+            curve: HoronMotion.collapseCurve,
+            alignment: Alignment.topCenter,
+            child: _open
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      for (final HoronWorkLogStep step in widget.steps)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          child: Row(
+                            children: <Widget>[
+                              if (step.running)
+                                const HoronSpinner(pixelSize: 14)
+                              else
+                                Icon(Icons.check_circle, size: 14, color: theme.colors.textSecondary),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      step.title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: theme.text.labelSm.copyWith(color: theme.colors.textPrimary),
+                                    ),
+                                    if (step.detail != null)
+                                      Text(
+                                        step.detail!,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          if (step.detail != null)
-                            Text(
-                              step.detail!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                        ),
+                    ],
+                  )
+                : const SizedBox(width: double.infinity),
+          ),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
@@ -59,10 +60,25 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronAttachment)));
     expect(tester.getSize(find.byType(HoronAttachment)).width, 280);
     expect(find.text('Q3-board-deck.pdf'), findsOneWidget);
     expect(find.text('PDF · 2.4 MB'), findsOneWidget);
     expect(find.byIcon(Icons.description_outlined), findsOneWidget);
+
+    // React dev: 파일 타일은 accent-sky-500-16 바탕에 text-brand 아이콘입니다.
+    expect(
+      tester
+          .widgetList<ColoredBox>(find.byType(ColoredBox))
+          .any((ColoredBox box) => box.color == theme.colors.accentSky500_16),
+      isTrue,
+    );
+    expect(tester.widget<Icon>(find.byIcon(Icons.description_outlined)).color, theme.colors.textBrand);
+    // 제거는 `IconButton size="sm"`(32px 상자)입니다.
+    expect(
+      tester.getSize(find.ancestor(of: find.byIcon(Icons.close), matching: find.byType(AnimatedContainer)).first),
+      const Size(32, 32),
+    );
 
     await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle();
@@ -70,6 +86,14 @@ void main() {
   });
 
   testWidgets('code block: the ink surface keeps its header and copies the code', (WidgetTester tester) async {
+    // `Clipboard.setData`가 성공해야 'Copied'로 바뀝니다(React는 성공 콜백에서만 바꿉니다).
+    final List<MethodCall> calls = <MethodCall>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (MethodCall call) async {
+      calls.add(call);
+      return null;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+
     await pumpExtras(tester, const HoronCodeBlock(code: 'const a = 1;', language: 'ts'));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronCodeBlock)));
 
@@ -83,9 +107,20 @@ void main() {
     });
     expect(hasInk, isTrue);
 
+    // 라벨 자리는 min-w-10(40px)이라 글자가 바뀌어도 폭이 흔들리지 않습니다.
+    expect(tester.getSize(find.ancestor(of: find.text('Copy'), matching: find.byType(SizedBox)).first).width, 40);
+
     await tester.tap(find.text('Copy'));
     await tester.pumpAndSettle();
+    final MethodCall write = calls.firstWhere((MethodCall call) => call.method == 'Clipboard.setData');
+    expect((write.arguments as Map<Object?, Object?>)['text'], 'const a = 1;');
     expect(find.text('Copied'), findsOneWidget);
+
+    // React dev: 복사 표시는 1.5초 뒤 스스로 되돌아갑니다.
+    await tester.pump(const Duration(milliseconds: 1500));
+    await tester.pumpAndSettle();
+    expect(find.text('Copied'), findsNothing);
+    expect(find.text('Copy'), findsOneWidget);
   });
 
   testWidgets('message extras: both brightnesses render every part', (WidgetTester tester) async {

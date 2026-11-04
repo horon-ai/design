@@ -3,7 +3,8 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `task_row`의 갤러리 섹션입니다.
 ///
-/// 실행 중·검토·실패·완료 네 상태를 목록으로 쌓아 보여 줍니다.
+/// 실행 중·검토·실패·완료 네 상태를 목록으로 쌓아 보여 줍니다. 봇 타일은 상태별
+/// 글자색을 함께 쓰고, 상태 아이콘은 16px 슬롯에 고정되며, 상세 앞에는 `·`가 붙습니다.
 class HoronTaskRowGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronTaskRowGallerySection({super.key});

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
-import '../tokens/horon_tokens.g.dart';
 
 /// `source-row.tsx`의 `SourceStatus`입니다.
 enum HoronSourceStatus {
@@ -28,7 +27,7 @@ enum HoronSourceStage {
   /// `todo` — 8% 잉크 막대입니다.
   todo,
 
-  /// `failed` — 위험 막대입니다.
+  /// `failed` — 붉은 막대입니다.
   failed,
 }
 
@@ -117,7 +116,7 @@ class HoronSourceRow extends StatelessWidget {
   Color _barColor(HoronThemeData theme, HoronSourceStage stage) => switch (stage) {
     HoronSourceStage.done => theme.colors.overlayInk35,
     HoronSourceStage.todo => theme.colors.overlayInk8,
-    HoronSourceStage.failed => HoronPalette.red500,
+    HoronSourceStage.failed => theme.colors.accentRed500_90, // bg-accent-red-500-90
     HoronSourceStage.active => theme.colors.overlayInk8,
   };
 
@@ -218,7 +217,8 @@ class HoronSourceRow extends StatelessWidget {
                                       heightFactor: 1,
                                       child: child,
                                     ),
-                                    child: ColoredBox(color: HoronPalette.sky500),
+                                    // bg-status-live — 진행 채움도 라이브 색입니다.
+                                    child: ColoredBox(color: theme.colors.statusLive),
                                   ),
                                 ),
                               ],
@@ -235,9 +235,25 @@ class HoronSourceRow extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: switch (status) {
                 HoronSourceStatus.ready => Icon(Icons.check, size: 16, color: theme.colors.textSecondary),
-                HoronSourceStatus.indexing => Text(
-                  '${progress.round()}%',
-                  style: theme.text.labelMd.copyWith(color: theme.colors.textSecondary),
+                // `w-9 text-right tabular-nums` — 퍼센트는 36px 상자에서 오른쪽 정렬이고
+                // 자릿수가 같아 값이 바뀌어도 폭이 흔들리지 않습니다. 값이 바뀔 때마다
+                // `animate-fade-in`으로 새로 나타납니다.
+                HoronSourceStatus.indexing => SizedBox(
+                  width: theme.space.step(9),
+                  child: AnimatedSwitcher(
+                    duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.fadeInDuration,
+                    switchInCurve: HoronMotion.fadeInCurve,
+                    child: Text(
+                      '${progress.round()}%',
+                      key: ValueKey<int>(progress.round()),
+                      textAlign: TextAlign.right,
+                      maxLines: 1,
+                      style: theme.text.labelMd.copyWith(
+                        color: theme.colors.textSecondary,
+                        fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ),
                 ),
                 HoronSourceStatus.failed => _RetryPill(onPressed: onRetry),
               },

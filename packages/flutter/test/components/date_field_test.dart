@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -56,6 +57,38 @@ void main() {
     await tester.tap(find.byType(HoronDateField));
     await tester.pumpAndSettle();
     expect(find.byType(HoronCalendar), findsWidgets);
+  });
+
+  testWidgets('date field: hovering the solid field raises the border to border-strong', (WidgetTester tester) async {
+    await pumpField(tester, const HoronDateField(placeholder: '날짜 선택'));
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronDateField)));
+
+    BoxDecoration fieldBox(WidgetTester tester) =>
+        tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first).decoration! as BoxDecoration;
+
+    expect(fieldBox(tester).border!.top.color, theme.colors.borderDefault);
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: tester.getCenter(find.byType(HoronFieldBox)));
+    await tester.pumpAndSettle();
+    expect(
+      fieldBox(tester).border!.top.color,
+      theme.colors.borderStrong,
+      reason: 'hover:enabled:not-data-invalid:border-border-strong',
+    );
+    await pointer.removePointer();
+    await tester.pumpAndSettle();
+
+    // 유리 표면은 React도 hover 규칙에서 빼고, veil-field가 hover 테두리를 그리지 않습니다.
+    await pumpField(tester, const HoronDateField(placeholder: '날짜 선택', surface: HoronSurface.glass));
+    final TestGesture glassPointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await glassPointer.addPointer(location: tester.getCenter(find.byType(HoronFieldBox)));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<HoronVeil>(find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronVeil))).kind,
+      HoronVeilKind.field,
+    );
+    await glassPointer.removePointer();
+    await tester.pumpAndSettle();
   });
 
   testWidgets('date field: a disabled field does not open', (WidgetTester tester) async {
@@ -124,8 +157,9 @@ void main() {
     final Rect field = tester.getRect(find.byKey(const Key('horon-date-field-surface')));
     final Rect calendar = tester.getRect(find.byType(HoronCalendar));
     expect(field.top, moreOrLessEquals(400, epsilon: 0.5));
-    // 위로 뒤집히고 화면 여백(8px) 안에서 끝납니다.
-    expect(field.top - calendar.bottom, moreOrLessEquals(8, epsilon: 0.5));
+    // `sideOffset={4}`: 뒤집혀도 트리거에서 4px만 떨어집니다. 화면 여백 상수와는
+    // 별개이고, 배치가 화면 여백에 닿기 전에 4px을 지킵니다.
+    expect(field.top - calendar.bottom, moreOrLessEquals(4, epsilon: 0.5));
     // 잘리지 않은 자연 높이입니다. 아래에 남아 있던 152px보다 큽니다.
     expect(calendar.height, greaterThan(152));
     // 달력을 담는 스크롤 뷰포트가 달력보다 짧지 않아야 합니다.

@@ -45,6 +45,10 @@ _TextareaMetrics _metricsOf(HoronTextareaSize size, HoronThemeData theme) => swi
 /// `min-h-28`(112)에서 시작해 입력이 늘면 함께 자라고, 오류 상태면 테두리가
 /// `border-danger`가 됩니다.
 ///
+/// 상자는 [HoronFieldBox] 하나로, React `fieldBoxClass.base`(테두리·반경·포커스 링)와
+/// `items-stretch`를 같은 자리에서 맡습니다. 그래서 안쪽 글자가 상자 높이를 채우고,
+/// 포커스 링도 입력이 아니라 상자에 붙습니다.
+///
 /// 표면은 [surface]로 고릅니다. 기본값은 React와 같은 불투명 [HoronInputSurface.solid]이고,
 /// 이미지나 유리 패널 위에서는 [HoronInputSurface.glass]를 넘깁니다. glass는
 /// [HoronFieldBox]가 `.veil-field`로 그리므로 HoronLiquidGlass를 겹치지 않습니다.
@@ -122,6 +126,8 @@ class _HoronTextareaState extends State<HoronTextarea> {
       color: widget.enabled ? colors.textPrimary : colors.textDisabled,
     );
 
+    // React `fieldBoxClass.base` + `items-stretch`: 상자가 테두리·반경·포커스 링을
+    // 맡고, 입력은 상자 폭을 다 씁니다.
     return Semantics(
       label: widget.semanticLabel,
       textField: true,

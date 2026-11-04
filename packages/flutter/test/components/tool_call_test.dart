@@ -100,8 +100,12 @@ void main() {
 
     expect((decoration.border! as Border).top.color, theme.colors.borderDanger);
     expect(find.text('Failed'), findsOneWidget);
-    // `WarningCircle size-4` — 상태 아이콘 자리는 16px입니다.
-    expect(find.byIcon(Icons.error_outline), findsOneWidget);
+    // `WarningCircle size-4` — 상태 아이콘 자리는 16px입니다. React는 트리거의 상태
+    // 아이콘과 오류 상자의 아이콘에 같은 WarningCircle을 두 번 쓰므로, 트리거 범위에서
+    // 하나인지 확인합니다.
+    final Finder trigger = find.ancestor(of: find.text('Failed'), matching: find.byType(GestureDetector)).first;
+    expect(find.descendant(of: trigger, matching: find.byIcon(Icons.error_outline)), findsOneWidget);
+    expect(tester.widget<Icon>(find.byIcon(Icons.error_outline).first).size, 16);
     expect(find.text('The card was declined'), findsOneWidget);
     expect(tester.widget<Text>(find.text('The card was declined')).style!.color, theme.colors.textDanger);
     expect(find.text('RESULT'), findsNothing);

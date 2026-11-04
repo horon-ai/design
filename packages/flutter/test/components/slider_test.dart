@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
@@ -75,6 +76,38 @@ void main() {
       // 부모가 폭을 꽉 잡으면 위젯 상자는 부모 폭이고, 트랙만 220에서 멈춥니다.
       expect(tester.getSize(_track()).width, expected, reason: '폭 $hostWidth에서의 트랙 폭');
     }
+  });
+
+  testWidgets('the thumb grabs on hover (1.05) and grows further while pressed (1.1)', (WidgetTester tester) async {
+    final TestGesture hover = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await hover.addPointer(location: Offset.zero);
+    addTearDown(hover.removePointer);
+
+    await tester.pumpWidget(_host(HoronSlider(value: 40, onChanged: (_) {})));
+    AnimatedScale thumbScale() => tester.widget<AnimatedScale>(
+      find.descendant(of: find.byType(HoronSlider), matching: find.byType(AnimatedScale)).first,
+    );
+
+    // `MouseRegion`은 트랙이 아니라 썸에 붙어 있으므로, 값 40이 놓인 썸 중심으로
+    // 포인터를 옮겨야 hover가 들어옵니다. 트랙 중앙(값 50 근처)은 썸 밖입니다.
+    final Offset thumbCenter = tester.getCenter(
+      find.descendant(of: find.byType(HoronSlider), matching: find.byType(Container)),
+    );
+    expect(thumbCenter.dx, lessThan(tester.getCenter(find.byType(HoronSlider)).dx), reason: '값 40은 중앙 왼쪽입니다');
+
+    expect(thumbScale().scale, 1);
+    await hover.moveTo(thumbCenter);
+    await tester.pumpAndSettle();
+    expect(thumbScale().scale, 1.05, reason: 'hover:scale-105');
+
+    final TestGesture press = await tester.startGesture(thumbCenter);
+    // 탭 인식기는 누른 뒤 100ms가 지나야 `onTapDown`을 부릅니다.
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.pumpAndSettle();
+    expect(thumbScale().scale, 1.1, reason: 'active:scale-110');
+    await press.up();
+    await tester.pumpAndSettle();
+    expect(thumbScale().scale, 1.05, reason: '누르고 나면 hover 배율로 돌아옵니다');
   });
 
   testWidgets('a disabled slider dims and reports nothing', (WidgetTester tester) async {

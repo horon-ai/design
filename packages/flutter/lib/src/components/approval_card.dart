@@ -109,7 +109,12 @@ class HoronApprovalCard extends StatelessWidget {
                 decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
               ),
               const SizedBox(width: 6),
-              Text(status ?? label, style: theme.text.labelSm.copyWith(color: text)),
+              // `key={state}` + `animate-fade-in` — 상태가 바뀌면 라벨이 제자리에서
+              // 160ms로 다시 나타납니다.
+              _FadeIn(
+                key: ValueKey<HoronApprovalState>(state),
+                child: Text(status ?? label, style: theme.text.labelSm.copyWith(color: text)),
+              ),
             ],
           ),
           const SizedBox(height: _approvalGap), // mt-3
@@ -141,29 +146,32 @@ class HoronApprovalCard extends StatelessWidget {
           ],
           // `motion-reveal` — 대기 중에만 펼쳐지고, 아니면 높이 0으로 접힙니다.
           // 접힌 동안에도 버튼은 트리에 남아 있지만 눌리지 않습니다(React `inert`).
-          _Reveal(
+          HoronReveal(
             collapsed: !pending,
             child: IgnorePointer(
               ignoring: !pending,
               child: ExcludeSemantics(
                 excluding: !pending,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: _approvalGap), // pt-3
-                  // `flex w-full justify-end` — 나중에가 먼저, 승인이 오른쪽 끝입니다.
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        HoronButton(
-                          label: laterLabel,
-                          size: HoronButtonSize.sm,
-                          variant: HoronButtonVariant.glass,
-                          onPressed: onLater,
-                        ),
-                        const SizedBox(width: 8),
-                        HoronButton(label: approveLabel, size: HoronButtonSize.sm, onPressed: onApprove),
-                      ],
+                child: ExcludeFocus(
+                  excluding: !pending,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: _approvalGap), // pt-3
+                    // `flex w-full justify-end` — 나중에가 먼저, 승인이 오른쪽 끝입니다.
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          HoronButton(
+                            label: laterLabel,
+                            size: HoronButtonSize.sm,
+                            variant: HoronButtonVariant.glass,
+                            onPressed: onLater,
+                          ),
+                          const SizedBox(width: 8),
+                          HoronButton(label: approveLabel, size: HoronButtonSize.sm, onPressed: onApprove),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -209,36 +217,24 @@ class HoronApprovalCard extends StatelessWidget {
   }
 }
 
-/// `motion-reveal` — grid 행 `1fr`↔`0fr`과 불투명도로 접고 펴는 래퍼입니다.
+/// `animate-fade-in` — 상태 라벨이 제자리에서 160ms로 나타납니다.
 ///
-/// React는 `grid-template-rows`를 200ms `ease-out-quint`로, 불투명도를 150ms
-/// `ease-out`으로 바꿉니다. Flutter에는 `0fr`이 없으므로 [Align]의 `heightFactor`를
-/// 0과 1 사이에서 animate 합니다.
-class _Reveal extends StatelessWidget {
-  const _Reveal({required this.collapsed, required this.child});
+/// React는 상태마다 `key`를 바꿔 `animate-fade-in`을 다시 재생합니다. Flutter는
+/// 위젯을 새로 만들 때 [TweenAnimationBuilder]가 0에서 1로 불투명도를 올립니다.
+class _FadeIn extends StatelessWidget {
+  const _FadeIn({super.key, required this.child});
 
-  final bool collapsed;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
-    return AnimatedSize(
-      duration: reduceMotion ? Duration.zero : HoronMotion.collapseDuration,
-      curve: HoronMotion.easeOutQuint,
-      alignment: Alignment.topCenter,
-      child: ClipRect(
-        child: Align(
-          alignment: Alignment.topCenter,
-          heightFactor: collapsed ? 0 : 1,
-          child: AnimatedOpacity(
-            opacity: collapsed ? 0 : 1,
-            duration: reduceMotion ? Duration.zero : const Duration(milliseconds: 150),
-            curve: Curves.easeOut,
-            child: child,
-          ),
-        ),
-      ),
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: HoronMotion.fadeInDuration,
+      curve: HoronMotion.fadeInCurve,
+      builder: (BuildContext context, double value, Widget? child) => Opacity(opacity: value, child: child),
+      child: child,
     );
   }
 }

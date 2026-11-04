@@ -7,6 +7,8 @@ import '../surface_group.dart';
 ///
 /// 날짜 하나를 고르는 달력, 팝오버 변형, 범위 달력, 일부 날짜를 막은 달력을
 /// solid와 glass 두 표면에 같은 목록으로 놓습니다. 각 표본은 실제로 눌러 볼 수 있습니다.
+/// 달을 넘기면 격자가 옆에서 12px 밀려 들어오고 제목이 160ms로 나타나며, 화살표는
+/// hover에서 잉크 배경과 `text-primary`를 씁니다. 바깥 달 날짜는 `text-placeholder`입니다.
 class HoronCalendarGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronCalendarGallerySection({super.key});

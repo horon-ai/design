@@ -94,6 +94,36 @@ void main() {
     }
   });
 
+  testWidgets('a caller-owned controller keeps the counter in sync without an input event', (
+    WidgetTester tester,
+  ) async {
+    final TextEditingController controller = TextEditingController(text: '셋');
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 800,
+              child: Center(
+                child: HoronTextareaField(label: '메모', maxLength: 20, controller: controller),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('1 / 20'), findsOneWidget, reason: 'value가 있으면 길이를 값에서 셉니다');
+
+    // 부모가 값을 다시 쓰는 경우(폼 초기화 등)에도 카운터가 따라갑니다.
+    controller.text = '다섯글자임';
+    await tester.pump();
+    expect(find.text('5 / 20'), findsOneWidget);
+  });
+
   testWidgets('the counter follows the field text', (WidgetTester tester) async {
     await pumpField(tester, maxLength: 20);
     expect(find.text('0 / 20'), findsOneWidget);

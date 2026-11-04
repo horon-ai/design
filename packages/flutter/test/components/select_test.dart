@@ -1,5 +1,6 @@
 import 'dart:ui' show Tristate;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -185,6 +186,57 @@ void main() {
     await pumpSelect(tester, disabled: true);
     await open(tester);
     expect(find.text('Alpha'), findsNothing);
+  });
+
+  testWidgets('hovering the solid field raises the border to border-strong and glass stays veil', (
+    WidgetTester tester,
+  ) async {
+    await pumpSelect(tester, surface: HoronInputSurface.solid);
+    expect(borderOf(tester), themeOf(tester).colors.borderDefault, reason: '쉬는 상태의 border-border-default');
+
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: tester.getCenter(find.byType(HoronFieldBox)));
+    await tester.pumpAndSettle();
+    expect(
+      borderOf(tester),
+      themeOf(tester).colors.borderStrong,
+      reason: 'hover:not-data-disabled:not-data-invalid:border-border-strong',
+    );
+    await pointer.removePointer();
+    await tester.pumpAndSettle();
+    expect(borderOf(tester), themeOf(tester).colors.borderDefault);
+
+    // 유리는 `veil-field`가 hover 테두리를 그리지 않으므로 React도 hover 규칙에서
+    // 뺍니다. 유리 필드는 veil 한 겹만 들고 있습니다.
+    await pumpSelect(tester);
+    final TestGesture glassPointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await glassPointer.addPointer(location: tester.getCenter(find.byType(HoronFieldBox)));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<HoronVeil>(find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronVeil))).kind,
+      HoronVeilKind.field,
+      reason: '유리 표면은 hover 테두리 대신 veil-field입니다',
+    );
+    await glassPointer.removePointer();
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('hovering an invalid or disabled field keeps its border', (WidgetTester tester) async {
+    await pumpSelect(tester, surface: HoronInputSurface.solid, invalid: true);
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: tester.getCenter(find.byType(HoronFieldBox)));
+    await tester.pumpAndSettle();
+    expect(borderOf(tester), themeOf(tester).colors.borderDanger, reason: 'not-data-invalid');
+    await pointer.removePointer();
+    await tester.pumpAndSettle();
+
+    await pumpSelect(tester, surface: HoronInputSurface.solid, disabled: true);
+    final TestGesture disabledPointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await disabledPointer.addPointer(location: tester.getCenter(find.byType(HoronFieldBox)));
+    await tester.pumpAndSettle();
+    expect(borderOf(tester), themeOf(tester).colors.borderDefault, reason: 'not-data-disabled');
+    await disabledPointer.removePointer();
+    await tester.pumpAndSettle();
   });
 
   testWidgets('showIndicator false drops the caret', (WidgetTester tester) async {

@@ -163,31 +163,39 @@ class HoronMcpServerRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: theme.space.s1, // gap-1
       children: <Widget>[
-        Wrap(
-          spacing: theme.space.s2, // gap-2
-          runSpacing: theme.space.s2,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: <Widget>[
-            Text(
-              name,
-              // text-label-md font-semibold text-text-primary
-              style: theme.text.labelMd.copyWith(fontWeight: HoronFontWeight.semibold, color: theme.colors.textPrimary),
-            ),
-            for (final String tag in tags ?? const <String>[])
-              _pill(
-                theme,
-                background: theme.colors.overlayInk6, // bg-overlay-ink-6
-                foreground: theme.colors.textSecondary,
-                label: tag,
+        LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) => Wrap(
+            spacing: theme.space.s2, // gap-2
+            runSpacing: theme.space.s2,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: <Widget>[
+              // `max-w-full min-w-0 truncate` — 이름이 한 줄 폭을 넘으면 말줄임합니다.
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis, // truncate
+                  // text-label-md text-text-primary
+                  style: theme.text.labelMd.copyWith(color: theme.colors.textPrimary),
+                ),
               ),
-            for (final String tag in brandTags ?? const <String>[])
-              _pill(
-                theme,
-                background: theme.colors.accentSky500_18, // bg-accent-sky-500-18
-                foreground: theme.colors.textBrand,
-                label: tag,
-              ),
-          ],
+              for (final String tag in tags ?? const <String>[])
+                _pill(
+                  theme,
+                  background: theme.colors.overlayInk6, // bg-overlay-ink-6
+                  foreground: theme.colors.textSecondary,
+                  label: tag,
+                ),
+              for (final String tag in brandTags ?? const <String>[])
+                _pill(
+                  theme,
+                  background: theme.colors.accentSky500_18, // bg-accent-sky-500-18
+                  foreground: theme.colors.textBrand,
+                  label: tag,
+                ),
+            ],
+          ),
         ),
         if (description != null)
           Text(
@@ -202,11 +210,11 @@ class HoronMcpServerRow extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
               for (int index = 0; index < meta!.length; index++) ...<Widget>[
-                if (index > 0) Text('·', style: theme.text.labelSm.copyWith(color: theme.colors.textPlaceholder)),
+                if (index > 0) Text('·', style: theme.text.labelSm.copyWith(color: theme.colors.textSecondary)),
                 Text(
                   meta![index],
-                  // text-label-sm text-text-placeholder
-                  style: theme.text.labelSm.copyWith(color: theme.colors.textPlaceholder),
+                  // text-label-sm text-text-secondary
+                  style: theme.text.labelSm.copyWith(color: theme.colors.textSecondary),
                 ),
               ],
             ],

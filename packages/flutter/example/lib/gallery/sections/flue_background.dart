@@ -59,8 +59,8 @@ class HoronFlueBackgroundGallerySection extends StatelessWidget {
           Text(
             '셰이더를 못 쓰는 엔진과 테스트에서는 단색으로 내려갑니다. 포인터를 따라 '
             '연기가 휘는 움직임과 모션 축소 시의 정지 프레임은 앱에서 확인합니다. '
-            '밤 팔레트는 다크 테마에서 자동으로 선택되고, Sidebar·Auth 변형은 자기 '
-            '색조를 얹지 않습니다.',
+            '밤 팔레트는 다크 테마에서 자동으로 선택되고, 라이트의 Sidebar는 80% 흰 유리로 '
+            '연기를 덮어 위 글자의 대비를 지키며 Auth는 색조를 얹지 않습니다.',
             style: theme.text.bodySm.copyWith(
               color: theme.colors.textSecondary,
             ),

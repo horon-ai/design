@@ -40,6 +40,14 @@ class HoronScheduleGallerySection extends StatelessWidget {
             ),
           ),
           _Sample(label: '요일', child: const _DaysPicker()),
+          Text(
+            '시간 필드를 누르면 목록이 8px 아래에 열리고, 지금 값(없으면 첫 줄)에 포커스와 '
+            '강조가 놓입니다. 그래서 Enter가 그 값을 바로 고르고, Tab은 다음 줄로 옮깁니다. '
+            '고른 줄의 체크는 0.6배에서 커지며 나타납니다(React `animate-pop-in`).',
+            style: theme.text.bodySm.copyWith(
+              color: theme.colors.textSecondary,
+            ),
+          ),
         ],
       ),
     );

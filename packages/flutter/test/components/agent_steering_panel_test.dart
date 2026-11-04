@@ -74,15 +74,15 @@ void main() {
     }
   });
 
-  testWidgets('steering: the header carries the 18px sparkle, a 6px live dot and a 30px pause button', (
+  testWidgets('steering: the header carries the 18px path, a 6px live dot and a 30px pause button', (
     WidgetTester tester,
   ) async {
     await pumpPanel(tester, const HoronAgentSteeringPanel(title: 'Draft', steps: _steps));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronAgentSteeringPanel)));
-    // `Sparkle size-4.5 text-text-primary`.
-    final Icon sparkle = tester.widget<Icon>(find.byIcon(Icons.auto_awesome));
-    expect(sparkle.size, 18);
-    expect(sparkle.color, theme.colors.textPrimary);
+    // `Path size-4.5 text-text-primary` — dev React는 Sparkle을 Path로 바꿨습니다.
+    final Icon path = tester.widget<Icon>(find.byIcon(Icons.route));
+    expect(path.size, 18);
+    expect(path.color, theme.colors.textPrimary);
     // `text-label-lg`.
     expect(_labelColor(tester, 'Draft'), theme.colors.textPrimary);
 
@@ -198,8 +198,8 @@ void main() {
     );
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronAgentSteeringPanel)));
 
-    // `Queued for the next step` + 대기 중인 쪽지 수 1.
-    expect(find.text('QUEUED FOR THE NEXT STEP'), findsOneWidget);
+    // `Queued for the next step` + 대기 중인 쪽지 수 1. dev React는 대문자 변환을 뺐습니다.
+    expect(find.text('Queued for the next step'), findsOneWidget);
     expect(find.text('1'), findsOneWidget);
     // `bg-overlay-ink-4`.
     expect(_paints(tester, theme.colors.overlayInk4), isTrue);

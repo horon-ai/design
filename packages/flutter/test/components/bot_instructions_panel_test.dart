@@ -12,6 +12,13 @@ const List<List<HoronInstructionPart>> _instructions = <List<HoronInstructionPar
   <HoronInstructionPart>[HoronInstructionPart.text('Escalate billing questions.')],
 ];
 
+/// 패널의 라이브 점은 2초마다 도는 애니메이션이라 `pumpAndSettle`이 끝나지 않습니다.
+/// 그래서 정착 대신 짧은 전환 길이만큼만 프레임을 넘깁니다.
+Future<void> settle(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 400));
+}
+
 Future<void> pumpPanel(
   WidgetTester tester,
   Widget child, {
@@ -32,7 +39,7 @@ Future<void> pumpPanel(
       ),
     ),
   );
-  await tester.pumpAndSettle();
+  await settle(tester);
 }
 
 /// 화면에 그려진 모든 [BoxDecoration]입니다. `Container`와 `DecoratedBox`를 모두 봅니다.
@@ -163,13 +170,13 @@ void main() {
     );
     expect(find.text('Where is my invoice?'), findsNothing);
     await tester.tap(find.text('Example'));
-    await tester.pumpAndSettle();
+    await settle(tester);
     expect(find.text('Where is my invoice?'), findsOneWidget);
     expect(find.text('briefly.'), findsNothing);
 
     // Example 탭에 포커스가 남아 있으므로 왼쪽 화살표가 Instructions를 고릅니다.
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
-    await tester.pumpAndSettle();
+    await settle(tester);
     expect(find.text('briefly.'), findsOneWidget);
     expect(find.text('Where is my invoice?'), findsNothing);
   });
@@ -199,7 +206,35 @@ void main() {
       expect(tester.getSize(find.byWidget(element.widget)).height, 30);
     }
     expect(find.text('v4'), findsOneWidget);
+    // dev React는 `onVersionClick`·`onBotClick`이 있을 때만 캐럿을 그립니다.
+    expect(find.byIcon(Icons.expand_more), findsNothing);
+  });
+
+  testWidgets('bot instructions panel: the header pills grow carets only when the callbacks are wired', (
+    WidgetTester tester,
+  ) async {
+    int versions = 0;
+    int bots = 0;
+    await pumpPanel(
+      tester,
+      HoronBotInstructionsPanel(
+        version: 'v4',
+        versionStatus: 'Live',
+        bot: const HoronBotSummary(initial: 'H', name: 'Horon Helper'),
+        instructions: _instructions,
+        onVersionClick: () => versions++,
+        onBotClick: () => bots++,
+      ),
+    );
     expect(find.byIcon(Icons.expand_more), findsNWidgets(2));
+
+    await tester.tap(find.text('v4'));
+    await settle(tester);
+    expect(versions, 1);
+
+    await tester.tap(find.text('Horon Helper'));
+    await settle(tester);
+    expect(bots, 1);
   });
 
   testWidgets('bot instructions panel: variable values are 40px md boxes and Run is a 30px pill', (
@@ -277,13 +312,13 @@ void main() {
     expect(find.text('⌘↵'), findsOneWidget);
 
     await tester.tap(find.text('Run'));
-    await tester.pumpAndSettle();
+    await settle(tester);
     expect(runs, <String?>['Onboarding'], reason: 'defaultScenario가 없으면 첫 시나리오입니다');
 
     await tester.tap(find.text('Pricing'));
-    await tester.pumpAndSettle();
+    await settle(tester);
     await tester.tap(find.text('Run'));
-    await tester.pumpAndSettle();
+    await settle(tester);
     expect(runs, <String?>['Onboarding', 'Pricing']);
   });
 

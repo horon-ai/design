@@ -137,37 +137,40 @@ class _HoronListDetailState extends State<HoronListDetail> {
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: _maxWidth),
-      child: HoronSurfaceLayer(
-        surface: widget.surface,
-        tier: HoronGlassTier.thick,
-        borderRadius: BorderRadius.circular(theme.radius.xl2), // rounded-2xl = 16
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            final double available = constraints.maxWidth.isFinite
-                ? math.min(constraints.maxWidth, _maxWidth)
-                : _maxWidth;
-            final bool sideBySide = available >= theme.breakpoints.md;
-            final Widget list = _buildList(theme, selected, sideBySide: sideBySide);
-            final Widget detail = _buildDetail(theme, selected);
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(theme.radius.xl2), // overflow-clip rounded-2xl
+        child: HoronSurfaceLayer(
+          surface: widget.surface,
+          tier: HoronGlassTier.thick,
+          borderRadius: BorderRadius.circular(theme.radius.xl2), // rounded-2xl = 16
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final double available = constraints.maxWidth.isFinite
+                  ? math.min(constraints.maxWidth, _maxWidth)
+                  : _maxWidth;
+              final bool sideBySide = available >= theme.breakpoints.md;
+              final Widget list = _buildList(theme, selected, sideBySide: sideBySide);
+              final Widget detail = _buildDetail(theme, selected);
 
-            if (!sideBySide) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[list, detail],
+              if (!sideBySide) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[list, detail],
+                );
+              }
+              final double listWidth = math.min(widget.listWidth, available * 0.45);
+              return IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    SizedBox(width: listWidth, child: list),
+                    Expanded(child: detail),
+                  ],
+                ),
               );
-            }
-            final double listWidth = math.min(widget.listWidth, available * 0.45);
-            return IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  SizedBox(width: listWidth, child: list),
-                  Expanded(child: detail),
-                ],
-              ),
-            );
-          },
+            },
+          ),
         ),
       ),
     );
@@ -175,7 +178,7 @@ class _HoronListDetailState extends State<HoronListDetail> {
 
   Widget _buildList(HoronThemeData theme, HoronListDetailItem? selected, {required bool sideBySide}) {
     final bool glass = widget.surface == HoronSurface.glass;
-    final Color muted = glass ? theme.colors.textSecondary : theme.colors.textPlaceholder;
+    final Color muted = theme.colors.textSecondary; // React: mutedClass는 표면과 무관하게 text-secondary
     return DecoratedBox(
       decoration: BoxDecoration(
         // glass면 bg-transparent, 아니면 bg-bg-inset
@@ -276,9 +279,11 @@ class _ListRowState extends State<_ListRow> {
     final HoronThemeData theme = HoronTheme.of(context);
     final bool reduce = MediaQuery.disableAnimationsOf(context);
     final Color background = widget.selected
-        ? theme
-              .colors
-              .interactiveSecondary // data-selected:bg-interactive-secondary
+        ? (_pressed || _hovered
+              ? theme
+                    .colors
+                    .overlayInk8 // data-selected:hover:bg-overlay-ink-8
+              : theme.colors.overlayInk6) // data-selected:bg-overlay-ink-6
         : _pressed || _hovered
         ? theme
               .colors
@@ -314,13 +319,6 @@ class _ListRowState extends State<_ListRow> {
                 Row(
                   spacing: theme.space.s2, // gap-2
                   children: <Widget>[
-                    SizedBox(
-                      width: theme.space.step(1.5), // size-1.5 = 6
-                      height: theme.space.step(1.5),
-                      child: const DecoratedBox(
-                        decoration: BoxDecoration(color: HoronPalette.sky500, shape: BoxShape.circle),
-                      ),
-                    ),
                     Expanded(
                       child: Text(
                         widget.item.title,
@@ -337,15 +335,12 @@ class _ListRowState extends State<_ListRow> {
                   ],
                 ),
                 if (widget.item.meta != null)
-                  Padding(
-                    padding: EdgeInsets.only(left: theme.space.step(3.5)), // pl-3.5 = 14
-                    child: Text(
-                      widget.item.meta!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      // text-label-sm
-                      style: theme.text.labelSm.copyWith(color: widget.muted),
-                    ),
+                  Text(
+                    widget.item.meta!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    // text-label-sm
+                    style: theme.text.labelSm.copyWith(color: widget.muted),
                   ),
               ],
             ),
@@ -458,11 +453,9 @@ class HoronListDetailMeta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final bool dark = theme.brightness == Brightness.dark;
     return DecoratedBox(
       decoration: BoxDecoration(
-        // bg-neutral-50 dark:bg-neutral-800
-        color: dark ? HoronPalette.neutral800 : HoronPalette.neutral50,
+        color: theme.colors.bgSubtle, // bg-bg-subtle
         borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md = 12
       ),
       child: Padding(
@@ -506,7 +499,7 @@ class HoronListDetailMeta extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           // text-label-sm
-          style: theme.text.labelSm.copyWith(color: theme.colors.textPlaceholder),
+          style: theme.text.labelSm.copyWith(color: theme.colors.textSecondary),
         ),
         Text(
           item.value,
@@ -619,7 +612,11 @@ class _HoronListDetailInstructionsState extends State<HoronListDetailInstruction
               ),
             ),
             SizedBox(width: theme.space.s2),
-            _SolidButton(label: _editing ? 'Done' : 'Edit', onPressed: () => setState(() => _editing = !_editing)),
+            _SolidButton(
+              label: _editing ? 'Done' : 'Edit',
+              width: theme.space.step(16), // w-16 = 64
+              onPressed: () => setState(() => _editing = !_editing),
+            ),
           ],
         ),
         HoronCodePanel(code: text),
@@ -629,30 +626,27 @@ class _HoronListDetailInstructionsState extends State<HoronListDetailInstruction
           alignment: Alignment.topCenter,
           child: !_editing
               ? const SizedBox(width: double.infinity)
-              : Padding(
-                  padding: EdgeInsets.only(top: theme.space.s1), // mt-1
-                  child: TextField(
-                    controller: _controller,
-                    minLines: 6,
-                    maxLines: null, // rows={6} + resize-y: 여섯 줄에서 시작해 내용만큼 자랍니다
-                    keyboardType: TextInputType.multiline,
-                    style: theme.text.code.copyWith(fontSize: 12, height: 21 / 12, color: theme.colors.textPrimary),
-                    onChanged: (String value) {
-                      setState(() => _inner = value);
-                      widget.onValueChange?.call(value);
-                    },
-                    decoration: InputDecoration(
-                      isDense: true,
-                      filled: true,
-                      fillColor: theme.colors.bgInset, // bg-bg-inset
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: theme.space.s4, // px-4
-                        vertical: theme.space.s3_5, // py-3.5
-                      ),
-                      border: _fieldBorder(theme, theme.colors.borderDefault),
-                      enabledBorder: _fieldBorder(theme, theme.colors.borderDefault),
-                      focusedBorder: _fieldBorder(theme, theme.colors.borderFocus, width: 2),
+              : TextField(
+                  controller: _controller,
+                  minLines: 6,
+                  maxLines: null, // rows={6} + resize-y: 여섯 줄에서 시작해 내용만큼 자랍니다
+                  keyboardType: TextInputType.multiline,
+                  style: theme.text.code.copyWith(fontSize: 12, height: 21 / 12, color: theme.colors.textPrimary),
+                  onChanged: (String value) {
+                    setState(() => _inner = value);
+                    widget.onValueChange?.call(value);
+                  },
+                  decoration: InputDecoration(
+                    isDense: true,
+                    filled: true,
+                    fillColor: theme.colors.bgInset, // bg-bg-inset
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: theme.space.s4, // px-4
+                      vertical: theme.space.s3_5, // py-3.5
                     ),
+                    border: _fieldBorder(theme, theme.colors.borderDefault),
+                    enabledBorder: _fieldBorder(theme, theme.colors.borderDefault),
+                    focusedBorder: _fieldBorder(theme, theme.colors.borderFocus, width: 2),
                   ),
                 ),
         ),
@@ -743,10 +737,13 @@ class HoronListDetailFooter extends StatelessWidget {
 /// `button`은 다른 레인의 컴포넌트라 이 파일이 그 자리를 직접 그립니다. 보이는 값은
 /// `h-8`, `px-3`, `text-label-md`, `rounded-full`, `bg-bg-surface`와 `border-default`입니다.
 class _SolidButton extends StatefulWidget {
-  const _SolidButton({required this.label, this.onPressed});
+  const _SolidButton({required this.label, this.onPressed, this.width});
 
   final String label;
   final VoidCallback? onPressed;
+
+  /// 고정 폭입니다. React `w-16`처럼 글자 폭과 무관한 자리를 줄 때 씁니다.
+  final double? width;
 
   @override
   State<_SolidButton> createState() => _SolidButtonState();
@@ -759,6 +756,7 @@ class _SolidButtonState extends State<_SolidButton> {
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
+    final bool reduce = MediaQuery.disableAnimationsOf(context);
     return Semantics(
       button: true,
       enabled: widget.onPressed != null,
@@ -778,11 +776,20 @@ class _SolidButtonState extends State<_SolidButton> {
             ),
             child: SizedBox(
               height: theme.space.step(8), // sm h-8 = 32
+              width: widget.width, // w-16 = 64
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: theme.space.s3), // px-3
+                padding: EdgeInsets.symmetric(horizontal: widget.width == null ? theme.space.s3 : 0), // px-3 / px-0
                 child: Center(
                   widthFactor: 1,
-                  child: Text(widget.label, maxLines: 1, style: theme.text.labelMd.copyWith(color: colors.textPrimary)),
+                  child: AnimatedSwitcher(
+                    duration: reduce ? Duration.zero : HoronMotion.fadeInDuration, // animate-fade-in
+                    child: Text(
+                      widget.label,
+                      key: ValueKey<String>(widget.label),
+                      maxLines: 1,
+                      style: theme.text.labelMd.copyWith(color: colors.textPrimary),
+                    ),
+                  ),
                 ),
               ),
             ),

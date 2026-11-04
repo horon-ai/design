@@ -209,6 +209,11 @@ class _HoronDateFieldState extends State<HoronDateField> {
                 height: metrics.height,
                 // React `fieldBoxClass[surface]` — glass는 veil-field이고 나머지는 불투명
                 // 상자입니다. 유리 레이어를 따로 깔지 않고 필드 상자가 표면을 그립니다.
+                //
+                // `surface !== "glass" && "hover:enabled:not-data-invalid:border-border-strong"`
+                // — 불투명 표면의 필드만 포인터가 올라오면 `borderStrong`으로 바뀝니다.
+                // 유리 표면은 `veil-field`가 hover 테두리를 그리지 않습니다. 규칙은
+                // [HoronFieldBox]가 들고 있습니다.
                 child: HoronFieldBox(
                   surface: widget.surface == HoronSurface.glass ? HoronInputSurface.glass : HoronInputSurface.solid,
                   invalid: widget.invalid,

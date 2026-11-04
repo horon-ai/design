@@ -5,8 +5,8 @@ import '../surface_group.dart';
 
 /// `usage_meter`의 갤러리 섹션입니다.
 ///
-/// 세 사용량(25%, 48%, 64%, 100%)과 캡션 유무를 solid와 glass 두 표면에 같은
-/// 목록으로 보여 줍니다.
+/// 네 사용량(25%, 48%, 64%, 100%)과 캡션 유무를 solid와 glass 두 표면에 같은
+/// 목록으로 보여 줍니다. 퍼센트는 자릿수가 같은 숫자 폭(`tabular-nums`)으로 그립니다.
 class HoronUsageMeterGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronUsageMeterGallerySection({super.key});

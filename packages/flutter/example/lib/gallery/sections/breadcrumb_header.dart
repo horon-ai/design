@@ -40,6 +40,15 @@ class HoronBreadcrumbHeaderGallerySection extends StatelessWidget {
             ),
           ),
           _Sample(
+            label: '조각만 (버튼 없음)',
+            child: HoronBreadcrumbHeader(
+              crumbs: <HoronBreadcrumbHeaderCrumb>[
+                HoronBreadcrumbHeaderCrumb(label: '워크스페이스', onTap: () {}),
+                const HoronBreadcrumbHeaderCrumb(label: '설정'),
+              ],
+            ),
+          ),
+          _Sample(
             label: '긴 조각 (폭에 따라 줄바꿈)',
             child: HoronBreadcrumbHeader(
               crumbs: <HoronBreadcrumbHeaderCrumb>[

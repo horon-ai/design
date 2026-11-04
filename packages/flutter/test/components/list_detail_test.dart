@@ -63,7 +63,7 @@ void main() {
     final AnimatedContainer selected = tester.widget<AnimatedContainer>(
       find.ancestor(of: find.text('alpha'), matching: find.byType(AnimatedContainer)).first,
     );
-    expect((selected.decoration! as BoxDecoration).color, theme.colors.interactiveSecondary);
+    expect((selected.decoration! as BoxDecoration).color, theme.colors.overlayInk6); // data-selected:bg-overlay-ink-6
 
     final AnimatedContainer unselected = tester.widget<AnimatedContainer>(
       find.ancestor(of: find.text('beta'), matching: find.byType(AnimatedContainer)).first,
@@ -115,6 +115,24 @@ void main() {
     expect(groupLabel.style!.letterSpacing, (theme.text.labelSm.fontSize ?? 12) * 0.04);
   });
 
+  testWidgets('the rows carry no status dot and mute the meta with text-secondary', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(_listDetail(), width: 900));
+    await tester.pumpAndSettle();
+    final HoronThemeData theme = _themeOf(tester, find.byType(HoronListDetail));
+
+    // React dev는 목록 행의 하늘색 점을 지웠고, meta는 표면과 무관하게 text-secondary입니다.
+    expect(
+      find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is DecoratedBox &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration as BoxDecoration).color == HoronPalette.sky500,
+      ),
+      findsNothing,
+    );
+    expect(tester.widget<Text>(find.text('owner · alpox')).style!.color, theme.colors.textSecondary);
+  });
+
   testWidgets('tapping an item reports the id and swaps the detail pane', (WidgetTester tester) async {
     String? reported;
     await tester.pumpWidget(
@@ -134,10 +152,7 @@ void main() {
     final AnimatedContainer row = tester.widget<AnimatedContainer>(
       find.ancestor(of: find.text('gamma'), matching: find.byType(AnimatedContainer)).first,
     );
-    expect(
-      (row.decoration! as BoxDecoration).color,
-      _themeOf(tester, find.byType(HoronListDetail)).colors.interactiveSecondary,
-    );
+    expect((row.decoration! as BoxDecoration).color, _themeOf(tester, find.byType(HoronListDetail)).colors.overlayInk6);
   });
 
   testWidgets('a controlled value wins over the inner selection', (WidgetTester tester) async {
@@ -207,7 +222,7 @@ void main() {
     expect(IconTheme.of(tester.element(find.byType(Icon))).color, HoronPalette.sky300);
   });
 
-  testWidgets('the meta box keeps rounded-md on the neutral surface in both brightnesses', (WidgetTester tester) async {
+  testWidgets('the meta box keeps rounded-md on the subtle surface in both brightnesses', (WidgetTester tester) async {
     const HoronListDetailMeta meta = HoronListDetailMeta(
       items: <HoronListDetailMetaItem>[
         HoronListDetailMetaItem(id: 'scope', label: 'Scope', value: 'files.read'),
@@ -217,13 +232,13 @@ void main() {
 
     await tester.pumpWidget(_host(meta, width: 480));
     HoronThemeData theme = _themeOf(tester, find.byType(HoronListDetailMeta));
-    DecoratedBox light = tester.widget<DecoratedBox>(_decoratedWith(HoronPalette.neutral50));
+    DecoratedBox light = tester.widget<DecoratedBox>(_decoratedWith(theme.colors.bgSubtle));
     expect((light.decoration as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.md));
 
     await tester.pumpWidget(_host(meta, brightness: Brightness.dark, width: 480));
     await tester.pumpAndSettle();
     theme = _themeOf(tester, find.byType(HoronListDetailMeta));
-    final DecoratedBox dark = tester.widget<DecoratedBox>(_decoratedWith(HoronPalette.neutral800));
+    final DecoratedBox dark = tester.widget<DecoratedBox>(_decoratedWith(theme.colors.bgSubtle));
     expect((dark.decoration as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.md));
     expect(tester.takeException(), isNull);
   });
@@ -284,6 +299,11 @@ void main() {
       (tester.widget<DecoratedBox>(solidSurface).decoration as BoxDecoration).border,
       Border.all(color: theme.colors.borderDefault),
     );
+    // React dev: `w-16 justify-center px-0` — 글자 폭과 무관한 64px 자리입니다.
+    final SizedBox editBox = tester.widget<SizedBox>(
+      find.ancestor(of: find.text('Edit'), matching: find.byType(SizedBox)).first,
+    );
+    expect(editBox.width, theme.space.step(16));
 
     await tester.tap(find.text('Edit'));
     await tester.pumpAndSettle();

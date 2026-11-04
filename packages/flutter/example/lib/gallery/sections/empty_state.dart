@@ -4,6 +4,7 @@ import 'package:horon_ui/horon_ui.dart';
 /// `empty_state`의 갤러리 섹션입니다.
 ///
 /// 일러스트·제목·설명·동작이 모두 있는 경우와 제목만 있는 경우를 보여 줍니다.
+/// 폭은 부모를 따르되 360을 넘지 않습니다(좁은 부모에서는 그 폭을 채웁니다).
 class HoronEmptyStateGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronEmptyStateGallerySection({super.key});

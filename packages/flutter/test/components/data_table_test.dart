@@ -367,7 +367,7 @@ void main() {
       find.descendant(of: find.byType(HoronDataTableRow).first, matching: find.byType(AnimatedContainer)).first,
     );
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronDataTableRow).first));
-    expect((row.decoration! as BoxDecoration).color, theme.colors.overlayInk3);
+    expect((row.decoration! as BoxDecoration).color, theme.colors.overlayInk4, reason: 'hover:bg-overlay-ink-4');
   });
 
   testWidgets('data_table: the whole table renders in both brightnesses', (WidgetTester tester) async {

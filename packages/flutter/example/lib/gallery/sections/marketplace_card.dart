@@ -9,7 +9,8 @@ import '../surface_group.dart';
 ///
 /// 변형 어휘가 없으므로 상태를 늘어놓습니다. 별점과 설치 수가 있는 기본형, 칩만
 /// 있는 카드, 이름만 있는 최소형을 solid와 glass 두 표면에 같은 목록으로 보여
-/// 줍니다. 폭이 좁으면 카드가 프레임 폭에 맞춰 줄어듭니다.
+/// 줍니다. 최소형은 `onInstall`이 없어 Install 버튼도 그리지 않습니다. 폭이 좁으면
+/// 카드가 프레임 폭에 맞춰 줄어듭니다.
 class HoronMarketplaceCardGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronMarketplaceCardGallerySection({super.key});
@@ -80,7 +81,7 @@ class HoronMarketplaceCardGallerySection extends StatelessWidget {
               ),
             ),
             _Cell(
-              label: '최소 — 이름만',
+              label: '최소 — 이름만 · Install 없음',
               width: card,
               child: HoronMarketplaceCard(
                 surface: surface,

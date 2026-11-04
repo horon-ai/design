@@ -9,11 +9,19 @@ Widget _host(Widget child, {Brightness brightness = Brightness.light}) => Materi
 
 HoronThemeData _theme(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronChip)));
 
-Finder _surface() => find.descendant(of: find.byType(HoronChip), matching: find.byType(AnimatedContainer));
+/// 칩 상자입니다. 체크 자리도 `AnimatedContainer`라 폭을 여닫으므로, 먼저 나오는
+/// 바깥 상자를 집습니다.
+Finder _surface() => find.descendant(of: find.byType(HoronChip), matching: find.byType(AnimatedContainer)).first;
 
 AnimatedContainer _container(WidgetTester tester) => tester.widget<AnimatedContainer>(_surface());
 
 BoxDecoration _decoration(WidgetTester tester) => _container(tester).decoration! as BoxDecoration;
+
+/// 체크 아이콘의 불투명도입니다. React는 선택 전에도 아이콘을 트리에 두고
+/// `opacity-0`으로 숨깁니다.
+double _checkOpacity(WidgetTester tester) => tester
+    .widget<AnimatedOpacity>(find.ancestor(of: find.byIcon(Icons.check), matching: find.byType(AnimatedOpacity)).first)
+    .opacity;
 
 /// 유리 위에 얹히는 내용의 패딩입니다. React의 `px-3`와 체크 자리 당김을 담습니다.
 EdgeInsetsGeometry _contentPadding(WidgetTester tester) =>
@@ -42,7 +50,13 @@ void main() {
     // React가 체크 슬롯 음수 마진을 없앴으므로 라벨은 선택 전후 모두 12px에서 시작합니다.
     expect(_contentPadding(tester), EdgeInsets.symmetric(horizontal: theme.space.s3));
     expect(tester.widget<Text>(find.text('필터')).style!.fontSize, theme.text.labelMd.fontSize, reason: 'text-label-md');
-    expect(find.byIcon(Icons.check), findsNothing, reason: '선택 전에는 체크가 숨습니다');
+    expect(find.byIcon(Icons.check), findsOneWidget, reason: '체크 아이콘은 트리에 있고');
+    expect(_checkOpacity(tester), 0, reason: 'opacity-0으로 숨습니다');
+    expect(
+      tester.getSize(find.ancestor(of: find.byIcon(Icons.check), matching: find.byType(ClipRect)).first).width,
+      0,
+      reason: '체크 자리는 w-0에서 시작합니다',
+    );
   });
 
   testWidgets('tapping selects the chip: check, brand rim, brand label', (WidgetTester tester) async {
@@ -55,6 +69,7 @@ void main() {
     final HoronThemeData theme = _theme(tester);
     expect(changes, <bool>[true]);
     expect(find.byIcon(Icons.check), findsOneWidget, reason: '선택하면 체크가 나타납니다');
+    expect(_checkOpacity(tester), 1, reason: 'group-data-pressed:opacity-100');
     expect(_decoration(tester).color, theme.colors.bgSurface, reason: 'pressed keeps the solid fill');
     expect(_decoration(tester).border!.top.color, theme.colors.borderBrand, reason: 'data-pressed:border-border-brand');
     expect(tester.widget<Text>(find.text('필터')).style!.color, theme.colors.textBrand, reason: 'text-text-brand');
@@ -64,7 +79,7 @@ void main() {
     await tester.tap(find.byType(HoronChip));
     await tester.pumpAndSettle();
     expect(changes, <bool>[true, false], reason: '다시 누르면 해제를 요청합니다');
-    expect(find.byIcon(Icons.check), findsNothing);
+    expect(_checkOpacity(tester), 0, reason: '해제하면 opacity-0으로 돌아갑니다');
   });
 
   testWidgets('a controlled chip follows the pressed argument', (WidgetTester tester) async {
@@ -75,7 +90,7 @@ void main() {
 
     await tester.pumpWidget(_host(const HoronChip(label: '필터', pressed: false)));
     await tester.pumpAndSettle();
-    expect(find.byIcon(Icons.check), findsNothing);
+    expect(_checkOpacity(tester), 0);
   });
 
   testWidgets('a disabled chip dims and does not toggle', (WidgetTester tester) async {

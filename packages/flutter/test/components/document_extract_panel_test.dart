@@ -69,6 +69,7 @@ Widget panel({
   Key? key,
   VoidCallback? onExtract,
   VoidCallback? onAcceptAll,
+  VoidCallback? onOpenFile,
   List<HoronExtractGroup> groups = _groups,
   HoronExtractBot? bot,
 }) {
@@ -80,6 +81,7 @@ Widget panel({
     bot: bot,
     onExtract: onExtract,
     onAcceptAll: onAcceptAll,
+    onOpenFile: onOpenFile,
     sheet: const Text('Sheet body'),
   );
 }
@@ -116,9 +118,43 @@ void main() {
       isNotEmpty,
       reason: 'border-border-default',
     );
-    // FilePdf는 size-4, CaretDown은 size-3.5입니다.
+    // FilePdf는 size-4입니다. CaretDown(size-3.5)은 onOpenFile이 있을 때만 붙습니다.
     expect(tester.widget<Icon>(find.byIcon(Icons.picture_as_pdf)).size, 16);
-    expect(tester.widgetList<Icon>(find.byIcon(Icons.expand_more)).first.size, 14);
+    expect(find.byIcon(Icons.expand_more), findsNothing, reason: 'onOpenFile이 없으면 이름은 라벨입니다');
+  });
+
+  testWidgets('document extract panel: onOpenFile makes the file name a caret button', (WidgetTester tester) async {
+    int opens = 0;
+    await pumpPanel(tester, panel(onOpenFile: () => opens++));
+
+    expect(tester.widget<Icon>(find.byIcon(Icons.expand_more)).size, 14); // CaretDown size-3.5
+    await tester.tap(find.text('invoice.pdf'));
+    await tester.pumpAndSettle();
+    expect(opens, 1);
+  });
+
+  testWidgets('document extract panel: the paper sheet is neutral-50 with an 8% ink ring', (WidgetTester tester) async {
+    await pumpPanel(tester, panel());
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronDocumentExtractPanel)));
+    final List<BoxDecoration> painted = decorations(tester);
+
+    expect(
+      painted.where((BoxDecoration d) => d.color == HoronPalette.neutral50),
+      isNotEmpty,
+      reason: 'bg-neutral-50 시트',
+    );
+    expect(
+      painted.where((BoxDecoration d) => d.border?.top.color == theme.colors.overlayInk8),
+      isNotEmpty,
+      reason: 'ring-1 ring-overlay-ink-8',
+    );
+    final Text sheet = tester.widget<Text>(find.text('Sheet body'));
+    expect(sheet.style, isNull, reason: '시트 글자색은 DefaultTextStyle이 정합니다');
+    expect(
+      DefaultTextStyle.of(tester.element(find.text('Sheet body'))).style.color,
+      HoronPalette.neutral900,
+      reason: 'text-neutral-900',
+    );
   });
 
   testWidgets('document extract panel: both brightnesses render at phone width', (WidgetTester tester) async {
@@ -228,7 +264,7 @@ void main() {
     await tester.tap(find.text('Extract'));
     await tester.pumpAndSettle();
     expect(extracts, 1);
-    expect(find.text('4 fields filled from this document'), findsOneWidget);
+    expect(find.text('4 fields read from this document'), findsOneWidget);
 
     await tester.tap(find.text('JSON'));
     await tester.pumpAndSettle();
@@ -288,6 +324,27 @@ void main() {
       find.ancestor(of: find.text('Vendor'), matching: find.byType(SizedBox)).first,
     );
     expect(label.width, 100, reason: '스키마 라벨 w-25');
+
+    await tester.tap(find.text('Fields'));
+    await tester.pumpAndSettle();
+    // React dev: 툴바는 `p-[3px]`이고, 값 상자는 `max-w-75`를 버리고 `flex-1`로 남는 폭을 다 씁니다.
+    final Container track = tester.widget<Container>(
+      find
+          .byWidgetPredicate(
+            (Widget widget) =>
+                widget is Container &&
+                widget.decoration is BoxDecoration &&
+                (widget.decoration as BoxDecoration).color == theme.colors.overlayInk5 &&
+                (widget.decoration as BoxDecoration).borderRadius == BorderRadius.circular(theme.radius.full),
+          )
+          .first,
+    );
+    expect(track.padding, const EdgeInsets.all(3), reason: 'p-[3px]');
+
+    final Size fieldBox = tester.getSize(
+      find.ancestor(of: find.text('Northwind'), matching: find.byType(AnimatedContainer)).first,
+    );
+    expect(fieldBox.width, greaterThan(300), reason: '필드 상자는 flex-1입니다');
   });
 
   testWidgets('document extract panel: one column below 1024 and two columns above', (WidgetTester tester) async {

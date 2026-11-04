@@ -110,6 +110,7 @@ class HoronDocumentExtractPanelGallerySection extends StatelessWidget {
                   ),
                   onExtract: () {},
                   onAcceptAll: () {},
+                  onOpenFile: () {},
                   sheet: _sheet(theme),
                 ),
               ],
@@ -202,12 +203,15 @@ class HoronDocumentExtractPanelGallerySection extends StatelessWidget {
   }
 
   /// 뷰어에 들어가는 종이 시트입니다.
+  ///
+  /// React의 시트는 밝기와 무관하게 `bg-neutral-50 text-neutral-900`인 종이입니다.
+  /// 그래서 글자색도 테마의 의미 색이 아니라 중립 팔레트에서 고릅니다.
   Widget _sheet(HoronThemeData theme) {
     final TextStyle body = theme.text.bodySm.copyWith(
-      color: theme.colors.textPrimary,
+      color: HoronPalette.neutral900,
     );
     final TextStyle label = theme.text.caption.copyWith(
-      color: theme.colors.textSecondary,
+      color: HoronPalette.neutral600,
     );
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -216,7 +220,7 @@ class HoronDocumentExtractPanelGallerySection extends StatelessWidget {
       children: <Widget>[
         Text(
           'NORTHWIND SUPPLY',
-          style: theme.text.titleSm.copyWith(color: theme.colors.textPrimary),
+          style: theme.text.titleSm.copyWith(color: HoronPalette.neutral900),
         ),
         Text('Invoice INV-2043-118 · 14 Sep 2026', style: label),
         SizedBox(height: theme.space.s1),

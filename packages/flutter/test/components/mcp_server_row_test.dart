@@ -29,11 +29,23 @@ HoronThemeData _themeOf(WidgetTester tester) => HoronTheme.of(tester.element(fin
 Finder _sizedBox(double size) =>
     find.byWidgetPredicate((Widget widget) => widget is SizedBox && widget.width == size && widget.height == size);
 
-Finder _decoratedWith(Color color) => find.byWidgetPredicate(
+/// 색만으로 찾으면 라이트에서 `status-live`(#7199B6)가 `sky-500`과 같은 값이라 상태 점까지
+/// 함께 걸립니다. 타일은 10px 둥근 사각형, 점은 원이라는 모양으로 갈라 찾습니다.
+Finder _decoratedWith(Color color, {BoxShape shape = BoxShape.rectangle}) => find.byWidgetPredicate(
   (Widget widget) =>
       widget is DecoratedBox &&
       widget.decoration is BoxDecoration &&
-      (widget.decoration as BoxDecoration).color == color,
+      (widget.decoration as BoxDecoration).color == color &&
+      (widget.decoration as BoxDecoration).shape == shape,
+);
+
+/// 6px 상태 점입니다. 타일과 달리 원이고 크기가 작습니다.
+Finder _statusDot(Color color) => find.byWidgetPredicate(
+  (Widget widget) =>
+      widget is DecoratedBox &&
+      widget.decoration is BoxDecoration &&
+      (widget.decoration as BoxDecoration).color == color &&
+      (widget.decoration as BoxDecoration).shape == BoxShape.circle,
 );
 
 Container _pillOf(WidgetTester tester, String label) =>
@@ -98,7 +110,7 @@ void main() {
     final Text value = tester.widget<Text>(find.text('2 tools'));
     expect(value.style?.fontSize, theme.text.labelSm.fontSize, reason: 'text-label-sm');
     expect(value.style?.height, theme.text.labelSm.height);
-    expect(value.style?.color, theme.colors.textPlaceholder);
+    expect(value.style?.color, theme.colors.textSecondary, reason: 'meta는 보조 색입니다');
   });
 
   testWidgets('the status pill and the two actions keep their sizes', (WidgetTester tester) async {
@@ -110,17 +122,7 @@ void main() {
     expect((status.decoration! as BoxDecoration).color, theme.colors.overlayInk6, reason: 'connected는 잉크 바탕');
     expect(tester.widget<Text>(find.text('Connected')).style?.color, theme.colors.textPrimary);
     expect(
-      tester.getSize(
-        find.descendant(
-          of: find.byType(HoronMcpServerRow),
-          matching: find.byWidgetPredicate(
-            (Widget widget) =>
-                widget is DecoratedBox &&
-                widget.decoration is BoxDecoration &&
-                (widget.decoration as BoxDecoration).color == theme.colors.statusLive,
-          ),
-        ),
-      ),
+      tester.getSize(_statusDot(theme.colors.statusLive)),
       Size(theme.space.step(1.5), theme.space.step(1.5)),
       reason: 'size-1.5 라이브 점',
     );
@@ -156,16 +158,7 @@ void main() {
     expect((warning.decoration! as BoxDecoration).color, theme.colors.accentRed500_14);
     expect(tester.widget<Text>(find.text('Needs attention')).style?.color, theme.colors.textDanger);
 
-    Finder dotOf(Color color) => find.descendant(
-      of: find.byType(HoronMcpServerRow),
-      matching: find.byWidgetPredicate(
-        (Widget widget) =>
-            widget is DecoratedBox &&
-            widget.decoration is BoxDecoration &&
-            (widget.decoration as BoxDecoration).color == color,
-      ),
-    );
-    expect(dotOf(theme.colors.textDanger), findsOneWidget, reason: 'warning 점은 위험 색');
+    expect(_statusDot(theme.colors.textDanger), findsOneWidget, reason: 'warning 점은 위험 색');
 
     await tester.pumpWidget(
       _host(
@@ -176,7 +169,7 @@ void main() {
     final Container neutral = _pillOf(tester, 'Paused');
     expect((neutral.decoration! as BoxDecoration).color, theme.colors.overlayInk6);
     expect(tester.widget<Text>(find.text('Paused')).style?.color, theme.colors.textSecondary);
-    expect(dotOf(theme.colors.textPlaceholder), findsOneWidget, reason: 'neutral 점은 흐린 색');
+    expect(_statusDot(theme.colors.textPlaceholder), findsOneWidget, reason: 'neutral 점은 흐린 색');
   });
 
   testWidgets('the actions call back', (WidgetTester tester) async {

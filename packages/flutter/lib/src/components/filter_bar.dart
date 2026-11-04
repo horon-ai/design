@@ -193,13 +193,23 @@ class _FilterOptionState extends State<_FilterOption> {
     final bool interactive = !widget.item.disabled;
     final Color foreground = widget.selected || _hovered ? colors.textPrimary : colors.textSecondary;
 
+    // `hover:bg-overlay-ink-5` — 비활성 탭도 hover에서 옅은 잉크를 깝니다.
+    final Duration colorsDuration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : HoronMotion.colorsDuration;
     final Widget surface = AnimatedDefaultTextStyle(
-      duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,
+      duration: colorsDuration,
       curve: HoronMotion.colorsCurve,
       style: theme.text.labelMd.copyWith(color: foreground),
-      child: Container(
+      child: AnimatedContainer(
+        duration: colorsDuration,
+        curve: HoronMotion.colorsCurve,
         height: space.step(7.5), // h-7.5 = 30
         padding: EdgeInsets.symmetric(horizontal: space.s4), // px-4
+        decoration: BoxDecoration(
+          color: !widget.selected && _hovered ? colors.overlayInk5 : Colors.transparent,
+          borderRadius: BorderRadius.circular(theme.radius.full),
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: space.s1_5, // gap-1.5

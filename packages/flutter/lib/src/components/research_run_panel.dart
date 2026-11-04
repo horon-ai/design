@@ -292,7 +292,11 @@ class _HoronResearchRunPanelState extends State<HoronResearchRunPanel> with Sing
               );
             },
           ),
-          if (widget.running) _statusLine(theme, count),
+          // `motion-reveal` — 실행 중이 아니면 상태 줄이 높이 0으로 접힙니다.
+          HoronReveal(
+            collapsed: !widget.running,
+            child: widget.running ? _statusLine(theme, count) : const SizedBox(width: double.infinity),
+          ),
           if (widget.queries.isNotEmpty) _queries(theme),
           if (widget.sources.isNotEmpty) _sources(theme),
         ],
@@ -565,9 +569,12 @@ class _HoronResearchRunPanelState extends State<HoronResearchRunPanel> with Sing
                 width: space.step(8), // size-8 = 32
                 height: space.step(8),
                 decoration: BoxDecoration(color: colors.interactivePrimary, shape: BoxShape.circle),
-                child: widget.running
-                    ? Icon(Icons.stop, size: _smallIconSize, color: colors.textInverse) // size-3.5
-                    : Icon(Icons.arrow_upward, size: _iconSize, color: colors.textInverse), // size-4
+                // `motion-swap` — 정지와 보내기가 같은 원 안에서 교차합니다.
+                child: HoronSwap(
+                  hidden: widget.running,
+                  hiddenChild: Icon(Icons.stop, size: _smallIconSize, color: colors.textInverse), // size-3.5
+                  child: Icon(Icons.arrow_upward, size: _iconSize, color: colors.textInverse), // size-4
+                ),
               ),
             ),
           ],

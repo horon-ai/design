@@ -28,7 +28,7 @@ class HoronMarketplaceCardChip {
   /// 12/16 보조 색 글자입니다.
   final String label;
 
-  /// 앞에 붙는 11px 아이콘입니다.
+  /// 앞에 붙는 12px 아이콘입니다.
   final Widget? icon;
 }
 
@@ -185,7 +185,7 @@ class HoronMarketplaceCard extends StatelessWidget {
           if (chip.icon != null)
             IconTheme.merge(
               data: IconThemeData(
-                size: theme.space.step(2.75), // [&_svg]:size-2.75 = 11
+                size: theme.space.step(3), // [&_svg]:size-3 = 12
                 color: theme.colors.textSecondary,
               ),
               child: chip.icon!,
@@ -220,22 +220,26 @@ class HoronMarketplaceCard extends StatelessWidget {
                     ),
                     Text(score!, maxLines: 1, style: theme.text.labelSm.copyWith(color: theme.colors.textPrimary)),
                   ],
+                  // React는 `·`를 별도 장식 노드로 두고 설치 수는 보조 색으로 씁니다.
+                  if (score != null && installs != null)
+                    Text('·', maxLines: 1, style: theme.text.caption.copyWith(color: theme.colors.textPlaceholder)),
                   if (installs != null)
                     Text(
-                      '· $installs',
+                      installs!,
                       maxLines: 1,
-                      // text-caption text-text-placeholder
-                      style: theme.text.caption.copyWith(color: theme.colors.textPlaceholder),
+                      // text-caption text-text-secondary
+                      style: theme.text.caption.copyWith(color: theme.colors.textSecondary),
                     ),
                 ],
               ),
             ),
-            HoronButton(
-              label: installLabel,
-              variant: HoronButtonVariant.solid, // variant="solid"
-              size: HoronButtonSize.sm, // size="sm"
-              onPressed: onInstall,
-            ),
+            if (onInstall != null)
+              HoronButton(
+                label: installLabel,
+                variant: HoronButtonVariant.solid, // variant="solid"
+                size: HoronButtonSize.sm, // size="sm"
+                onPressed: onInstall,
+              ),
           ],
         ),
       ),

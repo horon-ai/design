@@ -61,8 +61,9 @@ class HoronFieldGallerySection extends StatelessWidget {
       notes:
           'Figma `Field examples`(58:163)입니다. 라벨·컨트롤·도움말을 세로로 쌓고 사이를 '
           '8px 띄웁니다. 라벨은 `label-md`/`text-primary`(비활성이면 `text-disabled`), '
-          '도움말은 `caption`/`text-secondary`, 오류는 `caption`/`text-danger`이고 160ms로 '
-          '4px 아래에서 들어옵니다.',
+          '도움말은 `caption`/`text-secondary`이고 필드 폭을 다 씁니다(`w-full`). 오류는 '
+          '`caption`/`text-danger`로, `motion-reveal`처럼 자리를 0에서 200ms 동안 열면서 '
+          '150ms 불투명도로 나타나 아래 필드가 튀지 않고 함께 밀립니다.',
     );
   }
 }

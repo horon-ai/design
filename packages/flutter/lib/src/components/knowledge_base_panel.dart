@@ -280,14 +280,26 @@ class _HoronKnowledgeBasePanelState extends State<HoronKnowledgeBasePanel> {
           ),
         ),
         const Spacer(),
-        if (widget.indexing > 0)
-          Row(
+        // React `motion-reveal-x` + `data-collapsed={indexing <= 0}`: 자리를 접고 펴기만 하고
+        // 내용은 트리에 남깁니다. 스피너는 숨은 동안에도 도는 애니메이션이라 0일 때는 올리지
+        // 않습니다(보이지 않는 자리라 화면에는 차이가 없습니다).
+        HoronReveal(
+          axis: Axis.horizontal,
+          collapsed: widget.indexing <= 0,
+          child: Row(
             spacing: space.s2, // gap-2
             children: <Widget>[
-              const HoronSpinner(pixelSize: 12),
-              Text('${widget.indexing} indexing', style: theme.text.caption.copyWith(color: colors.textSecondary)),
+              if (widget.indexing > 0) const HoronSpinner(pixelSize: 12),
+              Text(
+                '${widget.indexing} indexing',
+                style: theme.text.caption.copyWith(
+                  color: colors.textSecondary,
+                  fontFeatures: const <FontFeature>[FontFeature.tabularFigures()], // tabular-nums
+                ),
+              ),
             ],
           ),
+        ),
       ],
     );
   }

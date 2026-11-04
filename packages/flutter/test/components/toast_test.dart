@@ -139,6 +139,58 @@ void main() {
     expect(controller.toasts, isEmpty);
   });
 
+  testWidgets('the viewport stacks cards 12px apart with no gap of its own', (WidgetTester tester) async {
+    final HoronToastController controller = HoronToastController();
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: HoronToaster(controller: controller, child: const SizedBox.expand()),
+        ),
+      ),
+    );
+    controller.show(title: '첫 번째', duration: Duration.zero);
+    controller.show(title: '두 번째', duration: Duration.zero);
+    await tester.pumpAndSettle();
+
+    // React 뷰포트는 `gap-0`이고 카드마다 `mt-3`(12)을 들고 있습니다.
+    final Rect first = tester.getRect(find.byType(HoronToast).at(0));
+    final Rect second = tester.getRect(find.byType(HoronToast).at(1));
+    expect(second.top - first.bottom, HoronThemeData.light.space.s3);
+    expect(tester.getRect(find.byType(HoronToast).at(0)).right, second.right, reason: '오른쪽에 붙습니다');
+  });
+
+  testWidgets('a dismissed card collapses before it leaves the list', (WidgetTester tester) async {
+    final HoronToastController controller = HoronToastController();
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: HoronToaster(controller: controller, child: const SizedBox.expand()),
+        ),
+      ),
+    );
+    controller.show(title: '첫 번째', duration: Duration.zero);
+    await tester.pumpAndSettle();
+    final double before = tester.getRect(find.text('첫 번째')).top;
+
+    controller.dismiss(0);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 90));
+
+    // `data-ending-style:h-0`·`mt-0` — 카드가 접히는 동안 목록에는 아직 남습니다.
+    expect(controller.toasts, hasLength(1), reason: '퇴장 전환이 끝난 뒤에 지웁니다');
+    expect(tester.getRect(find.text('첫 번째')).top, greaterThan(before), reason: '위 여백이 0으로 줄어듭니다');
+
+    await tester.pumpAndSettle();
+    expect(find.byType(HoronToast), findsNothing);
+    expect(controller.toasts, isEmpty);
+  });
+
   testWidgets('the scope hands the controller to descendants and refuses to invent one', (WidgetTester tester) async {
     final HoronToastController controller = HoronToastController();
     addTearDown(controller.dispose);

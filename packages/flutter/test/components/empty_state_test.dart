@@ -20,30 +20,32 @@ void main() {
   });
 
   testWidgets('empty state: it fills a narrower parent and never exceeds 360', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: horonTheme(Brightness.light),
-        home: const Scaffold(
-          body: Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(width: 300, child: HoronEmptyState(title: '아직 없습니다')),
+    // 폭 상자는 부모의 제약을 풀어 놓은 자리에서 정해집니다(`w-full max-w-90`).
+    // tight 폭을 그대로 넘기면 위젯의 렌더 상자가 부모 폭이 되므로 중간에 Align을 둡니다.
+    Future<void> pumpIn(double width) {
+      return tester.pumpWidget(
+        MaterialApp(
+          theme: horonTheme(Brightness.light),
+          home: Scaffold(
+            body: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: width,
+                child: const Align(
+                  alignment: Alignment.topLeft,
+                  child: HoronEmptyState(title: '아직 없습니다'),
+                ),
+              ),
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
+
+    await pumpIn(300);
     expect(tester.getSize(find.byType(HoronEmptyState)).width, 300, reason: 'w-full: 좁은 부모를 채웁니다');
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: horonTheme(Brightness.light),
-        home: const Scaffold(
-          body: Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(width: 640, child: HoronEmptyState(title: '아직 없습니다')),
-          ),
-        ),
-      ),
-    );
+    await pumpIn(640);
     expect(tester.getSize(find.byType(HoronEmptyState)).width, 360, reason: 'max-w-90 = 360');
   });
 

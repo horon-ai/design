@@ -9,7 +9,8 @@ import '../surface_group.dart';
 /// Tabs 갤러리 섹션입니다.
 ///
 /// 아이콘·개수가 붙은 탭과 글자만 있는 탭을 solid와 glass 두 표면에 같은 목록으로
-/// 놓습니다. 탭을 누르면 선택 표시자가 옮겨 가고 아래 패널이 바뀝니다.
+/// 놓습니다. 탭을 누르면 선택 표시자가 옮겨 가고 아래 패널이 바뀌며, 새 패널은
+/// 4px 아래에서 제자리로 올라옵니다(React `animate-swap-move`).
 /// 마지막 줄은 `variant="underline"` 문서형 탭입니다. 쟁반 없이 폭을 채우고 아래
 /// 1px 테두리 위를 2px 밑줄이 따라갑니다. 크기 단계(sm·md·lg)도 함께 보여 줍니다.
 class HoronTabsGallerySection extends StatelessWidget {

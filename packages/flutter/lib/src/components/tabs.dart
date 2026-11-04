@@ -85,12 +85,6 @@ double _listPaddingOf(HoronTabsSize size, HoronThemeData theme) =>
 /// `border-b` — 아래 테두리 1px입니다.
 const double _hairline = 1;
 
-/// `animate-[tab-panel-in_200ms_var(--ease-out-quint)]` — 패널 진입 200ms입니다.
-///
-/// `motion-rise` 유틸리티도 같은 키프레임을 쓰지만 220ms이고, 이 컴포넌트는 클래스에
-/// 적힌 200ms를 씁니다.
-const Duration _panelInDuration = Duration(milliseconds: 200);
-
 /// Figma `Tabs example`(62:353)의 탭 묶음입니다.
 ///
 /// 자식은 [HoronTabsList]와 [HoronTabsPanel]입니다. React의 `Tabs`가 `flex flex-col
@@ -527,8 +521,8 @@ class _CountPill extends StatelessWidget {
 
 /// `tabs.tsx`의 `TabsPanel`입니다.
 ///
-/// 선택된 탭의 내용만 그립니다. 나타날 때 `tab-panel-in`(220ms, opacity 0→1,
-/// translate 4px→0)을 한 번 재생합니다.
+/// 선택된 탭의 내용만 그립니다. 나타날 때 React `animate-swap-move`(200ms,
+/// translate 4px→0, 불투명도 없음)를 한 번 재생합니다.
 class HoronTabsPanel extends StatelessWidget {
   /// 패널 하나를 만듭니다.
   const HoronTabsPanel({super.key, required this.value, required this.child});
@@ -543,22 +537,22 @@ class HoronTabsPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool selected = _TabsScope.maybeOf(context)?.selected == value;
     if (!selected) return const SizedBox.shrink();
-    return _PanelIn(child: child);
+    return _PanelSwap(child: child);
   }
 }
 
-/// `animate-[tab-panel-in_200ms_var(--ease-out-quint)]`입니다.
-class _PanelIn extends StatefulWidget {
-  const _PanelIn({required this.child});
+/// `animate-swap-move` — 4px 아래에서 제자리로 올라오는 패널 진입입니다.
+class _PanelSwap extends StatefulWidget {
+  const _PanelSwap({required this.child});
 
   final Widget child;
 
   @override
-  State<_PanelIn> createState() => _PanelInState();
+  State<_PanelSwap> createState() => _PanelSwapState();
 }
 
-class _PanelInState extends State<_PanelIn> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(vsync: this, duration: _panelInDuration);
+class _PanelSwapState extends State<_PanelSwap> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(vsync: this, duration: HoronMotion.swapMoveDuration);
 
   @override
   void initState() {
@@ -575,13 +569,11 @@ class _PanelInState extends State<_PanelIn> with SingleTickerProviderStateMixin 
   @override
   Widget build(BuildContext context) {
     if (MediaQuery.disableAnimationsOf(context)) return widget.child;
-    final Animation<double> curve = CurvedAnimation(parent: _controller, curve: HoronMotion.riseCurve);
+    final Animation<double> curve = CurvedAnimation(parent: _controller, curve: HoronMotion.swapMoveCurve);
     return AnimatedBuilder(
       animation: curve,
-      builder: (BuildContext context, Widget? child) => Opacity(
-        opacity: curve.value,
-        child: Transform.translate(offset: Offset(0, HoronMotion.riseOffset * (1 - curve.value)), child: child),
-      ),
+      builder: (BuildContext context, Widget? child) =>
+          Transform.translate(offset: Offset(0, HoronMotion.swapMoveOffset * (1 - curve.value)), child: child),
       child: widget.child,
     );
   }

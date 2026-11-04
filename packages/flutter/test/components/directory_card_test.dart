@@ -75,6 +75,19 @@ void main() {
     expect(calls, 1);
   });
 
+  testWidgets('directory card: no add button without onAdd', (WidgetTester tester) async {
+    await pumpCard(tester, const HoronDirectoryCard(icon: Icon(Icons.folder_outlined), name: 'Docs'));
+    expect(find.byType(HoronIconButton), findsNothing, reason: 'React는 onAdd가 있을 때만 버튼을 그립니다');
+  });
+
+  testWidgets('directory card: the right padding is 12', (WidgetTester tester) async {
+    await pumpCard(tester, const HoronDirectoryCard(icon: Icon(Icons.folder_outlined), name: 'Docs'));
+    final Padding padding = tester.widget<Padding>(
+      find.descendant(of: find.byType(HoronDirectoryCard), matching: find.byType(Padding)).first,
+    );
+    expect(padding.padding, const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 12), reason: 'pr-3');
+  });
+
   testWidgets('directory card: both brightnesses render', (WidgetTester tester) async {
     for (final Brightness brightness in Brightness.values) {
       await pumpCard(

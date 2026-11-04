@@ -12,12 +12,14 @@
 // Flutter에서는 배치와 크기를 `Positioned.fill`이나 `SizedBox`가 정하므로
 // `className`·`style`에 대응하는 인자가 없습니다. `variant`는 [HoronFlueVariant]이고,
 // `config`는 [HoronFlueConfig], `tintClassName`은 [HoronFlueBackground.tint]입니다.
-// 색조를 넘기지 않으면 `defaultValue` 변형에서 테마의 `glassRegular`(React의
-// `bg-glass-regular dark:bg-transparent`)를 쓰고, `sidebar`·`auth`에서는 색조를 얹지
-// 않습니다. `config`는 변형 튜닝을 덮어씁니다.
+// 색조를 넘기지 않으면 변형이 정합니다: `defaultValue`는 라이트에서 테마의
+// `glassRegular`(React의 `bg-glass-regular dark:bg-transparent`), `sidebar`는 라이트에서
+// `glassThick`(React의 `bg-glass-thick dark:bg-transparent`, 80% 흰 유리로 보조 글자
+// 대비를 지킴), `auth`는 없음입니다. `config`는 변형 튜닝을 덮어씁니다.
 //
 // 셰이더를 못 쓰면 [HoronFlueConfig.bgColor] 단색으로 남고, 모션 축소
-// (`MediaQuery.disableAnimations`)면 12초 시점의 한 프레임만 그립니다.
+// (`MediaQuery.disableAnimations`)면 12초 시점의 한 프레임만 그립니다. 열려 있는 동안
+// 설정이 켜지면 지금 프레임에서 멈추고, 꺼지면 같은 시계에서 이어 갑니다.
 
 library;
 
@@ -32,8 +34,8 @@ enum HoronFlueVariant {
   /// `default` — 사이드바와 인증 화면이 아닌 기본 배경입니다. `glass-regular` 색조를 씁니다.
   defaultValue,
 
-  /// `sidebar` — 사이드바 유리 아래의 좁고 긴 기둥입니다. 연기가 더 느리고 크게 흐르며
-  /// 자기 색조를 얹지 않습니다.
+  /// `sidebar` — 사이드바 유리 아래의 좁고 긴 기둥입니다. 연기가 더 느리고 크게 흐르며,
+  /// 라이트에서는 80% 흰 유리(`glass-thick`)를 직접 얹어 그 위 보조 글자의 대비를 지킵니다.
   sidebar,
 
   /// `auth` — 로그인 화면 가운데 카드 뒤의 넓은 연기입니다. 아래에서 올라오고 색조가 없습니다.

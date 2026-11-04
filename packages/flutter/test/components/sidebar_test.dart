@@ -172,6 +172,72 @@ void main() {
     expect(changes, <bool>[false, true]);
   });
 
+  testWidgets('hovering a group label lifts the label and the caret to text-primary', (WidgetTester tester) async {
+    _useSurface(tester);
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: Offset.zero);
+    addTearDown(pointer.removePointer);
+
+    await tester.pumpWidget(
+      _host(
+        HoronSidebar(
+          children: <Widget>[
+            HoronSidebarGroup(
+              label: 'Workspace',
+              children: <Widget>[HoronSidebarItem(label: 'Inbox', onPressed: () {})],
+            ),
+          ],
+        ),
+      ),
+    );
+    final HoronColors colors = _colors(tester);
+
+    Color labelColor() => DefaultTextStyle.of(tester.element(find.text('Workspace'))).style.color!;
+    Color caretColor() => tester.widget<Icon>(find.byIcon(Icons.expand_more)).color!;
+
+    expect(labelColor(), colors.textSecondary);
+    expect(caretColor(), colors.textSecondary);
+
+    await pointer.moveTo(tester.getCenter(find.text('Workspace')));
+    await tester.pumpAndSettle();
+    expect(labelColor(), colors.textPrimary, reason: 'hover:text-text-primary');
+    expect(caretColor(), colors.textPrimary, reason: '캐럿도 함께 올라갑니다');
+  });
+
+  testWidgets('the header collapse button keeps the 28px box inside a 44px hit area', (WidgetTester tester) async {
+    _useSurface(tester);
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: Offset.zero);
+    addTearDown(pointer.removePointer);
+
+    int collapses = 0;
+    await tester.pumpWidget(
+      _host(
+        HoronSidebar(
+          children: <Widget>[HoronSidebarHeader(initial: 'H', name: 'Horon', onCollapse: () => collapses += 1)],
+        ),
+      ),
+    );
+    final HoronColors colors = _colors(tester);
+    final HoronThemeData theme = _theme(tester);
+
+    final Finder box = find
+        .ancestor(of: find.byIcon(Icons.chevron_left), matching: find.byType(AnimatedContainer))
+        .first;
+    expect(tester.getSize(box), Size.square(theme.space.step(7)), reason: 'size-7 = 28');
+    final Finder hit = find.ancestor(of: box, matching: find.byType(GestureDetector)).first;
+    expect(tester.getSize(hit).width, 44, reason: 'after:min-w-11');
+
+    // 라이트 유리가 아닌 glass 표면에서도 hover는 6% 잉크입니다.
+    await pointer.moveTo(tester.getCenter(box));
+    await tester.pumpAndSettle();
+    expect((tester.widget<AnimatedContainer>(box).decoration! as BoxDecoration).color, colors.overlayInk6);
+
+    await tester.tap(box);
+    await tester.pumpAndSettle();
+    expect(collapses, 1);
+  });
+
   testWidgets('a project row swaps its chevron for the actions on hover and while its menu is open', (
     WidgetTester tester,
   ) async {
@@ -196,11 +262,11 @@ void main() {
     );
 
     final HoronColors colors = _colors(tester);
-    Visibility chevron() => tester.widget<Visibility>(
-      find.descendant(of: find.byType(HoronSidebarProject), matching: find.byType(Visibility)).first,
+    AnimatedOpacity caret() => tester.widget<AnimatedOpacity>(
+      find.descendant(of: find.byType(HoronSidebarProject), matching: find.byType(AnimatedOpacity)).first,
     );
     AnimatedOpacity actions() => tester.widget<AnimatedOpacity>(
-      find.descendant(of: find.byType(HoronSidebarProject), matching: find.byType(AnimatedOpacity)),
+      find.descendant(of: find.byType(HoronSidebarProject), matching: find.byType(AnimatedOpacity)).last,
     );
 
     BoxDecoration rowDecoration() =>
@@ -212,13 +278,13 @@ void main() {
             as BoxDecoration;
 
     // 평상시: 캐럿이 보이고 액션은 투명합니다.
-    expect(chevron().visible, isTrue);
+    expect(caret().opacity, 1);
     expect(actions().opacity, 0);
     expect(rowDecoration().color, Colors.transparent, reason: '평상시 바탕이 없습니다');
 
     await pointer.moveTo(tester.getCenter(find.byType(HoronSidebarProject)));
     await tester.pumpAndSettle();
-    expect(chevron().visible, isFalse, reason: 'group-hover/project:invisible');
+    expect(caret().opacity, 0, reason: 'group-hover/project:opacity-0');
     expect(actions().opacity, 1, reason: 'group-hover/project:opacity-100');
     expect(rowDecoration().color, colors.overlayInk4, reason: 'hover:bg-overlay-ink-4');
 
@@ -239,9 +305,51 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(chevron().visible, isFalse);
+    expect(caret().opacity, 0);
     expect(actions().opacity, 1);
     expect(rowDecoration().color, colors.overlayInk6, reason: 'has-data-popup-open:bg-overlay-ink-6');
+  });
+
+  testWidgets('the project more button is a 16px box inside a 44px hit area with a hover fill', (
+    WidgetTester tester,
+  ) async {
+    _useSurface(tester);
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: Offset.zero);
+    addTearDown(pointer.removePointer);
+
+    await tester.pumpWidget(
+      _host(
+        HoronSidebar(
+          children: <Widget>[
+            HoronSidebarProject(
+              icon: const HoronSidebarProjectTile(child: Icon(Icons.folder)),
+              label: 'Paper',
+              menuOpen: true,
+              actions: HoronSidebarProjectMore(onPressed: () {}),
+              children: <Widget>[HoronSidebarItem(label: 'Design sync')],
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final HoronThemeData theme = _theme(tester);
+
+    final Finder box = find.ancestor(of: find.byIcon(Icons.more_horiz), matching: find.byType(AnimatedContainer)).first;
+    expect(tester.getSize(box), Size.square(theme.space.step(4)), reason: 'size-4 = 16');
+    final Finder hit = find.ancestor(of: box, matching: find.byType(GestureDetector)).first;
+    expect(tester.getSize(hit).width, 44, reason: 'after:min-w-11');
+
+    // 메뉴가 열려 있어도 hover는 6% 잉크를 더합니다.
+    expect((tester.widget<AnimatedContainer>(box).decoration! as BoxDecoration).color, Colors.transparent);
+    await pointer.moveTo(tester.getCenter(box));
+    await tester.pumpAndSettle();
+    expect(
+      (tester.widget<AnimatedContainer>(box).decoration! as BoxDecoration).color,
+      _colors(tester).overlayInk6,
+      reason: 'hover:bg-overlay-ink-6',
+    );
   });
 
   testWidgets('the drag handle resizes within its bounds', (WidgetTester tester) async {
@@ -261,20 +369,22 @@ void main() {
     final Finder handle = find.byKey(horonSidebarResizeHandleKey);
     expect(handle, findsOneWidget);
 
+    // 드래그가 끝난 프레임에는 `_dragging`이 이미 false라 `transition-[width]`가
+    // 켜집니다. 마지막 값까지 200ms 전이를 끝낸 뒤 폭을 잽니다.
     await tester.drag(handle, const Offset(60, 0));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(tester.getSize(find.byType(HoronSidebar)).width, 340);
     expect(widths.last, 340);
 
     // maxWidth 400에서 멈춥니다.
     await tester.drag(handle, const Offset(500, 0));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(tester.getSize(find.byType(HoronSidebar)).width, 400);
     expect(widths.last, 400);
 
     // minWidth 240에서 멈춥니다.
     await tester.drag(handle, const Offset(-2000, 0));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(tester.getSize(find.byType(HoronSidebar)).width, 240);
     expect(widths.last, 240);
 
@@ -301,17 +411,22 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
     await tester.pump();
     expect(widths.last, 296, reason: 'RESIZE_STEP 16');
+    // 키보드 입력은 포인터를 따라가는 중이 아니므로 React `transition-[width]`처럼
+    // 200ms로 미끄러집니다. 첫 프레임에는 아직 시작 폭입니다.
+    expect(tester.getSize(find.byType(HoronSidebar)).width, 280, reason: '전이 시작 프레임');
+    await tester.pumpAndSettle();
+    expect(tester.getSize(find.byType(HoronSidebar)).width, 296, reason: '전이가 끝나면 새 폭');
 
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(widths.last, 280);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.home);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(widths.last, 240);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.end);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(widths.last, 400);
 
     // 더블 탭 인식기가 걸어 둔 타이머를 비웁니다.
@@ -333,7 +448,8 @@ void main() {
 
     final Finder handle = find.byKey(horonSidebarResizeHandleKey);
     await tester.drag(handle, const Offset(40, 0));
-    await tester.pump();
+    // 드래그가 끝나면 폭 전이가 켜지므로 320까지 200ms를 끝낸 뒤 잽니다.
+    await tester.pumpAndSettle();
     expect(tester.getSize(find.byType(HoronSidebar)).width, 320);
 
     await tester.tap(handle);

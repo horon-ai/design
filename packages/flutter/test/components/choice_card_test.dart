@@ -1,11 +1,13 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
 
 /// 선택 카드의 계약을 확인합니다.
 ///
-/// React `choice-card.tsx`: 252px 불투명 카드, 14 여백, 16 반경, 18px 고리(꺼짐 1.5px,
-/// 켜짐 5px + 8px 점), 선택 시 브랜드 테두리. 유리 표면은 없습니다.
+/// React `choice-card.tsx`: 252px 불투명 카드, 14 여백, 16 반경, 18px 고리(꺼짐 1.5px
+/// 점선, 켜짐 1.5px 잉크 테두리 + 안쪽 3.5px 링 + 8px 점), 선택 시 브랜드 테두리,
+/// 꺼진 카드는 hover에서 border-strong. 유리 표면은 없습니다.
 Widget _host(Brightness brightness, Widget child, {double width = 600}) {
   return MaterialApp(
     // 밝기를 바꿀 때 AnimatedTheme가 이전 색에서 보간하지 않도록 트리를 새로 만듭니다.
@@ -67,7 +69,7 @@ void main() {
     expect(tester.widget<AnimatedScale>(find.byType(AnimatedScale)).scale, 0);
   });
 
-  testWidgets('선택되면 브랜드 테두리와 5px 잉크 고리, 점을 그린다', (WidgetTester tester) async {
+  testWidgets('선택되면 브랜드 테두리와 잉크 고리(테두리 1.5 + 안쪽 3.5), 점을 그린다', (WidgetTester tester) async {
     await tester.pumpWidget(
       _host(
         Brightness.light,
@@ -86,9 +88,12 @@ void main() {
     final Border border = surface.border! as Border;
     expect(border.top.color, colors.borderBrand, reason: '선택 상태는 브랜드 테두리입니다');
 
-    final Border ring = (_ring(tester).decoration! as BoxDecoration).border! as Border;
-    expect(ring.top.width, 5);
-    expect(ring.top.color, colors.interactivePrimary);
+    // React는 1.5px 테두리를 유지하고 `shadow-[inset_0_0_0_3.5px]`로 안쪽을 잉크로 덮습니다.
+    // 18 − 2 × (1.5 + 3.5) = 8이라 가운데 8px 점만 남습니다.
+    final BoxDecoration ring = _ring(tester).decoration! as BoxDecoration;
+    expect((ring.border! as Border).top.width, 1.5);
+    expect((ring.border! as Border).top.color, colors.interactivePrimary);
+    expect(ring.color, colors.interactivePrimary);
 
     expect(tester.widget<AnimatedScale>(find.byType(AnimatedScale)).scale, 1);
     final Container dot = tester.widget<Container>(find.byKey(const Key('horon-choice-card-dot')));
@@ -162,6 +167,30 @@ void main() {
     );
     expect(opacity.opacity, 0.4);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('꺼진 카드는 hover에서 border-strong이 되고 선택된 카드는 그대로다', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(Brightness.light, _card));
+    final TestGesture hover = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await hover.addPointer(location: Offset.zero);
+    addTearDown(hover.removePointer);
+    await hover.moveTo(tester.getCenter(find.byKey(const Key('horon-choice-card-surface'))));
+    await tester.pumpAndSettle();
+    expect(
+      ((_surface(tester).decoration! as BoxDecoration).border! as Border).top.color,
+      colors.borderStrong,
+      reason: 'data-unchecked:hover:border-border-strong',
+    );
+
+    await tester.pumpWidget(_host(Brightness.light, const HoronChoiceCard(title: Text('T'), checked: true)));
+    await tester.pumpAndSettle();
+    await hover.moveTo(tester.getCenter(find.byKey(const Key('horon-choice-card-surface'))));
+    await tester.pumpAndSettle();
+    expect(
+      ((_surface(tester).decoration! as BoxDecoration).border! as Border).top.color,
+      colors.borderBrand,
+      reason: '선택된 카드는 hover에서도 브랜드 테두리입니다',
+    );
   });
 
   testWidgets('부모가 좁으면 252 대신 부모 폭을 따른다', (WidgetTester tester) async {

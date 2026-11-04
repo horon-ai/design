@@ -110,6 +110,44 @@ void main() {
     expect(veilOf(tester).invalid, isTrue, reason: '오류 링은 border-danger입니다');
   });
 
+  testWidgets('the box carries the 2px brand focus ring on every surface', (WidgetTester tester) async {
+    /// `focus-within:outline-2 outline-offset-2 outline-text-brand`을 그리는 링입니다.
+    Iterable<BoxDecoration> brandRings() => tester
+        .widgetList<DecoratedBox>(find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(DecoratedBox)))
+        .map((DecoratedBox box) => box.decoration)
+        .whereType<BoxDecoration>()
+        .where(
+          (BoxDecoration d) => d.border?.top.width == 2 && d.border?.top.color == themeOf(tester).colors.textBrand,
+        );
+
+    /// 표면마다 트리를 비워 State와 포커스 노드를 버립니다. 같은 타입·같은 자리로 다시
+    /// pump하면 Flutter가 상태를 재사용해, 앞 표면의 포커스가 다음 표면으로 새어 들어갑니다.
+    Future<void> freshSurface(HoronInputSurface surface, {bool invalid = false}) async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await pumpInput(tester, surface: surface, invalid: invalid);
+    }
+
+    for (final HoronInputSurface surface in HoronInputSurface.values) {
+      await freshSurface(surface);
+      expect(brandRings(), isEmpty, reason: '$surface — 쉬는 상태에는 링이 없습니다');
+      await tester.tap(find.byType(TextField));
+      await tester.pump();
+      expect(brandRings(), isNotEmpty, reason: '$surface — focus-within은 상자에 2px 브랜드 링을 겁니다');
+    }
+
+    await freshSurface(HoronInputSurface.solid, invalid: true);
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+    expect(brandRings(), isEmpty, reason: '오류 상태는 상자 테두리가 위험 색이라 링을 겹치지 않습니다');
+    expect(
+      (tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first).decoration! as BoxDecoration)
+          .border!
+          .top
+          .color,
+      themeOf(tester).colors.borderDanger,
+    );
+  });
+
   testWidgets('a disabled veil field drops to 60% opacity', (WidgetTester tester) async {
     await pumpInput(tester, enabled: false);
     expect(find.byType(HoronVeil), findsOneWidget);

@@ -170,8 +170,10 @@ void main() {
     final Rect body = tester.getRect(find.byType(SingleChildScrollView));
     expect(body.bottom, lessThanOrEqualTo(footer.top), reason: '본문이 스크롤되고 푸터는 아래에 남습니다');
 
+    // 2000px 자식은 자기 상자 안에서 가운데가 화면 밖이라, 끌기 시작점은 본문
+    // 뷰포트 자체에서 잡습니다.
     final double before = tester.getRect(find.text('본문')).top;
-    await tester.drag(find.text('본문'), const Offset(0, -300));
+    await tester.dragFrom(body.center, const Offset(0, -300));
     await tester.pumpAndSettle();
     final double after = tester.getRect(find.text('본문')).top;
     expect(after, lessThan(before), reason: '본문만 스크롤합니다');
@@ -188,6 +190,7 @@ void main() {
             children: <Widget>[
               for (final String label in <String>['취소', '저장', '나중에'])
                 SizedBox(
+                  key: ValueKey<String>('footer-$label'),
                   width: 160,
                   child: TextButton(onPressed: () {}, child: Text(label)),
                 ),
@@ -199,7 +202,9 @@ void main() {
     );
     final Rect footer = tester.getRect(find.byType(HoronModalFooter));
     expect(footer.height, greaterThan(60), reason: '한 줄에 들어가지 않으면 줄을 바꿉니다');
-    final Rect last = tester.getRect(find.text('나중에'));
+    // 버튼 상자(160px)의 오른쪽 끝으로 잽니다. 글자 상자는 버튼 안에서 가운데라
+    // (160 - 글자폭) / 2 만큼 왼쪽으로 들어가 있습니다.
+    final Rect last = tester.getRect(find.byKey(const ValueKey<String>('footer-나중에')));
     expect(last.right, closeTo(footer.right - HoronThemeData.light.space.s6, 0.5), reason: 'justify-end');
   });
 }

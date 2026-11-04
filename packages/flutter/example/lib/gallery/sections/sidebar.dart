@@ -144,7 +144,8 @@ List<Widget> _content() => <Widget>[
 ///
 /// 오른쪽 가장자리 8px를 끌거나, 손잡이를 눌러 포커스를 준 뒤 화살표·Home·End를
 /// 누르거나, 더블 탭해 기본 폭으로 돌아옵니다. 손잡이는 이 상자가 768보다 넓을 때만
-/// 보입니다.
+/// 보입니다. 끄는 동안은 폭이 포인터를 그대로 따라가고, 키보드·더블 탭처럼 값이
+/// 뛸 때는 200ms로 미끄러집니다(React `transition-[width] data-resizing:transition-none`).
 class _ResizableSample extends StatefulWidget {
   const _ResizableSample();
 

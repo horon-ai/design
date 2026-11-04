@@ -51,6 +51,8 @@ class HoronAgentLanesTimelineGallerySection extends StatelessWidget {
                           HoronLaneHandoff(from: 'scan', to: 'draft'),
                         ],
                         cursor: 2,
+                        // `onRangeClick`이 있으면 범위 알약이 버튼이 됩니다.
+                        onRangeClick: () {},
                         approval: HoronAgentLanesTimelineApproval(
                           message: 'Writer가 배포를 기다립니다',
                           onLater: () {},

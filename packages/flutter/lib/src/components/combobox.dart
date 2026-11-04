@@ -63,6 +63,7 @@ typedef _ComboboxMetrics = ({
   double chipHeight,
   double chipGap,
   double chipPaddingX,
+  double chipIcon,
   double icon,
   double check,
   TextStyle fieldText,
@@ -81,6 +82,7 @@ _ComboboxMetrics _metricsOf(HoronComboboxSize size, HoronThemeData theme) => swi
     chipHeight: theme.space.step(5),
     chipGap: theme.space.s0_5,
     chipPaddingX: theme.space.s1_5,
+    chipIcon: 12, // chipClass sm `[&_svg]:size-3`
     icon: 16,
     check: 16,
     fieldText: theme.text.bodySm,
@@ -97,7 +99,8 @@ _ComboboxMetrics _metricsOf(HoronComboboxSize size, HoronThemeData theme) => swi
     chipHeight: theme.space.step(6),
     chipGap: theme.space.s1,
     chipPaddingX: theme.space.s2,
-    icon: 18,
+    chipIcon: 14, // chipClass md `[&_svg]:size-3.5`
+    icon: 16, // md `[&_svg]:size-4`
     check: 16,
     fieldText: theme.text.bodyMd,
     itemText: theme.text.labelMd,
@@ -113,6 +116,7 @@ _ComboboxMetrics _metricsOf(HoronComboboxSize size, HoronThemeData theme) => swi
     chipHeight: theme.space.step(7),
     chipGap: theme.space.s1,
     chipPaddingX: theme.space.s2_5,
+    chipIcon: 16, // chipClass lg `[&_svg]:size-4`
     icon: 20,
     check: 20,
     fieldText: theme.text.bodyLg,
@@ -353,7 +357,7 @@ class _HoronComboboxState extends State<HoronCombobox> {
         child: Row(
           spacing: metrics.gap,
           children: <Widget>[
-            Icon(Icons.search, size: 16, color: colors.textSecondary),
+            Icon(Icons.search, size: metrics.icon, color: colors.textSecondary),
             Expanded(
               child: Text(
                 chosen == null ? widget.placeholder : _shortLabel(chosen),
@@ -375,49 +379,41 @@ class _HoronComboboxState extends State<HoronCombobox> {
     final List<HoronComboboxItem> chosen = <HoronComboboxItem>[
       for (final String value in _selectedValues) ?_find(value),
     ];
-    return SizedBox(
-      width: _multiFieldWidth,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: metrics.fieldHeight),
-        child: HoronFieldBox(
-          surface: widget.surface,
-          invalid: widget.invalid,
-          enabled: !_disabled,
-          padding: EdgeInsets.symmetric(horizontal: metrics.chipPaddingX, vertical: metrics.chipGap),
-          child: Wrap(
-            spacing: metrics.chipGap,
-            runSpacing: metrics.chipGap,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: <Widget>[
-              for (final HoronComboboxItem item in chosen) _chip(context, metrics, item),
-              Text(
-                chosen.isEmpty ? widget.placeholder : '',
-                style: metrics.fieldText.copyWith(color: _disabled ? colors.textDisabled : colors.textPlaceholder),
-              ),
-            ],
+    // `w-60` — 폭이 꽉 찬 부모 안에서도 240을 지키도록 왼쪽으로 붙여 느슨한 제약을 줍니다.
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      // 폭·높이를 자식에 맞춰 필드 자체가 240이 되게 합니다(React `w-60`).
+      widthFactor: 1,
+      heightFactor: 1,
+      child: SizedBox(
+        width: _multiFieldWidth,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: metrics.fieldHeight),
+          child: HoronFieldBox(
+            surface: widget.surface,
+            invalid: widget.invalid,
+            enabled: !_disabled,
+            padding: EdgeInsets.symmetric(horizontal: metrics.chipPaddingX, vertical: metrics.chipGap),
+            child: Wrap(
+              spacing: metrics.chipGap,
+              runSpacing: metrics.chipGap,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: <Widget>[
+                for (final HoronComboboxItem item in chosen)
+                  _ComboboxChip(
+                    key: ValueKey<String>('horon-combobox-chip-${item.value}'),
+                    label: _shortLabel(item),
+                    metrics: metrics,
+                    onRemove: _disabled ? null : () => _remove(item.value),
+                  ),
+                Text(
+                  chosen.isEmpty ? widget.placeholder : '',
+                  style: metrics.fieldText.copyWith(color: _disabled ? colors.textDisabled : colors.textPlaceholder),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _chip(BuildContext context, _ComboboxMetrics metrics, HoronComboboxItem item) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
-    return Container(
-      height: metrics.chipHeight,
-      padding: EdgeInsets.only(left: metrics.chipPaddingX, right: metrics.chipGap),
-      decoration: BoxDecoration(color: colors.overlayInk6, borderRadius: BorderRadius.circular(theme.radius.full)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: metrics.chipGap,
-        children: <Widget>[
-          Text(_shortLabel(item), style: metrics.chipText.copyWith(color: colors.textPrimary)),
-          GestureDetector(
-            onTap: _disabled ? null : () => _remove(item.value),
-            child: Icon(Icons.close, size: metrics.chipText.fontSize, color: colors.textSecondary),
-          ),
-        ],
       ),
     );
   }
@@ -543,7 +539,7 @@ class _HoronComboboxState extends State<HoronCombobox> {
             child: Row(
               spacing: metrics.gap,
               children: <Widget>[
-                Icon(Icons.search, size: 16, color: colors.textSecondary),
+                Icon(Icons.search, size: metrics.icon, color: colors.textSecondary),
                 Expanded(
                   child: TextField(
                     controller: _search,
@@ -618,6 +614,48 @@ class _HoronComboboxState extends State<HoronCombobox> {
               if (selected) Icon(Icons.check, size: metrics.check, color: colors.textPrimary),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 다중 선택 필드의 칩 하나입니다. React `Combobox.Chip`(`animate-pop-in`).
+///
+/// 칩은 목록에서 고를 때마다 새로 생기므로, 처음 그려질 때 0.6배에서 제 크기로
+/// 커지며 나타납니다. 제거 버튼은 React `ChipRemove`의 `p-0.5` 자리에 14px
+/// (`[&_svg]:size-3.5`) 아이콘을 둡니다.
+class _ComboboxChip extends StatelessWidget {
+  const _ComboboxChip({super.key, required this.label, required this.metrics, this.onRemove});
+
+  final String label;
+  final _ComboboxMetrics metrics;
+  final VoidCallback? onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
+      duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
+      curve: HoronMotion.popInCurve,
+      builder: (BuildContext context, double scale, Widget? child) => Transform.scale(scale: scale, child: child),
+      child: Container(
+        height: metrics.chipHeight,
+        padding: EdgeInsets.only(left: metrics.chipPaddingX, right: metrics.chipGap),
+        decoration: BoxDecoration(color: colors.overlayInk6, borderRadius: BorderRadius.circular(theme.radius.full)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: metrics.chipGap,
+          children: <Widget>[
+            Text(label, style: metrics.chipText.copyWith(color: colors.textPrimary)),
+            GestureDetector(
+              onTap: onRemove,
+              child: Icon(Icons.close, size: metrics.chipIcon, color: colors.textSecondary),
+            ),
+          ],
         ),
       ),
     );

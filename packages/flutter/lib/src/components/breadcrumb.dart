@@ -124,10 +124,10 @@ class HoronBreadcrumbItem extends StatelessWidget {
         return AnimatedDefaultTextStyle(
           duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,
           curve: HoronMotion.colorsCurve,
-          style: theme.text.labelMd.copyWith(color: foreground),
+          style: theme.text.labelMd.copyWith(color: foreground, decoration: TextDecoration.none),
           child: Padding(
-            // `py-1 pr-2 pl-1.5`입니다.
-            padding: EdgeInsets.only(top: space.s1, bottom: space.s1, right: space.s2, left: space.s1_5),
+            // `py-1 pr-1.5 pl-1.5`입니다. 오른쪽 여백은 React가 `pr-2`에서 6px로 줄인 값입니다.
+            padding: EdgeInsets.only(top: space.s1, bottom: space.s1, right: space.s1_5, left: space.s1_5),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               spacing: space.s1_5, // gap-1.5

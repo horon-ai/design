@@ -10,6 +10,7 @@
 //   - 부모를 채우고 내용 뒤에 놓입니다.
 //   - 셰이더를 못 쓰면 `bgColor` 단색으로 남습니다.
 //   - 모션 축소(`MediaQuery.disableAnimationsOf`)면 한 프레임만 그립니다(시계 12초).
+//     열려 있는 동안 설정이 켜지면 지금 프레임에서 멈추고, 꺼지면 같은 시계에서 이어 갑니다.
 //   - `TickerMode`가 꺼져 있거나 앱이 다시 그려지지 않는 상태면 티커를 멈춥니다.
 //   - 포인터는 [Listener]로 받고 aim()과 같은 식으로 정규화합니다. 포인터가 없으면
 //     원본의 초기 상태(0, 0)입니다.
@@ -279,6 +280,11 @@ class HoronFlueConfig {
   }) {
     final bool dark = brightness == Brightness.dark;
     final HoronFlueConfig base = dark ? night : sky;
+    // `sidebar`: 유리가 세부를 흐리므로 연기를 더 느리고 크게, 기둥 아래쪽에 둡니다. 색조는
+    // 여기가 아니라 `_variantTint`가 정합니다(라이트의 두꺼운 유리).
+    // `auth`: 카드 뒤에서 기둥 폭을 넓히고 아래에서 올립니다. 라이트는 셰이더 비네트가
+    // 검정으로 어둡게 하므로 비네트 없이 옅은 하늘을 지키고, 다크만 모서리를 밤 바탕에
+    // 가라앉힙니다.
     final HoronFlueConfig tuned = switch (variant) {
       HoronFlueVariant.defaultValue => base,
       HoronFlueVariant.sidebar =>
@@ -304,7 +310,7 @@ class HoronFlueConfig {
       HoronFlueVariant.auth =>
         dark
             ? base.copyWith(width: 1.9, spread: 1.3, density: 2, midpoint: 0.76, glow: 0.45, vignette: 0.45)
-            : base.copyWith(width: 1.9, spread: 1.3, density: 2, midpoint: 0.74, glow: 0.45, vignette: 0.18),
+            : base.copyWith(width: 1.9, spread: 1.3, density: 1.85, midpoint: 0.8, glow: 0.3, vignette: 0),
     };
     return config ?? tuned;
   }
@@ -442,10 +448,11 @@ class HoronFlueBackground extends StatefulWidget {
 
   /// 연기 위에 얹는 색조입니다.
   ///
-  /// 없으면 라이트의 `defaultValue` 변형에서만 테마의 `glass-regular`를 씁니다
-  /// (React의 `bg-glass-regular dark:bg-transparent`). 다크와 `sidebar`·`auth`
-  /// 변형에서는 색조를 얹지 않습니다. 명시적으로 색조를 없애려면
-  /// `Colors.transparent`를 넘깁니다.
+  /// 없으면 변형이 정한 색조를 씁니다: 라이트의 `defaultValue`는 테마의
+  /// `glass-regular`(React의 `bg-glass-regular dark:bg-transparent`), 라이트의
+  /// `sidebar`는 `glass-thick`(React의 `bg-glass-thick dark:bg-transparent`, 80% 흰
+  /// 유리로 보조 글자 대비를 지킵니다), `auth`는 없음입니다. 다크에서는 모두 없습니다.
+  /// 명시적으로 색조를 없애려면 `Colors.transparent`를 넘깁니다.
   final Color? tint;
 
   @override
@@ -464,6 +471,7 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   ui.FragmentShader? _shader;
   bool _requested = false;
   bool _resumed = true;
+  bool _drawn = false;
   Duration _lastElapsed = Duration.zero;
   HoronFlueConfig _settings = HoronFlueConfig.sky;
   Size _size = Size.zero;
@@ -492,8 +500,11 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   Color? _variantTint(HoronThemeData horon) => switch (widget.variant) {
     // `bg-glass-regular dark:bg-transparent`
     HoronFlueVariant.defaultValue => horon.brightness == Brightness.dark ? null : horon.colors.glassRegular,
-    // 사이드바 유리가 바탕을 채우고, 인증 화면은 색조를 얹지 않습니다.
-    HoronFlueVariant.sidebar || HoronFlueVariant.auth => null,
+    // `bg-glass-thick dark:bg-transparent`: 연기가 사이드바 유리 채움보다 위에 그려지므로 라이트에서는
+    // 80% 흰 유리를 직접 얹어 보조 글자 대비를 지킵니다.
+    HoronFlueVariant.sidebar => horon.brightness == Brightness.dark ? null : horon.colors.glassThick,
+    // 인증 화면은 색조를 얹지 않습니다.
+    HoronFlueVariant.auth => null,
   };
 
   @override
@@ -523,13 +534,16 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   /// 티커를 켜고 끕니다.
   ///
   /// 세 조건이 모두 참일 때만 돕니다: `TickerMode` 켜짐, 앱이 앞에 있음, 모션 축소 아님.
-  /// 모션 축소일 때는 [HoronFlueDamping.time]을 12로 둔 한 프레임을 그립니다(원본과 같은 값).
+  /// 멈출 때는 지금 프레임을 그대로 둡니다. 원본도 `cancelAnimationFrame`만 하고 `clock`을
+  /// 건드리지 않으므로, 모션 축소를 껐다 켜거나 앱이 돌아오면 같은 시계에서 이어 갑니다.
+  /// 한 번도 그린 적이 없으면 [HoronFlueDamping.time]을 12로 둔 프레임을 그립니다(원본의
+  /// `clock = still ? 12 : 0`).
   void _syncTicker() {
     if (!mounted) return;
     final bool animated = TickerMode.valuesOf(context).enabled && _resumed && !MediaQuery.disableAnimationsOf(context);
     if (!animated) {
       if (_ticker.isActive) _ticker.stop();
-      _drawStill();
+      _freeze();
       return;
     }
     if (_ticker.isActive) return;
@@ -537,8 +551,12 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
     _ticker.start();
   }
 
-  /// 한 프레임만 그립니다. 원본의 `clock = still ? 12 : 0; draw();` 중 정지 쪽입니다.
-  void _drawStill() {
+  /// 지금 프레임에서 멈춥니다. 아직 한 프레임도 그리지 않았으면 12초 시점을 그립니다.
+  void _freeze() {
+    if (_drawn) {
+      _frame.value = _damping.toFrame();
+      return;
+    }
     _damping.time = 12;
     _frame.value = _damping.toFrame();
   }
@@ -550,6 +568,7 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
     // 진짜 포인터를 받지 않을 때만 가상 포인터를 움직입니다. 시계를 진행한 뒤
     // 목표를 정하므로 React `frame()`과 같은 순서입니다.
     if (_settings.cursor == 0) _damping.aimVirtual(_size);
+    _drawn = true;
     _frame.value = _damping.toFrame();
   }
 
@@ -584,8 +603,9 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
     // 다크는 DOM 클래스가 아니라 테마 밝기로 정합니다. 이번 빌드의 설정을 상태에
     // 남겨 두어야 티커와 포인터 처리도 같은 값을 봅니다.
     _settings = HoronFlueConfig.resolve(brightness: horon.brightness, variant: widget.variant, config: widget.config);
-    // React의 기본 tint 클래스는 `bg-glass-regular dark:bg-transparent`입니다.
-    // 다크에서는 색조를 얹지 않아야 밤 팔레트가 회색으로 뜨지 않습니다.
+    // 변형마다 색조 클래스가 다릅니다(`default`는 glass-regular, `sidebar`는 glass-thick,
+    // `auth`는 없음). 다크에서는 모두 `dark:bg-transparent`라 색조를 얹지 않아야 밤
+    // 팔레트가 회색으로 뜨지 않습니다.
     final Color? tint = widget.tint ?? _variantTint(horon);
     final ui.FragmentShader? shader = _shader;
 

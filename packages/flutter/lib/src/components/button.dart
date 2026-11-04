@@ -57,9 +57,9 @@ const double _minTapTarget = 44;
 ///
 /// Primary·Glass·Solid·Danger 네 변형과 세 크기, 그리고 크기와 무관한 텍스트 전용
 /// `link` 변형이 있습니다. `link`만 `motion-press` 배율과 44px 터치 영역을 쓰지
-/// 않고, `glass`는 자기 사각형 밖으로 터치 영역을 넓히지 않습니다(React가
-/// `overflow-clip`으로 자르기 때문입니다). `solid`는 불투명 표면 위에 놓는 변형으로,
-/// 바탕 채움과 1px 테두리를 함께 그립니다.
+/// 않습니다. React는 `overflow-clip`을 걷어 냈으므로 `glass`도 다른 변형과 같이
+/// 44px 터치 영역을 갖습니다. `solid`는 불투명 표면 위에 놓는 변형으로, 바탕 채움과
+/// 1px 테두리를 함께 그립니다.
 class HoronButton extends StatefulWidget {
   /// 버튼을 만듭니다.
   const HoronButton({
@@ -174,7 +174,9 @@ class _HoronButtonState extends State<HoronButton> {
           HoronButtonVariant.danger => (
             colors.interactiveDanger,
             colors.interactiveDangerHover,
-            colors.interactiveDangerHover,
+            // React `active:bg-interactive-danger` — 누르면 hover 색이 아니라 원래
+            // 위험 색으로 돌아갑니다.
+            colors.interactiveDanger,
             colors.interactiveOnDanger,
           ),
           HoronButtonVariant.link => (
@@ -254,10 +256,9 @@ class _HoronButtonState extends State<HoronButton> {
           : label,
     );
 
-    // React는 sm·md의 primary·danger에만 `after:min-h-11 after:min-w-11`로 44px
-    // 터치 영역을 그립니다. 보이는 크기는 그대로 두고 히트 영역만 넓힙니다.
-    final bool needsWideReach =
-        !isLink && widget.variant != HoronButtonVariant.glass && widget.size != HoronButtonSize.lg;
+    // React는 link를 뺀 모든 변형에 `after:min-h-11 after:min-w-11`로 44px 터치
+    // 영역을 그립니다. 보이는 크기는 그대로 두고 히트 영역만 넓힙니다.
+    final bool needsWideReach = !isLink && widget.size != HoronButtonSize.lg;
     final Widget target = needsWideReach
         ? ConstrainedBox(
             constraints: const BoxConstraints(minWidth: _minTapTarget, minHeight: _minTapTarget),

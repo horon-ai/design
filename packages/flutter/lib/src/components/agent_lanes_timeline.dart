@@ -50,12 +50,6 @@ const double _labelWidth = 230;
 /// `RIGHT_GUTTER` — 현재선 뒤에 남기는 오른쪽 여백 18입니다.
 const double _rightGutter = 18;
 
-/// `h-76` — 타임라인 본문의 최소 높이 304입니다.
-const double _timelineHeight = 304;
-
-/// `min-w-175` — 시간축이 줄어들지 않는 최소 폭 700입니다. 더 좁으면 가로로 스크롤합니다.
-const double _timelineMinWidth = 700;
-
 /// `top-9` — 눈금선과 현재선이 시작하는 위쪽 36입니다.
 const double _trackTop = 36;
 
@@ -267,9 +261,9 @@ class HoronAgentLanesTimelineApproval {
 /// 280ms emphasized로 새 값까지 미끄러집니다. 줄은 hover에서 3% 잉크로 물들고, 실행 중
 /// 막대에는 12px 스피너가 붙습니다.
 ///
-/// React는 본문을 `overflow-x-auto`로 감싸 최소 폭 1000을 유지합니다. 이 포트는
-/// 가로 스크롤을 두지 않고, 폭이 `md`(768)보다 좁으면 이름 열을 폭의 42%까지 줄이고
-/// 눈금 라벨을 감춰 같은 시간축을 좁은 화면에 맞춥니다.
+/// React는 본문을 `overflow-x-auto`로 감싸 최소 폭 700을 유지하지만, 이 포트는
+/// 가로 스크롤을 두지 않습니다. 폭이 `md`(768)보다 좁으면 이름 열을 폭의 42%까지
+/// 줄이고 눈금 라벨을 감춰 같은 시간축을 좁은 화면에 맞춥니다.
 class HoronAgentLanesTimeline extends StatelessWidget {
   /// 타임라인을 만듭니다.
   const HoronAgentLanesTimeline({
@@ -282,7 +276,7 @@ class HoronAgentLanesTimeline extends StatelessWidget {
     this.windowMinutes = 30,
     this.cursor = 0,
     this.approval,
-    this.onRangeTap,
+    this.onRangeClick,
   });
 
   /// 머리의 제목입니다.
@@ -309,9 +303,9 @@ class HoronAgentLanesTimeline extends StatelessWidget {
   /// 아래에 붙는 승인 줄입니다.
   final HoronAgentLanesTimelineApproval? approval;
 
-  /// 범위 알약을 눌렀을 때입니다. React는 처리기 없는 `button`을 그리므로, 포트는
-  /// 알약을 쓸 수 있도록 이 콜백을 열어 둡니다.
-  final VoidCallback? onRangeTap;
+  /// 범위 알약을 눌렀을 때입니다. React `onRangeClick`과 같습니다. 넘기지 않으면
+  /// 알약은 누를 수 없는 라벨로 그려집니다.
+  final VoidCallback? onRangeClick;
 
   @override
   Widget build(BuildContext context) {
@@ -384,7 +378,7 @@ class HoronAgentLanesTimeline extends StatelessWidget {
             ),
           ),
           SizedBox(width: space.s2_5),
-          _RangePill(label: range, onTap: onRangeTap),
+          _RangePill(label: range, onTap: onRangeClick),
         ],
       ),
     );
@@ -398,13 +392,15 @@ class HoronAgentLanesTimeline extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double available = constraints.hasBoundedWidth ? constraints.maxWidth : _panelMaxWidth;
-        // `min-w-175` — 좁은 화면에서도 700을 지키고 바깥에서 가로로 스크롤합니다.
-        final double width = math.max(_timelineMinWidth, available);
+        // React는 `overflow-x-auto`로 최소 폭 700을 유지하지만, 이 포트는 가로 스크롤을
+        // 두지 않습니다. 대신 폭이 `md`보다 좁으면 이름 열을 줄이고 눈금 라벨을 감춥니다.
+        final double width = available;
         // React의 고정 230px 이름 열은 좁은 화면에서 시간축을 삼키므로 폭에 맞춰 줄입니다.
         final double labelWidth = width >= theme.breakpoints.md ? _labelWidth : math.min(_labelWidth, width * 0.42);
         final double track = math.max(0, width - labelWidth - _rightGutter);
         final double span = windowMinutes > 0 ? windowMinutes.toDouble() : 1;
-        final double height = math.max(_timelineHeight, _rowsTop + bots.length * _rowHeight);
+        // `height: TOP + max(2, bots.length) * ROW` — 줄 수만큼만 높아집니다.
+        final double height = _rowsTop + math.max(2, bots.length) * _rowHeight;
         // `top-9 bottom-0` — 눈금선과 현재선은 줄 수에 맞춰 아래 끝까지 이어집니다.
         final double guideHeight = math.max(0, height - _trackTop);
 
@@ -445,12 +441,19 @@ class HoronAgentLanesTimeline extends StatelessWidget {
           );
         }
 
+        final double nowX = xAt(at(-cursor));
+        final Duration glide = reduceMotion ? Duration.zero : HoronMotion.indicatorDuration;
+
         final List<Widget> bars = <Widget>[];
         for (int lane = 0; lane < bots.length; lane++) {
           for (final HoronLaneTask task in bots[lane].tasks) {
             final double barWidth = math.max(0, track * (task.end - task.start) / span);
             bars.add(
-              Positioned(
+              // `transition-[left,width] duration-280 ease-emphasized` — 시간이 바뀌면
+              // 막대가 제자리에서 새 자리로 미끄러집니다.
+              AnimatedPositioned(
+                duration: glide,
+                curve: HoronMotion.indicatorCurve,
                 left: xAt(at(task.start)),
                 top: _rowsTop + lane * _rowHeight + _barTop,
                 width: barWidth,
@@ -464,74 +467,67 @@ class HoronAgentLanesTimeline extends StatelessWidget {
           }
         }
 
-        final double nowX = xAt(at(-cursor));
-        final Duration glide = reduceMotion ? Duration.zero : HoronMotion.indicatorDuration;
-
         return SizedBox(
           height: height,
-          child: SingleChildScrollView(
-            // `overflow-x-auto` — 700보다 좁은 자리에서는 가로로 스크롤합니다.
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              width: width,
-              height: height,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: <Widget>[
-                  // `top-9 bottom-0 w-px bg-overlay-ink-5` 눈금선과 `text-caption` 눈금 라벨.
-                  for (final double minutes in tickMinutes) ...<Widget>[
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: <Widget>[
+                // `top-9 bottom-0 w-px bg-overlay-ink-5` 눈금선과 `text-caption` 눈금 라벨.
+                for (final double minutes in tickMinutes) ...<Widget>[
+                  Positioned(
+                    left: xAt(at(minutes)),
+                    top: _trackTop,
+                    width: _tickWidth,
+                    height: guideHeight,
+                    child: ColoredBox(color: colors.overlayInk5),
+                  ),
+                  if (showTickLabels)
                     Positioned(
                       left: xAt(at(minutes)),
-                      top: _trackTop,
-                      width: _tickWidth,
-                      height: guideHeight,
-                      child: ColoredBox(color: colors.overlayInk5),
-                    ),
-                    if (showTickLabels)
-                      Positioned(
-                        left: xAt(at(minutes)),
-                        top: _labelTop,
-                        child: FractionalTranslation(
-                          translation: const Offset(-0.5, 0),
-                          child: Text(
-                            '${minutes.toInt()}m',
-                            style: theme.text.caption.copyWith(color: colors.textSecondary),
-                            maxLines: 1,
-                            softWrap: false,
-                          ),
+                      top: _labelTop,
+                      child: FractionalTranslation(
+                        translation: const Offset(-0.5, 0),
+                        child: Text(
+                          '${minutes.toInt()}m',
+                          style: theme.text.caption.copyWith(color: colors.textSecondary),
+                          maxLines: 1,
+                          softWrap: false,
                         ),
                       ),
-                  ],
-                  for (int lane = 0; lane < bots.length; lane++)
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      top: _rowsTop + lane * _rowHeight,
-                      height: _rowHeight,
-                      child: _LaneRow(bot: bots[lane], labelWidth: labelWidth, showDivider: lane < bots.length - 1),
                     ),
-                  ...handoffCurves,
-                  ...bars,
-                  // `top-2.5 -translate-x-full` — 창 끝을 가리키는 "now" 알약.
-                  AnimatedPositioned(
-                    duration: glide,
-                    curve: HoronMotion.indicatorCurve,
-                    left: nowX,
-                    top: _labelTop,
-                    child: FractionalTranslation(translation: const Offset(-1, 0), child: const _NowPill()),
-                  ),
-                  // `top-9 bottom-0 w-[1.5px] bg-status-live/60` — 280ms로 미끄러지는 현재선.
-                  AnimatedPositioned(
-                    duration: glide,
-                    curve: HoronMotion.indicatorCurve,
-                    left: nowX,
-                    top: _trackTop,
-                    width: _cursorWidth,
-                    height: guideHeight,
-                    child: ColoredBox(color: colors.accentSky500_60),
-                  ),
                 ],
-              ),
+                for (int lane = 0; lane < bots.length; lane++)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: _rowsTop + lane * _rowHeight,
+                    height: _rowHeight,
+                    child: _LaneRow(bot: bots[lane], labelWidth: labelWidth, showDivider: lane < bots.length - 1),
+                  ),
+                ...handoffCurves,
+                ...bars,
+                // `top-2.5 -translate-x-full` — 창 끝을 가리키는 "now" 알약.
+                AnimatedPositioned(
+                  duration: glide,
+                  curve: HoronMotion.indicatorCurve,
+                  left: nowX,
+                  top: _labelTop,
+                  child: FractionalTranslation(translation: const Offset(-1, 0), child: const _NowPill()),
+                ),
+                // `top-9 bottom-0 w-[1.5px] bg-status-live/60` — 280ms로 미끄러지는 현재선.
+                AnimatedPositioned(
+                  duration: glide,
+                  curve: HoronMotion.indicatorCurve,
+                  left: nowX,
+                  top: _trackTop,
+                  width: _cursorWidth,
+                  height: guideHeight,
+                  child: ColoredBox(color: colors.accentSky500_60),
+                ),
+              ],
             ),
           ),
         );
@@ -852,16 +848,24 @@ class _TaskBar extends StatelessWidget {
       border: border == null ? null : Border.all(color: border),
     );
 
+    // `transition-[background-color,color,border-color] duration-280` — 톤이 바뀌면
+    // 막대 색이 새 값까지 부드럽게 옮겨 갑니다.
+    final Duration toneDuration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : HoronMotion.indicatorDuration;
+
     if (width < _barMinContentWidth) {
       // 내용이 들어가지 않는 폭에서는 React처럼 글자를 자르고 색만 남깁니다.
-      return DecoratedBox(decoration: decoration);
+      return AnimatedContainer(duration: toneDuration, curve: HoronMotion.indicatorCurve, decoration: decoration);
     }
 
     final bool showIcon = task.icon != null && width >= _barIconMinWidth;
 
     return ClipRRect(
       borderRadius: radius,
-      child: DecoratedBox(
+      child: AnimatedContainer(
+        duration: toneDuration,
+        curve: HoronMotion.indicatorCurve,
         decoration: decoration,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: space.s2_5),

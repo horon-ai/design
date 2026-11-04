@@ -194,13 +194,62 @@ void main() {
     expect(_dayStyle(tester, 2026, 10, 14).color, _theme(tester).colors.textDisabled, reason: 'text-text-disabled');
   });
 
-  testWidgets('days outside the month use the disabled colour and today gets the dot', (WidgetTester tester) async {
+  testWidgets('the default header keeps the 24/28/32 wrappers and 16/18/20 icons', (WidgetTester tester) async {
+    for (final ({HoronCalendarSize size, double wrap, double icon}) row
+        in <({HoronCalendarSize size, double wrap, double icon})>[
+          (size: HoronCalendarSize.sm, wrap: 24, icon: 16), // size-6 / size-4
+          (size: HoronCalendarSize.md, wrap: 28, icon: 18), // size-7 / size-4.5
+          (size: HoronCalendarSize.lg, wrap: 32, icon: 20), // size-8 / size-5
+        ]) {
+      await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today, size: row.size)));
+      // 같은 위젯을 다시 쓰므로 화살표 `AnimatedContainer`가 앞 크기에서 새 크기로
+      // 이어 그립니다. 중간값을 재지 않도록 전이가 끝날 때까지 기다립니다.
+      await tester.pumpAndSettle();
+      final Finder next = find.byKey(const Key('horon-calendar-next'));
+      expect(tester.getSize(next), Size(row.wrap, row.wrap), reason: '${row.size} 래퍼');
+      expect(
+        tester.widget<Icon>(find.descendant(of: next, matching: find.byType(Icon))).size,
+        row.icon,
+        reason: '${row.size} 아이콘',
+      );
+    }
+  });
+
+  testWidgets('the arrows share the ink-6 hover background in both variants', (WidgetTester tester) async {
+    // 포인터는 `pumpWidget` 앞에 만들고 트리 위에 올려 둡니다. 위젯이 새로 붙을 때
+    // 마우스 위치를 다시 알려 주지 않으면 hover 진입이 일어나지 않습니다.
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: Offset.zero);
+    addTearDown(pointer.removePointer);
+
+    for (final bool popover in <bool>[false, true]) {
+      await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today, popover: popover)));
+      await tester.pumpAndSettle();
+      final Finder next = find.byKey(const Key('horon-calendar-next'));
+      // 새 트리가 붙은 뒤 포인터를 화살표 밖으로 한 번 옮겨 이번 트리에 위치를 알리고,
+      // 곧바로 화살표 위로 들어가야 이번 트리의 MouseRegion이 hover를 냅니다.
+      await pointer.moveTo(const Offset(5, 5));
+      await tester.pump();
+      await pointer.moveTo(tester.getCenter(next));
+      await tester.pumpAndSettle();
+      final AnimatedContainer surface = tester.widget<AnimatedContainer>(
+        find.descendant(of: next, matching: find.byType(AnimatedContainer)),
+      );
+      expect(
+        (surface.decoration! as BoxDecoration).color,
+        _theme(tester).colors.overlayInk6,
+        reason: 'popover=$popover — hover:bg-overlay-ink-6',
+      );
+    }
+  });
+
+  testWidgets('days outside the month use the placeholder colour and today gets the dot', (WidgetTester tester) async {
     await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today)));
     final HoronThemeData theme = _theme(tester);
 
     // 2026년 10월 1일은 목요일이라 일요일 시작 격자는 9월 27일에서 시작합니다.
     expect(_dayOf(2026, 9, 27), findsOneWidget);
-    expect(_dayStyle(tester, 2026, 9, 27).color, theme.colors.textDisabled, reason: 'text-text-disabled (#B0B1B3)');
+    expect(_dayStyle(tester, 2026, 9, 27).color, theme.colors.textPlaceholder, reason: 'text-text-placeholder');
     expect(_dayStyle(tester, 2026, 9, 27).fontSize, theme.text.labelMd.fontSize, reason: 'text-label-md');
     expect(_dayStyle(tester, 2026, 10, 19).color, theme.colors.textBrand, reason: 'text-text-brand (오늘)');
     expect(_dayStyle(tester, 2026, 10, 19).fontSize, theme.text.labelMd.fontSize);

@@ -58,11 +58,11 @@ const double _todoMarkerSize = 18;
 /// `size-3` — 완료 체크와 "Now" 번개 12입니다.
 const double _markerIconSize = 12;
 
-/// `top-5.5` — 연결선이 시작하는 위쪽 22입니다.
-const double _connectorTop = 22;
+/// `top-[calc(50%+12.5px)]` — 연결선이 줄 가운데에서 12.5 아래로 시작합니다.
+const double _connectorDrop = 12.5;
 
-/// `h-5` — 연결선의 길이 20입니다.
-const double _connectorHeight = 20;
+/// `bottom-[-18px]` — 연결선이 줄 아래로 18 더 내려가 다음 줄과 만납니다.
+const double _connectorOverhang = 18;
 
 /// `w-px` — 연결선의 두께 1입니다.
 const double _connectorWidth = 1;
@@ -329,30 +329,42 @@ class _HoronAgentSteeringPanelState extends State<HoronAgentSteeringPanel> {
         // `gap-2.5`.
         spacing: space.s2_5,
         children: <Widget>[
-          if (widget.notes.isNotEmpty) ...<Widget>[
-            Row(
-              spacing: space.s2,
-              children: <Widget>[
-                Text(
-                  // `uppercase text-caption text-text-secondary`.
-                  'Queued for the next step'.toUpperCase(),
-                  style: theme.text.caption.copyWith(color: colors.textSecondary),
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-                HoronKbd(label: '$queued'),
-              ],
+          // `motion-reveal` — 쪽지가 하나도 없으면 이 묶음이 높이 0으로 접힙니다.
+          HoronReveal(
+            collapsed: widget.notes.isEmpty,
+            child: ExcludeFocus(
+              excluding: widget.notes.isEmpty,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                // `gap-2.5`.
+                spacing: space.s2_5,
+                children: <Widget>[
+                  Row(
+                    spacing: space.s2,
+                    children: <Widget>[
+                      Text(
+                        // `text-caption text-text-secondary`.
+                        'Queued for the next step',
+                        style: theme.text.caption.copyWith(color: colors.textSecondary),
+                        maxLines: 1,
+                        softWrap: false,
+                      ),
+                      HoronKbd(label: '$queued'),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    // `gap-2`.
+                    spacing: space.s2,
+                    children: <Widget>[
+                      for (final HoronSteeringNote note in widget.notes)
+                        _NoteRow(note: note, onApplyNow: widget.onApplyNow, onRemoveNote: widget.onRemoveNote),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              // `gap-2`.
-              spacing: space.s2,
-              children: <Widget>[
-                for (final HoronSteeringNote note in widget.notes)
-                  _NoteRow(note: note, onApplyNow: widget.onApplyNow, onRemoveNote: widget.onRemoveNote),
-              ],
-            ),
-          ],
+          ),
           _buildSteerBox(context, theme),
           _buildHints(theme),
         ],
@@ -496,11 +508,13 @@ class _StepRow extends StatelessWidget {
             ),
           ),
           if (showConnector)
+            // `absolute top-[calc(50%+12.5px)] bottom-[-18px] left-2.5 w-px` — 표식
+            // 열 안이 아니라 줄에 붙어, 줄 높이가 늘어도 같은 지점에서 시작합니다.
             Positioned(
-              left: (_markerColumnWidth - _connectorWidth) / 2,
-              top: _connectorTop,
+              left: _markerColumnWidth / 2,
+              top: _stepRowHeight / 2 + _connectorDrop,
+              bottom: -_connectorOverhang,
               width: _connectorWidth,
-              height: _connectorHeight,
               child: ColoredBox(
                 // 끝난 단계에서만 라이브 색, 아니면 10% 잉크.
                 color: step.status == HoronSteeringStepStatus.done ? colors.statusLive : colors.overlayInk10,
@@ -868,10 +882,11 @@ class _PauseButtonState extends State<_PauseButton> {
                 color: _pressed || _hovered ? colors.overlayInk10 : colors.overlayInk6,
                 borderRadius: BorderRadius.circular(theme.radius.full),
               ),
-              child: Icon(
-                widget.paused ? Icons.play_arrow : Icons.pause,
-                size: _iconButtonIconSize,
-                color: colors.textPrimary,
+              // `motion-swap` — 재생과 정지가 같은 칸에서 150ms로 교차합니다.
+              child: HoronSwap(
+                hidden: widget.paused,
+                hiddenChild: Icon(Icons.play_arrow, size: _iconButtonIconSize, color: colors.textPrimary),
+                child: Icon(Icons.pause, size: _iconButtonIconSize, color: colors.textPrimary),
               ),
             ),
           ),

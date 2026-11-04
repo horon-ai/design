@@ -76,7 +76,8 @@ class HoronSegmentedControlGallerySection extends StatelessWidget {
             '알약이고, 채움(fill)이면 알약이 옆 세그먼트로 미끄러지며, 글자 폭에 맞춘 '
             '트랙에서는 세그먼트 안에서 교차 페이드합니다. glass 트랙의 알약은 크기와 '
             '관계없이 두꺼운 유리와 1px 림, 0 1 3 8% 그림자를 쓰고, 나머지 표면에서는 '
-            '10% 잉크(또는 흰색)입니다. 라벨은 선택 전 hover에서도 `text-primary`가 됩니다.',
+            '10% 잉크입니다. subtle 트랙의 선택 알약만 라이트에서 페이지 배경색이고, '
+            '다크에서는 10% 잉크로 바뀝니다. 라벨은 선택 전 hover에서도 `text-primary`가 됩니다.',
             style: theme.text.bodySm.copyWith(
               color: theme.colors.textSecondary,
             ),

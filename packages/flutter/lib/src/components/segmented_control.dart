@@ -35,7 +35,8 @@ enum HoronSegmentedControlSurface {
   /// `insetFaint` — 헤더 필터 안쪽의 4% 잉크 트랙입니다.
   insetFaint,
 
-  /// `subtle` — `bg-subtle` 페이지 탭 트레이입니다. 선택 표시는 흰 알약입니다.
+  /// `subtle` — `bg-subtle` 페이지 탭 트레이입니다. 다크에서는 `overlay-ink-10`이고,
+  /// 선택 표시는 흰 알약입니다.
   subtle,
 }
 
@@ -306,7 +307,9 @@ class _HoronSegmentedControlState extends State<HoronSegmentedControl> {
       );
     }
 
-    final Color fill = widget.surface == HoronSegmentedControlSurface.subtle
+    // React `surface === "subtle" ? "bg-bg-default dark:bg-overlay-ink-10" : "bg-overlay-ink-10"`
+    // — 라이트의 선택 알약만 페이지 배경색이고, 다크는 10% 잉크입니다.
+    final Color fill = widget.surface == HoronSegmentedControlSurface.subtle && horon.brightness == Brightness.light
         ? horon.colors.bgDefault
         : horon.colors.overlayInk10;
     return AnimatedContainer(
