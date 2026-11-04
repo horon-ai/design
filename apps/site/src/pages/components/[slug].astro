@@ -5,6 +5,7 @@ import { createElement, Fragment, type ReactNode } from "react";
 import CodeBlock from "@/components/site/CodeBlock.astro";
 import { ComponentCard } from "@/components/site/ComponentCard";
 import Demo from "@/components/site/Demo.astro";
+import { PreviewTabs } from "@/components/site/PreviewTabs";
 import T from "@/components/i18n/T.astro";
 import { components, componentBySlug, componentGroups } from "@/data/components";
 import type { Localized } from "@/i18n";
@@ -63,27 +64,31 @@ const breadcrumb = [
   description={component.description}
   section="components"
   breadcrumb={breadcrumb}
+  toc={false}
 >
   <div class="flex flex-wrap items-center gap-2">
     <Badge tone="neutral">@horon-ai/react</Badge>
     {group && <Badge tone="brand"><T m={group.title} /></Badge>}
   </div>
 
-  <h2><T m={m.previewHeading} /></h2>
-  {
-    demoName ? (
-      <Demo name={demoName} overlay={component.overlay} />
-    ) : (
-      <EmptyState
-        className="mx-auto"
-        title={localized(m.previewMissingTitle)}
-        description={localized(m.previewMissingBody)}
-      />
-    )
-  }
-
-  <h2><T m={m.usageHeading} /></h2>
-  <CodeBlock code={snippet} title="tsx" />
+  <PreviewTabs client:load previewLabel={m.previewTab} codeLabel={m.codeTab}>
+    <div slot="preview">
+      {
+        demoName ? (
+          <Demo name={demoName} overlay={component.overlay} />
+        ) : (
+          <EmptyState
+            className="mx-auto"
+            title={localized(m.previewMissingTitle)}
+            description={localized(m.previewMissingBody)}
+          />
+        )
+      }
+    </div>
+    <div slot="code">
+      <CodeBlock code={snippet} title="tsx" />
+    </div>
+  </PreviewTabs>
 
   <nav
     class="mt-16 grid gap-6 border-t border-border-default pt-8 sm:grid-cols-2"
