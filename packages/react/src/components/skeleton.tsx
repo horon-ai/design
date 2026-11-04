@@ -15,7 +15,7 @@ export function Skeleton({ shape = "block", className, ...props }: SkeletonProps
     <div
       aria-hidden
       className={cn(
-        "animate-shimmer bg-overlay-ink-7 bg-[linear-gradient(90deg,transparent_30%,rgba(255,255,255,0.4)_50%,transparent_70%)] bg-size-[200%_100%] dark:bg-[linear-gradient(90deg,transparent_30%,rgba(255,255,255,0.06)_50%,transparent_70%)]",
+        "animate-shimmer bg-overlay-ink-7 bg-[linear-gradient(90deg,transparent_30%,rgba(255,255,255,0.4)_50%,transparent_70%)] bg-size-[200%_100%] bg-no-repeat dark:bg-[linear-gradient(90deg,transparent_30%,rgba(255,255,255,0.06)_50%,transparent_70%)]",
         shape === "pill" ? "rounded-full" : "rounded-xs",
         className,
       )}
@@ -38,7 +38,7 @@ export function SkeletonCard({ type = "row", surface = "solid", className }: Ske
       role="status"
       aria-label="Loading"
       className={cn(
-        "relative flex gap-3 overflow-clip rounded-2xl p-4",
+        "relative flex gap-3 overflow-clip rounded-xl p-4",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         type === "row" ? "w-75 items-center" : "w-70 flex-col items-start",
         className,

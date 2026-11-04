@@ -59,8 +59,8 @@ export function CommandPalette({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       {trigger}
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-bg-scrim motion-fade opacity-40" />
-        <Dialog.Viewport className="fixed inset-0 flex items-start justify-center px-2 pt-24">
+        <Dialog.Backdrop className="fixed inset-0 z-50 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]" />
+        <Dialog.Viewport className="fixed inset-0 z-50 flex items-start justify-center px-2 pt-24">
           <Dialog.Popup
             aria-label={placeholder}
             className={cn(
@@ -127,8 +127,10 @@ export function CommandPaletteBody({
       autoHighlight="always"
       keepHighlight
     >
-      <div className="relative flex h-12 items-center gap-2.5 px-3.5">
-        <MagnifyingGlass aria-hidden className="size-5 shrink-0 text-text-secondary" />
+      <div className="relative flex h-12 items-center gap-2.5 px-3">
+        <span className="flex size-7 shrink-0 items-center justify-center">
+          <MagnifyingGlass aria-hidden className="size-5 text-text-secondary" />
+        </span>
         <Autocomplete.Input
           placeholder={placeholder}
           className="min-w-0 flex-1 bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
