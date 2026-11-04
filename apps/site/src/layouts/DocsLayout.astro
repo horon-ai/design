@@ -1,56 +1,71 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import DocsBreadcrumb from "@/components/site/DocsBreadcrumb";
+import DocsSidebar from "@/components/site/DocsSidebar";
+import DocsToc from "@/components/site/DocsToc";
 import Footer from "@/components/site/Footer.astro";
-import Sidebar from "@/components/site/Sidebar.astro";
-import Toc from "@/components/site/Toc.astro";
+import T from "@/components/i18n/T.astro";
+import type { Localized } from "@/i18n";
 
 interface Props {
-  title: string;
-  description?: string;
+  /** Page title. A plain string is Korean-only; `Localized` renders both. */
+  title: string | Localized;
+  description?: string | Localized;
   section: string;
-  eyebrow?: string;
+  eyebrow?: string | Localized;
   toc?: boolean;
-  breadcrumb?: { label: string; href: string }[];
+  breadcrumb?: { label: string | Localized; href: string }[];
 }
 
-const { title, description, section, eyebrow, toc = true, breadcrumb } = Astro.props;
+const { title, description, section, eyebrow, toc = true, breadcrumb = [] } = Astro.props;
+
 const sidebarSections = ["foundations", "components", "get-started", "updates"];
 const withSidebar = sidebarSections.includes(section);
 const showToc = toc && withSidebar;
-const contentWidth = withSidebar ? "max-w-[56.25rem]" : "max-w-[68.75rem]";
+const currentPath = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const contentWidth = withSidebar ? "max-w-225" : "max-w-275";
+const crumbs = breadcrumb.map((item) => ({
+  label: typeof item.label === "string" ? { ko: item.label, en: item.label } : item.label,
+  href: item.href,
+}));
 ---
 
 <BaseLayout title={title} description={description} footer={false}>
-  <div class:list={[withSidebar ? "docs-grid" : "block"]}>
-    {withSidebar && <Sidebar section={section} />}
-    <article class:list={[withSidebar ? "docs-main" : "docs-main-wide"]}>
+  <div class="flex flex-col items-stretch lg:flex-row lg:items-start">
+    {withSidebar && <DocsSidebar section={section} currentPath={currentPath} client:load />}
+
+    <article class="min-w-0 flex-1 px-4 pt-6 pb-16 md:px-6 md:pt-14 md:pb-24">
       <div class:list={["mx-auto w-full", contentWidth]}>
-        {
-          breadcrumb && breadcrumb.length > 0 && (
-            <nav
-              aria-label="현재 위치"
-              class="flex flex-wrap items-center gap-2 text-body-sm text-text-secondary"
-            >
-              {breadcrumb.map((item, index) => (
-                <Fragment>
-                  {index > 0 && <span aria-hidden="true">/</span>}
-                  <a href={item.href} class="transition-colors hover:text-text-primary">
-                    {item.label}
-                  </a>
-                </Fragment>
-              ))}
-            </nav>
-          )
-        }
-        {eyebrow && <p class="mt-3 text-body-sm text-text-secondary">{eyebrow}</p>}
-        <h1 class:list={[withSidebar ? "doc-title" : "doc-title doc-title-wide"]}>{title}</h1>
-        {description && <p class="doc-lead mt-4">{description}</p>}
+        {crumbs.length > 0 && <DocsBreadcrumb items={crumbs} client:load />}
+
+        <header>
+          {
+            eyebrow && (
+              <p class="text-caption text-text-secondary">
+                {typeof eyebrow === "string" ? eyebrow : <T m={eyebrow} />}
+              </p>
+            )
+          }
+          <h1 class:list={["text-display-md text-text-primary text-balance", eyebrow && "mt-2"]}>
+            {typeof title === "string" ? title : <T m={title} />}
+          </h1>
+          {
+            description && (
+              <p class="mt-4 max-w-3xl text-body-lg text-text-secondary">
+                {typeof description === "string" ? description : <T m={description} />}
+              </p>
+            )
+          }
+        </header>
+
         <div class="prose-docs mt-10">
           <slot />
         </div>
+
         <Footer />
       </div>
     </article>
-    {showToc && <Toc />}
+
+    {showToc && <DocsToc client:load />}
   </div>
 </BaseLayout>

@@ -1,37 +1,44 @@
 ---
-import DocsLayout from "@/layouts/DocsLayout.astro";
 import { radius, shadow } from "@horon-ai/tokens";
+
+import T from "@/components/i18n/T.astro";
+import { foundationsRadiusMessages as m } from "@/i18n/messages/foundations-radius";
+import DocsLayout from "@/layouts/DocsLayout.astro";
 ---
 
 <DocsLayout
-  title="Radius"
+  title={m.title}
   eyebrow="Foundations"
   section="foundations"
-  description="반경 7단과 떠 있는 표면에 쓰는 그림자 2종입니다."
+  description={m.description}
 >
-  <h2>Radius</h2>
-  <div class="not-prose mt-5 flex flex-wrap gap-4">
+  <h2><T m={m.radiusHeading} /></h2>
+  <div class="mt-5 flex flex-wrap gap-4">
     {
       Object.entries(radius).map(([name, value]) => (
         <div class="flex flex-col items-center gap-2">
-          <div class="size-20 border border-border-strong bg-bg-subtle" style={`border-radius: ${Math.min(value, 40)}px`} />
+          <div
+            class="size-20 border border-border-strong bg-bg-subtle"
+            style={`border-radius: ${Math.min(value, 40)}px`}
+            aria-hidden="true"
+          />
           <span class="font-mono text-caption text-text-secondary">{name} · {value}</span>
         </div>
       ))
     }
   </div>
-  <p>버튼·칩·탭은 <code>full</code>, 입력과 메뉴 항목은 <code>md</code>, 카드와 다이얼로그는 <code>xl</code>을 씁니다.</p>
+  <p><T m={m.radiusNote} /></p>
 
-  <h2>Shadow</h2>
-  <p>
-    유리 표면은 그림자 대신 경계선과 흐림으로 떠 보입니다. 그림자는 유리 위에 다시 뜨는 불투명 표면에만 씁니다.
-    <code>popover</code>는 계정·워크스페이스 메뉴, <code>palette</code>는 커맨드 팔레트입니다.
-  </p>
-  <div class="not-prose mt-5 grid gap-6 sm:grid-cols-2">
+  <h2><T m={m.shadowHeading} /></h2>
+  <p><T m={m.shadowBody} /></p>
+  <div class="mt-5 grid gap-6 sm:grid-cols-2">
     {
       Object.entries(shadow).map(([name, value]) => (
         <div class="rounded-xl bg-bg-subtle p-8">
-          <div class="flex h-24 items-center justify-center rounded-[18px] bg-bg-surface" style={`box-shadow: ${value}`}>
+          <div
+            class="flex h-24 items-center justify-center rounded-xl bg-bg-surface"
+            style={`box-shadow: ${value}`}
+          >
             <span class="font-mono text-caption text-text-secondary">shadow-{name}</span>
           </div>
           <p class="mt-3 font-mono text-caption text-text-secondary">{value}</p>

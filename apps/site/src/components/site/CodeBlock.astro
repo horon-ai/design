@@ -1,47 +1,37 @@
 ---
+import { CodePanel } from "@horon-ai/react";
+
+import { CopyButton } from "@/components/site/CopyButton";
+import type { Localized } from "@/i18n";
+
 interface Props {
-  code: string;
+  /** One sample for both locales, or one per locale when the comments differ. */
+  code: string | Localized;
   lang?: string;
   title?: string;
 }
 
 const { code, lang = "tsx", title } = Astro.props;
-const trimmed = code.trim();
+const label = title ?? lang;
 ---
 
-<figure class="not-prose overflow-hidden rounded-md border border-border-default bg-bg-surface">
-  <figcaption class="flex items-center justify-between border-b border-border-default px-4 py-2">
-    <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-text-secondary">
-      {title ?? lang}
-    </span>
-    <button
-      type="button"
-      data-copy-code
-      class="rounded-xs px-2 py-1 font-mono text-[11px] text-text-secondary transition-colors hover:bg-bg-subtle hover:text-text-primary"
-    >
-      복사
-    </button>
+<figure class="not-prose flex flex-col gap-2">
+  <figcaption class="flex items-center justify-between gap-4">
+    <span class="font-mono text-caption text-text-secondary">{label}</span>
+    <CopyButton client:visible code={code} />
   </figcaption>
-  <pre class="overflow-x-auto px-4 py-4 text-[12.5px] leading-6"><code data-code-block>{trimmed}</code></pre>
+  {
+    typeof code === "string" ? (
+      <CodePanel>{code.trim()}</CodePanel>
+    ) : (
+      <>
+        <div data-locale-text="ko" lang="ko">
+          <CodePanel>{code.ko.trim()}</CodePanel>
+        </div>
+        <div data-locale-text="en" lang="en">
+          <CodePanel>{code.en.trim()}</CodePanel>
+        </div>
+      </>
+    )
+  }
 </figure>
-
-<script is:inline>
-  (() => {
-    document.addEventListener("click", async (event) => {
-      const button = event.target.closest("[data-copy-code]");
-      if (!button) return;
-      const code = button.closest("figure")?.querySelector("[data-code-block]");
-      if (!code) return;
-      try {
-        await navigator.clipboard.writeText(code.textContent ?? "");
-        const original = button.textContent;
-        button.textContent = "복사됨";
-        setTimeout(() => {
-          button.textContent = original;
-        }, 1400);
-      } catch {
-        button.textContent = "실패";
-      }
-    });
-  })();
-</script>

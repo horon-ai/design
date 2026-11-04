@@ -1,60 +1,101 @@
 ---
-import DocsLayout from "@/layouts/DocsLayout.astro";
-import CodeBlock from "@/components/site/CodeBlock.astro";
+import {
+  DataTable,
+  DataTableCell,
+  DataTableHead,
+  DataTableRow,
+  DataTableTable,
+} from "@horon-ai/react";
 import { lightColors, primitives, radius, shadow, spacing, textStyles } from "@horon-ai/tokens";
 
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import T from "@/components/i18n/T.astro";
+import { fill } from "@/i18n/messages/fill";
+import { foundationsTokensMessages as m } from "@/i18n/messages/foundations-tokens";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+
 const rows = [
-  ["color.ts", "시맨틱 색 라이트·다크, sky·red 프리미티브", `${Object.keys(lightColors).length}개 + ${Object.keys(primitives).length}개`, "Components 54:81, Components / Dark 166:1107"],
-  ["typography.ts", "글꼴, 굵기 4종, 글자 스타일의 플랫폼별 크기", `${Object.keys(textStyles).length}개 스타일 × 3 플랫폼`, "Typography 26:2"],
-  ["scale.ts", "간격, 반경, 그림자", `${Object.keys(spacing).length} · ${Object.keys(radius).length} · ${Object.keys(shadow).length}`, "Scale 컬렉션, Menus 88:495"],
-  ["glass.ts", "유리 레이어 값과 높이 비례 규칙", "레이어 5장", "Button 55:339 외"],
+  {
+    file: "color.ts",
+    body: m.colorBody,
+    count: fill(m.colorCount, {
+      semantic: Object.keys(lightColors).length,
+      primitive: Object.keys(primitives).length,
+    }),
+    source: m.colorSource,
+  },
+  {
+    file: "typography.ts",
+    body: m.typographyBody,
+    count: fill(m.typographyCount, { styles: Object.keys(textStyles).length }),
+    source: m.typographySource,
+  },
+  {
+    file: "scale.ts",
+    body: m.scaleBody,
+    count: fill(m.scaleCount, {
+      spacing: Object.keys(spacing).length,
+      radius: Object.keys(radius).length,
+      shadow: Object.keys(shadow).length,
+    }),
+    source: m.scaleSource,
+  },
+  {
+    file: "glass.ts",
+    body: m.glassBody,
+    count: m.glassCount,
+    source: m.glassSource,
+  },
 ];
 
-const build = `# 저장소 루트에서
-bun run --filter @horon-ai/tokens build   # packages/tokens/theme.css 재생성
-bun test packages/tokens                  # 생성 결과와 커밋된 파일이 같은지 확인`;
+const build = `# from the repository root
+bun run --filter @horon-ai/tokens build   # regenerate packages/tokens/theme.css
+bun test packages/tokens                  # check the output matches the committed file`;
 
-const usage = `<p class="text-label-md text-text-secondary">라벨</p>
+const usage = `<p class="text-label-md text-text-secondary">Label</p>
 <div class="rounded-xl bg-glass-thick" />
-<span style="color: var(--color-text-brand)">브랜드</span>`;
+<span style="color: var(--color-text-brand)">Brand</span>`;
 ---
 
 <DocsLayout
-  title="Design Token"
+  title={m.title}
   eyebrow="Foundations"
   section="foundations"
-  description="토큰은 Figma 변수를 그대로 옮긴 TypeScript 값입니다. 여기서 웹용 theme.css가 생성됩니다."
+  description={m.description}
 >
-  <h2>파일 구성</h2>
-  <div class="not-prose mt-5 overflow-x-auto rounded-xl border border-border-default">
-    <table class="w-full text-left text-[13px]">
-      <thead class="bg-bg-subtle text-text-secondary">
-        <tr><th class="px-4 py-2.5 font-medium">파일</th><th class="px-4 py-2.5 font-medium">내용</th><th class="px-4 py-2.5 font-medium">개수</th><th class="px-4 py-2.5 font-medium">Figma 출처</th></tr>
+  <h2><T m={m.filesHeading} /></h2>
+  <DataTable className="mt-5">
+    <DataTableTable>
+      <thead>
+        <DataTableRow>
+          <DataTableHead><T m={m.headFile} /></DataTableHead>
+          <DataTableHead><T m={m.headBody} /></DataTableHead>
+          <DataTableHead><T m={m.headCount} /></DataTableHead>
+          <DataTableHead><T m={m.headSource} /></DataTableHead>
+        </DataTableRow>
       </thead>
       <tbody>
         {
-          rows.map(([file, body, count, source]) => (
-            <tr class="border-t border-border-default">
-              <td class="px-4 py-2.5 font-mono">{file}</td>
-              <td class="px-4 py-2.5">{body}</td>
-              <td class="px-4 py-2.5 text-text-secondary">{count}</td>
-              <td class="px-4 py-2.5 text-text-secondary">{source}</td>
-            </tr>
+          rows.map((row) => (
+            <DataTableRow>
+              <DataTableCell>
+                <code class="font-mono text-code text-text-primary">{row.file}</code>
+              </DataTableCell>
+              <DataTableCell><T m={row.body} /></DataTableCell>
+              <DataTableCell><T m={row.count} /></DataTableCell>
+              <DataTableCell><T m={row.source} /></DataTableCell>
+            </DataTableRow>
           ))
         }
       </tbody>
-    </table>
-  </div>
+    </DataTableTable>
+  </DataTable>
 
-  <h2>이름 규칙</h2>
-  <p>
-    CSS 변수 이름은 Figma 변수의 WEB 코드 문법과 같습니다. Tailwind에서는 앞의 <code>--color-</code>,
-    <code>--text-</code>, <code>--radius-</code>를 떼고 씁니다. Tailwind 기본 팔레트, 글자 크기, 반경은 비웠기 때문에
-    <code>text-sm</code>이나 <code>bg-zinc-100</code>은 동작하지 않습니다. 이름이 없는 값이 필요하면 토큰을 먼저 추가합니다.
-  </p>
+  <h2><T m={m.namingHeading} /></h2>
+  <p><T m={m.namingBody} /></p>
   <CodeBlock code={usage} title="html" />
 
-  <h2>재생성</h2>
-  <p><code>theme.css</code>는 손으로 고치지 않습니다. 값을 바꾼 뒤 아래 명령으로 다시 만듭니다.</p>
+  <h2><T m={m.rebuildHeading} /></h2>
+  <p><T m={m.rebuildBody} /></p>
   <CodeBlock code={build} lang="bash" title="terminal" />
 </DocsLayout>

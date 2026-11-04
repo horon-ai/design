@@ -1,108 +1,159 @@
 ---
+import { Button, Card, HoronWordmark } from "@horon-ai/react";
+import { createElement, Fragment, type ReactNode } from "react";
+
+import T from "@/components/i18n/T.astro";
+import {
+  coreMascots,
+  mascotImageUrl,
+  mascotPalette,
+  mascotSourceUrl,
+  mascotSpec,
+  stateMascots,
+} from "@/data/mascots";
+import type { Localized } from "@/i18n";
+import { mascotMessages as m } from "@/i18n/messages/mascot";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { coreMascots, mascotImageUrl, mascotPalette, mascotSourceUrl, mascotSpec, stateMascots } from "@/data/mascots";
 
 const groups = [
-  { id: "core", title: "Core poses", description: "캐릭터의 기본 자세 일곱 가지입니다.", items: coreMascots },
-  { id: "state", title: "Product states", description: "제품 화면의 상태를 대신 말하는 열아홉 가지 컷입니다.", items: stateMascots },
+  { title: m.coreTitle, description: m.coreDescription, items: coreMascots },
+  { title: m.stateTitle, description: m.stateDescription, items: stateMascots },
 ];
+
+const logoScales = [
+  { size: 24, className: "size-6" },
+  { size: 32, className: "size-8" },
+  { size: 48, className: "size-12" },
+  { size: 64, className: "size-16" },
+];
+
+const swatchClass: Record<string, string> = {
+  ink: "bg-mascot-ink",
+  cream: "bg-mascot-cream",
+  gold: "bg-mascot-gold",
+};
+
+const rules = [m.rule1, m.rule2, m.rule3, m.rule4, m.rule5];
+
+/** React nodes for library props, using the same two-span markup as `T.astro`. */
+function localized(entry: Localized): ReactNode {
+  return createElement(
+    Fragment,
+    null,
+    createElement("span", { "data-locale-text": "ko", lang: "ko" }, entry.ko),
+    createElement("span", { "data-locale-text": "en", lang: "en" }, entry.en),
+  );
+}
+
 ---
 
-<BaseLayout
-  title="Mascot"
-  description="HORON의 마스코트는 둥근 송곳니 매 병아리입니다. 제품 이름 Horus + ON에서 왔고, 26가지 컷을 투명 PNG로 제공합니다."
->
-  <div class="site-shell py-16">
+<BaseLayout title={m.pageTitle} description={m.description}>
+  <div class="mx-auto w-full max-w-275 px-4 py-16 md:px-6">
     <header class="max-w-3xl">
-      <p class="mb-3 text-body-sm text-text-secondary">Mascot</p>
-      <h1 class="doc-title">Horon mascot</h1>
-      <p class="mt-5 max-w-2xl text-[15px] leading-7 text-text-secondary text-pretty">
-        제품 이름 Horus + ON에서 온 둥근 병아리입니다. 머리는 모서리가 크게 둥근 사각형이고, 그 위에
-        짧은 깃털 두 가닥이 솟아 있습니다. 얼굴 판은 따뜻한 크림색 타원, 눈은 크고 둥근 검은 눈에
-        작은 흰 하이라이트가 하나씩 있습니다.
-      </p>
+      <p class="mb-3 text-body-sm text-text-secondary"><T m={m.eyebrow} /></p>
+      <h1 class="text-display-md text-text-primary"><T m={m.title} /></h1>
+      <p class="mt-5 max-w-2xl text-body-lg text-text-secondary text-pretty"><T m={m.body} /></p>
       <dl class="mt-8 flex flex-wrap gap-x-10 gap-y-4">
         <div>
-          <dt class="text-caption text-text-secondary">Cuts</dt>
-          <dd class="mt-1 text-[1.5rem] font-semibold tracking-[-0.02em]">{mascotSpec.count}</dd>
+          <dt class="text-caption text-text-secondary"><T m={m.specCuts} /></dt>
+          <dd class="mt-1 text-title-md text-text-primary">{mascotSpec.count}</dd>
         </div>
         <div>
-          <dt class="text-caption text-text-secondary">Size</dt>
-          <dd class="mt-1 text-[1.5rem] font-semibold tracking-[-0.02em]">{mascotSpec.size}</dd>
+          <dt class="text-caption text-text-secondary"><T m={m.specSize} /></dt>
+          <dd class="mt-1 text-title-md text-text-primary">{mascotSpec.size}</dd>
         </div>
         <div>
-          <dt class="text-caption text-text-secondary">Format</dt>
-          <dd class="mt-1 text-[0.9375rem] font-medium">{mascotSpec.format}</dd>
+          <dt class="text-caption text-text-secondary"><T m={m.specFormat} /></dt>
+          <dd class="mt-1 text-label-lg text-text-primary"><T m={mascotSpec.format} /></dd>
         </div>
       </dl>
     </header>
 
-    <section class="not-prose mt-12">
-      <h2 class="text-title-md font-medium">사이트 적용</h2>
-      <p class="mt-1 text-[13px] text-text-secondary">
-        이 사이트는 마스코트를 로고와 파비콘, 공유 이미지에 그대로 씁니다.
-      </p>
-      <div class="mt-5 grid gap-3 md:grid-cols-2">
-        <div class="rounded-xl bg-bg-subtle/40 px-5 py-5">
-          <p class="text-body-sm text-text-secondary">Header lockup</p>
-          <div class="mt-4 flex items-center gap-2.5">
-            <img src={mascotImageUrl("face")} alt="" width="30" height="30" class="size-[30px] object-contain" />
-            <span class="text-[15px] font-semibold tracking-[-0.02em]">HORON</span>
-            <span class="text-[13px] text-text-secondary">Design System</span>
+    <section class="mt-12">
+      <h2 class="text-title-md text-text-primary"><T m={m.appliedTitle} /></h2>
+      <p class="mt-1 text-body-sm text-text-secondary"><T m={m.appliedBody} /></p>
+      <div class="mt-5 grid gap-4 md:grid-cols-2">
+        <Card title={localized(m.lockupTitle)}>
+          <div class="flex items-center gap-2.5">
+            <img
+              src={mascotImageUrl("face")}
+              alt=""
+              width="30"
+              height="30"
+              class="size-8 object-contain"
+            />
+            <HoronWordmark />
+            <span class="text-body-sm text-text-secondary"><T m={m.designSystem} /></span>
           </div>
           <div class="mt-5 flex items-end gap-4">
-            {[24, 32, 48, 64].map((size) => (
-              <div class="flex flex-col items-center gap-1.5">
-                <img
-                  src={mascotImageUrl("face")}
-                  alt={`${size}px 로고`}
-                  width={size}
-                  height={size}
-                  style={`width:${size}px;height:${size}px`}
-                  class="object-contain"
-                />
-                <span class="font-mono text-[10px] text-text-secondary">{size}</span>
-              </div>
-            ))}
+            {
+              logoScales.map((logo) => (
+                <div class="flex flex-col items-center gap-1.5">
+                  <img
+                    src={mascotImageUrl("face")}
+                    alt={`${logo.size}${m.logoAlt.ko}`}
+                    width={logo.size}
+                    height={logo.size}
+                    class:list={["object-contain", logo.className]}
+                  />
+                  <span class="text-caption text-text-secondary">{logo.size}</span>
+                </div>
+              ))
+            }
           </div>
-        </div>
-        <div class="rounded-xl bg-bg-subtle/40 px-5 py-5">
-          <p class="text-body-sm text-text-secondary">Favicon · OG</p>
-          <div class="mt-4 flex items-center gap-4">
-            <img src="/icon.png" alt="파비콘 256px" width="64" height="64" class="size-16 rounded-lg" />
-            <img src="/apple-icon.png" alt="애플 터치 아이콘" width="56" height="56" class="size-14 rounded-lg" />
+        </Card>
+
+        <Card title={localized(m.faviconTitle)}>
+          <div class="flex flex-wrap items-center gap-4">
+            <img
+              src="/icon.png"
+              alt={m.faviconAlt.ko}
+              width="64"
+              height="64"
+              class="size-16 rounded-lg"
+            />
+            <img
+              src="/apple-icon.png"
+              alt={m.appleIconAlt.ko}
+              width="56"
+              height="56"
+              class="size-14 rounded-lg"
+            />
             <div class="flex flex-col gap-1">
-              <span class="font-mono text-[11px]">favicon.ico 16 · 32 · 48</span>
-              <span class="font-mono text-[11px]">icon.png 256</span>
-              <span class="font-mono text-[11px]">icon-512.png · apple-icon.png 180</span>
+              <code class="text-code text-text-secondary">favicon.ico 16 · 32 · 48</code>
+              <code class="text-code text-text-secondary">icon.png 256</code>
+              <code class="text-code text-text-secondary">icon-512.png · apple-icon.png 180</code>
             </div>
           </div>
           <img
             src="/og.png"
-            alt="공유 이미지 미리보기"
+            alt={m.ogAlt.ko}
             width="1200"
             height="630"
             loading="lazy"
             class="mt-5 w-full rounded-md border border-border-default"
           />
-        </div>
+        </Card>
       </div>
     </section>
 
-    <section class="not-prose mt-12">
-      <h2 class="text-title-md font-medium">Brand palette</h2>
+    <section class="mt-12">
+      <h2 class="text-title-md text-text-primary"><T m={m.paletteTitle} /></h2>
       <div class="mt-4 grid gap-3 sm:grid-cols-3">
         {
           mascotPalette.map((swatch) => (
-            <div class="flex items-center gap-3 rounded-xl bg-bg-subtle/40 px-4 py-3">
+            <div class="flex items-center gap-3 rounded-xl bg-bg-subtle p-3">
               <span
-                class="size-9 shrink-0 rounded-sm border border-border-default"
-                style={`background: ${swatch.hex}`}
+                aria-hidden="true"
+                class:list={[
+                  "size-9 shrink-0 rounded-sm border border-border-default",
+                  swatchClass[swatch.token],
+                ]}
               />
               <div class="min-w-0">
-                <p class="font-mono text-[12px]">{swatch.token}</p>
-                <p class="font-mono text-[11px] text-text-secondary">{swatch.hex}</p>
-                <p class="mt-0.5 text-[11.5px] text-text-secondary">{swatch.role}</p>
+                <p class="text-code text-text-primary">{swatch.token}</p>
+                <p class="text-caption text-text-secondary">{swatch.hex}</p>
+                <p class="mt-0.5 text-caption text-text-secondary"><T m={swatch.role} /></p>
               </div>
             </div>
           ))
@@ -112,38 +163,38 @@ const groups = [
 
     {
       groups.map((group) => (
-        <section class="not-prose mt-14">
+        <section class="mt-14">
           <div class="flex items-baseline justify-between gap-4">
             <div>
-              <h2 class="text-title-md font-medium">{group.title}</h2>
-              <p class="mt-1 text-[13px] text-text-secondary">{group.description}</p>
+              <h2 class="text-title-md text-text-primary"><T m={group.title} /></h2>
+              <p class="mt-1 text-body-sm text-text-secondary"><T m={group.description} /></p>
             </div>
-            <span class="font-mono text-[11px] text-text-secondary">{group.items.length}</span>
+            <span class="text-caption text-text-secondary">{group.items.length}</span>
           </div>
           <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {group.items.map((mascot) => (
-              <figure class="group flex flex-col overflow-hidden rounded-xl bg-bg-subtle/40">
+              <figure class="group flex flex-col overflow-hidden rounded-xl bg-bg-subtle">
                 <div class="flex aspect-square items-center justify-center p-4">
                   <img
                     src={mascotImageUrl(mascot.slug)}
-                    alt={`Horon 마스코트 ${mascot.name} 컷`}
+                    alt={`${m.mascotAlt.ko} ${mascot.name} ${m.cutSuffix.ko}`}
                     width="384"
                     height="384"
                     loading="lazy"
-                    class="size-full object-contain transition-transform duration-200 group-hover:scale-[1.04]"
+                    class="size-full object-contain transition-transform duration-200 group-hover:scale-105"
                   />
                 </div>
                 <figcaption class="flex flex-1 flex-col gap-1 px-3 py-2.5">
-                  <span class="font-mono text-[11.5px] text-text-primary">horon-mascot-{mascot.name}</span>
-                  <span class="text-[11.5px] leading-4 text-text-secondary">{mascot.use}</span>
-                  <a
+                  <span class="text-code text-text-primary">horon-mascot-{mascot.name}</span>
+                  <span class="text-caption text-text-secondary"><T m={mascot.use} /></span>
+                  <Button
+                    variant="link"
                     href={mascotSourceUrl(mascot.slug)}
-                    class="mt-1 font-mono text-[10.5px] text-text-secondary underline decoration-[var(--color-text-brand)] underline-offset-2 transition-colors hover:text-text-primary"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    PNG 내려받기
-                  </a>
+                    <T m={m.download} />
+                  </Button>
                 </figcaption>
               </figure>
             ))}
@@ -152,14 +203,10 @@ const groups = [
       ))
     }
 
-    <section class="prose-docs mt-16 max-w-3xl border-t border-border-default pt-10">
-      <h2>사용 규칙</h2>
-      <ul>
-        <li>투명 배경 PNG(1254 × 1254)를 원본으로 쓰고, 이 사이트는 768px WebP로 줄여 제공합니다.</li>
-        <li>자르지 않고 원본 비율을 유지합니다. 캐릭터 주변 여백은 컷마다 같습니다.</li>
-        <li>얼굴 판이 있는 쪽으로 시선을 두고, 캐릭터 위에 텍스트를 얹지 않습니다.</li>
-        <li>상태 컷은 화면의 빈 상태·오류·로딩을 대신 말할 때만 씁니다. 장식으로 반복하지 않습니다.</li>
-        <li>색은 브랜드 팔레트 세 값만 씁니다. 다른 색으로 다시 칠하지 않습니다.</li>
+    <section class="mt-16 max-w-3xl border-t border-border-default pt-10">
+      <h2 class="text-title-md text-text-primary"><T m={m.rulesTitle} /></h2>
+      <ul class="mt-4 list-disc space-y-2 pl-5 text-body-sm text-text-secondary">
+        {rules.map((rule) => <li><T m={rule} /></li>)}
       </ul>
     </section>
   </div>
