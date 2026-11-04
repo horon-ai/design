@@ -434,101 +434,98 @@ Future<void> showHoronBottomSheet(
 }
 
 /// 아래에서 올라오는 시트 라우트입니다.
-class _HoronBottomSheetRoute extends PopupRoute<void> {
+class _HoronBottomSheetRoute extends RawDialogRoute<void> {
   _HoronBottomSheetRoute({
-    required this.title,
-    required this.closeLabel,
-    required this.detail,
-    required this.solid,
-    required this.backdrop,
-    required this.floating,
-    required this.child,
-    required this.onClose,
-  });
+    required Widget title,
+    required String? closeLabel,
+    required bool detail,
+    required bool solid,
+    required bool backdrop,
+    required bool floating,
+    required Widget? child,
+    required VoidCallback? onClose,
+  }) : super(
+         pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+           final HoronThemeData theme = HoronTheme.of(context);
+           final HoronSpaceSpec space = theme.space;
+           final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+           final Animation<double> progress = reduceMotion ? const AlwaysStoppedAnimation<double>(1) : animation;
 
-  final Widget title;
-  final String? closeLabel;
-  final bool detail;
-  final bool solid;
-  final bool backdrop;
-  final bool floating;
-  final Widget? child;
-  final VoidCallback? onClose;
+           // detail은 전폭, floating은 가장자리 16px, 패널은 최대 374px입니다.
+           final double maxWidth = detail || floating ? double.infinity : _panelMaxWidth;
 
-  @override
-  Color? get barrierColor => null;
+           return Stack(
+             children: <Widget>[
+               if (backdrop)
+                 Positioned.fill(
+                   child: FadeTransition(
+                     opacity: CurvedAnimation(parent: progress, curve: HoronMotion.easeOutQuint),
+                     child: BackdropFilter(
+                       filter: ui.ImageFilter.blur(sigmaX: _scrimBlur, sigmaY: _scrimBlur),
+                       child: ColoredBox(color: theme.colors.bgScrim.withValues(alpha: _scrimOpacity)),
+                     ),
+                   ),
+                 ),
+               if (backdrop)
+                 Positioned.fill(
+                   child: GestureDetector(
+                     behavior: HitTestBehavior.opaque,
+                     onTap: () => Navigator.of(context).maybePop(),
+                   ),
+                 ),
+               Positioned.fill(
+                 child: Align(
+                   alignment: Alignment.bottomCenter,
+                   child: Padding(
+                     padding: floating ? EdgeInsets.fromLTRB(space.s4, 0, space.s4, space.s4) : EdgeInsets.zero,
+                     child: ConstrainedBox(
+                       constraints: BoxConstraints(maxWidth: maxWidth),
+                       child: SizedBox(
+                         width: double.infinity,
+                         child: SlideTransition(
+                           // data-starting-style:translate-y-full — 시트 높이만큼 아래에서 올라옵니다.
+                           position: Tween<Offset>(
+                             begin: const Offset(0, 1),
+                             end: Offset.zero,
+                           ).animate(CurvedAnimation(parent: progress, curve: HoronMotion.easeOutQuint)),
+                           child: HoronBottomSheet(
+                             title: title,
+                             closeLabel: closeLabel,
+                             detail: detail,
+                             solid: solid,
+                             floating: floating,
+                             onClose: onClose,
+                             child: child,
+                           ),
+                         ),
+                       ),
+                     ),
+                   ),
+                 ),
+               ),
+             ],
+           );
+         },
+         barrierDismissible: backdrop,
+         barrierLabel: closeLabel,
+         // 배경 스크림·블러는 페이지가 직접 그립니다.
+         barrierColor: null,
+         transitionDuration: _enterDuration,
+         // SDK 기본 전환은 `FadeTransition`입니다. 페이지가 이미 슬라이드와
+         // 스크림 페이드를 들고 있으므로 두 번 겹치지 않게 항등으로 넘깁니다.
+         transitionBuilder: (
+           BuildContext context,
+           Animation<double> animation,
+           Animation<double> secondaryAnimation,
+           Widget child,
+         ) => child,
+       );
 
-  @override
-  bool get barrierDismissible => backdrop;
-
-  @override
-  String? get barrierLabel => closeLabel;
-
-  @override
-  Duration get transitionDuration => _enterDuration;
-
+  /// 나가는 시간만 들어오는 시간(320ms)과 다릅니다.
+  ///
+  /// `RawDialogRoute`에는 이 값을 받는 생성자 인자가 없어 게터로 덮어씁니다.
   @override
   Duration get reverseTransitionDuration => _exitDuration;
-
-  @override
-  Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final HoronSpaceSpec space = theme.space;
-    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final Animation<double> progress = reduceMotion ? const AlwaysStoppedAnimation<double>(1) : animation;
-
-    // detail은 전폭, floating은 가장자리 16px, 패널은 최대 374px입니다.
-    final double maxWidth = detail || floating ? double.infinity : _panelMaxWidth;
-
-    return Stack(
-      children: <Widget>[
-        if (backdrop)
-          Positioned.fill(
-            child: FadeTransition(
-              opacity: CurvedAnimation(parent: progress, curve: HoronMotion.easeOutQuint),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: _scrimBlur, sigmaY: _scrimBlur),
-                child: ColoredBox(color: theme.colors.bgScrim.withValues(alpha: _scrimOpacity)),
-              ),
-            ),
-          ),
-        if (backdrop)
-          Positioned.fill(
-            child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () => Navigator.of(context).maybePop()),
-          ),
-        Positioned.fill(
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: floating ? EdgeInsets.fromLTRB(space.s4, 0, space.s4, space.s4) : EdgeInsets.zero,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: maxWidth),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: SlideTransition(
-                    // data-starting-style:translate-y-full — 시트 높이만큼 아래에서 올라옵니다.
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 1),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(parent: progress, curve: HoronMotion.easeOutQuint)),
-                    child: HoronBottomSheet(
-                      title: title,
-                      closeLabel: closeLabel,
-                      detail: detail,
-                      solid: solid,
-                      floating: floating,
-                      onClose: onClose,
-                      child: child,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 /// `motion-press`(scale .97)와 누름 콜백, 포커스 고리를 한 자리에 묶습니다.

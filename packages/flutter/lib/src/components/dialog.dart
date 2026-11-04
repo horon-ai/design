@@ -235,100 +235,94 @@ Future<void> showHoronDialog(
 }
 
 /// 가운데에 나타나는 다이얼로그 라우트입니다.
-class _HoronDialogRoute extends PopupRoute<void> {
+class _HoronDialogRoute extends RawDialogRoute<void> {
   _HoronDialogRoute({
-    required this.title,
-    required this.description,
-    required this.closeLabel,
-    required this.leading,
-    required this.solid,
-    required this.child,
-    required this.onClose,
-    required this.dismissible,
-  });
+    required Widget title,
+    required Widget? description,
+    required String? closeLabel,
+    required Widget? leading,
+    required bool solid,
+    required Widget? child,
+    required VoidCallback? onClose,
+    required bool dismissible,
+  }) : super(
+         pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+           final HoronThemeData theme = HoronTheme.of(context);
+           final HoronSpaceSpec space = theme.space;
+           final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+           final Animation<double> progress = reduceMotion
+               ? const AlwaysStoppedAnimation<double>(1)
+               : CurvedAnimation(parent: animation, curve: HoronMotion.easeOutQuint);
 
-  final Widget title;
-  final Widget? description;
-  final String? closeLabel;
-  final Widget? leading;
-  final bool solid;
-  final Widget? child;
-  final VoidCallback? onClose;
-  final bool dismissible;
-
-  @override
-  Color? get barrierColor => null;
-
-  @override
-  bool get barrierDismissible => dismissible;
-
-  @override
-  String? get barrierLabel => closeLabel;
-
-  @override
-  Duration get transitionDuration => _enterDuration;
-
-  @override
-  Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final HoronSpaceSpec space = theme.space;
-    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final Animation<double> progress = reduceMotion
-        ? const AlwaysStoppedAnimation<double>(1)
-        : CurvedAnimation(parent: animation, curve: HoronMotion.easeOutQuint);
-
-    return Stack(
-      children: <Widget>[
-        Positioned.fill(
-          child: FadeTransition(
-            opacity: progress,
-            child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: _scrimBlur, sigmaY: _scrimBlur),
-              child: ColoredBox(color: theme.colors.bgScrim.withValues(alpha: _scrimOpacity)),
-            ),
-          ),
-        ),
-        if (dismissible)
-          Positioned.fill(
-            child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () => Navigator.of(context).maybePop()),
-          ),
-        Positioned.fill(
-          // px-4 — 뷰포트 여백이 max-w-[calc(100vw-2rem)]의 자리입니다.
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: space.s4),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: _dialogMaxWidth),
-                child: SizedBox(
-                  width: double.infinity,
-                  // 화면보다 큰 내용도 잘리지 않게 세로로만 스크롤합니다.
-                  child: SingleChildScrollView(
-                    child: AnimatedBuilder(
-                      animation: progress,
-                      builder: (BuildContext context, Widget? child) => Transform.translate(
-                        // data-starting-style:translate-y-2 — 8px 아래에서 올라옵니다.
-                        offset: Offset(0, (1 - progress.value) * _enterOffset),
-                        child: Opacity(opacity: progress.value, child: child),
-                      ),
-                      child: HoronDialog(
-                        title: title,
-                        description: description,
-                        closeLabel: closeLabel,
-                        leading: leading,
-                        solid: solid,
-                        onClose: onClose,
-                        child: child,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+           return Stack(
+             children: <Widget>[
+               Positioned.fill(
+                 child: FadeTransition(
+                   opacity: progress,
+                   child: BackdropFilter(
+                     filter: ui.ImageFilter.blur(sigmaX: _scrimBlur, sigmaY: _scrimBlur),
+                     child: ColoredBox(color: theme.colors.bgScrim.withValues(alpha: _scrimOpacity)),
+                   ),
+                 ),
+               ),
+               if (dismissible)
+                 Positioned.fill(
+                   child: GestureDetector(
+                     behavior: HitTestBehavior.opaque,
+                     onTap: () => Navigator.of(context).maybePop(),
+                   ),
+                 ),
+               Positioned.fill(
+                 // px-4 — 뷰포트 여백이 max-w-[calc(100vw-2rem)]의 자리입니다.
+                 child: Padding(
+                   padding: EdgeInsets.symmetric(horizontal: space.s4),
+                   child: Center(
+                     child: ConstrainedBox(
+                       constraints: const BoxConstraints(maxWidth: _dialogMaxWidth),
+                       child: SizedBox(
+                         width: double.infinity,
+                         // 화면보다 큰 내용도 잘리지 않게 세로로만 스크롤합니다.
+                         child: SingleChildScrollView(
+                           child: AnimatedBuilder(
+                             animation: progress,
+                             builder: (BuildContext context, Widget? child) => Transform.translate(
+                               // data-starting-style:translate-y-2 — 8px 아래에서 올라옵니다.
+                               offset: Offset(0, (1 - progress.value) * _enterOffset),
+                               child: Opacity(opacity: progress.value, child: child),
+                             ),
+                             child: HoronDialog(
+                               title: title,
+                               description: description,
+                               closeLabel: closeLabel,
+                               leading: leading,
+                               solid: solid,
+                               onClose: onClose,
+                               child: child,
+                             ),
+                           ),
+                         ),
+                       ),
+                     ),
+                   ),
+                 ),
+               ),
+             ],
+           );
+         },
+         barrierDismissible: dismissible,
+         barrierLabel: closeLabel,
+         // 배경 스크림·블러는 페이지가 직접 그립니다.
+         barrierColor: null,
+         transitionDuration: _enterDuration,
+         // SDK 기본 전환은 `FadeTransition`입니다. 페이지가 이미 스크림 페이드를
+         // 들고 있으므로 두 번 겹치지 않게 항등으로 넘깁니다.
+         transitionBuilder: (
+           BuildContext context,
+           Animation<double> animation,
+           Animation<double> secondaryAnimation,
+           Widget child,
+         ) => child,
+       );
 }
 
 /// `motion-press`(scale .97)와 누름 콜백을 한 자리에 묶습니다.
