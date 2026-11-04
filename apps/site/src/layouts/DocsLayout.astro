@@ -5,48 +5,55 @@ import DocsSidebar from "@/components/site/DocsSidebar";
 import DocsToc from "@/components/site/DocsToc";
 import Footer from "@/components/site/Footer.astro";
 import T from "@/components/i18n/T.astro";
+import { primaryNav } from "@/data/nav";
 import type { Localized } from "@/i18n";
+import { docsMessages } from "@/i18n/messages/docs";
+
+export type DocsSection = "get-started" | "foundations" | "components" | "mascot" | "updates";
 
 interface Props {
   /** Page title. A plain string is Korean-only; `Localized` renders both. */
   title: string | Localized;
   description?: string | Localized;
-  section: string;
-  eyebrow?: string | Localized;
+  section: DocsSection;
+  /** `false` leaves the table of contents empty; its column stays so the text does not move. */
   toc?: boolean;
+  /** Crumbs between the section and the page. Omit to get `Home / Section / Page`. */
   breadcrumb?: { label: string | Localized; href: string }[];
 }
 
-const { title, description, section, eyebrow, toc = true, breadcrumb = [] } = Astro.props;
+const { title, description, section, toc = true, breadcrumb } = Astro.props;
 
-const sidebarSections = ["foundations", "components", "get-started", "updates"];
-const withSidebar = sidebarSections.includes(section);
-const showToc = toc && withSidebar;
+const both = (value: string | Localized): Localized =>
+  typeof value === "string" ? { ko: value, en: value } : value;
+
 const currentPath = Astro.url.pathname.replace(/\/+$/, "") || "/";
-const contentWidth = withSidebar ? "max-w-225" : "max-w-275";
-const crumbs = breadcrumb.map((item) => ({
-  label: typeof item.label === "string" ? { ko: item.label, en: item.label } : item.label,
-  href: item.href,
-}));
+const sectionHref = `/${section}`;
+const sectionLabel = primaryNav.find((item) => item.href === sectionHref)?.label ?? both(section);
+
+// Every docs page gets the same header rows (breadcrumb, title, lead), so the
+// title sits at the same height on every page and nothing jumps on navigation.
+const crumbs = [
+  { label: docsMessages.home, href: "/" },
+  ...(breadcrumb
+    ? breadcrumb.map((item) => ({ label: both(item.label), href: item.href }))
+    : [
+        { label: sectionLabel, href: sectionHref },
+        ...(currentPath === sectionHref ? [] : [{ label: both(title), href: currentPath }]),
+      ]),
+];
 ---
 
 <BaseLayout title={title} description={description} footer={false}>
-  <div class="flex flex-col items-stretch lg:flex-row lg:items-start">
-    {withSidebar && <DocsSidebar section={section} currentPath={currentPath} client:load />}
+  <DocsSidebar section={section} currentPath={currentPath} client:load />
 
-    <article class:list={["min-w-0 flex-1 px-4 pt-6 pb-16 md:px-6 md:pt-14 md:pb-24", withSidebar && "lg:ml-60"]}>
-      <div class:list={["mx-auto w-full", contentWidth]}>
-        {crumbs.length > 0 && <DocsBreadcrumb items={crumbs} client:load />}
+  <div class="flex items-start lg:ml-60">
+    <article class="min-w-0 flex-1 px-4 pt-6 pb-16 md:px-6 md:pt-14 md:pb-24">
+      <div class="mx-auto w-full max-w-225">
+        <DocsBreadcrumb items={crumbs} client:load />
 
         <header>
-          {
-            eyebrow && (
-              <p class="text-caption text-text-secondary">
-                {typeof eyebrow === "string" ? eyebrow : <T m={eyebrow} />}
-              </p>
-            )
-          }
-          <h1 class:list={["text-display-md text-text-primary text-balance", eyebrow && "mt-2"]}>
+          <h1 class="text-display-md text-text-primary text-balance">
             {typeof title === "string" ? title : <T m={title} />}
           </h1>
           {
@@ -66,6 +73,9 @@ const crumbs = breadcrumb.map((item) => ({
       </div>
     </article>
 
-    {showToc && <DocsToc client:load />}
+    {/* Reserved on every docs page from xl, filled or not, so the text column never shifts. */}
+    <aside class="hidden xl:sticky xl:top-19 xl:block xl:max-h-dvh xl:w-50 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pt-14 xl:pr-4 xl:pb-19">
+      {toc && <DocsToc client:load />}
+    </aside>
   </div>
 </BaseLayout>

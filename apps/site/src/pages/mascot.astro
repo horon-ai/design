@@ -13,7 +13,7 @@ import {
 } from "@/data/mascots";
 import type { Localized } from "@/i18n";
 import { mascotMessages as m } from "@/i18n/messages/mascot";
-import BaseLayout from "@/layouts/BaseLayout.astro";
+import DocsLayout from "@/layouts/DocsLayout.astro";
 
 const groups = [
   { title: m.coreTitle, description: m.coreDescription, items: coreMascots },
@@ -47,167 +47,128 @@ function localized(entry: Localized): ReactNode {
 
 ---
 
-<BaseLayout title={m.pageTitle} description={m.description}>
-  <div class="mx-auto w-full max-w-275 px-4 py-16 md:px-6">
-    <header class="max-w-3xl">
-      <p class="mb-3 text-body-sm text-text-secondary"><T m={m.eyebrow} /></p>
-      <h1 class="text-display-md text-text-primary"><T m={m.title} /></h1>
-      <p class="mt-5 max-w-2xl text-body-lg text-text-secondary text-pretty"><T m={m.body} /></p>
-      <dl class="mt-8 flex flex-wrap gap-x-10 gap-y-4">
-        <div>
-          <dt class="text-caption text-text-secondary"><T m={m.specCuts} /></dt>
-          <dd class="mt-1 text-title-md text-text-primary">{mascotSpec.count}</dd>
-        </div>
-        <div>
-          <dt class="text-caption text-text-secondary"><T m={m.specSize} /></dt>
-          <dd class="mt-1 text-title-md text-text-primary">{mascotSpec.size}</dd>
-        </div>
-        <div>
-          <dt class="text-caption text-text-secondary"><T m={m.specFormat} /></dt>
-          <dd class="mt-1 text-label-lg text-text-primary"><T m={mascotSpec.format} /></dd>
-        </div>
-      </dl>
-    </header>
+<DocsLayout title={m.pageTitle} description={m.description} section="mascot">
+  <p><T m={m.body} /></p>
+  <dl class="flex flex-wrap gap-x-10 gap-y-4">
+    <div>
+      <dt class="text-caption text-text-secondary"><T m={m.specCuts} /></dt>
+      <dd class="mt-1 text-title-md text-text-primary">{mascotSpec.count}</dd>
+    </div>
+    <div>
+      <dt class="text-caption text-text-secondary"><T m={m.specSize} /></dt>
+      <dd class="mt-1 text-title-md text-text-primary">{mascotSpec.size}</dd>
+    </div>
+    <div>
+      <dt class="text-caption text-text-secondary"><T m={m.specFormat} /></dt>
+      <dd class="mt-1 text-label-lg text-text-primary"><T m={mascotSpec.format} /></dd>
+    </div>
+  </dl>
 
-    <section class="mt-12">
-      <h2 class="text-title-md text-text-primary"><T m={m.appliedTitle} /></h2>
-      <p class="mt-1 text-body-sm text-text-secondary"><T m={m.appliedBody} /></p>
-      <div class="mt-5 grid gap-4 md:grid-cols-2">
-        <Card title={localized(m.lockupTitle)}>
-          <div class="flex items-center gap-2.5">
-            <img
-              src={mascotImageUrl("face")}
-              alt=""
-              width="30"
-              height="30"
-              class="size-8 object-contain"
-            />
-            <HoronWordmark />
-            <span class="text-body-sm text-text-secondary"><T m={m.designSystem} /></span>
-          </div>
-          <div class="mt-5 flex items-end gap-4">
-            {
-              logoScales.map((logo) => (
-                <div class="flex flex-col items-center gap-1.5">
-                  <img
-                    src={mascotImageUrl("face")}
-                    alt={`${logo.size}${m.logoAlt.ko}`}
-                    width={logo.size}
-                    height={logo.size}
-                    class:list={["object-contain", logo.className]}
-                  />
-                  <span class="text-caption text-text-secondary">{logo.size}</span>
-                </div>
-              ))
-            }
-          </div>
-        </Card>
-
-        <Card title={localized(m.faviconTitle)}>
-          <div class="flex flex-wrap items-center gap-4">
-            <img
-              src="/icon.png"
-              alt={m.faviconAlt.ko}
-              width="64"
-              height="64"
-              class="size-16 rounded-lg"
-            />
-            <img
-              src="/apple-icon.png"
-              alt={m.appleIconAlt.ko}
-              width="56"
-              height="56"
-              class="size-14 rounded-lg"
-            />
-            <div class="flex flex-col gap-1">
-              <code class="text-code text-text-secondary">favicon.ico 16 · 32 · 48</code>
-              <code class="text-code text-text-secondary">icon.png 256</code>
-              <code class="text-code text-text-secondary">icon-512.png · apple-icon.png 180</code>
-            </div>
-          </div>
-          <img
-            src="/og.png"
-            alt={m.ogAlt.ko}
-            width="1200"
-            height="630"
-            loading="lazy"
-            class="mt-5 w-full rounded-md border border-border-default"
-          />
-        </Card>
+  <h2><T m={m.appliedTitle} /></h2>
+  <p><T m={m.appliedBody} /></p>
+  <div class="grid gap-4 md:grid-cols-2">
+    <Card title={localized(m.lockupTitle)}>
+      <div class="flex items-center gap-2.5">
+        <img src={mascotImageUrl("face")} alt="" width="30" height="30" class="size-8 object-contain" />
+        <HoronWordmark />
+        <span class="text-body-sm text-text-secondary"><T m={m.designSystem} /></span>
       </div>
-    </section>
-
-    <section class="mt-12">
-      <h2 class="text-title-md text-text-primary"><T m={m.paletteTitle} /></h2>
-      <div class="mt-4 grid gap-3 sm:grid-cols-3">
+      <div class="mt-5 flex items-end gap-4">
         {
-          mascotPalette.map((swatch) => (
-            <div class="flex items-center gap-3 rounded-xl bg-bg-subtle p-3">
-              <span
-                aria-hidden="true"
-                class:list={[
-                  "size-9 shrink-0 rounded-sm border border-border-default",
-                  swatchClass[swatch.token],
-                ]}
+          logoScales.map((logo) => (
+            <div class="flex flex-col items-center gap-1.5">
+              <img
+                src={mascotImageUrl("face")}
+                alt={`${logo.size}${m.logoAlt.ko}`}
+                width={logo.size}
+                height={logo.size}
+                class:list={["object-contain", logo.className]}
               />
-              <div class="min-w-0">
-                <p class="text-code text-text-primary">{swatch.token}</p>
-                <p class="text-caption text-text-secondary">{swatch.hex}</p>
-                <p class="mt-0.5 text-caption text-text-secondary"><T m={swatch.role} /></p>
-              </div>
+              <span class="text-caption text-text-secondary">{logo.size}</span>
             </div>
           ))
         }
       </div>
-    </section>
+    </Card>
 
+    <Card title={localized(m.faviconTitle)}>
+      <div class="flex flex-wrap items-center gap-4">
+        <img src="/icon.png" alt={m.faviconAlt.ko} width="64" height="64" class="size-16 rounded-lg" />
+        <img src="/apple-icon.png" alt={m.appleIconAlt.ko} width="56" height="56" class="size-14 rounded-lg" />
+        <div class="flex flex-col gap-1">
+          <code class="text-code text-text-secondary">favicon.ico 16 · 32 · 48</code>
+          <code class="text-code text-text-secondary">icon.png 256</code>
+          <code class="text-code text-text-secondary">icon-512.png · apple-icon.png 180</code>
+        </div>
+      </div>
+      <img
+        src="/og.png"
+        alt={m.ogAlt.ko}
+        width="1200"
+        height="630"
+        loading="lazy"
+        class="mt-5 w-full rounded-md border border-border-default"
+      />
+    </Card>
+  </div>
+
+  <h2><T m={m.paletteTitle} /></h2>
+  <div class="grid gap-3 sm:grid-cols-3">
     {
-      groups.map((group) => (
-        <section class="mt-14">
-          <div class="flex items-baseline justify-between gap-4">
-            <div>
-              <h2 class="text-title-md text-text-primary"><T m={group.title} /></h2>
-              <p class="mt-1 text-body-sm text-text-secondary"><T m={group.description} /></p>
-            </div>
-            <span class="text-caption text-text-secondary">{group.items.length}</span>
+      mascotPalette.map((swatch) => (
+        <div class="flex items-center gap-3 rounded-xl bg-bg-subtle p-3">
+          <span
+            aria-hidden="true"
+            class:list={["size-9 shrink-0 rounded-sm border border-border-default", swatchClass[swatch.token]]}
+          />
+          <div class="min-w-0">
+            <p class="text-code text-text-primary">{swatch.token}</p>
+            <p class="text-caption text-text-secondary">{swatch.hex}</p>
+            <p class="mt-0.5 text-caption text-text-secondary"><T m={swatch.role} /></p>
           </div>
-          <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {group.items.map((mascot) => (
-              <figure class="group flex flex-col overflow-hidden rounded-xl bg-bg-subtle">
-                <div class="flex aspect-square items-center justify-center p-4">
-                  <img
-                    src={mascotImageUrl(mascot.slug)}
-                    alt={`${m.mascotAlt.ko} ${mascot.name} ${m.cutSuffix.ko}`}
-                    width="384"
-                    height="384"
-                    loading="lazy"
-                    class="size-full object-contain transition-transform duration-200 group-hover:scale-105"
-                  />
-                </div>
-                <figcaption class="flex flex-1 flex-col gap-1 px-3 py-2.5">
-                  <span class="text-code text-text-primary">horon-mascot-{mascot.name}</span>
-                  <span class="text-caption text-text-secondary"><T m={mascot.use} /></span>
-                  <Button
-                    variant="link"
-                    href={mascotSourceUrl(mascot.slug)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <T m={m.download} />
-                  </Button>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </section>
+        </div>
       ))
     }
-
-    <section class="mt-16 max-w-3xl border-t border-border-default pt-10">
-      <h2 class="text-title-md text-text-primary"><T m={m.rulesTitle} /></h2>
-      <ul class="mt-4 list-disc space-y-2 pl-5 text-body-sm text-text-secondary">
-        {rules.map((rule) => <li><T m={rule} /></li>)}
-      </ul>
-    </section>
   </div>
-</BaseLayout>
+
+  {
+    groups.map((group) => (
+      <Fragment>
+        <h2><T m={group.title} /></h2>
+        <p>
+          <T m={group.description} /> ({group.items.length})
+        </p>
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {group.items.map((mascot) => (
+            <figure class="group flex flex-col overflow-hidden rounded-xl bg-bg-subtle">
+              <div class="flex aspect-square items-center justify-center p-4">
+                <img
+                  src={mascotImageUrl(mascot.slug)}
+                  alt={`${m.mascotAlt.ko} ${mascot.name} ${m.cutSuffix.ko}`}
+                  width="384"
+                  height="384"
+                  loading="lazy"
+                  class="size-full object-contain transition-transform duration-200 group-hover:scale-105"
+                />
+              </div>
+              <figcaption class="flex flex-1 flex-col gap-1 px-3 py-2.5">
+                <span class="text-code text-text-primary">horon-mascot-{mascot.name}</span>
+                <span class="text-caption text-text-secondary">
+                  <T m={mascot.use} />
+                </span>
+                <Button variant="link" href={mascotSourceUrl(mascot.slug)} target="_blank" rel="noreferrer">
+                  <T m={m.download} />
+                </Button>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </Fragment>
+    ))
+  }
+
+  <h2><T m={m.rulesTitle} /></h2>
+  <ul>
+    {rules.map((rule) => <li><T m={rule} /></li>)}
+  </ul>
+</DocsLayout>

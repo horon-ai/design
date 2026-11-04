@@ -14,6 +14,8 @@ export const docsMessages = defineMessages({
   sectionNav: { ko: "섹션 목차", en: "Section navigation" },
   /** Accessible name of the breadcrumb navigation. */
   breadcrumb: { ko: "현재 위치", en: "Breadcrumb" },
+  /** First breadcrumb on every docs page. */
+  home: { ko: "홈", en: "Home" },
   /** Sidebar entry that opens the component catalog index. */
   overview: { ko: "개요", en: "Overview" },
   /** Label of the block that lists the top-level docs pages. */

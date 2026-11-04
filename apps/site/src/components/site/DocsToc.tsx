@@ -5,12 +5,14 @@
  * collects `article .prose-docs h2, h3` (demo stages excluded, the same
  * selector the old inline script used), lists them as library link buttons,
  * and tracks the section in view with an IntersectionObserver. With fewer than
- * two headings there is nothing worth listing, so it renders nothing.
+ * two headings there is nothing worth listing, so it renders nothing. The
+ * column itself belongs to `DocsLayout`, which keeps it on every docs page so
+ * the text never moves when the list is empty.
  *
  * The heading list is derived from the document instead of being copied into
  * state: `useSyncExternalStore` reads it during render (the server snapshot is
- * `null`, so the empty column keeps its width before hydration) and the only
- * state left is the section in view, which the observer callback sets.
+ * `null`) and the only state left is the section in view, which the observer
+ * callback sets.
  */
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
@@ -22,8 +24,6 @@ import { useLocale } from "@/i18n/react";
 
 const HEADING_SELECTOR =
   "article .prose-docs h2:not(.demo-stage *), article .prose-docs h3:not(.demo-stage *)";
-
-const COLUMN = "hidden xl:sticky xl:top-19 xl:block xl:max-h-dvh xl:w-50 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pt-14 xl:pr-4 xl:pb-19";
 
 /** Top margin of the reading band; keep it in sync with the observer below. */
 const BAND_TOP = 80;
@@ -113,33 +113,29 @@ export default function DocsToc() {
     return () => observer.disconnect();
   }, [items]);
 
-  if (items !== null && items.length < 2) return null;
+  if (items === null || items.length < 2) return null;
 
   return (
-    <aside className={COLUMN}>
-      {items !== null && (
-        <>
-          <p className="mb-3 text-caption text-text-secondary">{pick(docsMessages.tocLabel, locale)}</p>
-          <nav aria-label={pick(docsMessages.tocNav, locale)}>
-            <ul className="flex flex-col gap-1">
-              {items.map((item) => (
-                <li key={item.id}>
-                  <Button
-                    variant="link"
-                    href={`#${item.id}`}
-                    aria-current={item.id === activeId ? "true" : undefined}
-                    className={["justify-start text-left whitespace-normal", item.level === 3 && "ml-3"]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    {item.text}
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </>
-      )}
-    </aside>
+    <>
+      <p className="mb-3 text-caption text-text-secondary">{pick(docsMessages.tocLabel, locale)}</p>
+      <nav aria-label={pick(docsMessages.tocNav, locale)}>
+        <ul className="flex flex-col gap-1">
+          {items.map((item) => (
+            <li key={item.id}>
+              <Button
+                variant="link"
+                href={`#${item.id}`}
+                aria-current={item.id === activeId ? "true" : undefined}
+                className={["justify-start text-left whitespace-normal", item.level === 3 && "ml-3"]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                {item.text}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </>
   );
 }
