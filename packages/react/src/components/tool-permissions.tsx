@@ -30,8 +30,10 @@ const options: { value: ToolPermission; label: string }[] = [
 ];
 
 /**
- * Paper `Tool permissions` (1VT5-0): a subtle group header with a count pill and an "Allow all" text button,
- * then one divided row per tool with a mono name, a description and an Allow / Ask / Off segmented control.
+ * Paper `Tool permissions` (1VT5-0): one solid card, 16px radius with a default border. A subtle header
+ * carries the group title, a count pill and an "Allow all" text button; below it one divided row per tool
+ * with a mono name, a description and a small solid Allow / Ask / Off segmented control. 16px side padding
+ * on every row so the names, the header title and the controls line up.
  */
 export function ToolPermissions({
   title,
@@ -51,11 +53,17 @@ export function ToolPermissions({
     onValuesChange?.(next);
   };
   return (
-    <div className={cn("flex w-full max-w-130.25 flex-col", className)} {...props}>
-      <div className="flex items-center gap-2 rounded-t-md bg-bg-subtle px-3 py-2">
+    <div
+      className={cn(
+        "flex w-full max-w-130 flex-col overflow-clip rounded-2xl border border-border-default bg-bg-surface",
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex h-11 items-center gap-2 border-b border-border-default bg-bg-subtle px-4">
         <span className="text-label-md font-semibold text-text-primary">{title}</span>
-        <span className="inline-flex h-5.5 items-center rounded-full bg-overlay-ink-6 px-2 text-label-sm text-text-secondary">
-          {tools.length}
+        <span className="inline-flex h-5 items-center rounded-full bg-overlay-ink-6 px-1.5 text-label-sm text-text-secondary">
+          <span className="text-trim">{tools.length}</span>
         </span>
         <span className="flex-1" />
         <button
@@ -69,17 +77,19 @@ export function ToolPermissions({
       {tools.map((tool, index) => (
         <div
           key={tool.name}
-          className="flex motion-rise items-center gap-3 border-b border-border-default px-3 py-3 last:border-b-0"
+          className="flex motion-rise items-center gap-4 border-b border-border-default px-4 py-3 last:border-b-0"
           style={{ animationDelay: `${index * 30}ms` }}
         >
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
             <span className="truncate font-mono text-code font-medium text-text-primary">{tool.name}</span>
             {tool.description && <span className="text-caption text-text-secondary">{tool.description}</span>}
           </div>
           <SegmentedControl
             aria-label={`${tool.name} permission`}
-            surface="glass"
+            size="sm"
+            surface="solid"
             fill={false}
+            className="shrink-0"
             items={options}
             value={current[tool.name] ?? "ask"}
             onValueChange={(value) => {
