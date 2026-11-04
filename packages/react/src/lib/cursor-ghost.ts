@@ -117,22 +117,31 @@ function startEffect({ ghosts, size, headFollow, smear, color }: Required<Cursor
     let moving = Math.abs(targetIntensity - intensity) > 0.01;
 
     for (let i = 0; i < count; i += 1) {
-      const dx = leaderX - xs[i];
-      const dy = leaderY - ys[i];
+      // The weight, position and node of one copy, read once per frame. Every
+      // array here is allocated at `count`, so the fallbacks are dead: they let
+      // the reads type under `noUncheckedIndexedAccess`.
+      const rate = follow[i] ?? 0;
+      const node = nodes[i];
+      let x = xs[i] ?? leaderX;
+      let y = ys[i] ?? leaderY;
+      const dx = leaderX - x;
+      const dy = leaderY - y;
       if (Math.abs(dx) > SETTLE_EPSILON || Math.abs(dy) > SETTLE_EPSILON) {
-        xs[i] += dx * follow[i];
-        ys[i] += dy * follow[i];
+        x += dx * rate;
+        y += dy * rate;
         moving = true;
       } else {
-        xs[i] = leaderX;
-        ys[i] = leaderY;
+        x = leaderX;
+        y = leaderY;
       }
-      const distance = Math.hypot(pointerX - xs[i], pointerY - ys[i]);
-      const node = nodes[i];
-      node.style.transform = `translate3d(${(xs[i] - tipX).toFixed(2)}px, ${(ys[i] - tipY).toFixed(2)}px, 0)`;
-      node.style.opacity = (baseOpacity[i] * Math.min(1, distance / fadeDistance) * intensity).toFixed(3);
-      leaderX = xs[i];
-      leaderY = ys[i];
+      xs[i] = x;
+      ys[i] = y;
+      if (!node) continue;
+      const distance = Math.hypot(pointerX - x, pointerY - y);
+      node.style.transform = `translate3d(${(x - tipX).toFixed(2)}px, ${(y - tipY).toFixed(2)}px, 0)`;
+      node.style.opacity = ((baseOpacity[i] ?? 0) * Math.min(1, distance / fadeDistance) * intensity).toFixed(3);
+      leaderX = x;
+      leaderY = y;
     }
 
     if (moving) frame = requestAnimationFrame(tick);

@@ -1,6 +1,6 @@
 import { Toggle } from "@base-ui/react/toggle";
 import { Check } from "@phosphor-icons/react";
-import { type ComponentProps, useState } from "react";
+import { Children, type ComponentProps, useState } from "react";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
@@ -36,6 +36,11 @@ const checkIconClass: Record<ChipSize, string> = {
 export function Chip({ size = "md", className, children, onPressedChange, ...props }: ChipProps) {
   // The exit animation only plays after the first toggle, so a chip that mounts unpressed never flashes the check.
   const [toggled, setToggled] = useState(false);
+  // Preflight makes every `svg` a block box, so an icon passed as a child would stack above the
+  // label and clip. Element children get a row at the label gap; text keeps the plain span.
+  const hasElementChild = Children.toArray(children).some(
+    (child) => typeof child !== "string" && typeof child !== "number",
+  );
   return (
     <Toggle
       className={cn(
@@ -68,7 +73,9 @@ export function Chip({ size = "md", className, children, onPressedChange, ...pro
           )}
         />
       </span>
-      <span className="relative text-trim">{children}</span>
+      <span className={cn("relative text-trim", hasElementChild && "inline-flex items-center gap-1.5")}>
+        {children}
+      </span>
     </Toggle>
   );
 }

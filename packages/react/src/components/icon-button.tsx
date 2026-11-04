@@ -5,7 +5,7 @@ import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { LiquidGlass } from "./liquid-glass";
 
-export type IconButtonVariant = "primary" | "ghost" | "glass" | "solid";
+export type IconButtonVariant = "primary" | "ghost" | "glass" | "solid" | "quiet";
 export type IconButtonSize = ControlSize;
 
 export type IconButtonProps = Omit<ComponentProps<typeof BaseButton>, "className" | "children"> & {
@@ -31,9 +31,13 @@ const variantClass: Record<IconButtonVariant, string> = {
     "overflow-clip bg-glass-clear text-text-primary hover:not-data-disabled:bg-glass-clear-hover active:not-data-disabled:bg-glass-clear-pressed",
   solid:
     "border border-border-default bg-bg-surface text-text-primary hover:not-data-disabled:bg-bg-subtle active:not-data-disabled:bg-interactive-secondary-hover",
+  // No fill and no liquid layer: only the ink wash on hover/press. A glass disc is wrong on a dark
+  // shell or title bar, where `glass` reads as a grey bubble; this keeps the icon legible without one.
+  quiet:
+    "text-text-secondary hover:not-data-disabled:bg-overlay-ink-6 hover:not-data-disabled:text-text-primary active:not-data-disabled:bg-overlay-ink-10",
 };
 
-/** Figma `Icon button` (57:167): Primary, Ghost, Glass and Solid in three sizes. */
+/** Figma `Icon button` (57:167): Primary, Ghost, Glass and Solid in three sizes, plus a fill-free `quiet` variant. */
 export function IconButton({ variant = "ghost", size = "md", icon, label, className, ...props }: IconButtonProps) {
   return (
     <BaseButton
