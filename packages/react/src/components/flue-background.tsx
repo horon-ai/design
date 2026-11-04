@@ -1,4 +1,4 @@
-import { type CSSProperties, useEffect, useRef } from "react";
+import { type CSSProperties, useEffect, useRef, useSyncExternalStore } from "react";
 
 import { cn } from "../lib/cn";
 
@@ -75,6 +75,32 @@ export const FLUE_SKY: FlueConfig = {
   maxDpr: 1,
 };
 
+/** The night palette for dark mode: near-black ground and blue smoke. Same motion as `FLUE_SKY`. */
+export const FLUE_NIGHT: FlueConfig = {
+  ...FLUE_SKY,
+  bgColor: "#050608",
+  colorA: "#07090d",
+  colorB: "#0c1a2c",
+  colorC: "#1f4a78",
+  colorD: "#4f8fd0",
+  glow: 0.35,
+};
+
+/** Follows the `.dark` class on <html>, the switch the theme uses. */
+function subscribeScheme(onChange: () => void): () => void {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  return () => observer.disconnect();
+}
+
+function useDarkScheme(): boolean {
+  return useSyncExternalStore(
+    subscribeScheme,
+    () => document.documentElement.classList.contains("dark"),
+    () => false,
+  );
+}
+
 const ENGINE_KEYS = new Set(["cursor", "maxDpr"]);
 
 const VERT = `#version 300 es
@@ -132,9 +158,9 @@ function activate(gl: WebGL2RenderingContext, program: WebGLProgram): void {
 export type FlueBackgroundProps = {
   className?: string;
   style?: CSSProperties;
-  /** Overrides on top of `FLUE_SKY`. */
+  /** Overrides on top of `FLUE_SKY`, or `FLUE_NIGHT` in dark mode. */
   config?: Partial<FlueConfig>;
-  /** Classes for the glass tint laid over the smoke. */
+  /** Classes for the tint laid over the smoke. */
   tintClassName?: string;
 };
 
@@ -142,10 +168,17 @@ export type FlueBackgroundProps = {
  * Flue: an animated WebGL2 smoke gradient, one fullscreen triangle and one fragment shader.
  * It fills its positioned parent behind the content (the parent needs `isolate`) and falls
  * back to the flat `bgColor` when WebGL2 is missing. Reduced motion draws a single still frame.
+ * Light mode paints the white-and-sky `FLUE_SKY`; dark mode paints the black-and-blue `FLUE_NIGHT`.
  */
-export function FlueBackground({ className, style, config, tintClassName = "bg-glass-regular" }: FlueBackgroundProps) {
+export function FlueBackground({
+  className,
+  style,
+  config,
+  tintClassName = "bg-glass-regular dark:bg-transparent",
+}: FlueBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const settings = { ...FLUE_SKY, ...config };
+  const dark = useDarkScheme();
+  const settings = { ...(dark ? FLUE_NIGHT : FLUE_SKY), ...config };
   const key = JSON.stringify(settings);
 
   useEffect(() => {
