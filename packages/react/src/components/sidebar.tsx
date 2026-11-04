@@ -221,7 +221,7 @@ export function SidebarHeader({
   );
 }
 
-export type SidebarItemProps = ButtonProps & {
+type SidebarItemCommonProps = {
   /** 18px icon, or a `SidebarProjectTile`. */
   icon?: ReactNode;
   /** Count on the right, such as unread items. */
@@ -229,23 +229,29 @@ export type SidebarItemProps = ButtonProps & {
   /** Trailing 7px red dot for attention. */
   attention?: boolean;
   current?: boolean;
+  className?: string;
 };
 
-/** Figma sidebar `Item`: 32px row, 12px radius, 10px gap; the current item is 6% ink. */
+/** With `href`, the row is a real link and takes anchor props; without it, a `type="button"` button. */
+export type SidebarItemProps =
+  | (SidebarItemCommonProps & { href: string } & Omit<ComponentProps<"a">, "className" | "href" | "type">)
+  | (SidebarItemCommonProps & { href?: undefined } & ButtonProps);
+
+/**
+ * Figma sidebar `Item`: 32px row, 12px radius, 10px gap; the current item is 6% ink.
+ * Pass `href` to render an `<a>` with the same look.
+ */
 export function SidebarItem({ icon, count, attention, current, className, children, ...props }: SidebarItemProps) {
-  return (
-    <button
-      type="button"
-      aria-current={current ? "page" : undefined}
-      className={cn(
-        "relative flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-label-md text-text-primary",
-        "motion-colors",
-        current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-4",
-        "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
-        className,
-      )}
-      {...props}
-    >
+  const classes = cn(
+    "relative flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-label-md text-text-primary",
+    "motion-colors",
+    current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-4",
+    "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
+    className,
+  );
+
+  const content = (
+    <>
       {icon && (
         <span data-slot="icon" className="flex shrink-0 [&>svg]:size-4.5">
           {icon}
@@ -254,6 +260,21 @@ export function SidebarItem({ icon, count, attention, current, className, childr
       <span className="min-w-0 flex-1 truncate">{children}</span>
       {count !== undefined && <span className="shrink-0 text-body-sm text-text-secondary">{count}</span>}
       {attention && <span aria-label="Needs attention" className="size-[7px] shrink-0 rounded-full bg-text-danger" />}
+    </>
+  );
+
+  if (props.href !== undefined) {
+    const { href, ...anchorProps } = props;
+    return (
+      <a href={href} aria-current={current ? "page" : undefined} className={classes} {...anchorProps}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button type="button" aria-current={current ? "page" : undefined} className={classes} {...props}>
+      {content}
     </button>
   );
 }

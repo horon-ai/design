@@ -29,6 +29,8 @@ export type CommandPaletteProps = {
   onOpenChange?: (open: boolean) => void;
   groups: CommandGroup[];
   placeholder?: string;
+  /** Shown when the query has no matches; defaults to "No results". */
+  empty?: ReactNode;
   /** Footer key hints, such as `[["↑↓", "Move"], ["↵", "Open"]]`. */
   hints?: [ReactNode, string][];
   trigger?: ReactNode;
@@ -44,6 +46,7 @@ export function CommandPalette({
   onOpenChange,
   groups,
   placeholder = "Search",
+  empty,
   hints,
   trigger,
   className,
@@ -66,6 +69,7 @@ export function CommandPalette({
             <CommandPaletteBody
               groups={groups}
               placeholder={placeholder}
+              empty={empty}
               closeControl={
                 <Dialog.Close aria-label="Close" className="motion-press cursor-pointer">
                   <Kbd>esc</Kbd>
