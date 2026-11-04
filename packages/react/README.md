@@ -87,7 +87,7 @@ Safari, iOS의 모든 브라우저, Firefox, macOS 데스크톱 앱은 배경에
 | `bottom-sheet` | 88:808 | Thick-glass bottom sheet; the light board adds frost. |
 | `breadcrumb` | 110:948 | Breadcrumb with workspace tile. |
 | `breadcrumb-header` | U8H-1 | Glass header row with a breadcrumb and two icon buttons. |
-| `button` | 55:339 | Primary, Glass, Danger and Link in three sizes. |
+| `button` | 55:339 | Primary, Glass, Danger and Link in three sizes; `href` renders a real link. |
 | `calendar` | 60:245 | Month grid with single and range selection. |
 | `card` | 63:310 | Thick-glass card: Default, Interactive, Selected. |
 | `chat-bubble` | 64:359 | Flat Me and Bot chat bubbles. |
@@ -96,7 +96,7 @@ Safari, iOS의 모든 브라우저, Firefox, macOS 데스크톱 앱은 배경에
 | `chip` | 61:302 | Clear-glass toggle chip. |
 | `choice-card` | 1VXM-0 | Radio card that picks one of two options. |
 | `code-panel` | 1VV9-0 | Light code panel for settings screens. |
-| `command-palette` | 110:676 | Frosted command palette. |
+| `command-palette` | 110:676 | Frosted command palette; `empty` is the no-match slot. |
 | `composer` | 63:462 | Glass message composer. |
 | `data-table` | 192:9046 | Solid data table with header, tags and footer. |
 | `date-field` | 60:244 | Glass field that opens the calendar. |
