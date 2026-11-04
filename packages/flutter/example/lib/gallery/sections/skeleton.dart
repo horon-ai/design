@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../surface_group.dart';
+
 /// `skeleton`의 갤러리 섹션입니다.
 ///
-/// 블록·알약 자리표시자와 카드 세 모양을 함께 보여 줍니다.
+/// 카드 세 모양을 solid와 glass 두 표면에 같은 목록으로 보여 주고, 블록·알약
+/// 자리표시자를 함께 놓습니다.
 class HoronSkeletonGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronSkeletonGallerySection({super.key});
@@ -13,11 +16,20 @@ class HoronSkeletonGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: Wrap(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: theme.space.s6,
-        runSpacing: theme.space.s4,
-        crossAxisAlignment: WrapCrossAlignment.start,
         children: <Widget>[
+          SurfaceGroup(
+            label: 'Solid',
+            child: _cards(theme, HoronSurface.solid),
+          ),
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
+            child: _cards(theme, HoronSurface.glass),
+          ),
           Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,12 +48,22 @@ class HoronSkeletonGallerySection extends StatelessWidget {
               const HoronSkeleton(width: 36, height: 36, pill: true),
             ],
           ),
-          const HoronSkeletonCard.row(),
-          const HoronSkeletonCard.card(),
-          const HoronSkeletonCard.text(),
-          const HoronSkeletonCard.row(surface: HoronSurface.glass),
         ],
       ),
+    );
+  }
+
+  /// 한 표면의 카드 표본 목록입니다. 표면만 바뀌고 모양은 같습니다.
+  Widget _cards(HoronThemeData theme, HoronSurface surface) {
+    return Wrap(
+      spacing: theme.space.s6,
+      runSpacing: theme.space.s4,
+      crossAxisAlignment: WrapCrossAlignment.start,
+      children: <Widget>[
+        HoronSkeletonCard.row(surface: surface),
+        HoronSkeletonCard.card(surface: surface),
+        HoronSkeletonCard.text(surface: surface),
+      ],
     );
   }
 }

@@ -3,11 +3,14 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../surface_group.dart';
+
 /// `list_detail` 갤러리 섹션입니다.
 ///
-/// 목록과 상세를 함께 놓은 완성형 하나와, 상세 패널을 이루는 조각(머리·메타 상자·
-/// 지시문·파일 줄·바닥)을 따로 보여 줍니다. 폭이 좁으면 셀이 프레임 폭에 맞춰 줄고,
-/// 완성형은 목록과 상세가 세로로 쌓입니다.
+/// 목록과 상세를 함께 놓은 완성형을 solid와 glass 두 표면에 같은 모습으로 보여
+/// 주고, 상세 패널을 이루는 조각(머리·메타 상자·지시문·파일 줄·바닥)을 따로
+/// 보여 줍니다. 폭이 좁으면 셀이 프레임 폭에 맞춰 줄고, 완성형은 목록과 상세가
+/// 세로로 쌓입니다.
 class HoronListDetailGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronListDetailGallerySection({super.key});
@@ -17,87 +20,107 @@ class HoronListDetailGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double available = constraints.maxWidth.isFinite
-              ? constraints.maxWidth
-              : 720;
-          final double full = math.min(available, 720);
-          final double part = math.min(available, 420);
-          return Wrap(
-            spacing: theme.space.s4,
-            runSpacing: theme.space.s4,
-            crossAxisAlignment: WrapCrossAlignment.start,
-            children: <Widget>[
-              _Cell(
-                label: 'glass — 유리 껍데기',
-                width: full,
-                child: HoronListDetail(
-                  surface: HoronSurface.glass,
-                  groups: _groups,
-                  detailBuilder: (HoronListDetailItem item) =>
-                      _SampleDetail(item: item),
-                ),
-              ),
-              _Cell(
-                label: '목록 + 상세 (md 이상에서 나란히)',
-                width: full,
-                child: HoronListDetail(
-                  groups: _groups,
-                  detailBuilder: (HoronListDetailItem item) =>
-                      _SampleDetail(item: item),
-                ),
-              ),
-              _Cell(
-                label: 'Header — 40px 타일 · 18px 아이콘',
-                width: part,
-                child: const HoronListDetailHeader(
-                  title: 'researcher',
-                  description: '파일을 읽고 근거를 모으는 봇입니다',
-                  icon: Icon(Icons.smart_toy_outlined),
-                ),
-              ),
-              _Cell(
-                label: 'Meta — 두 열 라벨/값',
-                width: part,
-                child: const HoronListDetailMeta(items: _meta),
-              ),
-              _Cell(
-                label: 'Instructions — 편집 상자는 Edit로 열립니다',
-                width: part,
-                child: const HoronListDetailInstructions(
-                  defaultValue: _instructions,
-                  tag: 'AGENTS.md',
-                ),
-              ),
-              _Cell(
-                label: 'Files · Footer',
-                width: part,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  spacing: theme.space.s5,
-                  children: <Widget>[
-                    const HoronListDetailFiles(
-                      children: <Widget>[
-                        _GlassChip(label: 'AGENTS.md'),
-                        _GlassChip(label: 'memory.md'),
-                        _GlassChip(label: 'tools.json'),
-                      ],
-                    ),
-                    HoronListDetailFooter(
-                      children: <Widget>[
-                        const _GlassChip(label: 'Cancel'),
-                        _GlassChip(label: 'Save', onTap: () {}),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: theme.space.s6,
+        children: <Widget>[
+          SurfaceGroup(label: 'Solid', child: _full(theme, HoronSurface.solid)),
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
+            child: _full(theme, HoronSurface.glass),
+          ),
+          _parts(theme),
+        ],
       ),
+    );
+  }
+
+  /// 한 표면의 완성형입니다. 표면만 바뀌고 내용은 같습니다.
+  Widget _full(HoronThemeData theme, HoronSurface surface) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double available = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 720;
+        final double full = math.min(available, 720);
+        return _Cell(
+          label: '목록 + 상세 (md 이상에서 나란히)',
+          width: full,
+          child: HoronListDetail(
+            surface: surface,
+            groups: _groups,
+            detailBuilder: (HoronListDetailItem item) =>
+                _SampleDetail(item: item),
+          ),
+        );
+      },
+    );
+  }
+
+  /// 표면과 무관한 상세 패널 조각들입니다.
+  Widget _parts(HoronThemeData theme) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double available = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 420;
+        final double part = math.min(available, 420);
+        return Wrap(
+          spacing: theme.space.s4,
+          runSpacing: theme.space.s4,
+          crossAxisAlignment: WrapCrossAlignment.start,
+          children: <Widget>[
+            _Cell(
+              label: 'Header — 40px 타일 · 18px 아이콘',
+              width: part,
+              child: const HoronListDetailHeader(
+                title: 'researcher',
+                description: '파일을 읽고 근거를 모으는 봇입니다',
+                icon: Icon(Icons.smart_toy_outlined),
+              ),
+            ),
+            _Cell(
+              label: 'Meta — 두 열 라벨/값',
+              width: part,
+              child: const HoronListDetailMeta(items: _meta),
+            ),
+            _Cell(
+              label: 'Instructions — 편집 상자는 Edit로 열립니다',
+              width: part,
+              child: const HoronListDetailInstructions(
+                defaultValue: _instructions,
+                tag: 'AGENTS.md',
+              ),
+            ),
+            _Cell(
+              label: 'Files · Footer',
+              width: part,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: theme.space.s5,
+                children: <Widget>[
+                  const HoronListDetailFiles(
+                    children: <Widget>[
+                      _GlassChip(label: 'AGENTS.md'),
+                      _GlassChip(label: 'memory.md'),
+                      _GlassChip(label: 'tools.json'),
+                    ],
+                  ),
+                  HoronListDetailFooter(
+                    children: <Widget>[
+                      const _GlassChip(label: 'Cancel'),
+                      _GlassChip(label: 'Save', onTap: () {}),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

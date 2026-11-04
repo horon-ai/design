@@ -3,7 +3,7 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `badge`의 갤러리 섹션입니다.
 ///
-/// 네 톤과 상태 점이 붙은 배지를 한 줄로 보여 줍니다.
+/// 톤마다 세 크기를 상태 점과 함께 한 줄로 보여 줍니다.
 class HoronBadgeGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronBadgeGallerySection({super.key});
@@ -13,21 +13,40 @@ class HoronBadgeGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: Wrap(
-        spacing: theme.space.s3,
-        runSpacing: theme.space.s2,
-        crossAxisAlignment: WrapCrossAlignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: theme.space.s4,
         children: <Widget>[
-          const HoronBadge(label: 'Neutral'),
-          const HoronBadge(label: 'Brand', tone: HoronBadgeTone.brand),
-          const HoronBadge(label: 'Danger', tone: HoronBadgeTone.danger),
-          const HoronBadge(label: 'Solid', tone: HoronBadgeTone.solid),
-          const HoronBadge(
-            label: 'Live',
-            tone: HoronBadgeTone.brand,
-            dot: true,
-          ),
-          const HoronBadge(label: '주의', tone: HoronBadgeTone.danger, dot: true),
+          for (final HoronBadgeTone tone in HoronBadgeTone.values)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: theme.space.s4,
+              children: <Widget>[
+                SizedBox(
+                  width: 72,
+                  child: Text(
+                    tone.name,
+                    style: theme.text.caption.copyWith(
+                      color: theme.colors.textSecondary,
+                    ),
+                  ),
+                ),
+                for (final HoronBadgeSize size in HoronBadgeSize.values)
+                  Wrap(
+                    spacing: theme.space.s2,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: <Widget>[
+                      HoronBadge(
+                        label: size.name,
+                        tone: tone,
+                        size: size,
+                        dot: true,
+                      ),
+                    ],
+                  ),
+              ],
+            ),
         ],
       ),
     );

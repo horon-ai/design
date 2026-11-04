@@ -2,25 +2,15 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
 /// 하나를 고르는 카드입니다. `RadioGroup` 안에서 씁니다.
 ///
-/// React `ChoiceCard`: 252px 유리 카드에 14 여백, 16 반경, 12 간격입니다. 18px 고리는
+/// React `ChoiceCard`: 252px 불투명 카드에 14 여백, 16 반경, 12 간격입니다. 18px 고리는
 /// 꺼져 있을 때 1.5px 회색 테두리이고, 켜지면 잉크색 5px 고리 안에 8px 점이 들어갑니다.
-/// `choice-card.tsx`의 `ChoiceCardSurface`입니다.
-enum HoronChoiceCardSurface {
-  /// `surface="solid"` — 불투명 `bg-surface`에 1px 테두리. 기본값입니다.
-  solid,
-
-  /// `surface="glass"` — 이미지나 유리 패널 위의 유리 카드입니다.
-  glass,
-}
-
+/// 표면은 solid 하나이며, 선택되면 테두리가 브랜드 색으로 바뀝니다.
 class HoronChoiceCard extends StatelessWidget {
   /// 제목과 선택 값을 받습니다.
   const HoronChoiceCard({
@@ -32,11 +22,7 @@ class HoronChoiceCard extends StatelessWidget {
     this.checked = false,
     this.disabled = false,
     this.onTap,
-    this.surface = HoronChoiceCardSurface.solid,
   });
-
-  /// 표면입니다. 기본값은 [HoronChoiceCardSurface.solid]입니다.
-  final HoronChoiceCardSurface surface;
 
   /// 카드의 첫 줄 제목입니다. React `title`(`ReactNode`).
   final Widget title;
@@ -121,14 +107,20 @@ class HoronChoiceCard extends StatelessWidget {
             ? math.min(HoronChoiceCard._width, constraints.maxWidth)
             : HoronChoiceCard._width;
         // 제목 칸이 실제로 쓰는 폭: 카드 여백·고리·간격을 뺀 나머지입니다.
-        final double textColumnWidth = math.max(0, width - space.s3_5 * 2 - HoronChoiceCard._radioSize - space.s3);
-        final double badgeMaxWidth = textColumnWidth * HoronChoiceCard._badgeMaxFraction;
+        final double textColumnWidth = math.max(
+          0,
+          width - space.s3_5 * 2 - HoronChoiceCard._radioSize - space.s3,
+        );
+        final double badgeMaxWidth =
+            textColumnWidth * HoronChoiceCard._badgeMaxFraction;
         return SizedBox(
           width: width,
           child: Opacity(
             opacity: disabled ? HoronChoiceCard._disabledOpacity : 1,
             child: MouseRegion(
-              cursor: disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
+              cursor: disabled
+                  ? SystemMouseCursors.basic
+                  : SystemMouseCursors.click,
               child: Semantics(
                 checked: checked,
                 inMutuallyExclusiveGroup: true,
@@ -140,115 +132,129 @@ class HoronChoiceCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(theme.radius.xl2),
                     child: AnimatedContainer(
                       key: const Key('horon-choice-card-surface'),
-                      duration: animate ? HoronMotion.colorsDuration : Duration.zero,
+                      duration: animate
+                          ? HoronMotion.colorsDuration
+                          : Duration.zero,
                       curve: HoronMotion.colorsCurve,
-                      // 바탕과 테두리는 유리 엔진이 그립니다. React는 호스트에
-                      // `bg-glass-clear`를 깔고 그 위에 `<LiquidGlass tier="clear" />`를
-                      // 얹으며(`choice-card.tsx:34`), 선택되면 둘 다 thick으로 바뀝니다.
-                      // 선택 상태의 브랜드 테두리는 호스트 테두리가 아니라 림 색으로 칠합니다.
+                      // React `choice-card.tsx`: `bg-bg-surface`에 1px `border-default`,
+                      // 선택되면 `data-checked:border-border-brand`. 유리 레이어는 없습니다.
                       decoration: BoxDecoration(
-                        color: surface == HoronChoiceCardSurface.solid ? colors.bgSurface : null,
+                        color: colors.bgSurface,
                         borderRadius: BorderRadius.circular(theme.radius.xl2),
-                        border: surface == HoronChoiceCardSurface.solid
-                            ? Border.all(color: checked ? colors.borderBrand : colors.borderDefault)
-                            : null,
+                        border: Border.all(
+                          color: checked
+                              ? colors.borderBrand
+                              : colors.borderDefault,
+                        ),
                       ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: <Widget>[
-                          if (surface == HoronChoiceCardSurface.glass)
-                            Positioned.fill(
-                              child: HoronLiquidGlass(
-                                tier: checked ? HoronGlassTier.thick : HoronGlassTier.clear,
-                                borderRadius: BorderRadius.circular(theme.radius.xl2),
-                                edgeColor: checked ? colors.borderBrand : null,
-                                child: const SizedBox.expand(),
+                      child: Padding(
+                        padding: EdgeInsets.all(space.s3_5),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: space.s3,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: HoronChoiceCard._radioTopOffset,
                               ),
-                            ),
-                          // 패딩은 내용에만 걸어 유리가 카드 전체를 채우게 합니다.
-                          Padding(
-                            padding: EdgeInsets.all(space.s3_5),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              spacing: space.s3,
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.only(top: HoronChoiceCard._radioTopOffset),
-                                  child: AnimatedContainer(
-                                    key: const Key('horon-choice-card-ring'),
-                                    duration: animate ? HoronMotion.colorsDuration : Duration.zero,
-                                    curve: HoronMotion.colorsCurve,
-                                    width: HoronChoiceCard._radioSize,
-                                    height: HoronChoiceCard._radioSize,
-                                    alignment: Alignment.center,
+                              child: AnimatedContainer(
+                                key: const Key('horon-choice-card-ring'),
+                                duration: animate
+                                    ? HoronMotion.colorsDuration
+                                    : Duration.zero,
+                                curve: HoronMotion.colorsCurve,
+                                width: HoronChoiceCard._radioSize,
+                                height: HoronChoiceCard._radioSize,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    width: checked
+                                        ? HoronChoiceCard._ringOn
+                                        : HoronChoiceCard._ringOff,
+                                    color: checked
+                                        ? colors.interactivePrimary
+                                        : colors.borderDashed,
+                                  ),
+                                ),
+                                child: AnimatedScale(
+                                  scale: checked ? 1 : 0,
+                                  duration: animate
+                                      ? HoronMotion.popInDuration
+                                      : Duration.zero,
+                                  curve: HoronMotion.popInCurve,
+                                  child: Container(
+                                    key: const Key('horon-choice-card-dot'),
+                                    width: HoronChoiceCard._dotSize,
+                                    height: HoronChoiceCard._dotSize,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      border: Border.all(
-                                        width: checked ? HoronChoiceCard._ringOn : HoronChoiceCard._ringOff,
-                                        color: checked ? colors.interactivePrimary : colors.borderDashed,
-                                      ),
+                                      color: colors.interactiveOnPrimary,
                                     ),
-                                    child: AnimatedScale(
-                                      scale: checked ? 1 : 0,
-                                      duration: animate ? HoronMotion.popInDuration : Duration.zero,
-                                      curve: HoronMotion.popInCurve,
-                                      child: Container(
-                                        key: const Key('horon-choice-card-dot'),
-                                        width: HoronChoiceCard._dotSize,
-                                        height: HoronChoiceCard._dotSize,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: colors.interactiveOnPrimary,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                // `gap-[3px]`.
+                                spacing: space.step(0.75),
+                                children: <Widget>[
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    // `gap-2.5`.
+                                    spacing: space.s2_5,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: DefaultTextStyle.merge(
+                                          style: titleStyle,
+                                          child: title,
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    // `gap-[3px]`.
-                                    spacing: space.step(0.75),
-                                    children: <Widget>[
-                                      Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        // `gap-2.5`.
-                                        spacing: space.s2_5,
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: DefaultTextStyle.merge(style: titleStyle, child: title),
+                                      if (badge != null)
+                                        ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxWidth: badgeMaxWidth,
                                           ),
-                                          if (badge != null)
-                                            ConstrainedBox(
-                                              constraints: BoxConstraints(maxWidth: badgeMaxWidth),
-                                              child: Container(
-                                                height: HoronChoiceCard._badgeHeight,
-                                                padding: EdgeInsets.symmetric(horizontal: space.s2),
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                  color: neutralBadge ? colors.overlayInk6 : colors.accentSky500_18,
-                                                  borderRadius: BorderRadius.circular(theme.radius.full),
-                                                ),
-                                                child: DefaultTextStyle.merge(
-                                                  style: badgeStyle,
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  child: badge!,
-                                                ),
-                                              ),
+                                          child: Container(
+                                            height:
+                                                HoronChoiceCard._badgeHeight,
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: space.s2,
                                             ),
-                                        ],
-                                      ),
-                                      if (description != null)
-                                        DefaultTextStyle.merge(style: descriptionStyle, child: description!),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: neutralBadge
+                                                  ? colors.overlayInk6
+                                                  : colors.accentSky500_18,
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                    theme.radius.full,
+                                                  ),
+                                            ),
+                                            child: DefaultTextStyle.merge(
+                                              style: badgeStyle,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              child: badge!,
+                                            ),
+                                          ),
+                                        ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  if (description != null)
+                                    DefaultTextStyle.merge(
+                                      style: descriptionStyle,
+                                      child: description!,
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
