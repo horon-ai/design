@@ -25,8 +25,7 @@ Widget _host(Brightness brightness, Widget child, {double width = 600}) {
   );
 }
 
-Finder _border(String state) =>
-    find.byKey(ValueKey<String>('horon-file-drop-border-$state'));
+Finder _border(String state) => find.byKey(ValueKey<String>('horon-file-drop-border-$state'));
 
 void main() {
   final HoronColors colors = HoronThemeData.light.colors;
@@ -38,9 +37,7 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.text(_label), findsOneWidget);
       expect(_border('idle'), findsOneWidget);
-      final Icon icon = tester.widget<Icon>(
-        find.byIcon(Icons.file_upload_outlined),
-      );
+      final Icon icon = tester.widget<Icon>(find.byIcon(Icons.file_upload_outlined));
       expect(icon.size, 16);
       final HoronColors expectedColors = brightness == Brightness.dark
           ? HoronThemeData.dark.colors
@@ -51,53 +48,38 @@ void main() {
 
   testWidgets('아이콘과 라벨은 8 간격으로 가운데 놓인다', (WidgetTester tester) async {
     await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop()));
-    final double iconRight = tester
-        .getTopRight(find.byIcon(Icons.file_upload_outlined))
-        .dx;
+    final double iconRight = tester.getTopRight(find.byIcon(Icons.file_upload_outlined)).dx;
     final double labelLeft = tester.getTopLeft(find.text(_label)).dx;
     expect(labelLeft - iconRight, greaterThanOrEqualTo(space.s2));
   });
 
   testWidgets('거부된 파일은 위험 테두리를 쓴다', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      _host(Brightness.light, const HoronFileDrop(rejected: true)),
-    );
+    await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop(rejected: true)));
     expect(_border('rejected'), findsOneWidget);
     expect(_border('idle'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
   testWidgets('업로드 중에는 아이콘 대신 진행 표시를 그린다', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      _host(Brightness.light, const HoronFileDrop(uploading: true)),
-    );
+    await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop(uploading: true)));
     expect(tester.takeException(), isNull);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(find.byIcon(Icons.file_upload_outlined), findsNothing);
     // 업로드 중에는 누를 수 없고 `opacity-40`입니다.
     final Opacity opacity = tester.widget<Opacity>(
-      find
-          .ancestor(of: find.text(_label), matching: find.byType(Opacity))
-          .first,
+      find.ancestor(of: find.text(_label), matching: find.byType(Opacity)).first,
     );
     expect(opacity.opacity, 0.4);
   });
 
   testWidgets('누르면 onTap을 부르고 비활성이면 부르지 않는다', (WidgetTester tester) async {
     int taps = 0;
-    await tester.pumpWidget(
-      _host(Brightness.light, HoronFileDrop(onTap: () => taps++)),
-    );
+    await tester.pumpWidget(_host(Brightness.light, HoronFileDrop(onTap: () => taps++)));
     await tester.tap(find.byType(HoronFileDrop));
     await tester.pump();
     expect(taps, 1);
 
-    await tester.pumpWidget(
-      _host(
-        Brightness.light,
-        HoronFileDrop(onTap: () => taps++, disabled: true),
-      ),
-    );
+    await tester.pumpWidget(_host(Brightness.light, HoronFileDrop(onTap: () => taps++, disabled: true)));
     await tester.tap(find.byType(HoronFileDrop));
     await tester.pump();
     expect(taps, 1, reason: '비활성 상태에서는 눌러도 콜백이 오지 않습니다');
@@ -143,25 +125,17 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('폭이 모자라면 550까지만 넓어지고 그 아래에서는 부모를 따른다', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      _host(Brightness.light, const HoronFileDrop(), width: 900),
-    );
+  testWidgets('폭이 모자라면 550까지만 넓어지고 그 아래에서는 부모를 따른다', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop(), width: 900));
     expect(tester.getSize(_border('idle')).width, 550);
     expect(tester.takeException(), isNull);
 
-    await tester.pumpWidget(
-      _host(Brightness.light, const HoronFileDrop(), width: 320),
-    );
+    await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop(), width: 320));
     expect(tester.getSize(_border('idle')).width, 320);
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('solid 표면은 bg-surface로 채우고 점선 테두리를 유지한다', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('solid 표면은 bg-surface로 채우고 점선 테두리를 유지한다', (WidgetTester tester) async {
     await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop()));
     expect(_fillColor(tester), colors.bgSurface);
     expect(_border('idle'), findsOneWidget);
@@ -169,15 +143,8 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('glass 표면은 bg-glass-clear 위에 LiquidGlass 레이어를 깐다', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      _host(
-        Brightness.light,
-        const HoronFileDrop(surface: HoronFileDropSurface.glass),
-      ),
-    );
+  testWidgets('glass 표면은 bg-glass-clear 위에 LiquidGlass 레이어를 깐다', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop(surface: HoronFileDropSurface.glass)));
     expect(_fillColor(tester), colors.glassClear);
     expect(find.byType(HoronLiquidGlass), findsOneWidget);
     // 점선 테두리는 glass에서도 그대로입니다.
@@ -187,13 +154,7 @@ void main() {
 
   testWidgets('glass에서도 거부는 위험 테두리로 바뀐다', (WidgetTester tester) async {
     await tester.pumpWidget(
-      _host(
-        Brightness.light,
-        const HoronFileDrop(
-          surface: HoronFileDropSurface.glass,
-          rejected: true,
-        ),
-      ),
+      _host(Brightness.light, const HoronFileDrop(surface: HoronFileDropSurface.glass, rejected: true)),
     );
     expect(_border('rejected'), findsOneWidget);
     expect(_border('idle'), findsNothing);
@@ -243,8 +204,6 @@ void main() {
 
 /// 표면 채움의 색을 읽습니다.
 Color? _fillColor(WidgetTester tester) {
-  final DecoratedBox box = tester.widget<DecoratedBox>(
-    find.byKey(const Key('horon-file-drop-fill')),
-  );
+  final DecoratedBox box = tester.widget<DecoratedBox>(find.byKey(const Key('horon-file-drop-fill')));
   return (box.decoration as BoxDecoration).color;
 }

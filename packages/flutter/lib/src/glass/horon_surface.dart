@@ -43,12 +43,7 @@ class HoronSurfaceLayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (surface == HoronSurface.glass) {
-      return HoronLiquidGlass(
-        tier: tier,
-        borderRadius: borderRadius,
-        edgeColor: borderColor,
-        child: child,
-      );
+      return HoronLiquidGlass(tier: tier, borderRadius: borderRadius, edgeColor: borderColor, child: child);
     }
     final HoronColors colors = HoronTheme.of(context).colors;
     return DecoratedBox(
