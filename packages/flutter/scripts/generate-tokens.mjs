@@ -375,11 +375,7 @@ function glassRimClass() {
     ],
     members: [
       "  /// 세 색을 받는 생성자입니다.",
-      "  const HoronGlassRim({",
-      "    required this.top,",
-      "    required this.mid,",
-      "    required this.bottom,",
-      "  });",
+      "  const HoronGlassRim({required this.top, required this.mid, required this.bottom});",
       "",
       "  /// 위쪽(그라디언트 0) 색입니다.",
       "  final Color top;",
@@ -404,12 +400,7 @@ function glassClass() {
   const rimMembers = (scheme) => Object.entries(rim[scheme]).map(([key, value]) => `    ${key}: ${rgbaColor(value)},`);
   const members = [
     "  /// 모든 글래스 값을 받는 생성자입니다.",
-    "  const HoronGlassTokens({",
-    `    this.blur = ${dartDouble(blur)},`,
-    `    this.saturate = ${dartDouble(saturate)},`,
-    `    this.rimWidth = ${dartDouble(rimWidth)},`,
-    `    this.rimMidStop = ${dartDouble(rimMidStop)},`,
-    "  });",
+    `  const HoronGlassTokens({this.blur = ${dartDouble(blur)}, this.saturate = ${dartDouble(saturate)}, this.rimWidth = ${dartDouble(rimWidth)}, this.rimMidStop = ${dartDouble(rimMidStop)}});`,
     "",
     "  /// 뒤 배경에 거는 가우스 블러의 표준편차입니다(논리 픽셀).",
     "  final double blur;",
