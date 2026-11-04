@@ -4,19 +4,46 @@ on:
   push:
     branches: [main, dev]
   pull_request:
+    # 제목을 고친 경우처럼 기본 트리거에 없는 이벤트도 다시 검사합니다.
+    types: [opened, edited, synchronize, reopened]
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'merge_group' }}
+
+env:
+  BUN_VERSION: 1.4.3
+  FLUTTER_VERSION: 3.47.7
+  TURBO_TELEMETRY_DISABLED: 1
 
 jobs:
-  ci:
-    name: lint / typecheck / test / build
+  js-quality:
+    name: JS lint / typecheck
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
-          bun-version: 1.4.3
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Cache Bun install cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -27,60 +54,214 @@ jobs:
       - name: Typecheck
         run: bun run typecheck
 
+  js-test:
+    name: JS test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Cache Bun install cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
       - name: Test
         run: bun test
 
-      - name: Build
-        run: bun run build
-
-  flutter:
-    name: flutter analyze / format / test
+  js-build:
+    name: JS build
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/flutter
+    timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          flutter-version: 3.47.7
-          channel: stable
-          cache: true
+          persist-credentials: false
 
-      # 토큰 드리프트 가드가 bun 테스트라 bun이 필요합니다. 루트 `ci` 잡과 같은
-      # 버전을 씁니다.
       - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
-          bun-version: 1.4.3
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Cache Bun install cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
 
       - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # 토큰 정본(TS)에서 CSS와 Dart 산출물을 다시 만들고, 커밋된 결과와
+      # 어긋나면 실패합니다. 생성 결과가 저장소 상태와 같은지가 이 단계의 전부입니다.
+      - name: Regenerate tokens
+        run: bun run tokens
+
+      - name: Verify token outputs are committed
+        run: git diff --exit-code -- packages/tokens/theme.css packages/flutter/lib/src/tokens/horon_tokens.g.dart
+
+      - name: Build site
+        run: bun run build:site
+
+      - name: Verify site artifacts
+        run: |
+          set -euo pipefail
+          for artifact in index.html sitemap.xml llms.txt; do
+            if [ ! -s "apps/site/dist/$artifact" ]; then
+              echo "Missing or empty build artifact: apps/site/dist/$artifact"
+              exit 1
+            fi
+          done
+
+      - name: Upload site dist
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site-dist
+          path: apps/site/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  flutter-static:
+    name: Flutter format / analyze
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+          pub-cache: true
+
+      - name: Install dependencies
+        working-directory: packages/flutter
         run: flutter pub get
 
-      # 토큰 드리프트 가드는 bun 테스트입니다(`scripts/generate-tokens.test.mjs`).
-      # `packages/flutter`는 `package.json`이 없어 bun 워크스페이스 멤버가 아니므로
-      # 루트 `bun test`가 이 파일을 주우지 않습니다. 그래서 여기서 따로 돌립니다.
-      # 이 가드가 없으면 생성된 Dart 토큰이 TypeScript 정본과 어긋나도 CI가 모릅니다.
-      - name: Token drift guard
-        run: bun test scripts/generate-tokens.test.mjs
-
-      - name: Analyze
-        run: flutter analyze --fatal-infos
-
       - name: Check formatting
+        working-directory: packages/flutter
         run: dart format --output=none --set-exit-if-changed lib test example
 
-      - name: Test
+      - name: Analyze
+        working-directory: packages/flutter
+        run: flutter analyze --fatal-infos
+
+      # example은 별도 패키지라 패키지 루트의 analyze가 닿지 않습니다.
+      - name: Install example dependencies
+        working-directory: packages/flutter/example
+        run: flutter pub get
+
+      - name: Analyze example
+        working-directory: packages/flutter/example
+        run: flutter analyze --fatal-infos
+
+  flutter-test:
+    name: Flutter test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+          pub-cache: true
+
+      - name: Install dependencies
+        working-directory: packages/flutter
+        run: flutter pub get
+
+      # 토큰 드리프트 가드는 루트 `bun test`가 이미 실행하므로 여기서 다시
+      # 돌리지 않습니다.
+      - name: Test package
+        working-directory: packages/flutter
         run: flutter test
 
-      # `flutter test`는 패키지 루트만 돌립니다. `example/`은 별도 패키지라
-      # 갤러리 회귀 테스트가 여기서 따로 돌지 않으면 CI에서 한 번도 실행되지
-      # 않습니다. 갤러리는 이 계획의 유일한 시각 검증 창구이므로 함께 돌립니다.
-      - name: Test the gallery
+      # example 갤러리 테스트는 별도 패키지라 여기서만 실행됩니다.
+      - name: Install example dependencies
         working-directory: packages/flutter/example
+        run: flutter pub get
+
+      - name: Test gallery
+        working-directory: packages/flutter/example
+        run: flutter test
+
+  pr-title:
+    name: PR title
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # 제목은 셸 문자열에 직접 넣지 않고 env로만 전달합니다.
+      # PR 이벤트가 아니면 단계만 건너뛰고 잡은 성공으로 남겨, 게이트가 모든
+      # needs의 결과를 success로만 판정할 수 있게 합니다.
+      - name: Check Conventional Commits title
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          flutter pub get
-          flutter test
+          set -euo pipefail
+          pattern='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9][a-z0-9._/-]*\))?!?: .+$'
+          if [[ ! "$PR_TITLE" =~ $pattern ]]; then
+            echo "PR title must follow Conventional Commits: <type>(<scope>): <subject>"
+            echo "Got: $PR_TITLE"
+            exit 1
+          fi
+
+  # 저장소 보호 규칙이 이 이름 하나만 필수로 걸 수 있게 하는 게이트입니다.
+  # 이름(`ci`)과 잡 키(`ci-ok`)를 바꾸면 보호 규칙도 함께 바꿔야 합니다.
+  ci-ok:
+    name: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always()
+    needs:
+      - js-quality
+      - js-test
+      - js-build
+      - flutter-static
+      - flutter-test
+      - pr-title
+    steps:
+      - name: Check job results
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+          failures=$(printf '%s' "$NEEDS" | jq -r '
+            to_entries[]
+            | select(.value.result != "success")
+            | "\(.key): \(.value.result)"
+          ')
+          if [ -n "$failures" ]; then
+            printf 'Required jobs did not succeed:\n%s\n' "$failures"
+            exit 1
+          fi
+          echo "All required jobs succeeded."

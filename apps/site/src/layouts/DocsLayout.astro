@@ -48,8 +48,8 @@ const crumbs = [
   <DocsSidebar section={section} currentPath={currentPath} client:load />
 
   <div class="flex items-start lg:ml-60">
-    <article class="min-w-0 flex-1 px-4 pt-6 pb-16 md:px-6 md:pt-14 md:pb-24">
-      <div class="mx-auto w-full max-w-225">
+    <article class="site-shell site-band min-w-0 flex-1">
+      <div class="max-w-3xl">
         <DocsBreadcrumb items={crumbs} client:load />
 
         <header>
@@ -74,7 +74,7 @@ const crumbs = [
     </article>
 
     {/* Reserved on every docs page from xl, filled or not, so the text column never shifts. */}
-    <aside class="hidden xl:sticky xl:top-19 xl:block xl:max-h-dvh xl:w-50 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pt-14 xl:pr-4 xl:pb-19">
+    <aside class="hidden xl:sticky xl:top-(--site-header-h) xl:block xl:max-h-[calc(100dvh-var(--site-header-h))] xl:w-50 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pt-16 xl:pr-4 xl:pb-16">
       {toc && <DocsToc client:load />}
     </aside>
   </div>

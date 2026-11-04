@@ -33,7 +33,7 @@ function MobileMenu({ pathname }: SiteHeaderBarProps) {
             variant="ghost"
             icon={<List />}
             label={pick(m.menu, locale)}
-            className="md:hidden"
+            className="lg:hidden"
           />
         }
       />
@@ -84,18 +84,21 @@ export function SiteHeaderBar({ pathname }: SiteHeaderBarProps) {
     <>
       <nav
         aria-label={pick(m.navLabel, locale)}
-        className="hidden flex-1 items-center justify-center gap-1 md:flex"
+        className="hidden flex-1 items-center justify-center lg:flex"
       >
-        {primaryNav.map((item) => (
-          <Button
-            key={item.href}
-            variant="link"
-            href={item.href}
-            aria-current={isActive(pathname, item.href) ? "page" : undefined}
-          >
-            {pick(item.label, locale)}
-          </Button>
-        ))}
+        <div className="flex items-center gap-0.5 rounded-full border border-glass-border bg-glass-fill-strong p-1">
+          {primaryNav.map((item) => (
+            <Button
+              key={item.href}
+              variant="link"
+              href={item.href}
+              aria-current={isActive(pathname, item.href) ? "page" : undefined}
+              className="rounded-full px-3.5 py-2 leading-[18px] hover:bg-glass-fill"
+            >
+              {pick(item.label, locale)}
+            </Button>
+          ))}
+        </div>
       </nav>
 
       <div className="ml-auto flex items-center gap-1">

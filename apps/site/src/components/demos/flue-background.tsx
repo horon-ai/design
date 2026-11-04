@@ -68,7 +68,7 @@ function AuthExample() {
               type="button"
               size="lg"
               icon={<AppleMark />}
-              className={`${SOCIAL_LABEL} gap-2.5 border border-[#000000] bg-[#000000] px-4 tracking-[-0.04px] hover:not-data-disabled:bg-[#000000]`}
+              className={`${SOCIAL_LABEL} gap-2.5 border border-[#000000] bg-[#000000] px-4 tracking-[-0.04px] text-[#FFFFFF] hover:not-data-disabled:bg-[#000000] dark:border-[#3a3b3d]`}
             >
               Continue with Apple
             </Button>
@@ -77,7 +77,7 @@ function AuthExample() {
               variant="glass"
               size="lg"
               icon={<PasskeyMark />}
-              className={`${SOCIAL_LABEL} gap-2.5 border border-border-strong bg-[#FFFFFF] px-4 tracking-[-0.04px] [&_.liquid-layers]:hidden`}
+              className={`${SOCIAL_LABEL} gap-2.5 border border-[#747775] bg-[#FFFFFF] px-4 tracking-[-0.04px] text-[#1F1F1F] hover:bg-[#F7F8F8] [&_.liquid-layers]:hidden`}
             >
               Sign in with a passkey
             </Button>
