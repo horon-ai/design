@@ -40,8 +40,8 @@ class HoronMenuAnchor extends StatelessWidget {
 
   /// 바깥 탭을 삼킬지 정합니다.
   ///
-  /// `false`면 바깥 탭이 아래 위젯까지 전달되고, `true`면 패널을 덮는 막이 탭을
-  /// 먹고 메뉴만 닫습니다. 메뉴처럼 뒤 화면을 누르지 못하게 하던 자리는 `true`를,
+  /// `false`면 바깥 탭이 아래 위젯까지 전달되고, `true`면 패널 뒤 화면을 덮는 막이
+  /// 탭을 먹고 메뉴만 닫습니다. 메뉴처럼 뒤 화면을 누르지 못하게 하던 자리는 `true`를,
   /// 셀렉트·날짜 필드처럼 통과시키던 자리는 `false`를 씁니다.
   final bool absorbOutsideTaps;
 

@@ -1,11 +1,14 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_glass.dart';
 import '../glass/horon_surface.dart';
+import '../overlay/horon_menu_anchor.dart';
+import '../overlay/horon_overlay.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -178,8 +181,16 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
   static const Duration _caretTurn = Duration(milliseconds: 200);
 
   late String? _value;
-  bool _open = false;
+  final LayerLink _link = LayerLink();
   final MenuController _menu = MenuController();
+
+  /// 패널의 실제 크기를 오버레이가 한 번 재었는지입니다.
+  ///
+  /// [HoronOverlayBody]는 재기 전까지 패널 크기를 0으로 보고 배치를 계산합니다.
+  /// 그 첫 계산 결과로 패널을 줄여 버리면, 줄어든 크기가 다시 측정되어 "이 방향에
+  /// 들어간다"고 판단되고 뒤집힘이 사라집니다. 그래서 첫 프레임은 줄이지 않고
+  /// 실제 높이를 재게 두고, 측정이 끝난 다음부터 배치가 준 높이로 자릅니다.
+  bool _panelMeasured = false;
 
   @override
   void initState() {
@@ -196,12 +207,12 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
   void _select(HoronPickerItem item) {
     setState(() => _value = item.value);
     widget.onChanged?.call(item.value);
+    _menu.close();
   }
 
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
     final bool animate = !MediaQuery.disableAnimationsOf(context);
 
@@ -219,98 +230,112 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
         final double width = constraints.maxWidth.isFinite
             ? math.min(metrics.width, constraints.maxWidth)
             : metrics.width;
-        return MenuAnchor(
+        return HoronMenuAnchor(
           controller: _menu,
-          // `sideOffset={8}` — 목록은 필드 8px 아래에 열립니다.
-          alignmentOffset: Offset(0, space.s2),
-          onOpen: () => setState(() => _open = true),
-          onClose: () => setState(() => _open = false),
-          style: MenuStyle(
-            // `bg-glass-thick`.
-            backgroundColor: WidgetStatePropertyAll<Color>(colors.glassThick),
-            surfaceTintColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-            shadowColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-            elevation: const WidgetStatePropertyAll<double>(0),
-            // `p-1.5`.
-            padding: WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.all(metrics.popupPadding)),
-            // `min-w-(--anchor-width)`.
-            minimumSize: WidgetStatePropertyAll<Size>(Size(width, 0)),
-            // `rounded-xl border border-glass-rim-strong`.
-            shape: WidgetStatePropertyAll<OutlinedBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(theme.radius.xl),
-                side: BorderSide(color: colors.glassRimStrong),
+          child: SizedBox(
+            width: width,
+            child: CompositedTransformTarget(
+              link: _link,
+              child: Builder(
+                builder: (BuildContext context) {
+                  final bool open = MenuController.maybeIsOpenOf(context) ?? false;
+                  // 닫히면 다음에 열 때 다시 실제 크기부터 잽니다.
+                  if (!open) _panelMeasured = false;
+                  return _trigger(theme, metrics, animate, selected, _menu, open);
+                },
               ),
             ),
           ),
-          menuChildren: <Widget>[
-            SizedBox(
-              width: width,
-              child: ConstrainedBox(
-                // `max-h-72 overflow-y-auto`.
-                constraints: const BoxConstraints(maxHeight: _maxPopupHeight),
-                child: SingleChildScrollView(
-                  // 메뉴 패널이 이미 스크롤 컨트롤러를 씁니다. 여기서 primary를 쓰면 두
-                  // 스크롤 위치가 같은 컨트롤러에 붙어 스크롤바가 그릴 수 없습니다.
-                  primary: false,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    // `gap-0.5`.
-                    spacing: space.s0_5,
-                    children: <Widget>[
-                      for (final HoronPickerItem item in widget.items)
-                        MenuItemButton(
-                          key: ValueKey<String>('horon-picker-item-${item.value}'),
-                          onPressed: () => _select(item),
-                          style: ButtonStyle(
-                            minimumSize: WidgetStatePropertyAll<Size>(Size(0, metrics.itemHeight)),
-                            maximumSize: WidgetStatePropertyAll<Size>(Size(double.infinity, metrics.itemHeight)),
-                            padding: WidgetStatePropertyAll<EdgeInsets>(
-                              EdgeInsets.symmetric(horizontal: metrics.itemPaddingX),
-                            ),
-                            // `rounded-md`.
-                            shape: WidgetStatePropertyAll<OutlinedBorder>(
-                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(theme.radius.md)),
-                            ),
-                            // `data-highlighted:bg-overlay-ink-6 data-selected:bg-overlay-ink-6`.
-                            backgroundColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
-                              final bool lit =
-                                  states.contains(WidgetState.hovered) ||
-                                  states.contains(WidgetState.focused) ||
-                                  states.contains(WidgetState.pressed);
-                              return lit ? colors.overlayInk6 : Colors.transparent;
-                            }),
-                            overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-                            // `text-label-md text-text-primary`.
-                            textStyle: WidgetStatePropertyAll<TextStyle>(metrics.item),
-                            foregroundColor: WidgetStatePropertyAll<Color>(colors.textPrimary),
-                          ),
-                          child: Row(
-                            spacing: metrics.itemGap,
-                            children: <Widget>[
-                              Expanded(
-                                child: DefaultTextStyle.merge(
-                                  style: metrics.item.copyWith(color: colors.textPrimary),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  child: item.label,
-                                ),
-                              ),
-                              if (item.value == _value)
-                                Icon(Icons.check, size: metrics.check, color: colors.textPrimary),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
+          overlayBuilder: (BuildContext context, RawMenuOverlayInfo info) => HoronOverlayBody(
+            link: _link,
+            anchor: info.anchorRect,
+            screen: MediaQuery.sizeOf(context),
+            safeArea: MediaQuery.paddingOf(context),
+            // `sideOffset={8}` — 목록은 필드 8px 아래에 열립니다. 배치가 이미 넣는
+            // 기본 간격을 뺀 나머지를 더해, 뒤집혀도 같은 거리를 유지합니다.
+            position: HoronOverlayPosition(offset: Offset(0, space.s2 - HoronOverlayPosition.gap)),
+            panelBuilder: (BuildContext context, HoronOverlayPlacement placement) {
+              // 첫 프레임은 오버레이가 패널 크기를 모르는 채로 배치를 계산합니다.
+              // 그 결과로 바로 자르면 줄어든 크기가 측정되어 뒤집힘이 사라지므로,
+              // 측정이 끝난 다음 프레임부터 배치가 준 한도로 자릅니다.
+              final Widget panel = _panel(theme, metrics, width, _panelMeasured ? placement : null, selected);
+              _panelMeasured = true;
+              return panel;
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  /// 목록 패널입니다. 배경·패딩·반경·테두리를 테마 토큰으로 직접 그립니다.
+  ///
+  /// 배치가 고른 쪽에 들어가는 높이([HoronOverlayPlacement.maxHeight])를 넘으면
+  /// 목록만 줄여 스크롤합니다. Material 메뉴가 하던 화면 안 밀어 넣기를 오버레이
+  /// 배치가 계산하므로, 패널도 그 결과를 따라야 화면 밖으로 나가지 않습니다.
+  Widget _panel(
+    HoronThemeData theme,
+    _PickerMetrics metrics,
+    double width,
+    HoronOverlayPlacement? placement,
+    HoronPickerItem? selected,
+  ) {
+    final HoronColors colors = theme.colors;
+    // 배치가 아직 패널 크기를 모르는 첫 프레임에는 한도를 두지 않습니다.
+    final double panelMaxWidth = placement?.maxWidth ?? double.infinity;
+    final double panelMaxHeight = placement?.maxHeight ?? double.infinity;
+    // 배치 높이는 트리거에서 `gap`만큼 떨어진 자리를 기준으로 셉니다. 이 패널은
+    // 그 위에 `s2 - gap`을 더 띄우므로, 그만큼을 빼야 화면 여백 안에서 끝납니다.
+    final double extraOffset = math.max(theme.space.s2 - HoronOverlayPosition.gap, 0);
+    // 테두리와 패딩도 배치가 준 높이 안에 들어와야 합니다.
+    final double contentMaxHeight = math.max(panelMaxHeight - metrics.popupPadding * 2 - extraOffset, 0);
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: panelMaxWidth, maxHeight: panelMaxHeight),
+      child: DecoratedBox(
+        // `bg-glass-thick`.
+        decoration: BoxDecoration(
+          color: colors.glassThick,
+          // `rounded-xl border border-glass-rim-strong`.
+          borderRadius: BorderRadius.circular(theme.radius.xl),
+          border: Border.all(color: colors.glassRimStrong),
+        ),
+        // `p-1.5`.
+        child: Padding(
+          padding: EdgeInsets.all(metrics.popupPadding),
+          child: SizedBox(
+            width: math.min(width, panelMaxWidth),
+            child: ConstrainedBox(
+              // `max-h-72 overflow-y-auto`. 자리가 모자라면 목록이 그 안에서
+              // 스크롤합니다.
+              constraints: BoxConstraints(maxHeight: math.min(_maxPopupHeight, contentMaxHeight)),
+              child: SingleChildScrollView(
+                // 패널이 포커스를 받을 때 스크롤 위치를 바꾸지 않도록 자체
+                // 컨트롤러를 씁니다.
+                primary: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  // `gap-0.5`.
+                  spacing: theme.space.s0_5,
+                  children: <Widget>[
+                    for (final HoronPickerItem item in widget.items)
+                      _PickerRow(
+                        key: ValueKey<String>('horon-picker-item-${item.value}'),
+                        height: metrics.itemHeight,
+                        paddingX: metrics.itemPaddingX,
+                        gap: metrics.itemGap,
+                        checkSize: metrics.check,
+                        style: metrics.item,
+                        selected: item.value == _value,
+                        onActivate: () => _select(item),
+                        label: item.label,
+                      ),
+                  ],
                 ),
               ),
             ),
-          ],
-          builder: (BuildContext context, MenuController controller, Widget? child) =>
-              SizedBox(width: width, child: _trigger(theme, metrics, animate, selected, controller)),
-        );
-      },
+          ),
+        ),
+      ),
     );
   }
 
@@ -320,6 +345,7 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
     bool animate,
     HoronPickerItem? selected,
     MenuController controller,
+    bool open,
   ) {
     final HoronColors colors = theme.colors;
     final BorderRadius radius = BorderRadius.circular(theme.radius.md);
@@ -349,7 +375,7 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
           ),
           AnimatedRotation(
             // `group-data-popup-open:rotate-180`.
-            turns: _open ? 0.5 : 0,
+            turns: open ? 0.5 : 0,
             duration: animate ? _caretTurn : Duration.zero,
             curve: HoronMotion.easeOutQuint,
             child: Icon(Icons.keyboard_arrow_down, size: metrics.caret, color: colors.textSecondary),
@@ -387,6 +413,123 @@ class _HoronPickerFieldState extends State<HoronPickerField> {
           behavior: HitTestBehavior.opaque,
           onTap: () => controller.isOpen ? controller.close() : controller.open(),
           child: surface,
+        ),
+      ),
+    );
+  }
+}
+
+/// 목록의 한 줄입니다. 호버·포커스·눌림을 직접 그리고 Enter·Space로 값을 고릅니다.
+///
+/// Material 메뉴 버튼을 걷어내면서도 포커스 이동과 Enter 선택은 유지해야 하므로
+/// [FocusableActionDetector]에 [ActivateIntent]를 걸어 둡니다.
+class _PickerRow extends StatefulWidget {
+  const _PickerRow({
+    super.key,
+    required this.height,
+    required this.paddingX,
+    required this.gap,
+    required this.checkSize,
+    required this.style,
+    required this.selected,
+    required this.onActivate,
+    required this.label,
+  });
+
+  /// 줄 높이입니다. `h-10` 같은 토큰 값입니다.
+  final double height;
+
+  /// 좌우 여백입니다.
+  final double paddingX;
+
+  /// 라벨과 체크 사이 간격입니다.
+  final double gap;
+
+  /// 체크 아이콘 크기입니다.
+  final double checkSize;
+
+  /// 라벨 글자 스타일입니다.
+  final TextStyle style;
+
+  /// 지금 고른 줄인지 정합니다.
+  final bool selected;
+
+  /// 줄을 누르거나 활성화했을 때 부릅니다.
+  final VoidCallback onActivate;
+
+  /// 줄에 그릴 라벨입니다.
+  final Widget label;
+
+  @override
+  State<_PickerRow> createState() => _PickerRowState();
+}
+
+class _PickerRowState extends State<_PickerRow> {
+  bool _hovered = false;
+  bool _focused = false;
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    // `data-highlighted:bg-overlay-ink-6 data-selected:bg-overlay-ink-6`.
+    final bool lit = _hovered || _focused || _pressed;
+
+    return FocusableActionDetector(
+      onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
+      onShowFocusHighlight: (bool value) => setState(() => _focused = value),
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+        SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+      },
+      actions: <Type, Action<Intent>>{
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (ActivateIntent intent) {
+            widget.onActivate();
+            return null;
+          },
+        ),
+      },
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onActivate,
+          onTapDown: (TapDownDetails details) => setState(() => _pressed = true),
+          onTapUp: (TapUpDetails details) {
+            if (_pressed) setState(() => _pressed = false);
+          },
+          onTapCancel: () {
+            if (_pressed) setState(() => _pressed = false);
+          },
+          child: AnimatedContainer(
+            duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+            curve: HoronMotion.colorsCurve,
+            height: widget.height,
+            padding: EdgeInsets.symmetric(horizontal: widget.paddingX),
+            // `rounded-md`.
+            decoration: BoxDecoration(
+              color: lit ? colors.overlayInk6 : Colors.transparent,
+              borderRadius: BorderRadius.circular(theme.radius.md),
+            ),
+            child: Row(
+              spacing: widget.gap,
+              children: <Widget>[
+                Expanded(
+                  child: DefaultTextStyle.merge(
+                    // `text-label-md text-text-primary`.
+                    style: widget.style.copyWith(color: colors.textPrimary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    child: widget.label,
+                  ),
+                ),
+                if (widget.selected) Icon(Icons.check, size: widget.checkSize, color: colors.textPrimary),
+              ],
+            ),
+          ),
         ),
       ),
     );

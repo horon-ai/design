@@ -284,4 +284,84 @@ void main() {
     expect(tester.getSize(_clipInside()).width, 288, reason: '320에서 좌우 16px을 남깁니다');
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('scrolling an ancestor closes the menu and reports it', (WidgetTester tester) async {
+    final ScrollController scroll = ScrollController();
+    addTearDown(scroll.dispose);
+    final List<bool> states = <bool>[];
+
+    await tester.pumpWidget(
+      _host(
+        SizedBox(
+          height: 300,
+          child: ListView(
+            controller: scroll,
+            children: <Widget>[
+              const SizedBox(height: 120),
+              HoronMenu(
+                trigger: const Text('열기'),
+                content: const HoronMenuContent(children: <Widget>[HoronMenuItem(label: 'One')]),
+                onOpenChange: states.add,
+              ),
+              const SizedBox(height: 600),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('열기'));
+    await tester.pumpAndSettle();
+    expect(find.byType(HoronMenuContent), findsOneWidget);
+
+    scroll.animateTo(80, duration: const Duration(milliseconds: 100), curve: Curves.linear);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 16));
+
+    expect(find.byType(HoronMenuContent), findsNothing, reason: '조상 스크롤이 메뉴를 닫습니다');
+    expect(states, <bool>[true, false], reason: '닫힘을 onOpenChange로 알립니다');
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('an outside tap closes the menu without pressing what is under it', (WidgetTester tester) async {
+    int underTaps = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: Stack(
+            children: <Widget>[
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => underTaps += 1,
+                  child: const SizedBox.expand(),
+                ),
+              ),
+              Center(
+                child: HoronMenu(
+                  trigger: const Text('열기'),
+                  content: const HoronMenuContent(children: <Widget>[HoronMenuItem(label: 'One')]),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('열기'));
+    await tester.pumpAndSettle();
+    expect(find.byType(HoronMenuContent), findsOneWidget);
+
+    await tester.tapAt(_outside);
+    await tester.pumpAndSettle();
+    expect(find.byType(HoronMenuContent), findsNothing, reason: '바깥 누르기는 메뉴를 닫습니다');
+    expect(underTaps, 0, reason: '팝업 아래 화면은 눌리지 않습니다');
+
+    await tester.tapAt(_outside);
+    await tester.pumpAndSettle();
+    expect(underTaps, 1, reason: '메뉴가 닫힌 뒤에는 아래 화면이 눌립니다');
+  });
 }
