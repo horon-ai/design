@@ -1,5 +1,5 @@
 import { Button as BaseButton } from "@base-ui/react/button";
-import type { ComponentProps, ReactNode } from "react";
+import { Children, type ComponentProps, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
@@ -15,10 +15,21 @@ type ButtonCommonProps = {
   className?: string;
 };
 
-/** Without `href`, a Base UI button; with `href`, a plain anchor with the same look. */
-export type ButtonProps =
-  | (ButtonCommonProps & { href?: undefined } & Omit<ComponentProps<typeof BaseButton>, "className">)
-  | (ButtonCommonProps & { href: string } & Omit<ComponentProps<"a">, "className" | "href" | "type">);
+/** Anchor attributes a button element does not have; they only reach the DOM when `href` is set. */
+type ButtonAnchorProps = Pick<ComponentProps<"a">, "href" | "target" | "rel" | "download">;
+
+/**
+ * One flat prop type rather than a union of button props and anchor props: a caller that forwards the
+ * component's props (`Omit<ComponentProps<typeof Button>, "variant" | "size">`) needs a single object
+ * type. `keyof` of a union is only the keys both branches share, so `type` vanished there and the
+ * caller's `type="button"` failed to type-check.
+ *
+ * `href` still switches the render to a real anchor, and the anchor drops everything a button-only prop
+ * means there: `type`, `disabled`, `name`, `value`, the `form*` family and Base UI's own props. They stay
+ * assignable while `href` is set — forbidding them needs the two-branch union that caused the bug — but
+ * they never reach the DOM, where `<a disabled>` would render as an inert attribute.
+ */
+export type ButtonProps = ButtonCommonProps & ButtonAnchorProps & Omit<ComponentProps<typeof BaseButton>, "className">;
 
 const sizeClass: Record<ButtonSize, string> = {
   sm: "h-8 gap-1.5 px-3 text-label-md [&_svg]:size-4",
@@ -39,7 +50,18 @@ const variantClass: Record<ButtonVariant, string> = {
 };
 
 /** Figma `Button` (55:339): Primary, Glass, Solid and Danger in three sizes, plus a text-only `link` variant (size-independent). */
-export function Button({ variant = "primary", size = "md", icon, className, children, ...props }: ButtonProps) {
+export function Button({
+  variant = "primary",
+  size = "md",
+  icon,
+  className,
+  children,
+  href,
+  target,
+  rel,
+  download,
+  ...props
+}: ButtonProps) {
   const classes = cn(
     "relative inline-flex shrink-0 cursor-pointer items-center justify-center whitespace-nowrap select-none",
     variant === "link" ? "" : "motion-press rounded-full",
@@ -54,18 +76,61 @@ export function Button({ variant = "primary", size = "md", icon, className, chil
     className,
   );
 
+  // Preflight makes every `svg` a block box, so an icon passed as a child (rather than through `icon`)
+  // started a second line and the label clipped. Element children get a row at the button's own gap.
+  // Text-only labels keep the exact single-span markup they had, so their `text-trim` centring is intact.
+  const hasElementChild = Children.toArray(children).some(
+    (child) => typeof child !== "string" && typeof child !== "number",
+  );
+
   const content = (
     <>
       {variant === "glass" && <LiquidGlass />}
       {icon && <span className="relative flex shrink-0">{icon}</span>}
-      <span className={cn("relative", variant !== "link" && "text-trim")}>{children}</span>
+      <span
+        className={cn(
+          "relative",
+          variant !== "link" && "text-trim",
+          hasElementChild && "inline-flex items-center gap-[inherit]",
+        )}
+      >
+        {children}
+      </span>
     </>
   );
 
-  if (props.href !== undefined) {
-    const { href, ...anchorProps } = props;
+  if (href !== undefined) {
+    // An anchor takes none of the button-only attributes, and React would write them to the DOM where
+    // they do nothing (`<a disabled>` is inert). They stop here. `type` is a button type in this prop
+    // type, not an anchor MIME type, so it stops too, as do Base UI's own props.
+    const {
+      type: _type,
+      style,
+      render: _render,
+      nativeButton: _native,
+      focusableWhenDisabled: _focus,
+      disabled: _disabled,
+      form: _form,
+      formAction: _formAction,
+      formEncType: _formEncType,
+      formMethod: _formMethod,
+      formNoValidate: _formNoValidate,
+      formTarget: _formTarget,
+      name: _name,
+      value: _value,
+      ...anchorProps
+    } = props;
     return (
-      <a href={href} className={classes} {...anchorProps}>
+      <a
+        href={href}
+        target={target}
+        rel={rel}
+        download={download}
+        style={typeof style === "function" ? undefined : style}
+        className={classes}
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- what is left is anchor attributes; Base UI types them against `<button>`
+        {...(anchorProps as Omit<ComponentProps<"a">, "className" | "href">)}
+      >
         {content}
       </a>
     );

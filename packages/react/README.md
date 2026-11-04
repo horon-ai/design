@@ -64,7 +64,15 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 유리 컴포넌트는 `LiquidGlass`를 첫 자식으로 둡니다. 굴절은 Safari와 WKWebView에서 그릴 수 없어서 쓰지 않습니다.
 투명도 줄이기 설정이 켜져 있거나 `backdrop-filter`를 지원하지 않으면 흐림 대신 `glass-fill-frost` 채움이 됩니다.
 
-## 컴포넌트 (80개)
+`LiquidGlass`는 **prop을 받지 않습니다**. 유리 높이(`clear` / `regular` / `thick`)는 호스트의 채움 클래스 하나로 정하고,
+레이어에 채움을 칠하지 않습니다. 레이어에 `bg-glass-*`를 얹으면 위의 `glass-fill-frost` 폴백을 Tailwind 유틸리티가
+덮어 투명도 줄이기·미지원 엔진에서 표면이 실제와 다르게 그려집니다. 예전 호출부의 `tier="thick"` 같은 인자는 지웁니다.
+
+레이어는 `absolute; inset: 0`이라 그대로 두면 정적 본문 위로 페인트됩니다. 호스트를 `relative isolate`로 두고
+레이어에 `-z-10`을 주면 호스트 채움 위, 제목·본문 아래로 확정됩니다(`Card`는 이 두 클래스를 스스로 답니다).
+`isolate`를 걸 수 없는 호스트는 본문 요소를 `relative`로 올려 같은 순서를 만듭니다.
+
+## 컴포넌트 (84개)
 
 | 파일 | Figma 노드 | 내용 |
 | --- | --- | --- |
@@ -83,15 +91,16 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 | `bottom-sheet` | 88:808 | Thick-glass bottom sheet; the light board adds frost. |
 | `breadcrumb` | 110:948 | Breadcrumb with workspace tile. |
 | `breadcrumb-header` | U8H-1 | Glass header row with a breadcrumb and optional search and more buttons. |
-| `button` | 55:339 | Primary, Glass, Danger and Link in three sizes; `href` renders a real link. |
+| `button` | 55:339 | Primary, Glass, Solid, Danger and Link in three sizes; `href` renders a real link, `type` reaches the button, and a child icon sits on the label's row. |
 | `calendar` | 60:245 | Month grid with single and range selection. |
-| `card` | 63:310 | Thick-glass card: Default, Interactive, Selected. |
+| `card` | 63:310 | Solid, thick-glass or frost card: Default, Interactive, Selected. Isolates its own stacking context so the glass layer stays under the body. |
 | `chat-bubble` | 64:359 | Flat Me and Bot chat bubbles. |
 | `chat-controls` | 88:659 | Jump to latest, new messages, voice input. |
 | `checkbox` | 58:217 | Off, On and Mixed checkbox. |
 | `chip` | 61:302 | Clear-glass toggle chip. |
 | `choice-card` | 1VXM-0 | Radio card that picks one of two options. |
 | `code-panel` | 1VV9-0 | Light code panel for settings screens. |
+| `combobox` | — | Searchable picker: type to narrow the list, then pick one item or, with `multiple`, several as chips. `variant="segment"` goes inside an `InputGroup`. |
 | `command-palette` | 110:676 | Frosted command palette; `empty` is the no-match slot. |
 | `composer` | 63:462 | Glass message composer. |
 | `data-table` | 192:9046 | Solid data table with header, tags and footer. |
@@ -103,20 +112,22 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 | `field` | 58:163 | Label, control, help and error text. |
 | `file-drop` | 1VWI-0 | Dashed drop zone for files. |
 | `filter-bar` | WLN-1 | Pill filter bar with counts. |
+| `flue-background` | — | Night-and-sky smoke gradient behind glass; `variant` picks the sidebar column or the full auth screen and bends toward the cursor. |
 | `horon-icon` | 256:9116 | The Horon falcon-eye icon. |
 | `horon-wordmark` | 88:808 | UI-size Horon wordmark. |
-| `icon-button` | 57:167 | Primary, Ghost and Glass icon-only buttons. |
+| `icon-button` | 57:167 | Primary, Ghost, Glass and Solid icon-only buttons in three sizes, plus a fill-free `quiet` variant that draws only the ink hover/press wash. |
 | `input` | 58:126 | Glass or Solid text input, MD and LG. |
 | `input-group` | 60:429 | Input with a prefix or suffix segment. |
 | `integration-row` | 110:883 | Integration row: connected, reconnect, not connected. |
 | `kbd` | 110:676 | Keyboard hint chip. |
 | `knowledge-base-panel` | XVM-1 | Indexing state of each knowledge source. |
-| `liquid-glass` | 55:339 | The liquid glass layer stack. |
+| `liquid-glass` | 55:339 | The liquid glass layer stack. Takes no props: the host owns the tier class and the `relative isolate` stacking. |
 | `list-detail` | 1W6P-0 | Two-pane layout with a list on the left and detail on the right. |
 | `marketplace-card` | 1VMY-0 | Marketplace card with a description; the install button shows when `onInstall` is passed. |
 | `mcp-server-row` | 1VHS-0 | Connected MCP server row with name, tags and state. |
 | `menu` | 88:495 | Glass menu and solid account/workspace menu. |
 | `message-extras` | 109:667 | Message actions, date separator, attachment, code block. |
+| `modal` | — | Form or long-read window: a fixed header, a body that scrolls on its own and a footer of actions at the right. |
 | `orchestrator-panel` | X01-1 | Lead bot, parallel lanes and a summary. |
 | `page-header` | 88:723 | Glass header with back, title, actions and filter. |
 | `plan-card` | XMH-1 | Card shell that wraps plan steps. |
@@ -131,10 +142,11 @@ web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 | `settings-list` | 1VD8-0 | Settings card of label and switch rows split by dividers. |
 | `sidebar` | 88:808 | Thick-glass sidebar with groups, tree and account. |
 | `skeleton` | 109:733 | Placeholder blocks and cards. |
+| `slider` | — | Settings slider: a thin ink track with a white hairline thumb; width comes from the caller. |
 | `source-row` | 114:1287 | Knowledge source with pipeline stages. |
 | `spinner` | 109:733 | Ink spinner in three sizes. |
 | `split-button` | 1VGK-0 | One pill with a primary action and a secondary menu caret. |
-| `switch` | 58:264 | MD and SM switch. |
+| `switch` | 58:264 | SM, MD, LG and COMPACT switch, with an optional label; the thumb holds its size inside the track. |
 | `tab-bar` | 63:441 | Mobile glass tab bar. |
 | `tabs` | 62:335 | Pill tabs on a glass tray. |
 | `task-row` | 112:939 | Task row: running, review, failed, done. |

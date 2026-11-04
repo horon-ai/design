@@ -54,7 +54,10 @@ export function Switch({ size = "md", label, className, ...props }: SwitchProps)
     >
       <BaseSwitch.Thumb
         className={cn(
-          "rounded-full bg-text-on-ink transition-[translate,background-color] duration-220 ease-spring data-checked:bg-interactive-on-primary",
+          // The thumb is a flex child of a fixed-width track whose content box can be
+          // narrower than the thumb plus its travel; `shrink-0` holds it at its own
+          // size so the track never reads as a bare bar.
+          "shrink-0 rounded-full bg-text-on-ink transition-[translate,background-color] duration-220 ease-spring data-checked:bg-interactive-on-primary",
           thumbClass[size],
         )}
       />
