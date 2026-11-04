@@ -3,7 +3,8 @@ import type { ComponentProps } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
-export type BadgeTone = "neutral" | "brand" | "danger" | "solid";
+/** `surface` is the white (raised surface) pill with a 1px default border and primary text. */
+export type BadgeTone = "neutral" | "brand" | "danger" | "solid" | "surface";
 export type BadgeSize = ControlSize;
 
 export type BadgeProps = Omit<ComponentProps<"span">, "className"> & {
@@ -32,6 +33,7 @@ const toneClass: Record<BadgeTone, string> = {
   brand: "bg-accent-sky-500-18 text-text-brand",
   danger: "bg-accent-red-500-14 text-text-danger",
   solid: "bg-interactive-primary text-interactive-on-primary",
+  surface: "border border-border-default bg-bg-surface text-text-primary",
 };
 
 const dotClass: Record<BadgeTone, string> = {
@@ -39,6 +41,7 @@ const dotClass: Record<BadgeTone, string> = {
   brand: "bg-status-live",
   danger: "bg-text-danger",
   solid: "bg-interactive-on-primary",
+  surface: "bg-text-primary",
 };
 
 /** Figma `Badge` (61:283): a 22px translucent pill with label-sm text. */
@@ -53,9 +56,7 @@ export function Badge({ tone = "neutral", dot, size = "md", className, children,
       )}
       {...props}
     >
-      {dot && (
-        <span aria-hidden className={cn("shrink-0 rounded-full", dotSizeClass[size], dotClass[tone])} />
-      )}
+      {dot && <span aria-hidden className={cn("shrink-0 rounded-full", dotSizeClass[size], dotClass[tone])} />}
       {children}
     </span>
   );
