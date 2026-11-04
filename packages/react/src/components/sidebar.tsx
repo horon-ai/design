@@ -458,8 +458,9 @@ export function SidebarProject({
             <span
               aria-hidden
               className={cn(
-                "flex size-3.5 shrink-0 opacity-100 transition-opacity duration-150 [&>svg]:size-3.5",
-                actions !== undefined && "group-hover/project:opacity-0 group-has-data-popup-open/project:opacity-0",
+                "flex size-3.5 shrink-0 [&>svg]:size-3.5",
+                actions !== undefined &&
+                  "group-hover/project:invisible group-focus-within/project:invisible group-has-data-popup-open/project:invisible",
               )}
             >
               <CaretRight className="transition-transform duration-200 ease-out-quint group-data-panel-open/trigger:rotate-90" />
@@ -467,7 +468,12 @@ export function SidebarProject({
           )}
         </Collapsible.Trigger>
         {actions !== undefined && (
-          <span className="absolute right-2.5 flex opacity-0 transition-opacity duration-150 group-focus-within/project:opacity-100 group-hover/project:opacity-100 group-has-data-popup-open/project:opacity-100">
+          <span
+            className={cn(
+              "invisible absolute right-2.5 flex",
+              "group-focus-within/project:visible group-hover/project:visible group-has-data-popup-open/project:visible",
+            )}
+          >
             {actions}
           </span>
         )}
