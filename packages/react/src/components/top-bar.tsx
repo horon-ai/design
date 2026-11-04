@@ -43,7 +43,7 @@ export function TopBar({
       {...props}
     >
       {surface === "glass" && <LiquidGlass />}
-      <IconButton icon={<CaretLeft />} label={backLabel} onClick={onBack} />
+      {onBack && <IconButton icon={<CaretLeft />} label={backLabel} onClick={onBack} />}
       <span className="relative inline-flex shrink-0">
         <Avatar type="bot" size="md" />
         {live && (
@@ -52,11 +52,14 @@ export function TopBar({
           </span>
         )}
       </span>
-      <div className="relative flex min-w-0 flex-1 flex-col overflow-clip">
+      <div
+        key={typeof title === "string" ? `${title}|${typeof subtitle === "string" ? subtitle : ""}` : undefined}
+        className="relative flex min-w-0 flex-1 animate-fade-in flex-col overflow-clip"
+      >
         <span className="truncate text-label-lg text-text-primary">{title}</span>
         {subtitle && <span className="truncate text-caption text-text-secondary">{subtitle}</span>}
       </div>
-      <IconButton icon={<DotsThree weight="bold" />} label={moreLabel} onClick={onMore} />
+      {onMore && <IconButton icon={<DotsThree weight="bold" />} label={moreLabel} onClick={onMore} />}
     </header>
   );
 }

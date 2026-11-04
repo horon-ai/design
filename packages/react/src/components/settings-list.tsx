@@ -78,16 +78,18 @@ export function SettingsSwitch(props: SwitchProps) {
   return <Switch size="md" {...props} />;
 }
 
-/** One keycap: 26px high, 6px radius, neutral-50 fill with a 1px hairline (replaces `Kbd` in settings rows). */
-export function SettingsKey({ className, ...props }: WithClass<ComponentProps<"kbd">>) {
+/** One keycap: 26px high, 6px radius, subtle fill with a 1px hairline (replaces `Kbd` in settings rows). */
+export function SettingsKey({ className, children, ...props }: WithClass<ComponentProps<"kbd">>) {
   return (
     <kbd
       className={cn(
-        "inline-flex h-6.5 items-center rounded-xs border border-border-default bg-neutral-50 px-2 font-sans text-label-sm text-text-primary dark:bg-neutral-800",
+        "inline-flex h-6.5 items-center rounded-xs border border-border-default bg-bg-subtle px-2 font-sans text-label-sm text-text-primary",
         className,
       )}
       {...props}
-    />
+    >
+      <span className="text-trim">{children}</span>
+    </kbd>
   );
 }
 

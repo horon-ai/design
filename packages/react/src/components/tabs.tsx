@@ -156,10 +156,5 @@ export function TabsTab({
 }
 
 export function TabsPanel({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Panel>>) {
-  return (
-    <BaseTabs.Panel
-      className={cn("animate-[tab-panel-in_200ms_var(--ease-out-quint)] outline-none", className)}
-      {...props}
-    />
-  );
+  return <BaseTabs.Panel className={cn("animate-swap-move outline-none", className)} {...props} />;
 }

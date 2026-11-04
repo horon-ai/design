@@ -19,7 +19,7 @@ import {
   type ReactTable,
   type RowData,
 } from "@tanstack/react-table";
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, CSSProperties, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { Checkbox } from "./checkbox";
@@ -304,13 +304,15 @@ export function DataTableView<TData extends RowData>({
                     >
                       {meta?.icon}
                       <table.FlexRender header={header} />
-                      {sorted === "asc" ? (
-                        <CaretUp aria-hidden />
-                      ) : sorted === "desc" ? (
-                        <CaretDown aria-hidden />
-                      ) : (
-                        <CaretUpDown aria-hidden className="opacity-60" />
-                      )}
+                      <span key={sorted || "none"} className="flex animate-fade-in">
+                        {sorted === "asc" ? (
+                          <CaretUp aria-hidden />
+                        ) : sorted === "desc" ? (
+                          <CaretDown aria-hidden />
+                        ) : (
+                          <CaretUpDown aria-hidden className="opacity-60" />
+                        )}
+                      </span>
                     </button>
                   ) : (
                     <table.FlexRender header={header} />
@@ -329,10 +331,13 @@ export function DataTableView<TData extends RowData>({
             </DataTableCell>
           </DataTableRow>
         ) : (
-          rows.map((row) => (
+          rows.map((row, index) => (
             <DataTableRow
-              key={row.id}
-              className="motion-colors hover:bg-overlay-ink-3"
+              key={`${table.state.pagination.pageIndex}:${table.state.sorting
+                .map((sort) => `${sort.id}${sort.desc ? "d" : "a"}`)
+                .join()}:${row.id}`}
+              className="motion-rise motion-colors hover:bg-overlay-ink-4 data-selected:[&>td]:bg-overlay-ink-4 data-selected:hover:[&>td]:bg-overlay-ink-6"
+              style={{ "--i": index, animationDelay: "calc(var(--i) * 30ms)" } as CSSProperties}
               data-selected={row.getIsSelected() ? "" : undefined}
             >
               {row.getAllCells().map((cell) => (

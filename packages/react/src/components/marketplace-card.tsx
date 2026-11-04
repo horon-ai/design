@@ -64,7 +64,7 @@ export function MarketplaceCard({
           {chips.map((chip) => (
             <span
               key={chip.id}
-              className="inline-flex h-5.5 items-center gap-1 rounded-full bg-overlay-ink-6 px-2 text-label-sm text-text-secondary [&_svg]:size-2.75"
+              className="inline-flex h-5.5 items-center gap-1 rounded-full bg-overlay-ink-6 px-2 text-label-sm text-text-secondary [&_svg]:size-3"
             >
               {chip.icon}
               {chip.label}
@@ -79,11 +79,18 @@ export function MarketplaceCard({
             <span className="text-label-sm text-text-primary">{score}</span>
           </>
         )}
-        {installs && <span className="text-caption text-text-placeholder">· {installs}</span>}
+        {score && installs && (
+          <span aria-hidden className="text-caption text-text-placeholder">
+            ·
+          </span>
+        )}
+        {installs && <span className="text-caption text-text-secondary">{installs}</span>}
         <span className="flex-1" />
-        <Button variant="solid" size="sm" onClick={onInstall}>
-          {installLabel}
-        </Button>
+        {onInstall && (
+          <Button variant="solid" size="sm" onClick={onInstall}>
+            {installLabel}
+          </Button>
+        )}
       </div>
     </div>
   );

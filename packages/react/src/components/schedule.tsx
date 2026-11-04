@@ -132,7 +132,7 @@ export function PickerField({
                 >
                   <BaseSelect.ItemText className="min-w-0 flex-1">{item.label}</BaseSelect.ItemText>
                   <BaseSelect.ItemIndicator className={cn("flex shrink-0", itemIndicatorSizeClass[size])}>
-                    <Check />
+                    <Check className="animate-pop-in" />
                   </BaseSelect.ItemIndicator>
                 </BaseSelect.Item>
               ))}

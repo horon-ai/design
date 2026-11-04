@@ -45,17 +45,25 @@ export function Card({
         surface === "frost" && "bg-glass-fill-frost shadow-[0_8px_24px_#0a14240f]",
         selected && (surface === "solid" ? "border-border-brand" : "[--glass-edge:var(--color-border-brand)]"),
         interactive &&
-          "cursor-pointer transition-[border-color,scale] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand active:scale-[0.99]",
+          cn(
+            "cursor-pointer transition-[color,background-color,border-color,box-shadow,scale] duration-150 ease-out",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand active:scale-[0.99]",
+            !selected &&
+              (surface === "solid" ? "hover:border-border-strong" : "hover:[--glass-edge:var(--color-border-strong)]"),
+          ),
         className,
       ),
       children: (
         <>
           {surface !== "solid" && <LiquidGlass />}
-          {(title || interactive) && (
+          {title && (
             <div className="relative flex w-full items-center gap-2">
               <span className="min-w-0 flex-1 text-title-sm text-text-primary">{title}</span>
               {interactive && <CaretRight aria-hidden className="size-4 shrink-0 text-text-secondary" />}
             </div>
+          )}
+          {interactive && !title && (
+            <CaretRight aria-hidden className="absolute top-5 right-5 size-4 shrink-0 text-text-secondary" />
           )}
           {description && <p className="relative text-body-sm text-text-secondary">{description}</p>}
           {children && <div className="relative w-full">{children}</div>}

@@ -65,9 +65,9 @@ const popoverHeaderSizeClass: Record<CalendarSize, string> = {
 };
 
 const arrowSizeClass: Record<CalendarSize, string> = {
-  sm: "size-4 [&_svg]:size-4",
-  md: "size-5 [&_svg]:size-5",
-  lg: "size-6 [&_svg]:size-6",
+  sm: "size-6 [&_svg]:size-4",
+  md: "size-7 [&_svg]:size-4.5",
+  lg: "size-8 [&_svg]:size-5",
 };
 
 const popoverArrowSizeClass: Record<CalendarSize, string> = {
@@ -230,7 +230,9 @@ export function Calendar(props: CalendarProps) {
       {variant === "popover" ? (
         <div className={cn("relative flex w-full items-center", popoverHeaderSizeClass[size])}>
           <p aria-live="polite" className={cn("min-w-0 flex-1 text-text-primary", popoverTitleSizeClass[size])}>
-            {title}
+            <span key={title} className="animate-fade-in">
+              {title}
+            </span>
           </p>
           {(
             [
@@ -244,6 +246,7 @@ export function Calendar(props: CalendarProps) {
               aria-label={label}
               className={cn(
                 "flex motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
                 popoverArrowSizeClass[size],
               )}
               onClick={() => setMonth(addMonths(month, step))}
@@ -258,7 +261,7 @@ export function Calendar(props: CalendarProps) {
             type="button"
             aria-label="Previous month"
             className={cn(
-              "flex motion-press cursor-pointer rounded-full text-text-secondary hover:text-text-primary",
+              "flex motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
               arrowSizeClass[size],
             )}
@@ -267,13 +270,15 @@ export function Calendar(props: CalendarProps) {
             <CaretLeft />
           </button>
           <p aria-live="polite" className={cn("flex-1 text-center text-text-primary", titleSizeClass[size])}>
-            {title}
+            <span key={title} className="animate-fade-in">
+              {title}
+            </span>
           </p>
           <button
             type="button"
             aria-label="Next month"
             className={cn(
-              "flex motion-press cursor-pointer rounded-full text-text-secondary hover:text-text-primary",
+              "flex motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
               arrowSizeClass[size],
             )}
@@ -290,8 +295,8 @@ export function Calendar(props: CalendarProps) {
         aria-label={title}
         className={cn(
           "relative flex flex-col",
-          slide === "next" && "animate-slide-next",
-          slide === "prev" && "animate-slide-prev",
+          slide === "next" && "animate-slide-shift-next",
+          slide === "prev" && "animate-slide-shift-prev",
         )}
         onKeyDown={onKeyDown}
       >
@@ -344,7 +349,7 @@ export function Calendar(props: CalendarProps) {
                       (disabled
                         ? cn("cursor-not-allowed text-text-disabled", dayTextClass[size])
                         : outside
-                          ? cn("text-text-disabled", dayTextClass[size])
+                          ? cn("text-text-placeholder", dayTextClass[size])
                           : isToday
                             ? cn("text-text-brand", dayEmphasisClass[size])
                             : cn("text-text-primary", dayTextClass[size])),

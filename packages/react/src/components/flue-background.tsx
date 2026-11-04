@@ -292,7 +292,8 @@ export function FlueBackground({ className, style, variant = "default", config, 
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let still = motionQuery.matches;
     let resizeQueued = 0;
     const observer = new ResizeObserver(() => {
       cancelAnimationFrame(resizeQueued);
@@ -340,15 +341,34 @@ export function FlueBackground({ className, style, variant = "default", config, 
       mouse.wy += (mouse.y - mouse.wy) * kWake;
       draw();
     };
-    if (!still) {
+    // The plume follows the OS switch while the page is open: turning on "reduce motion"
+    // freezes the current frame, turning it off resumes from the same clock.
+    const listen = () => {
+      if (still) {
+        window.removeEventListener("pointermove", aim);
+        window.removeEventListener("pointerdown", aim);
+        return;
+      }
       if (cfg.cursor) {
         window.addEventListener("pointermove", aim, { passive: true });
         window.addEventListener("pointerdown", aim, { passive: true });
       }
-      raf = requestAnimationFrame(frame);
-    }
+      previous = performance.now();
+      if (!raf) raf = requestAnimationFrame(frame);
+    };
+    const onMotionChange = (event: MediaQueryListEvent) => {
+      still = event.matches;
+      if (still) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+      listen();
+    };
+    motionQuery.addEventListener("change", onMotionChange);
+    listen();
 
     return () => {
+      motionQuery.removeEventListener("change", onMotionChange);
       cancelAnimationFrame(raf);
       cancelAnimationFrame(resizeQueued);
       observer.disconnect();
