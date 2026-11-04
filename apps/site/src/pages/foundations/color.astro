@@ -31,7 +31,9 @@ const dark = darkColors as Record<string, string>;
 
   <h2><T m={m.primitivesHeading} /></h2>
   <p><T m={m.primitivesBody} /></p>
-  <div class="mt-5 grid grid-cols-2 overflow-hidden rounded-xl border border-border-default sm:grid-cols-4">
+  <div
+    class="mt-5 grid grid-cols-2 overflow-hidden rounded-xl border border-border-default bg-bg-subtle sm:grid-cols-4"
+  >
     {
       Object.entries(primitives).map(([name, value]) => (
         <div class="border-r border-b border-border-default">
@@ -53,7 +55,7 @@ const dark = darkColors as Record<string, string>;
           {names
             .filter((name) => name.startsWith(group.prefix))
             .map((name) => (
-              <div class="flex items-center gap-3 rounded-lg bg-bg-subtle px-3 py-2">
+              <div class="flex items-center gap-3 rounded-xl border border-border-default bg-bg-subtle px-3 py-2">
                 <span
                   class="flex size-8 shrink-0 overflow-hidden rounded-xs border border-border-default"
                   aria-hidden="true"
