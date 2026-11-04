@@ -42,11 +42,12 @@ const descriptionText = typeof description === "string" ? description : descript
 <html lang="ko" data-locale="ko" class="h-full">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{pageTitle}</title>
     {pageTitleEn && <meta name={LOCALE_TITLE_META_NAME} content={pageTitleEn} />}
     <script is:inline set:html={PREPAINT_SCRIPT}></script>
     <meta name="description" content={descriptionText} />
+    <meta name="color-scheme" content="light dark" />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={descriptionText} />
@@ -83,7 +84,7 @@ const descriptionText = typeof description === "string" ? description : descript
     <main>
       <slot />
     </main>
-    {footer && <div class="w-full px-4 md:px-6"><Footer /></div>}
+    {footer && <Footer />}
     <script is:inline set:html={LOCALE_RUNTIME_SCRIPT}></script>
   </body>
 </html>

@@ -20,6 +20,25 @@
   }
 }
 
+/* iOS Safari zooms the whole page in when a focused form control's font size is
+ * under 16px, and it does not zoom back out on blur, so one tap on a 14px field
+ * leaves the layout cropped. A 16px floor on the control removes the trigger and
+ * the page stays at 1x. `maximum-scale` and `user-scalable=no` would also stop
+ * the zoom but take the user's own pinch zoom away, so this rule is the only
+ * remedy used. Coarse pointers only: a mouse-driven screen never zooms on focus,
+ * so it keeps the designed 13/14px field text, and coarse is the closest signal
+ * for the devices that do. max(16px, 1em) leaves text on a larger scale alone
+ * instead of shrinking it. Unlayered on purpose: field utilities such as
+ * `text-body-sm` sit in Tailwind's `utilities` layer and would otherwise win,
+ * leaving the control at 14px and the zoom in place. */
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1em);
+  }
+}
+
 /* Glass, the material in @horon-ai/tokens glass.ts that Flutter's
  * HoronLiquidGlass draws with the same values: the backdrop blurred and
  * saturated, under the host's own fill, and a rim ring on the edge. Only

@@ -13,10 +13,6 @@ export const shellMessages = defineMessages({
     ko: "HORON Design System 홈",
     en: "HORON Design System home",
   },
-  brandSuffix: {
-    ko: "Design System",
-    en: "Design System",
-  },
   navLabel: {
     ko: "주요 섹션",
     en: "Main sections",
@@ -68,5 +64,13 @@ export const shellMessages = defineMessages({
   footerBlurb: {
     ko: "데이터를 이해하는 것에서 끝나지 않고 실행과 결과까지 연결하는 AI 시스템. 그 시스템을 지탱하는 디자인 언어입니다.",
     en: "An AI system that carries data through to execution and results, not just understanding it. This is the design language behind that system.",
+  },
+  brandLine: {
+    ko: "Horus × ON",
+    en: "Horus × ON",
+  },
+  footerAvailability: {
+    ko: "macOS에서 쓸 수 있습니다. Windows와 Linux는 곧 나옵니다.",
+    en: "Available on macOS · Windows and Linux soon",
   },
 });
