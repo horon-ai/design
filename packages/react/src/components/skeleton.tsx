@@ -24,21 +24,27 @@ export function Skeleton({ shape = "block", className, ...props }: SkeletonProps
   );
 }
 
-export type SkeletonCardProps = { type?: "row" | "card" | "text"; className?: string };
+export type SkeletonCardProps = {
+  type?: "row" | "card" | "text";
+  /** `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass card. */
+  surface?: "solid" | "glass";
+  className?: string;
+};
 
-/** Figma `Skeleton` (in Loading 109:733): Row, Card and Text placeholders on a thick-glass card. */
-export function SkeletonCard({ type = "row", className }: SkeletonCardProps) {
+/** Figma `Skeleton` (in Loading 109:733): Row, Card and Text placeholders on a solid or thick-glass card. */
+export function SkeletonCard({ type = "row", surface = "solid", className }: SkeletonCardProps) {
   return (
     <div
       role="status"
       aria-label="Loading"
       className={cn(
-        "relative flex gap-2.5 overflow-clip rounded-[16px] bg-glass-thick p-3.5",
+        "relative flex gap-2.5 overflow-clip rounded-[16px] p-3.5",
+        surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         type === "row" ? "w-75 items-center" : "w-70 flex-col items-start",
         className,
       )}
     >
-      <LiquidGlass tier="thick" />
+      {surface === "glass" && <LiquidGlass />}
       {type === "row" && (
         <>
           <Skeleton shape="pill" className="relative size-9 shrink-0" />

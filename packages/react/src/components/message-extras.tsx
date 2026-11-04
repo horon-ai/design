@@ -17,24 +17,34 @@ export function DateSeparator({ children, className }: { children: ReactNode; cl
 
 export type MessageAction = { label: string; icon: ReactNode; onClick?: () => void };
 
-/** Figma `Message actions` (109:667): a regular-glass pill of 30px icon buttons with 16px icons. */
-export function MessageActions({ actions, className }: { actions: MessageAction[]; className?: string }) {
+/** Figma `Message actions` (109:667): a pill of 30px icon buttons with 16px icons, solid or regular glass. */
+export function MessageActions({
+  actions,
+  surface = "solid",
+  className,
+}: {
+  actions: MessageAction[];
+  /** `solid` (default) is an opaque surface pill with a default border; `glass` is the regular glass pill. */
+  surface?: "solid" | "glass";
+  className?: string;
+}) {
   return (
     <div
       role="toolbar"
       className={cn(
-        "relative flex w-fit items-center gap-0.5 overflow-clip rounded-full bg-glass-regular p-[3px]",
+        "relative flex w-fit items-center gap-0.5 overflow-clip rounded-full p-[3px]",
+        surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
         className,
       )}
     >
-      <LiquidGlass tier="regular" />
+      {surface === "glass" && <LiquidGlass />}
       {actions.map((action) => (
         <button
           key={action.label}
           type="button"
           aria-label={action.label}
           onClick={action.onClick}
-          className="relative flex size-7.5 motion-colors motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
+          className="relative flex size-7.5 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary motion-colors hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
         >
           {action.icon}
         </button>

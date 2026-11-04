@@ -3,9 +3,11 @@ import { CheckCircle, Info, WarningCircle, X } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
+import type { ControlSize } from "../lib/size";
 import { LiquidGlass } from "./liquid-glass";
 
 export type ToastTone = "neutral" | "success" | "danger";
+export type ToastSize = ControlSize;
 
 const toneIcon: Record<ToastTone, ReactNode> = {
   neutral: <Info className="text-text-secondary" />,
@@ -13,14 +15,47 @@ const toneIcon: Record<ToastTone, ReactNode> = {
   danger: <WarningCircle className="text-text-danger" />,
 };
 
-const toastClass =
-  "relative flex w-90 items-start gap-3 overflow-clip rounded-lg bg-glass-regular px-4 py-3.5";
+const sizeClass: Record<ToastSize, string> = {
+  sm: "w-80 gap-2 px-3 py-2.5",
+  md: "w-90 gap-3 px-4 py-3.5",
+  lg: "w-100 gap-3.5 px-5 py-4",
+};
+
+const iconSizeClass: Record<ToastSize, string> = {
+  sm: "[&_svg]:size-4",
+  md: "[&_svg]:size-5",
+  lg: "[&_svg]:size-6",
+};
+
+const titleSizeClass: Record<ToastSize, string> = {
+  sm: "text-label-md",
+  md: "text-label-lg",
+  lg: "text-label-lg",
+};
+
+const descriptionSizeClass: Record<ToastSize, string> = {
+  sm: "text-body-sm",
+  md: "text-body-sm",
+  lg: "text-body-md",
+};
+
+const contentGapClass: Record<ToastSize, string> = {
+  sm: "gap-0.5",
+  md: "gap-0.5",
+  lg: "gap-1",
+};
+
+const closeSizeClass: Record<ToastSize, string> = {
+  sm: "[&_svg]:size-3.5",
+  md: "[&_svg]:size-4",
+  lg: "[&_svg]:size-4.5",
+};
 
 function isTone(value: string | undefined): value is ToastTone {
   return value === "neutral" || value === "success" || value === "danger";
 }
 
-function ToastList() {
+function ToastList({ size, surface }: { size: ToastSize; surface: "solid" | "glass" }) {
   const { toasts } = BaseToast.useToastManager();
   return toasts.map((toast) => {
     const tone = isTone(toast.type) ? toast.type : "neutral";
@@ -29,19 +64,21 @@ function ToastList() {
         key={toast.id}
         toast={toast}
         className={cn(
-          toastClass,
+          "relative flex items-start overflow-clip rounded-lg",
+          surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface shadow-popover",
+          sizeClass[size],
           "transition-[opacity,translate,scale] duration-260 ease-out-quint data-ending-style:translate-x-6 data-ending-style:opacity-0 data-ending-style:duration-180 data-ending-style:ease-in data-starting-style:translate-y-4 data-starting-style:scale-95 data-starting-style:opacity-0",
         )}
       >
-        <LiquidGlass tier="regular" />
-        <span className="relative flex shrink-0 [&_svg]:size-5">{toneIcon[tone]}</span>
-        <BaseToast.Content className="relative flex min-w-0 flex-1 flex-col gap-0.5">
-          <BaseToast.Title className="text-label-lg text-text-primary" />
-          <BaseToast.Description className="text-body-sm text-text-secondary" />
+        {surface === "glass" && <LiquidGlass />}
+        <span className={cn("relative flex shrink-0", iconSizeClass[size])}>{toneIcon[tone]}</span>
+        <BaseToast.Content className={cn("relative flex min-w-0 flex-1 flex-col", contentGapClass[size])}>
+          <BaseToast.Title className={cn("text-text-primary", titleSizeClass[size])} />
+          <BaseToast.Description className={cn("text-text-secondary", descriptionSizeClass[size])} />
         </BaseToast.Content>
         <BaseToast.Close
           aria-label="Close"
-          className="relative flex shrink-0 motion-press cursor-pointer text-text-secondary [&_svg]:size-4"
+          className={cn("relative flex shrink-0 motion-press cursor-pointer text-text-secondary", closeSizeClass[size])}
         >
           <X />
         </BaseToast.Close>
@@ -50,19 +87,29 @@ function ToastList() {
   });
 }
 
-export type ToasterProps = { children?: ReactNode; className?: string };
+export type ToasterProps = {
+  children?: ReactNode;
+  /** Toast size: `sm` 320px, `md` 360px (default), `lg` 400px; applies to every toast this provider shows. */
+  size?: ToastSize;
+  /**
+   * `solid` (default) is an opaque surface card with a default border; `glass` is the regular glass card.
+   * Applies to every toast this provider shows.
+   */
+  surface?: "solid" | "glass";
+  className?: string;
+};
 
 /**
- * Figma `Toast` (62:307): a 360px regular-glass card. Wrap the app once; call
+ * Figma `Toast` (62:307): a 360px card, solid or regular glass. Wrap the app once; call
  * `useToast().add({ title, description, type: "success" })` to show one.
  */
-export function Toaster({ children, className }: ToasterProps) {
+export function Toaster({ children, size = "md", surface = "solid", className }: ToasterProps) {
   return (
     <BaseToast.Provider>
       {children}
       <BaseToast.Portal>
         <BaseToast.Viewport className={cn("fixed right-6 bottom-6 z-50 flex flex-col items-end gap-3", className)}>
-          <ToastList />
+          <ToastList size={size} surface={surface} />
         </BaseToast.Viewport>
       </BaseToast.Portal>
     </BaseToast.Provider>

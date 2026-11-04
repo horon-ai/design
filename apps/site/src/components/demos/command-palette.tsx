@@ -21,28 +21,62 @@ const groups = [
       },
     ],
   },
-  { label: "Projects", items: [{ value: "q4", label: "Q4 hiring", tile: <Folder />, tileClassName: "bg-overlay-ink-5 text-text-primary" }] },
-  { label: "Actions", items: [{ value: "new", label: "New bot", tile: <Plus />,
-        tileClassName: "bg-overlay-ink-5 text-text-primary", hint: <Kbd>⌘N</Kbd> }] },
+  {
+    label: "Projects",
+    items: [
+      {
+        value: "q4",
+        label: "Q4 hiring",
+        tile: <Folder />,
+        tileClassName: "bg-overlay-ink-5 text-text-primary",
+      },
+    ],
+  },
+  {
+    label: "Actions",
+    items: [
+      {
+        value: "new",
+        label: "New bot",
+        tile: <Plus />,
+        tileClassName: "bg-overlay-ink-5 text-text-primary",
+        hint: <Kbd>⌘N</Kbd>,
+      },
+    ],
+  },
+];
+
+const hints: [string, string][] = [
+  ["↑↓", "Move"],
+  ["↵", "Open"],
 ];
 
 export default function CommandPaletteDemo() {
-  const [open, setOpen] = useState(false);
+  const [glassOpen, setGlassOpen] = useState(false);
+  const [solidOpen, setSolidOpen] = useState(false);
   return (
-    <>
-      <Button variant="glass" onClick={() => setOpen(true)}>
+    <div className="flex flex-wrap gap-3">
+      <Button variant="glass" onClick={() => setGlassOpen(true)}>
         Search ⌘K
       </Button>
+      <Button variant="solid" onClick={() => setSolidOpen(true)}>
+        Search (solid)
+      </Button>
       <CommandPalette
-        open={open}
-        onOpenChange={setOpen}
+        surface="glass"
+        open={glassOpen}
+        onOpenChange={setGlassOpen}
         groups={groups}
         placeholder="Search bots, projects and routines"
-        hints={[
-          ["↑↓", "Move"],
-          ["↵", "Open"],
-        ]}
+        hints={hints}
       />
-    </>
+      <CommandPalette
+        open={solidOpen}
+        onOpenChange={setSolidOpen}
+        groups={groups}
+        placeholder="Search bots, projects and routines"
+        hints={hints}
+      />
+    </div>
   );
 }

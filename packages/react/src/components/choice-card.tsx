@@ -4,6 +4,8 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
+export type ChoiceCardSurface = "solid" | "glass";
+
 export type ChoiceCardProps = Omit<ComponentProps<typeof BaseRadio.Root>, "className" | "children" | "title"> & {
   title: ReactNode;
   description?: ReactNode;
@@ -11,31 +13,47 @@ export type ChoiceCardProps = Omit<ComponentProps<typeof BaseRadio.Root>, "class
   badge?: ReactNode;
   /** `brand` (default) is 18% sky with brand text; `neutral` is 6% ink with secondary text. */
   badgeTone?: "brand" | "neutral";
+  /** `solid` (default) on raised surfaces, `glass` over imagery and glass panels. */
+  surface?: ChoiceCardSurface;
   className?: string;
 };
 
 /**
- * Paper `Choice card` (1VXM-0 selected, 1VXR-0 default): a 252px glass card, padding 14, radius 16, gap 12.
+ * Paper `Choice card` (1VXM-0 selected, 1VXR-0 default): a 252px card, padding 14, radius 16, gap 12.
  * Use inside `RadioGroup`. The 18px radio is a ring: 1.5px grey when off, a 5px ink ring around an 8px core when on.
  */
-export function ChoiceCard({ title, description, badge, badgeTone = "brand", className, ...props }: ChoiceCardProps) {
+export function ChoiceCard({
+  title,
+  description,
+  badge,
+  badgeTone = "brand",
+  surface = "solid",
+  className,
+  ...props
+}: ChoiceCardProps) {
   return (
     <BaseRadio.Root
       className={cn(
-        "group relative flex w-[252px] cursor-pointer items-start gap-3 overflow-clip rounded-2xl border border-transparent bg-glass-clear p-3.5 text-left motion-colors",
-        "data-checked:border-border-brand data-checked:bg-glass-thick",
+        "group relative flex w-[252px] cursor-pointer items-start gap-3 overflow-clip rounded-2xl p-3.5 text-left motion-colors",
+        surface === "glass"
+          ? "border border-transparent bg-glass-clear data-checked:border-border-brand data-checked:bg-glass-thick"
+          : "border border-border-default bg-bg-surface data-checked:border-border-brand",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
         "data-disabled:cursor-not-allowed data-disabled:opacity-40",
         className,
       )}
       {...props}
     >
-      <span aria-hidden className="group-data-checked:hidden">
-        <LiquidGlass tier="clear" />
-      </span>
-      <span aria-hidden className="hidden group-data-checked:block">
-        <LiquidGlass tier="thick" />
-      </span>
+      {surface === "glass" && (
+        <>
+          <span aria-hidden className="group-data-checked:hidden">
+            <LiquidGlass />
+          </span>
+          <span aria-hidden className="hidden group-data-checked:block">
+            <LiquidGlass />
+          </span>
+        </>
+      )}
       <span
         aria-hidden
         className="relative mt-px flex size-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-border-dashed motion-colors group-data-checked:border-[5px] group-data-checked:border-interactive-primary"

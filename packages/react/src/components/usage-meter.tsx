@@ -12,20 +12,23 @@ export type UsageMeterProps = {
   detail?: ReactNode;
   /** Right caption, such as "Resets Nov 1". */
   note?: ReactNode;
+  /** `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass card. */
+  surface?: "solid" | "glass";
   className?: string;
 };
 
-/** Figma `Usage meter` (in Loading 109:733): a thick-glass card with a 6px sky fill. */
-export function UsageMeter({ label, value, detail, note, className }: UsageMeterProps) {
+/** Figma `Usage meter` (in Loading 109:733): a card with a 6px sky fill, solid or thick glass. */
+export function UsageMeter({ label, value, detail, note, surface = "solid", className }: UsageMeterProps) {
   return (
     <Meter.Root
       value={value}
       className={cn(
-        "relative flex w-75 flex-col gap-2.5 overflow-clip rounded-xl bg-glass-thick p-4",
+        "relative flex w-75 flex-col gap-2.5 overflow-clip rounded-xl p-4",
+        surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         className,
       )}
     >
-      <LiquidGlass tier="thick" />
+      {surface === "glass" && <LiquidGlass />}
       <div className="relative flex w-full items-center gap-2 text-label-md">
         <Meter.Label className="min-w-0 flex-1 text-text-primary">{label}</Meter.Label>
         <Meter.Value className="shrink-0 text-text-secondary" />
