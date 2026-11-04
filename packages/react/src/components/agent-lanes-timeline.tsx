@@ -117,14 +117,17 @@ export function AgentLanesTimeline({
       )}
       {...props}
     >
-      <div className="flex items-center gap-2.5 pt-4 pr-4.5 pb-3.5 pl-4.5">
+      <div className="flex items-center gap-2.5 px-5 pt-4 pb-3.5">
         <Sparkle aria-hidden className="size-4.5 shrink-0 text-text-primary" />
         <h3 className="text-label-lg text-text-primary">{title}</h3>
         {statuses.map((status) => (
           <span key={status.id} className="flex items-center gap-1.5 text-body-sm text-text-secondary">
             <span
               aria-hidden
-              className={cn("size-1.75 rounded-full", status.tone === "live" ? "bg-status-live" : "bg-interactive-primary")}
+              className={cn(
+                "size-1.75 rounded-full",
+                status.tone === "live" ? "bg-status-live" : "bg-interactive-primary",
+              )}
             />
             {status.label}
           </span>
@@ -132,7 +135,7 @@ export function AgentLanesTimeline({
         <span className="flex-1" />
         <button
           type="button"
-          className="flex h-7 motion-press cursor-pointer items-center gap-1 rounded-full bg-overlay-ink-6 px-2.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="flex h-7.5 motion-press cursor-pointer items-center gap-1 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
         >
           {range}
           <CaretDown aria-hidden className="size-3 text-text-secondary" />
@@ -141,7 +144,7 @@ export function AgentLanesTimeline({
       <div className="h-px bg-overlay-ink-8" />
 
       <div className="overflow-x-auto">
-        <div className="relative h-76 min-w-250">
+        <div className="relative h-76 min-w-175">
           {ticks.map((minutes) => (
             <span key={minutes}>
               <span
@@ -163,7 +166,7 @@ export function AgentLanesTimeline({
               key={bot.id}
               style={rowStyle(lane)}
               className={cn(
-                "motion-rise absolute inset-x-0 flex items-center gap-3 pl-4.5 motion-colors hover:bg-overlay-ink-3",
+                "absolute inset-x-0 flex motion-rise items-center gap-3 pl-5 motion-colors hover:bg-overlay-ink-3",
                 lane < bots.length - 1 && "border-b border-overlay-ink-6",
               )}
             >
@@ -273,7 +276,7 @@ export function AgentLanesTimeline({
       {approval && (
         <>
           <div className="h-px bg-overlay-ink-8" />
-          <div className="flex items-center gap-3 px-4.5 py-3">
+          <div className="flex items-center gap-3 px-5 py-3">
             <Warning aria-hidden className="size-3.5 shrink-0 text-text-primary" />
             <p className="min-w-0 flex-1 text-body-sm text-text-primary">{approval.message}</p>
             <button

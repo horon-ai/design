@@ -572,6 +572,13 @@ export const components: ComponentEntry[] = [
     overlay: true,
   },
   {
+    slug: "modal",
+    title: "Modal",
+    group: "overlays",
+    description: "폼이나 긴 내용을 담는 창입니다. 본문만 스크롤되고 동작 버튼은 오른쪽 아래에 고정됩니다.",
+    overlay: true,
+  },
+  {
     slug: "bottom-sheet",
     title: { ko: "Bottom Sheet", en: "Bottom Sheet" },
     group: "overlays",

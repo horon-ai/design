@@ -36,7 +36,6 @@ const groups = [
 ];
 
 function Detail({ surface }: { surface: "solid" | "glass" }) {
-  const buttonVariant = surface === "glass" ? "glass" : "solid";
   return (
     <ListDetail surface={surface} defaultValue="weekly" groups={groups}>
       {(item) => (
@@ -47,7 +46,7 @@ function Detail({ surface }: { surface: "solid" | "glass" }) {
             description="Runs on a schedule and reports back in chat."
             actions={
               <>
-                <span className="text-[13px]/[18px] font-medium text-text-secondary">Enabled</span>
+                <span className="text-label-md text-text-secondary">Enabled</span>
                 <Switch aria-label="Enabled" defaultChecked />
                 <IconButton size="sm" variant="ghost" label="More" icon={<DotsThree weight="bold" />} />
               </>
@@ -63,22 +62,22 @@ function Detail({ surface }: { surface: "solid" | "glass" }) {
           />
           <ListDetailInstructions tag="SKILL.md" defaultValue={instructions} />
           <ListDetailFiles>
-            <Button variant={buttonVariant} size="sm" icon={<FileText />}>
+            <Button variant="solid" size="sm" icon={<FileText />}>
               template.md
             </Button>
-            <Button variant={buttonVariant} size="sm" icon={<FileText />}>
+            <Button variant="solid" size="sm" icon={<FileText />}>
               projects.json
             </Button>
           </ListDetailFiles>
           <ListDetailFooter>
-            <Button variant={buttonVariant} size="sm">
+            <Button variant="solid" size="sm">
               Duplicate
             </Button>
-            <Button variant={buttonVariant} size="sm">
+            <Button variant="solid" size="sm">
               Export
             </Button>
             <span className="flex-1" />
-            <Button variant={buttonVariant} size="sm" icon={<Trash className="text-interactive-danger" />}>
+            <Button variant="solid" size="sm" icon={<Trash className="text-interactive-danger" />}>
               Delete
             </Button>
           </ListDetailFooter>

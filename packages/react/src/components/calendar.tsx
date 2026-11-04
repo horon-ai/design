@@ -100,11 +100,8 @@ const dayEmphasisClass: Record<CalendarSize, string> = {
   lg: "text-label-lg",
 };
 
-const todayDotSizeClass: Record<CalendarSize, string> = {
-  sm: "top-6 left-3.5",
-  md: "top-8 left-[18px]",
-  lg: "top-10 left-[22px]",
-};
+/** The today dot sits 4px above the cell's bottom edge, centred at every rung. */
+const todayDotClass = "bottom-1 left-1/2 -translate-x-1/2";
 
 const popoverDayTextClass: Record<CalendarSize, string> = {
   sm: "[&_[role=gridcell]]:text-label-sm",
@@ -260,7 +257,11 @@ export function Calendar(props: CalendarProps) {
           <button
             type="button"
             aria-label="Previous month"
-            className={cn("flex motion-press cursor-pointer text-text-secondary", arrowSizeClass[size])}
+            className={cn(
+              "flex motion-press cursor-pointer rounded-full text-text-secondary hover:text-text-primary",
+              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
+              arrowSizeClass[size],
+            )}
             onClick={() => setMonth(addMonths(month, -1))}
           >
             <CaretLeft />
@@ -271,7 +272,11 @@ export function Calendar(props: CalendarProps) {
           <button
             type="button"
             aria-label="Next month"
-            className={cn("flex motion-press cursor-pointer text-text-secondary", arrowSizeClass[size])}
+            className={cn(
+              "flex motion-press cursor-pointer rounded-full text-text-secondary hover:text-text-primary",
+              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
+              arrowSizeClass[size],
+            )}
             onClick={() => setMonth(addMonths(month, 1))}
           >
             <CaretRight />
@@ -347,10 +352,7 @@ export function Calendar(props: CalendarProps) {
                 >
                   {date.getDate()}
                   {isToday && !selected && !between && (
-                    <span
-                      aria-hidden
-                      className={cn("absolute size-1 rounded-full bg-status-live", todayDotSizeClass[size])}
-                    />
+                    <span aria-hidden className={cn("absolute size-1 rounded-full bg-status-live", todayDotClass)} />
                   )}
                 </button>
               );

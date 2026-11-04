@@ -3,6 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { Button } from "./button";
+import { IconButton } from "./icon-button";
 import { Menu, MenuContent, MenuTrigger } from "./menu";
 import { Switch } from "./switch";
 
@@ -61,7 +62,7 @@ export function PluginRow({
       <span className="flex min-w-0 flex-1 flex-col gap-1.5">
         <span className="flex items-center gap-2">
           <span className="truncate text-label-md text-text-primary">{name}</span>
-          {version && <span className="shrink-0 font-mono text-[12px]/[16px] text-text-placeholder">{version}</span>}
+          {version && <span className="shrink-0 font-mono text-label-sm text-text-placeholder">{version}</span>}
           {updateBadge && (
             <span className="inline-flex h-5.5 shrink-0 items-center rounded-full bg-accent-sky-500-18 px-2 text-label-sm text-text-brand">
               {updateBadge}
@@ -69,13 +70,13 @@ export function PluginRow({
           )}
         </span>
         {author && (
-          <span className="flex items-center gap-1 text-[12px]/[16px] text-text-placeholder">
+          <span className="flex items-center gap-1 text-label-sm text-text-secondary">
             {author}
             {verified && (
               <span
                 role="img"
                 aria-label="Verified"
-                className="flex size-3.25 shrink-0 items-center justify-center rounded-full bg-sky-500 text-neutral-50"
+                className="flex size-3.5 shrink-0 items-center justify-center rounded-full bg-sky-500 text-neutral-50"
               >
                 <Check aria-hidden weight="bold" className="size-2" />
               </span>
@@ -96,7 +97,7 @@ export function PluginRow({
           </span>
         )}
       </span>
-      <span className="flex shrink-0 items-center gap-2.5">
+      <span className="flex shrink-0 items-center gap-2">
         {onUpdate && (
           <Button size="sm" icon={<ArrowUp aria-hidden className="size-3.5" />} onClick={onUpdate}>
             {updateLabel}
@@ -106,11 +107,15 @@ export function PluginRow({
         {menu && (
           <Menu>
             <MenuTrigger
-              aria-label={overflowLabel}
-              className="flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-lg text-text-primary hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
-            >
-              <DotsThree aria-hidden weight="bold" className="size-5" />
-            </MenuTrigger>
+              render={
+                <IconButton
+                  label={overflowLabel}
+                  variant="ghost"
+                  size="sm"
+                  icon={<DotsThree aria-hidden weight="bold" />}
+                />
+              }
+            />
             <MenuContent align="end">{menu}</MenuContent>
           </Menu>
         )}

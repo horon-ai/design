@@ -40,15 +40,19 @@ const itemClass: Record<SelectSize, string> = {
 
 const itemIconClass: Record<SelectSize, string> = {
   sm: "[&_svg]:size-4",
-  md: "[&_svg]:size-4.5",
+  md: "[&_svg]:size-4",
   lg: "[&_svg]:size-5",
 };
 
+/** The field box carries its own ring (`fieldBoxClass.base`); a chip or segment is the focused element, so it needs one on itself. */
+const triggerFocusClass = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
+
 /**
- * Figma `Select` (58:162) trigger with the `Select list` (88:495) popup: a
- * 40px field with a 16px caret; Solid uses the 18px body-lg value, Glass body-md.
- * The popup is the veil (`veil-overlay`), 20px radius, 40px rows; the chosen row is 6% ink with a check.
- * `variant="chip"` keeps its single 32px chip size; `variant="segment"` follows its `InputGroup`.
+ * Figma `Select` (58:162) trigger with the `Select list` (88:495) popup: a field with the
+ * same text rung as `Input` (14/16/18) and a 16/20px caret; the surface never changes the
+ * text size. The popup is the veil (`veil-overlay`), 20px radius, 40px rows; the chosen row
+ * is 6% ink with a check. `variant="chip"` keeps its single 32px chip size;
+ * `variant="segment"` follows its `InputGroup`.
  */
 export function Select({
   items,
@@ -78,10 +82,9 @@ export function Select({
           field
             ? `${fieldBoxClass.base} ${fieldBoxClass[surface]} ${fieldSizeClass[size]} w-60`
             : segment
-              ? `${inputGroupSegmentClass[size]} text-left data-disabled:text-text-disabled`
-              : "relative inline-flex h-8 items-center gap-1 rounded-full bg-bg-subtle px-3",
+              ? `${inputGroupSegmentClass[size]} text-left data-disabled:text-text-disabled ${triggerFocusClass}`
+              : `relative inline-flex h-8 items-center gap-1 rounded-full bg-bg-subtle px-3 text-label-md ${triggerFocusClass}`,
           "group cursor-pointer text-left motion-colors data-disabled:cursor-not-allowed",
-          "outline-none",
           className,
         )}
       >
@@ -89,15 +92,7 @@ export function Select({
           className={cn(
             "relative min-w-0 truncate data-placeholder:text-text-placeholder",
             segment ? "" : "flex-1 text-text-primary group-data-disabled:text-text-disabled",
-            variant === "chip"
-              ? "text-[13px]/[18px] font-medium"
-              : segment
-                ? ""
-                : size === "md"
-                  ? surface === "glass"
-                    ? "text-body-md"
-                    : "text-body-lg"
-                  : fieldTextClass[size],
+            field ? fieldTextClass[size] : "",
           )}
         >
           {(value: string | null) => {

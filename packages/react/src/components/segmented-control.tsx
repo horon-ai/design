@@ -39,7 +39,7 @@ export type SegmentedControlProps = {
 const trackClass: Record<SegmentedControlSize, string> = {
   sm: "p-[3px]",
   md: "h-9 p-[3px]",
-  lg: "h-11 px-1",
+  lg: "h-11 p-1",
   tab: "gap-1 p-1",
 };
 
@@ -62,7 +62,8 @@ const surfaceClass: Record<SegmentedControlSurface, string> = {
  * Single-choice segmented control. The selection is one pill that slides to the
  * pressed segment. On the glass track it is a glass pill over the glass track,
  * thick fill and a 0 1 3 8% shadow, the iOS tab bar selection; dark mode keeps a
- * 10% fill. On the solid and inset tracks it is 10% ink.
+ * 10% fill. On the solid and inset tracks it is 10% ink. The pill is the same on
+ * every rung, as in `Tabs`.
  */
 export function SegmentedControl({
   items,
@@ -98,7 +99,7 @@ export function SegmentedControl({
         aria-hidden
         className={cn(
           "pointer-events-none absolute overflow-clip rounded-full",
-          surface === "glass" && size !== "lg"
+          surface === "glass"
             ? "bg-glass-thick shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:bg-overlay-ink-10"
             : surface === "subtle"
               ? "bg-bg-default"
@@ -107,7 +108,7 @@ export function SegmentedControl({
         )}
         style={rect ? { ...rect, opacity: 1 } : { opacity: 0 }}
       >
-        {surface === "glass" && size !== "lg" && <LiquidGlass />}
+        {surface === "glass" && <LiquidGlass />}
       </span>
       {items.map((item) => (
         <Toggle
@@ -116,13 +117,13 @@ export function SegmentedControl({
           disabled={item.disabled}
           className={cn(
             "relative flex min-w-0 cursor-pointer items-center justify-center rounded-full whitespace-nowrap text-text-secondary motion-colors",
-            "data-disabled:cursor-not-allowed data-disabled:opacity-40 data-pressed:text-text-primary",
+            "hover:text-text-primary data-disabled:cursor-not-allowed data-disabled:opacity-40 data-pressed:text-text-primary",
             "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
             segmentClass[size],
             fill && "flex-1",
           )}
         >
-          {item.label}
+          <span className="text-trim">{item.label}</span>
         </Toggle>
       ))}
     </ToggleGroup>

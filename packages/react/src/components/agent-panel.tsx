@@ -12,16 +12,18 @@ export function AgentPanel({
   filter,
   children,
   ...props
-}: WithClass<ComponentProps<"section">> & { /** Filter slot under the panel top, such as a `FilterBar`. */ filter?: ReactNode }) {
+}: WithClass<ComponentProps<"section">> & {
+  /** Filter slot under the panel top, such as a `FilterBar`. */ filter?: ReactNode;
+}) {
   return (
     <section
       className={cn(
-        "flex flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-4 pt-4 pb-2",
+        "flex flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-5 pt-4 pb-2",
         className,
       )}
       {...props}
     >
-      {filter}
+      {filter && <div className="flex">{filter}</div>}
       {children}
     </section>
   );
@@ -84,7 +86,7 @@ export function TaskComposer({
   className,
 }: TaskComposerProps) {
   return (
-    <div className={cn("flex flex-col gap-3.5 rounded-[18px] bg-overlay-ink-4 pt-3.5 pr-3.5 pb-2.5 pl-4", className)}>
+    <div className={cn("flex flex-col gap-3.5 rounded-xl bg-overlay-ink-4 px-4 pt-3.5 pb-2.5", className)}>
       <textarea
         rows={1}
         value={value}
@@ -104,7 +106,7 @@ export function TaskComposer({
         <button
           type="button"
           onClick={onStart}
-          className="flex h-8 shrink-0 motion-press cursor-pointer items-center rounded-full bg-interactive-primary px-3 text-label-sm text-text-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+          className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center rounded-full bg-interactive-primary px-3.5 text-label-sm text-text-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
         >
           {startLabel}
         </button>

@@ -40,7 +40,7 @@ export function PlanStep({
       <div className="flex shrink-0 flex-col items-center gap-1">
         <span
           className={cn(
-            "flex size-6 shrink-0 motion-colors items-center justify-center rounded-md text-label-sm",
+            "flex size-6 shrink-0 items-center justify-center rounded-md text-label-sm motion-colors",
             status === "done" && "bg-status-live text-interactive-on-primary",
             status === "failed" && "bg-bg-danger text-text-danger",
             status === "pending" && "border border-border-default text-text-secondary",
@@ -53,7 +53,10 @@ export function PlanStep({
         </span>
         {!last && (
           <span
-            className={cn("w-0.5 flex-1 motion-colors rounded-[1px]", status === "done" ? "bg-status-live" : "bg-border-default")}
+            className={cn(
+              "w-0.5 flex-1 rounded-[1px] motion-colors",
+              status === "done" ? "bg-status-live" : "bg-border-default",
+            )}
           />
         )}
       </div>
@@ -84,7 +87,7 @@ export function PlanStep({
           <button
             type="button"
             onClick={onRetry}
-            className="flex w-fit motion-press cursor-pointer items-center gap-1.5 rounded-[10px] border border-border-default bg-bg-surface px-3 py-[7px] text-label-md text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex h-7.5 w-fit motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
           >
             <ArrowClockwise aria-hidden className="size-3.5" />
             Retry from here

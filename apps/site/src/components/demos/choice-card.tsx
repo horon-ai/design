@@ -2,7 +2,7 @@ import { ChoiceCard, RadioGroup } from "@horon-ai/react";
 
 export default function ChoiceCardDemo() {
   return (
-    <RadioGroup aria-label="Plan" defaultValue="auto" className="flex-row flex-wrap justify-center gap-4">
+    <RadioGroup aria-label="Plan" defaultValue="auto" className="flex-row flex-wrap items-stretch justify-center gap-4">
       <ChoiceCard
         value="auto"
         title="Automatic"

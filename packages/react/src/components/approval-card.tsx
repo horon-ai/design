@@ -71,12 +71,12 @@ export function ApprovalCard({
         </div>
       )}
       {state === "pending" && (
-        <div className="relative flex gap-2">
-          <Button size="sm" onClick={onApprove}>
-            {approveLabel}
-          </Button>
+        <div className="relative flex w-full justify-end gap-2">
           <Button size="sm" variant={surface === "glass" ? "glass" : "solid"} onClick={onLater}>
             {laterLabel}
+          </Button>
+          <Button size="sm" onClick={onApprove}>
+            {approveLabel}
           </Button>
         </div>
       )}

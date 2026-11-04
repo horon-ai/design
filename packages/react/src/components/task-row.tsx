@@ -58,8 +58,8 @@ export function TaskRow({
       className={cn(
         "flex flex-col gap-2 px-4 py-3.5",
         variant === "list"
-          ? "relative rounded-b-[16px] after:absolute after:inset-x-4 after:bottom-0 after:h-px after:bg-overlay-ink-8 last:after:hidden"
-          : "rounded-[16px] border border-border-default bg-bg-surface",
+          ? "relative after:absolute after:inset-x-4 after:bottom-0 after:h-px after:bg-overlay-ink-8 last:after:hidden"
+          : "rounded-2xl border border-border-default bg-bg-surface",
         className,
       )}
     >
@@ -81,7 +81,7 @@ export function TaskRow({
         {project && (
           <>
             <span aria-hidden>·</span>
-            <Folder aria-hidden className="size-[13px] shrink-0" />
+            <Folder aria-hidden className="size-3.5 shrink-0" />
             <span className="truncate">{project}</span>
           </>
         )}

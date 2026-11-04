@@ -17,7 +17,7 @@ export function EmptyState({ illustration, title, description, action, className
   return (
     <div
       className={cn(
-        "flex w-90 animate-[tab-panel-in_240ms_var(--ease-out-quint)] flex-col items-center gap-3 px-6 py-8 text-center",
+        "flex w-full max-w-90 animate-[tab-panel-in_240ms_var(--ease-out-quint)] flex-col items-center gap-3 px-6 py-8 text-center",
         className,
       )}
     >

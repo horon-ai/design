@@ -34,13 +34,13 @@ export function ChoiceCard({ title, description, badge, badgeTone = "brand", cla
       >
         <BaseRadio.Indicator className="size-2 animate-pop-in rounded-full bg-interactive-on-primary data-unchecked:hidden" />
       </span>
-      <span className="relative flex min-w-0 flex-1 flex-col gap-[3px]">
+      <span className="relative flex min-w-0 flex-1 flex-col gap-1">
         <span className="flex items-center gap-2.5">
-          <span className="min-w-0 flex-1 text-[14px]/5 font-semibold text-text-primary">{title}</span>
+          <span className="min-w-0 flex-1 text-label-md font-semibold text-text-primary">{title}</span>
           {badge && (
             <span
               className={cn(
-                "inline-flex h-[22px] shrink-0 items-center rounded-full px-2 text-[12px]/4 font-medium",
+                "inline-flex h-[22px] shrink-0 items-center rounded-full px-2 text-label-sm",
                 badgeTone === "brand" ? "bg-accent-sky-500-18 text-text-brand" : "bg-overlay-ink-6 text-text-secondary",
               )}
             >
@@ -48,7 +48,7 @@ export function ChoiceCard({ title, description, badge, badgeTone = "brand", cla
             </span>
           )}
         </span>
-        {description && <span className="text-[12px]/4 text-text-secondary">{description}</span>}
+        {description && <span className="text-caption text-text-secondary">{description}</span>}
       </span>
     </BaseRadio.Root>
   );

@@ -23,10 +23,11 @@ const labelClass: Record<CheckboxSize, string> = {
   lg: "gap-3 text-body-lg",
 };
 
+/** One 6px corner (`rounded-xs`, the Figma radius) at every size; only the box grows with the rung. */
 const boxClass: Record<CheckboxSize, string> = {
-  sm: "size-4.5 rounded-[5px]",
+  sm: "size-4.5 rounded-xs",
   md: "size-5 rounded-xs",
-  lg: "size-6 rounded-[3px]",
+  lg: "size-6 rounded-xs",
 };
 
 const indicatorClass: Record<CheckboxSize, string> = {

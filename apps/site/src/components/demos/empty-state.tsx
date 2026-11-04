@@ -29,7 +29,7 @@ export default function EmptyStateDemo() {
         illustration={<Mascot name="horon-mascot-error" />}
         title="Something went wrong"
         description="We could not load your bots. Check the connection and try again."
-        action={<Button variant="glass">Try again</Button>}
+        action={<Button>Try again</Button>}
       />
     </div>
   );

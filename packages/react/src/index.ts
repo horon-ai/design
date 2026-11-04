@@ -48,6 +48,7 @@ export * from "./components/list-detail";
 export * from "./components/marketplace-card";
 export * from "./components/mcp-server-row";
 export * from "./components/menu";
+export * from "./components/modal";
 export * from "./components/message-extras";
 export * from "./components/orchestrator-panel";
 export * from "./components/page-header";

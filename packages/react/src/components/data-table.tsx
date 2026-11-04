@@ -148,7 +148,7 @@ export function DataTableTag({
   return (
     <span
       className={cn(
-        "inline-flex rounded-sm px-2.5 py-[3px] text-label-md whitespace-nowrap",
+        "inline-flex h-6.5 items-center rounded-sm px-2.5 text-label-md whitespace-nowrap",
         tone === "brand" ? "bg-bg-brand text-text-brand" : "bg-bg-subtle text-text-secondary",
         className,
       )}
@@ -363,12 +363,13 @@ export function DataTableSearch<TData extends RowData>({
   return (
     <Input
       surface="solid"
+      size="sm"
       icon={<MagnifyingGlass />}
       placeholder={placeholder}
       aria-label={placeholder}
       value={String(table.state.globalFilter ?? "")}
       onChange={(event) => table.setGlobalFilter(event.target.value)}
-      className={cn("h-8 min-w-0", className)}
+      className={cn("min-w-0", className)}
     />
   );
 }

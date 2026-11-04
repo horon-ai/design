@@ -82,7 +82,7 @@ export function CommandPalette({
               onSelect={() => onOpenChange?.(false)}
             />
             {hints && hints.length > 0 && (
-              <div className="relative flex items-center gap-3.5 px-3 pt-2.5 pb-1.5">
+              <div className="relative flex items-center gap-4 px-3 pt-2 pb-1">
                 {hints.map(([key, label]) => (
                   <span key={label} className="flex items-center gap-1.5 text-caption text-text-secondary">
                     <Kbd>{key}</Kbd>
@@ -140,14 +140,16 @@ export function CommandPaletteBody({
             </button>
           ))}
       </div>
-      <div className="relative pt-1 pb-1.5">
+      <div className="relative pt-1">
         <div className="h-px bg-overlay-ink-8" />
       </div>
-      <Autocomplete.Empty className="relative px-3 py-4 text-body-sm text-text-secondary">{empty}</Autocomplete.Empty>
+      <Autocomplete.Empty className="relative px-3 py-4 text-body-sm text-text-secondary empty:hidden">
+        {empty}
+      </Autocomplete.Empty>
       <Autocomplete.List className="relative flex max-h-[min(60dvh,24rem)] flex-col overflow-y-auto">
         {(group: CommandGroup) => (
-          <Autocomplete.Group key={group.label} items={group.items} className="flex flex-col">
-            <Autocomplete.GroupLabel className="px-3 pt-2 pb-1 text-caption text-text-secondary">
+          <Autocomplete.Group key={group.label} items={group.items} className="flex flex-col pt-1">
+            <Autocomplete.GroupLabel className="px-3 pt-1 pb-1 text-caption text-text-secondary">
               {group.label}
             </Autocomplete.GroupLabel>
             <Autocomplete.Collection>
@@ -159,7 +161,7 @@ export function CommandPaletteBody({
                     item.onSelect?.();
                     onSelect?.();
                   }}
-                  className="flex h-11 cursor-pointer items-center gap-2.5 rounded-md pr-3 pl-2.5 motion-colors outline-none select-none data-highlighted:bg-overlay-ink-6"
+                  className="flex h-11 cursor-pointer items-center gap-2.5 rounded-md px-3 motion-colors outline-none select-none data-highlighted:bg-overlay-ink-6"
                 >
                   {item.tile && (
                     <span

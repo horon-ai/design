@@ -19,9 +19,14 @@ function Examples({ variant }: { variant: "solid" | "glass" }) {
       <Button variant={variant} disabled>
         Disabled
       </Button>
-      <Button>Approve</Button>
-      <Button variant="danger">Delete bot</Button>
-      <Button variant="link">Show all</Button>
+      {/* The primary, danger and link variants are opaque; they only sit on the page, never on the glass row. */}
+      {variant === "solid" && (
+        <>
+          <Button>Approve</Button>
+          <Button variant="danger">Delete bot</Button>
+          <Button variant="link">Show all</Button>
+        </>
+      )}
     </div>
   );
 }

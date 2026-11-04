@@ -217,7 +217,7 @@ export function Combobox(props: ComboboxProps) {
             fieldBoxClass.base,
             fieldBoxClass[surface],
             multiFieldClass[size],
-            "w-72 cursor-text data-disabled:cursor-not-allowed",
+            "w-60 cursor-text data-disabled:cursor-not-allowed",
             className,
           )}
         >

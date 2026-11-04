@@ -58,7 +58,12 @@ export function FieldError({ className, ...props }: WithClass<ComponentProps<typ
   const size = useContext(FieldSizeContext);
   return (
     <BaseField.Error
-      className={cn("animate-[tab-panel-in_160ms_var(--ease-out-quint)]", metaClass[size], "text-text-danger", className)}
+      className={cn(
+        "animate-[tab-panel-in_160ms_var(--ease-out-quint)]",
+        metaClass[size],
+        "text-text-danger",
+        className,
+      )}
       {...props}
     />
   );

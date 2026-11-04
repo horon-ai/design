@@ -39,9 +39,9 @@ export function ToolCallsHeader({
     >
       <Collapsible.Trigger className="group flex w-full cursor-pointer items-center gap-2.5 pb-1 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand">
         {chips.length > 0 && (
-          <span className="flex items-center">
+          <span className="flex items-center gap-1">
             {Children.map(chips, (icon) => (
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-sm border border-border-default bg-bg-surface text-text-secondary not-first:-ml-1.5 [&>svg]:size-3.5">
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-[10px] border border-border-default bg-bg-surface text-text-secondary [&>svg]:size-3.5">
                 {icon}
               </span>
             ))}

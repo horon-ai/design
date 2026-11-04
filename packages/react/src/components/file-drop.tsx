@@ -59,7 +59,7 @@ export function FileDrop({
       onDragLeave={() => setDragging(false)}
       onDrop={onDrop}
       className={cn(
-        "relative flex w-full max-w-[550px] cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[10px] border-[1.5px] border-dashed border-border-dashed px-4 py-3 text-[13px]/[18px] font-medium text-text-secondary motion-colors",
+        "relative flex w-full max-w-[550px] cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[10px] border-[1.5px] border-dashed border-border-dashed px-4 py-3 text-label-md text-text-secondary motion-colors",
         "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-text-brand",
         "data-dragging:border-solid data-dragging:border-border-brand",
         surface === "solid" ? "bg-bg-surface data-dragging:bg-bg-subtle" : "veil-drop",
