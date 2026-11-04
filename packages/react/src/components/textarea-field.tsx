@@ -64,6 +64,9 @@ export function TextareaField({
   ...props
 }: TextareaFieldProps) {
   const [count, setCount] = useState(() => String(value ?? defaultValue ?? "").length);
+  // A controlled value can change without an input event (form reset, a parent rewriting it),
+  // so the counter follows the value whenever the caller owns it.
+  const length = value !== undefined ? String(value).length : count;
   const invalid = !!error;
   return (
     <BaseField.Root
@@ -114,7 +117,7 @@ export function TextareaField({
           )}
           {maxLength !== undefined && (
             <span className="shrink-0 whitespace-nowrap">
-              {count} / {maxLength}
+              {length} / {maxLength}
             </span>
           )}
         </div>

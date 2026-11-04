@@ -44,7 +44,7 @@ const itemIconClass: Record<SelectSize, string> = {
   lg: "[&_svg]:size-5",
 };
 
-/** The field box carries its own ring (`fieldBoxClass.base`); a chip or segment is the focused element, so it needs one on itself. */
+/** The field box rings on `:focus-within` (`fieldBoxClass.base`); a chip or segment is the focused element itself, so it carries its own `focus-visible` ring. */
 const triggerFocusClass = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
 
 /**
@@ -80,10 +80,19 @@ export function Select({
         data-invalid={invalid ? "" : undefined}
         className={cn(
           field
-            ? `${fieldBoxClass.base} ${fieldBoxClass[surface]} ${fieldSizeClass[size]} w-60`
+            ? cn(
+                fieldBoxClass.base,
+                fieldBoxClass[surface],
+                fieldSizeClass[size],
+                "w-60",
+                surface !== "glass" && "hover:not-data-disabled:not-data-invalid:border-border-strong",
+              )
             : segment
-              ? `${inputGroupSegmentClass[size]} text-left data-disabled:text-text-disabled ${triggerFocusClass}`
-              : `relative inline-flex h-8 items-center gap-1 rounded-full bg-bg-subtle px-3 text-label-md ${triggerFocusClass}`,
+              ? cn(inputGroupSegmentClass[size], "text-left data-disabled:text-text-disabled", triggerFocusClass)
+              : cn(
+                  "relative inline-flex h-8 items-center gap-1 rounded-full bg-bg-subtle px-3 text-label-md hover:not-data-disabled:bg-overlay-ink-8",
+                  triggerFocusClass,
+                ),
           "group cursor-pointer text-left motion-colors data-disabled:cursor-not-allowed",
           className,
         )}

@@ -13,7 +13,7 @@ const statuses = [
   { value: "done", label: "Done" },
 ];
 
-function Controls({ surface }: { surface: "solid" | "glass" }) {
+function Controls({ surface }: { surface: "solid" | "glass" | "subtle" }) {
   return (
     <>
       <SegmentedControl surface={surface} aria-label="View, small" size="sm" defaultValue="chat" items={views} />
@@ -30,6 +30,12 @@ export default function SegmentedControlDemo() {
         <p className="text-caption text-text-secondary">Solid</p>
         <div className="flex w-full flex-wrap items-center justify-center gap-4">
           <Controls surface="solid" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <p className="text-caption text-text-secondary">Subtle</p>
+        <div className="flex w-full flex-wrap items-center justify-center gap-4">
+          <Controls surface="subtle" />
         </div>
       </div>
       <div className="flex flex-col gap-3">
