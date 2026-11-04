@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_glass.dart';
+import '../overlay/horon_menu_anchor.dart';
+import '../overlay/horon_overlay.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -141,6 +143,17 @@ class _HoronDateFieldState extends State<HoronDateField> {
 
   final MenuController _menu = MenuController();
 
+  /// 트리거에 걸어 두는 링크입니다. 팝업이 이 링크를 따라 필드에 붙습니다.
+  final LayerLink _link = LayerLink();
+
+  /// 오버레이가 달력의 실제 크기를 한 번 재었는지입니다.
+  ///
+  /// [HoronOverlayBody]는 재기 전까지 패널 크기를 0으로 보고 배치를 계산합니다.
+  /// 그 첫 계산 결과로 패널을 줄여 버리면, 줄어든 크기가 다시 측정되어 "이 방향에
+  /// 들어간다"고 판단되고 뒤집힘이 사라집니다. 그래서 첫 프레임은 줄이지 않고
+  /// 실제 높이를 재게 두고, 측정이 끝난 다음부터 배치가 준 한도로 자릅니다.
+  bool _panelMeasured = false;
+
   String _label(MaterialLocalizations localizations) {
     final HoronDateRange? range = widget.range;
     if (range != null) {
@@ -159,9 +172,8 @@ class _HoronDateFieldState extends State<HoronDateField> {
     final BorderRadius radius = BorderRadius.circular(theme.radius.md);
     final String text = _label(MaterialLocalizations.of(context));
     final HoronFieldMetrics metrics = horonFieldMetrics(_inputSizeOf(widget.size), theme);
-    // 달력은 자기 LayoutBuilder로 폭을 정합니다. 메뉴 패널은 자식의 고유 폭을 묻기
-    // 때문에(LayoutBuilder는 그 질문에 답할 수 없습니다), 팝업 폭은 화면 폭과
-    // 달력의 자연 폭으로 미리 정합니다.
+    // 달력은 폭을 받지 않으면 자기 LayoutBuilder로 폭을 정합니다. 팝업은 폭을
+    // 미리 정해 넘기므로, 화면 폭과 달력의 자연 폭으로 계산합니다.
     final double calendarWidth = math.min(
       widget.popover ? _calendarPopoverWidth : _calendarWidth,
       MediaQuery.sizeOf(context).width - space.s4,
@@ -174,48 +186,17 @@ class _HoronDateFieldState extends State<HoronDateField> {
         : colors.textPlaceholder;
     final TextStyle valueStyle = metrics.textStyle.copyWith(color: textColor);
 
-    // 메뉴 패널은 앵커 자식에게 고유 폭을 묻습니다. LayoutBuilder 는 그 질문에 답하지
-    // 못하므로("LayoutBuilder does not support returning intrinsic dimensions"), 폭은
-    // 화면 폭에서 직접 계산합니다.
+    // 트리거는 `w-70`이지만 부모가 더 좁으면 그 폭을 따릅니다.
     final double width = math.min(_width, MediaQuery.sizeOf(context).width - space.s4);
 
-    return MenuAnchor(
+    return HoronMenuAnchor(
       controller: _menu,
-      // `sideOffset={8}`.
-      alignmentOffset: Offset(0, space.s2),
-      style: MenuStyle(
-        // 달력이 자기 유리 판을 그리므로 팝업 상자는 아무것도 칠하지 않습니다.
-        backgroundColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-        surfaceTintColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-        shadowColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-        elevation: const WidgetStatePropertyAll<double>(0),
-        padding: const WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.zero),
-        shape: const WidgetStatePropertyAll<OutlinedBorder>(RoundedRectangleBorder()),
-      ),
-      menuChildren: <Widget>[
-        _MotionPopup(
-          child: SizedBox(
-            width: calendarWidth,
-            child: HoronCalendar(
-              width: calendarWidth,
-              value: widget.value,
-              onValueChange: widget.onValueChange,
-              range: widget.range,
-              onRangeChange: widget.onRangeChange,
-              defaultMonth: widget.defaultMonth,
-              month: widget.month,
-              onMonthChange: widget.onMonthChange,
-              isDateDisabled: widget.isDateDisabled,
-              weekStartsOn: widget.weekStartsOn,
-              today: widget.today,
-              popover: widget.popover,
-              size: _calendarSizeOf(widget.size),
-              surface: widget.surface == HoronSurface.glass ? HoronCalendarSurface.glass : HoronCalendarSurface.solid,
-            ),
-          ),
-        ),
-      ],
-      builder: (BuildContext context, MenuController controller, Widget? child) => SizedBox(
+      builder: (BuildContext context, MenuController controller, Widget? child) {
+        // 닫히면 다음에 열 때 다시 실제 크기부터 잽니다.
+        if (!(MenuController.maybeIsOpenOf(context) ?? false)) _panelMeasured = false;
+        return CompositedTransformTarget(link: _link, child: child);
+      },
+      child: SizedBox(
         width: width,
         child: Semantics(
           button: true,
@@ -225,7 +206,7 @@ class _HoronDateFieldState extends State<HoronDateField> {
             child: GestureDetector(
               key: const Key('horon-date-field-trigger'),
               behavior: HitTestBehavior.opaque,
-              onTap: widget.disabled ? null : () => controller.isOpen ? controller.close() : controller.open(),
+              onTap: widget.disabled ? null : () => _menu.isOpen ? _menu.close() : _menu.open(),
               child: SizedBox(
                 key: const Key('horon-date-field-surface'),
                 height: metrics.height,
@@ -247,6 +228,68 @@ class _HoronDateFieldState extends State<HoronDateField> {
                         child: _row(colors, metrics, text, valueStyle),
                       ),
               ),
+            ),
+          ),
+        ),
+      ),
+      overlayBuilder: (BuildContext context, RawMenuOverlayInfo info) => HoronOverlayBody(
+        link: _link,
+        anchor: info.anchorRect,
+        screen: MediaQuery.sizeOf(context),
+        safeArea: MediaQuery.paddingOf(context),
+        // `sideOffset={8}` — placeHoronOverlay 가 기본 gap(s1)을 이미 더하므로 그
+        // 차이만 준다. 뒤집히면 주축 성분의 부호가 함께 뒤집혀 위로 8px가 된다.
+        position: HoronOverlayPosition(offset: Offset(0, space.s2 - HoronOverlayPosition.gap)),
+        // 달력이 자기 유리 판을 그리므로 패널 상자는 아무것도 칠하지 않습니다.
+        //
+        // 양쪽 어디에도 달력 높이만 한 자리가 없으면 [HoronOverlayPlacement]가
+        // 쓸 수 있는 만큼만 주므로, 그 안으로 줄이고 달력을 스크롤합니다. 예전
+        // Material 메뉴는 오버레이 제약 안에서 자식을 줄여 화면 밖으로 나가지
+        // 않았습니다(2026-11-05 검증: 640x360에서 달력 아랫변이 502까지 나감).
+        //
+        // 다만 첫 프레임은 오버레이가 패널 크기를 모르는 채로 배치를 계산합니다.
+        // 그 결과로 바로 자르면 줄어든 크기가 측정되어 "아래에 들어간다"고
+        // 판단되고, 아래 공간이 모자라는 경우에도 위로 뒤집히지 않습니다. 그래서
+        // 측정이 끝난 다음 프레임부터 배치가 준 한도로 자릅니다.
+        panelBuilder: (BuildContext context, HoronOverlayPlacement placement) {
+          final Widget panel = _calendarPanel(calendarWidth, _panelMeasured ? placement : null);
+          _panelMeasured = true;
+          return panel;
+        },
+      ),
+    );
+  }
+
+  /// 오버레이가 잰 배치를 받아 달력 패널을 만듭니다.
+  ///
+  /// [placement]가 `null`이면 크기를 아직 모르는 첫 프레임이므로 한도를 두지 않고
+  /// 자연 크기로 그립니다. 그 뒤에는 배치가 고른 방향에 들어가는 폭·높이로 자르고,
+  /// 달력은 그 안에서 스크롤합니다.
+  Widget _calendarPanel(double calendarWidth, HoronOverlayPlacement? placement) {
+    final double maxWidth = placement?.maxWidth ?? double.infinity;
+    final double maxHeight = placement?.maxHeight ?? double.infinity;
+    final double popupWidth = math.min(calendarWidth, maxWidth);
+    return _MotionPopup(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth, maxHeight: maxHeight),
+        child: SingleChildScrollView(
+          child: SizedBox(
+            width: popupWidth,
+            child: HoronCalendar(
+              width: popupWidth,
+              value: widget.value,
+              onValueChange: widget.onValueChange,
+              range: widget.range,
+              onRangeChange: widget.onRangeChange,
+              defaultMonth: widget.defaultMonth,
+              month: widget.month,
+              onMonthChange: widget.onMonthChange,
+              isDateDisabled: widget.isDateDisabled,
+              weekStartsOn: widget.weekStartsOn,
+              today: widget.today,
+              popover: widget.popover,
+              size: _calendarSizeOf(widget.size),
+              surface: widget.surface == HoronSurface.glass ? HoronCalendarSurface.glass : HoronCalendarSurface.solid,
             ),
           ),
         ),
