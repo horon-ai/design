@@ -169,6 +169,12 @@
   --animate-wave: wave-level 900ms ease-in-out infinite;
   --animate-slide-next: slide-next 200ms var(--ease-out-quint) both;
   --animate-slide-prev: slide-prev 200ms var(--ease-out-quint) both;
+  --animate-slide-shift-next: slide-shift-next 200ms var(--ease-out-quint) both;
+  --animate-slide-shift-prev: slide-shift-prev 200ms var(--ease-out-quint) both;
+  --animate-swap-move: swap-move 200ms var(--ease-out-quint) both;
+  --animate-fade-in: fade-in 160ms var(--ease-out-quint) both;
+  --animate-scale-out: scale-out 120ms ease-in both;
+  --animate-sweep: sweep 1.4s var(--ease-out-quint) infinite;
 
   @keyframes shimmer {
     from {
@@ -276,6 +282,68 @@
       translate: 0 0;
     }
   }
+
+  /* Opacity-free variants of slide-next/prev: a panel that is replaced in place moves in without a
+   * blank first frame. */
+  @keyframes slide-shift-next {
+    from {
+      translate: 12px 0;
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+
+  @keyframes slide-shift-prev {
+    from {
+      translate: -12px 0;
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+
+  /* The same, for content that is swapped rather than slid: a short rise with no fade. */
+  @keyframes swap-move {
+    from {
+      translate: 0 4px;
+    }
+    to {
+      translate: 0 0;
+    }
+  }
+
+  /* In-place text and value changes: a label, caret or number that is replaced, not moved. */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Deeper than pop-out, for small glyphs (checkmarks, radio dots) leaving a fixed slot. */
+  @keyframes scale-out {
+    from {
+      opacity: 1;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 0.6;
+    }
+  }
+
+  /* Indeterminate progress: a bar one third of the track wide that crosses it and re-enters. */
+  @keyframes sweep {
+    from {
+      translate: -100% 0;
+    }
+    to {
+      translate: 400% 0;
+    }
+  }
 }
 
 /* Optical centering for one-line labels in fixed-height pills and controls: the label box is trimmed to the
@@ -339,6 +407,90 @@
   &[data-ending-style] {
     height: 0;
     opacity: 0;
+  }
+}
+
+/* A <details> whose body opens and closes by height instead of snapping. Chromium 131+ and
+ * Safari 18.4+ animate ::details-content; other browsers keep the instant toggle. */
+@utility motion-details {
+  interpolate-size: allow-keywords;
+
+  &::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition-property: block-size, content-visibility;
+    transition-duration: 240ms;
+    transition-timing-function: var(--ease-out-quint);
+    transition-behavior: allow-discrete;
+  }
+
+  &[open]::details-content {
+    block-size: auto;
+  }
+}
+
+/* An inline block that opens and closes in place where Base UI's Collapsible is not used, so
+ * --collapsible-panel-height is not available: one grid row animates between 1fr (open) and 0fr.
+ * Wrap exactly one child; the child clips its own overflow. The wrapper is open by default — add
+ * data-collapsed to close it, and give focusable descendants `inert` while it is collapsed. */
+@utility motion-reveal {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition-property: grid-template-rows, opacity;
+  transition-duration: 200ms, 150ms;
+  transition-timing-function: var(--ease-out-quint), ease-out;
+
+  > * {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  &[data-collapsed] {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+/* The horizontal counterpart of motion-reveal, for a slot that appears beside other content
+ * (an action button, a badge). Same contract: open by default, data-collapsed to close. */
+@utility motion-reveal-x {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  opacity: 1;
+  transition-property: grid-template-columns, opacity;
+  transition-duration: 200ms, 150ms;
+  transition-timing-function: var(--ease-out-quint), ease-out;
+
+  > * {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  &[data-collapsed] {
+    grid-template-columns: minmax(0, 0fr);
+    opacity: 0;
+  }
+}
+
+/* One slot, two states: stack both children in the same grid cell and put data-hidden on the
+ * inactive one, so a control's icon, label or action crossfades instead of swapping. The slot is
+ * as wide as the larger child. Also give the inactive child aria-hidden and tabIndex={-1}. */
+@utility motion-swap {
+  display: grid;
+  grid-template-areas: "swap";
+
+  > * {
+    grid-area: swap;
+    transition-property: opacity, scale;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-out-quint);
+  }
+
+  > [data-hidden] {
+    opacity: 0;
+    scale: 0.95;
+    pointer-events: none;
   }
 }
 
