@@ -2,11 +2,18 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from "@horon-ai/react";
 
 import { Backdrop } from "../demo-backdrop";
 
-export default function TabsDemo() {
+function Lists({ surface }: { surface: "solid" | "glass" }) {
   return (
-    <Backdrop>
+    <>
+      <Tabs defaultValue="activity" size="sm">
+        <TabsList surface={surface}>
+          <TabsTab value="activity">Small</TabsTab>
+          <TabsTab value="routines">Routines</TabsTab>
+          <TabsTab value="tools">Tools</TabsTab>
+        </TabsList>
+      </Tabs>
       <Tabs defaultValue="activity">
-        <TabsList>
+        <TabsList surface={surface}>
           <TabsTab value="activity">Activity</TabsTab>
           <TabsTab value="routines">Routines</TabsTab>
           <TabsTab value="tools">Tools</TabsTab>
@@ -21,8 +28,15 @@ export default function TabsDemo() {
           Connected tools.
         </TabsPanel>
       </Tabs>
-      <Tabs defaultValue="mcp" className="mt-6">
-        <TabsList className="gap-1">
+      <Tabs defaultValue="activity" size="lg">
+        <TabsList surface={surface}>
+          <TabsTab value="activity">Large</TabsTab>
+          <TabsTab value="routines">Routines</TabsTab>
+          <TabsTab value="tools">Tools</TabsTab>
+        </TabsList>
+      </Tabs>
+      <Tabs defaultValue="mcp">
+        <TabsList surface={surface}>
           <TabsTab value="skills" count={6}>
             Skills
           </TabsTab>
@@ -34,6 +48,25 @@ export default function TabsDemo() {
           </TabsTab>
         </TabsList>
       </Tabs>
-    </Backdrop>
+    </>
+  );
+}
+
+export default function TabsDemo() {
+  return (
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex flex-col gap-3">
+        <p className="text-caption text-text-secondary">Solid</p>
+        <div className="flex w-full flex-col items-center gap-4">
+          <Lists surface="solid" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <p className="text-caption text-text-secondary">Glass</p>
+        <Backdrop className="flex-col">
+          <Lists surface="glass" />
+        </Backdrop>
+      </div>
+    </div>
   );
 }

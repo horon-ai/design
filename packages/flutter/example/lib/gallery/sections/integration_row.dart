@@ -3,11 +3,14 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:horon_ui/horon_ui.dart';
 
+import '../surface_group.dart';
+
 /// `integration_row` 갤러리 섹션입니다.
 ///
-/// 세 상태를 나란히 놓습니다. 연결됨은 점이 있는 알약, 다시 연결은 위험 테두리와
-/// Reconnect 버튼, 연결 안 됨은 Plug 아이콘이 있는 Connect 버튼입니다. 마지막 칸은
-/// 폭이 좁을 때 컨트롤이 글자 아래로 내려가는 모습입니다.
+/// 연결됨, 다시 연결, 연결 안 됨, 좁은 폭 네 상태를 solid와 glass 두 표면에 같은
+/// 목록으로 놓습니다. 연결됨은 점이 있는 알약, 다시 연결은 위험 테두리와 Reconnect
+/// 버튼, 연결 안 됨은 Plug 아이콘이 있는 Connect 버튼입니다. 마지막 칸은 폭이 좁을
+/// 때 컨트롤이 글자 아래로 내려가는 모습입니다.
 class HoronIntegrationRowGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronIntegrationRowGallerySection({super.key});
@@ -17,66 +20,87 @@ class HoronIntegrationRowGallerySection extends StatelessWidget {
     final HoronThemeData theme = HoronTheme.of(context);
     return Padding(
       padding: EdgeInsets.all(theme.space.s4),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double available = constraints.maxWidth.isFinite
-              ? constraints.maxWidth
-              : 640;
-          // Paper `UFQ-1` 등 세 행은 440px 폭입니다.
-          final double wide = math.min(available, 440);
-          final double narrow = math.min(available, 360);
-          return Wrap(
-            spacing: theme.space.s4,
-            runSpacing: theme.space.s4,
-            crossAxisAlignment: WrapCrossAlignment.start,
-            children: <Widget>[
-              _Cell(
-                label: 'connected — 점이 있는 알약',
-                width: wide,
-                child: const HoronIntegrationRow(
-                  icon: Icon(Icons.cloud_outlined),
-                  name: 'Google Drive',
-                  detail: 'alpox@gmail.com · files.read',
-                  status: HoronIntegrationStatus.connected,
-                ),
-              ),
-              _Cell(
-                label: 'reconnect — 위험 테두리와 Reconnect',
-                width: wide,
-                child: HoronIntegrationRow(
-                  icon: Icon(Icons.mail_outline),
-                  name: 'Gmail',
-                  detail: '권한이 만료되었습니다. 다시 연결해 주세요',
-                  status: HoronIntegrationStatus.reconnect,
-                  onAction: () {},
-                ),
-              ),
-              _Cell(
-                label: 'not-connected — Plug 아이콘이 있는 Connect',
-                width: wide,
-                child: HoronIntegrationRow(
-                  icon: Icon(Icons.calendar_today_outlined),
-                  name: 'Google Calendar',
-                  detail: '아직 연결하지 않았습니다',
-                  status: HoronIntegrationStatus.notConnected,
-                  onAction: () {},
-                ),
-              ),
-              _Cell(
-                label: '좁은 폭 — 컨트롤이 글자 아래로',
-                width: narrow,
-                child: HoronIntegrationRow(
-                  icon: Icon(Icons.chat_bubble_outline),
-                  name: 'Slack',
-                  detail: '워크스페이스 하나가 만료되었습니다',
-                  status: HoronIntegrationStatus.reconnect,
-                  onAction: () {},
-                ),
-              ),
-            ],
-          );
-        },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: theme.space.s6,
+        children: <Widget>[
+          SurfaceGroup(label: 'Solid', child: _rows(theme, HoronSurface.solid)),
+          SurfaceGroup(
+            label: 'Glass',
+            glass: true,
+            child: _rows(theme, HoronSurface.glass),
+          ),
+        ],
       ),
+    );
+  }
+
+  /// 한 표면의 행 표본 목록입니다. 표면만 바뀌고 내용은 같습니다.
+  Widget _rows(HoronThemeData theme, HoronSurface surface) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double available = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 640;
+        // Paper `UFQ-1` 등 세 행은 440px 폭입니다.
+        final double wide = math.min(available, 440);
+        final double narrow = math.min(available, 360);
+        return Wrap(
+          spacing: theme.space.s4,
+          runSpacing: theme.space.s4,
+          crossAxisAlignment: WrapCrossAlignment.start,
+          children: <Widget>[
+            _Cell(
+              label: 'connected — 점이 있는 알약',
+              width: wide,
+              child: HoronIntegrationRow(
+                icon: const Icon(Icons.cloud_outlined),
+                name: 'Google Drive',
+                detail: 'alpox@gmail.com · files.read',
+                status: HoronIntegrationStatus.connected,
+                surface: surface,
+              ),
+            ),
+            _Cell(
+              label: 'reconnect — 위험 테두리와 Reconnect',
+              width: wide,
+              child: HoronIntegrationRow(
+                icon: const Icon(Icons.mail_outline),
+                name: 'Gmail',
+                detail: '권한이 만료되었습니다. 다시 연결해 주세요',
+                status: HoronIntegrationStatus.reconnect,
+                surface: surface,
+                onAction: () {},
+              ),
+            ),
+            _Cell(
+              label: 'not-connected — Plug 아이콘이 있는 Connect',
+              width: wide,
+              child: HoronIntegrationRow(
+                icon: const Icon(Icons.calendar_today_outlined),
+                name: 'Google Calendar',
+                detail: '아직 연결하지 않았습니다',
+                status: HoronIntegrationStatus.notConnected,
+                surface: surface,
+                onAction: () {},
+              ),
+            ),
+            _Cell(
+              label: '좁은 폭 — 컨트롤이 글자 아래로',
+              width: narrow,
+              child: HoronIntegrationRow(
+                icon: const Icon(Icons.chat_bubble_outline),
+                name: 'Slack',
+                detail: '워크스페이스 하나가 만료되었습니다',
+                status: HoronIntegrationStatus.reconnect,
+                surface: surface,
+                onAction: () {},
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

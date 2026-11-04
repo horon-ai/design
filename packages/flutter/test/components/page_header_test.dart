@@ -23,7 +23,7 @@ void main() {
   });
 
   testWidgets('the header is regular glass with a 28px radius and a 40px title row', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(const HoronPageHeader(title: '에이전트 설정')));
+    await tester.pumpWidget(_host(const HoronPageHeader(title: '에이전트 설정', surface: HoronSurface.glass)));
     final HoronThemeData theme = _theme(tester);
 
     final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));

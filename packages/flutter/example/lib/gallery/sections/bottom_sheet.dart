@@ -32,6 +32,7 @@ class HoronBottomSheetGallerySection extends StatelessWidget {
                 width: width,
                 height: 320,
                 child: HoronBottomSheet(
+                  solid: false,
                   title: const Text('알림 설정'),
                   onClose: () {},
                   child: Column(

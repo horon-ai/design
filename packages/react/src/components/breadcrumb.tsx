@@ -4,9 +4,11 @@ import { Children, type ComponentProps, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
+export type BreadcrumbSurface = "glass" | "solid";
+
 export type BreadcrumbProps = Omit<ComponentProps<"nav">, "className"> & {
-  /** `glass` wraps the crumbs in a regular-glass tray. Omitted keeps them bare. */
-  surface?: "glass";
+  /** `glass` wraps the crumbs in a regular-glass tray, `solid` in an opaque tray. Omitted keeps them bare. */
+  surface?: BreadcrumbSurface;
   className?: string;
 };
 
@@ -21,10 +23,14 @@ export function Breadcrumb({
   return (
     <nav
       aria-label={ariaLabel}
-      className={cn(surface === "glass" && "relative w-fit overflow-clip rounded-xl bg-glass-regular px-4 py-3.5", className)}
+      className={cn(
+        surface === "glass" && "relative w-fit overflow-clip rounded-xl bg-glass-regular px-4 py-3.5",
+        surface === "solid" && "relative w-fit rounded-xl border border-border-default bg-bg-surface px-4 py-3.5",
+        className,
+      )}
       {...props}
     >
-      {surface === "glass" && <LiquidGlass tier="regular" />}
+      {surface === "glass" && <LiquidGlass />}
       <ol className="relative flex items-center gap-1.5">
         {Children.map(children, (item, index) => (
           <>

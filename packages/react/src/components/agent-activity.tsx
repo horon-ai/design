@@ -11,7 +11,7 @@ export function ThinkingIndicator({ label = "Thinking", className }: { label?: s
       role="status"
       aria-label={label}
       className={cn(
-        "inline-flex h-7.75 w-17.25 items-center justify-center gap-2 rounded-full bg-bg-subtle",
+        "inline-flex h-7.75 w-17.25 items-center justify-center gap-2 rounded-full border border-border-default bg-bg-surface",
         className,
       )}
     >
@@ -28,7 +28,7 @@ export function StreamingText({ children, className }: { children: ReactNode; cl
     <div
       aria-live="polite"
       className={cn(
-        "flex w-fit items-end gap-2 rounded-xl bg-bg-subtle px-4 py-3 text-body-sm text-text-primary",
+        "flex w-fit items-end gap-2 rounded-xl border border-border-default bg-bg-surface px-4 py-3 text-body-sm text-text-primary",
         className,
       )}
     >
@@ -53,7 +53,7 @@ export function ToolStep({ state = "running", title, detail, className, ...props
     <button
       type="button"
       className={cn(
-        "flex w-full motion-press cursor-pointer items-center gap-2.5 rounded-md bg-bg-subtle px-2.5 py-2 text-left focus-visible:outline-2 focus-visible:outline-text-brand",
+        "flex w-full motion-press cursor-pointer items-center gap-2.5 rounded-md border border-border-default bg-bg-surface px-2.5 py-2 text-left focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}
       {...props}
@@ -85,7 +85,13 @@ export function WorkLog({
   className?: string;
 }) {
   return (
-    <details open className={cn("group flex w-85 flex-col rounded-[16px] bg-bg-subtle p-1.5", className)}>
+    <details
+      open
+      className={cn(
+        "group flex w-85 flex-col rounded-[16px] border border-border-default bg-bg-surface p-1.5",
+        className,
+      )}
+    >
       <summary className="flex cursor-pointer list-none items-center gap-2 px-2.5 py-1.5 text-caption text-text-secondary [&::-webkit-details-marker]:hidden">
         <Wrench aria-hidden className="size-3.5 shrink-0" />
         <span className="min-w-0 flex-1">{summary}</span>

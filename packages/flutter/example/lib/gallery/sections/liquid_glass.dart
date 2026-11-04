@@ -5,12 +5,10 @@ import '../section_scaffold.dart';
 
 /// `liquid_glass` 갤러리 섹션입니다.
 ///
-/// 세 티어를 Flue 연기 배경 위에 얹어, 유리가 뒤 색을 어느 정도 통과시키고 가장자리에서
-/// 휘게 하는지 눈으로 확인합니다. 배경은 정지 프레임입니다(`TickerMode`를 끕니다).
-/// 그래야 갤러리를 스크롤하는 동안 티커가 돌지 않고도 색이 고르게 남습니다.
-///
-/// 굴절은 실제 기기에서만 보입니다. `ui.ImageFilter.shader`는 Impeller가 필요해서,
-/// 시뮬레이터·테스트처럼 Impeller가 없으면 세 티어 모두 서리 채움으로 그려집니다.
+/// 세 티어를 Flue 연기 배경 위에 얹어, 유리가 뒤 배경을 얼마나 흐리고 채도를 올리는지,
+/// 티어별 채움과 가장자리 림이 어떻게 보이는지 눈으로 확인합니다. 배경은 정지
+/// 프레임입니다(`TickerMode`를 끕니다). 그래야 갤러리를 스크롤하는 동안 티커가 돌지
+/// 않고도 색이 고르게 남습니다.
 class HoronLiquidGlassGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronLiquidGlassGallerySection({super.key});
@@ -46,40 +44,23 @@ class HoronLiquidGlassGallerySection extends StatelessWidget {
       ],
       states: <Widget>[
         const _LiquidCell(
-          label: 'Texture (칩의 질감 레이어)',
-          child: HoronLiquidGlass(
-            tier: HoronGlassTier.regular,
-            texture: true,
-            borderRadius: BorderRadius.all(Radius.circular(HoronRadius.full)),
-            child: _GlassLabel('Texture'),
-          ),
-        ),
-        const _LiquidCell(
-          label: 'Refraction off — 서리 채움',
-          child: HoronLiquidGlass(
-            tier: HoronGlassTier.regular,
-            refract: HoronGlassRefraction.off,
-            borderRadius: BorderRadius.all(Radius.circular(HoronRadius.full)),
-            child: _GlassLabel('Frost'),
-          ),
-        ),
-        const _LiquidCell(
-          label: 'Opaque host — 굴절 없이 레이어만',
-          child: HoronLiquidGlass(
-            tier: HoronGlassTier.thick,
-            opaque: true,
-            borderRadius: BorderRadius.all(Radius.circular(HoronRadius.xl)),
-            child: _GlassLabel('Opaque'),
+          label: 'Frost — 동작 줄이기 설정',
+          child: _ReducedMotion(
+            child: HoronLiquidGlass(
+              tier: HoronGlassTier.regular,
+              borderRadius: BorderRadius.all(Radius.circular(HoronRadius.full)),
+              child: _GlassLabel('Frost'),
+            ),
           ),
         ),
       ],
       notes:
-          'Figma의 `Liquid layers` 그룹을 그대로 옮겼습니다. 아래에서 위로 채움, 굴절(선택), '
-          '질감(선택), 색조(45px 블러), 안쪽 그늘(4px 블러, overlay), 부드러운 가장자리'
-          '(1px 테두리, plus-lighter), 광택(135°/315° 그라디언트 링, screen)입니다. '
-          '색조·안쪽 그늘·가장자리는 layerOpacity 0.5로, 질감·광택·굴절은 1로 그립니다. '
-          '안쪽 그늘 여백과 가장자리 블러는 호스트 높이에 비례합니다(높이 32/40/48/52/74/76/112/120에서 '
-          'CSS와 같은 값). 굴절이 켜지면 웹과 같이 광택이 사라지고, 셰이더를 못 쓰면 서리 채움만 남습니다.',
+          '세 플랫폼이 같은 재료를 씁니다. 아래에서 위로 뒤 배경을 20px 흐리고 채도를 '
+          '1.8배로 올린 다음, 티어 채움(glass-clear/regular/thick)을 덮고, 표면 안쪽 '
+          '1px 림을 위에서 아래로 밝음 → 12% → 30% 그라디언트로 그립니다. 굴절·질감·'
+          '안쪽 그늘·광택은 없고, 그림자는 재료가 아니라 컴포넌트가 자기 토큰으로 답니다. '
+          '뒤 배경을 필터할 수 없을 때(동작 줄이기 설정)는 glass-fill-frost 한 겹으로 '
+          '그리고 림은 그대로 남깁니다.',
     );
   }
 }
@@ -136,6 +117,21 @@ class _LiquidCell extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// 동작 줄이기 설정을 켠 채로 자식을 그립니다. 서리 채움 경로를 보여 줍니다.
+class _ReducedMotion extends StatelessWidget {
+  const _ReducedMotion({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(disableAnimations: true),
+      child: child,
     );
   }
 }

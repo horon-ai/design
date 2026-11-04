@@ -2,11 +2,36 @@ import { Composer } from "@horon-ai/react";
 
 import { Backdrop } from "../demo-backdrop";
 
+function Examples({ surface }: { surface: "solid" | "glass" }) {
+  return (
+    <div className="flex w-full flex-col items-center gap-3">
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <Composer surface={surface} className="max-w-72" size="sm" placeholder="Small" />
+        <Composer surface={surface} className="max-w-72" placeholder="Medium" />
+        <Composer surface={surface} className="max-w-72" size="lg" placeholder="Large" />
+      </div>
+      <Composer surface={surface} className="w-97.5" placeholder="Ask Chief of staff" />
+      <Composer
+        surface={surface}
+        className="w-97.5"
+        placeholder="Ask Chief of staff"
+        defaultValue="Add a slide for headcount"
+      />
+    </div>
+  );
+}
+
 export default function ComposerDemo() {
   return (
-    <Backdrop className="flex-col">
-      <Composer className="w-97.5" placeholder="Ask Chief of staff" />
-      <Composer className="w-97.5" placeholder="Ask Chief of staff" defaultValue="Add a slide for headcount" />
-    </Backdrop>
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex w-full flex-col gap-4">
+        <p className="text-caption text-text-secondary">Solid</p>
+        <Examples surface="solid" />
+      </div>
+      <Backdrop className="flex-col">
+        <p className="text-caption text-text-secondary">Glass</p>
+        <Examples surface="glass" />
+      </Backdrop>
+    </div>
   );
 }

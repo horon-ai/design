@@ -1,10 +1,8 @@
 import { BotMemoryPanel } from "@horon-ai/react";
 
-import { Backdrop } from "../demo-backdrop";
-
 export default function BotMemoryPanelDemo() {
   return (
-    <Backdrop>
+    <div className="flex w-full justify-center">
       <BotMemoryPanel
         subtitle="What Chief of staff remembers across chats"
         usage={62}
@@ -24,7 +22,12 @@ export default function BotMemoryPanelDemo() {
         ]}
         toast={{ title: "Memory updated", message: "Noted: you prefer replies under 120 words" }}
         memories={[
-          { id: "1", group: "About you", text: "Runs Horon HQ, a 3 person team in Seoul", source: "From a chat · Oct 8" },
+          {
+            id: "1",
+            group: "About you",
+            text: "Runs Horon HQ, a 3 person team in Seoul",
+            source: "From a chat · Oct 8",
+          },
           {
             id: "2",
             group: "About you",
@@ -47,6 +50,6 @@ export default function BotMemoryPanelDemo() {
           },
         ]}
       />
-    </Backdrop>
+    </div>
   );
 }

@@ -2,9 +2,10 @@ import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 
 import { cn } from "../lib/cn";
-import { LiquidGlass } from "./liquid-glass";
+import type { ControlSize } from "../lib/size";
 
 export type DateRange = { start: Date | null; end: Date | null };
+export type CalendarSize = ControlSize;
 
 type CommonProps = {
   /** First visible month; defaults to the selected date or today. */
@@ -24,10 +25,91 @@ type CommonProps = {
    * month and 32px round arrow buttons on the right.
    */
   variant?: "default" | "popover";
-  /** `glass` (default) layers the thick liquid glass; `flat` keeps the same 80% white fill without it (Paper Schedule mini calendar). */
-  surface?: "glass" | "flat";
-  /** Days drawn as subtle 40px circles (6% ink), e.g. the week the schedule shows; selection still draws on top. */
+  /**
+   * `solid` (default) is an opaque surface with a default border. `glass` puts it on the veil (`veil-overlay`),
+   * the material of the `DateField` popup; `flat` keeps the 80% white fill of the old thick glass
+   * without it (Paper Schedule mini calendar).
+   */
+  surface?: "glass" | "flat" | "solid";
+  /** Days drawn as subtle ink circles in the day cell size, e.g. the week the schedule shows; selection still draws on top. */
   highlight?: Date[];
+  /**
+   * Day cell size: `sm` 32px, `md` 40px (default, the Figma size), `lg` 48px.
+   * Scales the header, padding, weekday row and day text with the cells.
+   */
+  size?: CalendarSize;
+};
+
+const containerSizeClass: Record<CalendarSize, { default: string; popover: string }> = {
+  sm: { default: "gap-2 p-3", popover: "w-62 gap-1.5 p-3" },
+  md: { default: "gap-3 p-4", popover: "w-77 gap-2 p-3.5" },
+  lg: { default: "gap-3.5 p-4.5", popover: "w-92 gap-2.5 p-4" },
+};
+
+const titleSizeClass: Record<CalendarSize, string> = {
+  sm: "text-label-lg",
+  md: "text-title-sm",
+  lg: "text-title-md",
+};
+
+const popoverTitleSizeClass: Record<CalendarSize, string> = {
+  sm: "text-label-md",
+  md: "text-label-lg",
+  lg: "text-label-lg",
+};
+
+const popoverHeaderSizeClass: Record<CalendarSize, string> = {
+  sm: "gap-0.5 pb-0.5 pl-1",
+  md: "gap-1 pb-1 pl-1.5",
+  lg: "gap-1.5 pb-1.5 pl-2",
+};
+
+const arrowSizeClass: Record<CalendarSize, string> = {
+  sm: "size-4 [&_svg]:size-4",
+  md: "size-5 [&_svg]:size-5",
+  lg: "size-6 [&_svg]:size-6",
+};
+
+const popoverArrowSizeClass: Record<CalendarSize, string> = {
+  sm: "size-7 [&_svg]:size-4",
+  md: "size-8 [&_svg]:size-4.5",
+  lg: "size-10 [&_svg]:size-5",
+};
+
+const weekdayHeaderSizeClass: Record<CalendarSize, string> = {
+  sm: "h-5 w-8",
+  md: "h-6 w-10",
+  lg: "h-7 w-12",
+};
+
+const daySizeClass: Record<CalendarSize, string> = {
+  sm: "size-8",
+  md: "size-10",
+  lg: "size-12",
+};
+
+const dayTextClass: Record<CalendarSize, string> = {
+  sm: "text-body-sm",
+  md: "text-body-md",
+  lg: "text-body-lg",
+};
+
+const dayEmphasisClass: Record<CalendarSize, string> = {
+  sm: "text-label-md",
+  md: "text-label-lg",
+  lg: "text-label-lg",
+};
+
+const todayDotSizeClass: Record<CalendarSize, string> = {
+  sm: "top-6 left-3.5",
+  md: "top-8 left-[18px]",
+  lg: "top-10 left-[22px]",
+};
+
+const popoverDayTextClass: Record<CalendarSize, string> = {
+  sm: "[&_[role=gridcell]]:text-label-sm",
+  md: "[&_[role=gridcell]]:text-label-md",
+  lg: "[&_[role=gridcell]]:text-label-lg",
 };
 
 export type CalendarProps = CommonProps &
@@ -63,8 +145,9 @@ export function Calendar(props: CalendarProps) {
     weekStartsOn = 0,
     className,
     variant = "default",
-    surface = "glass",
+    surface = "solid",
     highlight,
+    size = "md",
   } = props;
   const [now] = useState(() => new Date());
   const today = startOfDay(props.today ?? now);
@@ -133,17 +216,23 @@ export function Calendar(props: CalendarProps) {
   return (
     <div
       className={cn(
-        "relative flex flex-col overflow-clip bg-glass-thick",
-        variant === "popover" ? "w-77 gap-2 rounded-[24px] p-3.5" : "w-fit gap-3 rounded-xl p-4",
-        // Paper renders every popover day as label-md (14/20 500); the default calendar mixes body-md and label-lg.
-        variant === "popover" && "[&_[role=gridcell]]:text-label-md",
+        "relative flex flex-col overflow-clip",
+        surface === "solid"
+          ? "border border-border-default bg-bg-surface"
+          : surface === "glass"
+            ? "veil-overlay"
+            : "bg-glass-thick",
+        variant === "popover"
+          ? cn("rounded-[24px]", containerSizeClass[size].popover)
+          : cn("w-fit rounded-xl", containerSizeClass[size].default),
+        // Paper renders every popover day on the label scale; the default calendar mixes body and label.
+        variant === "popover" && popoverDayTextClass[size],
         className,
       )}
     >
-      {surface === "glass" && <LiquidGlass tier="thick" />}
       {variant === "popover" ? (
-        <div className="relative flex w-full items-center gap-1 pb-1 pl-1.5">
-          <p aria-live="polite" className="min-w-0 flex-1 text-label-lg text-text-primary">
+        <div className={cn("relative flex w-full items-center", popoverHeaderSizeClass[size])}>
+          <p aria-live="polite" className={cn("min-w-0 flex-1 text-text-primary", popoverTitleSizeClass[size])}>
             {title}
           </p>
           {(
@@ -156,7 +245,10 @@ export function Calendar(props: CalendarProps) {
               key={label}
               type="button"
               aria-label={label}
-              className="flex size-8 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 [&_svg]:size-4.5"
+              className={cn(
+                "flex motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6",
+                popoverArrowSizeClass[size],
+              )}
               onClick={() => setMonth(addMonths(month, step))}
             >
               {icon}
@@ -168,18 +260,18 @@ export function Calendar(props: CalendarProps) {
           <button
             type="button"
             aria-label="Previous month"
-            className="flex size-5 motion-press cursor-pointer text-text-secondary [&_svg]:size-5"
+            className={cn("flex motion-press cursor-pointer text-text-secondary", arrowSizeClass[size])}
             onClick={() => setMonth(addMonths(month, -1))}
           >
             <CaretLeft />
           </button>
-          <p aria-live="polite" className="flex-1 text-center text-title-sm text-text-primary">
+          <p aria-live="polite" className={cn("flex-1 text-center text-text-primary", titleSizeClass[size])}>
             {title}
           </p>
           <button
             type="button"
             aria-label="Next month"
-            className="flex size-5 motion-press cursor-pointer text-text-secondary [&_svg]:size-5"
+            className={cn("flex motion-press cursor-pointer text-text-secondary", arrowSizeClass[size])}
             onClick={() => setMonth(addMonths(month, 1))}
           >
             <CaretRight />
@@ -203,7 +295,7 @@ export function Calendar(props: CalendarProps) {
             <span
               key={date.getDay()}
               role="columnheader"
-              className="flex h-6 w-10 justify-center text-caption text-text-secondary"
+              className={cn("flex justify-center text-caption text-text-secondary", weekdayHeaderSizeClass[size])}
             >
               {weekday.format(date)}
             </span>
@@ -232,29 +324,33 @@ export function Calendar(props: CalendarProps) {
                   onClick={() => select(date)}
                   onFocus={() => setFocused(date)}
                   className={cn(
-                    "relative flex size-10 cursor-pointer flex-col items-center justify-center motion-colors",
+                    "relative flex cursor-pointer flex-col items-center justify-center motion-colors",
+                    daySizeClass[size],
                     "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
                     between
-                      ? "bg-overlay-ink-8 text-body-md text-text-primary"
+                      ? cn("bg-overlay-ink-8 text-text-primary", dayTextClass[size])
                       : selected
-                        ? "rounded-full bg-interactive-primary text-label-lg text-text-inverse"
+                        ? cn("rounded-full bg-interactive-primary text-text-inverse", dayEmphasisClass[size])
                         : marked
                           ? "rounded-full bg-overlay-ink-6"
                           : "rounded-full hover:not-disabled:bg-overlay-ink-5",
                     !between &&
                       !selected &&
                       (disabled
-                        ? "cursor-not-allowed text-body-md text-text-disabled"
+                        ? cn("cursor-not-allowed text-text-disabled", dayTextClass[size])
                         : outside
-                          ? "text-body-md text-text-disabled"
+                          ? cn("text-text-disabled", dayTextClass[size])
                           : isToday
-                            ? "text-label-lg text-text-brand"
-                            : "text-body-md text-text-primary"),
+                            ? cn("text-text-brand", dayEmphasisClass[size])
+                            : cn("text-text-primary", dayTextClass[size])),
                   )}
                 >
                   {date.getDate()}
                   {isToday && !selected && !between && (
-                    <span aria-hidden className="absolute top-8 left-[18px] size-1 rounded-full bg-status-live" />
+                    <span
+                      aria-hidden
+                      className={cn("absolute size-1 rounded-full bg-status-live", todayDotSizeClass[size])}
+                    />
                   )}
                 </button>
               );

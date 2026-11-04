@@ -17,6 +17,8 @@ export type IntegrationRowProps = {
   connectedLabel?: string;
   reconnectLabel?: string;
   connectLabel?: string;
+  /** `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass row. */
+  surface?: "solid" | "glass";
   className?: string;
 };
 
@@ -26,7 +28,7 @@ const tileClass: Record<IntegrationStatus, string> = {
   "not-connected": "bg-interactive-primary",
 };
 
-/** Figma `Integration row` (Integrations 110:883): thick glass, 40px tile, status pill on the right. */
+/** Figma `Integration row` (Integrations 110:883): 40px tile, status pill on the right, solid or thick glass. */
 export function IntegrationRow({
   icon,
   name,
@@ -36,17 +38,20 @@ export function IntegrationRow({
   connectedLabel = "Connected",
   reconnectLabel = "Reconnect",
   connectLabel = "Connect",
+  surface = "solid",
   className,
 }: IntegrationRowProps) {
   return (
     <div
       className={cn(
-        "relative flex items-center gap-3 overflow-clip rounded-[16px] bg-glass-thick py-3 pr-3.5 pl-3",
-        status === "reconnect" && "border border-border-danger",
+        "relative flex items-center gap-3 overflow-clip rounded-[16px] py-3 pr-3.5 pl-3",
+        surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
+        status === "reconnect" &&
+          (surface === "glass" ? "[--glass-edge:var(--color-border-danger)]" : "border-border-danger"),
         className,
       )}
     >
-      <LiquidGlass tier="thick" />
+      {surface === "glass" && <LiquidGlass />}
       <span
         className={cn(
           "relative flex size-10 shrink-0 items-center justify-center rounded-[10px] text-text-inverse [&>svg]:size-5",

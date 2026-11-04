@@ -2,8 +2,6 @@ import { Radio as BaseRadio } from "@base-ui/react/radio";
 import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
-import { LiquidGlass } from "./liquid-glass";
-
 export type ChoiceCardProps = Omit<ComponentProps<typeof BaseRadio.Root>, "className" | "children" | "title"> & {
   title: ReactNode;
   description?: ReactNode;
@@ -15,27 +13,21 @@ export type ChoiceCardProps = Omit<ComponentProps<typeof BaseRadio.Root>, "class
 };
 
 /**
- * Paper `Choice card` (1VXM-0 selected, 1VXR-0 default): a 252px glass card, padding 14, radius 16, gap 12.
+ * Paper `Choice card` (1VXM-0 selected, 1VXR-0 default): a 252px solid card, padding 14, radius 16, gap 12,
+ * with a 1px default border that turns brand when selected; no glass.
  * Use inside `RadioGroup`. The 18px radio is a ring: 1.5px grey when off, a 5px ink ring around an 8px core when on.
  */
 export function ChoiceCard({ title, description, badge, badgeTone = "brand", className, ...props }: ChoiceCardProps) {
   return (
     <BaseRadio.Root
       className={cn(
-        "group relative flex w-[252px] cursor-pointer items-start gap-3 overflow-clip rounded-2xl border border-transparent bg-glass-clear p-3.5 text-left motion-colors",
-        "data-checked:border-border-brand data-checked:bg-glass-thick",
+        "group relative flex w-[252px] cursor-pointer items-start gap-3 overflow-clip rounded-2xl border border-border-default bg-bg-surface p-3.5 text-left motion-colors data-checked:border-border-brand",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
         "data-disabled:cursor-not-allowed data-disabled:opacity-40",
         className,
       )}
       {...props}
     >
-      <span aria-hidden className="group-data-checked:hidden">
-        <LiquidGlass tier="clear" />
-      </span>
-      <span aria-hidden className="hidden group-data-checked:block">
-        <LiquidGlass tier="thick" />
-      </span>
       <span
         aria-hidden
         className="relative mt-px flex size-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-border-dashed motion-colors group-data-checked:border-[5px] group-data-checked:border-interactive-primary"
@@ -44,11 +36,11 @@ export function ChoiceCard({ title, description, badge, badgeTone = "brand", cla
       </span>
       <span className="relative flex min-w-0 flex-1 flex-col gap-[3px]">
         <span className="flex items-center gap-2.5">
-          <span className="text-sm/5 min-w-0 flex-1 font-semibold text-text-primary">{title}</span>
+          <span className="min-w-0 flex-1 text-[14px]/5 font-semibold text-text-primary">{title}</span>
           {badge && (
             <span
               className={cn(
-                "text-xs/4 inline-flex h-[22px] shrink-0 items-center rounded-full px-2 font-medium",
+                "inline-flex h-[22px] shrink-0 items-center rounded-full px-2 text-[12px]/4 font-medium",
                 badgeTone === "brand" ? "bg-accent-sky-500-18 text-text-brand" : "bg-overlay-ink-6 text-text-secondary",
               )}
             >
@@ -56,7 +48,7 @@ export function ChoiceCard({ title, description, badge, badgeTone = "brand", cla
             </span>
           )}
         </span>
-        {description && <span className="text-xs/4 text-text-secondary">{description}</span>}
+        {description && <span className="text-[12px]/4 text-text-secondary">{description}</span>}
       </span>
     </BaseRadio.Root>
   );

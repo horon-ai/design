@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_glass.dart';
 import '../theme/horon_theme.dart';
+import '../tokens/horon_tokens.g.dart';
 
 /// `chat-controls.tsx`의 `size-11`입니다. 최신으로 가는 원형 버튼입니다.
 const double _jumpSide = 44;
@@ -27,16 +28,64 @@ const double _stopSquareRadius = 3;
 /// `chat-controls.tsx`의 `rounded-[2px]`입니다. 파형 막대의 반경입니다.
 const double _waveBarRadius = 2;
 
+/// `chat-controls.tsx`의 `ChatControlSurface`입니다.
+enum HoronChatControlSurface {
+  /// `surface="solid"` — 불투명 `bg-surface`에 1px 테두리. 기본값입니다.
+  solid,
+
+  /// `surface="glass"` — 이미지나 유리 패널 위의 유리 표면입니다.
+  glass,
+}
+
+/// 채팅 컨트롤의 바탕입니다. solid는 유리 없이 채움과 1px 테두리를 그립니다.
+class _ChatSurface extends StatelessWidget {
+  const _ChatSurface({
+    required this.surface,
+    required this.radius,
+    required this.child,
+    this.tier = HoronGlassTier.clear,
+  });
+
+  final HoronChatControlSurface surface;
+  final BorderRadius radius;
+  final Widget child;
+  final HoronGlassTier tier;
+
+  @override
+  Widget build(BuildContext context) {
+    if (surface == HoronChatControlSurface.glass) {
+      return HoronLiquidGlass(tier: tier, borderRadius: radius, child: child);
+    }
+    final HoronColors colors = HoronTheme.of(context).colors;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.bgSurface,
+        borderRadius: radius,
+        border: Border.all(color: colors.borderDefault),
+      ),
+      child: child,
+    );
+  }
+}
+
 /// Figma 파형의 막대 높이(px)입니다.
 const List<double> _waveform = <double>[8, 14, 22, 12, 26, 18, 10, 20, 28, 16, 9, 18, 24, 12, 7, 15, 21, 11];
 
 /// Figma `Jump to latest`(Chat controls 88:659): 44px 옅은 유리 원에 20px 캐럿입니다.
 class HoronJumpToLatest extends StatelessWidget {
   /// 버튼을 만듭니다.
-  const HoronJumpToLatest({super.key, this.onPressed, this.label = 'Jump to latest'});
+  const HoronJumpToLatest({
+    super.key,
+    this.onPressed,
+    this.label = 'Jump to latest',
+    this.surface = HoronChatControlSurface.solid,
+  });
 
   /// 누르는 동작입니다.
   final VoidCallback? onPressed;
+
+  /// 표면입니다. 기본값은 [HoronChatControlSurface.solid]입니다.
+  final HoronChatControlSurface surface;
 
   /// 접근성 이름입니다.
   final String label;
@@ -59,11 +108,7 @@ class HoronJumpToLatest extends StatelessWidget {
             child: Stack(
               children: <Widget>[
                 Positioned.fill(
-                  child: HoronLiquidGlass(
-                    tier: HoronGlassTier.clear,
-                    borderRadius: radius,
-                    child: const SizedBox.expand(),
-                  ),
+                  child: _ChatSurface(surface: surface, radius: radius, child: const SizedBox.expand()),
                 ),
                 Center(
                   child: Icon(Icons.keyboard_arrow_down, size: _jumpIcon, color: theme.colors.textPrimary),
@@ -80,10 +125,18 @@ class HoronJumpToLatest extends StatelessWidget {
 /// Figma `New messages`(88:659): 40px 옅은 유리 알약에 16px 캐럿과 라벨입니다.
 class HoronNewMessagesPill extends StatelessWidget {
   /// 알약을 만듭니다.
-  const HoronNewMessagesPill({super.key, required this.label, this.onPressed});
+  const HoronNewMessagesPill({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.surface = HoronChatControlSurface.solid,
+  });
 
   /// 알약 글자입니다.
   final String label;
+
+  /// 표면입니다. 기본값은 [HoronChatControlSurface.solid]입니다.
+  final HoronChatControlSurface surface;
 
   /// 누르는 동작입니다.
   final VoidCallback? onPressed;
@@ -104,11 +157,7 @@ class HoronNewMessagesPill extends StatelessWidget {
             child: Stack(
               children: <Widget>[
                 Positioned.fill(
-                  child: HoronLiquidGlass(
-                    tier: HoronGlassTier.clear,
-                    borderRadius: radius,
-                    child: const SizedBox.expand(),
-                  ),
+                  child: _ChatSurface(surface: surface, radius: radius, child: const SizedBox.expand()),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 14, right: 16),
@@ -148,7 +197,11 @@ class HoronVoiceInput extends StatefulWidget {
     this.recording = true,
     this.onStop,
     this.stopLabel = 'Stop recording',
+    this.surface = HoronChatControlSurface.solid,
   });
+
+  /// 표면입니다. 기본값은 [HoronChatControlSurface.solid]입니다.
+  final HoronChatControlSurface surface;
 
   /// 경과 시간입니다. 예: `0:07`.
   final String elapsed;
@@ -208,9 +261,10 @@ class _HoronVoiceInputState extends State<HoronVoiceInput> with SingleTickerProv
         child: Stack(
           children: <Widget>[
             Positioned.fill(
-              child: HoronLiquidGlass(
+              child: _ChatSurface(
+                surface: widget.surface,
+                radius: radius,
                 tier: HoronGlassTier.regular,
-                borderRadius: radius,
                 child: const SizedBox.expand(),
               ),
             ),

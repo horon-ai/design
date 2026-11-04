@@ -219,34 +219,64 @@ describe('타이포와 글래스', () => {
   });
 
   test('글래스 값이 glass.ts와 같다', () => {
-    const ratio = (value) => Number(value.toFixed(6));
     const expectations = [
-      `this.layerOpacity = ${glass.layerOpacity},`,
-      `this.tintBlur = ${glass.tint.blur}.0,`,
-      `this.tintColor = const Color(0x1A545454),`,
-      `this.innerShadeColor = const Color(0x1A000000),`,
-      `this.innerShadeBlur = ${glass.innerShade.blur}.0,`,
-      `this.innerInsetPerPx = ${ratio(glass.innerShade.insetPerPx)},`,
-      `this.innerInsetMaxY = ${glass.innerShade.maxInsetY}.0,`,
-      `this.innerInsetMaxX = ${glass.innerShade.maxInsetX}.0,`,
-      `this.edgeDarkColor = const Color(0xCC000000),`,
-      `this.edgeDarkBlurPerPx = ${ratio(glass.edgeDark.blurPerPx)},`,
-      `this.edgeDarkMaxBlur = ${glass.edgeDark.maxBlur}.0,`,
-      `this.edgeLightColor = const Color(0xCCFFFFFF),`,
-      `this.edgeLightBlurPerPx = ${ratio(glass.edgeLight.blurPerPx)},`,
-      `this.edgeLightMinBlur = ${glass.edgeLight.minBlur},`,
-      `this.edgeLightMaxBlur = ${glass.edgeLight.maxBlur},`,
-      `this.edgeLightSoftColor = const Color(0x33FFFFFF),`,
+      `this.blur = ${glass.blur}.0,`,
+      `this.saturate = ${glass.saturate},`,
+      `this.rimWidth = ${glass.rimWidth}.0,`,
+      `this.rimMidStop = ${glass.rimMidStop},`,
     ];
     const missing = expectations.filter((line) => !committed.includes(line));
     expect(missing).toEqual([]);
   });
 
-  test('글래스의 호스트 높이 규칙이 함수로 있다', () => {
-    expect(committed).toContain('double edgeDarkBlurFor(double hostHeight)');
-    expect(committed).toContain('double edgeLightBlurFor(double hostHeight)');
-    expect(committed).toContain('double innerInsetYFor(double hostHeight)');
-    expect(committed).toContain('double innerInsetXFor(double hostHeight)');
-    expect(committed).toContain('math.min(edgeDarkMaxBlur, hostHeight * edgeDarkBlurPerPx)');
+  test('림 색이 glass.ts의 밝기별 rgba 값과 같다', () => {
+    // CSS rgba를 `Color(0xAARRGGBB)`로 옮기는 규칙은 생성기와 같습니다.
+    const rgbaHex = (css) => {
+      const [r, g, b, a = 1] = /^rgba?\(([^)]+)\)$/.exec(css.trim())[1].split(',').map(Number);
+      const byte = (value) => Math.round(value).toString(16).padStart(2, '0').toUpperCase();
+      return `Color(0x${byte(a * 255)}${byte(r)}${byte(g)}${byte(b)})`;
+    };
+    expect(committed).toContain('final class HoronGlassRim {');
+    expect(committed).toContain('static const HoronGlassRim rimLight = HoronGlassRim(');
+    expect(committed).toContain('static const HoronGlassRim rimDark = HoronGlassRim(');
+    for (const scheme of ['light', 'dark']) {
+      for (const [key, value] of Object.entries(glass.rim[scheme])) {
+        expect(committed).toContain(`${key}: ${rgbaHex(value)},`);
+      }
+    }
+    expect(committed).toContain('rimFor(Brightness brightness)');
+    expect(committed).toContain('brightness == Brightness.dark ? rimDark : rimLight');
+  });
+
+  test('채도 행렬이 Filter Effects의 saturate 계수를 그대로 쓴다', () => {
+    expect(committed).toContain('List<double> get saturateMatrix');
+    expect(committed).toContain('0.213 + 0.787 * s,');
+    expect(committed).toContain('0.715 - 0.715 * s,');
+    expect(committed).toContain('0.072 - 0.072 * s,');
+    expect(committed).toContain('0.213 - 0.213 * s,');
+    expect(committed).toContain('0.715 + 0.285 * s,');
+    expect(committed).toContain('0.072 + 0.928 * s,');
+    // 알파 행은 단위 행렬입니다.
+    expect(committed).toContain('      1.0,\n      0.0,\n    ];');
+  });
+
+  test('예전 레이어 필드와 높이 함수가 남지 않는다', () => {
+    for (const gone of [
+      'layerOpacity',
+      'tintColor',
+      'tintBlur',
+      'innerShade',
+      'edgeDark',
+      'edgeLight',
+      'innerInset',
+      'edgeLightSoft',
+      'edgeDarkBlurFor',
+      'edgeLightBlurFor',
+      'innerInsetYFor',
+      'innerInsetXFor',
+    ]) {
+      expect(committed).not.toContain(gone);
+    }
+    expect(committed).not.toContain("import 'dart:math' as math;");
   });
 });

@@ -2,7 +2,6 @@ import { Menu as BaseMenu } from "@base-ui/react/menu";
 import { createContext, useContext, type ComponentProps, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
-import { LiquidGlass } from "./liquid-glass";
 
 type WithClass<T> = Omit<T, "className"> & { className?: string };
 
@@ -15,7 +14,7 @@ export const MenuTrigger = BaseMenu.Trigger;
 
 export type MenuContentProps = WithClass<ComponentProps<typeof BaseMenu.Popup>> & {
   /**
-   * `glass` is the Figma `Menu` (thick glass, 20px radius, 40px rows).
+   * `glass` is the Figma `Menu` on the veil (20px radius, 40px rows).
    * `solid` is the Account / Workspace menu that opens over glass chrome
    * (opaque fill, 18px radius, soft shadow, 36px rows).
    * `paper` is the Paper workspace switcher: default fill, 1px default border, 14px radius,
@@ -29,14 +28,14 @@ export type MenuContentProps = WithClass<ComponentProps<typeof BaseMenu.Popup>> 
 };
 
 export const menuPopupClass = {
-  glass: "rounded-xl bg-glass-thick",
+  glass: "rounded-xl veil-overlay",
   solid: "rounded-[18px] bg-glass-fill-solid shadow-popover",
   paper: "rounded-[14px] border border-border-default bg-bg-default shadow-[0_12px_32px_#0A142424]",
 } as const;
 
 /** Figma `Menus and popovers` (88:495): `Menu`, `Account menu` and `Workspace menu`. */
 export function MenuContent({
-  surface = "glass",
+  surface = "solid",
   side,
   align = "start",
   sideOffset = 8,
@@ -63,7 +62,6 @@ export function MenuContent({
           )}
           {...props}
         >
-          {surface === "paper" ? null : <LiquidGlass tier="thick" />}
           <SurfaceContext value={surface}>{children}</SurfaceContext>
         </BaseMenu.Popup>
       </BaseMenu.Positioner>

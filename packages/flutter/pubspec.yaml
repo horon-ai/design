@@ -17,8 +17,7 @@ dev_dependencies:
     sdk: flutter
 
 flutter:
-  # 리퀴드 글래스의 굴절과 Flue 배경입니다. `lib/src/glass/glass_shader.dart`가 이 두
-  # 경로를 읽고, 테스트가 목록 자체를 검사합니다.
+  # Flue 배경 셰이더입니다. `lib/src/glass/glass_shader.dart`가 이 경로를 읽고,
+  # 테스트가 목록 자체를 검사합니다.
   shaders:
-    - shaders/glass_refract.frag
     - shaders/flue.frag

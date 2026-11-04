@@ -7,6 +7,7 @@ void main() {
   Future<void> pumpTextarea(
     WidgetTester tester, {
     Brightness brightness = Brightness.light,
+    HoronInputSurface surface = HoronInputSurface.glass,
     bool invalid = false,
     bool enabled = true,
     ValueChanged<String>? onChanged,
@@ -18,7 +19,7 @@ void main() {
           body: Center(
             child: SizedBox(
               width: 320,
-              child: HoronTextarea(invalid: invalid, enabled: enabled, onChanged: onChanged),
+              child: HoronTextarea(surface: surface, invalid: invalid, enabled: enabled, onChanged: onChanged),
             ),
           ),
         ),
@@ -30,10 +31,12 @@ void main() {
   HoronThemeData themeOf(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronTextarea)));
 
   Color borderOf(WidgetTester tester) {
-    final DecoratedBox box = tester
-        .widgetList<DecoratedBox>(find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(DecoratedBox)))
-        .firstWhere((DecoratedBox box) => box.position == DecorationPosition.foreground);
-    return (box.decoration as BoxDecoration).border!.top.color;
+    final Finder glass = find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronLiquidGlass));
+    if (glass.evaluate().isNotEmpty) {
+      return tester.widget<HoronLiquidGlass>(glass).edgeColor ?? Colors.transparent;
+    }
+    final AnimatedContainer filled = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
+    return (filled.decoration! as BoxDecoration).border!.top.color;
   }
 
   /// 상자의 채움이 글래스 엔진 한 겹인지 확인합니다.

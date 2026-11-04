@@ -9,9 +9,6 @@ import 'liquid_glass.dart';
 /// `tab-bar.tsx`의 `focus-visible:outline-2`입니다.
 const double _focusWidth = 2;
 
-/// `[&_svg]:size-5.5` — 탭 아이콘 22px입니다.
-const double _iconSize = 22;
-
 /// `tab-bar.tsx`의 `TabBarItem`입니다.
 ///
 /// 아이콘 전용 탭 하나입니다. [label]은 화면에 그리지 않고 접근성 이름으로만 씁니다
@@ -33,6 +30,41 @@ class HoronTabBarItem {
 /// Figma `Tab bar`(63:441)입니다.
 ///
 /// 모바일 하단 탐색입니다. regular 유리 알약 안에 아이콘 전용 64x48(`h-12 w-16`) 탭을
+/// `tab-bar.tsx`의 `TabBarSize`입니다.
+enum HoronTabBarSize {
+  /// `size="sm"` — 여백 4, 탭 56x40, 아이콘 20px.
+  sm,
+
+  /// `size="md"` — 여백 6, 탭 64x48, 아이콘 22px. 기본값입니다.
+  md,
+
+  /// `size="lg"` — 여백 8, 탭 72x56, 아이콘 24px.
+  lg,
+}
+
+typedef _TabBarMetrics = ({double padding, double tabHeight, double tabWidth, double icon});
+
+_TabBarMetrics _metricsOf(HoronTabBarSize size, HoronThemeData theme) => switch (size) {
+  HoronTabBarSize.sm => (
+    padding: theme.space.s1,
+    tabHeight: theme.space.step(10),
+    tabWidth: theme.space.step(14),
+    icon: 20,
+  ),
+  HoronTabBarSize.md => (
+    padding: theme.space.s1_5,
+    tabHeight: theme.space.step(12),
+    tabWidth: theme.space.step(16),
+    icon: 22,
+  ),
+  HoronTabBarSize.lg => (
+    padding: theme.space.s2,
+    tabHeight: theme.space.step(14),
+    tabWidth: theme.space.step(18),
+    icon: 24,
+  ),
+};
+
 /// 놓고, 현재 탭 뒤로 10% 잉크 알약을 옮깁니다. React는 `w-fit`이라 폭이 모자라면 잘리지만,
 /// Flutter 판은 탭 폭을 줄여 한 줄에 모두 남깁니다(최소 40px).
 class HoronTabBar extends StatefulWidget {
@@ -44,6 +76,7 @@ class HoronTabBar extends StatefulWidget {
     this.initialValue,
     this.onChanged,
     this.glass = true,
+    this.size = HoronTabBarSize.md,
     this.label = 'Main',
   });
 
@@ -62,6 +95,9 @@ class HoronTabBar extends StatefulWidget {
   /// 참이면 `surface="glass"`입니다. 거짓이면 `surface="flat"`이라 유리 레이어 없이
   /// `bg-glass-regular` 색만 깔립니다.
   final bool glass;
+
+  /// 크기입니다. 기본값은 [HoronTabBarSize.md]입니다.
+  final HoronTabBarSize size;
 
   /// 접근성 이름입니다. React의 `aria-label`이고 기본값은 `Main`입니다.
   final String label;
@@ -88,7 +124,7 @@ class _HoronTabBarState extends State<HoronTabBar> {
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
-    final HoronSpaceSpec space = theme.space;
+    final _TabBarMetrics metrics = _metricsOf(widget.size, theme);
 
     if (_keys.length != widget.items.length) {
       _keys = List<GlobalKey>.generate(widget.items.length, (int index) => GlobalKey());
@@ -106,14 +142,14 @@ class _HoronTabBarState extends State<HoronTabBar> {
         // `w-16` = 64. 폭이 모자라면 탭을 줄여 한 줄에 남깁니다(최소 `w-10` = 40).
         final double available = constraints.maxWidth;
         final int count = widget.items.length;
-        final double gaps = space.s1 * (count > 1 ? count - 1 : 0); // gap-1
-        final double inner = available - space.s1_5 * 2 - gaps; // p-1.5
+        final double gaps = theme.space.s1 * (count > 1 ? count - 1 : 0); // gap-1
+        final double inner = available - metrics.padding * 2 - gaps;
         final double tabWidth = count == 0
-            ? space.step(16)
-            : (inner / count).clamp(space.step(10), space.step(16)).toDouble();
+            ? metrics.tabWidth
+            : (inner / count).clamp(theme.space.step(10), metrics.tabWidth).toDouble();
 
         return Padding(
-          padding: EdgeInsets.all(space.s1_5), // p-1.5
+          padding: EdgeInsets.all(metrics.padding),
           child: Stack(
             key: _track,
             children: <Widget>[
@@ -134,7 +170,7 @@ class _HoronTabBarState extends State<HoronTabBar> {
                 ),
               Row(
                 mainAxisSize: MainAxisSize.min,
-                spacing: space.s1, // gap-1
+                spacing: theme.space.s1, // gap-1
                 children: <Widget>[
                   for (int index = 0; index < widget.items.length; index++)
                     KeyedSubtree(
@@ -143,6 +179,8 @@ class _HoronTabBarState extends State<HoronTabBar> {
                         item: widget.items[index],
                         current: widget.items[index].value == _selected,
                         width: tabWidth,
+                        height: metrics.tabHeight,
+                        iconSize: metrics.icon,
                         onTap: select,
                       ),
                     ),
@@ -192,11 +230,20 @@ class _HoronTabBarState extends State<HoronTabBar> {
 
 /// `h-12 w-16 rounded-full [&_svg]:size-5.5` 아이콘 탭입니다.
 class _TabBarButton extends StatefulWidget {
-  const _TabBarButton({required this.item, required this.current, required this.width, required this.onTap});
+  const _TabBarButton({
+    required this.item,
+    required this.current,
+    required this.width,
+    required this.height,
+    required this.iconSize,
+    required this.onTap,
+  });
 
   final HoronTabBarItem item;
   final bool current;
   final double width;
+  final double height;
+  final double iconSize;
   final ValueChanged<HoronTabBarItem> onTap;
 
   @override
@@ -212,7 +259,6 @@ class _TabBarButtonState extends State<_TabBarButton> {
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
-    final HoronSpaceSpec space = theme.space;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     // `hover:bg-overlay-ink-5`는 현재 탭이 아닐 때만 붙습니다.
@@ -261,7 +307,7 @@ class _TabBarButtonState extends State<_TabBarButton> {
               color: colors.textBrand,
               child: SizedBox(
                 width: widget.width,
-                height: space.step(12), // h-12 = 48
+                height: widget.height,
                 // 크기는 즉시 바뀌고 색만 `motion-colors`로 전환합니다(React도 색만 바꿉니다).
                 child: AnimatedContainer(
                   duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
@@ -269,7 +315,7 @@ class _TabBarButtonState extends State<_TabBarButton> {
                   decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(theme.radius.full)),
                   child: Center(
                     child: IconTheme.merge(
-                      data: IconThemeData(size: _iconSize, color: foreground),
+                      data: IconThemeData(size: widget.iconSize, color: foreground),
                       child: widget.item.icon,
                     ),
                   ),

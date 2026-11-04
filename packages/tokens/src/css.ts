@@ -1,5 +1,5 @@
 import { darkColors, lightColors, primitives } from "./color";
-import { glass } from "./glass";
+import { glass, veil } from "./glass";
 import { radius, shadow } from "./scale";
 import { fontFamily, fontWeight, textStyles, type Platform } from "./typography";
 
@@ -49,24 +49,34 @@ function themeBlock(): string[] {
   return lines;
 }
 
+/** The rim gradient for one scheme; `.dark` repeats it with the dark colours. */
+const rimLines = (scheme: keyof typeof glass.rim) => [
+  `  --glass-rim-top: ${glass.rim[scheme].top};`,
+  `  --glass-rim-mid: ${glass.rim[scheme].mid};`,
+  `  --glass-rim-bottom: ${glass.rim[scheme].bottom};`,
+];
+
+/** The veil, the light glass of fields and overlays; `.dark` repeats it with the dark colours. */
+const veilLines = (scheme: keyof typeof veil.scheme) => [
+  `  --veil-ring: ${veil.scheme[scheme].ring};`,
+  `  --veil-field: ${veil.scheme[scheme].field};`,
+  `  --veil-field-focus: ${veil.scheme[scheme].fieldFocus};`,
+  `  --veil-field-shadow: ${veil.scheme[scheme].fieldShadow};`,
+  `  --veil-overlay: ${veil.scheme[scheme].overlay};`,
+  `  --veil-overlay-shadow: ${veil.scheme[scheme].overlayShadow};`,
+];
+
 function rootBlock(): string[] {
   const lines = [
-    `  --glass-layer-opacity: ${glass.layerOpacity};`,
-    `  --glass-tint: ${glass.tint.color};`,
-    `  --glass-tint-blur: ${px(glass.tint.blur)};`,
-    `  --glass-inner-shade: ${glass.innerShade.color};`,
-    `  --glass-inner-shade-blur: ${px(glass.innerShade.blur)};`,
-    `  --glass-inner-inset-ratio: ${ratio(glass.innerShade.insetPerPx)};`,
-    `  --glass-inner-inset-max-y: ${px(glass.innerShade.maxInsetY)};`,
-    `  --glass-inner-inset-max-x: ${px(glass.innerShade.maxInsetX)};`,
-    `  --glass-edge-dark: ${glass.edgeDark.color};`,
-    `  --glass-edge-dark-ratio: ${ratio(glass.edgeDark.blurPerPx)};`,
-    `  --glass-edge-dark-max: ${px(glass.edgeDark.maxBlur)};`,
-    `  --glass-edge-light: ${glass.edgeLight.color};`,
-    `  --glass-edge-light-ratio: ${ratio(glass.edgeLight.blurPerPx)};`,
-    `  --glass-edge-light-min: ${px(glass.edgeLight.minBlur)};`,
-    `  --glass-edge-light-max: ${px(glass.edgeLight.maxBlur)};`,
-    `  --glass-edge-light-soft: ${glass.edgeLightSoft.color};`,
+    `  --glass-blur: ${px(glass.blur)};`,
+    `  --glass-saturate: ${glass.saturate};`,
+    `  --glass-rim-width: ${px(glass.rimWidth)};`,
+    `  --glass-rim-mid-stop: ${ratio(glass.rimMidStop * 100)}%;`,
+    ...rimLines("light"),
+    `  --veil-blur: ${px(veil.blur)};`,
+    `  --veil-saturate: ${veil.saturate};`,
+    `  --veil-ring-width: ${px(veil.ringWidth)};`,
+    ...veilLines("light"),
   ];
   for (const [name, style] of Object.entries(textStyles)) {
     if ("paragraph" in style) lines.push(`  --paragraph-${name}: ${style.paragraph}em;`);
@@ -99,6 +109,8 @@ export function buildThemeCss(): string {
     ".dark {",
     "  color-scheme: dark;",
     ...dark,
+    ...rimLines("dark"),
+    ...veilLines("dark"),
     "}",
     "",
   ].join("\n");

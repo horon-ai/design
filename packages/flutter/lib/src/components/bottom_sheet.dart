@@ -76,7 +76,7 @@ class HoronBottomSheet extends StatelessWidget {
     required this.title,
     this.closeLabel = 'Close',
     this.detail = false,
-    this.solid = false,
+    this.solid = true,
     this.floating = false,
     this.child,
     this.onClose,

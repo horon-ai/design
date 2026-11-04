@@ -59,7 +59,7 @@ class HoronDialog extends StatelessWidget {
     this.description,
     this.closeLabel = 'Close',
     this.leading,
-    this.solid = false,
+    this.solid = true,
     this.child,
     this.onClose,
   });

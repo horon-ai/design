@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../contracts/horon_strings.dart';
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_glass.dart';
 import '../theme/horon_motion.dart';
@@ -37,6 +38,78 @@ class HoronDateRange {
 /// React는 `mode: "single" | "range"`로 값의 모양을 가릅니다. Dart에는 그 차이를
 /// [range]와 [onRangeChange]를 넘겼는지로 표현합니다. 둘 다 넘기지 않으면 날짜
 /// 하나를 고르고, 넘기면 범위를 고릅니다.
+/// `calendar.tsx`의 `CalendarSize`(`ControlSize`)입니다.
+enum HoronCalendarSize {
+  /// `size="sm"` — 날짜 칸 32, 요일 줄 20, 제목 `label-lg`.
+  sm,
+
+  /// `size="md"` — 날짜 칸 40, 요일 줄 24, 제목 `title-sm`. 기본값입니다.
+  md,
+
+  /// `size="lg"` — 날짜 칸 48, 요일 줄 28, 제목 `title-md`.
+  lg,
+}
+
+typedef _CalendarMetrics = ({
+  double cell,
+  double weekdayHeight,
+  double padding,
+  double popoverPadding,
+  double gap,
+  double popoverGap,
+  double arrow,
+  double popoverArrowSize,
+  double popoverArrowIcon,
+  TextStyle title,
+  TextStyle popoverTitle,
+  TextStyle day,
+});
+
+_CalendarMetrics _metricsOf(HoronCalendarSize size, HoronThemeData theme) => switch (size) {
+  HoronCalendarSize.sm => (
+    cell: theme.space.step(8),
+    weekdayHeight: theme.space.step(5),
+    padding: theme.space.s3,
+    popoverPadding: theme.space.s3,
+    gap: theme.space.s2,
+    popoverGap: theme.space.s1_5,
+    arrow: 16,
+    popoverArrowSize: theme.space.step(7),
+    popoverArrowIcon: 16,
+    title: theme.text.labelLg,
+    popoverTitle: theme.text.labelMd,
+    day: theme.text.labelSm,
+  ),
+  HoronCalendarSize.md => (
+    cell: theme.space.step(10),
+    weekdayHeight: theme.space.step(6),
+    padding: theme.space.s4,
+    popoverPadding: theme.space.s3_5,
+    gap: theme.space.s3,
+    popoverGap: theme.space.s2,
+    arrow: 20,
+    popoverArrowSize: theme.space.step(8),
+    popoverArrowIcon: 18,
+    title: theme.text.titleSm,
+    popoverTitle: theme.text.labelLg,
+    day: theme.text.labelMd,
+  ),
+  HoronCalendarSize.lg => (
+    cell: theme.space.step(12),
+    weekdayHeight: theme.space.step(7),
+    padding: theme.space.step(4.5),
+    popoverPadding: theme.space.s4,
+    gap: theme.space.s3_5,
+    popoverGap: theme.space.s2_5,
+    arrow: 24,
+    popoverArrowSize: theme.space.step(10),
+    popoverArrowIcon: 20,
+    title: theme.text.titleMd,
+    popoverTitle: theme.text.labelLg,
+    day: theme.text.labelLg,
+  ),
+};
+
 class HoronCalendar extends StatefulWidget {
   /// 날짜 하나를 고르는 달력을 만듭니다(React `mode: "single"`).
   const HoronCalendar({
@@ -52,6 +125,8 @@ class HoronCalendar extends StatefulWidget {
     this.weekStartsOn = 0,
     this.today,
     this.popover = false,
+    this.size = HoronCalendarSize.md,
+    this.surface = HoronCalendarSurface.solid,
     this.width,
   }) : assert(
          range == null && onRangeChange == null || value == null && onValueChange == null,
@@ -101,37 +176,25 @@ class HoronCalendar extends StatefulWidget {
   /// 옮겼습니다.
   final bool popover;
 
+  /// 크기입니다. 기본값은 [HoronCalendarSize.md]입니다.
+  final HoronCalendarSize size;
+
+  /// 표면입니다. 기본값은 [HoronCalendarSurface.solid]입니다.
+  final HoronCalendarSurface surface;
+
   @override
   State<HoronCalendar> createState() => _HoronCalendarState();
 }
 
 class _HoronCalendarState extends State<HoronCalendar> {
-  /// `size-10` — 날짜 칸의 한 변입니다.
-  static const double _cellSize = 40;
-
   /// 좁은 폭에서도 칸이 글자를 담을 수 있는 최소 크기입니다.
   static const double _minCellSize = 28;
-
-  /// `h-6` — 요일 줄의 높이입니다.
-  static const double _weekdayHeight = 24;
 
   /// `rounded-[24px]` — 팝오버 변형의 반경입니다.
   static const double _popoverRadius = 24;
 
-  /// `size-8` — 팝오버 변형 화살표 버튼의 한 변입니다.
-  static const double _popoverArrowSize = 32;
-
-  /// `size-4.5` — 팝오버 변형 화살표 아이콘입니다.
-  static const double _popoverArrowIcon = 18;
-
-  /// `size-5` — 기본 변형 화살표 버튼과 아이콘의 한 변입니다.
-  static const double _defaultArrowSize = 20;
-
   /// `size-1` — 오늘을 표시하는 점의 지름입니다.
   static const double _todayDotSize = 4;
-
-  /// `top-8` — 오늘 점이 칸 위에서 떨어진 거리입니다.
-  static const double _todayDotTop = 32;
 
   /// `outline-2` — 포커스 테두리 두께입니다.
   static const double _focusWidth = 2;
@@ -223,15 +286,15 @@ class _HoronCalendarState extends State<HoronCalendar> {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final HoronSpaceSpec space = theme.space;
     final HoronStrings strings = theme.strings;
 
     final DateTime month = _visibleMonth;
     final List<DateTime> days = _monthGrid(month, widget.weekStartsOn);
     final String title = '${strings.monthNames[month.month - 1]} ${month.year}';
     final BorderRadius radius = BorderRadius.circular(widget.popover ? _popoverRadius : theme.radius.xl);
-    final double padding = widget.popover ? space.s3_5 : space.s4;
-    final double gap = widget.popover ? space.s2 : space.s3;
+    final _CalendarMetrics metrics = _metricsOf(widget.size, theme);
+    final double padding = widget.popover ? metrics.popoverPadding : metrics.padding;
+    final double gap = widget.popover ? metrics.popoverGap : metrics.gap;
     final DateTime today = _today;
 
     // 폭을 호출자가 주면(팝업처럼 자식의 고유 크기를 묻는 부모 아래) LayoutBuilder 를
@@ -247,6 +310,7 @@ class _HoronCalendarState extends State<HoronCalendar> {
         radius: radius,
         padding: padding,
         gap: gap,
+        metrics: metrics,
         maxWidth: widget.width!,
       );
     }
@@ -254,7 +318,7 @@ class _HoronCalendarState extends State<HoronCalendar> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         // `w-fit` — 일곱 칸이 자연 폭이지만, 부모가 더 좁으면 칸을 줄여 맞춥니다.
-        final double maxWidth = constraints.maxWidth.isFinite ? constraints.maxWidth : _cellSize * 7;
+        final double maxWidth = constraints.maxWidth.isFinite ? constraints.maxWidth : metrics.cell * 7;
         return _buildSurface(
           theme: theme,
           strings: strings,
@@ -265,6 +329,7 @@ class _HoronCalendarState extends State<HoronCalendar> {
           radius: radius,
           padding: padding,
           gap: gap,
+          metrics: metrics,
           maxWidth: maxWidth,
         );
       },
@@ -281,58 +346,70 @@ class _HoronCalendarState extends State<HoronCalendar> {
     required BorderRadius radius,
     required double padding,
     required double gap,
+    required _CalendarMetrics metrics,
     required double maxWidth,
   }) {
     final double available = maxWidth - padding * 2;
-    final double cell = math.min(_cellSize, math.max(_minCellSize, available / 7));
+    final double cell = math.min(metrics.cell, math.max(_minCellSize, available / 7));
 
-    return Semantics(
-      container: true,
-      child: HoronLiquidGlass(
-        tier: HoronGlassTier.thick,
+    final Widget body = DecoratedBox(
+      key: const Key('horon-calendar-surface'),
+      decoration: BoxDecoration(
+        color: switch (widget.surface) {
+          HoronCalendarSurface.glass => null,
+          HoronCalendarSurface.flat => theme.colors.glassThick,
+          HoronCalendarSurface.solid => theme.colors.bgSurface,
+        },
         borderRadius: radius,
-        child: DecoratedBox(
-          key: const Key('horon-calendar-surface'),
-          // Paper는 유리 가장자리를 액체 레이어 안에서만 그립니다. 호스트 테두리는 없습니다.
-          decoration: BoxDecoration(borderRadius: radius),
-          child: Padding(
-            padding: EdgeInsets.all(padding),
-            child: SizedBox(
-              width: cell * 7,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: gap,
-                children: <Widget>[
-                  if (widget.popover) _buildPopoverHeader(theme, title) else _buildDefaultHeader(theme, title),
-                  Focus(
-                    focusNode: _gridFocus,
-                    onKeyEvent: _handleKeyEvent,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        _buildWeekdays(theme, strings, days, cell),
-                        for (int week = 0; week < days.length ~/ 7; week++)
-                          _buildWeek(
-                            theme: theme,
-                            days: days.sublist(week * 7, week * 7 + 7),
-                            month: month,
-                            today: today,
-                            cell: cell,
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
+        border: widget.surface == HoronCalendarSurface.solid ? Border.all(color: theme.colors.borderDefault) : null,
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(padding),
+        child: SizedBox(
+          width: cell * 7,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: gap,
+            children: <Widget>[
+              if (widget.popover)
+                _buildPopoverHeader(theme, title, metrics)
+              else
+                _buildDefaultHeader(theme, title, metrics),
+              Focus(
+                focusNode: _gridFocus,
+                onKeyEvent: _handleKeyEvent,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    _buildWeekdays(theme, strings, days, cell, metrics),
+                    for (int week = 0; week < days.length ~/ 7; week++)
+                      _buildWeek(
+                        theme: theme,
+                        days: days.sublist(week * 7, week * 7 + 7),
+                        month: month,
+                        today: today,
+                        cell: cell,
+                        metrics: metrics,
+                      ),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
     );
+
+    return Semantics(
+      container: true,
+      child: widget.surface == HoronCalendarSurface.glass
+          ? HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: body)
+          : body,
+    );
   }
 
-  Widget _buildDefaultHeader(HoronThemeData theme, String title) {
+  Widget _buildDefaultHeader(HoronThemeData theme, String title, _CalendarMetrics metrics) {
     final HoronColors colors = theme.colors;
     return Row(
       children: <Widget>[
@@ -340,8 +417,8 @@ class _HoronCalendarState extends State<HoronCalendar> {
           key: const Key('horon-calendar-prev'),
           icon: Icons.chevron_left,
           color: colors.textSecondary,
-          size: _defaultArrowSize,
-          iconSize: _defaultArrowSize,
+          size: metrics.arrow,
+          iconSize: metrics.arrow,
           label: theme.strings.previousPage,
           onPressed: () => _setMonth(_addMonths(_visibleMonth, -1)),
         ),
@@ -355,7 +432,7 @@ class _HoronCalendarState extends State<HoronCalendar> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               // `text-title-sm text-text-primary`.
-              style: theme.text.titleSm.copyWith(color: colors.textPrimary),
+              style: metrics.title.copyWith(color: colors.textPrimary),
             ),
           ),
         ),
@@ -363,8 +440,8 @@ class _HoronCalendarState extends State<HoronCalendar> {
           key: const Key('horon-calendar-next'),
           icon: Icons.chevron_right,
           color: colors.textSecondary,
-          size: _defaultArrowSize,
-          iconSize: _defaultArrowSize,
+          size: metrics.arrow,
+          iconSize: metrics.arrow,
           label: theme.strings.nextPage,
           onPressed: () => _setMonth(_addMonths(_visibleMonth, 1)),
         ),
@@ -372,7 +449,7 @@ class _HoronCalendarState extends State<HoronCalendar> {
     );
   }
 
-  Widget _buildPopoverHeader(HoronThemeData theme, String title) {
+  Widget _buildPopoverHeader(HoronThemeData theme, String title, _CalendarMetrics metrics) {
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
     return Padding(
@@ -391,7 +468,7 @@ class _HoronCalendarState extends State<HoronCalendar> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 // `text-label-lg text-text-primary`.
-                style: theme.text.labelLg.copyWith(color: colors.textPrimary),
+                style: metrics.popoverTitle.copyWith(color: colors.textPrimary),
               ),
             ),
           ),
@@ -399,8 +476,8 @@ class _HoronCalendarState extends State<HoronCalendar> {
             key: const Key('horon-calendar-prev'),
             icon: Icons.chevron_left,
             color: colors.textSecondary,
-            size: _popoverArrowSize,
-            iconSize: _popoverArrowIcon,
+            size: metrics.popoverArrowSize,
+            iconSize: metrics.popoverArrowIcon,
             hoverColor: colors.overlayInk6,
             label: theme.strings.previousPage,
             onPressed: () => _setMonth(_addMonths(_visibleMonth, -1)),
@@ -409,8 +486,8 @@ class _HoronCalendarState extends State<HoronCalendar> {
             key: const Key('horon-calendar-next'),
             icon: Icons.chevron_right,
             color: colors.textSecondary,
-            size: _popoverArrowSize,
-            iconSize: _popoverArrowIcon,
+            size: metrics.popoverArrowSize,
+            iconSize: metrics.popoverArrowIcon,
             hoverColor: colors.overlayInk6,
             label: theme.strings.nextPage,
             onPressed: () => _setMonth(_addMonths(_visibleMonth, 1)),
@@ -420,14 +497,20 @@ class _HoronCalendarState extends State<HoronCalendar> {
     );
   }
 
-  Widget _buildWeekdays(HoronThemeData theme, HoronStrings strings, List<DateTime> days, double cell) {
+  Widget _buildWeekdays(
+    HoronThemeData theme,
+    HoronStrings strings,
+    List<DateTime> days,
+    double cell,
+    _CalendarMetrics metrics,
+  ) {
     final HoronColors colors = theme.colors;
     return Row(
       children: <Widget>[
         for (final DateTime date in days.take(7))
           SizedBox(
             width: cell,
-            height: _weekdayHeight,
+            height: metrics.weekdayHeight,
             child: Center(
               child: Text(
                 _narrowWeekday(strings.weekdayNames[date.weekday - 1]),
@@ -447,6 +530,7 @@ class _HoronCalendarState extends State<HoronCalendar> {
     required DateTime month,
     required DateTime today,
     required double cell,
+    required _CalendarMetrics metrics,
   }) {
     return Row(
       children: <Widget>[
@@ -461,6 +545,8 @@ class _HoronCalendarState extends State<HoronCalendar> {
             isToday: _sameDay(date, today),
             disabled: widget.isDateDisabled?.call(date) ?? false,
             focused: _gridFocus.hasFocus && _sameDay(date, _focused),
+            textStyle: metrics.day,
+            todayDotTop: cell - 8,
             onTap: _select,
           ),
       ],
@@ -480,6 +566,8 @@ class _DayCell extends StatefulWidget {
     required this.isToday,
     required this.disabled,
     required this.focused,
+    required this.textStyle,
+    required this.todayDotTop,
     required this.onTap,
   });
 
@@ -491,6 +579,8 @@ class _DayCell extends StatefulWidget {
   final bool isToday;
   final bool disabled;
   final bool focused;
+  final TextStyle textStyle;
+  final double todayDotTop;
   final ValueChanged<DateTime> onTap;
 
   @override
@@ -509,20 +599,16 @@ class _DayCellState extends State<_DayCell> {
     // Paper의 팝오버는 모든 날짜 글자를 `text-label-md`(14/20 500)로 그립니다.
     // 상태는 색만 바꿉니다.
     final TextStyle style = widget.between
-        // `bg-overlay-ink-8 text-label-md text-text-primary`.
-        ? theme.text.labelMd.copyWith(color: colors.textPrimary)
+        ? widget.textStyle.copyWith(color: colors.textPrimary)
         : widget.selected
-        // `rounded-full bg-interactive-primary text-text-inverse`.
-        ? theme.text.labelMd.copyWith(color: colors.textInverse)
-        // `text-text-disabled`(비활성) · `text-text-disabled`(이번 달 밖) · `text-text-brand`(오늘) ·
-        // `text-text-primary`(그 밖).
+        ? widget.textStyle.copyWith(color: colors.textInverse)
         : widget.disabled
-        ? theme.text.labelMd.copyWith(color: colors.textDisabled)
+        ? widget.textStyle.copyWith(color: colors.textDisabled)
         : widget.outside
-        ? theme.text.labelMd.copyWith(color: colors.textDisabled)
+        ? widget.textStyle.copyWith(color: colors.textDisabled)
         : widget.isToday
-        ? theme.text.labelMd.copyWith(color: colors.textBrand)
-        : theme.text.labelMd.copyWith(color: colors.textPrimary);
+        ? widget.textStyle.copyWith(color: colors.textBrand)
+        : widget.textStyle.copyWith(color: colors.textPrimary);
 
     final Color background = widget.between
         ? colors.overlayInk8
@@ -569,7 +655,7 @@ class _DayCellState extends State<_DayCell> {
                 // `top-8 left-[18px] size-1 rounded-full bg-status-live`.
                 if (widget.isToday && !widget.selected && !widget.between)
                   Positioned(
-                    top: _HoronCalendarState._todayDotTop,
+                    top: widget.todayDotTop,
                     left: (widget.cell - _HoronCalendarState._todayDotSize) / 2,
                     child: Container(
                       key: ValueKey<String>(

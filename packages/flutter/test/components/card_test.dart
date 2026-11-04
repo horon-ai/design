@@ -16,7 +16,7 @@ Future<void> pumpCard(WidgetTester tester, Widget child, {Brightness brightness 
 
 void main() {
   testWidgets('card: the glass surface is a 20px rounded thick glass card', (WidgetTester tester) async {
-    await pumpCard(tester, const HoronCard(title: '제목', description: '설명'));
+    await pumpCard(tester, const HoronCard(title: '제목', description: '설명', surface: HoronCardSurface.glass));
     expect(find.byType(HoronLiquidGlass), findsOneWidget);
     final ClipRRect clip = tester.widget<ClipRRect>(
       find.descendant(of: find.byType(HoronCard), matching: find.byType(ClipRRect)).first,
@@ -27,7 +27,7 @@ void main() {
   });
 
   testWidgets('card: the frost surface drops the glass layer for a frosted fill', (WidgetTester tester) async {
-    await pumpCard(tester, const HoronCard(title: '제목', frost: true));
+    await pumpCard(tester, const HoronCard(title: '제목', surface: HoronCardSurface.frost));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronCard)));
     expect(find.byType(HoronLiquidGlass), findsNothing);
     final DecoratedBox box = tester.widget<DecoratedBox>(
@@ -54,16 +54,18 @@ void main() {
     expect(titleRow.spacing, theme.space.s2, reason: 'Paper UAP-1: 제목 행 gap 8');
   });
 
-  testWidgets('card: the selected card adds the brand border', (WidgetTester tester) async {
+  testWidgets('card: the selected card paints the brand rim', (WidgetTester tester) async {
     await pumpCard(tester, const HoronCard(title: '선택됨', selected: true));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronCard)));
-    final bool hasBrandBorder = tester.widgetList<DecoratedBox>(find.byType(DecoratedBox)).any((DecoratedBox box) {
-      final Decoration decoration = box.decoration;
-      return decoration is BoxDecoration &&
-          decoration.border is Border &&
-          (decoration.border! as Border).top.color == theme.colors.borderBrand;
-    });
-    expect(hasBrandBorder, isTrue);
+    final DecoratedBox box = tester.widget<DecoratedBox>(
+      find.descendant(of: find.byType(HoronCard), matching: find.byType(DecoratedBox)).first,
+    );
+    final Border border = (box.decoration as BoxDecoration).border! as Border;
+    expect(border.top.color, theme.colors.borderBrand, reason: 'solid 카드의 선택 테두리');
+
+    await pumpCard(tester, const HoronCard(title: '선택됨', selected: true, surface: HoronCardSurface.glass));
+    final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
+    expect(glass.edgeColor, theme.colors.borderBrand, reason: '유리 카드는 림 색으로 표시합니다');
   });
 
   testWidgets('card: both surfaces render in both brightnesses', (WidgetTester tester) async {
@@ -71,7 +73,7 @@ void main() {
       for (final bool frost in <bool>[false, true]) {
         await pumpCard(
           tester,
-          HoronCard(title: '제목', frost: frost),
+          HoronCard(title: '제목', surface: frost ? HoronCardSurface.frost : HoronCardSurface.solid),
           brightness: brightness,
         );
         expect(tester.takeException(), isNull, reason: '${brightness.name} frost=$frost');

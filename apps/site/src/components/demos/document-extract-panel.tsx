@@ -1,7 +1,5 @@
 import { DocumentExtractPanel, ExtractHighlight } from "@horon-ai/react";
 
-import { Backdrop } from "../demo-backdrop";
-
 const muted = "text-caption text-text-secondary";
 const plain = "text-caption text-text-primary";
 
@@ -83,7 +81,7 @@ function InvoiceSheet() {
 
 export default function DocumentExtractPanelDemo() {
   return (
-    <Backdrop>
+    <div className="flex w-full justify-center">
       <DocumentExtractPanel
         fileName="larkspur-invoice-0418.pdf"
         sheet={<InvoiceSheet />}
@@ -134,6 +132,6 @@ export default function DocumentExtractPanelDemo() {
           },
         ]}
       />
-    </Backdrop>
+    </div>
   );
 }

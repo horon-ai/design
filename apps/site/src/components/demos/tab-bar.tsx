@@ -14,8 +14,10 @@ const items = [
 export default function TabBarDemo() {
   const [value, setValue] = useState("horon");
   return (
-    <Backdrop>
+    <Backdrop className="flex-col">
+      <TabBar items={items} value={value} onValueChange={setValue} size="sm" />
       <TabBar items={items} value={value} onValueChange={setValue} />
+      <TabBar items={items} value={value} onValueChange={setValue} size="lg" />
     </Backdrop>
   );
 }

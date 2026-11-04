@@ -14,6 +14,7 @@ Widget _host(Widget child, {Brightness brightness = Brightness.light, double? wi
 
 HoronMarketplaceCard _card({VoidCallback? onInstall}) {
   return HoronMarketplaceCard(
+    surface: HoronSurface.glass,
     initials: 'WB',
     name: 'web-search',
     author: 'horon',
