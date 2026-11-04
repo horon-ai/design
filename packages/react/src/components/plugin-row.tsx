@@ -62,7 +62,7 @@ export function PluginRow({
       <span className="flex min-w-0 flex-1 flex-col gap-1.5">
         <span className="flex items-center gap-2">
           <span className="truncate text-label-md text-text-primary">{name}</span>
-          {version && <span className="shrink-0 font-mono text-label-sm text-text-placeholder">{version}</span>}
+          {version && <span className="shrink-0 font-mono text-label-sm text-text-secondary">{version}</span>}
           {updateBadge && (
             <span className="inline-flex h-5.5 shrink-0 items-center rounded-full bg-accent-sky-500-18 px-2 text-label-sm text-text-brand">
               {updateBadge}
@@ -98,11 +98,11 @@ export function PluginRow({
         )}
       </span>
       <span className="flex shrink-0 items-center gap-2">
-        {onUpdate && (
-          <Button size="sm" icon={<ArrowUp aria-hidden className="size-3.5" />} onClick={onUpdate}>
+        <span className="motion-reveal-x" data-collapsed={!onUpdate || undefined} inert={!onUpdate || undefined}>
+          <Button variant="solid" size="sm" icon={<ArrowUp aria-hidden className="size-3.5" />} onClick={onUpdate}>
             {updateLabel}
           </Button>
-        )}
+        </span>
         <Switch aria-label={toggleLabel} checked={enabled} onCheckedChange={onEnabledChange} />
         {menu && (
           <Menu>

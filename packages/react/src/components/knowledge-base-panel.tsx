@@ -127,12 +127,12 @@ export function KnowledgeBasePanel({
           }))}
         />
         <span className="flex-1" />
-        {indexing > 0 && (
-          <span className="flex items-center gap-2 text-caption text-text-secondary">
+        <span className="motion-reveal-x" data-collapsed={indexing <= 0 || undefined}>
+          <span className="flex items-center gap-2 text-caption text-text-secondary tabular-nums">
             <Spinner size={12} label="Indexing" />
             {indexing} indexing
           </span>
-        )}
+        </span>
       </div>
 
       <div aria-hidden className="hidden items-center gap-3 px-2 pt-2 pb-1 text-caption text-text-secondary sm:flex">
@@ -153,7 +153,10 @@ export function KnowledgeBasePanel({
         <label
           onDragOver={over}
           onDragEnter={over}
-          onDragLeave={() => setDragging(false)}
+          onDragLeave={(event) => {
+            const next = event.relatedTarget;
+            if (!(next instanceof Node) || !event.currentTarget.contains(next)) setDragging(false);
+          }}
           onDrop={drop}
           className={cn(
             "flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed px-4.5 py-4 motion-colors has-focus-visible:outline-2 has-focus-visible:outline-text-brand",

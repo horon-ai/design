@@ -86,7 +86,12 @@ export function TaskComposer({
   className,
 }: TaskComposerProps) {
   return (
-    <div className={cn("flex flex-col gap-3.5 rounded-xl bg-overlay-ink-4 px-4 pt-3.5 pb-2.5", className)}>
+    <div
+      className={cn(
+        "flex flex-col gap-3.5 rounded-xl bg-overlay-ink-4 px-4 pt-3.5 pb-2.5 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
+        className,
+      )}
+    >
       <textarea
         rows={1}
         value={value}
@@ -96,7 +101,7 @@ export function TaskComposer({
         }}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="resize-none bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
+        className="field-sizing-content max-h-40 min-h-5.5 w-full resize-none overflow-y-auto bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
       />
       <div className="flex items-center gap-1.5">
         {pickers}
