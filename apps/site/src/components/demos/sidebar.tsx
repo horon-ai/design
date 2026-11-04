@@ -23,12 +23,13 @@ import {
 import {
   Archive,
   Bell,
+  CalendarDots,
   ChartLineUp,
   ChatCircle,
   ClipboardText,
   Code,
   Copy,
-  Cube,
+  Files,
   Drop,
   FileText,
   Flask,
@@ -42,6 +43,7 @@ import {
   SignOut,
   Trash,
   UserPlus,
+  TreeStructure,
   UsersThree,
 } from "@phosphor-icons/react";
 import { useState, type ReactNode } from "react";
@@ -92,69 +94,79 @@ function ProjectMenu() {
   );
 }
 
-export default function SidebarDemo() {
+/** The sidebar shown on this page; the Flue page reuses it with `background` laid under its glass. */
+export function DemoSidebar({ background }: { background?: ReactNode }) {
   const [workspace, setWorkspace] = useState("hq");
   const current = workspaces.find((item) => item.id === workspace) ?? workspaces[0];
+  return (
+    <Sidebar resizable className={background ? "isolate h-190" : "h-190"}>
+      {background}
+      <SidebarHeader
+        initial={current.name.charAt(0)}
+        name={current.name}
+        switchSlot={
+          <WorkspaceMenu
+            workspaces={workspaces}
+            value={workspace}
+            onValueChange={setWorkspace}
+            trigger={<SidebarWorkspaceSwitch initial={current.name.charAt(0)} name={current.name} />}
+          />
+        }
+      />
+      <SidebarItem icon={<HoronIcon />} current aria-label="Horon">
+        <HoronWordmark height={9.6} />
+      </SidebarItem>
+      <SidebarItem icon={<Bell />} count={12}>
+        Inbox
+      </SidebarItem>
+      <SidebarItem icon={<Files />}>Artifacts</SidebarItem>
+      <SidebarItem icon={<CalendarDots />}>Schedule</SidebarItem>
+      <SidebarItem icon={<Repeat />}>Routines</SidebarItem>
+      <SidebarItem icon={<TreeStructure />}>Workflows</SidebarItem>
+      <SidebarItem icon={<MagnifyingGlass />}>Search</SidebarItem>
+      <SidebarGroup label="Projects">
+        {projects.map((project) => (
+          <SidebarProject
+            key={project.name}
+            defaultOpen={project.children !== undefined}
+            icon={<SidebarProjectTile className={project.tile}>{project.icon}</SidebarProjectTile>}
+            label={project.name}
+            actions={<ProjectMenu />}
+          >
+            {(project.children ?? [{ icon: <ChatCircle />, name: "Kickoff notes" }]).map((child) => (
+              <SidebarItem key={child.name} icon={child.icon}>
+                {child.name}
+              </SidebarItem>
+            ))}
+          </SidebarProject>
+        ))}
+      </SidebarGroup>
+      <SidebarAddButton>Add project</SidebarAddButton>
+      <SidebarSpacer />
+      <Menu>
+        <MenuTrigger render={<SidebarAccount initials="AL" name="Alpox" email="alpoxdev@gmail.com" />} />
+        <MenuContent surface="solid" side="top" className="w-64">
+          <MenuLabel className="pb-1.5 text-body-sm">alpoxdev@gmail.com</MenuLabel>
+          <MenuItem icon={<GearSix />} trailing="⌘,">
+            Settings
+          </MenuItem>
+          <MenuItem icon={<Drop />}>Usage</MenuItem>
+          <MenuItem icon={<UserPlus />}>Invite friends</MenuItem>
+          <MenuSeparator />
+          <MenuItem icon={<Question />}>Help</MenuItem>
+          <MenuItem icon={<SignOut />}>Log out</MenuItem>
+        </MenuContent>
+      </Menu>
+    </Sidebar>
+  );
+}
+
+export default function SidebarDemo() {
   return (
     <Backdrop>
       {/* Left-aligned so the right edge follows the pointer while resizing. */}
       <div className="flex w-full">
-        <Sidebar resizable className="h-190">
-          <SidebarHeader
-            initial={current.name.charAt(0)}
-            name={current.name}
-            switchSlot={
-              <WorkspaceMenu
-                workspaces={workspaces}
-                value={workspace}
-                onValueChange={setWorkspace}
-                trigger={<SidebarWorkspaceSwitch initial={current.name.charAt(0)} name={current.name} />}
-              />
-            }
-          />
-          <SidebarItem icon={<HoronIcon />} current aria-label="Horon">
-            <HoronWordmark height={9.6} />
-          </SidebarItem>
-          <SidebarItem icon={<Bell />} count={12}>
-            Inbox
-          </SidebarItem>
-          <SidebarItem icon={<Cube />}>Artifacts</SidebarItem>
-          <SidebarItem icon={<Repeat />}>Routines</SidebarItem>
-          <SidebarItem icon={<MagnifyingGlass />}>Search</SidebarItem>
-          <SidebarGroup label="Projects">
-            {projects.map((project) => (
-              <SidebarProject
-                key={project.name}
-                defaultOpen={project.children !== undefined}
-                icon={<SidebarProjectTile className={project.tile}>{project.icon}</SidebarProjectTile>}
-                label={project.name}
-                actions={<ProjectMenu />}
-              >
-                {(project.children ?? [{ icon: <ChatCircle />, name: "Kickoff notes" }]).map((child) => (
-                  <SidebarItem key={child.name} icon={child.icon}>
-                    {child.name}
-                  </SidebarItem>
-                ))}
-              </SidebarProject>
-            ))}
-          </SidebarGroup>
-          <SidebarAddButton>Add project</SidebarAddButton>
-          <SidebarSpacer />
-          <Menu>
-            <MenuTrigger render={<SidebarAccount initials="AL" name="Alpox" email="alpoxdev@gmail.com" />} />
-            <MenuContent surface="solid" side="top" className="w-64">
-              <MenuLabel className="pb-1.5 text-body-sm">alpoxdev@gmail.com</MenuLabel>
-              <MenuItem icon={<GearSix />} trailing="⌘,">
-                Settings
-              </MenuItem>
-              <MenuItem icon={<Drop />}>Usage</MenuItem>
-              <MenuItem icon={<UserPlus />}>Invite friends</MenuItem>
-              <MenuSeparator />
-              <MenuItem icon={<Question />}>Help</MenuItem>
-              <MenuItem icon={<SignOut />}>Log out</MenuItem>
-            </MenuContent>
-          </Menu>
-        </Sidebar>
+        <DemoSidebar />
       </div>
     </Backdrop>
   );
