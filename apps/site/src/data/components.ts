@@ -573,9 +573,12 @@ export const components: ComponentEntry[] = [
   },
   {
     slug: "modal",
-    title: "Modal",
+    title: { ko: "Modal", en: "Modal" },
     group: "overlays",
-    description: "폼이나 긴 내용을 담는 창입니다. 본문만 스크롤되고 동작 버튼은 오른쪽 아래에 고정됩니다.",
+    description: {
+      ko: "폼이나 긴 내용을 담는 창입니다. 본문만 스크롤되고 동작 버튼은 오른쪽 아래에 고정됩니다.",
+      en: "A window for forms and long content. Only the body scrolls; the actions stay at the bottom right.",
+    },
     overlay: true,
   },
   {
