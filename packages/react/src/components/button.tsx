@@ -1,5 +1,5 @@
 import { Button as BaseButton } from "@base-ui/react/button";
-import { Children, type ComponentProps, type ReactNode } from "react";
+import { Children, isValidElement, type ComponentProps, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
@@ -77,11 +77,13 @@ export function Button({
   );
 
   // Preflight makes every `svg` a block box, so an icon passed as a child (rather than through `icon`)
-  // started a second line and the label clipped. Element children get a row at the button's own gap.
-  // Text-only labels keep the exact single-span markup they had, so their `text-trim` centring is intact.
-  const hasElementChild = Children.toArray(children).some(
-    (child) => typeof child !== "string" && typeof child !== "number",
-  );
+  // started a second line and the label clipped. Any element child gets a row at the button's own gap.
+  // A plain string or number label keeps the exact single-span markup it had, `text-trim` included.
+  // `forEach` + `isValidElement` rather than `toArray().some()`: no array per render.
+  let hasElementChild = false;
+  Children.forEach(children, (child) => {
+    if (isValidElement(child)) hasElementChild = true;
+  });
 
   const content = (
     <>
