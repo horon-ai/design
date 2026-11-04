@@ -1,11 +1,21 @@
 ---
 import "@/styles/site.css";
+import "@/styles/i18n.css";
+
 import Footer from "@/components/site/Footer.astro";
 import Header from "@/components/site/Header.astro";
+import type { Localized } from "@/i18n";
+import {
+  LOCALE_RUNTIME_SCRIPT,
+  LOCALE_TITLE_META_NAME,
+  PREPAINT_SCRIPT,
+} from "@/i18n/prepaint";
 
 interface Props {
-  title?: string;
-  description?: string;
+  /** Korean-only string, or one `<title>` per locale. */
+  title?: string | Localized;
+  /** Korean-only string, or one meta description per locale. */
+  description?: string | Localized;
   footer?: boolean;
 }
 
@@ -14,27 +24,40 @@ const {
   description = "HORON 제품을 위한 토큰, 컴포넌트, 가이드. 디자인과 코드가 같은 값을 바라보게 만드는 디자인 시스템입니다.",
   footer = true,
 } = Astro.props;
-const pageTitle = title === "HORON Design System" ? title : `${title} — HORON Design System`;
+
+const brandTitle = "HORON Design System";
+const rawTitle = typeof title === "string" ? title : title.ko;
+const rawTitleEn = typeof title === "string" ? undefined : title.en;
+const pageTitle = rawTitle === brandTitle ? rawTitle : `${rawTitle} — ${brandTitle}`;
+const pageTitleEn =
+  rawTitleEn === undefined
+    ? undefined
+    : rawTitleEn === brandTitle
+      ? rawTitleEn
+      : `${rawTitleEn} — ${brandTitle}`;
+const descriptionText = typeof description === "string" ? description : description.ko;
 ---
 
 <!doctype html>
-<html lang="ko" class="h-full">
+<html lang="ko" data-locale="ko" class="h-full">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
-    <meta name="description" content={description} />
+    {pageTitleEn && <meta name={LOCALE_TITLE_META_NAME} content={pageTitleEn} />}
+    <script is:inline set:html={PREPAINT_SCRIPT}></script>
+    <meta name="description" content={descriptionText} />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={descriptionText} />
     <meta property="og:type" content="website" />
     <meta property="og:image" content={new URL("/og.png", Astro.site)} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={new URL("/og.png", Astro.site)} />
-    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0c0e" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32" />
     <link rel="icon" href="/icon.png" type="image/png" sizes="256x256" />
     <link rel="icon" href="/icon-512.png" type="image/png" sizes="512x512" />
@@ -60,6 +83,7 @@ const pageTitle = title === "HORON Design System" ? title : `${title} — HORON 
     <main>
       <slot />
     </main>
-    {footer && <div class="site-shell"><Footer /></div>}
+    {footer && <div class="w-full px-4 md:px-6"><Footer /></div>}
+    <script is:inline set:html={LOCALE_RUNTIME_SCRIPT}></script>
   </body>
 </html>

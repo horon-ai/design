@@ -1,14 +1,15 @@
 ---
+import T from "@/components/i18n/T.astro";
+import { blockMessages } from "@/i18n/messages/blocks";
 import { getDemo } from "@/lib/demos";
 
 interface Props {
   name: string;
   layout?: "inline" | "grid";
   overlay?: boolean;
-  minHeight?: string;
 }
 
-const { name, layout = "inline", overlay = false, minHeight } = Astro.props;
+const { name, layout = "inline", overlay = false } = Astro.props;
 const Demo = getDemo(name);
 ---
 
@@ -19,8 +20,15 @@ const Demo = getDemo(name);
     overlay && "demo-stage-overlay",
     "not-prose",
   ]}
-  style={minHeight ? `min-height: ${minHeight}` : undefined}
   data-demo={name}
 >
-  {Demo ? <Demo /> : <p class="text-[13px] text-text-secondary">데모를 불러오지 못했습니다.</p>}
+  {
+    Demo ? (
+      <Demo />
+    ) : (
+      <p class="text-body-sm text-text-secondary">
+        <T m={blockMessages.demoUnavailable} />
+      </p>
+    )
+  }
 </div>

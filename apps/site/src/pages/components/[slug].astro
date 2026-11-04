@@ -1,11 +1,15 @@
 ---
-import BaseLayout from "@/layouts/BaseLayout.astro";
+import { Badge, EmptyState } from "@horon-ai/react";
+import { createElement, Fragment, type ReactNode } from "react";
+
 import CodeBlock from "@/components/site/CodeBlock.astro";
+import { ComponentCard } from "@/components/site/ComponentCard";
 import Demo from "@/components/site/Demo.astro";
-import Footer from "@/components/site/Footer.astro";
-import Sidebar from "@/components/site/Sidebar.astro";
-import Toc from "@/components/site/Toc.astro";
+import T from "@/components/i18n/T.astro";
 import { components, componentBySlug, componentGroups } from "@/data/components";
+import type { Localized } from "@/i18n";
+import { componentPageMessages as m } from "@/i18n/messages/components-page";
+import DocsLayout from "@/layouts/DocsLayout.astro";
 import { resolveDemoName } from "@/lib/demos";
 
 export function getStaticPaths() {
@@ -33,87 +37,79 @@ const snippet = (sources[`../../components/demos/${component.slug}.tsx`] ?? "")
 const index = components.findIndex((entry) => entry.slug === component.slug);
 const previous = index > 0 ? components[index - 1] : undefined;
 const next = index >= 0 && index < components.length - 1 ? components[index + 1] : undefined;
-const showToc = true;
+
+/**
+ * Library components take React nodes for `title` and `description`, which
+ * Astro cannot pass as props. Building the same two-span markup `T.astro`
+ * renders keeps the static locale switch without a client island.
+ */
+function localized(entry: Localized): ReactNode {
+  return createElement(
+    Fragment,
+    null,
+    createElement("span", { "data-locale-text": "ko", lang: "ko" }, entry.ko),
+    createElement("span", { "data-locale-text": "en", lang: "en" }, entry.en),
+  );
+}
+
+const breadcrumb = [
+  { label: m.breadcrumbComponents, href: "/components" },
+  { label: group ? group.title : component.title, href: `/components#${component.group}` },
+];
 ---
 
-<BaseLayout title={component.title} description={component.description} footer={false}>
-  <div class="docs-grid">
-    <Sidebar section="components" />
-
-    <article class="docs-main">
-      <div class="mx-auto w-full max-w-[56.25rem]">
-        <nav
-          class="flex flex-wrap items-center gap-2 text-body-sm text-text-secondary"
-          aria-label="현재 위치"
-        >
-          <a href="/components" class="transition-colors hover:text-text-primary">Components</a>
-          <span aria-hidden="true">/</span>
-          {group && <span>{group.title}</span>}
-        </nav>
-
-        <h1 class="doc-title">{component.title}</h1>
-        <p class="doc-lead mt-4">{component.description}</p>
-
-        <div class="mt-6 flex flex-wrap items-center gap-2">
-          <span class="inline-flex h-9 items-center rounded-lg bg-bg-subtle px-3 text-body-sm">
-            @horon-ai/react
-          </span>
-          {
-            group && (
-              <span class="inline-flex h-9 items-center rounded-lg bg-bg-subtle px-3 text-body-sm">
-                {group.title}
-              </span>
-            )
-          }
-        </div>
-
-        {/* Toc.astro collects its links from `article .prose-docs h2, h3`. */}
-        <div class="prose-docs">
-          <h2 class="mt-14 mb-6 text-title-md font-medium">Preview</h2>
-          {
-            demoName ? (
-              <Demo name={demoName} overlay={component.overlay} />
-            ) : (
-              <div class="demo-stage">
-                <p class="max-w-md text-center text-body-sm leading-6 text-text-secondary">
-                  이 컴포넌트는 라이브 프리뷰를 아직 준비하지 않았습니다. Usage의 코드 예시를
-                  참고하세요.
-                </p>
-              </div>
-            )
-          }
-
-          <h2 class="mt-16 mb-6 text-title-md font-medium">Usage</h2>
-          <CodeBlock code={snippet} title="tsx" />
-        </div>
-
-        <nav class="mt-16 grid gap-6 border-t border-border-default pt-8 sm:grid-cols-2">
-          {
-            previous ? (
-              <a href={`/components/${previous.slug}`} class="card-link">
-                <span class="text-caption text-text-secondary">← 이전</span>
-                <span class="text-body-md font-medium">{previous.title}</span>
-              </a>
-            ) : (
-              <span />
-            )
-          }
-          {
-            next ? (
-              <a href={`/components/${next.slug}`} class="card-link text-right">
-                <span class="text-caption text-text-secondary">다음 →</span>
-                <span class="text-body-md font-medium">{next.title}</span>
-              </a>
-            ) : (
-              <span />
-            )
-          }
-        </nav>
-      </div>
-
-      <Footer />
-    </article>
-
-    {showToc && <Toc />}
+<DocsLayout
+  title={component.title}
+  description={component.description}
+  section="components"
+  breadcrumb={breadcrumb}
+>
+  <div class="flex flex-wrap items-center gap-2">
+    <Badge tone="neutral">@horon-ai/react</Badge>
+    {group && <Badge tone="brand"><T m={group.title} /></Badge>}
   </div>
-</BaseLayout>
+
+  <h2><T m={m.previewHeading} /></h2>
+  {
+    demoName ? (
+      <Demo name={demoName} overlay={component.overlay} />
+    ) : (
+      <EmptyState
+        className="mx-auto"
+        title={localized(m.previewMissingTitle)}
+        description={localized(m.previewMissingBody)}
+      />
+    )
+  }
+
+  <h2><T m={m.usageHeading} /></h2>
+  <CodeBlock code={snippet} title="tsx" />
+
+  <nav
+    class="mt-16 grid gap-6 border-t border-border-default pt-8 sm:grid-cols-2"
+    aria-label={m.paging.ko}
+  >
+    {
+      previous ? (
+        <ComponentCard
+          href={`/components/${previous.slug}`}
+          title={previous.title}
+          description={m.previous}
+        />
+      ) : (
+        <span />
+      )
+    }
+    {
+      next ? (
+        <ComponentCard
+          href={`/components/${next.slug}`}
+          title={next.title}
+          description={m.next}
+        />
+      ) : (
+        <span />
+      )
+    }
+  </nav>
+</DocsLayout>
