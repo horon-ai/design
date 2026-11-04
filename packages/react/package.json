@@ -13,6 +13,7 @@
 		".": "./src/index.ts",
 		"./globals.css": "./src/styles/globals.css",
 		"./components/*": "./src/components/*.tsx",
+		"./cursor-ghost": "./src/lib/cursor-ghost.ts",
 		"./package.json": "./package.json"
 	},
 	"scripts": {

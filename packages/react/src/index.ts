@@ -81,3 +81,4 @@ export * from "./components/top-bar";
 export * from "./components/usage-meter";
 export * from "./components/workspace-menu";
 export { cn, type ClassValue } from "./lib/cn";
+export { mountCursorGhost, type CursorGhostOptions } from "./lib/cursor-ghost";

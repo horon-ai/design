@@ -39,6 +39,18 @@ import { Plus } from "@phosphor-icons/react";
 
 하위 경로도 됩니다: `@horon-ai/react/components/button`.
 
+## 커서 잔상
+
+마우스나 트랙패드처럼 정밀한 포인터가 있는 데스크톱 환경에서는 화살표 뒤로 흐려지는 잔상 5개가 따라옵니다.
+`@horon-ai/react`를 한 번이라도 import하면 페이지마다 한 번 자동으로 붙습니다. React 컴포넌트를 쓰지 않는
+페이지에서는 `import "@horon-ai/react/cursor-ghost";` 한 줄로 붙입니다.
+
+- 시스템 커서는 숨기지 않습니다. 잔상은 클릭·포커스를 받지 않는 맨 위 겹 레이어이고 `aria-hidden`입니다.
+- 터치·펜처럼 거친 포인터, 동작 줄이기(`prefers-reduced-motion: reduce`) 설정에서는 붙지 않고, 설정이 바뀌면 다시 판단합니다.
+- 흰색을 `difference`로 섞어서 어두운 화면에서는 밝게, 밝은 화면에서는 어둡게 보입니다.
+- 끄려면 그 import보다 먼저 `<html data-horon-cursor="off">`를 둡니다. 값을 바꾸려면 끈 뒤
+  `mountCursorGhost({ ghosts, size, headFollow, smear, color })`를 직접 부르고, 돌려받은 함수로 떼어 냅니다.
+
 ## 유리 표면
 
 Figma의 `Liquid layers`(tint, inner shade, soft light edge를 50% 세기로 겹친 것)를 `LiquidGlass`가
