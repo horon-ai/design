@@ -86,10 +86,14 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 
 ### GitHub Actions로 게시
 
-`.github/workflows/publish.yml`이 두 패키지를 npm에 게시합니다. 태그를 밀거나 Actions 탭에서
-`Publish npm packages`를 수동 실행하면 됩니다. 두 경로 모두 게시 전에 lint·typecheck·test·build를
-다시 돌리고, npm에 이미 있는 버전은 건너뛰므로 재실행해도 안전합니다. 게시에는 npm provenance가
-붙습니다(OIDC 서명, 실행한 워크플로와 커밋이 npm 패키지 페이지에 표시됨).
+`.github/workflows/publish.yml`이 두 패키지를 npm에 게시합니다. 태그를 밀면 그 태그가 가리키는
+커밋의 워크플로가 실행되므로 `dev`에서도 바로 게시할 수 있습니다. 두 경로 모두 게시 전에
+lint·typecheck·test·build를 다시 돌리고, npm에 이미 있는 버전은 건너뛰므로 재실행해도 안전합니다.
+게시에는 npm provenance가 붙습니다(OIDC 서명, 실행한 워크플로와 커밋이 npm 패키지 페이지에
+표시됨).
+
+Actions 탭의 수동 실행 버튼은 워크플로가 기본 브랜치(`main`)에 있을 때만 나타납니다. 수동
+실행이 필요하면 `main` 병합 뒤에 쓰고, 그 전에는 태그로 게시합니다.
 
 ```bash
 # 1. 저장소 시크릿 NPM_TOKEN 을 한 번 등록한다 (npm granular access token, 공개 패키지 게시 권한)
