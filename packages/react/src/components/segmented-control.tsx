@@ -102,7 +102,7 @@ export function SegmentedControl({
           surface === "glass"
             ? "bg-glass-thick shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:bg-overlay-ink-10"
             : surface === "subtle"
-              ? "bg-bg-default"
+              ? "bg-bg-default dark:bg-overlay-ink-10"
               : "bg-overlay-ink-10",
           animate && "motion-indicator",
         )}

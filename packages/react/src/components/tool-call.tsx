@@ -1,6 +1,6 @@
 import { Collapsible } from "@base-ui/react/collapsible";
-import { ArrowClockwise, CaretDown, CheckCircle, Copy, WarningCircle } from "@phosphor-icons/react";
-import type { ReactNode } from "react";
+import { ArrowClockwise, CaretDown, Check, CheckCircle, Copy, WarningCircle } from "@phosphor-icons/react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { Button } from "./button";
@@ -77,12 +77,47 @@ export type ToolCallProps = {
   className?: string;
 };
 
-function Section({ label, children, footer }: { label: string; children: ReactNode; footer?: ReactNode }) {
+function Section({
+  label,
+  children,
+  copyText,
+  footer,
+}: {
+  label: string;
+  children: ReactNode;
+  /** Plain text of the section body; adds a real copy button when present. */
+  copyText?: string;
+  footer?: ReactNode;
+}) {
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return undefined;
+    const timer = setTimeout(() => setCopied(false), 1500);
+    return () => clearTimeout(timer);
+  }, [copied]);
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex items-center text-label-sm text-text-secondary">
+      <div className="flex items-center gap-2 text-label-sm text-text-secondary">
         <span className="flex-1 uppercase">{label}</span>
-        <Copy aria-hidden className="size-3.5" />
+        {copyText !== undefined && (
+          <button
+            type="button"
+            aria-label={copied ? "Copied" : `Copy ${label.toLowerCase()}`}
+            onClick={() => {
+              navigator.clipboard?.writeText(copyText).then(
+                () => setCopied(true),
+                () => undefined,
+              );
+            }}
+            className="flex motion-press cursor-pointer items-center justify-center rounded-sm hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+          >
+            {copied ? (
+              <Check key="copied" aria-hidden className="size-3.5 animate-pop-in text-status-live" />
+            ) : (
+              <Copy key="copy" aria-hidden className="size-3.5 animate-pop-in" />
+            )}
+          </button>
+        )}
       </div>
       <div className="rounded-[10px] bg-bg-subtle px-3.5 py-3">{children}</div>
       {footer}
@@ -90,7 +125,7 @@ function Section({ label, children, footer }: { label: string; children: ReactNo
   );
 }
 
-/** Figma `Tool call` (Tool call card 186:7811): a solid 14px-radius card that expands to arguments and result. */
+/** Figma `Tool call` (Tool call card 186:7811): a solid 16px-radius card that expands to arguments and result. */
 export function ToolCall({
   status,
   tool,
@@ -114,19 +149,26 @@ export function ToolCall({
         className,
       )}
     >
-      <Collapsible.Trigger className="group flex w-full cursor-pointer items-center gap-2.5 px-4 py-3.5 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand">
+      <Collapsible.Trigger className="group flex w-full cursor-pointer items-center gap-2.5 px-4 py-3.5 text-left motion-colors hover:bg-overlay-ink-3 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand">
         <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-overlay-ink-6 py-[3px] pr-2.5 pl-2 text-label-md text-text-primary [&>svg]:size-4 [&>svg]:text-text-secondary">
           {tool.icon}
           {tool.name}
         </span>
         <span className="min-w-0 flex-1 truncate text-body-sm text-text-secondary">{summary}</span>
-        {status === "running" && <Spinner size="sm" />}
-        {status === "done" && <CheckCircle aria-hidden className="size-4 shrink-0 text-status-live" />}
+        <span className="flex size-4 shrink-0 items-center justify-center">
+          {status === "running" && <Spinner key="running" size="sm" className="animate-pop-in" />}
+          {status === "done" && (
+            <CheckCircle key="done" aria-hidden className="size-4 animate-pop-in text-status-live" />
+          )}
+          {status === "failed" && (
+            <WarningCircle key="failed" aria-hidden className="size-4 animate-pop-in text-text-danger" />
+          )}
+        </span>
         {status === "failed" && <span className="shrink-0 text-label-sm text-text-danger">Failed</span>}
         {elapsed && <span className="shrink-0 text-caption text-text-secondary">{elapsed}</span>}
         <CaretDown
           aria-hidden
-          className="size-4 shrink-0 text-text-secondary group-data-panel-open:rotate-180 motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out-quint"
+          className="size-4 shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-panel-open:rotate-180"
         />
       </Collapsible.Trigger>
       <Collapsible.Panel className="motion-collapse">
@@ -148,13 +190,14 @@ export function ToolCall({
             </div>
           )}
           {args !== undefined && (
-            <Section label="Arguments">
+            <Section label="Arguments" copyText={JSON.stringify(args, null, 2)}>
               <JsonCode value={args} />
             </Section>
           )}
           {status !== "failed" && (
             <Section
               label="Result"
+              copyText={typeof result === "string" ? result : JSON.stringify(result, null, 2)}
               footer={
                 truncated && result !== undefined && status !== "running" ? (
                   <Button variant="link" className="self-start px-0" onClick={onShowAll}>

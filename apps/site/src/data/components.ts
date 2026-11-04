@@ -296,8 +296,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Avatar", en: "Avatar" },
     group: "display",
     description: {
-      ko: "사람의 이니셜, 봇, 이미지를 원형으로 보여주고 실행 중이면 점을 붙입니다.",
-      en: "Shows initials, a bot, or an image in a circle, with a dot while it runs.",
+      ko: "사람의 이니셜, 봇, 이미지를 원형으로 보여주고 실행 중이면 점을 붙입니다. 점 테두리 색은 liveRingClassName으로 바꿉니다.",
+      en: "Shows initials, a bot, or an image in a circle, with a dot while it runs. liveRingClassName matches the dot ring to the surface behind it.",
     },
   },
   {
@@ -332,8 +332,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Progress", en: "Progress" },
     group: "display",
     description: {
-      ko: "작업의 진행률을 6px 막대로 보여줍니다.",
-      en: "Shows task progress on a 6px bar.",
+      ko: "작업의 진행률을 6px 막대로 보여줍니다. 값을 생략하면 불확정 스윕 막대가 됩니다.",
+      en: "Shows task progress on a 6px bar. Omit the value for an indeterminate sweep.",
     },
   },
   {
@@ -440,8 +440,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "MCP Server Row", en: "MCP Server Row" },
     group: "display",
     description: {
-      ko: "연결된 MCP 서버의 이름, 태그, 상태를 보여 주는 행입니다.",
-      en: "A row showing a connected MCP server's name, tags, and status.",
+      ko: "연결된 MCP 서버의 이름, 태그, 상태를 보여 주는 행입니다. statusTone으로 상태 알약의 톤을 connected, warning, neutral 중에서 고릅니다.",
+      en: "A row showing a connected MCP server's name, tags, and status. statusTone picks the status pill tone: connected, warning, or neutral.",
     },
   },
   {
@@ -449,8 +449,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Directory Card", en: "Directory Card" },
     group: "display",
     description: {
-      ko: "디렉터리 항목을 소개하고 추가 버튼을 둔 카드입니다.",
-      en: "A card that introduces a directory entry and offers an add button.",
+      ko: "디렉터리 항목을 소개하는 카드입니다. onAdd를 넘기면 추가 버튼이 나타납니다.",
+      en: "A card that introduces a directory entry. The add button appears when onAdd is passed.",
     },
   },
   {
@@ -467,8 +467,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Marketplace Card", en: "Marketplace Card" },
     group: "display",
     description: {
-      ko: "마켓플레이스 항목의 설명과 설치 버튼을 담은 카드입니다.",
-      en: "A card with a marketplace item's description and an install button.",
+      ko: "마켓플레이스 항목의 설명을 담은 카드입니다. onInstall을 넘기면 설치 버튼이 나타납니다.",
+      en: "A card with a marketplace item's description. The install button appears when onInstall is passed.",
     },
   },
   {
@@ -539,8 +539,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Top Bar", en: "Top Bar" },
     group: "navigation",
     description: {
-      ko: "뒤로가기, 봇 아바타, 제목과 부제, 더보기를 한 줄에 담은 모바일 상단 바입니다.",
-      en: "A mobile top bar with back, bot avatar, title and subtitle, and more in one row.",
+      ko: "뒤로가기, 봇 아바타, 제목과 부제, 더보기를 한 줄에 담은 모바일 상단 바입니다. onBack과 onMore를 넘길 때만 해당 버튼이 나타납니다.",
+      en: "A mobile top bar with back, bot avatar, title and subtitle, and more in one row. The back and more buttons appear only when onBack or onMore is passed.",
     },
   },
   {
@@ -548,8 +548,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Breadcrumb Header", en: "Breadcrumb Header" },
     group: "navigation",
     description: {
-      ko: "브레드크럼과 아이콘 버튼 두 개를 한 줄에 담은 유리 머리말입니다.",
-      en: "A glass header with a breadcrumb and two icon buttons in one row.",
+      ko: "브레드크럼과 검색·더보기 아이콘 버튼을 한 줄에 담은 유리 머리말입니다. onSearch와 onMore를 넘길 때만 해당 버튼이 나타납니다.",
+      en: "A glass header with a breadcrumb and search/more icon buttons in one row. Each button appears only when onSearch or onMore is passed.",
     },
   },
   {
@@ -790,8 +790,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Agent Lanes Timeline", en: "Agent Lanes Timeline" },
     group: "agents",
     description: {
-      ko: "봇별 실행 구간을 시간축에 놓은 타임라인입니다.",
-      en: "A timeline that places each bot's run on a time axis.",
+      ko: "봇별 실행 구간을 시간축에 놓은 타임라인입니다. onRangeClick을 넘기면 범위 알약이 버튼이 됩니다.",
+      en: "A timeline that places each bot's run on a time axis. Pass onRangeClick to turn the range pill into a button.",
     },
   },
   {
@@ -799,8 +799,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Bot Instructions Panel", en: "Bot Instructions Panel" },
     group: "agents",
     description: {
-      ko: "봇 지침과 예시를 탭으로 보여 주는 패널입니다.",
-      en: "A panel that shows bot instructions and examples in tabs.",
+      ko: "봇 지침과 예시를 탭으로 보여 주는 패널입니다. onVersionClick과 onBotClick을 넘기면 버전·봇 알약이 버튼이 됩니다.",
+      en: "A panel that shows bot instructions and examples in tabs. Pass onVersionClick and onBotClick to turn the version and bot pills into buttons.",
     },
   },
   {
@@ -808,8 +808,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Document Extract Panel", en: "Document Extract Panel" },
     group: "agents",
     description: {
-      ko: "문서 뷰어와 추출된 필드를 나란히 보여 주는 패널입니다.",
-      en: "A panel that sets a document viewer beside extracted fields.",
+      ko: "문서 뷰어와 추출된 필드를 나란히 보여 주는 패널입니다. onOpenFile을 넘기면 파일 이름이 버튼이 되고, 시트 내부는 테마와 무관한 neutral 잉크를 씁니다.",
+      en: "A panel that sets a document viewer beside extracted fields. Pass onOpenFile to make the file name a button; sheet content uses neutral ink in both themes.",
     },
   },
   {
@@ -817,8 +817,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Bot Memory Panel", en: "Bot Memory Panel" },
     group: "agents",
     description: {
-      ko: "봇이 기억한 내용을 분류해 보여 주는 메모리 패널입니다.",
-      en: "A memory panel that groups what the bot remembers.",
+      ko: "봇이 기억한 내용을 분류해 보여 주는 메모리 패널입니다. onSearch를 넘기면 검색 버튼이 생깁니다.",
+      en: "A memory panel that groups what the bot remembers. Pass onSearch to show the search button.",
     },
   },
   {
@@ -826,8 +826,8 @@ export const components: ComponentEntry[] = [
     title: { ko: "Research Run Panel", en: "Research Run Panel" },
     group: "agents",
     description: {
-      ko: "리서치 질문, 진행 상태, 검색어 목록을 보여 주는 패널입니다.",
-      en: "A panel showing a research question, progress, and the list of queries.",
+      ko: "리서치 질문, 진행 상태, 검색어 목록을 보여 주는 패널입니다. onOpenSources와 onToggleStatus를 넘기면 출처 알약과 상태 줄이 버튼이 됩니다.",
+      en: "A panel showing a research question, progress, and the list of queries. Pass onOpenSources and onToggleStatus to turn the sources pill and status line into buttons.",
     },
   },
   {

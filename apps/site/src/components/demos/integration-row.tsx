@@ -1,7 +1,24 @@
-import { IntegrationRow } from "@horon-ai/react";
+import { IntegrationRow, type IntegrationStatus } from "@horon-ai/react";
 import { CalendarBlank, ChatCircle, EnvelopeSimple } from "@phosphor-icons/react";
+import { useState } from "react";
 
 import { Backdrop } from "../demo-backdrop";
+
+/** Connect flips the row to connected in place: the tile, the pill and the button crossfade. */
+function ConnectableSlack({ surface = "solid" }: { surface?: "solid" | "glass" }) {
+  const [status, setStatus] = useState<IntegrationStatus>("not-connected");
+  return (
+    <IntegrationRow
+      className="w-full max-w-110"
+      surface={surface}
+      icon={<ChatCircle />}
+      name="Slack"
+      detail={status === "connected" ? "Workspace chat · Read, post" : "Post updates to a channel"}
+      status={status}
+      onAction={() => setStatus("connected")}
+    />
+  );
+}
 
 export default function IntegrationRowDemo() {
   return (
@@ -25,14 +42,7 @@ export default function IntegrationRowDemo() {
             detail="Access expired 2 days ago"
             status="reconnect"
           />
-          <IntegrationRow
-            className="w-full max-w-110"
-            surface="solid"
-            icon={<ChatCircle />}
-            name="Slack"
-            detail="Post updates to a channel"
-            status="not-connected"
-          />
+          <ConnectableSlack />
         </div>
       </div>
       <div className="flex flex-col gap-3">
@@ -54,14 +64,7 @@ export default function IntegrationRowDemo() {
             detail="Access expired 2 days ago"
             status="reconnect"
           />
-          <IntegrationRow
-            className="w-full max-w-110"
-            surface="glass"
-            icon={<ChatCircle />}
-            name="Slack"
-            detail="Post updates to a channel"
-            status="not-connected"
-          />
+          <ConnectableSlack surface="glass" />
         </Backdrop>
       </div>
     </div>

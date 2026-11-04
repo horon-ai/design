@@ -5,6 +5,7 @@ import {
   DataTableItem,
   DataTableTag,
   DataTableView,
+  IconButton,
   dataTableSelectColumn,
   useDataTable,
   type DataTableColumn,
@@ -68,8 +69,8 @@ function Table({
         title="Design Stack"
         actions={
           <>
-            <ArrowClockwise aria-hidden />
-            <DotsThree aria-hidden />
+            <IconButton size="sm" variant="ghost" label="Refresh" icon={<ArrowClockwise />} />
+            <IconButton size="sm" variant="ghost" label="More" icon={<DotsThree />} />
           </>
         }
       />

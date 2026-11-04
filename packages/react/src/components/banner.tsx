@@ -22,8 +22,8 @@ export type BannerProps = Omit<ComponentProps<"div">, "className"> & {
 
 const sizeClass: Record<BannerSize, string> = {
   sm: "gap-2 px-3 py-2",
-  md: "gap-3 px-4 py-3",
-  lg: "gap-3 px-5 py-3.5",
+  md: "gap-3 px-4 py-2.5",
+  lg: "gap-3 px-5 py-3",
 };
 
 const iconSizeClass: Record<BannerSize, string> = {
@@ -59,7 +59,7 @@ const solidEdgeClass: Record<BannerTone, string> = {
   danger: "border-border-danger",
 };
 
-/** Figma `Banner` (62:318): a strip with a tinted rim, 18px icon and an underlined action. */
+/** Figma `Banner` (62:318): a strip with a tinted rim, 16px icon and an underlined action. */
 export function Banner({
   tone = "info",
   action,
@@ -73,11 +73,11 @@ export function Banner({
     <div
       role={tone === "danger" ? "alert" : "status"}
       className={cn(
-        "relative flex animate-[tab-panel-in_220ms_var(--ease-out-quint)] items-center overflow-clip rounded-md",
+        "relative flex motion-rise items-center overflow-clip rounded-md",
         sizeClass[size],
         toneClass[tone],
         surface === "glass"
-          ? cn("bg-glass-regular", glassEdgeClass[tone])
+          ? cn("border border-transparent bg-glass-regular", glassEdgeClass[tone])
           : cn("border border-border-default bg-bg-surface", solidEdgeClass[tone]),
         className,
       )}
@@ -87,7 +87,7 @@ export function Banner({
       <span className={cn("relative flex shrink-0", iconSizeClass[size])}>
         {tone === "danger" ? <WarningCircle /> : <Info />}
       </span>
-      <p className={cn("relative min-w-0 flex-1", textSizeClass[size])}>{children}</p>
+      <p className={cn("relative min-w-0 flex-1 text-text-primary", textSizeClass[size])}>{children}</p>
       {action && (
         <span
           className={cn(

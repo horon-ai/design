@@ -60,7 +60,7 @@ export function ModalContent({
           className={cn(
             "relative flex max-h-[calc(100dvh-2rem)] max-w-[calc(100vw-2rem)] flex-col overflow-clip rounded-xl outline-none",
             widthClass[size],
-            surface === "solid" ? "bg-bg-default shadow-[0_24px_64px_#0A142433]" : "veil-overlay",
+            surface === "solid" ? "bg-bg-surface shadow-[0_24px_64px_#0A142433]" : "veil-overlay",
             "motion-popup duration-240 data-starting-style:translate-y-2",
             className,
           )}
@@ -85,7 +85,12 @@ export function ModalContent({
               </BaseDialog.Close>
             )}
           </header>
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-2 text-body-md text-text-primary">
+          <div
+            className={cn(
+              "min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 text-body-md text-text-primary",
+              footer ? "pb-2" : "pb-6",
+            )}
+          >
             {children}
           </div>
           {footer}

@@ -121,6 +121,7 @@ export function Sidebar({
     <nav
       className={cn(
         "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip px-3 pt-4 pb-3",
+        resizable && "transition-[width] duration-200 ease-out-quint data-resizing:transition-none",
         surface === "glass" && "bg-glass-thick",
         surface === "photo" && "bg-sidebar-photo dark:bg-glass-thick dark:bg-none",
         surface === "plain" && "border-r border-border-default",
@@ -128,6 +129,7 @@ export function Sidebar({
         className,
       )}
       style={resizable ? ({ ...style, "--sidebar-width": `${width}px` } as CSSProperties) : style}
+      data-resizing={(resizable && dragging) || undefined}
       {...props}
     >
       {surface === "glass" && <LiquidGlass />}
@@ -215,7 +217,7 @@ export function SidebarHeader({
           type="button"
           aria-label={collapseLabel}
           onClick={onCollapse}
-          className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="relative flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm text-text-secondary motion-colors after:absolute after:top-1/2 after:left-1/2 after:min-h-11 after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] hover:bg-overlay-ink-6 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand active:bg-overlay-ink-10"
         >
           <CaretLeft aria-hidden className="size-4" />
         </button>
@@ -309,7 +311,7 @@ export type SidebarGroupProps = {
 export function SidebarGroup({ label, defaultOpen = true, children, className }: SidebarGroupProps) {
   return (
     <Collapsible.Root defaultOpen={defaultOpen} className={cn("relative mt-3.5 flex flex-col gap-0.5", className)}>
-      <Collapsible.Trigger className="group flex h-7 w-fit cursor-pointer items-center gap-1 px-2.5 text-label-md text-text-secondary focus-visible:outline-2 focus-visible:outline-text-brand">
+      <Collapsible.Trigger className="group flex h-7 w-fit cursor-pointer items-center gap-1 px-2.5 text-label-md text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand">
         {label}
         <CaretDown
           aria-hidden
@@ -456,8 +458,8 @@ export function SidebarProject({
             <span
               aria-hidden
               className={cn(
-                "flex size-3.5 shrink-0 [&>svg]:size-3.5",
-                actions !== undefined && "group-hover/project:invisible group-has-data-popup-open/project:invisible",
+                "flex size-3.5 shrink-0 opacity-100 transition-opacity duration-150 [&>svg]:size-3.5",
+                actions !== undefined && "group-hover/project:opacity-0 group-has-data-popup-open/project:opacity-0",
               )}
             >
               <CaretRight className="transition-transform duration-200 ease-out-quint group-data-panel-open/trigger:rotate-90" />
@@ -488,7 +490,7 @@ export function SidebarProjectMore({ label = "Project actions", className, ...pr
       type="button"
       aria-label={label}
       className={cn(
-        "flex size-4 cursor-pointer items-center justify-center rounded-xs text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand",
+        "relative flex size-4 cursor-pointer items-center justify-center rounded-xs text-text-primary motion-colors after:absolute after:top-1/2 after:left-1/2 after:min-h-11 after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] hover:bg-overlay-ink-6 focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}
       {...props}

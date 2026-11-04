@@ -37,7 +37,7 @@ export function PlanCard({ label, title, children, status, statusLabel, elapsed,
             {label}
           </div>
         )}
-        <h3 className="text-label-lg text-text-primary">{title}</h3>
+        <h3 className="text-label-lg font-semibold text-text-primary">{title}</h3>
       </header>
       <div className="flex flex-col px-6 pt-1.5 pb-1">{children}</div>
       <Collapsible.Root open={status !== undefined}>
@@ -51,8 +51,17 @@ export function PlanCard({ label, title, children, status, statusLabel, elapsed,
           >
             {status === "running" && <Spinner size={14} />}
             {status === "failed" && <WarningCircle aria-hidden className="size-4 shrink-0" />}
-            <span className="min-w-0 flex-1">{statusLabel}</span>
-            {elapsed && <span className="shrink-0 text-caption text-text-secondary">{elapsed}</span>}
+            <span key={String(status)} className="min-w-0 flex-1 animate-fade-in">
+              {statusLabel}
+            </span>
+            {elapsed && (
+              <span
+                key={elapsed ? "with-elapsed" : "without-elapsed"}
+                className="shrink-0 animate-fade-in text-caption text-text-secondary"
+              >
+                {elapsed}
+              </span>
+            )}
           </div>
         </Collapsible.Panel>
       </Collapsible.Root>

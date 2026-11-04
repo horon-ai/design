@@ -107,7 +107,23 @@ void main() {
 
     final Container status = _pillOf(tester, 'Connected');
     expect(status.constraints?.maxHeight, theme.space.step(5.5));
-    expect((status.decoration! as BoxDecoration).color, theme.colors.accentSky500_18);
+    expect((status.decoration! as BoxDecoration).color, theme.colors.overlayInk6, reason: 'connected는 잉크 바탕');
+    expect(tester.widget<Text>(find.text('Connected')).style?.color, theme.colors.textPrimary);
+    expect(
+      tester.getSize(
+        find.descendant(
+          of: find.byType(HoronMcpServerRow),
+          matching: find.byWidgetPredicate(
+            (Widget widget) =>
+                widget is DecoratedBox &&
+                widget.decoration is BoxDecoration &&
+                (widget.decoration as BoxDecoration).color == theme.colors.statusLive,
+          ),
+        ),
+      ),
+      Size(theme.space.step(1.5), theme.space.step(1.5)),
+      reason: 'size-1.5 라이브 점',
+    );
 
     // Configure는 `Button`의 `solid`·`sm`, 오버플로는 `IconButton`의 `ghost`·`sm`입니다.
     expect(find.text('Configure'), findsOneWidget);
@@ -121,6 +137,46 @@ void main() {
     expect(overflow.size, HoronIconButtonSize.sm);
     expect(overflow.label, 'More');
     expect(tester.getSize(find.byIcon(Icons.more_horiz)).width, theme.space.s4, reason: 'IconButton sm 16');
+  });
+
+  testWidgets('the status tone swaps the pill tint and the dot', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      _host(
+        const HoronMcpServerRow(
+          name: 'notion',
+          statusLabel: 'Needs attention',
+          statusTone: HoronMcpServerStatusTone.warning,
+        ),
+        width: 720,
+      ),
+    );
+    final HoronThemeData theme = _themeOf(tester);
+
+    final Container warning = _pillOf(tester, 'Needs attention');
+    expect((warning.decoration! as BoxDecoration).color, theme.colors.accentRed500_14);
+    expect(tester.widget<Text>(find.text('Needs attention')).style?.color, theme.colors.textDanger);
+
+    Finder dotOf(Color color) => find.descendant(
+      of: find.byType(HoronMcpServerRow),
+      matching: find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is DecoratedBox &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration as BoxDecoration).color == color,
+      ),
+    );
+    expect(dotOf(theme.colors.textDanger), findsOneWidget, reason: 'warning 점은 위험 색');
+
+    await tester.pumpWidget(
+      _host(
+        const HoronMcpServerRow(name: 'notion', statusLabel: 'Paused', statusTone: HoronMcpServerStatusTone.neutral),
+        width: 720,
+      ),
+    );
+    final Container neutral = _pillOf(tester, 'Paused');
+    expect((neutral.decoration! as BoxDecoration).color, theme.colors.overlayInk6);
+    expect(tester.widget<Text>(find.text('Paused')).style?.color, theme.colors.textSecondary);
+    expect(dotOf(theme.colors.textPlaceholder), findsOneWidget, reason: 'neutral 점은 흐린 색');
   });
 
   testWidgets('the actions call back', (WidgetTester tester) async {

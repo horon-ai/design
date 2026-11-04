@@ -1,9 +1,31 @@
-import { SourceRow } from "@horon-ai/react";
+import { Button, SourceRow } from "@horon-ai/react";
 import { EnvelopeSimple, FileText, Globe } from "@phosphor-icons/react";
+import { useState } from "react";
+
+function InteractiveIndexing() {
+  const [progress, setProgress] = useState(42);
+  return (
+    <div className="flex w-full flex-col gap-2">
+      <SourceRow
+        status="indexing"
+        icon={<Globe />}
+        name="wiki.horon.ai"
+        detail={`Embedding · ${Math.round((progress * 296) / 100)} of 296 chunks`}
+        progress={progress}
+      />
+      <div>
+        <Button size="sm" variant="solid" onClick={() => setProgress((value) => Math.min(100, value + 17))}>
+          Advance progress
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export default function SourceRowDemo() {
   return (
     <div className="flex w-full max-w-190 flex-col gap-2">
+      <InteractiveIndexing />
       <SourceRow
         status="ready"
         icon={<FileText />}

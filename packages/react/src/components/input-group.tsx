@@ -47,12 +47,13 @@ const inputPaddingClass: Record<InputGroupSize, string> = {
 
 /** The tinted segment look, shared by `InputGroupSegment` and the `segment` variant of `Select` and `Combobox`. */
 export const inputGroupSegmentClass: Record<InputGroupSize, string> = {
-  sm: "relative flex h-full shrink-0 items-center gap-1 bg-overlay-ink-4 px-2.5 text-body-sm text-text-primary [&_svg]:size-4 [&_svg]:text-text-secondary",
+  sm: "relative flex h-full shrink-0 items-center gap-1 bg-overlay-ink-4 px-3 text-body-sm text-text-primary [&_svg]:size-4 [&_svg]:text-text-secondary",
   md: "relative flex h-full shrink-0 items-center gap-1 bg-overlay-ink-4 px-3 text-body-md text-text-primary [&_svg]:size-4 [&_svg]:text-text-secondary",
   lg: "relative flex h-full shrink-0 items-center gap-1.5 bg-overlay-ink-4 px-4 text-body-lg text-text-primary [&_svg]:size-5 [&_svg]:text-text-secondary",
 };
 
-const divider = "relative h-full w-px shrink-0 bg-border-default group-data-invalid:bg-border-danger";
+const divider =
+  "relative h-full w-px shrink-0 bg-border-default group-data-invalid:bg-border-danger group-data-disabled:bg-border-default/60";
 
 /** Figma `Input group` (60:429): a glass or solid field split into a select segment and an input segment, in three sizes. */
 export function InputGroup({
@@ -69,12 +70,7 @@ export function InputGroup({
   return (
     <InputGroupContext value={context}>
       <div
-        className={cn(
-          "group relative flex items-center overflow-clip rounded-md border motion-colors",
-          sizeClass[size],
-          fieldBoxClass[surface],
-          className,
-        )}
+        className={cn(fieldBoxClass.base, "group", sizeClass[size], fieldBoxClass[surface], className)}
         data-invalid={invalid ? "" : undefined}
         data-disabled={disabled ? "" : undefined}
       >

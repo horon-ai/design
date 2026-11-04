@@ -1,5 +1,5 @@
 import { Button, Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger } from "@horon-ai/react";
-import { Copy, Gear, Paperclip, SignOut, Sparkle, Trash, User } from "@phosphor-icons/react";
+import { ArrowsClockwise, Copy, Gear, Paperclip, SignOut, Trash, User } from "@phosphor-icons/react";
 
 import { Backdrop } from "../demo-backdrop";
 
@@ -13,7 +13,7 @@ function ActionsMenu({ surface }: { surface: Surface }) {
         <MenuItem icon={<Copy />} trailing="⌘C">
           Copy
         </MenuItem>
-        <MenuItem icon={<Sparkle />}>Regenerate</MenuItem>
+        <MenuItem icon={<ArrowsClockwise />}>Regenerate</MenuItem>
         <MenuItem icon={<Paperclip />}>Attach file</MenuItem>
         <MenuSeparator />
         <MenuItem icon={<Trash />} danger>

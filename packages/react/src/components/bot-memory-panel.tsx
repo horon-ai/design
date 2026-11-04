@@ -39,6 +39,8 @@ export type BotMemoryPanelProps = WithClass<Omit<ComponentProps<"section">, "tit
   onToastDismiss?: () => void;
   onAdd?: () => void;
   onSettingChange?: (id: string, checked: boolean) => void;
+  /** Makes the search button actionable; without it the icon is a plain decoration. */
+  onSearch?: () => void;
 };
 
 function Divider({ inset }: { inset?: boolean }) {
@@ -63,12 +65,16 @@ export function BotMemoryPanel({
   onToastDismiss,
   onAdd,
   onSettingChange,
+  onSearch,
   className,
   ...props
 }: BotMemoryPanelProps) {
   const [filter, setFilter] = useState("all");
-  const [leaving, setLeaving] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  // Both marks are tied to the toast object, so a new toast event revives the pill without an effect.
+  const [leavingFor, setLeavingFor] = useState<BotMemoryToast | undefined>();
+  const [dismissedFor, setDismissedFor] = useState<BotMemoryToast | undefined>();
+  const leaving = toast !== undefined && leavingFor === toast;
+  const dismissed = toast !== undefined && dismissedFor === toast;
 
   const groups = [...new Set(memories.map((memory) => memory.group))];
   const visible = filter === "all" ? groups : groups.filter((group) => group === filter);
@@ -83,7 +89,7 @@ export function BotMemoryPanel({
       )}
       {...props}
     >
-      <header className="flex items-center gap-2.5 px-5 pt-4 pb-3">
+      <header className="flex items-center gap-2.5 px-5 pt-4 pb-3.5">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <h3 className="text-label-lg text-text-primary">{title}</h3>
           {subtitle ? <p className="text-caption text-text-secondary">{subtitle}</p> : null}
@@ -99,7 +105,7 @@ export function BotMemoryPanel({
             className="h-1.25 w-20 shrink-0 overflow-clip rounded-full bg-overlay-ink-8"
           >
             <div
-              className="h-full rounded-full bg-interactive-primary transition-[width] duration-400 ease-out-quint"
+              className="h-full rounded-full bg-interactive-primary transition-[width] duration-280 ease-emphasized"
               style={{ width: `${percent}%` }}
             />
           </div>
@@ -133,45 +139,57 @@ export function BotMemoryPanel({
           items={[{ value: "all", label: "All" }, ...groups.map((group) => ({ value: group, label: group }))]}
         />
         <span className="min-w-0 flex-1" />
-        <button
-          type="button"
-          aria-label="Search memories"
-          className="flex size-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-8 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
-        >
-          <MagnifyingGlass aria-hidden className="size-4" />
-        </button>
-      </div>
-      {toast && !dismissed ? (
-        <div className="px-5 py-1.5">
-          <div
-            role="status"
-            onAnimationEnd={() => {
-              if (leaving) {
-                setDismissed(true);
-                onToastDismiss?.();
-              }
-            }}
-            className={cn(
-              "inline-flex h-8 max-w-full items-center gap-2 rounded-full bg-accent-sky-500-16 pr-3 pl-2.5",
-              leaving ? "animate-pop-out" : "animate-pop-in",
-            )}
+        {onSearch ? (
+          <button
+            type="button"
+            aria-label="Search memories"
+            onClick={onSearch}
+            className="flex size-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-secondary hover:bg-overlay-ink-10 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
           >
-            <BookmarkSimple aria-hidden className="size-3.5 shrink-0 text-text-primary" />
-            <span className="shrink-0 text-label-sm text-text-primary">{toast.title}</span>
-            {toast.message ? (
-              <span className="min-w-0 truncate text-caption text-text-secondary">{toast.message}</span>
-            ) : null}
-            <button
-              type="button"
-              aria-label="Dismiss"
-              onClick={() => setLeaving(true)}
-              className="flex size-3 shrink-0 cursor-pointer items-center justify-center text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+            <MagnifyingGlass aria-hidden className="size-4" />
+          </button>
+        ) : (
+          <span
+            aria-hidden
+            className="flex size-7.5 shrink-0 items-center justify-center rounded-full bg-overlay-ink-6 text-text-secondary"
+          >
+            <MagnifyingGlass className="size-4" />
+          </span>
+        )}
+      </div>
+      <div className="motion-reveal" data-collapsed={!toast || dismissed || undefined}>
+        <div className="px-5 py-1.5">
+          {toast && !dismissed ? (
+            <div
+              role="status"
+              onAnimationEnd={() => {
+                if (leaving && toast) {
+                  setDismissedFor(toast);
+                  onToastDismiss?.();
+                }
+              }}
+              className={cn(
+                "inline-flex h-8 max-w-full items-center gap-2 rounded-full bg-accent-sky-500-16 pr-3 pl-2.5",
+                leaving ? "animate-pop-out" : "animate-pop-in",
+              )}
             >
-              <X aria-hidden className="size-3" />
-            </button>
-          </div>
+              <BookmarkSimple aria-hidden className="size-3.5 shrink-0 text-text-primary" />
+              <span className="shrink-0 text-label-sm text-text-primary">{toast.title}</span>
+              {toast.message ? (
+                <span className="min-w-0 truncate text-caption text-text-secondary">{toast.message}</span>
+              ) : null}
+              <button
+                type="button"
+                aria-label="Dismiss"
+                onClick={() => setLeavingFor(toast)}
+                className="flex size-3 shrink-0 cursor-pointer items-center justify-center text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+              >
+                <X aria-hidden className="size-3" />
+              </button>
+            </div>
+          ) : null}
         </div>
-      ) : null}
+      </div>
       <div key={filter} className="flex flex-col">
         {visible.map((group) => {
           const items = memories.filter((memory) => memory.group === group);

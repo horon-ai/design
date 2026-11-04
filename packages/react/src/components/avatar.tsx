@@ -19,6 +19,11 @@ export type AvatarProps = {
   live?: boolean;
   /** Initials colour: `neutral` (default) or `sky`, the Paper account profile avatar (sky-100 fill, sky-700 text). */
   tone?: "neutral" | "sky";
+  /**
+   * Border colour of the live dot, so it matches the surface behind it (glass panels, `bg-subtle`, brand tints).
+   * Defaults to `border-bg-surface`.
+   */
+  liveRingClassName?: string;
   className?: string;
 };
 
@@ -59,13 +64,14 @@ export function Avatar({
   children,
   live,
   tone = "neutral",
+  liveRingClassName = "border-bg-surface",
   className,
 }: AvatarProps) {
   return (
     <span className={cn("relative inline-flex shrink-0", className)}>
       <BaseAvatar.Root
         className={cn(
-          "inline-flex items-center justify-center overflow-clip rounded-full select-none",
+          "inline-flex items-center justify-center overflow-clip rounded-full inset-ring-1 inset-ring-overlay-ink-6 select-none",
           sizeClass[size],
           typeClass[type],
           type === "initials" && tone === "sky" && "bg-sky-100 text-sky-700",
@@ -86,7 +92,8 @@ export function Avatar({
         <span aria-hidden className="absolute -right-px -bottom-px flex animate-pop-in">
           <span
             className={cn(
-              "animate-live-pulse rounded-full border-2 border-bg-surface bg-status-live text-status-live",
+              "animate-live-pulse rounded-full border-2 bg-status-live text-status-live",
+              liveRingClassName,
               liveClass[size],
             )}
           />

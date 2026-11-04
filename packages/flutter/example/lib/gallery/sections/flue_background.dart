@@ -31,6 +31,14 @@ class HoronFlueBackgroundGallerySection extends StatelessWidget {
             children: <Widget>[
               const _FlueCell(label: 'Sky (기본 팔레트)'),
               const _FlueCell(
+                label: '사이드바 · sidebar',
+                variant: HoronFlueVariant.sidebar,
+              ),
+              const _FlueCell(
+                label: '인증 화면 · auth',
+                variant: HoronFlueVariant.auth,
+              ),
+              const _FlueCell(
                 label: '팔레트 덮어쓰기',
                 config: HoronFlueConfig(
                   bgColor: Color(0xFFF6EFEA),
@@ -40,11 +48,6 @@ class HoronFlueBackgroundGallerySection extends StatelessWidget {
                   colorD: Color(0xFF3B2113),
                 ),
               ),
-              const _FlueCell(
-                label: 'Sidebar 변형',
-                variant: HoronFlueVariant.sidebar,
-              ),
-              const _FlueCell(label: 'Auth 변형', variant: HoronFlueVariant.auth),
               const _FlueCell(
                 label: '밤 팔레트 (FLUE_NIGHT)',
                 config: HoronFlueConfig.night,

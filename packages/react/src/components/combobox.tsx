@@ -63,7 +63,7 @@ export type ComboboxProps = ComboboxSingleProps | ComboboxMultipleProps;
 
 const itemClass: Record<ComboboxSize, string> = {
   sm: "h-8 gap-2 px-2.5 text-label-sm [&_svg]:size-4",
-  md: "h-10 gap-2.5 px-3 text-label-md [&_svg]:size-4.5",
+  md: "h-10 gap-2.5 px-3 text-label-md [&_svg]:size-4",
   lg: "h-12 gap-3 px-4 text-label-lg [&_svg]:size-5",
 };
 
@@ -75,9 +75,9 @@ const chipClass: Record<ComboboxSize, string> = {
 
 /** Multiple chips wrap, so the field grows from its rung height instead of fixing it. */
 const multiFieldClass: Record<ComboboxSize, string> = {
-  sm: "min-h-8 flex-wrap gap-1 px-2 py-1 [&_svg]:size-4",
-  md: "min-h-10 flex-wrap gap-1.5 px-2.5 py-1.5 [&_svg]:size-4",
-  lg: "min-h-12 flex-wrap gap-2 px-3 py-2 [&_svg]:size-5",
+  sm: "min-h-8 flex-wrap gap-1 px-2 py-1",
+  md: "min-h-10 flex-wrap gap-1.5 px-2.5 py-1.5",
+  lg: "min-h-12 flex-wrap gap-2 px-3 py-2",
 };
 
 /** The popup follows the field's surface (a segment takes its group's): glass is the veil, every solid kind is solid. */
@@ -228,7 +228,7 @@ export function Combobox(props: ComboboxProps) {
                   <BaseCombobox.Chip
                     key={item.value}
                     className={cn(
-                      "relative flex shrink-0 items-center rounded-full bg-overlay-ink-6 text-text-primary outline-none data-highlighted:bg-overlay-ink-12",
+                      "relative flex shrink-0 animate-pop-in items-center rounded-full bg-overlay-ink-6 text-text-primary outline-none data-highlighted:bg-overlay-ink-12",
                       chipClass[size],
                     )}
                   >

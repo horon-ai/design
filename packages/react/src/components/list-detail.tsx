@@ -48,7 +48,7 @@ export function ListDetail({
   const [inner, setInner] = useState(defaultValue ?? all[0]?.id);
   const selectedId = value ?? inner;
   const selected = all.find((item) => item.id === selectedId) ?? all[0];
-  const mutedClass = surface === "glass" ? "text-text-secondary" : "text-text-placeholder";
+  const mutedClass = "text-text-secondary";
   return (
     <div
       className={cn(
@@ -79,17 +79,16 @@ export function ListDetail({
                 role="option"
                 aria-selected={item.id === selected?.id}
                 data-selected={item.id === selected?.id ? "" : undefined}
-                className="flex cursor-pointer flex-col gap-1 rounded-[10px] px-3 py-2.5 text-left motion-colors hover:bg-overlay-ink-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-selected:bg-interactive-secondary"
+                className="flex cursor-pointer flex-col gap-1 rounded-[10px] px-3 py-2.5 text-left motion-colors hover:bg-overlay-ink-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-selected:bg-overlay-ink-6 data-selected:hover:bg-overlay-ink-8"
                 onClick={() => {
                   setInner(item.id);
                   onValueChange?.(item.id);
                 }}
               >
                 <span className="flex items-center gap-2">
-                  <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-sky-500" />
                   <span className="min-w-0 truncate font-mono text-label-md text-text-primary">{item.title}</span>
                 </span>
-                {item.meta && <span className={cn("pl-3.5 text-label-sm", mutedClass)}>{item.meta}</span>}
+                {item.meta && <span className={cn("text-label-sm", mutedClass)}>{item.meta}</span>}
               </button>
             ))}
           </div>
@@ -134,19 +133,16 @@ export type ListDetailMetaProps = Omit<ComponentProps<"dl">, "className"> & {
   className?: string;
 };
 
-/** Meta box: a neutral-50 12px-radius box with equal columns of a label over a 14/20 value. */
+/** Meta box: a subtle-fill 12px-radius box with equal columns of a label over a 14/20 value. */
 export function ListDetailMeta({ items, className, ...props }: ListDetailMetaProps) {
   return (
     <dl
-      className={cn(
-        "m-0 grid grid-cols-2 gap-x-4 gap-y-3 rounded-md bg-neutral-50 px-4 py-3.5 dark:bg-neutral-800",
-        className,
-      )}
+      className={cn("m-0 grid grid-cols-2 gap-x-4 gap-y-3 rounded-md bg-bg-subtle px-4 py-3.5", className)}
       {...props}
     >
       {items.map((item) => (
         <div key={item.id} className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <dt className="text-label-sm text-text-placeholder">{item.label}</dt>
+          <dt className="text-label-sm text-text-secondary">{item.label}</dt>
           <dd className="m-0 truncate text-label-md text-text-primary">{item.value}</dd>
         </div>
       ))}
@@ -215,8 +211,16 @@ export function ListDetailInstructions({
           </span>
         )}
         <span className="flex-1" />
-        <Button variant="solid" size="sm" aria-pressed={editing} onClick={() => setEditing((open) => !open)}>
-          {editing ? "Done" : "Edit"}
+        <Button
+          variant="solid"
+          size="sm"
+          aria-pressed={editing}
+          onClick={() => setEditing((open) => !open)}
+          className="w-16 justify-center px-0"
+        >
+          <span key={editing ? "done" : "edit"} className="animate-fade-in">
+            {editing ? "Done" : "Edit"}
+          </span>
         </Button>
       </div>
       <CodePanel>{renderInstructions(text)}</CodePanel>
@@ -226,7 +230,7 @@ export function ListDetailInstructions({
             aria-label="Edit instructions"
             value={text}
             rows={6}
-            className="mt-1 block w-full resize-y rounded-[10px] border border-border-default bg-bg-inset px-4 py-3.5 font-mono text-[12px]/[21px] text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+            className="block w-full resize-y rounded-[10px] border border-border-default bg-bg-inset px-4 py-3.5 font-mono text-[12px]/[21px] text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
             onChange={(event) => {
               setInner(event.target.value);
               onValueChange?.(event.target.value);

@@ -63,7 +63,7 @@ export function FilterBar({
             }}
             className={cn(
               "relative flex h-7.5 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-4 whitespace-nowrap motion-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand disabled:cursor-not-allowed disabled:opacity-40",
-              active ? "text-text-primary" : "text-text-secondary hover:text-text-primary",
+              active ? "text-text-primary" : "text-text-secondary hover:bg-overlay-ink-5 hover:text-text-primary",
             )}
           >
             <span className="text-label-md">{item.label}</span>

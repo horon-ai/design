@@ -26,6 +26,14 @@ function Rows() {
         meta={["8 tools", "Last used yesterday"]}
         menu={<MenuItem>View tools</MenuItem>}
       />
+      <McpServerRow
+        name="Sentry"
+        tags={["Community"]}
+        description="Read issues and release health."
+        meta={["6 tools", "Never used", "v0.6"]}
+        statusLabel="Needs auth"
+        statusTone="warning"
+      />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { CaretDown, Sparkle, Warning } from "@phosphor-icons/react";
+import { CaretDown, Pulse, Warning } from "@phosphor-icons/react";
 import { type ComponentProps, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
@@ -54,6 +54,8 @@ export type AgentLanesTimelineProps = Omit<ComponentProps<"section">, "className
   /** Where the current line sits, in minutes before the end of the window. The line glides to a new value in 280ms. */
   cursor?: number;
   approval?: AgentLanesTimelineApproval;
+  /** Makes the range pill actionable; without it the range renders as a plain label. */
+  onRangeClick?: () => void;
   className?: string;
 };
 
@@ -99,6 +101,7 @@ export function AgentLanesTimeline({
   windowMinutes = 30,
   cursor = 0,
   approval,
+  onRangeClick,
   className,
   ...props
 }: AgentLanesTimelineProps) {
@@ -118,7 +121,7 @@ export function AgentLanesTimeline({
       {...props}
     >
       <div className="flex items-center gap-2.5 px-5 pt-4 pb-3.5">
-        <Sparkle aria-hidden className="size-4.5 shrink-0 text-text-primary" />
+        <Pulse aria-hidden className="size-4.5 shrink-0 text-text-primary" />
         <h3 className="text-label-lg text-text-primary">{title}</h3>
         {statuses.map((status) => (
           <span key={status.id} className="flex items-center gap-1.5 text-body-sm text-text-secondary">
@@ -133,23 +136,31 @@ export function AgentLanesTimeline({
           </span>
         ))}
         <span className="flex-1" />
-        <button
-          type="button"
-          className="flex h-7.5 motion-press cursor-pointer items-center gap-1 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
-        >
-          {range}
-          <CaretDown aria-hidden className="size-3 text-text-secondary" />
-        </button>
+        {onRangeClick ? (
+          <button
+            type="button"
+            onClick={onRangeClick}
+            className="flex h-7.5 motion-press cursor-pointer items-center gap-1 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+          >
+            {range}
+            <CaretDown aria-hidden className="size-3 text-text-secondary" />
+          </button>
+        ) : (
+          <span className="flex h-7.5 items-center gap-1 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary">
+            {range}
+            <CaretDown aria-hidden className="size-3 text-text-secondary" />
+          </span>
+        )}
       </div>
       <div className="h-px bg-overlay-ink-8" />
 
       <div className="overflow-x-auto">
-        <div className="relative h-76 min-w-175">
+        <div className="relative min-w-175" style={{ height: TOP + Math.max(2, bots.length) * ROW }}>
           {ticks.map((minutes) => (
             <span key={minutes}>
               <span
                 aria-hidden
-                className="absolute top-9 h-67 w-px bg-overlay-ink-5"
+                className="absolute top-9 bottom-0 w-px bg-overlay-ink-5"
                 style={{ left: trackX(at(minutes)) }}
               />
               <span
@@ -238,7 +249,7 @@ export function AgentLanesTimeline({
               <div
                 key={task.id}
                 className={cn(
-                  "absolute flex h-9 items-center gap-1.5 overflow-clip rounded-[10px] px-2.5 text-label-sm motion-colors [&>svg]:size-3.5",
+                  "absolute flex h-9 motion-rise items-center gap-1.5 overflow-clip rounded-[10px] px-2.5 text-label-sm transition-[left,width,background-color,color,border-color] duration-280 ease-emphasized [&>svg]:size-3.5",
                   barTone[task.tone],
                 )}
                 style={{
@@ -267,7 +278,7 @@ export function AgentLanesTimeline({
           </span>
           <span
             aria-hidden
-            className="absolute top-9 h-67 w-[1.5px] bg-status-live/60 transition-[left] duration-280 ease-emphasized"
+            className="absolute top-9 bottom-0 w-[1.5px] bg-status-live/60 transition-[left] duration-280 ease-emphasized"
             style={{ left: trackX(at(-cursor)) }}
           />
         </div>

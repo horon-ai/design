@@ -66,13 +66,16 @@ export function Radio({ label, size, className, ...props }: RadioProps) {
           "flex shrink-0 items-center justify-center rounded-full border-[1.5px] border-border-strong bg-bg-surface motion-colors",
           circleClass[resolvedSize],
           "hover:not-data-disabled:border-text-secondary",
-          "data-checked:border-0 data-checked:bg-interactive-primary hover:not-data-disabled:data-checked:bg-interactive-primary-hover",
+          "data-checked:border-interactive-primary data-checked:bg-interactive-primary hover:not-data-disabled:data-checked:border-interactive-primary-hover hover:not-data-disabled:data-checked:bg-interactive-primary-hover",
           "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
         )}
         {...props}
       >
         <BaseRadio.Indicator
-          className={cn("animate-pop-in rounded-full bg-interactive-on-primary data-unchecked:hidden", dotClass[resolvedSize])}
+          className={cn(
+            "animate-pop-in rounded-full bg-interactive-on-primary data-ending-style:animate-scale-out",
+            dotClass[resolvedSize],
+          )}
         />
       </BaseRadio.Root>
       {label}

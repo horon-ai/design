@@ -1,5 +1,5 @@
 import { Stop } from "@phosphor-icons/react";
-import { Children, type CSSProperties, type ReactNode } from "react";
+import { Children, isValidElement, type CSSProperties, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { SegmentedControl } from "./segmented-control";
@@ -77,7 +77,7 @@ export function OrchestratorPanel({
         className,
       )}
     >
-      <header className="flex flex-col gap-3 px-5 pt-4.5 pb-4">
+      <header className="flex flex-col gap-3 px-5 pt-4 pb-3.5">
         <h3 className="text-label-lg text-text-primary">{title}</h3>
         <div className="flex items-center gap-2.5">
           <span className="text-body-sm text-text-secondary">{parallelLabel}</span>
@@ -134,8 +134,12 @@ export function OrchestratorPanel({
         {lanes.length > 0 && (
           <div className="flex items-start">
             <div className="flex min-w-0 flex-1 flex-col gap-2.5 pl-7.5">
-              {Children.map(lanes, (lane, index) => (
-                <div className="relative motion-rise" style={stagger(index)}>
+              {lanes.map((lane, index) => (
+                <div
+                  key={isValidElement(lane) && lane.key != null ? lane.key : `lane-${index}`}
+                  className="relative motion-rise"
+                  style={stagger(index)}
+                >
                   <span
                     aria-hidden
                     className="absolute top-0 -left-7.5 h-5.5 w-7.5 rounded-bl-lg border-b-[1.5px] border-l-[1.5px] border-overlay-ink-14"
@@ -152,18 +156,19 @@ export function OrchestratorPanel({
             </div>
           </div>
         )}
-        {summary && (
-          <div
-            className="flex motion-rise flex-col gap-1 rounded-2xl bg-overlay-ink-4 px-4 py-3"
-            style={stagger(lanes.length)}
-          >
-            <div className="flex items-center gap-2">
-              <span className="min-w-0 flex-1 text-label-md text-text-primary">{summary.title ?? "Summary"}</span>
-              {summary.count && <span className="shrink-0 text-caption text-text-secondary">{summary.count}</span>}
-            </div>
-            <p className="text-body-sm text-text-secondary">{summary.body}</p>
+        <div className="motion-reveal" data-collapsed={!summary || undefined}>
+          <div>
+            {summary && (
+              <div className="flex flex-col gap-1 rounded-2xl bg-overlay-ink-4 px-4 py-3" style={stagger(lanes.length)}>
+                <div className="flex items-center gap-2">
+                  <span className="min-w-0 flex-1 text-label-md text-text-primary">{summary.title ?? "Summary"}</span>
+                  {summary.count && <span className="shrink-0 text-caption text-text-secondary">{summary.count}</span>}
+                </div>
+                <p className="text-body-sm text-text-secondary">{summary.body}</p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
