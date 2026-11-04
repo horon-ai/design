@@ -22,9 +22,10 @@ export type SidebarProps = Omit<ComponentProps<"nav">, "className"> & {
   className?: string;
   /**
    * `glass` (default) is the thick-glass column. `photo` is the Paper app sidebar: the Horon photo
-   * on #EEF3F8 under a 55% white veil, with the thick glass kept for dark mode.
+   * on #EEF3F8 under a 55% white veil, with the thick glass kept for dark mode. `plain` paints no
+   * fill or glass, so the column takes the color of the layout behind it, divided by a 1px border.
    */
-  surface?: "glass" | "photo";
+  surface?: "glass" | "photo" | "plain";
   /**
    * Drag the right edge to change the width, from the `md` breakpoint (768px) up.
    * Below `md` the handle is hidden and the sidebar keeps its fixed 280px width.
@@ -119,15 +120,17 @@ export function Sidebar({
   return (
     <nav
       className={cn(
-        "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip bg-glass-thick px-3 pt-4 pb-3",
+        "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip px-3 pt-4 pb-3",
+        surface === "glass" && "bg-glass-thick",
         surface === "photo" && "bg-sidebar-photo dark:bg-glass-thick dark:bg-none",
+        surface === "plain" && "border-r border-border-default",
         resizable && "md:w-(--sidebar-width)",
         className,
       )}
       style={resizable ? ({ ...style, "--sidebar-width": `${width}px` } as CSSProperties) : style}
       {...props}
     >
-      {surface === "photo" ? null : <LiquidGlass />}
+      {surface === "glass" && <LiquidGlass />}
       {children}
       {resizable && (
         <div
