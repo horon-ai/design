@@ -97,7 +97,7 @@ class HoronTooltip extends StatelessWidget {
   }
 }
 
-/// 지금의 `CompositedTransformTarget`·`Follower` 앵커 짝이 만들던 말풍선 좌상단입니다.
+/// 예전 `CompositedTransformTarget`·`Follower` 앵커 짝이 만들던 말풍선 좌상단입니다.
 ///
 /// `context.target`은 트리거 중심이라, 앵커 대신 트리거·말풍선 크기의 절반으로 같은 변을
 /// 구합니다. 화면 밖으로 밀거나 뒤집는 처리는 지금도 없으므로 넣지 않습니다.
