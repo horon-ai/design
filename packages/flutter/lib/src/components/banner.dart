@@ -14,17 +14,62 @@ enum HoronBannerTone {
   danger,
 }
 
-/// `banner.tsx`의 `gap-3`입니다.
-const double _bannerGap = 12;
+/// `banner.tsx`의 `BannerSurface`입니다.
+enum HoronBannerSurface {
+  /// `surface="solid"` — 불투명 `bg-surface`에 톤 테두리. 기본값입니다.
+  solid,
 
-/// `banner.tsx`의 `px-4`입니다.
-const double _bannerPaddingX = 16;
+  /// `surface="glass"` — 이미지나 유리 패널 위의 유리 표면입니다.
+  glass,
+}
 
-/// `banner.tsx`의 `py-3`입니다.
-const double _bannerPaddingY = 12;
+/// `banner.tsx`의 `BannerSize`입니다.
+enum HoronBannerSize {
+  /// `size="sm"` — 최소 높이 32, `body-sm`, 아이콘 16px.
+  sm,
 
-/// `banner.tsx`의 `[&_svg]:size-4.5`입니다.
-const double _bannerIconSize = 18;
+  /// `size="md"` — Figma 기본 띠(48), `body-md`, 아이콘 18px.
+  md,
+
+  /// `size="lg"` — 높이 56, `body-lg`, 아이콘 20px.
+  lg,
+}
+
+typedef _BannerMetrics = ({
+  double gap,
+  double paddingX,
+  double paddingY,
+  double icon,
+  TextStyle textStyle,
+  TextStyle action,
+});
+
+_BannerMetrics _metricsOf(HoronBannerSize size, HoronThemeData theme) => switch (size) {
+  HoronBannerSize.sm => (
+    gap: theme.space.s2,
+    paddingX: theme.space.s3,
+    paddingY: theme.space.s2,
+    icon: 16,
+    textStyle: theme.text.bodySm,
+    action: theme.text.labelMd,
+  ),
+  HoronBannerSize.md => (
+    gap: theme.space.s3,
+    paddingX: theme.space.s4,
+    paddingY: theme.space.s3,
+    icon: 18,
+    textStyle: theme.text.bodyMd,
+    action: theme.text.labelLg,
+  ),
+  HoronBannerSize.lg => (
+    gap: theme.space.s3,
+    paddingX: theme.space.s5,
+    paddingY: theme.space.s3_5,
+    icon: 20,
+    textStyle: theme.text.bodyLg,
+    action: theme.text.labelLg,
+  ),
+};
 
 /// Paper `TYN-1`의 액션 줄 높이입니다. `label-lg`의 22px보다 2px 낮은 20px입니다.
 const double _bannerActionLineHeight = 20;
@@ -40,10 +85,24 @@ const double _bannerActionLetterSpacing = -0.04;
 /// `tab-panel-in 220ms`와 같은 페이드·이동을 씁니다.
 class HoronBanner extends StatelessWidget {
   /// 띠를 만듭니다.
-  const HoronBanner({super.key, required this.message, this.tone = HoronBannerTone.info, this.action, this.icon});
+  const HoronBanner({
+    super.key,
+    required this.message,
+    this.tone = HoronBannerTone.info,
+    this.action,
+    this.icon,
+    this.size = HoronBannerSize.md,
+    this.surface = HoronBannerSurface.solid,
+  });
+
+  /// 표면입니다. 기본값은 [HoronBannerSurface.solid]입니다.
+  final HoronBannerSurface surface;
 
   /// 본문입니다.
   final String message;
+
+  /// 크기입니다. 기본값은 [HoronBannerSize.md]입니다.
+  final HoronBannerSize size;
 
   /// 톤입니다.
   final HoronBannerTone tone;
@@ -58,62 +117,70 @@ class HoronBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     final bool danger = tone == HoronBannerTone.danger;
+    final _BannerMetrics metrics = _metricsOf(size, theme);
     final Color accent = danger ? theme.colors.textDanger : theme.colors.textBrand;
-    final Color border = danger ? theme.colors.borderDanger : theme.colors.borderBrand;
+    final Color edge = danger ? theme.colors.borderDanger : theme.colors.borderBrand;
     final BorderRadius radius = BorderRadius.circular(theme.radius.md);
     final bool animate = !MediaQuery.disableAnimationsOf(context);
+
+    final Widget content = Padding(
+      padding: EdgeInsets.symmetric(horizontal: metrics.paddingX, vertical: metrics.paddingY),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          IconTheme.merge(
+            data: IconThemeData(size: metrics.icon, color: accent),
+            child: icon ?? Icon(danger ? Icons.error_outline : Icons.info_outline),
+          ),
+          SizedBox(width: metrics.gap),
+          Expanded(
+            child: Text(message, style: metrics.textStyle.copyWith(color: accent)),
+          ),
+          if (action != null) ...<Widget>[
+            SizedBox(width: metrics.gap),
+            DefaultTextStyle.merge(
+              style: metrics.action.copyWith(
+                color: accent,
+                height: _bannerActionLineHeight / metrics.action.fontSize!,
+                letterSpacing: _bannerActionLetterSpacing,
+                decoration: TextDecoration.underline,
+                decorationColor: accent,
+              ),
+              child: action!,
+            ),
+          ],
+        ],
+      ),
+    );
+
+    final Widget surfaceBody = surface == HoronBannerSurface.glass
+        ? Stack(
+            children: <Widget>[
+              Positioned.fill(
+                child: HoronLiquidGlass(
+                  tier: HoronGlassTier.regular,
+                  borderRadius: radius,
+                  edgeColor: edge,
+                  child: const SizedBox.expand(),
+                ),
+              ),
+              content,
+            ],
+          )
+        : Container(
+            decoration: BoxDecoration(
+              color: theme.colors.bgSurface,
+              borderRadius: radius,
+              border: Border.all(color: edge),
+            ),
+            child: content,
+          );
 
     final Widget body = Semantics(
       liveRegion: danger,
       container: true,
       label: danger ? '경고' : '안내',
-      child: ClipRRect(
-        borderRadius: radius,
-        child: Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: HoronLiquidGlass(
-                tier: HoronGlassTier.regular,
-                borderRadius: radius,
-                child: const SizedBox.expand(),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: radius,
-                border: Border.all(color: border),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: _bannerPaddingX, vertical: _bannerPaddingY),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  IconTheme.merge(
-                    data: IconThemeData(size: _bannerIconSize, color: accent),
-                    child: icon ?? Icon(danger ? Icons.error_outline : Icons.info_outline),
-                  ),
-                  const SizedBox(width: _bannerGap),
-                  Expanded(
-                    child: Text(message, style: theme.text.bodyMd.copyWith(color: accent)),
-                  ),
-                  if (action != null) ...<Widget>[
-                    const SizedBox(width: _bannerGap),
-                    DefaultTextStyle.merge(
-                      style: theme.text.labelLg.copyWith(
-                        color: accent,
-                        height: _bannerActionLineHeight / theme.text.labelLg.fontSize!,
-                        letterSpacing: _bannerActionLetterSpacing,
-                        decoration: TextDecoration.underline,
-                        decorationColor: accent,
-                      ),
-                      child: action!,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: ClipRRect(borderRadius: radius, child: surfaceBody),
     );
 
     if (!animate) return body;

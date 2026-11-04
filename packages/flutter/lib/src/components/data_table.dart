@@ -842,7 +842,7 @@ class HoronDataTableView<T> extends StatelessWidget {
                     child: Semantics(
                       label: 'Select all rows',
                       child: HoronCheckbox(
-                        small: true,
+                        size: HoronCheckboxSize.sm,
                         value: controller.allVisibleSelected ? true : (controller.someVisibleSelected ? null : false),
                         onChanged: (bool? value) => controller.toggleAllVisible(value ?? false),
                       ),
@@ -883,7 +883,7 @@ class HoronDataTableView<T> extends StatelessWidget {
                               child: Semantics(
                                 label: 'Select row ${index + 1}',
                                 child: HoronCheckbox(
-                                  small: true,
+                                  size: HoronCheckboxSize.sm,
                                   value: controller.selected.contains(rows[index]),
                                   onChanged: (bool? value) => controller.toggleSelection(rows[index], value ?? false),
                                 ),

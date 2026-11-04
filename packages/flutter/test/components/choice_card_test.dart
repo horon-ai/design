@@ -29,6 +29,13 @@ const Widget _card = HoronChoiceCard(
   badge: Text('Recommended'),
 );
 
+const Widget _glassCard = HoronChoiceCard(
+  title: Text('Workspace connection'),
+  description: Text('Share the workspace with this bot'),
+  badge: Text('Recommended'),
+  surface: HoronChoiceCardSurface.glass,
+);
+
 AnimatedContainer _surface(WidgetTester tester) =>
     tester.widget<AnimatedContainer>(find.byKey(const Key('horon-choice-card-surface')));
 
@@ -50,7 +57,7 @@ void main() {
   });
 
   testWidgets('기본 카드는 clear 유리, 흰 70% 림, 252 폭, 16 반경이다', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(Brightness.light, _card));
+    await tester.pumpWidget(_host(Brightness.light, _glassCard));
 
     final BoxDecoration surface = _surface(tester).decoration! as BoxDecoration;
     // 바탕은 유리 엔진이 그립니다. React `choice-card.tsx:34`의 `<LiquidGlass tier="clear" />`와
@@ -59,7 +66,8 @@ void main() {
     final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
     expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '카드가 유리 표면을 깝니다');
     expect(glass.tier, HoronGlassTier.clear);
-    expect((surface.border! as Border).top.color, colors.glassRimFrost, reason: 'Paper 1VXR-0은 흰 70% 림을 그립니다');
+    expect(glass.edgeColor, isNull, reason: '선택 전에는 토큰 림 그라디언트입니다');
+    expect(surface.border, isNull, reason: '테두리는 유리 림이 그립니다');
     expect(surface.borderRadius, BorderRadius.circular(radius.xl2));
     expect(tester.getSize(find.byKey(const Key('horon-choice-card-surface'))).width, 252);
 
@@ -78,6 +86,7 @@ void main() {
           description: Text('Share the workspace with this bot'),
           badge: Text('Recommended'),
           checked: true,
+          surface: HoronChoiceCardSurface.glass,
         ),
       ),
     );
@@ -85,8 +94,9 @@ void main() {
 
     final BoxDecoration surface = _surface(tester).decoration! as BoxDecoration;
     expect(surface.color, isNull, reason: 'bg-glass-thick도 유리 채움 레이어가 그립니다');
-    expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier, HoronGlassTier.thick);
-    expect((surface.border! as Border).top.color, colors.borderBrand);
+    final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
+    expect(glass.tier, HoronGlassTier.thick);
+    expect(glass.edgeColor, colors.borderBrand, reason: '선택 상태는 림 색으로 표시합니다');
 
     final Border ring = (_ring(tester).decoration! as BoxDecoration).border! as Border;
     expect(ring.top.width, 5);

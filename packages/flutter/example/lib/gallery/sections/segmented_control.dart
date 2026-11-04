@@ -52,8 +52,16 @@ class HoronSegmentedControlGallerySection extends StatelessWidget {
       ],
       states: <Widget>[
         const _Cell(
-          label: 'glass 트랙',
+          label: 'solid 트랙 (기본)',
           child: HoronSegmentedControl(items: _items, value: 'day'),
+        ),
+        const _Cell(
+          label: 'glass 트랙',
+          child: HoronSegmentedControl(
+            items: _items,
+            surface: HoronSegmentedControlSurface.glass,
+            value: 'day',
+          ),
         ),
         const _Cell(
           label: 'inset 트랙 (잉크 5%)',

@@ -22,6 +22,21 @@ class HoronMessageExtrasGallerySection extends StatelessWidget {
           children: <Widget>[
             const HoronDateSeparator(label: '오늘'),
             HoronMessageActions(
+              surface: HoronSurface.glass,
+              actions: <HoronMessageAction>[
+                HoronMessageAction(
+                  label: '복사',
+                  icon: const Icon(Icons.copy),
+                  onPressed: () {},
+                ),
+                HoronMessageAction(
+                  label: '다시 생성',
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+            HoronMessageActions(
               actions: <HoronMessageAction>[
                 HoronMessageAction(
                   label: '복사',

@@ -21,7 +21,10 @@ class HoronMenuGallerySection extends StatelessWidget {
         children: <Widget>[
           _Sample(
             label: 'glass',
-            child: HoronMenuContent(children: _items(theme)),
+            child: HoronMenuContent(
+              surface: HoronMenuSurface.glass,
+              children: _items(theme),
+            ),
           ),
           _Sample(
             label: 'solid',

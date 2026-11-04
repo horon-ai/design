@@ -16,8 +16,15 @@ class HoronTextareaGallerySection extends StatelessWidget {
       title: 'Textarea',
       variants: <Widget>[
         const _TextareaCell(
-          label: '기본 (112px 유리 상자)',
+          label: '기본 (112px solid 상자)',
           child: HoronTextarea(hintText: '메모를 남겨 주세요'),
+        ),
+        const _TextareaCell(
+          label: 'Glass (112px 유리 상자)',
+          child: HoronTextarea(
+            surface: HoronInputSurface.glass,
+            hintText: '메모를 남겨 주세요',
+          ),
         ),
         const _TextareaCell(
           label: 'Invalid',
@@ -37,7 +44,8 @@ class HoronTextareaGallerySection extends StatelessWidget {
       notes:
           'Figma `Textarea`(58:137)입니다. 상자는 `min-h-28`(112)에서 시작해 입력이 늘면 '
           '함께 자라고, 여백은 좌우 14·위아래 12입니다. 글자는 `body-md`, 안내 문구는 '
-          '`text-placeholder`, 오류 테두리는 `border-danger`입니다.',
+          '`text-placeholder`, 오류 테두리는 `border-danger`입니다. 기본 표면은 solid이고, '
+          '유리 패널 위에서는 `surface: HoronInputSurface.glass`를 넘깁니다.',
     );
   }
 }

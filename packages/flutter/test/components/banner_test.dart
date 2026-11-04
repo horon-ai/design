@@ -57,7 +57,7 @@ void main() {
 
   testWidgets('banner: a one-line message makes the 52px strip', (WidgetTester tester) async {
     await pumpBanner(tester, const HoronBanner(message: '새 버전이 있습니다.'));
-    // Paper `TY7-1`: 위아래 여백 12 + `body-md` 줄 높이 26 + 테두리 1씩 = 52.
+    // solid: 위아래 여백 12 + `body-md` 줄 높이 26 + 1px 테두리 둘 = 52.
     expect(tester.getSize(find.byType(HoronBanner)).height, 52);
   });
 

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 import 'icon_button.dart';
@@ -38,7 +39,11 @@ class HoronDirectoryCard extends StatelessWidget {
     this.description,
     this.onAdd,
     this.addLabel = 'Add',
+    this.surface = HoronSurface.solid,
   });
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다. solid면 추가 버튼도 solid입니다.
+  final HoronSurface surface;
 
   /// 40px 타일에 그릴 아이콘입니다. 20px로 그려집니다.
   final Widget icon;
@@ -65,7 +70,12 @@ class HoronDirectoryCard extends StatelessWidget {
       child: Stack(
         children: <Widget>[
           Positioned.fill(
-            child: HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: const SizedBox.expand()),
+            child: HoronSurfaceLayer(
+              surface: surface,
+              tier: HoronGlassTier.thick,
+              borderRadius: radius,
+              child: const SizedBox.expand(),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(
@@ -123,7 +133,7 @@ class HoronDirectoryCard extends StatelessWidget {
                 ),
                 const SizedBox(width: _cardGap),
                 HoronIconButton(
-                  variant: HoronIconButtonVariant.glass,
+                  variant: surface == HoronSurface.glass ? HoronIconButtonVariant.glass : HoronIconButtonVariant.solid,
                   size: HoronIconButtonSize.sm,
                   label: addLabel,
                   icon: const Icon(Icons.add, size: 14),

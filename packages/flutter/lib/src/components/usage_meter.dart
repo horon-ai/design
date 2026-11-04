@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_surface.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -31,7 +32,17 @@ const Duration _meterFillDuration = Duration(milliseconds: 400);
 /// `bg-sky-500`이며 400ms `ease-out-quint`로 움직입니다.
 class HoronUsageMeter extends StatelessWidget {
   /// 사용량 막대를 만듭니다.
-  const HoronUsageMeter({super.key, required this.label, required this.value, this.detail, this.note});
+  const HoronUsageMeter({
+    super.key,
+    required this.label,
+    required this.value,
+    this.detail,
+    this.note,
+    this.surface = HoronSurface.solid,
+  });
+
+  /// 표면입니다. 기본값은 [HoronSurface.solid]입니다.
+  final HoronSurface surface;
 
   /// 막대 이름입니다.
   final String label;
@@ -60,7 +71,12 @@ class HoronUsageMeter extends StatelessWidget {
         child: Stack(
           children: <Widget>[
             Positioned.fill(
-              child: HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: const SizedBox.expand()),
+              child: HoronSurfaceLayer(
+                surface: surface,
+                tier: HoronGlassTier.thick,
+                borderRadius: radius,
+                child: const SizedBox.expand(),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(_meterPadding),

@@ -16,10 +16,18 @@ class HoronTextareaFieldGallerySection extends StatelessWidget {
       title: 'Textarea field',
       variants: <Widget>[
         const _Cell(
-          label: '도움말',
+          label: '도움말 (solid 기본)',
           child: HoronTextareaField(
             label: '메모',
             hint: 'Optional',
+            description: '팀에게 공유할 내용을 적어 주세요.',
+          ),
+        ),
+        const _Cell(
+          label: 'Glass 표면',
+          child: HoronTextareaField(
+            label: '메모',
+            surface: HoronInputSurface.glass,
             description: '팀에게 공유할 내용을 적어 주세요.',
           ),
         ),
@@ -52,7 +60,7 @@ class HoronTextareaFieldGallerySection extends StatelessWidget {
         ),
       ],
       notes:
-          'Figma `Textarea field`(60:466)입니다. 라벨 줄(오른쪽에 힌트), 120px 유리 상자, '
+          'Figma `Textarea field`(60:466)입니다. 라벨 줄(오른쪽에 힌트), 120px 상자, '
           '아래 푸터로 이루어집니다. React는 폭을 `w-90`(360)으로 고정하지만, 여기서는 '
           '360까지 늘고 좁은 화면에서는 부모 폭을 따릅니다. 오류가 있으면 테두리와 '
           '푸터가 `text-danger`로 바뀌고, 카운터는 `현재 / 최대`로 갱신됩니다.',

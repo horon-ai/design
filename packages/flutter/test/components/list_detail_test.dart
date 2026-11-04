@@ -31,7 +31,8 @@ List<HoronListDetailGroup> _groups() => const <HoronListDetailGroup>[
 
 Widget _detail(HoronListDetailItem item) => Text('detail:${item.id}');
 
-HoronListDetail _listDetail() => HoronListDetail(groups: _groups(), detailBuilder: _detail);
+HoronListDetail _listDetail() =>
+    HoronListDetail(groups: _groups(), detailBuilder: _detail, surface: HoronSurface.glass);
 
 HoronThemeData _themeOf(WidgetTester tester, Finder finder) => HoronTheme.of(tester.element(finder));
 

@@ -19,7 +19,11 @@ class HoronCalendarGallerySection extends StatelessWidget {
         runSpacing: theme.space.s6,
         crossAxisAlignment: WrapCrossAlignment.start,
         children: <Widget>[
-          const _Sample(label: '기본', child: _SingleCalendar()),
+          const _Sample(label: '기본 (solid)', child: _SingleCalendar()),
+          const _Sample(
+            label: '유리 (glass)',
+            child: _SingleCalendar(surface: HoronCalendarSurface.glass),
+          ),
           const _Sample(label: '팝오버', child: _SingleCalendar(popover: true)),
           const _Sample(label: '범위', child: _RangeCalendar()),
           const _Sample(label: '일부 날짜 막음', child: _DisabledCalendar()),
@@ -56,9 +60,13 @@ class _Sample extends StatelessWidget {
 
 /// 날짜 하나를 고르는 표본입니다.
 class _SingleCalendar extends StatefulWidget {
-  const _SingleCalendar({this.popover = false});
+  const _SingleCalendar({
+    this.popover = false,
+    this.surface = HoronCalendarSurface.solid,
+  });
 
   final bool popover;
+  final HoronCalendarSurface surface;
 
   @override
   State<_SingleCalendar> createState() => _SingleCalendarState();
@@ -73,6 +81,7 @@ class _SingleCalendarState extends State<_SingleCalendar> {
       value: _value,
       onValueChange: (DateTime next) => setState(() => _value = next),
       popover: widget.popover,
+      surface: widget.surface,
     );
   }
 }

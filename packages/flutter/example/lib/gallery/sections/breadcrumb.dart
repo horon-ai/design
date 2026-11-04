@@ -39,7 +39,7 @@ class HoronBreadcrumbGallerySection extends StatelessWidget {
           _Sample(
             label: 'surface="glass"',
             child: HoronBreadcrumb(
-              glass: true,
+              surface: HoronBreadcrumbSurface.glass,
               children: <Widget>[
                 HoronBreadcrumbItem(label: '워크스페이스', onTap: () {}),
                 HoronBreadcrumbItem(label: '지식 베이스', onTap: () {}),
@@ -50,7 +50,7 @@ class HoronBreadcrumbGallerySection extends StatelessWidget {
           _Sample(
             label: '긴 조각 (폭에 따라 줄바꿈)',
             child: HoronBreadcrumb(
-              glass: true,
+              surface: HoronBreadcrumbSurface.glass,
               children: <Widget>[
                 HoronBreadcrumbItem(label: '워크스페이스 설정', onTap: () {}),
                 HoronBreadcrumbItem(label: '에이전트 관리', onTap: () {}),

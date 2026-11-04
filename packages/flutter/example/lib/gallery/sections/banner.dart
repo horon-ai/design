@@ -26,6 +26,11 @@ class HoronBannerGallerySection extends StatelessWidget {
             const HoronBanner(message: '새 버전이 있습니다. 지금 업데이트할 수 있습니다.'),
             SizedBox(height: theme.space.s3),
             const HoronBanner(
+              message: '유리 표면 위의 안내 띠입니다.',
+              surface: HoronBannerSurface.glass,
+            ),
+            SizedBox(height: theme.space.s3),
+            const HoronBanner(
               message: '워크스페이스 연결이 끊겼습니다.',
               tone: HoronBannerTone.danger,
             ),

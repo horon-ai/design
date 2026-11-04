@@ -61,6 +61,7 @@ void main() {
         // 깔고 아이콘을 얹는 것과 같은 순서입니다. 쉬는 상태의 컨테이너 색은 비어 있고,
         // 호버·누름에서만 토큰 색이 얇게 얹힙니다.
         HoronIconButtonVariant.glass => (null, colors.textPrimary),
+        HoronIconButtonVariant.solid => (colors.bgSurface, colors.textPrimary),
       };
       expect(_decoration(tester).color, expected.$1, reason: '$variant 배경색');
       if (variant == HoronIconButtonVariant.glass) {
@@ -72,6 +73,14 @@ void main() {
         );
       } else {
         expect(_decoration(tester).shape, BoxShape.circle, reason: 'rounded-full');
+      }
+      if (variant == HoronIconButtonVariant.solid) {
+        expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'solid 변형은 유리를 쓰지 않습니다');
+        expect(
+          (_decoration(tester).border! as Border).top.color,
+          colors.borderDefault,
+          reason: 'solid 변형은 border-default 1px 테두리를 그립니다',
+        );
       }
       expect(_iconColor(tester), expected.$2, reason: '$variant 아이콘색');
     }

@@ -23,6 +23,14 @@ class HoronPageHeaderGallerySection extends StatelessWidget {
         crossAxisAlignment: WrapCrossAlignment.start,
         children: <Widget>[
           _Sample(
+            label: '유리 표면',
+            child: HoronPageHeader(
+              title: '에이전트 설정',
+              surface: HoronSurface.glass,
+              onBack: () {},
+            ),
+          ),
+          _Sample(
             label: '뒤로 버튼',
             child: HoronPageHeader(title: '에이전트 설정', onBack: () {}),
           ),

@@ -52,7 +52,11 @@ void main() {
       for (final bool glass in <bool>[true, false]) {
         await tester.pumpWidget(
           _host(
-            HoronPickerField(items: _times, value: '09:00', glass: glass),
+            HoronPickerField(
+              items: _times,
+              value: '09:00',
+              surface: glass ? HoronPickerSurface.glass : HoronPickerSurface.solid,
+            ),
             brightness: brightness,
           ),
         );
@@ -62,7 +66,7 @@ void main() {
   });
 
   testWidgets('the glass picker is a 40px tall, 160px wide field with the md radius', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00')));
+    await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00', surface: HoronPickerSurface.glass)));
     final HoronThemeData theme = _theme(tester);
     final BoxDecoration decoration = _triggerDecoration(tester);
 
@@ -86,7 +90,7 @@ void main() {
   });
 
   testWidgets('an inset picker paints the 4% ink and skips the glass', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00', glass: false)));
+    await tester.pumpWidget(_host(HoronPickerField(items: _times, value: '09:00', surface: HoronPickerSurface.solid)));
     final HoronThemeData theme = _theme(tester);
 
     expect(_triggerDecoration(tester).color, theme.colors.overlayInk4, reason: 'bg-overlay-ink-4');
@@ -159,7 +163,7 @@ void main() {
           children: <Widget>[
             HoronScheduleSection(
               label: const Text('Repeat'),
-              children: <Widget>[HoronPickerField(items: _times, value: '09:00', glass: false)],
+              children: <Widget>[HoronPickerField(items: _times, value: '09:00', surface: HoronPickerSurface.solid)],
             ),
           ],
         ),

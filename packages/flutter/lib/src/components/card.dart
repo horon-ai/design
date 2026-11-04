@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_glass.dart';
 import '../theme/horon_theme.dart';
@@ -30,7 +31,7 @@ class HoronCard extends StatefulWidget {
     this.description,
     this.interactive = false,
     this.selected = false,
-    this.frost = false,
+    this.surface = HoronCardSurface.solid,
     this.onTap,
     this.child,
   });
@@ -47,8 +48,8 @@ class HoronCard extends StatefulWidget {
   /// 선택된 카드입니다. 브랜드 테두리가 붙습니다.
   final bool selected;
 
-  /// `surface="frost"` 자리입니다.
-  final bool frost;
+  /// 표면입니다. 기본값은 [HoronCardSurface.solid]입니다.
+  final HoronCardSurface surface;
 
   /// 누르는 동작입니다.
   final VoidCallback? onTap;
@@ -99,7 +100,7 @@ class _HoronCardState extends State<HoronCard> {
 
     final Widget surface = ClipRRect(
       borderRadius: radius,
-      child: widget.frost
+      child: widget.surface == HoronCardSurface.frost
           ? DecoratedBox(
               decoration: BoxDecoration(
                 color: theme.colors.glassFillFrost,
@@ -116,31 +117,31 @@ class _HoronCardState extends State<HoronCard> {
               ),
               child: BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24), child: content),
             )
-          : Stack(
+          : widget.surface == HoronCardSurface.glass
+          ? Stack(
               children: <Widget>[
                 Positioned.fill(
                   child: HoronLiquidGlass(
                     tier: HoronGlassTier.thick,
                     borderRadius: radius,
+                    edgeColor: selected ? theme.colors.borderBrand : null,
                     child: const SizedBox.expand(),
                   ),
                 ),
                 content,
               ],
+            )
+          : DecoratedBox(
+              decoration: BoxDecoration(
+                color: theme.colors.bgSurface,
+                borderRadius: radius,
+                border: Border.all(color: selected ? theme.colors.borderBrand : theme.colors.borderDefault),
+              ),
+              child: content,
             ),
     );
 
-    final Widget bordered = selected
-        ? DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: radius,
-              border: Border.all(color: theme.colors.borderBrand),
-            ),
-            child: surface,
-          )
-        : surface;
-
-    if (!widget.interactive && widget.onTap == null) return bordered;
+    if (!widget.interactive && widget.onTap == null) return surface;
 
     return FocusableActionDetector(
       actions: <Type, Action<Intent>>{
@@ -159,11 +160,7 @@ class _HoronCardState extends State<HoronCard> {
           onTapCancel: () => setState(() => _pressed = false),
           onTapUp: (_) => setState(() => _pressed = false),
           onTap: widget.onTap,
-          child: AnimatedScale(
-            scale: _pressed ? 0.99 : 1,
-            duration: const Duration(milliseconds: 120),
-            child: bordered,
-          ),
+          child: AnimatedScale(scale: _pressed ? 0.99 : 1, duration: const Duration(milliseconds: 120), child: surface),
         ),
       ),
     );

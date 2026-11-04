@@ -54,7 +54,9 @@ void main() {
   testWidgets('the default calendar is a thick-glass plate with the 20 radius and 16 padding', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today)));
+    await tester.pumpWidget(
+      _host(HoronCalendar(defaultMonth: _month, today: _today, surface: HoronCalendarSurface.glass)),
+    );
     final HoronThemeData theme = _theme(tester);
     final BoxDecoration decoration = _surfaceDecoration(tester);
 
