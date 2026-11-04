@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
@@ -39,7 +39,7 @@ jobs:
       # 그 값은 아래 게시 스텝에서만 주입합니다. 설치 단계 뒤에 두는 이유는 bun이
       # 빈 토큰이 적힌 .npmrc를 읽지 않게 하기 위해서입니다.
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
