@@ -1,15 +1,29 @@
-import { FileDrop } from "@horon-ai/react";
+import { FileDrop, type FileDropSurface } from "@horon-ai/react";
 
 import { Backdrop } from "../demo-backdrop";
 
+function Examples({ surface }: { surface: FileDropSurface }) {
+  return (
+    <div className="flex w-full max-w-[550px] flex-col gap-4">
+      <FileDrop surface={surface} />
+      <FileDrop surface={surface} uploading label="Uploading report.pdf" />
+      <FileDrop surface={surface} rejected label="That file type isn't supported" />
+      <FileDrop surface={surface} disabled label="Uploads are off for this workspace" />
+    </div>
+  );
+}
+
 export default function FileDropDemo() {
   return (
-    <Backdrop>
-      <div className="flex w-full max-w-[550px] flex-col gap-4">
-        <FileDrop />
-        <FileDrop uploading label="Uploading report.pdf" />
-        <FileDrop rejected label="That file type isn't supported" />
+    <div className="flex w-full flex-col gap-6">
+      <p className="text-caption text-text-secondary">Solid</p>
+      <div className="flex justify-center">
+        <Examples surface="solid" />
       </div>
-    </Backdrop>
+      <p className="text-caption text-text-secondary">Glass</p>
+      <Backdrop>
+        <Examples surface="glass" />
+      </Backdrop>
+    </div>
   );
 }

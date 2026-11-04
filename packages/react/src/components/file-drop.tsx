@@ -2,7 +2,10 @@ import { UploadSimple } from "@phosphor-icons/react";
 import { type ComponentProps, type DragEvent, type ReactNode, useId, useState } from "react";
 
 import { cn } from "../lib/cn";
+import { LiquidGlass } from "./liquid-glass";
 import { Spinner } from "./spinner";
+
+export type FileDropSurface = "solid" | "glass";
 
 export type FileDropProps = Omit<ComponentProps<"input">, "className" | "type" | "children" | "onDrop"> & {
   /** Label next to the icon. */
@@ -13,18 +16,22 @@ export type FileDropProps = Omit<ComponentProps<"input">, "className" | "type" |
   rejected?: boolean;
   /** Called with the dropped files. */
   onFiles?: (files: File[]) => void;
+  /** `solid` (default) fills the target with the raised surface; `glass` puts it on liquid glass over imagery. */
+  surface?: FileDropSurface;
   className?: string;
 };
 
 /**
  * Paper `File drop` (1VWI-0): a 1.5px dashed r10 target, icon 16 and a 13/18 500 label centred with gap 8.
- * Dragging swaps the dashes for a 1px brand rim over clear glass; no shake or bounce.
+ * Dragging swaps the dashes for a 1px brand rim; no shake or bounce. Solid fills with the raised surface,
+ * glass sits on liquid glass.
  */
 export function FileDrop({
   label = "Drop files here or click to upload",
   uploading,
   rejected,
   onFiles,
+  surface = "solid",
   disabled,
   className,
   onChange,
@@ -53,9 +60,10 @@ export function FileDrop({
       onDragLeave={() => setDragging(false)}
       onDrop={onDrop}
       className={cn(
-        "flex w-full max-w-[550px] cursor-pointer items-center justify-center gap-2 rounded-[10px] border-[1.5px] border-dashed border-border-dashed px-4 py-3 text-[13px]/[18px] font-medium text-text-secondary motion-colors",
+        "relative flex w-full max-w-[550px] cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[10px] border-[1.5px] border-dashed border-border-dashed px-4 py-3 text-[13px]/[18px] font-medium text-text-secondary motion-colors",
         "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-text-brand",
-        "data-dragging:border-solid data-dragging:border-border-brand data-dragging:bg-glass-clear",
+        "data-dragging:border-solid data-dragging:border-border-brand",
+        surface === "solid" ? "bg-bg-surface data-dragging:bg-bg-subtle" : "bg-glass-clear",
         "data-rejected:border-solid data-rejected:border-border-danger",
         (disabled || uploading) && "cursor-not-allowed opacity-40",
         className,
@@ -72,12 +80,11 @@ export function FileDrop({
         }}
         {...props}
       />
-      {uploading ? (
-        <Spinner size={16} label="Uploading" />
-      ) : (
-        <UploadSimple aria-hidden className="size-4 shrink-0" />
-      )}
-      <span>{label}</span>
+      {surface === "glass" && <LiquidGlass />}
+      <span className="relative flex items-center gap-2">
+        {uploading ? <Spinner size={16} label="Uploading" /> : <UploadSimple aria-hidden className="size-4 shrink-0" />}
+        <span>{label}</span>
+      </span>
     </label>
   );
 }

@@ -9,17 +9,40 @@ const items = [
   { value: "triage", label: "Inbox triage" },
 ];
 
+function Fields({ surface }: { surface: "solid" | "glass" }) {
+  return (
+    <>
+      <div className="flex flex-wrap items-end justify-center gap-3">
+        <Select aria-label="Bot" items={items} surface={surface} size="sm" placeholder="Small" className="max-w-44" />
+        <Select aria-label="Bot" items={items} surface={surface} placeholder="Medium" className="max-w-44" />
+        <Select aria-label="Bot" items={items} surface={surface} size="lg" placeholder="Large" className="max-w-44" />
+      </div>
+      <Select aria-label="Bot" items={items} surface={surface} placeholder="Select a bot" />
+      <Select
+        aria-label="Bot"
+        items={items}
+        surface={surface === "glass" ? "glass" : "solid-on-page"}
+        defaultValue="chief"
+      />
+    </>
+  );
+}
+
 export default function SelectDemo() {
   return (
-    <Backdrop>
-      <div className="flex flex-wrap items-end justify-center gap-3">
-        <Select aria-label="Bot" items={items} size="sm" placeholder="Small" className="max-w-44" />
-        <Select aria-label="Bot" items={items} placeholder="Medium" className="max-w-44" />
-        <Select aria-label="Bot" items={items} size="lg" placeholder="Large" className="max-w-44" />
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex flex-col gap-3">
+        <p className="text-caption text-text-secondary">Solid</p>
+        <div className="flex w-full flex-col items-center gap-4">
+          <Fields surface="solid" />
+        </div>
       </div>
-      <Select aria-label="Bot" items={items} placeholder="Select a bot" />
-      <Select aria-label="Bot" items={items} surface="glass" defaultValue="chief" />
-      <Select aria-label="Bot" items={items} surface="solid-on-page" defaultValue="chief" />
-    </Backdrop>
+      <div className="flex flex-col gap-3">
+        <p className="text-caption text-text-secondary">Glass</p>
+        <Backdrop className="flex-col">
+          <Fields surface="glass" />
+        </Backdrop>
+      </div>
+    </div>
   );
 }
