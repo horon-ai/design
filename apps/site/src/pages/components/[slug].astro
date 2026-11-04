@@ -55,7 +55,8 @@ function localized(entry: Localized): ReactNode {
 
 const breadcrumb = [
   { label: m.breadcrumbComponents, href: "/components" },
-  { label: group ? group.title : component.title, href: `/components#${component.group}` },
+  ...(group ? [{ label: group.title, href: `/components#${component.group}` }] : []),
+  { label: component.title, href: `/components/${component.slug}` },
 ];
 ---
 
