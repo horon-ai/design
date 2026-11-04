@@ -230,10 +230,10 @@ void main() {
 
       expect(config.width, 1.9);
       expect(config.spread, 1.3);
-      expect(config.density, 2.0);
-      expect(config.midpoint, 0.74);
-      expect(config.glow, 0.45);
-      expect(config.vignette, 0.18);
+      expect(config.density, 1.85);
+      expect(config.midpoint, 0.8);
+      expect(config.glow, 0.3);
+      expect(config.vignette, 0, reason: '라이트는 비네트로 하늘을 회색으로 만들지 않습니다');
       expect(state.resolvedConfig.speed, HoronFlueConfig.sky.speed, reason: 'auth는 속도를 바꾸지 않습니다');
       await drain(tester);
     });
