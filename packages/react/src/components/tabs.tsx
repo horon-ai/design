@@ -10,6 +10,11 @@ export type TabsSize = ControlSize;
 /** `Tabs` owns the size; every `TabsTab` inside reads it so one list stays on one rung. */
 const TabsSizeContext = createContext<ControlSize>("md");
 
+export type TabsListVariant = "pill" | "underline";
+
+/** `TabsList` owns the variant; its `TabsTab`s read it to drop the pill shape on the underline list. */
+const TabsVariantContext = createContext<TabsListVariant>("pill");
+
 type WithClass<T> = Omit<T, "className"> & { className?: string };
 
 export function Tabs({
@@ -36,17 +41,36 @@ const listClass: Record<TabsSize, string> = {
  * `SegmentedControl` (3/3/4px padding, 2px between tabs). The selection is one indicator that
  * slides to the active tab (Base UI `Tabs.Indicator` positions it): 10% ink on solid, the thick
  * glass pill with a soft shadow on glass, as on the segmented control.
+ *
+ * `variant="underline"` is the document variant: no tray, a full-width 1px default border under
+ * the tabs, and a 2px primary bar that slides under the active tab. `surface` does not apply to it.
  */
 export function TabsList({
+  variant = "pill",
   surface = "solid",
   className,
   children,
   ...props
 }: WithClass<ComponentProps<typeof BaseTabs.List>> & {
+  /** `pill` (default) is the tray of pill tabs; `underline` is a text row with a sliding underline. */
+  variant?: TabsListVariant;
   /** `solid` (default) is an opaque surface tray with a default border; `glass` is the regular glass tray. */
   surface?: "solid" | "glass";
 }) {
   const size = useContext(TabsSizeContext);
+  if (variant === "underline") {
+    return (
+      <TabsVariantContext.Provider value="underline">
+        <BaseTabs.List
+          className={cn("relative flex w-full items-center gap-6 border-b border-border-default", className)}
+          {...props}
+        >
+          <BaseTabs.Indicator className="absolute -bottom-px left-(--active-tab-left) h-0.5 w-(--active-tab-width) bg-text-primary motion-indicator" />
+          {children}
+        </BaseTabs.List>
+      </TabsVariantContext.Provider>
+    );
+  }
   return (
     <BaseTabs.List
       className={cn(
@@ -100,11 +124,15 @@ export function TabsTab({
   count?: number;
 }) {
   const size = useContext(TabsSizeContext);
+  const underline = useContext(TabsVariantContext) === "underline";
   return (
     <BaseTabs.Tab
       className={cn(
-        "group/tab relative inline-flex cursor-pointer items-center justify-center rounded-full whitespace-nowrap text-text-secondary",
+        "group/tab relative inline-flex cursor-pointer items-center justify-center whitespace-nowrap text-text-secondary",
+        underline ? "rounded-xs" : "rounded-full",
         tabClass[size],
+        // The underline row keeps each rung's height and type but drops the pill's side padding.
+        underline && "px-0",
         "motion-colors hover:text-text-primary data-active:text-text-primary",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed data-disabled:opacity-40",
         className,
