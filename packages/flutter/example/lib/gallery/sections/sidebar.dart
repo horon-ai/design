@@ -6,7 +6,8 @@ import 'package:horon_ui/horon_ui.dart';
 /// 데스크톱 폭에서 네 가지 바탕(glass·photo·plain·flue)과 휴대폰 폭의 280 고정 기둥을
 /// 나란히 보여 주고, 아래에 폭 조절 손잡이를 실제로 끌어 볼 수 있는 예를 둡니다.
 /// `plain`은 채움과 유리가 없어 뒤 레이아웃의 색이 그대로 비치고 오른쪽 1px 테두리만
-/// 남습니다.
+/// 남습니다. 프로젝트 행은 펼친 상태에서만 "더 보기"를 보이고 접히면 캐럿만 남깁니다
+/// (React `04f963d`).
 class HoronSidebarGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronSidebarGallerySection({super.key});
@@ -120,6 +121,7 @@ List<Widget> _content() => <Widget>[
       ),
     ],
   ),
+  // 펼친 프로젝트: 캐럿 자리를 "더 보기"가 대신합니다.
   HoronSidebarProject(
     icon: const HoronSidebarProjectTile(child: Icon(Icons.folder)),
     label: 'Paper',
@@ -129,6 +131,14 @@ List<Widget> _content() => <Widget>[
       HoronSidebarItem(label: 'Design sync', onPressed: () {}),
       HoronSidebarItem(label: 'Weekly notes', count: '3', onPressed: () {}),
     ],
+  ),
+  // 접힌 프로젝트: "더 보기"는 숨고 14px 캐럿만 남습니다. 눌러 펼치면 More가 나타납니다.
+  HoronSidebarProject(
+    icon: const HoronSidebarProjectTile(child: Icon(Icons.folder)),
+    label: 'Archive',
+    defaultOpen: false,
+    actions: HoronSidebarProjectMore(onPressed: () {}),
+    children: <Widget>[HoronSidebarItem(label: '2025 회고', onPressed: () {})],
   ),
   const HoronSidebarSpacer(),
   HoronSidebarAddButton(label: 'Add project', onPressed: () {}),

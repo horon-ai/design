@@ -1238,8 +1238,13 @@ class _HoronSidebarAccountState extends State<HoronSidebarAccount> {
 ///
 /// 타일·이름·14px 캐럿을 한 줄(32px)에 두고, 열려 있으면 아래에
 /// [HoronSidebarTree]를 붙입니다. 캐럿은 열렸을 때 90° 돌아 아래를 봅니다.
-/// [actions]가 있으면 행을 hover하거나 포커스가 들어오거나 메뉴가 열려 있을 때
-/// 캐럿을 가리고 그 자리에 겹쳐 보입니다.
+///
+/// [actions]가 있으면 **펼친 상태에서만** 캐럿 대신 16px "더 보기" 버튼을 보이고
+/// 자식이 없는 프로젝트는 항상 보입니다(React `04f963d`의 `actions !== undefined &&
+/// isOpen`·`!hasChildren || isOpen` 규칙). hover·포커스·메뉴 열림은 더 이상 표시
+/// 조건이 아니며 6% 잉크 행 배경만 남깁니다.
+///
+/// [open]이 있으면 controlled, 없으면 [defaultOpen]에서 시작해 스스로 바뀝니다.
 class HoronSidebarProject extends StatefulWidget {
   /// 프로젝트 행을 만듭니다.
   const HoronSidebarProject({
@@ -1277,9 +1282,13 @@ class HoronSidebarProject extends StatefulWidget {
   final ValueChanged<bool>? onOpenChange;
 
   /// "더 보기" 컨트롤입니다. 보통 [HoronSidebarProjectMore]입니다.
+  ///
+  /// 있으면 펼친 상태에서 캐럿 대신 보이고(자식이 없으면 항상), 접으면 캐럿만 남습니다.
   final Widget? actions;
 
-  /// "더 보기" 메뉴가 열려 있는지 여부입니다. 참이면 행에 6% 잉크가 남고 액션이 보입니다.
+  /// "더 보기" 메뉴가 열려 있는지 여부입니다. 참이면 행에 6% 잉크가 남습니다.
+  ///
+  /// React의 `has-data-popup-open` 자리이며, 표시 여부는 [open] 상태가 정합니다.
   final bool menuOpen;
 
   @override
@@ -1294,8 +1303,6 @@ class _HoronSidebarProjectState extends State<HoronSidebarProject> {
   bool get _isOpen => widget.open ?? _open;
 
   bool get _hasChildren => widget.children.isNotEmpty;
-
-  bool get _showActions => widget.menuOpen || _hovered || _focused;
 
   void _toggle() {
     if (!_hasChildren) return;
@@ -1367,25 +1374,23 @@ class _HoronSidebarProjectState extends State<HoronSidebarProject> {
                         ),
                       ),
                       if (_hasChildren)
-                        AnimatedOpacity(
-                          // `opacity-100 transition-opacity duration-150
-                          //  group-hover/project:opacity-0` — 자리는 남기고 투명해집니다.
-                          opacity: widget.actions != null && _showActions ? 0 : 1,
-                          duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
-                          curve: HoronMotion.colorsCurve,
-                          child: IgnorePointer(
-                            ignoring: widget.actions != null && _showActions,
-                            child: AnimatedRotation(
-                              // group-data-panel-open/trigger:rotate-90
-                              turns: _isOpen ? 0.25 : 0,
-                              duration: reduceMotion ? Duration.zero : HoronMotion.popupEnterDuration,
-                              curve: HoronMotion.easeOutQuint,
-                              child: Icon(
-                                // @phosphor-icons/react CaretRight
-                                Icons.chevron_right,
-                                size: _caretSmall,
-                                color: colors.textPrimary,
-                              ),
+                        Visibility(
+                          // `actions && isOpen ? invisible` — 열린 프로젝트에서만 캐럿을
+                          // 숨기고 자리는 남깁니다(`visibility:hidden`).
+                          visible: !(widget.actions != null && _isOpen),
+                          maintainSize: true,
+                          maintainAnimation: true,
+                          maintainState: true,
+                          child: AnimatedRotation(
+                            // group-data-panel-open/trigger:rotate-90
+                            turns: _isOpen ? 0.25 : 0,
+                            duration: reduceMotion ? Duration.zero : HoronMotion.popupEnterDuration,
+                            curve: HoronMotion.easeOutQuint,
+                            child: Icon(
+                              // @phosphor-icons/react CaretRight
+                              Icons.chevron_right,
+                              size: _caretSmall,
+                              color: colors.textPrimary,
                             ),
                           ),
                         ),
@@ -1403,12 +1408,14 @@ class _HoronSidebarProjectState extends State<HoronSidebarProject> {
               bottom: 0,
               right: space.s2_5 - _projectMoreHitInset,
               child: Center(
-                child: AnimatedOpacity(
-                  duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
-                  curve: HoronMotion.colorsCurve,
-                  opacity: _showActions ? 1 : 0,
-                  // 숨김 상태에서도 자리는 차지하지만 탭은 받지 않습니다.
-                  child: IgnorePointer(ignoring: !_showActions, child: widget.actions),
+                child: Visibility(
+                  // `!hasChildren || isOpen ? visible : invisible` — 자식이 없는
+                  // 프로젝트는 항상, 자식이 있으면 펼쳤을 때만 More를 보입니다.
+                  visible: !_hasChildren || _isOpen,
+                  maintainSize: true,
+                  maintainAnimation: true,
+                  maintainState: true,
+                  child: widget.actions!,
                 ),
               ),
             ),

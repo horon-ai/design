@@ -238,7 +238,7 @@ void main() {
     expect(collapses, 1);
   });
 
-  testWidgets('a project row swaps its chevron for the actions on hover and while its menu is open', (
+  testWidgets('an open project shows More in place of the chevron and a collapsed one keeps the chevron', (
     WidgetTester tester,
   ) async {
     _useSurface(tester);
@@ -246,68 +246,84 @@ void main() {
     await pointer.addPointer(location: Offset.zero);
     addTearDown(pointer.removePointer);
 
-    await tester.pumpWidget(
-      _host(
-        HoronSidebar(
-          children: <Widget>[
-            HoronSidebarProject(
-              icon: const HoronSidebarProjectTile(child: Icon(Icons.folder)),
-              label: 'Paper',
-              actions: HoronSidebarProjectMore(onPressed: () {}),
-              children: <Widget>[HoronSidebarItem(label: 'Design sync')],
-            ),
-          ],
+    Widget project({
+      bool? open,
+      bool defaultOpen = false,
+      bool withChildren = true,
+      ValueChanged<bool>? onOpenChange,
+    }) => HoronSidebar(
+      children: <Widget>[
+        HoronSidebarProject(
+          icon: const HoronSidebarProjectTile(child: Icon(Icons.folder)),
+          label: 'Paper',
+          open: open,
+          defaultOpen: defaultOpen,
+          onOpenChange: onOpenChange,
+          actions: HoronSidebarProjectMore(onPressed: () {}),
+          children: withChildren ? <Widget>[HoronSidebarItem(label: 'Design sync')] : const <Widget>[],
         ),
-      ),
+      ],
     );
 
-    final HoronColors colors = _colors(tester);
-    AnimatedOpacity caret() => tester.widget<AnimatedOpacity>(
-      find.descendant(of: find.byType(HoronSidebarProject), matching: find.byType(AnimatedOpacity)).first,
+    Visibility caretGate() => tester.widget<Visibility>(
+      find.ancestor(of: find.byIcon(Icons.chevron_right), matching: find.byType(Visibility)).first,
     );
-    AnimatedOpacity actions() => tester.widget<AnimatedOpacity>(
-      find.descendant(of: find.byType(HoronSidebarProject), matching: find.byType(AnimatedOpacity)).last,
+    Visibility moreGate() => tester.widget<Visibility>(
+      find.ancestor(of: find.byType(HoronSidebarProjectMore), matching: find.byType(Visibility)).first,
     );
 
-    BoxDecoration rowDecoration() =>
-        tester
-                .widget<AnimatedContainer>(
-                  find.descendant(of: find.byType(HoronSidebarProject), matching: find.byType(AnimatedContainer)).first,
-                )
-                .decoration!
-            as BoxDecoration;
-
-    // 평상시: 캐럿이 보이고 액션은 투명합니다.
-    expect(caret().opacity, 1);
-    expect(actions().opacity, 0);
-    expect(rowDecoration().color, Colors.transparent, reason: '평상시 바탕이 없습니다');
-
-    await pointer.moveTo(tester.getCenter(find.byType(HoronSidebarProject)));
+    // 접힌 프로젝트: 캐럿만 보이고 More는 숨습니다(`!hasChildren || isOpen`).
+    await tester.pumpWidget(_host(project()));
     await tester.pumpAndSettle();
-    expect(caret().opacity, 0, reason: 'group-hover/project:opacity-0');
-    expect(actions().opacity, 1, reason: 'group-hover/project:opacity-100');
-    expect(rowDecoration().color, colors.overlayInk4, reason: 'hover:bg-overlay-ink-4');
+    expect(caretGate().visible, isTrue, reason: '접힌 프로젝트는 캐럿을 남깁니다');
+    expect(moreGate().visible, isFalse, reason: '접혀 있으면 More는 invisible');
+    expect(find.byType(HoronSidebarTree), findsNothing);
 
-    // `menuOpen`은 React의 has-data-popup-open과 같습니다.
-    await tester.pumpWidget(
-      _host(
-        HoronSidebar(
-          children: <Widget>[
-            HoronSidebarProject(
-              icon: const HoronSidebarProjectTile(child: Icon(Icons.folder)),
-              label: 'Paper',
-              menuOpen: true,
-              actions: HoronSidebarProjectMore(onPressed: () {}),
-              children: <Widget>[HoronSidebarItem(label: 'Design sync')],
-            ),
-          ],
-        ),
-      ),
-    );
+    // hover·포커스는 더 이상 표시 조건이 아닙니다(React `986662a`가 걷어 냄).
+    await pointer.moveTo(tester.getCenter(find.text('Paper')));
     await tester.pumpAndSettle();
-    expect(caret().opacity, 0);
-    expect(actions().opacity, 1);
-    expect(rowDecoration().color, colors.overlayInk6, reason: 'has-data-popup-open:bg-overlay-ink-6');
+    expect(moreGate().visible, isFalse, reason: 'hover로는 More가 나오지 않습니다');
+    expect(caretGate().visible, isTrue);
+    await pointer.moveTo(Offset.zero);
+    await tester.pumpAndSettle();
+
+    // 펼친 프로젝트: 캐럿은 자리를 남긴 채 invisible, 제자리에 More가 섭니다.
+    await tester.pumpWidget(_host(project(open: true)));
+    await tester.pumpAndSettle();
+    expect(caretGate().visible, isFalse, reason: 'actions && isOpen → 캐럿 invisible');
+    expect(moreGate().visible, isTrue, reason: 'isOpen → More visible');
+    expect(find.byIcon(Icons.chevron_right), findsOneWidget, reason: 'invisible은 자리를 남깁니다');
+    expect(find.byType(HoronSidebarTree), findsOneWidget, reason: '펼치면 트리가 붙습니다');
+
+    // uncontrolled: defaultOpen=false에서 탭하면 열리고, More가 그때 나타납니다.
+    final List<bool> changes = <bool>[];
+    await tester.pumpWidget(_host(project(onOpenChange: changes.add)));
+    await tester.pumpAndSettle();
+    expect(moreGate().visible, isFalse);
+    await tester.tap(find.text('Paper'));
+    await tester.pumpAndSettle();
+    expect(changes, <bool>[true]);
+    expect(moreGate().visible, isTrue, reason: '열리면 More가 보입니다');
+    expect(caretGate().visible, isFalse);
+    await tester.tap(find.text('Paper'));
+    await tester.pumpAndSettle();
+    expect(changes, <bool>[true, false]);
+    expect(moreGate().visible, isFalse, reason: '다시 접으면 캐럿만 남습니다');
+
+    // controlled: `open: false`면 탭해도 상태가 바뀌지 않습니다.
+    await tester.pumpWidget(_host(project(open: false, onOpenChange: changes.add)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Paper'));
+    await tester.pumpAndSettle();
+    expect(changes.last, isTrue);
+    expect(moreGate().visible, isFalse, reason: 'controlled 값이 우선입니다');
+    expect(caretGate().visible, isTrue);
+
+    // 자식이 없는 프로젝트는 캐럿 없이 More를 항상 보입니다.
+    await tester.pumpWidget(_host(project(withChildren: false)));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.chevron_right), findsNothing, reason: '자식이 없으면 캐럿이 없습니다');
+    expect(moreGate().visible, isTrue, reason: '!hasChildren → More visible');
   });
 
   testWidgets('the project more button is a 16px box inside a 44px hit area with a hover fill', (
@@ -325,6 +341,8 @@ void main() {
             HoronSidebarProject(
               icon: const HoronSidebarProjectTile(child: Icon(Icons.folder)),
               label: 'Paper',
+              // More는 펼친 프로젝트에서만 보입니다(React `04f963d`).
+              defaultOpen: true,
               menuOpen: true,
               actions: HoronSidebarProjectMore(onPressed: () {}),
               children: <Widget>[HoronSidebarItem(label: 'Design sync')],
@@ -341,7 +359,7 @@ void main() {
     final Finder hit = find.ancestor(of: box, matching: find.byType(GestureDetector)).first;
     expect(tester.getSize(hit).width, 44, reason: 'after:min-w-11');
 
-    // 메뉴가 열려 있어도 hover는 6% 잉크를 더합니다.
+    // More 자체의 hover는 6% 잉크입니다(`hover:bg-overlay-ink-6`).
     expect((tester.widget<AnimatedContainer>(box).decoration! as BoxDecoration).color, Colors.transparent);
     await pointer.moveTo(tester.getCenter(box));
     await tester.pumpAndSettle();
