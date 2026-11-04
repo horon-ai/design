@@ -2,32 +2,44 @@ import { Field } from "@base-ui/react/field";
 import type { ComponentProps } from "react";
 
 import { cn } from "../lib/cn";
-import { fieldBoxClass } from "./input";
+import type { ControlSize } from "../lib/size";
+import { fieldBoxClass, fieldTextClass, type InputSurface } from "./input";
 import { LiquidGlass } from "./liquid-glass";
 
+export type TextareaSize = ControlSize;
+
 export type TextareaProps = Omit<ComponentProps<"textarea">, "className"> & {
+  size?: TextareaSize;
   invalid?: boolean;
+  /** Solid (default) or glass, as on `Input`. */
+  surface?: InputSurface;
   className?: string;
   textareaClassName?: string;
 };
 
-/** Figma `Textarea` (58:137): a 112px glass box with 14/12px padding. */
-export function Textarea({ invalid, className, textareaClassName, rows = 3, ...props }: TextareaProps) {
+const sizeClass: Record<TextareaSize, string> = {
+  sm: "min-h-22 px-3 py-2",
+  md: "min-h-28 px-3.5 py-3",
+  lg: "min-h-34 px-4 py-3.5",
+};
+
+/** Figma `Textarea` (58:137): an 88/112/136px glass or solid box with 12/14px padding. */
+export function Textarea({ size = "md", invalid, surface = "solid", className, textareaClassName, rows = 3, ...props }: TextareaProps) {
   return (
     <div
       className={cn(
-        "relative flex min-h-28 overflow-clip rounded-md border px-3.5 py-3 motion-colors",
-        fieldBoxClass.glass,
-        "focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
+        "relative flex overflow-clip rounded-md border motion-colors",
+        sizeClass[size],
+        fieldBoxClass[surface],
         className,
       )}
       data-invalid={invalid ? "" : undefined}
     >
-      <LiquidGlass tier="regular" />
+      {surface === "glass" && <LiquidGlass />}
       <Field.Control
         render={<textarea rows={rows} {...props} />}
         aria-invalid={invalid || undefined}
-        className={cn("relative resize-none text-body-md", fieldBoxClass.text, textareaClassName)}
+        className={cn("relative resize-none", fieldTextClass[size], fieldBoxClass.text, textareaClassName)}
       />
     </div>
   );

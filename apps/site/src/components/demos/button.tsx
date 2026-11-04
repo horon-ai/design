@@ -10,6 +10,7 @@ export default function ButtonDemo() {
       <Button icon={<Plus />}>New bot</Button>
       <Button variant="danger">Delete bot</Button>
       <Button variant="glass">Cancel</Button>
+      <Button variant="solid">Cancel</Button>
       <Button variant="link">Show all</Button>
       <Button size="sm">Small</Button>
       <Button size="lg">Large</Button>

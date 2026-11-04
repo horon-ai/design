@@ -17,9 +17,11 @@ export type MarketplaceCardProps = Omit<ComponentProps<"div">, "children"> & {
   installs?: ReactNode;
   onInstall?: () => void;
   installLabel?: string;
+  /** `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass card. */
+  surface?: "solid" | "glass";
 };
 
-/** Paper `Marketplace card` (Settings 1VMY-0): thick glass column with tile header, description, chips and a footer with rating and Install. */
+/** Paper `Marketplace card` (Settings 1VMY-0): solid or thick glass column with tile header, description, chips and a footer with rating and Install. */
 export function MarketplaceCard({
   initials,
   name,
@@ -30,15 +32,20 @@ export function MarketplaceCard({
   installs,
   onInstall,
   installLabel = "Install",
+  surface = "solid",
   className,
   ...props
 }: MarketplaceCardProps) {
   return (
     <div
-      className={cn("relative flex flex-col gap-3 overflow-clip rounded-[20px] bg-glass-thick p-4", className)}
+      className={cn(
+        "relative flex flex-col gap-3 overflow-clip rounded-[20px] p-4",
+        surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
+        className,
+      )}
       {...props}
     >
-      <LiquidGlass tier="thick" />
+      {surface === "glass" && <LiquidGlass />}
       <div className="relative flex items-center gap-3">
         <span
           aria-hidden
@@ -74,7 +81,7 @@ export function MarketplaceCard({
         )}
         {installs && <span className="text-[12px]/[16px] text-text-placeholder">· {installs}</span>}
         <span className="flex-1" />
-        <Button variant="glass" size="sm" onClick={onInstall}>
+        <Button variant={surface === "glass" ? "glass" : "solid"} size="sm" onClick={onInstall}>
           {installLabel}
         </Button>
       </div>

@@ -23,6 +23,7 @@ export * from "./components/chip";
 export * from "./components/choice-card";
 export * from "./components/code-panel";
 export * from "./components/command-palette";
+export * from "./components/combobox";
 export * from "./components/composer";
 export * from "./components/data-table";
 export * from "./components/date-field";

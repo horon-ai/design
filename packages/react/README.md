@@ -41,20 +41,16 @@ import { Plus } from "@phosphor-icons/react";
 
 ## 유리 표면
 
-Figma의 `Liquid layers`(tint, inner shade, soft light edge를 50% 세기로 겹친 것)를 `LiquidGlass`가
-그립니다. 유리 컴포넌트는 이것을 첫 자식으로 두고, 채움은 `glass-clear` / `glass-regular` /
-`glass-thick` 토큰으로 정합니다. 경계선 흐림과 안쪽 그림자 여백은 Figma처럼 높이에 비례합니다.
+`LiquidGlass`가 `@horon-ai/tokens`의 `glass.ts` 재질을 그립니다. Flutter의 `HoronLiquidGlass`도 같은 값을 읽으므로
+web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습입니다.
 
-Chromium 계열 브라우저(Chrome, Edge, Arc, Android Chrome, Windows 데스크톱 앱)에서는 패키지가 만든 SVG 변위 필터가
-뒤 배경을 표면 가장자리에서 휘게 합니다. 칩이나 버튼처럼 작은 표면뿐 아니라 카드, 시트 같은 큰 사각형도 같은 방식으로
-휘고, 같은 크기의 표면은 필터 하나를 나눠 씁니다. 한 번에 굴절하는 표면은 16개까지이고, 터치 기기에서는 6개까지입니다.
-화면 밖 표면과 터치 기기에서 너무 큰 표면은 굴절하지 않습니다.
+- 배경: 뒤 내용을 흐리게(20px) 하고 채도를 180%로 올립니다.
+- 채움: 호스트가 `glass-clear` / `glass-regular` / `glass-thick`으로 칠합니다.
+- 테두리: 가장자리 안쪽 1px 링으로, 위가 밝고 옆으로 갈수록 옅어집니다. 호스트에는 자기 테두리를 두지 않고,
+  `data-invalid` 상태에서는 링이 위험 색이 됩니다.
 
-Safari, iOS의 모든 브라우저, Firefox, macOS 데스크톱 앱은 배경에 SVG 필터를 걸지 못합니다
-([WebKit 245510](https://bugs.webkit.org/show_bug.cgi?id=245510), [Gecko 1961378](https://bugzilla.mozilla.org/show_bug.cgi?id=1961378)).
-이 엔진에서는 위의 CSS 레이어에 밝은 테두리를 더한 흐린 유리로 그립니다. 투명도 줄이기 설정이 켜져 있거나
-브라우저가 `backdrop-filter`를 지원하지 않으면 불투명한 흐린 표면이 됩니다. `<LiquidGlass refract={false} />`처럼
-`refract`를 끄면 굴절만 사라집니다.
+유리 컴포넌트는 `LiquidGlass`를 첫 자식으로 둡니다. 굴절은 Safari와 WKWebView에서 그릴 수 없어서 쓰지 않습니다.
+투명도 줄이기 설정이 켜져 있거나 `backdrop-filter`를 지원하지 않으면 흐림 대신 `glass-fill-frost` 채움이 됩니다.
 
 ## 컴포넌트 (80개)
 

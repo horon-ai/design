@@ -1,48 +1,85 @@
-import { InputGroup } from "@horon-ai/react";
-import { CaretDown } from "@phosphor-icons/react";
+import { Combobox, InputGroup, Select, type ComboboxItemData } from "@horon-ai/react";
 
 import { Backdrop } from "../demo-backdrop";
+
+const countries: ComboboxItemData[] = [
+  { value: "KR", label: "South Korea", selectedLabel: "+82", trailing: "+82", keywords: ["+82", "한국"] },
+  { value: "US", label: "United States", selectedLabel: "+1", trailing: "+1", keywords: ["+1", "USA"] },
+  { value: "JP", label: "Japan", selectedLabel: "+81", trailing: "+81", keywords: ["+81", "일본"] },
+  { value: "GB", label: "United Kingdom", selectedLabel: "+44", trailing: "+44", keywords: ["+44", "UK"] },
+  { value: "DE", label: "Germany", selectedLabel: "+49", trailing: "+49", keywords: ["+49"] },
+  { value: "SG", label: "Singapore", selectedLabel: "+65", trailing: "+65", keywords: ["+65"] },
+];
+
+const dialCodes = countries.map((country) => ({
+  value: country.value,
+  label: `${country.selectedLabel} ${country.label}`,
+  selectedLabel: country.selectedLabel,
+}));
+
+const currencies = [
+  { value: "KRW", label: "KRW" },
+  { value: "USD", label: "USD" },
+  { value: "JPY", label: "JPY" },
+];
 
 export default function InputGroupDemo() {
   return (
     <Backdrop className="flex-col">
+      <div className="flex flex-wrap items-end justify-center gap-3">
+        <InputGroup
+          className="w-52"
+          size="sm"
+          placeholder="Small"
+          prefix={<Select variant="segment" aria-label="Country code" items={dialCodes} defaultValue="KR" />}
+        />
+        <InputGroup
+          className="w-52"
+          placeholder="Medium"
+          prefix={<Select variant="segment" aria-label="Country code" items={dialCodes} defaultValue="KR" />}
+        />
+        <InputGroup
+          className="w-52"
+          size="lg"
+          placeholder="Large"
+          prefix={<Select variant="segment" aria-label="Country code" items={dialCodes} defaultValue="KR" />}
+        />
+      </div>
       <InputGroup
         className="w-80"
         placeholder="Phone number"
         prefix={
-          <>
-            +82 <CaretDown />
-          </>
+          <Combobox
+            variant="segment"
+            aria-label="Country code"
+            items={countries}
+            defaultValue="KR"
+            searchPlaceholder="Search countries"
+          />
         }
       />
       <InputGroup
         className="w-80"
+        surface="glass"
+        placeholder="Phone number"
+        prefix={<Select variant="segment" aria-label="Country code" items={dialCodes} defaultValue="KR" />}
+      />
+      <InputGroup
+        className="w-80"
         placeholder="Amount"
-        suffix={
-          <>
-            KRW <CaretDown />
-          </>
-        }
+        suffix={<Select variant="segment" aria-label="Currency" items={currencies} defaultValue="KRW" />}
       />
       <InputGroup
         className="w-80"
         invalid
         defaultValue="12"
-        suffix={
-          <>
-            KRW <CaretDown />
-          </>
-        }
+        suffix={<Select variant="segment" aria-label="Currency" items={currencies} defaultValue="KRW" />}
       />
       <InputGroup
         className="w-80"
         disabled
         placeholder="Phone number"
-        prefix={
-          <>
-            +82 <CaretDown />
-          </>
-        }
+        prefix={<Select variant="segment" aria-label="Country code" items={dialCodes} defaultValue="KR" />}
       />
     </Backdrop>
   );

@@ -4,31 +4,51 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
-type ButtonProps = Omit<ComponentProps<"button">, "className"> & { className?: string };
+export type ChatControlSurface = "solid" | "glass";
 
-const clearGlass =
-  "motion-press relative flex animate-[tab-panel-in_220ms_var(--ease-out-quint)] cursor-pointer items-center overflow-clip rounded-full bg-glass-clear text-text-primary hover:bg-glass-clear-hover active:bg-glass-clear-pressed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
+type ButtonProps = Omit<ComponentProps<"button">, "className"> & {
+  className?: string;
+  /** `solid` (default) on raised surfaces, `glass` over imagery and glass panels. */
+  surface?: ChatControlSurface;
+};
+
+const controlBase =
+  "motion-press relative flex animate-[tab-panel-in_220ms_var(--ease-out-quint)] cursor-pointer items-center overflow-clip rounded-full text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
+
+const surfaceClass: Record<ChatControlSurface, string> = {
+  glass: "bg-glass-clear hover:bg-glass-clear-hover active:bg-glass-clear-pressed",
+  solid: "border border-border-default bg-bg-surface hover:bg-bg-subtle active:bg-interactive-secondary-hover",
+};
 
 /** Figma `Jump to latest` (Chat controls 88:659): a 44px clear-glass circle with a 20px caret. */
-export function JumpToLatest({ className, "aria-label": ariaLabel = "Jump to latest", ...props }: ButtonProps) {
+export function JumpToLatest({
+  surface = "solid",
+  className,
+  "aria-label": ariaLabel = "Jump to latest",
+  ...props
+}: ButtonProps) {
   return (
     <button
       type="button"
       aria-label={ariaLabel}
-      className={cn(clearGlass, "size-11 justify-center", className)}
+      className={cn(controlBase, surfaceClass[surface], "size-11 justify-center", className)}
       {...props}
     >
-      <LiquidGlass />
+      {surface === "glass" && <LiquidGlass />}
       <CaretDown aria-hidden className="relative size-5" />
     </button>
   );
 }
 
 /** Figma `New messages` (88:659): a 40px clear-glass pill with a 16px caret and a label. */
-export function NewMessagesPill({ className, children, ...props }: ButtonProps) {
+export function NewMessagesPill({ surface = "solid", className, children, ...props }: ButtonProps) {
   return (
-    <button type="button" className={cn(clearGlass, "h-10 gap-1.5 pr-4 pl-3.5 text-label-md", className)} {...props}>
-      <LiquidGlass />
+    <button
+      type="button"
+      className={cn(controlBase, surfaceClass[surface], "h-10 gap-1.5 pr-4 pl-3.5 text-label-md", className)}
+      {...props}
+    >
+      {surface === "glass" && <LiquidGlass />}
       <CaretDown aria-hidden className="relative size-4" />
       <span className="relative whitespace-nowrap">{children}</span>
     </button>
@@ -47,16 +67,19 @@ export type VoiceInputProps = {
   recording?: boolean;
   onStop?: () => void;
   stopLabel?: string;
+  /** `solid` (default) on raised surfaces, `glass` over imagery and glass panels. */
+  surface?: ChatControlSurface;
   className?: string;
 };
 
-/** Figma `Voice input` (88:659): a 52px regular-glass pill with a red stop button, waveform and timer. */
+/** Figma `Voice input` (88:659): a 52px pill with a red stop button, waveform and timer. */
 export function VoiceInput({
   elapsed,
   levels,
   recording = true,
   onStop,
   stopLabel = "Stop recording",
+  surface = "solid",
   className,
 }: VoiceInputProps) {
   const heights = levels ? levels.map((level) => Math.max(4, Math.round(level * 28))) : WAVEFORM;
@@ -64,11 +87,12 @@ export function VoiceInput({
   return (
     <div
       className={cn(
-        "relative flex h-13 w-60 items-center gap-3 overflow-clip rounded-full bg-glass-regular px-2",
+        "relative flex h-13 w-60 items-center gap-3 overflow-clip rounded-full px-2",
+        surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
         className,
       )}
     >
-      <LiquidGlass tier="regular" />
+      {surface === "glass" && <LiquidGlass />}
       <button
         type="button"
         aria-label={stopLabel}
