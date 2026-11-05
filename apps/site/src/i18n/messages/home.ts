@@ -55,7 +55,7 @@ export const homeMessages = defineMessages({
   openGroup: { ko: "보기", en: "Open" },
 
   mascotEyebrow: { ko: "Mascot", en: "Mascot" },
-  mascotTitleLead: { ko: "둥근 병아리, ", en: "A round chick, " },
+  mascotTitleLead: { ko: "둥근 매, ", en: "A round falcon, " },
   mascotTitleTail: { ko: "가지 표정", en: " expressions" },
   mascotBody: {
     ko: "Horus × ON에서 온 마스코트입니다. 빈 상태, 오류, 로딩처럼 화면이 말을 걸어야 할 때 대신 표정을 짓습니다. 1254 × 1254 투명 PNG로 모든 컷을 내려받을 수 있습니다.",

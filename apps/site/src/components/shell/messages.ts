@@ -10,8 +10,8 @@ import { defineMessages } from "@/i18n";
  */
 export const shellMessages = defineMessages({
   home: {
-    ko: "HORON Design System 홈",
-    en: "HORON Design System home",
+    ko: "Horon Design System 홈",
+    en: "Horon Design System home",
   },
   navLabel: {
     ko: "주요 섹션",

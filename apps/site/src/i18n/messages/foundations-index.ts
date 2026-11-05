@@ -4,8 +4,8 @@ import { defineMessages } from "@/i18n";
 export const foundationsIndexMessages = defineMessages({
   title: { ko: "Foundations", en: "Foundations" },
   description: {
-    ko: "HORON의 화면을 이루는 가장 아래 층입니다. 색, 글자, 간격, 반경, 유리 표면의 값과 그 값을 언제 쓰는지 정리했습니다.",
-    en: "The bottom layer of every HORON screen: values for color, type, spacing, radius and liquid glass, and when to use each one.",
+    ko: "Horon의 화면을 이루는 가장 아래 층입니다. 색, 글자, 간격, 반경, 유리 표면의 값과 그 값을 언제 쓰는지 정리했습니다.",
+    en: "The bottom layer of every Horon screen: values for color, type, spacing, radius and liquid glass, and when to use each one.",
   },
   intro: {
     ko: "모든 값은 Figma Horon 파일의 변수에서 읽어 @horon-ai/tokens에 한 번만 적었습니다. 이 문서의 수치와 견본도 그 패키지에서 읽어 그리므로, 문서와 라이브러리가 서로 다른 값을 보여줄 수 없습니다.",

@@ -8,9 +8,9 @@ export const GET: APIRoute = ({ site }) => {
   const link = (path: string) => new URL(path, origin).toString();
 
   const lines = [
-    "# HORON Design System",
+    "# Horon Design System",
     "",
-    "> HORON 제품을 위한 디자인 시스템. 토큰 하나에서 웹 CSS가 나오고, @horon-ai/react 컴포넌트가 그 값을 참조합니다.",
+    "> Horon 제품을 위한 디자인 시스템. 토큰 하나에서 웹 CSS가 나오고, @horon-ai/react 컴포넌트가 그 값을 참조합니다.",
     "",
     "## Docs",
     "",
