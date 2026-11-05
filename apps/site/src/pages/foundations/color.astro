@@ -55,7 +55,9 @@ const dark = darkColors as Record<string, string>;
           {names
             .filter((name) => name.startsWith(group.prefix))
             .map((name) => (
-              <div class="flex items-center gap-3 rounded-xl border border-border-default bg-bg-subtle px-3 py-2">
+              <div class="flex min-w-0 items-center gap-3 rounded-xl border border-border-default bg-bg-subtle px-3 py-2">
+                {/* `min-w-0` keeps the grid track from inheriting the row's min-content
+                  * width, which is the whole token name. */}
                 <span
                   class="flex size-8 shrink-0 overflow-hidden rounded-xs border border-border-default"
                   aria-hidden="true"
@@ -64,7 +66,9 @@ const dark = darkColors as Record<string, string>;
                   <span class="flex-1" style={`background: ${dark[name] ?? lightColors[name]}`} />
                 </span>
                 <span class="min-w-0">
-                  <span class="block truncate font-mono text-caption text-text-primary">
+                  {/* Below `sm` a full token name is wider than the track, so it breaks
+                    * anywhere to stay readable; from `sm` up it truncates as it always did. */}
+                  <span class="block break-all font-mono text-caption text-text-primary sm:truncate sm:break-normal">
                     --color-{name}
                   </span>
                   <span class="block font-mono text-caption text-text-secondary">

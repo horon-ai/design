@@ -18,7 +18,11 @@ export type FilterBarProps = Omit<ComponentProps<"div">, "onChange" | "defaultVa
   onValueChange?: (value: string) => void;
 };
 
-/** Paper `Filter bar` (Agents N2): a 5% ink pill track with 30px options; the selected option sits on a sliding 10% ink pill. */
+/**
+ * Paper `Filter bar` (Agents N2): a 5% ink pill track with 30px options; the selected option sits on a sliding 10% ink pill.
+ * The pills never wrap, so a screen too narrow for all of them scrolls the track sideways instead of widening the page.
+ * The track keeps its intrinsic width (and so stays centred by its parent) unless that width exceeds the box.
+ */
 export function FilterBar({
   items,
   value,
@@ -38,7 +42,10 @@ export function FilterBar({
       ref={track}
       role="radiogroup"
       aria-label={ariaLabel}
-      className={cn("relative inline-flex items-center gap-0.5 rounded-full bg-overlay-ink-5 p-[3px]", className)}
+      className={cn(
+        "relative inline-flex max-w-full min-w-0 items-center gap-0.5 overflow-x-auto rounded-full bg-overlay-ink-5 p-[3px]",
+        className,
+      )}
       {...props}
     >
       {rect && (

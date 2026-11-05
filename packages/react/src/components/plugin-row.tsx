@@ -50,7 +50,10 @@ export function PluginRow({
 }: PluginRowProps) {
   return (
     <div
-      className={cn("flex items-center gap-3.5 border-b border-border-default py-4 last:border-b-0", className)}
+      className={cn(
+        "flex flex-wrap items-center gap-x-3.5 gap-y-3 border-b border-border-default py-4 last:border-b-0",
+        className,
+      )}
       {...props}
     >
       <span
@@ -59,9 +62,9 @@ export function PluginRow({
       >
         {initials}
       </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <span className="flex items-center gap-2">
-          <span className="truncate text-label-md text-text-primary">{name}</span>
+      <span className="flex min-w-0 grow basis-40 flex-col gap-1.5">
+        <span className="flex flex-wrap items-center gap-2">
+          <span className="min-w-0 truncate text-label-md text-text-primary">{name}</span>
           {version && <span className="shrink-0 font-mono text-label-sm text-text-secondary">{version}</span>}
           {updateBadge && (
             <span className="inline-flex h-5.5 shrink-0 items-center rounded-full bg-accent-sky-500-18 px-2 text-label-sm text-text-brand">
@@ -97,7 +100,7 @@ export function PluginRow({
           </span>
         )}
       </span>
-      <span className="flex shrink-0 items-center gap-2">
+      <span className="flex shrink-0 flex-wrap items-center gap-2">
         <span className="motion-reveal-x" data-collapsed={!onUpdate || undefined} inert={!onUpdate || undefined}>
           <Button variant="solid" size="sm" icon={<ArrowUp aria-hidden className="size-3.5" />} onClick={onUpdate}>
             {updateLabel}

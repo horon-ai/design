@@ -72,7 +72,7 @@ export function TextareaField({
     <BaseField.Root
       disabled={disabled}
       invalid={invalid}
-      className={cn("flex w-90 flex-col items-start data-disabled:opacity-60", rootClass[size], className)}
+      className={cn("flex w-full max-w-90 flex-col items-start data-disabled:opacity-60", rootClass[size], className)}
     >
       <div className="flex w-full items-center">
         <BaseField.Label className={cn("min-w-0 flex-1 text-text-primary", labelClass[size])}>{label}</BaseField.Label>

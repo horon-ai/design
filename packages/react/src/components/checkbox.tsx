@@ -41,7 +41,7 @@ export function Checkbox({ label, size = "md", className, ...props }: CheckboxPr
   return (
     <label
       className={cn(
-        "group inline-flex cursor-pointer items-center text-text-primary has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-40",
+        "group inline-flex max-w-full min-w-0 cursor-pointer items-center text-text-primary has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-40",
         labelClass[size],
         className,
       )}

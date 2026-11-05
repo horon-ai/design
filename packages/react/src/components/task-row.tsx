@@ -85,7 +85,7 @@ export function TaskRow({
           </>
         )}
       </div>
-      <div className="flex items-center gap-2 pt-0.5">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 pt-0.5">
         <span className="flex size-4 shrink-0 items-center justify-center">
           {status === "running" && <Spinner key="running" size={15} className="animate-pop-in" />}
           {status === "review" && (
@@ -101,7 +101,7 @@ export function TaskRow({
         <span
           key={status}
           className={cn(
-            "shrink-0 animate-fade-in text-label-md whitespace-nowrap motion-colors",
+            "min-w-0 animate-fade-in truncate text-label-md motion-colors",
             status === "failed" ? "text-text-danger" : status === "done" ? "text-text-secondary" : "text-text-primary",
           )}
         >
@@ -113,7 +113,7 @@ export function TaskRow({
             <span className="min-w-0 truncate text-caption text-text-secondary">{detail}</span>
           </>
         )}
-        <span className="flex-1" />
+        <span className="min-w-0 flex-1" />
         {status === "running" && (
           <button
             type="button"

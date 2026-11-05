@@ -67,13 +67,16 @@ export function McpServerRow({
 }: McpServerRowProps) {
   return (
     <div
-      className={cn("flex items-center gap-3.5 border-b border-border-default py-4 last:border-b-0", className)}
+      className={cn(
+        "flex min-w-0 flex-wrap items-center gap-x-3.5 gap-y-3 border-b border-border-default py-4 last:border-b-0",
+        className,
+      )}
       {...props}
     >
       <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-500 text-label-md text-neutral-50">
         {initials ?? name.slice(0, 2).toUpperCase()}
       </span>
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
+      <div className="flex min-w-0 grow basis-40 flex-col gap-1">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <span className="max-w-full min-w-0 truncate text-label-md text-text-primary">{name}</span>
           {withKeys(tags).map(({ value, key }) => (
@@ -87,7 +90,7 @@ export function McpServerRow({
             </span>
           ))}
         </div>
-        {description && <span className="text-body-sm text-text-secondary">{description}</span>}
+        {description && <span className="text-body-sm wrap-break-word text-text-secondary">{description}</span>}
         {meta && meta.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5 text-label-sm text-text-secondary">
             {withKeys(meta).map(({ value, key }, i) => (

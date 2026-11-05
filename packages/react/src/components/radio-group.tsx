@@ -56,7 +56,7 @@ export function Radio({ label, size, className, ...props }: RadioProps) {
   return (
     <label
       className={cn(
-        "inline-flex cursor-pointer items-center text-text-primary has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-40",
+        "inline-flex max-w-full min-w-0 cursor-pointer items-center text-text-primary has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-40",
         labelClass[resolvedSize],
         className,
       )}

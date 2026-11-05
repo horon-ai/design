@@ -52,7 +52,9 @@ export function TabBar({
       ref={track}
       aria-label={props["aria-label"] ?? "Main"}
       className={cn(
-        "relative flex w-fit items-center gap-1 overflow-clip rounded-full bg-glass-regular",
+        // Tabs keep their fixed 56/64/72px tap size; when the row is wider than the
+        // container the track scrolls instead of squeezing the icons.
+        "relative flex w-fit max-w-full min-w-0 items-center gap-1 overflow-x-auto overflow-y-clip rounded-full bg-glass-regular",
         trackClass[size],
         className,
       )}
@@ -73,7 +75,7 @@ export function TabBar({
             aria-current={current ? "page" : undefined}
             onClick={() => onValueChange?.(item.value)}
             className={cn(
-              "relative flex motion-press cursor-pointer items-center justify-center rounded-full",
+              "relative flex shrink-0 motion-press cursor-pointer items-center justify-center rounded-full",
               tabClass[size],
               current ? "text-text-primary" : "text-text-secondary hover:bg-overlay-ink-5",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
