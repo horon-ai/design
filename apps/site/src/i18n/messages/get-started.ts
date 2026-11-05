@@ -4,7 +4,7 @@ import { defineMessages, type Localized } from "@/i18n";
 export const getStartedMessages = defineMessages({
   title: { ko: "Get Started", en: "Get Started" },
   description: {
-    ko: "Horon 디자인 시스템은 하나의 토큰 소스에서 웹 컴포넌트와 문서 사이트의 값을 함께 냅니다. 하려는 일에 맞는 길을 고르고 시작하세요.",
+    ko: "Horon 디자인 시스템은 토큰 소스 하나로 웹 컴포넌트와 문서 사이트의 값을 함께 만듭니다. 하려는 일에 맞는 길을 골라 시작하세요.",
     en: "Horon Design System serves web components and the docs site from one token source. Pick the path that fits what you are doing.",
   },
 
@@ -42,12 +42,12 @@ export const getStartedMessages = defineMessages({
   },
   stepUseTitle: { ko: "3. 컴포넌트 쓰기", en: "3. Use a component" },
   stepUseBody: {
-    ko: "컴포넌트는 배럴에서 가져오고, 아이콘은 Phosphor를 씁니다.",
-    en: "Import components from the barrel; icons come from Phosphor.",
+    ko: "컴포넌트는 패키지 진입점(@horon-ai/react)에서 가져오고, 아이콘은 Phosphor를 씁니다.",
+    en: "Import components from the package entry (@horon-ai/react); icons come from Phosphor.",
   },
   stepSiteTitle: { ko: "4. 문서 사이트에서 확인하기", en: "4. Check it on the docs site" },
   stepSiteBody: {
-    ko: "문서 사이트는 같은 컴포넌트를 쓰고, 모든 컴포넌트의 라이브 프리뷰가 있습니다.",
+    ko: "문서 사이트도 같은 컴포넌트로 만들었고, 모든 컴포넌트의 라이브 프리뷰를 볼 수 있습니다.",
     en: "The docs site uses the same components and has a live preview of each one.",
   },
 
@@ -75,8 +75,8 @@ export const getStartedMessages = defineMessages({
 
   boundariesTitle: { ko: "패키지 경계", en: "Package boundaries" },
   boundariesBody: {
-    ko: "컴포넌트는 @horon-ai/react 하나에만 있고, 앱은 그것을 소비합니다. 스타일 값은 전부 @horon-ai/tokens의 theme.css에서 읽고, 정적 검사는 oxlint가 맡습니다.",
-    en: "Components live only in @horon-ai/react, and apps consume it. Every style value comes from theme.css in @horon-ai/tokens, and oxlint runs the static checks.",
+    ko: "컴포넌트는 @horon-ai/react 한 곳에만 두고, 앱은 그 패키지를 가져다 씁니다. 스타일 값은 전부 @horon-ai/tokens의 theme.css에서 읽고, 정적 검사는 oxlint가 맡습니다.",
+    en: "Components live only in @horon-ai/react, and apps import that package. Every style value comes from theme.css in @horon-ai/tokens, and oxlint runs the static checks.",
   },
 
   helpTitle: { ko: "도움과 소식", en: "Help and news" },

@@ -9,8 +9,8 @@ export const homeMessages = defineMessages({
   promise: { ko: "The vision of Horus. The power to act.", en: "The vision of Horus. The power to act." },
 
   body: {
-    ko: "데이터를 이해하는 것에서 끝나지 않고 실행과 결과까지 연결하는 시스템. 그 시스템을 지탱하는 토큰과 컴포넌트를 하나의 기준으로 정의합니다. 디자인과 코드가 같은 값을 바라봅니다.",
-    en: "A system that connects understanding data to execution and results. It defines the tokens and components that hold that system together on one basis, so design and code read the same values.",
+    ko: "Horon은 데이터를 이해하는 데서 멈추지 않고 실행과 결과까지 이어 갑니다. 이 디자인 시스템은 Horon 화면을 이루는 토큰과 컴포넌트를 한 기준으로 정합니다.",
+    en: "Horon carries data past understanding into execution and results. This design system defines, on one basis, the tokens and components that make up every Horon screen.",
   },
 
   start: { ko: "시작하기", en: "Get started" },
@@ -28,18 +28,18 @@ export const homeMessages = defineMessages({
   principlesEyebrow: { ko: "Principles", en: "Principles" },
   principlesTitle: { ko: "세 가지 원칙", en: "Three principles" },
   principlesBody: {
-    ko: "Horon의 UI는 잉크와 종이 위에 하늘색 액센트 하나만 얹습니다. 떠 있는 표면은 유리로, 계층과 상태는 글자와 여백으로 드러냅니다.",
-    en: "Horon UI puts a single sky accent on ink and paper. Floating surfaces are glass; hierarchy and state show through type and whitespace.",
+    ko: "Horon 화면은 잉크와 흰 종이에 하늘색 액센트 하나만 씁니다. 떠 있는 표면은 유리로 만들고, 계층과 상태는 글자와 여백으로 나눕니다.",
+    en: "Horon screens use ink and white paper with a single sky accent. Floating surfaces are glass; hierarchy and state come from type and whitespace.",
   },
   principleInkTitle: { ko: "Ink and paper", en: "Ink and paper" },
   principleInkBody: {
-    ko: "표면은 흰 종이, 글자와 버튼은 잉크입니다. 계층은 색보다 글자와 여백으로 드러냅니다.",
-    en: "Surfaces are white paper; text and buttons are ink. Hierarchy comes from type and whitespace before color.",
+    ko: "표면은 흰 종이, 글자와 버튼은 잉크입니다. 색을 더하기 전에 글자와 여백으로 계층을 나눕니다.",
+    en: "Surfaces are white paper; text and buttons are ink. Type and whitespace set the hierarchy before color does.",
   },
   principleGlassTitle: { ko: "Liquid glass", en: "Liquid glass" },
   principleGlassBody: {
-    ko: "떠 있는 표면은 유리입니다. 흐림과 경계선이 표면 높이에 비례해 Figma와 같은 질감을 냅니다.",
-    en: "Floating surfaces are glass. Blur and edges scale with surface height, matching the Figma texture.",
+    ko: "떠 있는 표면은 유리입니다. 웹, 데스크톱, iOS, Android가 같은 흐림, 채움, 테두리 값으로 그립니다.",
+    en: "Floating surfaces are glass. Web, desktop, iOS and Android draw them with the same blur, fill and rim values.",
   },
   principleSourceTitle: { ko: "Same source", en: "Same source" },
   principleSourceBody: {
@@ -58,19 +58,19 @@ export const homeMessages = defineMessages({
   mascotTitleLead: { ko: "둥근 매, ", en: "A round falcon, " },
   mascotTitleTail: { ko: "가지 표정", en: " expressions" },
   mascotBody: {
-    ko: "Horus × ON에서 온 마스코트입니다. 빈 상태, 오류, 로딩처럼 화면이 말을 걸어야 할 때 대신 표정을 짓습니다. 1254 × 1254 투명 PNG로 모든 컷을 내려받을 수 있습니다.",
-    en: "A mascot from Horus × ON. It holds the expression when a screen needs to say something: empty states, errors, loading. Every cut downloads as a 1254 × 1254 transparent PNG.",
+    ko: "Horus × ON에서 이름을 딴 매입니다. 빈 상태, 오류, 로딩처럼 화면이 상황을 알려야 할 때 한 컷씩 나옵니다. 모든 컷은 1254 × 1254 투명 PNG로 내려받을 수 있습니다.",
+    en: "A falcon named after Horus × ON. One cut appears when a screen has to tell you something: empty states, errors, loading. Every cut downloads as a 1254 × 1254 transparent PNG.",
   },
   viewMascot: { ko: "마스코트 보기", en: "View mascot" },
 
   foundationsTitle: { ko: "Foundations", en: "Foundations" },
   foundationsBody: {
-    ko: "색, 글자, 간격, 반경, 유리 표면까지 모든 시각 결정의 값과 규칙.",
-    en: "Values and rules for every visual decision, from color, type, spacing, and radius to glass surfaces.",
+    ko: "색, 글자, 간격, 반경, 유리 표면의 값과 규칙.",
+    en: "Values and rules for color, type, spacing, radius, and glass.",
   },
   getStartedTitle: { ko: "Get Started", en: "Get Started" },
   getStartedBody: {
-    ko: "설치하고 첫 화면을 만드는 데 필요한 최소 절차.",
+    ko: "설치부터 첫 화면까지 필요한 최소 절차.",
     en: "The minimum steps from install to a first screen.",
   },
   componentsTitle: { ko: "Components", en: "Components" },
