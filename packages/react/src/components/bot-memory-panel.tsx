@@ -84,15 +84,15 @@ export function BotMemoryPanel({
   return (
     <section
       className={cn(
-        "flex w-full max-w-140 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full max-w-140 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
     >
-      <header className="flex items-center gap-2.5 px-5 pt-4 pb-3.5">
+      <header className="flex flex-wrap items-center gap-x-2.5 gap-y-2 px-5 pt-4 pb-3.5">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <h3 className="text-label-lg text-text-primary">{title}</h3>
-          {subtitle ? <p className="text-caption text-text-secondary">{subtitle}</p> : null}
+          <h3 className="min-w-0 truncate text-label-lg text-text-primary">{title}</h3>
+          {subtitle ? <p className="min-w-0 truncate text-caption text-text-secondary">{subtitle}</p> : null}
         </div>
         <div className="flex flex-col items-end gap-1">
           <span className="text-caption text-text-secondary">{percent}% full</span>
@@ -169,12 +169,12 @@ export function BotMemoryPanel({
                 }
               }}
               className={cn(
-                "inline-flex h-8 max-w-full items-center gap-2 rounded-full bg-accent-sky-500-16 pr-3 pl-2.5",
+                "inline-flex h-8 max-w-full min-w-0 items-center gap-2 rounded-full bg-accent-sky-500-16 pr-3 pl-2.5",
                 leaving ? "animate-pop-out" : "animate-pop-in",
               )}
             >
               <BookmarkSimple aria-hidden className="size-3.5 shrink-0 text-text-primary" />
-              <span className="shrink-0 text-label-sm text-text-primary">{toast.title}</span>
+              <span className="min-w-0 truncate text-label-sm text-text-primary">{toast.title}</span>
               {toast.message ? (
                 <span className="min-w-0 truncate text-caption text-text-secondary">{toast.message}</span>
               ) : null}
@@ -208,8 +208,8 @@ export function BotMemoryPanel({
                   )}
                   style={{ animationDelay: `${rowIndex++ * 30}ms` }}
                 >
-                  <span className="text-body-sm text-text-primary">{memory.text}</span>
-                  <span className="text-caption text-text-secondary">{memory.source}</span>
+                  <span className="text-body-sm wrap-break-word text-text-primary">{memory.text}</span>
+                  <span className="text-caption wrap-break-word text-text-secondary">{memory.source}</span>
                 </div>
               ))}
             </div>

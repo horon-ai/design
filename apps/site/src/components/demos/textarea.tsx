@@ -10,7 +10,7 @@ function Fields({ surface }: { surface: "solid" | "glass" }) {
         <Textarea className="w-52" surface={surface} placeholder="Medium" />
         <Textarea className="w-52" surface={surface} size="lg" placeholder="Large" />
       </div>
-      <Textarea className="w-80" surface={surface} placeholder="Give the bot a task" />
+      <Textarea className="w-full max-w-80" surface={surface} placeholder="Give the bot a task" />
     </>
   );
 }

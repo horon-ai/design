@@ -87,9 +87,12 @@ export function SegmentedControl({
         if (next[0] !== undefined) onValueChange?.(next[0]);
       }}
       className={cn(
-        "relative flex items-center gap-0.5 rounded-full",
+        // Segments keep the padding their rung gives them; when the set is wider
+        // than the container the track scrolls instead of spilling the pills.
+        "relative flex max-w-full min-w-0 items-center gap-0.5 rounded-full",
         trackClass[size],
         surfaceClass[surface],
+        "overflow-x-auto overflow-y-clip",
         className,
       )}
       aria-label={props["aria-label"]}
@@ -120,7 +123,9 @@ export function SegmentedControl({
             "hover:text-text-primary data-disabled:cursor-not-allowed data-disabled:opacity-40 data-pressed:text-text-primary",
             "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
             segmentClass[size],
-            fill && "flex-1",
+            // Filled segments share the track; hugging segments keep the padding their
+            // rung gives them and let the track scroll when the set is wider than the row.
+            fill ? "flex-1" : "shrink-0",
           )}
         >
           <span className="text-trim">{item.label}</span>

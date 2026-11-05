@@ -8,7 +8,7 @@ const filters = ["All", "Running", "Done", "Failed"].map((label) => ({ value: la
 function Header({ surface }: { surface: "solid" | "glass" }) {
   return (
     <PageHeader
-      className="w-97.5"
+      className="w-full max-w-97.5"
       surface={surface}
       title="Routines"
       onBack={() => undefined}

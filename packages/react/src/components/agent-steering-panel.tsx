@@ -146,12 +146,12 @@ export function AgentSteeringPanel({
   return (
     <section
       className={cn(
-        "flex w-full max-w-130 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full max-w-130 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
     >
-      <div className="flex items-center gap-2.5 px-5 pt-4 pb-3.5">
+      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2 px-5 pt-4 pb-3.5">
         <Path aria-hidden className="size-4.5 shrink-0 text-text-primary" />
         <div className="flex min-w-0 flex-1 flex-col">
           <h3 className="truncate text-label-lg text-text-primary">{title}</h3>
@@ -164,7 +164,7 @@ export function AgentSteeringPanel({
             !paused && "animate-live-pulse",
           )}
         />
-        {status && <span className="shrink-0 text-body-sm text-text-secondary tabular-nums">{status}</span>}
+        {status && <span className="min-w-0 truncate text-body-sm text-text-secondary tabular-nums">{status}</span>}
         <button
           type="button"
           aria-label={paused ? "Resume" : "Pause"}
@@ -253,7 +253,7 @@ export function AgentSteeringPanel({
           </button>
         </div>
 
-        <div className="flex items-center gap-3.5 text-caption text-text-secondary">
+        <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-caption text-text-secondary">
           <span className="flex items-center gap-1.25">
             <Kbd>
               <ArrowElbowDownLeft aria-hidden />

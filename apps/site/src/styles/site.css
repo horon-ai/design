@@ -92,6 +92,10 @@
     align-items: center;
     justify-content: center;
     gap: calc(var(--spacing) * 3);
+    /* A demo that is wider than the stage must not widen the page: the stage
+     * is a block in the prose column, so zeroing the automatic minimum lets it
+     * clamp its children instead of growing to their min-content. */
+    min-width: 0;
     min-height: 26rem;
     padding: calc(var(--spacing) * 8);
     border-radius: var(--radius-2xl);
@@ -99,11 +103,41 @@
     color: var(--color-text-primary);
   }
 
-  /* The grid variant of the same stage; no library grid is tied to demo previews. */
+  /* Below `md` the stage gives its gutters back to the demo. At 320px the 2rem
+   * padding left 224px of usable width while demos that carry a fixed width
+   * (several `w-80`/`w-96`/`max-w-*` samples) still needed more; a centred flex
+   * row then pushed those pixels outside the page. The smaller padding and
+   * height keep the frame at phone sizes and `md` restores the design values,
+   * so the desktop render is untouched. */
+  @media (max-width: 767px) {
+    .demo-stage {
+      min-height: 16rem;
+      padding: calc(var(--spacing) * 4);
+    }
+
+    /* A demo may size itself wider than the stage (`w-80`, `w-96`). Capping
+     * every descendant keeps that width inside the frame instead of pushing
+     * the document wide. An element that owns a horizontal scroller still
+     * scrolls: capping the box does not cap its content, so `CodePanel`, the
+     * data table and the filter bar keep their intended overflow.
+     * Index previews are excluded because `.demo-fit` scales them by transform
+     * to their 16:9 tile already. */
+    .demo-stage :where(*) {
+      max-width: 100%;
+    }
+
+    .demo-tile .demo-stage :where(*) {
+      max-width: none;
+    }
+  }
+
+  /* The grid variant of the same stage; no library grid is tied to demo previews.
+   * `min(220px, 100%)` keeps the track from forcing the stage wider than a
+   * 320px phone once the gutter is subtracted. */
   .demo-stage-grid {
     display: grid;
     align-items: stretch;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   }
 
   /* Overlay demos need a fixed-height positioning context so opening the panel does not move the page. */

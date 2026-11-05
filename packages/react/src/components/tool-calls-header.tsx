@@ -35,11 +35,14 @@ export function ToolCallsHeader({
       defaultOpen={defaultOpen}
       open={open}
       onOpenChange={onOpenChange}
-      className={cn("flex w-full flex-col rounded-xl border border-border-default bg-bg-surface p-3", className)}
+      className={cn(
+        "flex w-full min-w-0 flex-col rounded-xl border border-border-default bg-bg-surface p-3",
+        className,
+      )}
     >
-      <Collapsible.Trigger className="group flex w-full cursor-pointer items-center gap-2.5 pb-1 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand">
+      <Collapsible.Trigger className="group flex w-full min-w-0 cursor-pointer items-center gap-2.5 pb-1 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand">
         {chips.length > 0 && (
-          <span className="flex items-center">
+          <span className="flex shrink-0 items-center">
             {Children.map(chips, (icon) => (
               <span className="-ml-2 flex size-7 shrink-0 items-center justify-center rounded-[10px] bg-bg-subtle text-text-secondary ring-2 ring-bg-surface first:ml-0 [&>svg]:size-3.5">
                 {icon}
@@ -47,15 +50,15 @@ export function ToolCallsHeader({
             ))}
           </span>
         )}
-        <span className="text-label-md text-text-primary">{title}</span>
-        {elapsed && <span className="text-label-md text-text-secondary">· {elapsed}</span>}
+        <span className="min-w-0 truncate text-label-md text-text-primary">{title}</span>
+        {elapsed && <span className="shrink-0 text-label-md text-text-secondary">· {elapsed}</span>}
         <CaretDown
           aria-hidden
           className="ml-auto size-4 shrink-0 text-text-secondary transition-transform duration-200 ease-out-quint group-data-panel-open:rotate-180"
         />
       </Collapsible.Trigger>
       <Collapsible.Panel className="motion-collapse">
-        <div className="flex flex-col gap-2 pt-1">{children}</div>
+        <div className="flex min-w-0 flex-col gap-2 pt-1">{children}</div>
       </Collapsible.Panel>
     </Collapsible.Root>
   );

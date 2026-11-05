@@ -43,7 +43,7 @@ export function DataTable({
     <div
       data-device={device}
       className={cn(
-        "group/dt flex flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
+        "group/dt flex min-w-0 flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
@@ -78,7 +78,7 @@ export function DataTableHeader({ icon, title, actions, className }: DataTableHe
 
 export function DataTableTable({ className, ...props }: WithClass<ComponentProps<"table">>) {
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full max-w-full min-w-0 overflow-x-auto">
       <table
         className={cn("w-full border-collapse text-left group-data-[device=mobile]/dt:min-w-max", className)}
         {...props}
@@ -162,7 +162,12 @@ export type DataTableFooterProps = { onAdd?: () => void; addLabel?: string; hint
 /** Footer: "Add row" with a 16px plus and a caption hint on the right. */
 export function DataTableFooter({ onAdd, addLabel = "Add row", hint, className }: DataTableFooterProps) {
   return (
-    <div className={cn("flex items-center gap-2 px-6 pt-3.5 pb-4 group-data-[device=mobile]/dt:px-4.5", className)}>
+    <div
+      className={cn(
+        "flex flex-wrap items-center gap-x-2 gap-y-1 px-6 pt-3.5 pb-4 group-data-[device=mobile]/dt:px-4.5",
+        className,
+      )}
+    >
       <button
         type="button"
         onClick={onAdd}
@@ -393,7 +398,7 @@ export function DataTablePagination<TData extends RowData>({ table, className }:
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-4 px-6 py-3 group-data-[device=mobile]/dt:px-4.5",
+        "flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-6 py-3 group-data-[device=mobile]/dt:px-4.5",
         className,
       )}
     >

@@ -65,7 +65,13 @@ export function Switch({ size = "md", label, className, ...props }: SwitchProps)
   );
   if (!label) return control;
   return (
-    <label className={cn("inline-flex cursor-pointer items-center text-text-primary", labelClass[size], className)}>
+    <label
+      className={cn(
+        "inline-flex max-w-full min-w-0 cursor-pointer items-center text-text-primary",
+        labelClass[size],
+        className,
+      )}
+    >
       <span className="min-w-0 flex-1">{label}</span>
       {control}
     </label>

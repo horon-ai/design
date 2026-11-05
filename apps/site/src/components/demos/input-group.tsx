@@ -49,7 +49,7 @@ function Examples({ surface }: { surface: "solid" | "glass" }) {
         />
       </div>
       <InputGroup
-        className="w-80"
+        className="w-full max-w-80"
         surface={surface}
         placeholder="Phone number"
         prefix={
@@ -63,20 +63,20 @@ function Examples({ surface }: { surface: "solid" | "glass" }) {
         }
       />
       <InputGroup
-        className="w-80"
+        className="w-full max-w-80"
         surface={surface}
         placeholder="Amount"
         suffix={<Select variant="segment" aria-label="Currency" items={currencies} defaultValue="KRW" />}
       />
       <InputGroup
-        className="w-80"
+        className="w-full max-w-80"
         surface={surface}
         invalid
         defaultValue="12"
         suffix={<Select variant="segment" aria-label="Currency" items={currencies} defaultValue="KRW" />}
       />
       <InputGroup
-        className="w-80"
+        className="w-full max-w-80"
         surface={surface}
         disabled
         placeholder="Phone number"

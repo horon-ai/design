@@ -68,7 +68,12 @@ export type AttachmentProps = {
 /** Figma `Attachment` (109:667): a flat subtle card with a 40px thumb, name, detail and remove button. */
 export function Attachment({ name, detail, thumbnail, onRemove, removeLabel = "Remove", className }: AttachmentProps) {
   return (
-    <div className={cn("flex w-70 motion-rise items-center gap-2.5 rounded-lg bg-bg-subtle py-2 pr-2 pl-2", className)}>
+    <div
+      className={cn(
+        "flex w-full max-w-70 min-w-0 motion-rise items-center gap-2.5 rounded-lg bg-bg-subtle py-2 pr-2 pl-2",
+        className,
+      )}
+    >
       {thumbnail ? (
         <span
           aria-hidden

@@ -200,7 +200,9 @@ function linkTo(href: string): ReactElement {
             </Button>
           </div>
         </div>
-        <div class="grid grid-cols-3 gap-2">
+        {/* Three 88px tiles at 320 are too small to read the cut; two columns keep the
+         * mascot legible and return to the current three-across grid from `sm` up. */}
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {
             mascotCuts.map((slug) => (
               <div class="flex aspect-square items-center justify-center rounded-xl bg-bg-subtle p-2">

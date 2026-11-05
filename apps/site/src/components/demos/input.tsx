@@ -11,9 +11,9 @@ function Examples({ surface }: { surface: "solid" | "glass" }) {
         <Input className="w-44" surface={surface} placeholder="Medium" />
         <Input className="w-44" surface={surface} size="lg" placeholder="Large" />
       </div>
-      <Input className="w-72" surface={surface} icon={<MagnifyingGlass />} placeholder="Search bots" />
-      <Input className="w-72" surface={surface} invalid defaultValue="Inbox Manager" />
-      <Input className="w-72" surface={surface} disabled placeholder="Search bots" />
+      <Input className="w-full max-w-72" surface={surface} icon={<MagnifyingGlass />} placeholder="Search bots" />
+      <Input className="w-full max-w-72" surface={surface} invalid defaultValue="Inbox Manager" />
+      <Input className="w-full max-w-72" surface={surface} disabled placeholder="Search bots" />
     </div>
   );
 }
@@ -31,7 +31,12 @@ export default function InputDemo() {
       </Backdrop>
       <div className="flex flex-col items-center gap-4">
         <p className="text-caption text-text-secondary">Solid on page</p>
-        <Input className="w-72" surface="solid-on-page" icon={<MagnifyingGlass />} placeholder="Search bots" />
+        <Input
+          className="w-full max-w-72"
+          surface="solid-on-page"
+          icon={<MagnifyingGlass />}
+          placeholder="Search bots"
+        />
       </div>
     </div>
   );

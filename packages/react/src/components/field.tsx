@@ -34,7 +34,10 @@ export function Field({
 }: WithClass<Omit<ComponentProps<typeof BaseField.Root>, "size">> & { size?: ControlSize }) {
   return (
     <FieldSizeContext.Provider value={size}>
-      <BaseField.Root className={cn("flex flex-col items-start", gapClass[size], className)} {...props} />
+      <BaseField.Root
+        className={cn("flex max-w-full min-w-0 flex-col items-start", gapClass[size], className)}
+        {...props}
+      />
     </FieldSizeContext.Provider>
   );
 }

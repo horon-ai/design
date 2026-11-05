@@ -57,6 +57,9 @@ export function MenuContent({
           className={cn(
             "relative flex motion-popup flex-col gap-0.5 overflow-clip p-1.5 outline-none",
             surface === "glass" ? "w-55" : surface === "paper" ? "w-76" : "w-64",
+            // The 304px paper menu is wider than a 320px viewport allows once the
+            // positioner offsets it; this cap keeps the popup on screen.
+            "max-w-[calc(100vw-2rem)]",
             menuPopupClass[surface],
             className,
           )}

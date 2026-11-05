@@ -38,8 +38,11 @@ function buildGroups(locale: Locale): CommandGroup[] {
  * Header search. The trigger is a library IconButton and the dialog is the
  * library CommandPalette, so the glass surface, grouping and keyboard handling
  * all come from the design system. Cmd/Ctrl+K opens it from anywhere on the page.
+ *
+ * `className` reaches the trigger only: the header passes the narrow-width size
+ * rung so the row fits at 320px, and the palette dialog is unaffected.
  */
-export function SearchPalette() {
+export function SearchPalette({ className }: { className?: string }) {
   const locale = useLocale();
   const [open, setOpen] = useState(false);
   const groups = buildGroups(locale);
@@ -62,6 +65,7 @@ export function SearchPalette() {
         icon={<MagnifyingGlass />}
         label={pick(m.search, locale)}
         aria-keyshortcuts="Meta+K Control+K"
+        className={className}
         onClick={() => setOpen(true)}
       />
       <CommandPalette

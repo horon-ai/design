@@ -73,13 +73,13 @@ export function OrchestratorPanel({
   return (
     <section
       className={cn(
-        "flex w-full flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
     >
       <header className="flex flex-col gap-3 px-5 pt-4 pb-3.5">
         <h3 className="text-label-lg text-text-primary">{title}</h3>
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
           <span className="text-body-sm text-text-secondary">{parallelLabel}</span>
           {parallelOptions && (
             <SegmentedControl
@@ -106,11 +106,11 @@ export function OrchestratorPanel({
       </header>
       <div role="separator" className="h-px bg-overlay-ink-8" />
       <div className="flex flex-col gap-2.5 px-5 pt-4 pb-5">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="flex size-5.5 shrink-0 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
             {lead.initial}
           </span>
-          <span className="text-label-lg text-text-primary">{lead.name}</span>
+          <span className="min-w-0 truncate text-label-lg text-text-primary">{lead.name}</span>
           <span className="min-w-0 flex-1 truncate text-body-sm text-text-secondary">{lead.role ?? "Lead"}</span>
           {lead.running && <Spinner size={13} />}
           {lead.status && <span className="shrink-0 text-caption text-text-secondary">{lead.status}</span>}
@@ -119,14 +119,14 @@ export function OrchestratorPanel({
         {plan && plan.length > 0 && (
           <ul className="flex flex-col gap-1.5 pt-0.5 pb-1 pl-7.5">
             {plan.map((item, index) => (
-              <li key={item.label} className="flex motion-rise items-center gap-2.5" style={stagger(index)}>
+              <li key={item.label} className="flex min-w-0 motion-rise items-center gap-2.5" style={stagger(index)}>
                 <span
                   aria-hidden
                   className={cn("shrink-0 rounded-full text-sky-400", item.running && "animate-live-pulse")}
                 >
                   <span className={cn("block size-1.5 rounded-full", item.dotClassName ?? "bg-status-live")} />
                 </span>
-                <span className="text-body-sm text-text-primary">{item.label}</span>
+                <span className="min-w-0 text-body-sm wrap-break-word text-text-primary">{item.label}</span>
               </li>
             ))}
           </ul>

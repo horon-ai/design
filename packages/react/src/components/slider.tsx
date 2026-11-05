@@ -14,7 +14,7 @@ export type SliderProps = Omit<ComponentProps<typeof BaseSlider.Root>, "classNam
  */
 export function Slider({ className, "aria-label": ariaLabel, ...props }: SliderProps) {
   return (
-    <BaseSlider.Root className={cn("relative w-55", className)} {...props}>
+    <BaseSlider.Root className={cn("relative w-55 max-w-full", className)} {...props}>
       <BaseSlider.Control className="flex h-5 w-full cursor-pointer touch-none items-center select-none data-disabled:cursor-not-allowed data-disabled:opacity-40">
         <BaseSlider.Track className="relative h-1.5 w-full rounded-full bg-overlay-ink-8">
           <BaseSlider.Indicator className="rounded-full bg-interactive-primary" />

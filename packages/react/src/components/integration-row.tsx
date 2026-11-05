@@ -44,7 +44,7 @@ export function IntegrationRow({
   return (
     <div
       className={cn(
-        "relative flex items-center gap-3 overflow-clip rounded-2xl py-3 pr-3.5 pl-3",
+        "relative flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 overflow-clip rounded-2xl py-3 pr-3.5 pl-3",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         status === "reconnect" &&
           (surface === "glass" ? "[--glass-edge:var(--color-border-danger)]" : "border-border-danger"),
@@ -62,7 +62,7 @@ export function IntegrationRow({
       >
         {icon}
       </span>
-      <span className="relative flex min-w-0 flex-1 flex-col gap-0.5">
+      <span className="relative flex min-w-0 grow basis-40 flex-col gap-0.5">
         <span className="truncate text-label-md text-text-primary">{name}</span>
         {detail && (
           <span

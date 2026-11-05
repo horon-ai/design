@@ -8,7 +8,7 @@ export default function SwitchDemo() {
         <Switch label="Medium" defaultChecked />
         <Switch size="lg" label="Large" defaultChecked />
       </div>
-      <div className="flex w-64 flex-col gap-3">
+      <div className="flex w-full max-w-64 min-w-0 flex-col gap-3">
         <Switch className="w-full justify-between" label="Morning brief" defaultChecked />
         <Switch className="w-full justify-between" label="Weekly report" />
         <Switch className="w-full justify-between" label="Paused" disabled />

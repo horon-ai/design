@@ -82,12 +82,12 @@ export function KnowledgeBasePanel({
   return (
     <section
       className={cn(
-        "flex w-full max-w-200 flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-5 py-4.5",
+        "flex w-full max-w-200 min-w-0 flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-5 py-4.5",
         className,
       )}
       {...props}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <h3 className="truncate text-label-lg text-text-primary">{title}</h3>
           {meta && <p className="truncate text-caption text-text-secondary">{meta}</p>}
@@ -111,7 +111,7 @@ export function KnowledgeBasePanel({
         </button>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <PanelPillTabs
           aria-label="Sources"
           value={selectedId}
@@ -126,8 +126,8 @@ export function KnowledgeBasePanel({
             ),
           }))}
         />
-        <span className="flex-1" />
-        <span className="motion-reveal-x" data-collapsed={indexing <= 0 || undefined}>
+        <span className="min-w-0 flex-1" />
+        <span className="motion-reveal-x shrink-0" data-collapsed={indexing <= 0 || undefined}>
           <span className="flex items-center gap-2 text-caption text-text-secondary tabular-nums">
             <Spinner size={12} label="Indexing" />
             {indexing} indexing
@@ -175,8 +175,8 @@ export function KnowledgeBasePanel({
           />
           <UploadSimple aria-hidden className="size-4.5 shrink-0 text-text-secondary" />
           <span className="flex min-w-0 flex-col gap-0.5">
-            <span className="text-label-md text-text-primary">{dropTitle}</span>
-            <span className="text-caption text-text-secondary">{dropHint}</span>
+            <span className="text-label-md wrap-break-word text-text-primary">{dropTitle}</span>
+            <span className="text-caption wrap-break-word text-text-secondary">{dropHint}</span>
           </span>
         </label>
       )}

@@ -47,7 +47,10 @@ export function PanelPillTabs({ items, value, defaultValue, onValueChange, class
       role="tablist"
       aria-label={props["aria-label"]}
       onKeyDown={onKeyDown}
-      className={cn("relative flex items-center gap-0.5 rounded-full bg-overlay-ink-5 p-[3px]", className)}
+      className={cn(
+        "relative flex max-w-full min-w-0 items-center gap-0.5 overflow-x-auto rounded-full bg-overlay-ink-5 p-[3px]",
+        className,
+      )}
     >
       <span
         aria-hidden
@@ -175,13 +178,13 @@ export function BotInstructionsPanel({
   return (
     <section
       className={cn(
-        "flex w-full max-w-155 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full max-w-155 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
     >
-      <header className="flex items-center gap-2 px-5 pt-4 pb-3.5">
-        <h3 className="text-label-lg text-text-primary">{title}</h3>
+      <header className="flex flex-wrap items-center gap-2 px-5 pt-4 pb-3.5">
+        <h3 className="min-w-0 text-label-lg text-text-primary">{title}</h3>
         {version ? (
           onVersionClick ? (
             <button
@@ -304,7 +307,7 @@ export function BotInstructionsPanel({
             {variables ? (
               <div className="flex flex-wrap gap-2">
                 {variables.map((variable) => (
-                  <div key={variable.name} className="flex min-w-35 flex-1 flex-col gap-1.5">
+                  <div key={variable.name} className="flex min-w-0 flex-1 basis-35 flex-col gap-1.5">
                     <div className="flex items-center gap-1.5 text-caption text-text-secondary">
                       <span
                         aria-hidden
@@ -312,14 +315,14 @@ export function BotInstructionsPanel({
                       />
                       {variable.name}
                     </div>
-                    <div className="flex h-10 items-center rounded-md bg-overlay-ink-5 px-3 text-body-sm text-text-primary">
-                      {variable.value}
+                    <div className="flex h-10 min-w-0 items-center rounded-md bg-overlay-ink-5 px-3 text-body-sm text-text-primary">
+                      <span className="min-w-0 truncate">{variable.value}</span>
                     </div>
                   </div>
                 ))}
               </div>
             ) : null}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {scenarios ? (
                 <PanelPillTabs
                   aria-label="Scenario"
