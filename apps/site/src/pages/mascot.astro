@@ -69,7 +69,7 @@ function localized(entry: Localized): ReactNode {
   <div class="grid gap-4 md:grid-cols-2">
     <Card title={localized(m.lockupTitle)}>
       <div class="flex items-center gap-2.5">
-        <img src={mascotImageUrl("face")} alt="" width="30" height="30" class="size-8 object-contain" />
+        <img src={mascotImageUrl("face")} alt="" width="30" height="30" class="size-8 object-contain dark:rounded-full dark:bg-sky-100 dark:p-0.5" />
         <HoronWordmark />
         <span class="text-body-sm text-text-secondary"><T m={m.designSystem} /></span>
       </div>
@@ -82,7 +82,7 @@ function localized(entry: Localized): ReactNode {
                 alt={`${logo.size}${m.logoAlt.ko}`}
                 width={logo.size}
                 height={logo.size}
-                class:list={["object-contain", logo.className]}
+                class:list={["object-contain dark:rounded-full dark:bg-sky-100 dark:p-0.5", logo.className]}
               />
               <span class="text-caption text-text-secondary">{logo.size}</span>
             </div>
@@ -141,7 +141,7 @@ function localized(entry: Localized): ReactNode {
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {group.items.map((mascot) => (
             <figure class="group flex flex-col overflow-hidden rounded-xl bg-bg-subtle">
-              <div class="flex aspect-square items-center justify-center p-4">
+              <div class="flex aspect-square items-center justify-center p-4 dark:bg-sky-100">
                 <img
                   src={mascotImageUrl(mascot.slug)}
                   alt={`${m.mascotAlt.ko} ${mascot.name} ${m.cutSuffix.ko}`}
