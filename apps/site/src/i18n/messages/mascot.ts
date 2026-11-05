@@ -4,13 +4,13 @@ import { defineMessages } from "@/i18n";
 export const mascotMessages = defineMessages({
   pageTitle: { ko: "Mascot", en: "Mascot" },
   description: {
-    ko: "HORON의 마스코트는 둥근 송곳니 매 병아리입니다. 제품 이름 Horus + ON에서 왔고, 26가지 컷을 투명 PNG로 제공합니다.",
-    en: "The HORON mascot is a round chick. The name comes from Horus + ON, and all 26 cuts ship as transparent PNGs.",
+    ko: "Horon의 마스코트는 둥근 매입니다. 이름은 Horus × ON에서 왔고, 26가지 컷을 투명 PNG로 제공합니다.",
+    en: "The Horon mascot is a round falcon. The name comes from Horus × ON, and all 26 cuts ship as transparent PNGs.",
   },
 
   body: {
-    ko: "제품 이름 Horus + ON에서 온 둥근 병아리입니다. 머리는 모서리가 크게 둥근 사각형이고, 그 위에 짧은 깃털 두 가닥이 솟아 있습니다. 얼굴 판은 따뜻한 크림색 타원, 눈은 크고 둥근 검은 눈에 작은 흰 하이라이트가 하나씩 있습니다.",
-    en: "A round chick named after Horus + ON. The head is a rectangle with heavily rounded corners and two short feathers on top. The face plate is a warm cream oval, and the large round eyes each carry one small white highlight.",
+    ko: "Horus에게서 눈을 받고 ON으로 늘 깨어 있는 둥근 매입니다. 머리는 모서리가 크게 둥근 사각형이고, 그 위에 짧은 깃털 두 가닥이 솟아 있습니다. 얼굴 판은 따뜻한 크림색 타원, 눈은 크고 둥근 검은 눈에 작은 흰 하이라이트가 하나씩 있습니다.",
+    en: "A round falcon. Horus gave it the eye, ON keeps it awake. The head is a rectangle with heavily rounded corners and two short feather tufts on top. The face plate is a warm cream oval, and the large round eyes each carry one small white highlight.",
   },
 
   specCuts: { ko: "Cuts", en: "Cuts" },
