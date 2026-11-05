@@ -45,9 +45,23 @@ const containerSizeClass: Record<CalendarSize, { default: string; popover: strin
   // so it lands on that size on desktop and folds to the column on a narrow screen. `w-full` rather than a
   // fixed `w-*` keeps its min-content at zero, which is what lets a flex parent shrink it. The popover is
   // fixed by design, so it caps against the viewport instead: its positioner is auto-width.
-  sm: { default: "w-full max-w-62.5 gap-2 p-3", popover: "w-62 max-w-[calc(100vw-2rem)] gap-1.5 p-3" },
-  md: { default: "w-full max-w-78.5 gap-3 p-4", popover: "w-77 max-w-[calc(100vw-2rem)] gap-2 p-3.5" },
-  lg: { default: "w-full max-w-93.5 gap-3.5 p-4.5", popover: "w-92 max-w-[calc(100vw-2rem)] gap-2.5 p-4" },
+  //
+  // Below `sm` the frame gives its padding and cell gaps back to the grid: at a 320px viewport the demo
+  // stage leaves 248px, and the desktop 16px padding plus 12px gaps left each day about 21px. The narrower
+  // frame and gap keep every day at or above `min-w-7` (28px), which is the smallest a seven-column month
+  // can be without dropping under the 24px pointer minimum.
+  sm: {
+    default: "w-full max-w-62.5 gap-2 p-3 max-sm:gap-1 max-sm:p-2",
+    popover: "w-62 max-w-[calc(100vw-2rem)] gap-1.5 p-3",
+  },
+  md: {
+    default: "w-full max-w-78.5 gap-3 p-4 max-sm:gap-1 max-sm:p-2",
+    popover: "w-77 max-w-[calc(100vw-2rem)] gap-2 p-3.5",
+  },
+  lg: {
+    default: "w-full max-w-93.5 gap-3.5 p-4.5 max-sm:gap-1 max-sm:p-2",
+    popover: "w-92 max-w-[calc(100vw-2rem)] gap-2.5 p-4",
+  },
 };
 
 const titleSizeClass: Record<CalendarSize, string> = {
@@ -98,7 +112,11 @@ const daySizeClass: Record<CalendarSize, string> = {
   lg: "max-w-12",
 };
 
-const cellFluidClass = "min-w-0 flex-1";
+/**
+ * A day cell takes an equal share of the row and never drops below 28px, so a phone grid stays tappable
+ * while a desktop grid keeps the Figma size from `daySizeClass` as its ceiling.
+ */
+const cellFluidClass = "min-w-7 flex-1";
 const dayShapeClass = "aspect-square";
 
 const dayTextClass: Record<CalendarSize, string> = {
@@ -226,7 +244,10 @@ export function Calendar(props: CalendarProps) {
   return (
     <div
       className={cn(
-        "relative flex flex-col overflow-clip",
+        "relative flex flex-col",
+        // The default grid scrolls sideways rather than clipping when a viewport is narrower than the
+        // 28px cell floor allows; the popover is viewport-capped, so it keeps clipping its corners.
+        variant === "popover" ? "overflow-clip" : "overflow-x-auto overflow-y-clip",
         surface === "solid"
           ? "border border-border-default bg-bg-surface"
           : surface === "glass"

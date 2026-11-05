@@ -16,6 +16,7 @@ import { Sidebar, SidebarGroup, SidebarItem } from "@horon-ai/react";
 
 import { componentGroups, componentsInGroup } from "@/data/components";
 import { foundationsNav, isActive, primaryNav } from "@/data/nav";
+import { siteHref } from "@/lib/urls";
 import { pick, type Locale, type Localized } from "@/i18n";
 import { docsMessages } from "@/i18n/messages/docs";
 import { useLocale } from "@/i18n/react";
@@ -124,7 +125,7 @@ export default function DocsSidebar({ section, currentPath }: DocsSidebarProps) 
 
   const renderEntries = (block: DocsSidebarBlock) =>
     block.entries.map((entry) => (
-      <SidebarItem key={entry.href} href={entry.href} current={entry.current}>
+      <SidebarItem key={entry.href} href={siteHref(entry.href)} current={entry.current}>
         {pick(entry.label, locale)}
       </SidebarItem>
     ));

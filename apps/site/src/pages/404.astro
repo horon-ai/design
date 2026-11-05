@@ -5,6 +5,7 @@ import { createElement, Fragment, type ReactNode } from "react";
 import T from "@/components/i18n/T.astro";
 import { componentGroups, componentsInGroup } from "@/data/components";
 import { mascotImageUrl } from "@/data/mascots";
+import { siteHref } from "@/lib/urls";
 import type { Localized } from "@/i18n";
 import { notFoundMessages as m } from "@/i18n/messages/not-found";
 import BaseLayout from "@/layouts/BaseLayout.astro";
@@ -42,7 +43,7 @@ const actions = createElement(
   ),
   createElement(
     Button,
-    { variant: "glass", href: "/components" },
+    { variant: "glass", href: siteHref("/components") },
     localized(m.components),
   ),
 );
@@ -69,7 +70,7 @@ const actions = createElement(
                 <li>
                   <Button
                     variant="link"
-                    href={`/components/${component.slug}`}
+                    href={siteHref(`/components/${component.slug}`)}
                   >
                     <T m={component.title} />
                   </Button>

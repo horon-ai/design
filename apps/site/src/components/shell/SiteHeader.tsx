@@ -2,6 +2,7 @@ import { Button, IconButton, Menu, MenuContent, MenuItem, MenuSeparator, MenuTri
 import { List } from "@phosphor-icons/react";
 
 import { externalLinks, isActive, primaryNav } from "@/data/nav";
+import { siteHref } from "@/lib/urls";
 import { pick } from "@/i18n";
 import { useLocale } from "@/i18n/react";
 
@@ -80,7 +81,7 @@ export function SiteHeaderBar({ pathname }: SiteHeaderBarProps) {
             <Button
               key={item.href}
               variant="link"
-              href={item.href}
+              href={siteHref(item.href)}
               aria-current={isActive(pathname, item.href) ? "page" : undefined}
               className="rounded-full px-3.5 py-2 leading-[18px] hover:bg-glass-fill"
             >

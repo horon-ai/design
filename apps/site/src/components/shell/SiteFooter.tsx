@@ -1,6 +1,7 @@
 import { Button, HoronWordmark } from "@horon-ai/react";
 
 import { externalLinks, foundationsNav, primaryNav } from "@/data/nav";
+import { siteHref } from "@/lib/urls";
 import type { Localized } from "@/i18n";
 
 import { shellMessages as m } from "./messages";
@@ -29,7 +30,7 @@ function FooterLink({ link }: { link: { href: string; label: Localized } }) {
   return (
     <Button
       variant="link"
-      href={link.href}
+      href={siteHref(link.href)}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
     >

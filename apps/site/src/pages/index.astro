@@ -10,6 +10,7 @@ import type { Localized } from "@/i18n";
 import { homeMessages as m } from "@/i18n/messages/home";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { demoCount } from "@/lib/demos";
+import { siteHref } from "@/lib/urls";
 
 const featured = ["button", "card", "input", "dialog", "tabs", "select", "sidebar", "tool-call"];
 const showcase = featured
@@ -53,7 +54,7 @@ function localized(entry: Localized): ReactNode {
 
 /** Anchor for `Card`'s `render` prop; library Buttons take `href` directly. */
 function linkTo(href: string): ReactElement {
-  return createElement("a", { href });
+  return createElement("a", { href: siteHref(href) });
 }
 
 ---
@@ -67,10 +68,10 @@ function linkTo(href: string): ReactElement {
       </h1>
       <p class="mt-7 max-w-xl text-body-lg text-text-secondary text-pretty"><T m={m.body} /></p>
       <div class="mt-9 flex flex-wrap items-center gap-3">
-        <Button variant="primary" href="/get-started">
+        <Button variant="primary" href={siteHref("/get-started")}>
           <T m={m.start} />
         </Button>
-        <Button variant="glass" href="/components">
+        <Button variant="glass" href={siteHref("/components")}>
           <T m={m.browseComponents} />
         </Button>
       </div>
@@ -140,7 +141,7 @@ function linkTo(href: string): ReactElement {
             {componentCount}<T m={m.componentsUnit} />, {componentGroups.length}<T m={m.groupsUnit} />
           </h2>
         </div>
-        <Button variant="link" href="/components">
+        <Button variant="link" href={siteHref("/components")}>
           <T m={m.allComponents} />
         </Button>
       </div>
@@ -174,7 +175,7 @@ function linkTo(href: string): ReactElement {
             <li>
               <Button
                 variant="link"
-                href={`/components/${component.slug}`}
+                href={siteHref(`/components/${component.slug}`)}
               >
                 <T m={component.title} />
               </Button>
@@ -195,7 +196,7 @@ function linkTo(href: string): ReactElement {
           </h2>
           <p class="mt-4 max-w-md text-body-sm text-text-secondary"><T m={m.mascotBody} /></p>
           <div class="mt-6">
-            <Button variant="glass" href="/mascot">
+            <Button variant="glass" href={siteHref("/mascot")}>
               <T m={m.viewMascot} />
             </Button>
           </div>
@@ -228,7 +229,7 @@ function linkTo(href: string): ReactElement {
         {
           entryCards.map((card) => (
             <ComponentCard
-              href={card.href}
+              href={siteHref(card.href)}
               title={card.title}
               description={card.body}
               surface="frost"
