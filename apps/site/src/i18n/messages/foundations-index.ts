@@ -8,13 +8,13 @@ export const foundationsIndexMessages = defineMessages({
     en: "The bottom layer of every Horon screen: values for color, type, spacing, radius and liquid glass, and when to use each one.",
   },
   intro: {
-    ko: "모든 값은 Figma Horon 파일의 변수에서 읽어 @horon-ai/tokens에 한 번만 적었습니다. 이 문서의 수치와 견본도 그 패키지에서 읽어 그리므로, 문서와 라이브러리가 서로 다른 값을 보여줄 수 없습니다.",
+    ko: "모든 값은 Figma Horon 파일의 변수에서 읽어 @horon-ai/tokens에 한 번만 적었습니다. 이 문서의 수치와 견본도 같은 패키지에서 읽어 오기 때문에 문서와 라이브러리의 값이 어긋나지 않습니다.",
     en: "Every value is read from the Figma Horon file and written once in @horon-ai/tokens. This page draws its numbers and samples from the same package, so the docs and the library cannot show different values.",
   },
   designTokenTitle: { ko: "Design Token", en: "Design Token" },
   designTokenBody: {
-    ko: "Figma 변수에서 읽은 값을 하나의 패키지에서 웹 CSS로 냅니다.",
-    en: "Values read from Figma variables, shipped as web CSS from one package.",
+    ko: "Figma 변수를 옮긴 값과 거기서 만드는 웹 CSS.",
+    en: "Values carried over from Figma variables, and the web CSS built from them.",
   },
   colorTitle: { ko: "Color", en: "Color" },
   colorBody: {
@@ -38,16 +38,16 @@ export const foundationsIndexMessages = defineMessages({
   },
   glassTitle: { ko: "Glass", en: "Glass" },
   glassBody: {
-    ko: "높이에 비례해 흐려지는 리퀴드 글래스 레이어.",
-    en: "Liquid glass layers that blur in proportion to surface height.",
+    ko: "모든 플랫폼이 같은 값으로 그리는 리퀴드 글래스 레이어.",
+    en: "Liquid glass layers every platform draws with the same values.",
   },
   flowHeading: { ko: "값의 흐름", en: "How values flow" },
   flowBody: {
-    ko: "Figma 변수(Primitives → Semantic, Type, Scale) → @horon-ai/tokens의 TypeScript 값 → 생성된 theme.css → 컴포넌트의 Tailwind 클래스 순서로 흐릅니다. 변수 이름은 Figma Dev Mode의 WEB 코드와 같아서 var(--color-text-primary)가 양쪽에서 같은 값입니다. 다크 모드는 시맨틱 층의 값만 바뀝니다.",
+    ko: "값은 Figma 변수(Primitives → Semantic, Type, Scale) → @horon-ai/tokens의 TypeScript 값 → 생성된 theme.css → 컴포넌트의 Tailwind 클래스 순서로 흐릅니다. 변수 이름이 Figma Dev Mode의 WEB 코드와 같아서 var(--color-text-primary)는 양쪽에서 같은 값입니다. 다크 모드에서는 시맨틱 층의 값만 바뀝니다.",
     en: "Values flow from Figma variables (Primitives → Semantic, Type, Scale) to TypeScript values in @horon-ai/tokens, then to the generated theme.css, then to component Tailwind classes. A variable name matches the WEB code in Figma Dev Mode, so var(--color-text-primary) holds the same value in both places. Dark mode changes only the semantic layer.",
   },
   count: {
-    ko: "사이드바의 항목이 Foundations의 전체 목록입니다. 항목 수는 {count}개입니다.",
+    ko: "Foundations 문서는 모두 {count}개이고, 사이드바에서 전부 볼 수 있습니다.",
     en: "The sidebar lists every Foundations page. {count} entries.",
   },
 });
