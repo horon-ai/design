@@ -4,8 +4,8 @@ import { defineMessages, type Localized } from "@/i18n";
 export const getStartedMessages = defineMessages({
   title: { ko: "Get Started", en: "Get Started" },
   description: {
-    ko: "HORON 디자인 시스템은 하나의 토큰 소스에서 웹 컴포넌트와 문서 사이트의 값을 함께 냅니다. 하려는 일에 맞는 길을 고르고 시작하세요.",
-    en: "HORON Design System serves web components and the docs site from one token source. Pick the path that fits what you are doing.",
+    ko: "Horon 디자인 시스템은 하나의 토큰 소스에서 웹 컴포넌트와 문서 사이트의 값을 함께 냅니다. 하려는 일에 맞는 길을 고르고 시작하세요.",
+    en: "Horon Design System serves web components and the docs site from one token source. Pick the path that fits what you are doing.",
   },
 
   pathsTitle: { ko: "어디서 시작할까요", en: "Where to start" },

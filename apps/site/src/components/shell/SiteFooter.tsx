@@ -115,7 +115,7 @@ export function SiteFooter({ year }: SiteFooterProps) {
 
         <div className="flex flex-col gap-1 border-t border-border-default pt-4 lg:flex-row lg:items-center lg:gap-10">
           <p className="font-mono text-caption tracking-[0.04em] text-text-secondary">
-            © {year} HORON. All rights reserved.
+            © {year} Horon. All rights reserved.
           </p>
           <p className="font-mono text-caption tracking-[0.04em] text-text-secondary">
             <LocalizedText entry={m.footerAvailability} />
