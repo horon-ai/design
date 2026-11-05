@@ -74,54 +74,47 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 
 ## 패키지 게시 (npm)
 
-라이브러리 두 패키지(`@horon-ai/react`, `@horon-ai/tokens`)는 버전 `0.1.0`이고
-`publishConfig.access`가 `public`입니다. 앱(`@horon/site`)과 저장소 루트는 `private: true`라
-게시 대상이 아닙니다.
+라이브러리 두 패키지(`@horon-ai/react`, `@horon-ai/tokens`)는 `publishConfig.access`가 `public`입니다.
+앱(`@horon/site`)과 저장소 루트는 `private: true`라 게시 대상이 아닙니다.
 
-두 패키지는 같은 버전으로 움직입니다. `0.1.0`이 첫 게시 버전이고, 이후에도
-`packages/tokens/package.json`과 `packages/react/package.json`의 `version`을 함께 올립니다.
-`@horon-ai/react`의 `@horon-ai/tokens` 의존은 워크스페이스에서 `workspace:*`로 두고,
-`bun pm pack`이 게시 시점에 같은 버전으로 바꿉니다. 그래서 `packages/react/package.json`의
-`workspace:*`를 손으로 고치지 않습니다.
+두 패키지는 같은 버전으로 움직이고, 버전은 npm 레지스트리가 정본입니다. `main`에 두 패키지의
+변경(`packages/tokens/**`, `packages/react/**`, `bun.lock`)이 올라오면
+`.github/workflows/publish.yml`이 PATCH만 하나 올려 게시합니다.
 
-### GitHub Actions로 게시
+- 첫 게시는 `0.1.0`, 그 뒤로 `0.1.1`, `0.1.2` … 순서입니다.
+- `package.json`의 `version`(`0.1.0`)은 MAJOR·MINOR 라인만 정합니다. CI가 작업 공간에서만
+  버전을 바꿔 게시하고 저장소에 다시 커밋하지 않으므로 손으로 올리지 않습니다.
+- npm의 라인과 `package.json`의 라인이 다르면(MAJOR·MINOR 변경) 게시하지 않고 실패합니다.
+- 직전 실행이 `tokens`만 올리고 `react`에서 실패했다면 빠진 패키지만 같은 버전으로 채웁니다.
+- 게시 전에 lint·typecheck·test·build를 다시 돌리고, 게시한 커밋에 `v0.1.N` 태그를 남깁니다.
+  provenance(실행한 워크플로와 커밋이 npm 패키지 페이지에 표시됨)가 붙습니다.
 
-`.github/workflows/publish.yml`이 두 패키지를 npm에 게시합니다. 태그를 밀면 그 태그가 가리키는
-커밋의 워크플로가 실행되므로 `dev`에서도 바로 게시할 수 있습니다. 두 경로 모두 게시 전에
-lint·typecheck·test·build를 다시 돌리고, npm에 이미 있는 버전은 건너뛰므로 재실행해도 안전합니다.
-게시에는 npm provenance가 붙습니다(OIDC 서명, 실행한 워크플로와 커밋이 npm 패키지 페이지에
-표시됨).
-
-Actions 탭의 수동 실행 버튼은 워크플로가 기본 브랜치(`main`)에 있을 때만 나타납니다. 수동
-실행이 필요하면 `main` 병합 뒤에 쓰고, 그 전에는 태그로 게시합니다.
+계산 규칙은 `.github/scripts/release-version.mjs`에 있고, 로컬에서 다음 버전을 미리 볼 수 있습니다.
 
 ```bash
-# 1. 저장소 시크릿 NPM_TOKEN 을 한 번 등록한다 (npm granular access token, 공개 패키지 게시 권한)
-#    Settings → Secrets and variables → Actions → New repository secret
-
-# 2. 버전을 함께 올린다 (아직 0.1.0이면 생략)
-#    packages/tokens/package.json, packages/react/package.json
-
-# 3. 커밋을 dev 또는 main에 올린 뒤, 같은 커밋에 태그를 만들어 민다
-git tag v0.1.0
-git push origin v0.1.0
+node .github/scripts/release-version.mjs   # 마지막 줄이 다음 게시 버전, 파일은 바꾸지 않음
 ```
 
-태그 이름은 `v`와 패키지 버전을 붙인 형식이어야 합니다. `v0.1.0` 태그인데 package.json이
-`0.1.1`이면 워크플로가 게시 전에 멈춥니다. 태그 없이 게시하려면 Actions 탭에서 수동 실행합니다.
+`@horon-ai/react`의 `@horon-ai/tokens` 의존은 저장소에서 `workspace:*`로 두고, 게시할 때
+버전 스크립트가 같은 버전으로 고정합니다. 그래서 이 줄을 손으로 고치지 않습니다.
+
+### 처음 한 번 하는 설정
+
+1. npmjs.com에서 `horon-ai` 조직(organization)을 만듭니다. `@horon-ai/*` 이름은 이 조직이
+   있어야 게시됩니다.
+2. npm에서 Granular Access Token을 만듭니다. 권한은 Packages and scopes **Read and write**,
+   범위는 `@horon-ai` 조직, 2FA 우회(Bypass 2FA)를 켭니다.
+3. 저장소 Settings → Secrets and variables → Actions에 `NPM_TOKEN`으로 등록합니다.
+4. `main`에 병합하면 `0.1.0`이 게시됩니다. 패키지 변경 없이 게시하려면 Actions 탭의
+   Publish npm packages에서 수동 실행합니다(PATCH가 하나 오릅니다).
+5. 첫 게시 뒤 npmjs.com의 두 패키지 Settings → Trusted Publisher에 GitHub Actions,
+   `horon-ai/design`, 워크플로 `publish.yml`을 등록합니다. 그다음부터는 토큰 없이 OIDC로
+   게시되므로 `NPM_TOKEN` 시크릿과 npm 토큰을 지워도 됩니다(토큰은 만료일이 있습니다).
 
 ```bash
-# 4. 레지스트리에서 확인한다
-npm view @horon-ai/tokens@0.1.0 version
-npm view @horon-ai/react@0.1.0 version
-```
-
-### 로컬에서 게시
-
-CI를 거치지 않고 급할 때만 씁니다. provenance는 붙지 않습니다.
-
-```bash
-bun run publish:packages
+# 게시 확인
+npm view @horon-ai/tokens versions
+npm view @horon-ai/react versions
 ```
 
 게시한 뒤에는 `web/package.json`과 `desktop/package.json`의 `file:` 의존을
