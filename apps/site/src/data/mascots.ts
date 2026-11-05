@@ -115,7 +115,7 @@ export const mascots: MascotEntry[] = [
   {
     slug: "error",
     name: "error",
-    cut: { ko: "찡그리며 머리를 긁고 땀방울", en: "Frowning, scratching head, with a sweat drop" },
+    cut: { ko: "찡그린 채 머리를 긁으며 땀을 흘림", en: "Frowning, scratching head, with a sweat drop" },
     use: { ko: "오류, 실패", en: "Errors, failures" },
     category: "state",
   },
@@ -129,7 +129,7 @@ export const mascots: MascotEntry[] = [
   {
     slug: "loading",
     name: "loading",
-    cut: { ko: "두 날개를 모으고 위를 기대해 봄", en: "Wings together, looking up" },
+    cut: { ko: "두 날개를 모으고 위를 올려다봄", en: "Wings together, looking up" },
     use: { ko: "로딩, 처리 중", en: "Loading, in progress" },
     category: "state",
   },
@@ -143,14 +143,14 @@ export const mascots: MascotEntry[] = [
   {
     slug: "notification",
     name: "notification",
-    cut: { ko: "눈을 크게 뜨고 머리 위에 종", en: "Wide eyes with a bell overhead" },
+    cut: { ko: "머리 위에 종을 띄우고 눈을 크게 뜸", en: "Wide eyes with a bell overhead" },
     use: { ko: "알림, 새 항목", en: "Notifications, new items" },
     category: "state",
   },
   {
     slug: "work",
     name: "work",
-    cut: { ko: "작은 노트북으로 작업", en: "Working on a small laptop" },
+    cut: { ko: "작은 노트북으로 일함", en: "Working on a small laptop" },
     use: { ko: "콘솔, 워크스페이스", en: "Console, workspace" },
     category: "state",
   },
@@ -164,7 +164,7 @@ export const mascots: MascotEntry[] = [
   {
     slug: "lost",
     name: "lost",
-    cut: { ko: "고개를 돌리고 물음표와 함께 긁적임", en: "Head turned, scratching with a question mark" },
+    cut: { ko: "물음표를 띄우고 고개를 돌려 머리를 긁적임", en: "Head turned, scratching with a question mark" },
     use: { ko: "찾을 수 없음, 404", en: "Not found, 404" },
     category: "state",
   },
@@ -185,7 +185,7 @@ export const mascots: MascotEntry[] = [
   {
     slug: "team",
     name: "team",
-    cut: { ko: "작은 병아리 옆에 서 있음", en: "Standing beside a small chick" },
+    cut: { ko: "작은 매 옆에서 날개를 흔듦", en: "Waving beside a smaller falcon" },
     use: { ko: "협업, 초대", en: "Collaboration, invites" },
     category: "state",
   },
@@ -214,7 +214,7 @@ export const mascots: MascotEntry[] = [
     slug: "coffee",
     name: "coffee",
     cut: { ko: "따뜻한 커피잔을 들고 있음", en: "Holding a warm coffee cup" },
-    use: { ko: "휴식, 비번 상태", en: "Breaks, away status" },
+    use: { ko: "휴식, 자리 비움", en: "Breaks, away status" },
     category: "state",
   },
 ];

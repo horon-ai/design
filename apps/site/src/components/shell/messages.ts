@@ -62,8 +62,8 @@ export const shellMessages = defineMessages({
     en: "More",
   },
   footerBlurb: {
-    ko: "데이터를 이해하는 것에서 끝나지 않고 실행과 결과까지 연결하는 AI 시스템. 그 시스템을 지탱하는 디자인 언어입니다.",
-    en: "An AI system that carries data through to execution and results, not just understanding it. This is the design language behind that system.",
+    ko: "Horon은 데이터를 이해하는 데서 멈추지 않고 실행과 결과까지 이어 가는 AI입니다. 이곳은 Horon 화면을 만드는 디자인 시스템입니다.",
+    en: "Horon is AI that carries data past understanding into execution and results. This is the design system behind its screens.",
   },
   brandLine: {
     ko: "Horus × ON",

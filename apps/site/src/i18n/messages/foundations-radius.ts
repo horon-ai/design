@@ -14,7 +14,7 @@ export const foundationsRadiusMessages = defineMessages({
   },
   shadowHeading: { ko: "Shadow", en: "Shadow" },
   shadowBody: {
-    ko: "유리 표면은 그림자 대신 경계선과 흐림으로 떠 보입니다. 그림자는 유리 위에 다시 뜨는 불투명 표면에만 씁니다. popover는 계정·워크스페이스 메뉴, palette는 커맨드 팔레트입니다.",
+    ko: "유리 표면은 그림자 대신 경계선과 흐림으로 떠 보입니다. 그림자는 유리 위에 다시 뜨는 불투명 표면에만 씁니다. popover 그림자는 계정·워크스페이스 메뉴에, palette 그림자는 커맨드 팔레트에 씁니다.",
     en: "A glass surface floats on its border and blur, not on a shadow. Shadows are reserved for an opaque surface that sits on top of glass: popover for the account and workspace menus, palette for the command palette.",
   },
 });

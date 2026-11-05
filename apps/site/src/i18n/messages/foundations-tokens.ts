@@ -34,8 +34,8 @@ export const foundationsTokensMessages = defineMessages({
   },
   scaleSource: { ko: "Scale 컬렉션, Menus 88:495", en: "Scale collection, Menus 88:495" },
   glassBody: {
-    ko: "유리 레이어 값과 높이 비례 규칙",
-    en: "Glass layer values and the height-scaling rule.",
+    ko: "유리 레이어 값",
+    en: "Glass layer values.",
   },
   glassCount: { ko: "레이어 5장", en: "5 layers" },
   glassSource: { ko: "Button 55:339 외", en: "Button 55:339 and others" },

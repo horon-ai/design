@@ -4,7 +4,7 @@ import { defineMessages } from "@/i18n";
 export const foundationsColorMessages = defineMessages({
   title: { ko: "Color", en: "Color" },
   description: {
-    ko: "잉크와 흰 종이를 백본으로 두고, 하늘색(sky)을 브랜드 액센트로 씁니다. 위험은 낮춘 붉은색 하나로 표시합니다.",
+    ko: "잉크와 흰 종이가 기본이고, 하늘색(sky)을 브랜드 액센트로 씁니다. 위험 상태는 채도를 낮춘 붉은색 하나로 표시합니다.",
     en: "Ink and white paper form the backbone, with sky as the brand accent. Danger uses one muted red.",
   },
   intro: {
