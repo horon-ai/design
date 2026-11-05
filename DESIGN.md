@@ -1,12 +1,12 @@
-# HORON Design System
+# Horon Design System
 
-HORON 제품의 화면을 만드는 토큰과 React 컴포넌트, 그리고 그 값을 그대로 보여 주는 문서 사이트의 계약입니다. 색·간격·글자·모션·표면 값을 `@horon-ai/tokens` 한 곳에서 정의하고, `@horon-ai/react`와 `apps/site`가 그 값을 그대로 소비합니다. 이 문서의 모든 값은 저장소의 실제 토큰과 컴포넌트에서 읽었으며, 외부 레퍼런스 브랜드의 값을 빌려오지 않습니다.
+Horon 제품의 화면을 만드는 토큰과 React 컴포넌트, 그리고 그 값을 그대로 보여 주는 문서 사이트의 계약입니다. 색·간격·글자·모션·표면 값을 `@horon-ai/tokens` 한 곳에서 정의하고, `@horon-ai/react`와 `apps/site`가 그 값을 그대로 가져다 씁니다. 이 문서의 모든 값은 저장소의 실제 토큰과 컴포넌트에서 읽었으며, 외부 레퍼런스 브랜드의 값을 빌려오지 않습니다.
 
 Core v2 anchors: `experience`, `foundations`, `typography-assets`, `components-states`, `layout-platforms`, `content-locales`, `governance`.
 
 ## 1. Experience
 
-**제품과 범위.** HORON Design System은 디자인과 코드가 같은 값을 바라보게 만드는 사내 디자인 시스템입니다. 표면은 두 가지입니다. 첫째, `@horon-ai/react`의 React 컴포넌트를 제품 화면에 바로 쓰는 라이브러리 표면. 둘째, `design.horon.ai`에서 토큰 값과 컴포넌트 프리뷰·사용법을 확인하는 문서 표면입니다. 이 문서는 두 표면, 그중에서도 문서 사이트의 셸과 페이지 구성을 규정합니다.
+**제품과 범위.** Horon Design System은 디자인과 코드가 같은 값을 쓰게 만드는 사내 디자인 시스템입니다. 표면은 두 가지입니다. 첫째, `@horon-ai/react`의 React 컴포넌트를 제품 화면에 바로 쓰는 라이브러리 표면입니다. 둘째, `design.horon.ai`에서 토큰 값과 컴포넌트 프리뷰·사용법을 확인하는 문서 표면입니다. 이 문서는 두 표면, 그중에서도 문서 사이트의 셸과 페이지 구성을 규정합니다.
 
 **핵심 과업.** 문서 사이트 방문자는 세 가지를 가장 빠르게 얻습니다.
 
@@ -16,9 +16,9 @@ Core v2 anchors: `experience`, `foundations`, `typography-assets`, `components-s
 
 따라서 모든 페이지는 "무엇을 하는 컴포넌트인가 → 어떻게 생겼는가 → 어떻게 쓰는가" 순서를 지킵니다. 마케팅 문구나 기능 소개보다 값과 예시가 먼저 옵니다.
 
-**방향.** 잉크(`--color-text-primary`)와 종이(`--color-bg-default`)를 백본으로 두고, 하늘색(`--color-sky-500`, `--color-sky-700`)을 브랜드 액센트로 씁니다. 표면은 리퀴드 글래스 레이어로 깊이를 만들고, 그림자와 그라데이션으로 장식하지 않습니다. 문장은 짧고 건조하게, 화면은 값의 밀도가 드러나게 구성합니다.
+**방향.** 잉크(`--color-text-primary`)와 종이(`--color-bg-default`)가 기본이고, 하늘색(`--color-sky-500`, `--color-sky-700`)을 브랜드 액센트로 씁니다. 표면은 리퀴드 글래스 레이어로 깊이를 만들고, 그림자와 그라데이션으로 장식하지 않습니다. 문장은 짧고 건조하게, 화면은 값의 밀도가 드러나게 구성합니다.
 
-**레퍼런스 권위.** HORON 자체 토큰·컴포넌트·README·`assets/README.md`가 유일한 권위입니다. 외부 브랜드의 색, 반경, 서체, 카피 톤을 가져오지 않습니다.
+**레퍼런스 권위.** Horon 자체 토큰·컴포넌트·README·`assets/README.md`가 유일한 권위입니다. 외부 브랜드의 색, 반경, 서체, 카피 톤을 가져오지 않습니다. 이름 표기, 슬로건, 마스코트 규칙은 Paper `Horon-design` 파일의 Brand·Mascot 페이지를 따릅니다. 제품 이름은 대문자 H 하나로 `Horon`이라 쓰고, 슬로건 세 줄(`AI that turns ideas into action.` → `Horus × ON` → `The vision of Horus. The power to act.`)은 이 순서로 바꿔 말하지 않고 씁니다.
 
 ## 2. Foundations
 
@@ -152,10 +152,10 @@ Core v2 anchors: `experience`, `foundations`, `typography-assets`, `components-s
 
 ### 3.5 자산
 
-- **아이콘.** `@phosphor-icons/react`를 기본 세트로 쓰고, HORON 고유 표식은 `HoronIcon`(라인 팔콘 눈, `currentColor`, `size` prop)을 씁니다. 다른 아이콘 세트를 섞지 않습니다.
-- **워드마크.** `HoronWordmark`는 `currentColor` 벡터이고 기본 높이 11.5px입니다. 텍스트로 "HORON"을 다시 조판하지 않습니다.
-- **마스코트.** `assets/horon-mascot-*.png` 26컷, 1254×1254 RGBA 투명 배경. 팔레트는 `--color-mascot-ink`(#1c1a17), `--color-mascot-cream`(#fbf7f0), `--color-mascot-gold`(#e0921f)입니다. 문서 사이트는 `apps/site/public/mascots/*.webp`로 변환한 파일을 씁니다.
-- **메타 이미지.** `og.png`(1200×630), `icon.png`(256), `icon-512.png`, `apple-icon.png`(180), `favicon.ico`.
+- **아이콘.** `@phosphor-icons/react`를 기본 세트로 쓰고, Horon 고유 표식은 `HoronIcon`(라인 팔콘 눈, `currentColor`, `size` prop)을 씁니다. 다른 아이콘 세트를 섞지 않습니다.
+- **워드마크.** `HoronWordmark`는 `currentColor` 벡터이고 기본 높이 11.5px입니다. 워드마크 자리에 글자로 "Horon"을 다시 조판하지 않습니다.
+- **마스코트.** 둥근 매 한 캐릭터입니다. `assets/horon-mascot-*.png` 26컷, 1254×1254 RGBA 투명 배경. 팔레트는 `--color-mascot-ink`(#1c1a17), `--color-mascot-cream`(#fbf7f0), `--color-mascot-gold`(#e0921f)입니다. 문서 사이트는 `apps/site/public/mascots/*.webp`로 변환한 파일을 씁니다. 몸이 잉크색이라 밝은 바탕에만 두고, 다크 모드에서는 `--color-sky-100` 판(`dark:bg-sky-100`) 위에 둡니다.
+- **메타 이미지.** `og.png`(1200×630, Paper Cover 구성: 워드마크, 슬로건 세 줄, 하늘색 원 위의 main 컷), `icon.png`(256), `icon-512.png`, `apple-icon.png`(180), `favicon.ico`.
 - **라이선스.** Pretendard는 SIL Open Font License 1.1, Geist Mono는 SIL Open Font License 1.1입니다. 마스코트는 저장소가 소유한 브랜드 자산이며 `assets/README.md`에 제작 경위가 있습니다. 저장소 밖 재배포 조건은 별도 라이선스 파일로 선언되어 있지 않습니다.
 
 ## 4. Components & States

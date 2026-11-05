@@ -8,6 +8,20 @@ export const updatesMessages = defineMessages({
     en: "A record of changes to the design system, newest first: which values changed and which components are new.",
   },
 
+  brandTitle: { ko: "Brand 기준으로 이름과 문구 정리", en: "Name and copy aligned with the Brand guide" },
+  brandItem1: {
+    ko: "홈 슬로건을 Brand의 세 줄(AI that turns ideas into action. / Horus × ON / The vision of Horus. The power to act.)로 바꿨습니다.",
+    en: "The home slogan now uses the three Brand lines (AI that turns ideas into action. / Horus × ON / The vision of Horus. The power to act.).",
+  },
+  brandItem2: {
+    ko: "제품 이름을 Horon으로 통일하고, 마스코트를 둥근 매로 부릅니다. 공유 이미지(og.png)도 새로 만들었습니다.",
+    en: "The product name is written Horon everywhere, and the mascot is called a round falcon. The share image (og.png) was redrawn.",
+  },
+  brandItem3: {
+    ko: "다크 모드에서는 마스코트를 하늘색 판 위에 둡니다.",
+    en: "In dark mode the mascot now stands on a sky plate.",
+  },
+
   figmaTitle: { ko: "Figma 기준으로 처음부터 다시 만듦", en: "Rebuilt from scratch on the Figma baseline" },
   figmaItem1: {
     ko: "토큰을 Figma Horon 파일의 변수에서 다시 읽었습니다. 라이트·다크 색, 13개 글자 스타일의 Web·Desktop·Mobile 크기, 반경, 그림자가 바뀌었습니다.",

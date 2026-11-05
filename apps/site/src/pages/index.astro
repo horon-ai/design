@@ -85,7 +85,7 @@ function linkTo(href: string): ReactElement {
         alt={m.mascotAlt.ko}
         width="320"
         height="320"
-        class="pointer-events-none absolute right-6 bottom-6 hidden size-64 object-contain lg:block xl:right-16 xl:size-80"
+        class="pointer-events-none absolute right-6 bottom-6 hidden size-64 object-contain lg:block xl:right-16 xl:size-80 dark:rounded-full dark:bg-sky-100 dark:p-6"
       />
 
       <dl
@@ -210,7 +210,7 @@ function linkTo(href: string): ReactElement {
         <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {
             mascotCuts.map((slug) => (
-              <div class="flex aspect-square items-center justify-center rounded-xl bg-bg-subtle p-2">
+              <div class="flex aspect-square items-center justify-center rounded-xl bg-bg-subtle p-2 dark:bg-sky-100">
                 <img
                   src={mascotImageUrl(slug)}
                   alt={`${m.mascotAlt.ko} ${slug} ${m.cutSuffix.ko}`}
