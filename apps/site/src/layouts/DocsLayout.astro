@@ -6,6 +6,7 @@ import DocsToc from "@/components/site/DocsToc";
 import Footer from "@/components/site/Footer.astro";
 import T from "@/components/i18n/T.astro";
 import { primaryNav } from "@/data/nav";
+import { siteHref } from "@/lib/urls";
 import type { Localized } from "@/i18n";
 import { docsMessages } from "@/i18n/messages/docs";
 
@@ -36,10 +37,10 @@ const sectionLabel = primaryNav.find((item) => item.href === sectionHref)?.label
 const crumbs = [
   { label: docsMessages.home, href: "/" },
   ...(breadcrumb
-    ? breadcrumb.map((item) => ({ label: both(item.label), href: item.href }))
+    ? breadcrumb.map((item) => ({ label: both(item.label), href: siteHref(item.href) }))
     : [
-        { label: sectionLabel, href: sectionHref },
-        ...(currentPath === sectionHref ? [] : [{ label: both(title), href: currentPath }]),
+        { label: sectionLabel, href: siteHref(sectionHref) },
+        ...(currentPath === sectionHref ? [] : [{ label: both(title), href: siteHref(currentPath) }]),
       ]),
 ];
 ---

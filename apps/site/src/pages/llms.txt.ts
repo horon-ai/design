@@ -2,10 +2,11 @@ import type { APIRoute } from "astro";
 import { componentGroups, components, componentsInGroup } from "@/data/components";
 import { foundationsNav } from "@/data/nav";
 import { pick } from "@/i18n";
+import { siteHref } from "@/lib/urls";
 
 export const GET: APIRoute = ({ site }) => {
   const origin = site?.origin ?? "https://design.horon.ai";
-  const link = (path: string) => new URL(path, origin).toString();
+  const link = (path: string) => new URL(siteHref(path), origin).toString();
 
   const lines = [
     "# HORON Design System",

@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { components } from "@/data/components";
 import { foundationsNav } from "@/data/nav";
+import { siteHref } from "@/lib/urls";
 
 const pages = [
   "/",
@@ -15,7 +16,7 @@ const pages = [
 
 export const GET: APIRoute = ({ site }) => {
   const origin = site?.origin ?? "https://design.horon.ai";
-  const urls = pages.map((path) => `  <url><loc>${new URL(path, origin).toString()}</loc></url>`).join("\n");
+  const urls = pages.map((path) => `  <url><loc>${new URL(siteHref(path), origin).toString()}</loc></url>`).join("\n");
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

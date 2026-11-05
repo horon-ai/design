@@ -5,6 +5,7 @@ import Demo from "@/components/site/Demo.astro";
 import { componentGroups, componentsInGroup } from "@/data/components";
 import { blockMessages } from "@/i18n/messages/blocks";
 import { resolveDemoName } from "@/lib/demos";
+import { siteHref } from "@/lib/urls";
 
 interface Props {
   group: (typeof componentGroups)[number];
@@ -26,7 +27,7 @@ const items = componentsInGroup(group.id);
         const demoName = component.overlay ? undefined : resolveDemoName(component.slug);
         return (
           <ComponentCard
-            href={`/components/${component.slug}`}
+            href={siteHref(`/components/${component.slug}`)}
             title={component.title}
             description={component.description}
             className="min-w-0"
