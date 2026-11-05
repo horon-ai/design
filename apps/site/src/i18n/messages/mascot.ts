@@ -39,8 +39,8 @@ export const mascotMessages = defineMessages({
   },
   stateTitle: { ko: "Product states", en: "Product states" },
   stateDescription: {
-    ko: "제품 화면의 상태를 대신 말하는 열아홉 가지 컷입니다.",
-    en: "Nineteen cuts that speak for product screen states.",
+    ko: "제품 화면의 상태를 보여 주는 열아홉 가지 컷입니다.",
+    en: "Nineteen cuts that show product screen states.",
   },
 
   mascotAlt: { ko: "Horon 마스코트", en: "Horon mascot" },
@@ -53,19 +53,19 @@ export const mascotMessages = defineMessages({
     en: "Use the transparent 1254 × 1254 PNG as the source; this site serves 768px WebP copies.",
   },
   rule2: {
-    ko: "자르지 않고 원본 비율을 유지합니다. 캐릭터 주변 여백은 컷마다 같습니다.",
-    en: "Keep the original ratio without cropping. Margin around the character is the same in every cut.",
+    ko: "컷을 그대로 씁니다. 자르거나 다시 그리지 않고 원본 비율을 유지합니다. 캐릭터 주변 여백은 컷마다 같습니다.",
+    en: "Use the cuts as they are. Never crop or redraw them; keep the original ratio. Margin around the character is the same in every cut.",
   },
   rule3: {
-    ko: "얼굴 판이 있는 쪽으로 시선을 두고, 캐릭터 위에 텍스트를 얹지 않습니다.",
-    en: "Keep the character facing the face plate and never place text over it.",
+    ko: "흰색, 회색, 하늘색처럼 밝은 바탕에 둡니다. 다크 모드에서는 밝은 판 위에 세우고, 캐릭터 위에 글자를 얹지 않습니다.",
+    en: "Place it on a light ground: white, gray, or a sky tint. In dark mode, stand it on a light plate, and never place text over it.",
   },
   rule4: {
-    ko: "상태 컷은 화면의 빈 상태·오류·로딩을 대신 말할 때만 씁니다. 장식으로 반복하지 않습니다.",
-    en: "Use state cuts only when they replace an empty, error, or loading message. Never repeat them as decoration.",
+    ko: "한 화면에 한 컷만, 빈 상태·오류·로딩처럼 상태를 알려야 할 때 씁니다. 표, 툴바, 대화 말풍선 같은 작업 화면 안에는 넣지 않습니다.",
+    en: "One cut per screen, only when it stands in for a state such as empty, error, or loading. Never inside working UI such as tables, toolbars, or chat bubbles.",
   },
   rule5: {
-    ko: "색은 브랜드 팔레트 세 값만 씁니다. 다른 색으로 다시 칠하지 않습니다.",
-    en: "Use only the three brand palette values. Never recolor the mascot.",
+    ko: "색은 브랜드 팔레트 세 값만 씁니다. 다른 색으로 칠하거나 그림자, 외곽선, 빛 번짐 같은 효과를 더하지 않습니다.",
+    en: "Use only the three brand palette values. Never recolor the mascot or add a drop shadow, outline, or glow.",
   },
 });
