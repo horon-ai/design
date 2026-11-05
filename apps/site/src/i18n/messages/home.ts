@@ -4,8 +4,9 @@ import { defineMessages } from "@/i18n";
 export const homeMessages = defineMessages({
   eyebrow: { ko: "Horon Design System", en: "Horon Design System" },
 
-  titleLine1: { ko: "Seed to Root,", en: "Seed to Root," },
-  titleLine2: { ko: "Root to Execute.", en: "Root to Execute." },
+  tagline: { ko: "AI that turns ideas into action.", en: "AI that turns ideas into action." },
+  origin: { ko: "Horus × ON", en: "Horus × ON" },
+  promise: { ko: "The vision of Horus. The power to act.", en: "The vision of Horus. The power to act." },
 
   body: {
     ko: "데이터를 이해하는 것에서 끝나지 않고 실행과 결과까지 연결하는 시스템. 그 시스템을 지탱하는 토큰과 컴포넌트를 하나의 기준으로 정의합니다. 디자인과 코드가 같은 값을 바라봅니다.",
@@ -27,8 +28,8 @@ export const homeMessages = defineMessages({
   principlesEyebrow: { ko: "Principles", en: "Principles" },
   principlesTitle: { ko: "세 가지 원칙", en: "Three principles" },
   principlesBody: {
-    ko: "HORON의 UI는 잉크와 종이 위에 하늘색 액센트 하나만 얹습니다. 떠 있는 표면은 유리로, 계층과 상태는 글자와 여백으로 드러냅니다.",
-    en: "HORON UI puts a single sky accent on ink and paper. Floating surfaces are glass; hierarchy and state show through type and whitespace.",
+    ko: "Horon의 UI는 잉크와 종이 위에 하늘색 액센트 하나만 얹습니다. 떠 있는 표면은 유리로, 계층과 상태는 글자와 여백으로 드러냅니다.",
+    en: "Horon UI puts a single sky accent on ink and paper. Floating surfaces are glass; hierarchy and state show through type and whitespace.",
   },
   principleInkTitle: { ko: "Ink and paper", en: "Ink and paper" },
   principleInkBody: {
@@ -57,8 +58,8 @@ export const homeMessages = defineMessages({
   mascotTitleLead: { ko: "둥근 병아리, ", en: "A round chick, " },
   mascotTitleTail: { ko: "가지 표정", en: " expressions" },
   mascotBody: {
-    ko: "Horus + ON에서 온 마스코트입니다. 빈 상태, 오류, 로딩처럼 화면이 말을 걸어야 할 때 대신 표정을 짓습니다. 1254 × 1254 투명 PNG로 모든 컷을 내려받을 수 있습니다.",
-    en: "A mascot from Horus + ON. It holds the expression when a screen needs to say something: empty states, errors, loading. Every cut downloads as a 1254 × 1254 transparent PNG.",
+    ko: "Horus × ON에서 온 마스코트입니다. 빈 상태, 오류, 로딩처럼 화면이 말을 걸어야 할 때 대신 표정을 짓습니다. 1254 × 1254 투명 PNG로 모든 컷을 내려받을 수 있습니다.",
+    en: "A mascot from Horus × ON. It holds the expression when a screen needs to say something: empty states, errors, loading. Every cut downloads as a 1254 × 1254 transparent PNG.",
   },
   viewMascot: { ko: "마스코트 보기", en: "View mascot" },
 

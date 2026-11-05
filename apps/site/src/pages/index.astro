@@ -64,8 +64,12 @@ function linkTo(href: string): ReactElement {
     <div class="site-shell site-band">
       <p class="text-body-sm text-text-secondary"><T m={m.eyebrow} /></p>
       <h1 class="mt-6 max-w-4xl text-display-lg text-balance text-text-primary">
-        <T m={m.titleLine1} /><br /><T m={m.titleLine2} />
+        <T m={m.tagline} />
       </h1>
+      <div class="mt-7 flex flex-col gap-2.5 text-title-md">
+        <p class="text-text-brand"><T m={m.origin} /></p>
+        <p class="text-text-secondary text-pretty"><T m={m.promise} /></p>
+      </div>
       <p class="mt-7 max-w-xl text-body-lg text-text-secondary text-pretty"><T m={m.body} /></p>
       <div class="mt-9 flex flex-wrap items-center gap-3">
         <Button variant="primary" href={siteHref("/get-started")}>
