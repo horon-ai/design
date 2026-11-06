@@ -40,6 +40,8 @@ jobs:
 
       # 수동 실행은 언제나 게시합니다. push는 이번에 올라온 커밋 범위에 라이브러리 변경이
       # 있을 때만 게시하고, 범위를 알 수 없으면(새 브랜치, 강제 푸시) 게시 쪽으로 판단합니다.
+      # 워크플로나 버전 스크립트만 바뀐 커밋은 게시하지 않습니다. 라이브러리 내용이 그대로인데
+      # PATCH만 올라가지 않게 하려는 것이고, 그런 커밋은 npm 최신 버전으로 사이트만 배포합니다.
       - name: Compare the pushed range
         id: diff
         env:
@@ -52,8 +54,7 @@ jobs:
             exit 0
           fi
           changed=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" -- \
-            packages/tokens packages/react bun.lock \
-            .github/workflows/publish.yml .github/scripts/release-version.mjs)
+            packages/tokens packages/react bun.lock)
           if [ -n "$changed" ]; then
             echo "$changed"
             echo "packages=true" >> "$GITHUB_OUTPUT"
@@ -148,6 +149,7 @@ jobs:
             npm publish "$tarball" --access public --provenance
           done
 
+      # npm은 게시 직후 "처리 중"이라 몇 분 동안 404를 돌려줄 수 있습니다. 최대 10분 기다립니다.
       - name: Verify the registry
         env:
           VERSION: ${{ steps.version.outputs.version }}
@@ -155,7 +157,18 @@ jobs:
           set -euo pipefail
           for name in tokens react; do
             package="@horon-ai/$name"
-            published=$(npm view "$package@$VERSION" version)
+            for attempt in $(seq 1 40); do
+              if published=$(npm view "$package@$VERSION" version 2>/dev/null) && [ -n "$published" ]; then
+                break
+              fi
+              published=""
+              echo "$package@$VERSION 이 아직 보이지 않습니다($attempt/40). 15초 뒤 다시 봅니다."
+              sleep 15
+            done
+            if [ -z "$published" ]; then
+              echo "::error::$package@$VERSION 이 10분 안에 레지스트리에 나타나지 않았습니다."
+              exit 1
+            fi
             echo "$package@$published"
           done
           npm view "@horon-ai/react@$VERSION" dependencies
@@ -234,6 +247,14 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
+          # 게시 잡이 확인을 마쳤어도 레지스트리 노드마다 반영 시점이 달라 한 번 더 기다립니다.
+          for name in tokens react; do
+            for attempt in $(seq 1 20); do
+              npm view "@horon-ai/$name@$VERSION" version >/dev/null 2>&1 && break
+              [ "$attempt" = 20 ] && { echo "::error::@horon-ai/$name@$VERSION 을 레지스트리에서 찾지 못했습니다."; exit 1; }
+              sleep 15
+            done
+          done
           node .github/scripts/site-use-published.mjs "$VERSION"
           bun install
           # 저장소 폴더가 아니라 npm에서 받은 그 버전인지 확인합니다.
