@@ -62,6 +62,8 @@ void main() {
         // 호버·누름에서만 토큰 색이 얇게 얹힙니다.
         HoronIconButtonVariant.glass => (null, colors.textPrimary),
         HoronIconButtonVariant.solid => (colors.bgSurface, colors.textPrimary),
+        // quiet은 바탕 없이 보조 텍스트 색 아이콘만 그립니다.
+        HoronIconButtonVariant.quiet => (Colors.transparent, colors.textSecondary),
       };
       expect(_decoration(tester).color, expected.$1, reason: '$variant 배경색');
       if (variant == HoronIconButtonVariant.glass) {
@@ -84,6 +86,31 @@ void main() {
       }
       expect(_iconColor(tester), expected.$2, reason: '$variant 아이콘색');
     }
+  });
+
+  testWidgets('hover on quiet lays the ink overlay and darkens the icon', (WidgetTester tester) async {
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: Offset.zero);
+    addTearDown(pointer.removePointer);
+
+    await tester.pumpWidget(
+      _host(
+        HoronIconButton(
+          icon: const Icon(Icons.add),
+          label: '추가',
+          variant: HoronIconButtonVariant.quiet,
+          onPressed: () {},
+        ),
+      ),
+    );
+    final HoronColors colors = _theme(tester).colors;
+    expect(_iconColor(tester), colors.textSecondary, reason: 'text-text-secondary');
+
+    await pointer.moveTo(tester.getCenter(find.byType(HoronIconButton)));
+    await tester.pumpAndSettle();
+    expect(_decoration(tester).color, colors.overlayInk6, reason: 'hover:bg-overlay-ink-6');
+    expect(_iconColor(tester), colors.textPrimary, reason: 'hover:text-text-primary');
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'quiet 변형은 유리를 쓰지 않습니다');
   });
 
   testWidgets('hover on ghost lays the ink overlay and tapping calls onPressed', (WidgetTester tester) async {

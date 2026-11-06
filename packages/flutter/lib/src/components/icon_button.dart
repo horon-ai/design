@@ -21,6 +21,11 @@ enum HoronIconButtonVariant {
   /// `variant="solid"` — 불투명 `bg-surface` 원에 `border-default` 1px 테두리,
   /// 기본 텍스트 색 아이콘입니다. hover에서 `bg-subtle`이 깔립니다.
   solid,
+
+  /// `variant="quiet"` — 바탕도 유리 층도 없는 보조 텍스트 색 아이콘입니다.
+  /// hover·누름에서 옅은 잉크가 깔리고 아이콘이 기본 텍스트 색으로 진해집니다.
+  /// 어두운 셸이나 제목 표시줄처럼 유리 원이 회색 방울로 보이는 자리에 씁니다.
+  quiet,
 }
 
 /// `icon-button.tsx`의 `IconButtonSize`입니다.
@@ -125,6 +130,14 @@ class _HoronIconButtonState extends State<HoronIconButton> {
         colors.bgSubtle,
         colors.interactiveSecondaryHover,
         colors.textPrimary,
+      ),
+      // quiet은 ghost처럼 잉크만 깔고, 아이콘은 `text-secondary`에서 hover·누름 때
+      // `text-primary`로 진해집니다.
+      HoronIconButtonVariant.quiet => (
+        Colors.transparent,
+        colors.overlayInk6,
+        colors.overlayInk10,
+        interactive && (_hovered || _pressed) ? colors.textPrimary : colors.textSecondary,
       ),
     };
 
