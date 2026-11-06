@@ -66,6 +66,8 @@ void main() {
   });
 
   testWidgets('without a shader the bgColor and the glass-regular tint are painted', (WidgetTester tester) async {
+    // 엔진이 셰이더를 거부한 경우입니다. 테스트 환경은 셰이더를 실을 수 있으므로 직접 막습니다.
+    HoronShaderProbe.loadProgram = (String asset) async => null;
     await pumpFlue(tester);
 
     final HoronThemeData horon = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
@@ -77,7 +79,7 @@ void main() {
       find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == horon.colors.glassRegular),
       findsOneWidget,
     );
-    // 셰이더 캔버스는 위젯 테스트 환경에서 붙지 않습니다.
+    // 셰이더가 없으면 캔버스를 붙이지 않습니다.
     expect(find.byKey(horonFlueCanvasKey), findsNothing);
 
     await drain(tester);
