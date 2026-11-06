@@ -159,7 +159,8 @@ export function unionTypes(source) {
   for (const m of code.matchAll(/export\s+type\s+([A-Za-z0-9_]+)\s*=\s*([^;]+);/g)) {
     const rhs = m[2].trim();
     // 문자열 리터럴과 "|" 만으로 이루어진 유니온만 받습니다. `Omit<...>` 같은 타입은 제외합니다.
-    if (!/^("[^"]+"\s*\|?\s*)+$/.test(rhs)) continue;
+    // 멤버와 구분자를 번갈아 맞춰서 되돌아가며 다시 맞추는 경우가 생기지 않게 합니다.
+    if (!/^"[^"]+"(?:\s*\|\s*"[^"]+")*$/.test(rhs)) continue;
     const members = [...rhs.matchAll(/"([^"]+)"/g)].map((x) => x[1]);
     if (!members.length) continue;
     unions.set(m[1], [...new Set(members)]);
