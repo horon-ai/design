@@ -8,6 +8,7 @@ void main() {
     WidgetTester tester, {
     Brightness brightness = Brightness.light,
     HoronInputSurface surface = HoronInputSurface.glass,
+    HoronTextareaSize size = HoronTextareaSize.md,
     bool invalid = false,
     bool enabled = true,
     ValueChanged<String>? onChanged,
@@ -19,7 +20,13 @@ void main() {
           body: Center(
             child: SizedBox(
               width: 320,
-              child: HoronTextarea(surface: surface, invalid: invalid, enabled: enabled, onChanged: onChanged),
+              child: HoronTextarea(
+                surface: surface,
+                size: size,
+                invalid: invalid,
+                enabled: enabled,
+                onChanged: onChanged,
+              ),
             ),
           ),
         ),
@@ -28,29 +35,16 @@ void main() {
     await tester.pump();
   }
 
-  HoronThemeData themeOf(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronTextarea)));
+  HoronVeil veilOf(WidgetTester tester) =>
+      tester.widget<HoronVeil>(find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronVeil)));
 
-  Color borderOf(WidgetTester tester) {
-    final Finder glass = find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronLiquidGlass));
-    if (glass.evaluate().isNotEmpty) {
-      return tester.widget<HoronLiquidGlass>(glass).edgeColor ?? Colors.transparent;
-    }
-    final AnimatedContainer filled = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
-    return (filled.decoration! as BoxDecoration).border!.top.color;
-  }
-
-  /// 상자의 채움이 글래스 엔진 한 겹인지 확인합니다.
-  ///
-  /// React `textarea.tsx:26`은 `fieldBoxClass.glass` 위에 `<LiquidGlass tier="regular" />`를
-  /// 얹습니다. Flutter는 그 자리를 [HoronFieldBox]가 맡으므로, 토큰 색으로 채우는
-  /// [AnimatedContainer]가 상자 안에 있으면 유리 표면이 사라진 것입니다.
-  void expectGlassSurface(WidgetTester tester) {
-    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '유리 레이어는 한 겹입니다');
-    expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier, HoronGlassTier.regular);
+  void expectVeilSurface(WidgetTester tester) {
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'glass는 LiquidGlass를 겹치지 않습니다');
+    expect(veilOf(tester).kind, HoronVeilKind.field, reason: '.veil-field');
     expect(
       find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(AnimatedContainer)),
       findsNothing,
-      reason: '유리 상자는 토큰 색 채움을 그리지 않습니다',
+      reason: 'veil 상자는 토큰 색 채움을 그리지 않습니다',
     );
   }
 
@@ -61,11 +55,10 @@ void main() {
     }
   });
 
-  testWidgets('starts at min-h-28 (112) on the regular glass layer', (WidgetTester tester) async {
+  testWidgets('starts at min-h-28 (112) on the veil field', (WidgetTester tester) async {
     await pumpTextarea(tester);
     expect(tester.getSize(find.byType(HoronTextarea)).height, greaterThanOrEqualTo(112));
-    expectGlassSurface(tester);
-    expect(borderOf(tester), Colors.transparent);
+    expectVeilSurface(tester);
   });
 
   testWidgets('grows past the minimum when the text needs more lines', (WidgetTester tester) async {
@@ -76,9 +69,23 @@ void main() {
     expect(tester.getSize(find.byType(HoronTextarea)).height, greaterThan(before));
   });
 
-  testWidgets('invalid turns the border danger', (WidgetTester tester) async {
+  testWidgets('each size takes the React 12/14/20 horizontal padding', (WidgetTester tester) async {
+    for (final ({HoronTextareaSize size, double padding}) row in <({HoronTextareaSize size, double padding})>[
+      (size: HoronTextareaSize.sm, padding: HoronThemeData.light.space.s3),
+      (size: HoronTextareaSize.md, padding: HoronThemeData.light.space.s3_5),
+      (size: HoronTextareaSize.lg, padding: HoronThemeData.light.space.s5),
+    ]) {
+      await pumpTextarea(tester, size: row.size);
+      final Padding pad = tester.widget<Padding>(
+        find.ancestor(of: find.byType(TextField), matching: find.byType(Padding)).first,
+      );
+      expect((pad.padding as EdgeInsets).left, row.padding, reason: '${row.size} 좌우 여백');
+    }
+  });
+
+  testWidgets('invalid turns the veil ring danger', (WidgetTester tester) async {
     await pumpTextarea(tester, invalid: true);
-    expect(borderOf(tester), themeOf(tester).colors.borderDanger);
+    expect(veilOf(tester).invalid, isTrue);
   });
 
   testWidgets('typing reaches onChanged, disabled refuses it', (WidgetTester tester) async {

@@ -79,15 +79,18 @@ void main() {
 
     final Text author = tester.widget<Text>(find.text('horon'));
     expect(author.maxLines, 1);
-    expect(author.style?.fontSize, 12);
-    expect(author.style?.color, theme.colors.textPlaceholder);
+    // `text-caption text-text-secondary`
+    expect(author.style?.fontSize, theme.text.caption.fontSize);
+    expect(author.style?.color, theme.colors.textSecondary);
 
     final Text description = tester.widget<Text>(find.text('웹을 검색하고 인용할 수 있는 근거를 모읍니다'));
-    expect(description.style?.fontSize, 13);
+    // `text-body-sm text-text-secondary`
+    expect(description.style?.fontSize, theme.text.bodySm.fontSize);
+    expect(description.style?.height, theme.text.bodySm.height);
     expect(description.style?.color, theme.colors.textSecondary);
   });
 
-  testWidgets('chips are 22px pills with an 11px icon', (WidgetTester tester) async {
+  testWidgets('chips are 22px pills with a 12px icon', (WidgetTester tester) async {
     await tester.pumpWidget(_host(_card(), width: 320));
     final HoronThemeData theme = _themeOf(tester);
 
@@ -96,7 +99,7 @@ void main() {
     );
     expect(chip.constraints?.maxHeight, theme.space.step(5.5));
     expect((chip.decoration! as BoxDecoration).color, theme.colors.overlayInk6);
-    expect(IconTheme.of(tester.element(find.byIcon(Icons.public))).size, theme.space.step(2.75));
+    expect(IconTheme.of(tester.element(find.byIcon(Icons.public))).size, theme.space.step(3));
   });
 
   testWidgets('the footer draws the rule, a gold star and the install button', (WidgetTester tester) async {
@@ -112,17 +115,30 @@ void main() {
     expect(hasRule, isTrue, reason: 'the footer keeps a default-colour rule');
 
     final Icon star = tester.widget<Icon>(find.byIcon(Icons.star));
-    expect(star.size, theme.space.step(3.25));
+    expect(star.size, theme.space.step(3.5), reason: 'Star size-3.5 = 14');
     expect(star.color, HoronPalette.mascotGold);
     expect(tester.widget<Text>(find.text('4.8')).style?.color, theme.colors.textPrimary);
-    expect(find.text('· 12k'), findsOneWidget);
+    // React dev는 `·`를 장식 노드로 분리하고 설치 수는 보조 색으로 그립니다.
+    expect(find.text('·'), findsOneWidget);
+    expect(find.text('12k'), findsOneWidget);
+    expect(tester.widget<Text>(find.text('12k')).style?.color, theme.colors.textSecondary);
 
     expect(find.text('Install'), findsOneWidget);
-    expect(
-      tester.getSize(find.ancestor(of: find.text('Install'), matching: find.byType(SizedBox)).first).height,
-      theme.space.step(8),
-      reason: 'glass sm h-8',
+    // 두 표면 모두 Install은 `Button`의 `solid`·`sm`입니다.
+    final HoronButton install = tester.widget<HoronButton>(find.byType(HoronButton));
+    expect(install.variant, HoronButtonVariant.solid);
+    expect(install.size, HoronButtonSize.sm);
+    final Padding footerPadding = tester.widget<Padding>(
+      find
+          .descendant(
+            of: find.byType(HoronMarketplaceCard),
+            matching: find.byWidgetPredicate(
+              (Widget widget) => widget is Padding && widget.padding == EdgeInsets.only(top: theme.space.s3),
+            ),
+          )
+          .first,
     );
+    expect(footerPadding.padding, EdgeInsets.only(top: theme.space.s3), reason: 'pt-3 = 12');
     expect(tester.takeException(), isNull);
   });
 
@@ -135,14 +151,14 @@ void main() {
 
     await tester.pumpWidget(_host(_card(), width: 320));
     await tester.pumpAndSettle();
-    expect(find.text('Install'), findsOneWidget, reason: 'React는 onInstall이 없어도 버튼을 그립니다');
+    expect(find.text('Install'), findsNothing, reason: 'React는 onInstall이 있을 때만 버튼을 그립니다');
   });
 
   testWidgets('omits the score and installs lines when they are absent', (WidgetTester tester) async {
     await tester.pumpWidget(_host(const HoronMarketplaceCard(initials: 'WB', name: 'web-search'), width: 320));
     expect(find.byIcon(Icons.star), findsNothing);
-    expect(find.text('· 12k'), findsNothing);
-    expect(find.text('Install'), findsOneWidget);
+    expect(find.text('·'), findsNothing);
+    expect(find.text('Install'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

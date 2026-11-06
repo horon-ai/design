@@ -3,7 +3,8 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `split_button` 갤러리 섹션입니다.
 ///
-/// 기본, 아이콘 있음, 메뉴 열림, 비활성 네 상태를 나란히 보여 줍니다.
+/// 기본, 아이콘 있음, 메뉴 열림, 메뉴 없음, 비활성 다섯 상태를 나란히 보여 줍니다.
+/// `onMenuPressed`가 없으면 캐럿 절반과 구분 막대를 그리지 않습니다.
 class HoronSplitButtonGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronSplitButtonGallerySection({super.key});
@@ -43,6 +44,10 @@ class HoronSplitButtonGallerySection extends StatelessWidget {
               onPressed: () {},
               onMenuPressed: () {},
             ),
+          ),
+          _Sample(
+            label: '메뉴 없음',
+            child: HoronSplitButton(label: 'Deploy', onPressed: () {}),
           ),
           _Sample(
             label: '비활성',

@@ -14,8 +14,8 @@ final HoronToastController _demoController = HoronToastController();
 
 /// Toast 갤러리 섹션입니다.
 ///
-/// 세 톤의 카드를 solid와 glass 두 표면에 같은 목록으로 놓고, 실제로 뜨고 닫히는
-/// 토스터 하나를 함께 둡니다.
+/// 세 톤의 카드를 solid와 veil(glass) 두 표면에 같은 목록으로 놓고, 크기 sm·lg와
+/// 실제로 뜨고 닫히는 토스터 하나를 함께 둡니다.
 class HoronToastGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronToastGallerySection({super.key});
@@ -35,9 +35,40 @@ class HoronToastGallerySection extends StatelessWidget {
             child: _tones(theme, HoronSurface.solid),
           ),
           SurfaceGroup(
-            label: 'Glass',
+            label: 'Glass · veil-overlay',
             glass: true,
             child: _tones(theme, HoronSurface.glass),
+          ),
+          Wrap(
+            spacing: theme.space.s4,
+            runSpacing: theme.space.s4,
+            crossAxisAlignment: WrapCrossAlignment.start,
+            children: <Widget>[
+              _Sample(
+                label: 'sm · 320px',
+                child: SizedBox(
+                  width: 320,
+                  child: HoronToast(
+                    title: '동기화가 끝났습니다',
+                    size: HoronToastSize.sm,
+                    onDismiss: () {},
+                  ),
+                ),
+              ),
+              _Sample(
+                label: 'lg · 400px, 20px 닫기',
+                child: SizedBox(
+                  width: 400,
+                  child: HoronToast(
+                    title: '업로드에 실패했습니다',
+                    description: '네트워크를 확인하고 다시 시도하세요.',
+                    tone: HoronToastTone.danger,
+                    size: HoronToastSize.lg,
+                    onDismiss: () {},
+                  ),
+                ),
+              ),
+            ],
           ),
           _Sample(
             label: 'live · 오른쪽 아래에 쌓입니다',

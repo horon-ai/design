@@ -6,6 +6,7 @@ import { componentCount } from "@/data/components";
 import { externalLinks } from "@/data/nav";
 import { fill } from "@/i18n/messages/fill";
 import { getStartedMessages as m, getStartedSnippets as snippets } from "@/i18n/messages/get-started";
+import { siteHref } from "@/lib/urls";
 import DocsLayout from "@/layouts/DocsLayout.astro";
 
 // The page follows the shape other design system docs share: pick a path,
@@ -33,7 +34,7 @@ const help = [
 <DocsLayout title={m.title} description={m.description} section="get-started">
   <h2><T m={m.pathsTitle} /></h2>
   <div class="grid gap-4 sm:grid-cols-3">
-    {paths.map((path) => <ComponentCard href={path.href} title={path.title} description={path.description} />)}
+    {paths.map((path) => <ComponentCard href={siteHref(path.href)} title={path.title} description={path.description} />)}
   </div>
 
   <h2 id="install"><T m={m.installTitle} /></h2>
@@ -57,7 +58,7 @@ const help = [
 
   <h2><T m={m.guidesTitle} /></h2>
   <div class="grid gap-4 sm:grid-cols-2">
-    {guides.map((guide) => <ComponentCard href={guide.href} title={guide.title} description={guide.description} />)}
+    {guides.map((guide) => <ComponentCard href={siteHref(guide.href)} title={guide.title} description={guide.description} />)}
   </div>
 
   <h2><T m={m.boundariesTitle} /></h2>
@@ -65,6 +66,6 @@ const help = [
 
   <h2><T m={m.helpTitle} /></h2>
   <div class="grid gap-4 sm:grid-cols-2">
-    {help.map((item) => <ComponentCard href={item.href} title={item.title} description={item.description} />)}
+    {help.map((item) => <ComponentCard href={siteHref(item.href)} title={item.title} description={item.description} />)}
   </div>
 </DocsLayout>

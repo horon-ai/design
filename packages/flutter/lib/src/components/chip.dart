@@ -20,21 +20,13 @@ enum HoronChipSize {
   lg,
 }
 
-typedef _ChipMetrics = ({
-  double height,
-  double paddingX,
-  double slot,
-  double margin,
-  double check,
-  TextStyle textStyle,
-});
+typedef _ChipMetrics = ({double height, double paddingX, double slot, double check, TextStyle textStyle});
 
 _ChipMetrics _metricsOf(HoronChipSize size, HoronThemeData theme) => switch (size) {
   HoronChipSize.sm => (
     height: theme.space.step(7),
     paddingX: theme.space.s2_5,
     slot: theme.space.step(4.5),
-    margin: theme.space.s1,
     check: 12,
     textStyle: theme.text.labelSm,
   ),
@@ -42,7 +34,6 @@ _ChipMetrics _metricsOf(HoronChipSize size, HoronThemeData theme) => switch (siz
     height: theme.space.step(8),
     paddingX: theme.space.s3,
     slot: theme.space.step(5.5),
-    margin: theme.space.s1_5,
     check: 14,
     textStyle: theme.text.labelMd,
   ),
@@ -50,7 +41,6 @@ _ChipMetrics _metricsOf(HoronChipSize size, HoronThemeData theme) => switch (siz
     height: theme.space.step(9),
     paddingX: theme.space.s3_5,
     slot: theme.space.step(6.5),
-    margin: theme.space.s2,
     check: 16,
     textStyle: theme.text.labelLg,
   ),
@@ -126,24 +116,32 @@ class _HoronChipState extends State<HoronChip> {
     final Color foreground = pressed ? colors.textBrand : colors.textPrimary;
     final Color border = pressed ? colors.borderBrand : colors.borderDefault;
 
-    // 체크 자리는 `w-0 -mr-1.5`에서 `w-[1.375rem] mr-0`으로 자랍니다. 그래서 선택
-    // 전에는 라벨이 왼쪽 여백 12px에서 6px만큼 당겨진 6px에 서고, 선택하면 22px
-    // 자리(체크 14px + 8px) 뒤 12px에서 시작합니다.
-    final EdgeInsets padding = EdgeInsets.only(
-      left: pressed ? metrics.paddingX : metrics.paddingX - metrics.margin,
-      right: metrics.paddingX,
-    );
+    // 체크 자리는 `w-0`에서 `w-[1.125rem]`(sm)처럼 자랍니다. React가 음수 마진을
+    // 없앴으므로 라벨은 선택 전후 모두 paddingX에서 시작하고, 선택하면 체크 자리만큼
+    // 오른쪽으로 밀립니다.
+    final EdgeInsets padding = EdgeInsets.symmetric(horizontal: metrics.paddingX);
 
-    final Widget check = TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
-      duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
-      curve: HoronMotion.popInCurve,
-      builder: (BuildContext context, double scale, Widget? child) => Transform.scale(scale: scale, child: child),
-      child: SizedBox(
-        width: metrics.slot,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Icon(Icons.check, size: metrics.check, color: foreground),
+    // React `chip.tsx`: 체크 자리는 `w-0`에서 `w-[1.125rem]`처럼 열리고
+    // (`transition-[width] 150ms`), 아이콘은 `opacity-0 group-data-pressed:opacity-100`으로
+    // 자리를 잡습니다. 해제 때는 `animate-pop-out`(130ms), 선택 때는
+    // `animate-pop-in`(220ms spring)입니다.
+    final Widget checkSlot = ClipRect(
+      child: AnimatedContainer(
+        duration: reduceMotion ? Duration.zero : _revealDuration,
+        curve: Curves.easeOut,
+        width: pressed ? metrics.slot : 0,
+        alignment: Alignment.centerLeft,
+        child: AnimatedOpacity(
+          opacity: pressed ? 1 : 0,
+          // pop-in·pop-out 키프레임이 불투명도도 함께 움직이므로 배율과 같은 시간을 씁니다.
+          duration: reduceMotion ? Duration.zero : (pressed ? HoronMotion.popInDuration : HoronMotion.popOutDuration),
+          curve: pressed ? HoronMotion.popInCurve : Curves.easeIn,
+          child: AnimatedScale(
+            scale: pressed ? 1 : HoronMotion.popInScale,
+            duration: reduceMotion ? Duration.zero : (pressed ? HoronMotion.popInDuration : HoronMotion.popOutDuration),
+            curve: pressed ? HoronMotion.popInCurve : Curves.easeIn,
+            child: Icon(Icons.check, size: metrics.check, color: foreground),
+          ),
         ),
       ),
     );
@@ -193,7 +191,7 @@ class _HoronChipState extends State<HoronChip> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      if (pressed) check,
+                      checkSlot,
                       Flexible(
                         child: Text(
                           widget.label,

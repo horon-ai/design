@@ -139,14 +139,14 @@ export function DocumentExtractPanel({
   return (
     <section
       className={cn(
-        "@container flex w-full max-w-280 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "@container flex w-full max-w-280 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
     >
       <div className="flex flex-col @4xl:flex-row">
-        <div className="flex min-w-0 shrink-0 flex-col @4xl:w-135">
-          <div className="flex items-center gap-2 px-5 py-3">
+        <div className="flex min-w-0 flex-col @4xl:w-135 @4xl:shrink-0">
+          <div className="flex flex-wrap items-center gap-2 px-5 py-3">
             <span className="flex size-7 shrink-0 items-center justify-center rounded-[10px] bg-overlay-ink-5 text-text-danger">
               <FilePdf aria-hidden className="size-4" />
             </span>
@@ -195,7 +195,7 @@ export function DocumentExtractPanel({
           </div>
           <div className="flex min-h-120 flex-1 justify-center overflow-hidden bg-overlay-ink-7 px-6 py-5">
             <div
-              className="flex h-fit w-117.5 shrink-0 origin-top flex-col gap-3.5 bg-neutral-50 px-6.5 pt-6.5 pb-5 text-neutral-900 ring-1 ring-overlay-ink-8 [filter:drop-shadow(0_2px_4px_#00000014)] transition-[scale] duration-220 ease-out-quint"
+              className="flex h-fit w-full max-w-117.5 shrink-0 origin-top flex-col gap-3.5 bg-neutral-50 px-6.5 pt-6.5 pb-5 text-neutral-900 ring-1 ring-overlay-ink-8 [filter:drop-shadow(0_2px_4px_#00000014)] transition-[scale] duration-220 ease-out-quint"
               style={{ scale: zoom / ZOOM_FIT }}
             >
               {sheet}
@@ -253,50 +253,52 @@ export function DocumentExtractPanel({
                                 </span>
                               ) : null}
                             </div>
-                            <div className="flex flex-col rounded-[10px] border border-overlay-ink-10 px-3 py-0.5">
-                              <div className="flex items-center gap-2 py-2 text-caption text-text-secondary">
-                                {field.columns.map((column) => (
-                                  <span
-                                    key={column.label}
-                                    className={cn(
-                                      column.width ? "shrink-0" : "min-w-0 flex-1",
-                                      column.align === "end" && "text-end",
-                                    )}
-                                    style={column.width ? { width: column.width } : undefined}
+                            <div className="flex flex-col overflow-x-auto rounded-[10px] border border-overlay-ink-10 px-3 py-0.5">
+                              <div className="flex min-w-52 flex-col">
+                                <div className="flex items-center gap-2 py-2 text-caption text-text-secondary">
+                                  {field.columns.map((column) => (
+                                    <span
+                                      key={column.label}
+                                      className={cn(
+                                        column.width ? "shrink-0" : "min-w-0 flex-1",
+                                        column.align === "end" && "text-end",
+                                      )}
+                                      style={column.width ? { width: column.width } : undefined}
+                                    >
+                                      {column.label}
+                                    </span>
+                                  ))}
+                                </div>
+                                {field.rows.map((row) => (
+                                  <div
+                                    key={row.join("|")}
+                                    className="flex items-center gap-2 py-2 text-caption text-text-primary"
                                   >
-                                    {column.label}
-                                  </span>
+                                    {row.map((cell, index) => {
+                                      const column = field.columns[index];
+                                      return (
+                                        <span
+                                          key={column?.label ?? cell}
+                                          className={cn(
+                                            column?.width ? "shrink-0" : "min-w-0 flex-1",
+                                            column?.align === "end" && "text-end",
+                                          )}
+                                          style={column?.width ? { width: column.width } : undefined}
+                                        >
+                                          {cell}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
                                 ))}
                               </div>
-                              {field.rows.map((row) => (
-                                <div
-                                  key={row.join("|")}
-                                  className="flex items-center gap-2 py-2 text-caption text-text-primary"
-                                >
-                                  {row.map((cell, index) => {
-                                    const column = field.columns[index];
-                                    return (
-                                      <span
-                                        key={column?.label ?? cell}
-                                        className={cn(
-                                          column?.width ? "shrink-0" : "min-w-0 flex-1",
-                                          column?.align === "end" && "text-end",
-                                        )}
-                                        style={column?.width ? { width: column.width } : undefined}
-                                      >
-                                        {cell}
-                                      </span>
-                                    );
-                                  })}
-                                </div>
-                              ))}
                             </div>
                           </div>
                         );
                       }
                       const needsCheck = isChecked(field, resolved);
                       return (
-                        <div key={field.id} className="flex motion-rise items-center gap-3" style={delay}>
+                        <div key={field.id} className="flex motion-rise flex-wrap items-center gap-3" style={delay}>
                           <span className="w-25 shrink-0 text-body-sm text-text-secondary">{field.label}</span>
                           <button
                             type="button"

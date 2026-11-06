@@ -7,13 +7,13 @@ function Examples({ surface }: { surface: "solid" | "glass" }) {
     <div className="flex flex-wrap items-start justify-center gap-4">
       <Card
         surface={surface}
-        className="w-80"
+        className="w-full max-w-80"
         title="Inbox Manager"
         description="6 emails need you. Drafts are ready for review."
       />
       <Card
         surface={surface}
-        className="w-80"
+        className="w-full max-w-80"
         interactive
         selected
         render={<button type="button" />}

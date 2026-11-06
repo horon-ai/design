@@ -5,6 +5,7 @@ import { foundationsNav } from "@/data/nav";
 import { fill } from "@/i18n/messages/fill";
 import { foundationsIndexMessages as m } from "@/i18n/messages/foundations-index";
 import DocsLayout from "@/layouts/DocsLayout.astro";
+import { siteHref } from "@/lib/urls";
 
 const items = [
   { href: "/foundations/tokens", title: m.designTokenTitle, description: m.designTokenBody },
@@ -33,7 +34,7 @@ const listCount = fill(m.count, { count: foundationsNav.length - 1 });
     {
       items.map((item) => (
         <ComponentCard
-          href={item.href}
+          href={siteHref(item.href)}
           title={item.title}
           description={item.description}
         />

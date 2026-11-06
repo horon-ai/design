@@ -79,7 +79,13 @@ void main() {
       colors.interactivePrimary,
       reason: 'data-checked:bg-interactive-primary',
     );
-    expect(_circleDecoration(tester, 1).border!.top.width, 0, reason: 'data-checked:border-0');
+    // React `data-checked:border-interactive-primary` — 1.5px 테두리가 남습니다.
+    expect(_circleDecoration(tester, 1).border!.top.width, 1.5, reason: 'border-[1.5px]');
+    expect(
+      _circleDecoration(tester, 1).border!.top.color,
+      colors.interactivePrimary,
+      reason: 'data-checked:border-interactive-primary',
+    );
     expect(_containerSizes(tester, 1), contains(const Size(8, 8)), reason: 'size-2 점');
 
     expect(_circleDecoration(tester, 0).color, colors.bgSurface, reason: 'bg-bg-surface');

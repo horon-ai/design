@@ -24,14 +24,20 @@ export function Breadcrumb({
     <nav
       aria-label={ariaLabel}
       className={cn(
-        surface === "glass" && "relative w-fit overflow-clip rounded-xl bg-glass-regular px-4 py-3.5",
-        surface === "solid" && "relative w-fit rounded-xl border border-border-default bg-bg-surface px-4 py-3.5",
+        // A flex item cannot shrink below its trail's min-content width, so the tray
+        // would keep its 369px min-content and push the page wide. As a grid box the
+        // tray takes the available width below `sm` and hugs the crumbs from `sm` up.
+        "grid w-full min-w-0 sm:w-fit sm:max-w-fit",
+        surface === "glass" && "relative overflow-clip rounded-xl bg-glass-regular px-4 py-3.5",
+        surface === "solid" && "relative rounded-xl border border-border-default bg-bg-surface px-4 py-3.5",
         className,
       )}
       {...props}
     >
       {surface === "glass" && <LiquidGlass />}
-      <ol className="relative flex items-center gap-1.5">
+      {/* Crumbs are navigation targets: an over-wide trail scrolls inside the tray
+       * instead of truncating a label the reader may need to tap. */}
+      <ol className="relative flex min-w-0 items-center gap-1.5 overflow-x-auto">
         {Children.map(children, (item, index) => (
           <Fragment key={index}>
             {index > 0 && (

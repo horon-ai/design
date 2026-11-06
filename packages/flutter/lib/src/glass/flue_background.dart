@@ -10,10 +10,12 @@
 //   - 부모를 채우고 내용 뒤에 놓입니다.
 //   - 셰이더를 못 쓰면 `bgColor` 단색으로 남습니다.
 //   - 모션 축소(`MediaQuery.disableAnimationsOf`)면 한 프레임만 그립니다(시계 12초).
+//     열려 있는 동안 설정이 켜지면 지금 프레임에서 멈추고, 꺼지면 같은 시계에서 이어 갑니다.
 //   - `TickerMode`가 꺼져 있거나 앱이 다시 그려지지 않는 상태면 티커를 멈춥니다.
 //   - 포인터는 [Listener]로 받고 aim()과 같은 식으로 정규화합니다. 포인터가 없으면
 //     원본의 초기 상태(0, 0)입니다.
 
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/scheduler.dart';
@@ -58,7 +60,7 @@ class HoronFlueConfig {
     this.grainAnim = 0,
     this.dither = 1.1,
     this.vignette = 0.26,
-    this.cursor = 1,
+    this.cursor = 0,
     this.pointerRadius = 0.84,
     this.draft = 1.85,
     this.pointerStrength = 0.16,
@@ -79,53 +81,6 @@ class HoronFlueConfig {
     colorC: Color(0xFF1F4A78),
     colorD: Color(0xFF4F8FD0),
     glow: 0.35,
-  );
-
-  /// [HoronFlueVariant]가 덮어쓰는 값만 바꾼 사본입니다. 원본의 `Partial<FlueConfig>` 자리입니다.
-  HoronFlueConfig _tuned({
-    double? speed,
-    double? smokeScale,
-    double? width,
-    double? spread,
-    double? density,
-    double? contrast,
-    double? midpoint,
-    double? glow,
-    double? vignette,
-  }) => HoronFlueConfig(
-    bgColor: bgColor,
-    colorA: colorA,
-    colorB: colorB,
-    colorC: colorC,
-    colorD: colorD,
-    scale: scale,
-    speed: speed ?? this.speed,
-    flow: flow,
-    roughness: roughness,
-    lacunarity: lacunarity,
-    smokeScale: smokeScale ?? this.smokeScale,
-    curl: curl,
-    curlScale: curlScale,
-    rise: rise,
-    slender: slender,
-    width: width ?? this.width,
-    spread: spread ?? this.spread,
-    lean: lean,
-    density: density ?? this.density,
-    contrast: contrast ?? this.contrast,
-    midpoint: midpoint ?? this.midpoint,
-    glow: glow ?? this.glow,
-    sink: sink,
-    grain: grain,
-    grainAnim: grainAnim,
-    dither: dither,
-    vignette: vignette ?? this.vignette,
-    cursor: cursor,
-    pointerRadius: pointerRadius,
-    draft: draft,
-    pointerStrength: pointerStrength,
-    parallax: parallax,
-    maxDpr: maxDpr,
   );
 
   /// 셰이더를 못 쓸 때 남는 바탕색입니다.
@@ -228,6 +183,137 @@ class HoronFlueConfig {
   /// `min(devicePixelRatio, maxDpr)`배로 잡습니다. Flutter의 캔버스는 기기 배율로
   /// 래스터화되므로 여기서는 쓰지 않고, 팔레트 이식을 위해 값만 유지합니다.
   final double maxDpr;
+
+  /// 일부 값만 덮어쓴 설정입니다. 변형 튜닝이 이 함수로 기본 팔레트를 고칩니다.
+  HoronFlueConfig copyWith({
+    Color? bgColor,
+    Color? colorA,
+    Color? colorB,
+    Color? colorC,
+    Color? colorD,
+    double? scale,
+    double? speed,
+    double? flow,
+    double? roughness,
+    double? lacunarity,
+    double? smokeScale,
+    double? curl,
+    double? curlScale,
+    double? rise,
+    double? slender,
+    double? width,
+    double? spread,
+    double? lean,
+    double? density,
+    double? contrast,
+    double? midpoint,
+    double? glow,
+    double? sink,
+    double? grain,
+    double? grainAnim,
+    double? dither,
+    double? vignette,
+    double? cursor,
+    double? pointerRadius,
+    double? draft,
+    double? pointerStrength,
+    double? parallax,
+    double? maxDpr,
+  }) {
+    return HoronFlueConfig(
+      bgColor: bgColor ?? this.bgColor,
+      colorA: colorA ?? this.colorA,
+      colorB: colorB ?? this.colorB,
+      colorC: colorC ?? this.colorC,
+      colorD: colorD ?? this.colorD,
+      scale: scale ?? this.scale,
+      speed: speed ?? this.speed,
+      flow: flow ?? this.flow,
+      roughness: roughness ?? this.roughness,
+      lacunarity: lacunarity ?? this.lacunarity,
+      smokeScale: smokeScale ?? this.smokeScale,
+      curl: curl ?? this.curl,
+      curlScale: curlScale ?? this.curlScale,
+      rise: rise ?? this.rise,
+      slender: slender ?? this.slender,
+      width: width ?? this.width,
+      spread: spread ?? this.spread,
+      lean: lean ?? this.lean,
+      density: density ?? this.density,
+      contrast: contrast ?? this.contrast,
+      midpoint: midpoint ?? this.midpoint,
+      glow: glow ?? this.glow,
+      sink: sink ?? this.sink,
+      grain: grain ?? this.grain,
+      grainAnim: grainAnim ?? this.grainAnim,
+      dither: dither ?? this.dither,
+      vignette: vignette ?? this.vignette,
+      cursor: cursor ?? this.cursor,
+      pointerRadius: pointerRadius ?? this.pointerRadius,
+      draft: draft ?? this.draft,
+      pointerStrength: pointerStrength ?? this.pointerStrength,
+      parallax: parallax ?? this.parallax,
+      maxDpr: maxDpr ?? this.maxDpr,
+    );
+  }
+
+  /// 밝기와 변형의 기본 팔레트에 호출자 [config]를 얹은 설정입니다.
+  ///
+  /// 병합 순서는 React `FlueBackground`와 같습니다: `FLUE_NIGHT`/`FLUE_SKY` →
+  /// `FLUE_VARIANTS[variant]` → 호출자 설정.
+  ///
+  /// React의 `config`는 `Partial<FlueConfig>`이지만 Flutter에는 부분 타입이 없어
+  /// [HoronFlueConfig]가 모든 필드를 항상 들고 있습니다. 그래서 [config]는 완전한
+  /// 설정으로 보고 최종 값이 됩니다. 변형 튜닝 위에 몇 값만 고치려면 이 함수의 결과에
+  /// [copyWith]를 겁니다:
+  ///
+  /// ```dart
+  /// final HoronFlueConfig tuned = HoronFlueConfig.resolve(
+  ///   brightness: HoronTheme.of(context).brightness,
+  ///   variant: HoronFlueVariant.auth,
+  /// ).copyWith(glow: 0.6);
+  /// ```
+  static HoronFlueConfig resolve({
+    required Brightness brightness,
+    HoronFlueVariant variant = HoronFlueVariant.defaultValue,
+    HoronFlueConfig? config,
+  }) {
+    final bool dark = brightness == Brightness.dark;
+    final HoronFlueConfig base = dark ? night : sky;
+    // `sidebar`: 유리가 세부를 흐리므로 연기를 더 느리고 크게, 기둥 아래쪽에 둡니다. 색조는
+    // 여기가 아니라 `_variantTint`가 정합니다(라이트의 두꺼운 유리).
+    // `auth`: 카드 뒤에서 기둥 폭을 넓히고 아래에서 올립니다. 라이트는 셰이더 비네트가
+    // 검정으로 어둡게 하므로 비네트 없이 옅은 하늘을 지키고, 다크만 모서리를 밤 바탕에
+    // 가라앉힙니다.
+    final HoronFlueConfig tuned = switch (variant) {
+      HoronFlueVariant.defaultValue => base,
+      HoronFlueVariant.sidebar =>
+        dark
+            ? base.copyWith(
+                speed: 0.22,
+                smokeScale: 1.9,
+                density: 1.85,
+                contrast: 1.5,
+                midpoint: 0.8,
+                glow: 0.22,
+                vignette: 0,
+              )
+            : base.copyWith(
+                speed: 0.22,
+                smokeScale: 1.9,
+                density: 1.85,
+                contrast: 1.45,
+                midpoint: 0.8,
+                glow: 0.3,
+                vignette: 0,
+              ),
+      HoronFlueVariant.auth =>
+        dark
+            ? base.copyWith(width: 1.9, spread: 1.3, density: 2, midpoint: 0.76, glow: 0.45, vignette: 0.45)
+            : base.copyWith(width: 1.9, spread: 1.3, density: 1.85, midpoint: 0.8, glow: 0.3, vignette: 0),
+    };
+    return config ?? tuned;
+  }
 }
 
 /// Flue 캔버스의 키입니다. 셰이더를 칠하고 있을 때만 트리에 있습니다.
@@ -291,6 +377,16 @@ class HoronFlueDamping {
     targetY = 0.5 - localPosition.dy / size.height;
   }
 
+  /// 진짜 포인터가 없을 때 목표를 옮깁니다. React `frame()`의 가상 포인터입니다.
+  ///
+  /// 화면 비율만큼 가로를 넓혀 두 개의 어긋난 사인으로 천천히 흔듭니다. 시계를 먼저
+  /// 진행한 뒤 부르므로 [time]이 이번 프레임의 값입니다.
+  void aimVirtual(Size size) {
+    final double aspect = size.width / math.max(1, size.height);
+    targetX = aspect * (0.3 * math.sin(time * 0.23) + 0.12 * math.sin(time * 0.57 + 0.8));
+    targetY = 0.22 * math.sin(time * 0.19 + 1.3) + 0.08 * math.sin(time * 0.41);
+  }
+
   /// 한 프레임을 진행합니다.
   ///
   /// [rawMs]는 이전 프레임과의 간격입니다. JS와 같이 4.167~50ms로 자르고, 36.7ms보다
@@ -338,16 +434,25 @@ class HoronFlueBackground extends StatefulWidget {
   /// 배경을 만듭니다.
   const HoronFlueBackground({super.key, this.variant = HoronFlueVariant.defaultValue, this.config, this.tint});
 
-  /// 연기를 그리는 자리입니다. 밝기에 맞는 기본 팔레트 위에 모션과 색을 조금 다르게 얹습니다.
+  /// 연기가 놓이는 자리입니다. React `FlueVariant`와 같은 세 값입니다.
+  ///
+  /// `sidebar`는 유리 뒤의 좁고 긴 열, `auth`는 로그인 카드 뒤의 넓은 화면입니다.
+  /// 변형마다 밝기별 튜닝이 다르고, `defaultValue`는 튜닝이 없습니다.
   final HoronFlueVariant variant;
 
-  /// 팔레트와 파라미터의 덮어쓰기입니다. 값이 있으면 변형 조정을 덮어씁니다.
+  /// 팔레트와 파라미터 전체를 덮어쓸 때 씁니다.
   ///
-  /// 없으면 테마 밝기에 따라 [HoronFlueConfig.sky]나 [HoronFlueConfig.night]를 쓰고,
-  /// [variant]의 조정을 그 위에 얹습니다.
+  /// 없으면 밝기·변형의 기본값을 씁니다. 넘기면 변형 튜닝 대신 이 설정을 그대로 그리므로,
+  /// 변형 위에 몇 값만 바꾸려면 [HoronFlueConfig.resolve] 결과에 `copyWith`를 겁니다.
   final HoronFlueConfig? config;
 
-  /// 연기 위에 얹는 색조입니다. 없으면 변형이 정합니다. React의 `tintClassName` 자리입니다.
+  /// 연기 위에 얹는 색조입니다.
+  ///
+  /// 없으면 변형이 정한 색조를 씁니다: 라이트의 `defaultValue`는 테마의
+  /// `glass-regular`(React의 `bg-glass-regular dark:bg-transparent`), 라이트의
+  /// `sidebar`는 `glass-thick`(React의 `bg-glass-thick dark:bg-transparent`, 80% 흰
+  /// 유리로 보조 글자 대비를 지킵니다), `auth`는 없음입니다. 다크에서는 모두 없습니다.
+  /// 명시적으로 색조를 없애려면 `Colors.transparent`를 넘깁니다.
   final Color? tint;
 
   @override
@@ -366,7 +471,10 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   ui.FragmentShader? _shader;
   bool _requested = false;
   bool _resumed = true;
+  bool _drawn = false;
   Duration _lastElapsed = Duration.zero;
+  HoronFlueConfig _settings = HoronFlueConfig.sky;
+  Size _size = Size.zero;
 
   /// 이 배경의 티커입니다. `TickerMode`가 꺼지면 멈춥니다.
   @visibleForTesting
@@ -385,34 +493,8 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   HoronFlueConfig get resolvedConfig => _resolveConfig(HoronTheme.of(context));
 
   /// React의 `{ ...(dark ? FLUE_NIGHT : FLUE_SKY), ...tuning, ...config }`입니다.
-  HoronFlueConfig _resolveConfig(HoronThemeData horon) {
-    final HoronFlueConfig? explicit = widget.config;
-    if (explicit != null) return explicit;
-    final bool dark = horon.brightness == Brightness.dark;
-    final HoronFlueConfig base = dark ? HoronFlueConfig.night : HoronFlueConfig.sky;
-    return switch (widget.variant) {
-      HoronFlueVariant.defaultValue => base,
-      HoronFlueVariant.sidebar => base._tuned(
-        speed: 0.22,
-        smokeScale: 1.9,
-        density: 1.85,
-        contrast: dark ? 1.5 : 1.45,
-        midpoint: 0.8,
-        glow: dark ? 0.22 : 0.3,
-        vignette: 0,
-      ),
-      // 셰이더 비네트는 검정 쪽으로 어둡게 하므로 라이트는 비네트 없이 옅은 하늘을 지키고,
-      // 다크는 비네트로 모서리를 밤 바탕에 가라앉힙니다.
-      HoronFlueVariant.auth => base._tuned(
-        width: 1.9,
-        spread: 1.3,
-        density: dark ? 2.0 : 1.85,
-        midpoint: dark ? 0.76 : 0.8,
-        glow: dark ? 0.45 : 0.3,
-        vignette: dark ? 0.45 : 0,
-      ),
-    };
-  }
+  HoronFlueConfig _resolveConfig(HoronThemeData horon) =>
+      HoronFlueConfig.resolve(brightness: horon.brightness, variant: widget.variant, config: widget.config);
 
   /// 변형이 정한 색조입니다. React의 `FLUE_VARIANTS[...].tint`입니다.
   Color? _variantTint(HoronThemeData horon) => switch (widget.variant) {
@@ -452,13 +534,16 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   /// 티커를 켜고 끕니다.
   ///
   /// 세 조건이 모두 참일 때만 돕니다: `TickerMode` 켜짐, 앱이 앞에 있음, 모션 축소 아님.
-  /// 모션 축소일 때는 [HoronFlueDamping.time]을 12로 둔 한 프레임을 그립니다(원본과 같은 값).
+  /// 멈출 때는 지금 프레임을 그대로 둡니다. 원본도 `cancelAnimationFrame`만 하고 `clock`을
+  /// 건드리지 않으므로, 모션 축소를 껐다 켜거나 앱이 돌아오면 같은 시계에서 이어 갑니다.
+  /// 한 번도 그린 적이 없으면 [HoronFlueDamping.time]을 12로 둔 프레임을 그립니다(원본의
+  /// `clock = still ? 12 : 0`).
   void _syncTicker() {
     if (!mounted) return;
     final bool animated = TickerMode.valuesOf(context).enabled && _resumed && !MediaQuery.disableAnimationsOf(context);
     if (!animated) {
       if (_ticker.isActive) _ticker.stop();
-      _drawStill();
+      _freeze();
       return;
     }
     if (_ticker.isActive) return;
@@ -466,8 +551,12 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
     _ticker.start();
   }
 
-  /// 한 프레임만 그립니다. 원본의 `clock = still ? 12 : 0; draw();` 중 정지 쪽입니다.
-  void _drawStill() {
+  /// 지금 프레임에서 멈춥니다. 아직 한 프레임도 그리지 않았으면 12초 시점을 그립니다.
+  void _freeze() {
+    if (_drawn) {
+      _frame.value = _damping.toFrame();
+      return;
+    }
     _damping.time = 12;
     _frame.value = _damping.toFrame();
   }
@@ -476,6 +565,10 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
     final double rawMs = (elapsed - _lastElapsed).inMicroseconds / 1000;
     _lastElapsed = elapsed;
     _damping.advance(rawMs);
+    // 진짜 포인터를 받지 않을 때만 가상 포인터를 움직입니다. 시계를 진행한 뒤
+    // 목표를 정하므로 React `frame()`과 같은 순서입니다.
+    if (_settings.cursor == 0) _damping.aimVirtual(_size);
+    _drawn = true;
     _frame.value = _damping.toFrame();
   }
 
@@ -507,38 +600,48 @@ class HoronFlueBackgroundState extends State<HoronFlueBackground>
   @override
   Widget build(BuildContext context) {
     final HoronThemeData horon = HoronTheme.of(context);
-    final HoronFlueConfig config = _resolveConfig(horon);
+    // 다크는 DOM 클래스가 아니라 테마 밝기로 정합니다. 이번 빌드의 설정을 상태에
+    // 남겨 두어야 티커와 포인터 처리도 같은 값을 봅니다.
+    _settings = HoronFlueConfig.resolve(brightness: horon.brightness, variant: widget.variant, config: widget.config);
+    // 변형마다 색조 클래스가 다릅니다(`default`는 glass-regular, `sidebar`는 glass-thick,
+    // `auth`는 없음). 다크에서는 모두 `dark:bg-transparent`라 색조를 얹지 않아야 밤
+    // 팔레트가 회색으로 뜨지 않습니다.
     final Color? tint = widget.tint ?? _variantTint(horon);
     final ui.FragmentShader? shader = _shader;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final Size size = constraints.biggest;
+        _size = size;
+        final Widget background = ColoredBox(
+          color: _settings.bgColor,
+          child: Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              if (shader != null)
+                CustomPaint(
+                  key: horonFlueCanvasKey,
+                  painter: _HoronFluePainter(shader: shader, config: _settings, repaint: _frame),
+                ),
+              if (tint != null) IgnorePointer(child: ColoredBox(color: tint)),
+            ],
+          ),
+        );
+        // `cursor`가 0이면 실제 포인터를 받지 않습니다. React도 `cfg.cursor`일 때만
+        // 포인터 이벤트를 등록합니다.
+        if (_settings.cursor == 0) return background;
         return Listener(
           behavior: HitTestBehavior.translucent,
-          onPointerDown: (PointerEvent event) => _aim(event.localPosition, size, config),
-          onPointerMove: (PointerEvent event) => _aim(event.localPosition, size, config),
-          child: ColoredBox(
-            color: config.bgColor,
-            child: Stack(
-              fit: StackFit.expand,
-              children: <Widget>[
-                if (shader != null)
-                  CustomPaint(
-                    key: horonFlueCanvasKey,
-                    painter: _HoronFluePainter(shader: shader, config: config, repaint: _frame),
-                  ),
-                if (tint != null) IgnorePointer(child: ColoredBox(color: tint)),
-              ],
-            ),
-          ),
+          onPointerDown: (PointerEvent event) => _aim(event.localPosition, size),
+          onPointerMove: (PointerEvent event) => _aim(event.localPosition, size),
+          child: background,
         );
       },
     );
   }
 
-  void _aim(Offset localPosition, Size size, HoronFlueConfig config) {
-    if (config.cursor == 0) return;
+  void _aim(Offset localPosition, Size size) {
+    if (_settings.cursor == 0) return;
     _damping.aim(localPosition: localPosition, size: size);
   }
 }

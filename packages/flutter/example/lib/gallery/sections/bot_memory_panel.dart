@@ -66,6 +66,8 @@ class HoronBotMemoryPanelGallerySection extends StatelessWidget {
                 title: 'Memory updated',
                 message: '표와 짧은 문단을 함께 씁니다',
               ),
+              // 처리기를 넘기면 오른쪽 검색 아이콘이 버튼이 됩니다.
+              onSearch: () {},
             ),
           ),
           _Labelled(

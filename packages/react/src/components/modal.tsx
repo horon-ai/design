@@ -30,9 +30,9 @@ export type ModalContentProps = Omit<ComponentProps<typeof BaseDialog.Popup>, "c
 };
 
 const widthClass: Record<ModalSize, string> = {
-  sm: "w-100",
-  md: "w-140",
-  lg: "w-180",
+  sm: "w-full max-w-100",
+  md: "w-full max-w-140",
+  lg: "w-full max-w-180",
 };
 
 /**
@@ -58,7 +58,9 @@ export function ModalContent({
       <BaseDialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <BaseDialog.Popup
           className={cn(
-            "relative flex max-h-[calc(100dvh-2rem)] max-w-[calc(100vw-2rem)] flex-col overflow-clip rounded-xl outline-none",
+            // The 16px viewport padding caps `w-full`, so the popup never exceeds
+            // the screen even on the narrowest phone.
+            "relative flex max-h-[calc(100dvh-2rem)] flex-col overflow-clip rounded-xl outline-none",
             widthClass[size],
             surface === "solid" ? "bg-bg-surface shadow-[0_24px_64px_#0A142433]" : "veil-overlay",
             "motion-popup duration-240 data-starting-style:translate-y-2",

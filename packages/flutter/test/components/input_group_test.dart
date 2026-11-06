@@ -48,28 +48,17 @@ void main() {
     ),
   );
 
-  /// 상자의 테두리 색입니다. 유리 상자는 앞쪽 장식을 읽습니다.
-  Color borderOf(WidgetTester tester) {
-    final Finder glass = find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronLiquidGlass));
-    if (glass.evaluate().isNotEmpty) {
-      return tester.widget<HoronLiquidGlass>(glass).edgeColor ?? Colors.transparent;
-    }
-    final AnimatedContainer filled = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
-    return (filled.decoration! as BoxDecoration).border!.top.color;
-  }
+  /// 상자의 veil 표면입니다. glass는 [HoronVeil] 한 겹입니다.
+  HoronVeil veilOf(WidgetTester tester) =>
+      tester.widget<HoronVeil>(find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronVeil)));
 
-  /// 대상 상자의 채움이 글래스 엔진 한 겹인지 확인합니다.
-  ///
-  /// React `input-group.tsx:33`은 `fieldBoxClass.glass` 위에 `<LiquidGlass tier="regular" />`를
-  /// 깔고 그 위에 앞·뒤 칸과 1px 구분선을 얹습니다. 칸의 `bg-overlay-ink-4`는 유리 위에
-  /// 놓이는 별도 레이어이므로, 채움을 맡는 `AnimatedContainer`가 상자 안에 있으면 안 됩니다.
-  void expectGlassSurface(WidgetTester tester) {
-    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '유리 레이어는 한 겹입니다');
-    expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier, HoronGlassTier.regular);
+  void expectVeilSurface(WidgetTester tester) {
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: 'glass는 LiquidGlass를 겹치지 않습니다');
+    expect(veilOf(tester).kind, HoronVeilKind.field, reason: '.veil-field');
     expect(
       find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(AnimatedContainer)),
       findsNothing,
-      reason: '유리 상자는 토큰 색 채움을 그리지 않습니다',
+      reason: 'veil 상자는 토큰 색 채움을 그리지 않습니다',
     );
   }
 
@@ -88,21 +77,51 @@ void main() {
     expect(dividerBoxes(tester).length, 2);
   });
 
-  testWidgets('the 40px group paints the regular glass layer', (WidgetTester tester) async {
+  testWidgets('the 40px group paints the veil field', (WidgetTester tester) async {
     await pumpGroup(tester, prefix: true, suffix: true);
     expect(tester.getSize(find.byType(HoronFieldBox)).height, 40);
-    expectGlassSurface(tester);
-    expect(borderOf(tester), Colors.transparent);
+    expectVeilSurface(tester);
   });
 
-  testWidgets('segment sits on overlay-ink-4 with a 14px icon', (WidgetTester tester) async {
-    await pumpGroup(tester, suffix: true);
+  testWidgets('the input takes the 12/14/20 padding of a standalone field', (WidgetTester tester) async {
+    for (final ({HoronInputGroupSize size, double padding}) row in <({HoronInputGroupSize size, double padding})>[
+      (size: HoronInputGroupSize.sm, padding: HoronThemeData.light.space.s3),
+      (size: HoronInputGroupSize.md, padding: HoronThemeData.light.space.s3_5),
+      (size: HoronInputGroupSize.lg, padding: HoronThemeData.light.space.s5),
+    ]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: horonTheme(Brightness.light),
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 320,
+                child: HoronInputGroup(size: row.size, hintText: 'Hint'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      final Padding pad = tester.widget<Padding>(
+        find.ancestor(of: find.byType(TextField), matching: find.byType(Padding)).first,
+      );
+      expect(pad.padding, EdgeInsets.symmetric(horizontal: row.padding), reason: '${row.size}');
+    }
+  });
+
+  testWidgets('segment sits on overlay-ink-4 with a 16px icon and body-md text', (WidgetTester tester) async {
+    await pumpGroup(tester, prefix: true, suffix: true);
     final HoronThemeData horon = themeOf(tester);
     final ColoredBox segment = tester.widget<ColoredBox>(
       find.ancestor(of: find.byIcon(Icons.attach_money), matching: find.byType(ColoredBox)).first,
     );
     expect(segment.color, horon.colors.overlayInk4);
-    expect(IconTheme.of(tester.element(find.byIcon(Icons.attach_money))).size, 14);
+    expect(IconTheme.of(tester.element(find.byIcon(Icons.attach_money))).size, 16, reason: '[&_svg]:size-4');
+    final DefaultTextStyle text = tester.widget<DefaultTextStyle>(
+      find.ancestor(of: find.text('+82'), matching: find.byType(DefaultTextStyle)).first,
+    );
+    expect(text.style.fontSize, horon.text.bodyMd.fontSize, reason: 'md 칸은 text-body-md');
   });
 
   testWidgets('dividers go strong on hover and danger on invalid', (WidgetTester tester) async {
@@ -111,6 +130,39 @@ void main() {
 
     await pumpGroup(tester, prefix: true, invalid: true);
     expect(dividerBoxes(tester).map((ColoredBox box) => box.color), <Color>[themeOf(tester).colors.borderDanger]);
+  });
+
+  testWidgets('a disabled group draws the divider at 60% of the default border', (WidgetTester tester) async {
+    await pumpGroup(tester, prefix: true, disabled: true);
+    final HoronColors colors = themeOf(tester).colors;
+    final Color divider = dividerBoxes(tester).single.color;
+    expect(divider.a, closeTo(0.6, 0.001), reason: 'group-data-disabled:bg-border-default/60');
+    expect(divider.withValues(alpha: 1), colors.borderDefault);
+  });
+
+  testWidgets('the 12px sm segment padding matches the React sm rung', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 320,
+              child: HoronInputGroup(
+                size: HoronInputGroupSize.sm,
+                prefix: const HoronInputGroupSegment(child: Text('+82')),
+                hintText: 'Hint',
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    final Padding pad = tester.widget<Padding>(
+      find.ancestor(of: find.text('+82'), matching: find.byType(Padding)).first,
+    );
+    expect(pad.padding, EdgeInsets.symmetric(horizontal: themeOf(tester).space.s3), reason: 'sm: px-3');
   });
 
   testWidgets('typing reaches onChanged and disabled turns the field off', (WidgetTester tester) async {

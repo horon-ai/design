@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../theme/horon_motion.dart';
-import '../theme/horon_theme.dart';
 import 'menu.dart';
 
 /// 워크스페이스 메뉴의 한 줄입니다. React `WorkspaceMenuItem`입니다.
@@ -71,7 +70,6 @@ class HoronWorkspaceMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
     return HoronMenu(
       trigger: trigger,
       content: HoronMenuContent(
@@ -87,9 +85,10 @@ class HoronWorkspaceMenu extends StatelessWidget {
               label: workspace.name,
               description: workspace.meta,
               icon: HoronMenuTile(label: workspace.tileInitial),
-              // 현재 행은 `className="bg-overlay-ink-6"`으로 강조색 바탕을 칠합니다.
-              background: workspace.id == value ? theme.colors.overlayInk6 : null,
-              trailing: workspace.id == value ? const _SelectedCheck() : null,
+              // 현재 행은 React `selected`(`bg-bg-brand`)로 브랜드 색조를 칠합니다.
+              selected: workspace.id == value,
+              // 체크는 항상 자리를 잡고 불투명도만 바뀝니다(`transition-opacity`).
+              trailing: _SelectedCheck(visible: workspace.id == value),
               onTap: () => onValueChange?.call(workspace.id),
             ),
           const HoronMenuSeparator(),
@@ -101,18 +100,23 @@ class HoronWorkspaceMenu extends StatelessWidget {
   }
 }
 
-/// 현재 워크스페이스 체크입니다. React `Check weight="bold" className="animate-pop-in"`.
+/// 현재 워크스페이스 체크입니다.
+///
+/// React `Check weight="bold"`에 `transition-opacity duration-150`과
+/// `opacity-100`/`opacity-0`을 겁니다. 체크는 모든 행에 자리만 잡아 두고 선택이
+/// 옮겨 갈 때 불투명도만 바뀌므로, 행 너비가 흔들리지 않습니다.
 class _SelectedCheck extends StatelessWidget {
-  const _SelectedCheck();
+  const _SelectedCheck({required this.visible});
+
+  final bool visible;
 
   @override
   Widget build(BuildContext context) {
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
-      duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
-      curve: HoronMotion.popInCurve,
-      builder: (BuildContext context, double scale, Widget? child) => Transform.scale(scale: scale, child: child),
+    return AnimatedOpacity(
+      opacity: visible ? 1 : 0,
+      duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+      curve: HoronMotion.colorsCurve,
       child: const Icon(Icons.check),
     );
   }

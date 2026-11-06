@@ -70,7 +70,7 @@ export function Composer({
     <form
       onSubmit={submit}
       className={cn(
-        "relative flex items-center overflow-clip rounded-full motion-colors has-[input:focus-visible]:border-border-strong",
+        "relative flex max-w-full min-w-0 items-center overflow-clip rounded-full motion-colors has-[input:focus-visible]:border-border-strong",
         surface === "glass" ? "veil-field" : "border border-border-default bg-bg-surface",
         sizeClass[size],
         className,

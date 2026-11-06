@@ -79,10 +79,19 @@ void main() {
         .whereType<BoxDecoration>()
         .firstWhere((BoxDecoration decoration) => decoration.boxShadow != null);
     expect(shadowed.boxShadow, theme.shadows.palette, reason: 'shadow-palette');
+    expect(shadowed.color, theme.colors.bgSurface, reason: 'bg-bg-surface');
+    expect(shadowed.border!.top.color, theme.colors.borderDefault, reason: 'border-border-default');
+    expect(find.byType(HoronVeil), findsNothing, reason: 'solid 팔레트는 veil을 깔지 않습니다');
+  });
 
-    final HoronSurfaceLayer layer = tester.widget<HoronSurfaceLayer>(find.byType(HoronSurfaceLayer).first);
-    expect(layer.surface, HoronSurface.solid, reason: '기본 표면은 solid입니다');
-    expect(layer.borderRadius, BorderRadius.circular(24));
+  testWidgets('the glass popup is the veil overlay and drops the palette shadow', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronCommandPalette(open: true, surface: HoronSurface.glass, groups: _groups())));
+    await tester.pumpAndSettle();
+
+    final HoronVeil veil = tester.widget<HoronVeil>(find.byType(HoronVeil).first);
+    expect(veil.kind, HoronVeilKind.overlay, reason: 'React veil-overlay');
+    expect(veil.borderRadius!.topLeft.x, 24, reason: 'rounded-[24px]');
+    expect(find.byType(HoronLiquidGlass), findsNothing);
   });
 
   testWidgets('the search row is 48px with a 20px icon and the 14px padding', (WidgetTester tester) async {

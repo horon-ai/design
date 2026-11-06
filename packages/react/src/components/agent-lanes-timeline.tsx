@@ -115,14 +115,14 @@ export function AgentLanesTimeline({
   return (
     <section
       className={cn(
-        "flex w-full max-w-252.5 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full max-w-252.5 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
     >
-      <div className="flex items-center gap-2.5 px-5 pt-4 pb-3.5">
+      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2 px-5 pt-4 pb-3.5">
         <Pulse aria-hidden className="size-4.5 shrink-0 text-text-primary" />
-        <h3 className="text-label-lg text-text-primary">{title}</h3>
+        <h3 className="min-w-0 text-label-lg text-text-primary">{title}</h3>
         {statuses.map((status) => (
           <span key={status.id} className="flex items-center gap-1.5 text-body-sm text-text-secondary">
             <span
@@ -287,7 +287,7 @@ export function AgentLanesTimeline({
       {approval && (
         <>
           <div className="h-px bg-overlay-ink-8" />
-          <div className="flex items-center gap-3 px-5 py-3">
+          <div className="flex flex-wrap items-center gap-3 px-5 py-3">
             <Warning aria-hidden className="size-3.5 shrink-0 text-text-primary" />
             <p className="min-w-0 flex-1 text-body-sm text-text-primary">{approval.message}</p>
             <button

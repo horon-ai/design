@@ -3,8 +3,10 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// Checkbox 갤러리 섹션입니다.
 ///
-/// 두 크기와 세 상태(꺼짐·켜짐·부분 선택), 비활성 상태를 놓았습니다. 라벨을 눌러도
-/// 상자가 바뀌는지 확인할 수 있습니다.
+/// 세 크기와 세 상태(꺼짐·켜짐·부분 선택), 비활성 상태를 놓았습니다. 모든 크기의
+/// 모서리는 `rounded-xs`(6px)입니다. 선택해도 1.5px 테두리는 남고 색만 잉크색으로
+/// 바뀌며, 표시는 pop-in으로 들어오고 scale-out으로 빠집니다. 라벨을 눌러도 상자가
+/// 바뀌는지 확인할 수 있습니다.
 class HoronCheckboxGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronCheckboxGallerySection({super.key});
@@ -49,6 +51,11 @@ class _CheckboxSamplesState extends State<_CheckboxSamples> {
           size: HoronCheckboxSize.sm,
           label: 'sm · 18px',
           onChanged: (bool? value) => setState(() => _sm = value),
+        ),
+        const HoronCheckbox(
+          value: true,
+          size: HoronCheckboxSize.lg,
+          label: 'lg · 24px',
         ),
         const HoronCheckbox(value: null, label: '부분 선택'),
         const HoronCheckbox(value: true, label: '비활성 · 켜짐', enabled: false),

@@ -1,5 +1,6 @@
 import 'dart:ui' show Tristate;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -57,10 +58,6 @@ void main() {
   HoronThemeData themeOf(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronSelect)));
 
   Color borderOf(WidgetTester tester) {
-    final Finder glass = find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronLiquidGlass));
-    if (glass.evaluate().isNotEmpty) {
-      return tester.widget<HoronLiquidGlass>(glass).edgeColor ?? Colors.transparent;
-    }
     final AnimatedContainer filled = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
     return (filled.decoration! as BoxDecoration).border!.top.color;
   }
@@ -100,8 +97,11 @@ void main() {
     await pumpSelect(tester);
     expect(tester.getSize(find.byType(HoronFieldBox)).height, 40);
     expect(find.text('Select'), findsOneWidget);
-    expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass)).tier, HoronGlassTier.regular);
-    expect(borderOf(tester), Colors.transparent);
+    final HoronVeil veil = tester.widget<HoronVeil>(
+      find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronVeil)),
+    );
+    expect(veil.kind, HoronVeilKind.field, reason: 'glass 표면은 veil-field입니다');
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: '유리 레이어를 겹치지 않습니다');
   });
 
   testWidgets('tapping opens the list, choosing reports the value and closes it', (WidgetTester tester) async {
@@ -122,14 +122,14 @@ void main() {
     expect(tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).turns, 0);
   });
 
-  testWidgets('the chosen row is 6% ink with an 18px check', (WidgetTester tester) async {
+  testWidgets('the chosen row is 6% ink with a 16px check', (WidgetTester tester) async {
     await pumpSelect(tester, value: 'alpha');
     await open(tester);
     final AnimatedContainer row = tester.widget<AnimatedContainer>(
       find.ancestor(of: find.byIcon(Icons.check), matching: find.byType(AnimatedContainer)).first,
     );
     expect((row.decoration! as BoxDecoration).color, themeOf(tester).colors.overlayInk6);
-    expect(IconTheme.of(tester.element(find.byIcon(Icons.check))).size, 18);
+    expect(IconTheme.of(tester.element(find.byIcon(Icons.check))).size, 16);
     expect(tester.getSize(find.byType(AnimatedContainer).first).height, 40);
   });
 
@@ -142,28 +142,101 @@ void main() {
     expect(seen, isEmpty);
   });
 
-  testWidgets('solid uses body-lg, glass uses body-md, chip is a 32px subtle pill', (WidgetTester tester) async {
+  testWidgets('the value uses the field text rung on every surface and chips use label-md', (
+    WidgetTester tester,
+  ) async {
     await pumpSelect(tester);
     expect(tester.widget<Text>(find.text('Select')).style!.fontSize, themeOf(tester).text.bodyMd.fontSize);
 
     await pumpSelect(tester, surface: HoronInputSurface.solid);
-    expect(tester.widget<Text>(find.text('Select')).style!.fontSize, themeOf(tester).text.bodyLg.fontSize);
+    expect(
+      tester.widget<Text>(find.text('Select')).style!.fontSize,
+      themeOf(tester).text.bodyMd.fontSize,
+      reason: '표면이 글자 단계를 바꾸지 않습니다',
+    );
 
     await pumpSelect(tester, chip: true);
     expect(tester.getSize(find.byType(HoronSelect)).height, 32);
     expect(find.byType(HoronLiquidGlass), findsNothing);
     final AnimatedContainer pill = tester.widget<AnimatedContainer>(find.byType(AnimatedContainer).first);
     expect((pill.decoration! as BoxDecoration).color, themeOf(tester).colors.bgSubtle);
-    expect(tester.widget<Text>(find.text('Select')).style!.fontSize, 13);
+    expect(tester.widget<Text>(find.text('Select')).style!.fontSize, themeOf(tester).text.labelMd.fontSize);
+  });
+
+  testWidgets('the popup is the veil for glass and an opaque surface for solid', (WidgetTester tester) async {
+    await pumpSelect(tester);
+    await open(tester);
+    final Iterable<HoronVeil> veils = tester.widgetList<HoronVeil>(find.byType(HoronVeil));
+    expect(veils.any((HoronVeil veil) => veil.kind == HoronVeilKind.overlay), isTrue, reason: 'popup은 veil-overlay입니다');
+
+    await pumpSelect(tester, surface: HoronInputSurface.solid);
+    await open(tester);
+    final Iterable<HoronVeil> solidVeils = tester.widgetList<HoronVeil>(find.byType(HoronVeil));
+    expect(
+      solidVeils.any((HoronVeil veil) => veil.kind == HoronVeilKind.overlay),
+      isFalse,
+      reason: 'solid popup은 veil을 깔지 않습니다',
+    );
   });
 
   testWidgets('invalid reddens the border and a disabled trigger cannot open', (WidgetTester tester) async {
-    await pumpSelect(tester, invalid: true);
+    await pumpSelect(tester, invalid: true, surface: HoronInputSurface.solid);
     expect(borderOf(tester), themeOf(tester).colors.borderDanger);
 
     await pumpSelect(tester, disabled: true);
     await open(tester);
     expect(find.text('Alpha'), findsNothing);
+  });
+
+  testWidgets('hovering the solid field raises the border to border-strong and glass stays veil', (
+    WidgetTester tester,
+  ) async {
+    await pumpSelect(tester, surface: HoronInputSurface.solid);
+    expect(borderOf(tester), themeOf(tester).colors.borderDefault, reason: '쉬는 상태의 border-border-default');
+
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: tester.getCenter(find.byType(HoronFieldBox)));
+    await tester.pumpAndSettle();
+    expect(
+      borderOf(tester),
+      themeOf(tester).colors.borderStrong,
+      reason: 'hover:not-data-disabled:not-data-invalid:border-border-strong',
+    );
+    await pointer.removePointer();
+    await tester.pumpAndSettle();
+    expect(borderOf(tester), themeOf(tester).colors.borderDefault);
+
+    // 유리는 `veil-field`가 hover 테두리를 그리지 않으므로 React도 hover 규칙에서
+    // 뺍니다. 유리 필드는 veil 한 겹만 들고 있습니다.
+    await pumpSelect(tester);
+    final TestGesture glassPointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await glassPointer.addPointer(location: tester.getCenter(find.byType(HoronFieldBox)));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<HoronVeil>(find.descendant(of: find.byType(HoronFieldBox), matching: find.byType(HoronVeil))).kind,
+      HoronVeilKind.field,
+      reason: '유리 표면은 hover 테두리 대신 veil-field입니다',
+    );
+    await glassPointer.removePointer();
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('hovering an invalid or disabled field keeps its border', (WidgetTester tester) async {
+    await pumpSelect(tester, surface: HoronInputSurface.solid, invalid: true);
+    final TestGesture pointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await pointer.addPointer(location: tester.getCenter(find.byType(HoronFieldBox)));
+    await tester.pumpAndSettle();
+    expect(borderOf(tester), themeOf(tester).colors.borderDanger, reason: 'not-data-invalid');
+    await pointer.removePointer();
+    await tester.pumpAndSettle();
+
+    await pumpSelect(tester, surface: HoronInputSurface.solid, disabled: true);
+    final TestGesture disabledPointer = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await disabledPointer.addPointer(location: tester.getCenter(find.byType(HoronFieldBox)));
+    await tester.pumpAndSettle();
+    expect(borderOf(tester), themeOf(tester).colors.borderDefault, reason: 'not-data-disabled');
+    await disabledPointer.removePointer();
+    await tester.pumpAndSettle();
   });
 
   testWidgets('showIndicator false drops the caret', (WidgetTester tester) async {

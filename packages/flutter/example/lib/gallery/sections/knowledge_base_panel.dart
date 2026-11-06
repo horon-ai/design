@@ -33,7 +33,7 @@ class HoronKnowledgeBasePanelGallerySection extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.start,
           children: <Widget>[
             _Labelled(
-              caption: 'dropzone · indexing · list rows',
+              caption: 'shared pill tabs · dropzone · indexing · list rows',
               child: HoronKnowledgeBasePanel(
                 title: 'Knowledge base',
                 meta: '12 sources · 248 chunks · 3 bots',

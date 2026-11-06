@@ -24,7 +24,7 @@ export function Tabs({
 }: WithClass<ComponentProps<typeof BaseTabs.Root>> & { size?: TabsSize }) {
   return (
     <TabsSizeContext.Provider value={size}>
-      <BaseTabs.Root className={cn("flex flex-col gap-4", className)} {...props} />
+      <BaseTabs.Root className={cn("flex max-w-full min-w-0 flex-col gap-4", className)} {...props} />
     </TabsSizeContext.Provider>
   );
 }
@@ -74,7 +74,9 @@ export function TabsList({
   return (
     <BaseTabs.List
       className={cn(
-        "relative flex w-fit items-center gap-0.5 overflow-clip rounded-full",
+        // The tray hugs its tabs and caps at the container; tabs keep their label
+        // padding and type, so an over-wide set scrolls rather than squeezing.
+        "relative flex w-full max-w-fit min-w-0 items-center gap-0.5 overflow-x-auto overflow-y-clip rounded-full",
         listClass[size],
         surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
         className,

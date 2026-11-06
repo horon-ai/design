@@ -5,8 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../contracts/horon_strings.dart';
 import '../contracts/surface.dart';
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_veil.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -58,6 +57,7 @@ typedef _CalendarMetrics = ({
   double gap,
   double popoverGap,
   double arrow,
+  double arrowIcon,
   double popoverArrowSize,
   double popoverArrowIcon,
   TextStyle title,
@@ -73,7 +73,9 @@ _CalendarMetrics _metricsOf(HoronCalendarSize size, HoronThemeData theme) => swi
     popoverPadding: theme.space.s3,
     gap: theme.space.s2,
     popoverGap: theme.space.s1_5,
-    arrow: 16,
+    // React `arrowSizeClass`: sm `size-6 [&_svg]:size-4`.
+    arrow: theme.space.step(6),
+    arrowIcon: 16,
     popoverArrowSize: theme.space.step(7),
     popoverArrowIcon: 16,
     title: theme.text.labelLg,
@@ -87,7 +89,9 @@ _CalendarMetrics _metricsOf(HoronCalendarSize size, HoronThemeData theme) => swi
     popoverPadding: theme.space.s3_5,
     gap: theme.space.s3,
     popoverGap: theme.space.s2,
-    arrow: 20,
+    // md `size-7 [&_svg]:size-4.5`.
+    arrow: theme.space.step(7),
+    arrowIcon: theme.space.step(4.5),
     popoverArrowSize: theme.space.step(8),
     popoverArrowIcon: 18,
     title: theme.text.titleSm,
@@ -101,7 +105,9 @@ _CalendarMetrics _metricsOf(HoronCalendarSize size, HoronThemeData theme) => swi
     popoverPadding: theme.space.s4,
     gap: theme.space.s3_5,
     popoverGap: theme.space.s2_5,
-    arrow: 24,
+    // lg `size-8 [&_svg]:size-5`.
+    arrow: theme.space.step(8),
+    arrowIcon: theme.space.step(5),
     popoverArrowSize: theme.space.step(10),
     popoverArrowIcon: 20,
     title: theme.text.titleMd,
@@ -201,6 +207,9 @@ class _HoronCalendarState extends State<HoronCalendar> {
 
   late DateTime _monthState;
   late DateTime _focused;
+
+  /// React `slide` — 달이 바뀐 방향입니다. 처음 그릴 때는 null이라 들어오는 전환이 없습니다.
+  int _slide = 0;
   final FocusNode _gridFocus = FocusNode(debugLabel: 'horon-calendar-grid');
 
   bool get _isRange => widget.range != null || widget.onRangeChange != null;
@@ -219,14 +228,34 @@ class _HoronCalendarState extends State<HoronCalendar> {
   }
 
   @override
+  void didUpdateWidget(HoronCalendar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 바깥에서 `month`를 바꾼 경우에도 React처럼 격자가 밀려 들어옵니다. React는
+    // 보이는 달과 새 달을 비교해 방향을 정합니다.
+    final DateTime? previous = oldWidget.month == null ? null : _firstOfMonth(oldWidget.month!);
+    if (widget.month == null || previous == null) return;
+    final DateTime next = _firstOfMonth(widget.month!);
+    if (next.isAtSameMomentAs(previous)) return;
+    _slide = next.isAfter(previous) ? 1 : -1;
+  }
+
+  @override
   void dispose() {
     _gridFocus.dispose();
     super.dispose();
   }
 
   void _setMonth(DateTime next) {
-    if (widget.month == null) setState(() => _monthState = _firstOfMonth(next));
-    widget.onMonthChange?.call(_firstOfMonth(next));
+    final DateTime target = _firstOfMonth(next);
+    final int direction = target.isAfter(_visibleMonth) ? 1 : (target.isBefore(_visibleMonth) ? -1 : 0);
+    // 바깥에서 달을 정하면(didUpdateWidget) 이 위젯은 달을 바꾸지 않고 알리기만 합니다.
+    if (widget.month == null) {
+      setState(() {
+        _monthState = target;
+        if (direction != 0) _slide = direction;
+      });
+    }
+    widget.onMonthChange?.call(target);
   }
 
   bool _isSelected(DateTime date) {
@@ -352,31 +381,23 @@ class _HoronCalendarState extends State<HoronCalendar> {
     final double available = maxWidth - padding * 2;
     final double cell = math.min(metrics.cell, math.max(_minCellSize, available / 7));
 
-    final Widget body = DecoratedBox(
-      key: const Key('horon-calendar-surface'),
-      decoration: BoxDecoration(
-        color: switch (widget.surface) {
-          HoronCalendarSurface.glass => null,
-          HoronCalendarSurface.flat => theme.colors.glassThick,
-          HoronCalendarSurface.solid => theme.colors.bgSurface,
-        },
-        borderRadius: radius,
-        border: widget.surface == HoronCalendarSurface.solid ? Border.all(color: theme.colors.borderDefault) : null,
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(padding),
-        child: SizedBox(
-          width: cell * 7,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: gap,
-            children: <Widget>[
-              if (widget.popover)
-                _buildPopoverHeader(theme, title, metrics)
-              else
-                _buildDefaultHeader(theme, title, metrics),
-              Focus(
+    final Widget content = Padding(
+      padding: EdgeInsets.all(padding),
+      child: SizedBox(
+        width: cell * 7,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: gap,
+          children: <Widget>[
+            if (widget.popover)
+              _buildPopoverHeader(theme, title, metrics)
+            else
+              _buildDefaultHeader(theme, title, metrics),
+            _SlideShift(
+              key: ValueKey<int>(month.millisecondsSinceEpoch),
+              direction: _slide,
+              child: Focus(
                 focusNode: _gridFocus,
                 onKeyEvent: _handleKeyEvent,
                 child: Column(
@@ -395,18 +416,33 @@ class _HoronCalendarState extends State<HoronCalendar> {
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
 
-    return Semantics(
-      container: true,
-      child: widget.surface == HoronCalendarSurface.glass
-          ? HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: body)
-          : body,
-    );
+    // glass는 React `.veil-overlay`입니다. HoronLiquidGlass를 깔지 않고 veil 한 겹만
+    // 쓰므로 테두리도 veil의 1px 링이 맡습니다.
+    final Widget body = switch (widget.surface) {
+      HoronCalendarSurface.glass => HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: content),
+      HoronCalendarSurface.flat => DecoratedBox(
+        key: const Key('horon-calendar-surface'),
+        decoration: BoxDecoration(color: theme.colors.glassThick, borderRadius: radius),
+        child: content,
+      ),
+      HoronCalendarSurface.solid => DecoratedBox(
+        key: const Key('horon-calendar-surface'),
+        decoration: BoxDecoration(
+          color: theme.colors.bgSurface,
+          borderRadius: radius,
+          border: Border.all(color: theme.colors.borderDefault),
+        ),
+        child: content,
+      ),
+    };
+
+    return Semantics(container: true, child: body);
   }
 
   Widget _buildDefaultHeader(HoronThemeData theme, String title, _CalendarMetrics metrics) {
@@ -418,21 +454,28 @@ class _HoronCalendarState extends State<HoronCalendar> {
           icon: Icons.chevron_left,
           color: colors.textSecondary,
           size: metrics.arrow,
-          iconSize: metrics.arrow,
+          iconSize: metrics.arrowIcon,
+          hoverColor: colors.overlayInk6,
+          hoverTextPrimary: true,
           label: theme.strings.previousPage,
           onPressed: () => _setMonth(_addMonths(_visibleMonth, -1)),
         ),
         Expanded(
           child: Semantics(
             liveRegion: true,
-            child: Text(
-              title,
-              key: const Key('horon-calendar-title'),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              // `text-title-sm text-text-primary`.
-              style: metrics.title.copyWith(color: colors.textPrimary),
+            // React `<span key={title} className="animate-fade-in">` — 달 제목은
+            // 바뀔 때 160ms로 제자리에서 나타납니다.
+            child: _TitleFade(
+              title: title,
+              child: Text(
+                title,
+                key: const Key('horon-calendar-title'),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                // `text-title-sm text-text-primary`.
+                style: metrics.title.copyWith(color: colors.textPrimary),
+              ),
             ),
           ),
         ),
@@ -441,7 +484,9 @@ class _HoronCalendarState extends State<HoronCalendar> {
           icon: Icons.chevron_right,
           color: colors.textSecondary,
           size: metrics.arrow,
-          iconSize: metrics.arrow,
+          iconSize: metrics.arrowIcon,
+          hoverColor: colors.overlayInk6,
+          hoverTextPrimary: true,
           label: theme.strings.nextPage,
           onPressed: () => _setMonth(_addMonths(_visibleMonth, 1)),
         ),
@@ -462,13 +507,16 @@ class _HoronCalendarState extends State<HoronCalendar> {
           Expanded(
             child: Semantics(
               liveRegion: true,
-              child: Text(
-                title,
-                key: const Key('horon-calendar-title'),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                // `text-label-lg text-text-primary`.
-                style: metrics.popoverTitle.copyWith(color: colors.textPrimary),
+              child: _TitleFade(
+                title: title,
+                child: Text(
+                  title,
+                  key: const Key('horon-calendar-title'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  // `text-label-lg text-text-primary`.
+                  style: metrics.popoverTitle.copyWith(color: colors.textPrimary),
+                ),
               ),
             ),
           ),
@@ -546,10 +594,58 @@ class _HoronCalendarState extends State<HoronCalendar> {
             disabled: widget.isDateDisabled?.call(date) ?? false,
             focused: _gridFocus.hasFocus && _sameDay(date, _focused),
             textStyle: metrics.day,
-            todayDotTop: cell - 8,
             onTap: _select,
           ),
       ],
+    );
+  }
+}
+
+/// `animate-slide-shift-next`·`prev` — 달 격자가 옆에서 12px 밀려 들어옵니다.
+///
+/// React는 `key={month}`로 격자를 새로 만들고 `200ms var(--ease-out-quint)` 가로
+/// 이동을 겁니다(불투명도는 바뀌지 않습니다). Flutter는 달이 바뀔 때 위젯을 새로
+/// 만들되, 처음 그릴 때는 [direction]이 0이라 전환을 걸지 않습니다.
+class _SlideShift extends StatelessWidget {
+  const _SlideShift({super.key, required this.direction, required this.child});
+
+  /// 1은 다음 달(오른쪽에서), −1은 이전 달(왼쪽에서)입니다.
+  final int direction;
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (direction == 0) return child;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: direction * HoronMotion.slideShiftOffset, end: 0),
+      duration: reduceMotion ? Duration.zero : HoronMotion.slideShiftDuration,
+      curve: HoronMotion.slideShiftCurve,
+      builder: (BuildContext context, double dx, Widget? child) =>
+          Transform.translate(offset: Offset(dx, 0), child: child),
+      child: child,
+    );
+  }
+}
+
+/// `animate-fade-in` — 달 제목처럼 제자리에서 바뀌는 글자의 등장입니다.
+///
+/// React는 제목에 `key={title}`을 주어 글자가 바뀔 때마다 160ms 불투명도 전환을 다시
+/// 겁니다. Flutter는 제목 문자열을 key로 삼은 [AnimatedSwitcher]로 같은 순간을 냅니다.
+class _TitleFade extends StatelessWidget {
+  const _TitleFade({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    return AnimatedSwitcher(
+      duration: reduceMotion ? Duration.zero : HoronMotion.fadeInDuration,
+      switchInCurve: HoronMotion.fadeInCurve,
+      child: KeyedSubtree(key: ValueKey<String>(title), child: child),
     );
   }
 }
@@ -567,7 +663,6 @@ class _DayCell extends StatefulWidget {
     required this.disabled,
     required this.focused,
     required this.textStyle,
-    required this.todayDotTop,
     required this.onTap,
   });
 
@@ -580,7 +675,6 @@ class _DayCell extends StatefulWidget {
   final bool disabled;
   final bool focused;
   final TextStyle textStyle;
-  final double todayDotTop;
   final ValueChanged<DateTime> onTap;
 
   @override
@@ -605,7 +699,7 @@ class _DayCellState extends State<_DayCell> {
         : widget.disabled
         ? widget.textStyle.copyWith(color: colors.textDisabled)
         : widget.outside
-        ? widget.textStyle.copyWith(color: colors.textDisabled)
+        ? widget.textStyle.copyWith(color: colors.textPlaceholder)
         : widget.isToday
         ? widget.textStyle.copyWith(color: colors.textBrand)
         : widget.textStyle.copyWith(color: colors.textPrimary);
@@ -652,10 +746,10 @@ class _DayCellState extends State<_DayCell> {
                   ),
                   child: Text('${widget.date.day}', maxLines: 1, style: style),
                 ),
-                // `top-8 left-[18px] size-1 rounded-full bg-status-live`.
+                // `bottom-1 left-1/2 -translate-x-1/2 size-1 rounded-full bg-status-live`.
                 if (widget.isToday && !widget.selected && !widget.between)
                   Positioned(
-                    top: widget.todayDotTop,
+                    bottom: theme.space.s1,
                     left: (widget.cell - _HoronCalendarState._todayDotSize) / 2,
                     child: Container(
                       key: ValueKey<String>(
@@ -677,8 +771,9 @@ class _DayCellState extends State<_DayCell> {
 
 /// 이전·다음 달 화살표 버튼입니다.
 ///
-/// React의 `motion-press`(누르면 0.97)와 팝오버 변형의 `hover:bg-overlay-ink-6`을
-/// 옮겼습니다. 기본 변형은 hover 배경이 없습니다.
+/// React의 `motion-press`(누르면 0.97)를 옮겼습니다. 기본 변형은 hover에서 글자색이
+/// `text-primary`가 되고, 팝오버 변형은 `hover:bg-overlay-ink-6` 배경을 씁니다. 두 변형
+/// 모두 키보드 포커스에 2px 브랜드 링을 그립니다.
 class _CaretButton extends StatefulWidget {
   const _CaretButton({
     super.key,
@@ -689,6 +784,7 @@ class _CaretButton extends StatefulWidget {
     required this.label,
     required this.onPressed,
     this.hoverColor,
+    this.hoverTextPrimary = false,
   });
 
   final IconData icon;
@@ -699,24 +795,46 @@ class _CaretButton extends StatefulWidget {
   final VoidCallback onPressed;
   final Color? hoverColor;
 
+  /// 참이면 hover에서 아이콘도 `text-primary`가 됩니다. 기본 변형이 그렇고
+  /// 팝오버 변형은 배경만 바뀝니다.
+  final bool hoverTextPrimary;
+
   @override
   State<_CaretButton> createState() => _CaretButtonState();
 }
 
 class _CaretButtonState extends State<_CaretButton> {
   bool _hovered = false;
+  bool _focused = false;
   bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
     final bool animate = !MediaQuery.disableAnimationsOf(context);
+    // 두 변형 모두 hover에서 `bg-overlay-ink-6` 배경을 그립니다. 기본 변형은
+    // `hover:text-text-primary`까지 함께 바뀝니다.
+    final Color iconColor = _hovered && widget.hoverTextPrimary ? colors.textPrimary : widget.color;
     return Semantics(
       button: true,
       label: widget.label,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
-        onExit: (PointerExitEvent event) => setState(() => _hovered = false),
+      child: FocusableActionDetector(
+        mouseCursor: SystemMouseCursors.click,
+        onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
+        onShowFocusHighlight: (bool value) => setState(() => _focused = value),
+        shortcuts: const <ShortcutActivator, Intent>{
+          SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+          SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+        },
+        actions: <Type, Action<Intent>>{
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (ActivateIntent intent) {
+              widget.onPressed();
+              return null;
+            },
+          ),
+        },
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: (TapDownDetails details) => setState(() => _pressed = true),
@@ -727,21 +845,74 @@ class _CaretButtonState extends State<_CaretButton> {
             scale: _pressed ? HoronMotion.pressScale : 1,
             duration: animate ? HoronMotion.pressDuration : Duration.zero,
             curve: HoronMotion.pressCurve,
-            child: AnimatedContainer(
-              duration: animate ? HoronMotion.colorsDuration : Duration.zero,
-              curve: HoronMotion.colorsCurve,
-              width: widget.size,
-              height: widget.size,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _hovered && widget.hoverColor != null ? widget.hoverColor : Colors.transparent,
+            child: _CaretFocusRing(
+              visible: _focused,
+              gap: theme.space.s0_5,
+              width: theme.space.s0_5,
+              color: colors.textBrand,
+              radius: theme.radius.full,
+              child: AnimatedContainer(
+                duration: animate ? HoronMotion.colorsDuration : Duration.zero,
+                curve: HoronMotion.colorsCurve,
+                width: widget.size,
+                height: widget.size,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _hovered && widget.hoverColor != null ? widget.hoverColor : Colors.transparent,
+                ),
+                child: Icon(widget.icon, size: widget.iconSize, color: iconColor),
               ),
-              child: Icon(widget.icon, size: widget.iconSize, color: widget.color),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+/// `focus-visible:outline-2 outline-offset-2 outline-text-brand`을 그립니다.
+///
+/// 레이아웃을 밀지 않도록 링을 자식 바깥에 겹쳐 그립니다.
+class _CaretFocusRing extends StatelessWidget {
+  const _CaretFocusRing({
+    required this.visible,
+    required this.gap,
+    required this.width,
+    required this.color,
+    required this.radius,
+    required this.child,
+  });
+
+  final bool visible;
+  final double gap;
+  final double width;
+  final Color color;
+  final double radius;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!visible) return child;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        Positioned(
+          left: -gap,
+          top: -gap,
+          right: -gap,
+          bottom: -gap,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(radius + gap),
+                border: Border.all(color: color, width: width),
+              ),
+            ),
+          ),
+        ),
+        child,
+      ],
     );
   }
 }

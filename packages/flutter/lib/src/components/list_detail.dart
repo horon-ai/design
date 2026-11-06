@@ -14,11 +14,11 @@ import 'package:flutter/material.dart';
 
 import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
 import '../glass/horon_surface.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
+import 'code_panel.dart';
 
 /// `max-w-201.5` — 목록과 상세를 합친 최대 폭 806px입니다.
 const double _maxWidth = 806;
@@ -137,46 +137,52 @@ class _HoronListDetailState extends State<HoronListDetail> {
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: _maxWidth),
-      child: HoronSurfaceLayer(
-        surface: widget.surface,
-        tier: HoronGlassTier.thick,
-        borderRadius: BorderRadius.circular(theme.radius.xl2), // rounded-2xl = 16
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            final double available = constraints.maxWidth.isFinite
-                ? math.min(constraints.maxWidth, _maxWidth)
-                : _maxWidth;
-            final bool sideBySide = available >= theme.breakpoints.md;
-            final Widget list = _buildList(theme, selected, sideBySide: sideBySide);
-            final Widget detail = _buildDetail(theme, selected);
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(theme.radius.xl2), // overflow-clip rounded-2xl
+        child: HoronSurfaceLayer(
+          surface: widget.surface,
+          tier: HoronGlassTier.thick,
+          borderRadius: BorderRadius.circular(theme.radius.xl2), // rounded-2xl = 16
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final double available = constraints.maxWidth.isFinite
+                  ? math.min(constraints.maxWidth, _maxWidth)
+                  : _maxWidth;
+              final bool sideBySide = available >= theme.breakpoints.md;
+              final Widget list = _buildList(theme, selected, sideBySide: sideBySide);
+              final Widget detail = _buildDetail(theme, selected);
 
-            if (!sideBySide) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[list, detail],
+              if (!sideBySide) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[list, detail],
+                );
+              }
+              final double listWidth = math.min(widget.listWidth, available * 0.45);
+              return IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    SizedBox(width: listWidth, child: list),
+                    Expanded(child: detail),
+                  ],
+                ),
               );
-            }
-            final double listWidth = math.min(widget.listWidth, available * 0.45);
-            return IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  SizedBox(width: listWidth, child: list),
-                  Expanded(child: detail),
-                ],
-              ),
-            );
-          },
+            },
+          ),
         ),
       ),
     );
   }
 
   Widget _buildList(HoronThemeData theme, HoronListDetailItem? selected, {required bool sideBySide}) {
+    final bool glass = widget.surface == HoronSurface.glass;
+    final Color muted = theme.colors.textSecondary; // React: mutedClass는 표면과 무관하게 text-secondary
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: theme.colors.bgInset, // bg-bg-inset
+        // glass면 bg-transparent, 아니면 bg-bg-inset
+        color: glass ? Colors.transparent : theme.colors.bgInset,
         border: sideBySide
             ? Border(right: BorderSide(color: theme.colors.borderDefault)) // border-r
             : Border(bottom: BorderSide(color: theme.colors.borderDefault)),
@@ -200,18 +206,16 @@ class _HoronListDetailState extends State<HoronListDetail> {
                       group.label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      // text-[11px]/[14px] font-semibold tracking-[0.4px]
+                      // text-label-sm font-semibold tracking-[0.04em]
                       style: theme.text.labelSm.copyWith(
-                        fontSize: 11,
-                        height: 14 / 11,
-                        letterSpacing: 0.4,
+                        letterSpacing: (theme.text.labelSm.fontSize ?? 12) * 0.04,
                         fontWeight: HoronFontWeight.semibold,
-                        color: theme.colors.textPlaceholder,
+                        color: muted,
                       ),
                     ),
                   ),
                   for (final HoronListDetailItem item in group.items)
-                    _ListRow(item: item, selected: item.id == selected?.id, onTap: () => _select(item)),
+                    _ListRow(item: item, selected: item.id == selected?.id, muted: muted, onTap: () => _select(item)),
                 ],
               ),
           ],
@@ -255,10 +259,11 @@ class _HoronListDetailState extends State<HoronListDetail> {
 
 /// 목록 항목 한 줄입니다. 선택·호버·누름 배경을 150ms로 바꿉니다.
 class _ListRow extends StatefulWidget {
-  const _ListRow({required this.item, required this.selected, required this.onTap});
+  const _ListRow({required this.item, required this.selected, required this.muted, required this.onTap});
 
   final HoronListDetailItem item;
   final bool selected;
+  final Color muted;
   final VoidCallback onTap;
 
   @override
@@ -274,9 +279,11 @@ class _ListRowState extends State<_ListRow> {
     final HoronThemeData theme = HoronTheme.of(context);
     final bool reduce = MediaQuery.disableAnimationsOf(context);
     final Color background = widget.selected
-        ? theme
-              .colors
-              .interactiveSecondary // data-selected:bg-interactive-secondary
+        ? (_pressed || _hovered
+              ? theme
+                    .colors
+                    .overlayInk8 // data-selected:hover:bg-overlay-ink-8
+              : theme.colors.overlayInk6) // data-selected:bg-overlay-ink-6
         : _pressed || _hovered
         ? theme
               .colors
@@ -312,23 +319,15 @@ class _ListRowState extends State<_ListRow> {
                 Row(
                   spacing: theme.space.s2, // gap-2
                   children: <Widget>[
-                    SizedBox(
-                      width: theme.space.step(1.75), // size-1.75 = 7
-                      height: theme.space.step(1.75),
-                      child: const DecoratedBox(
-                        decoration: BoxDecoration(color: HoronPalette.sky500, shape: BoxShape.circle),
-                      ),
-                    ),
                     Expanded(
                       child: Text(
                         widget.item.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        // font-mono text-[13px]/[18px] font-medium
-                        style: theme.text.code.copyWith(
-                          fontSize: 13,
-                          height: 18 / 13,
-                          fontWeight: HoronFontWeight.medium,
+                        // font-mono text-label-md
+                        style: theme.text.labelMd.copyWith(
+                          fontFamily: theme.text.code.fontFamily,
+                          fontFamilyFallback: theme.text.code.fontFamilyFallback,
                           color: theme.colors.textPrimary,
                         ),
                       ),
@@ -336,15 +335,12 @@ class _ListRowState extends State<_ListRow> {
                   ],
                 ),
                 if (widget.item.meta != null)
-                  Padding(
-                    padding: EdgeInsets.only(left: theme.space.step(3.75)), // pl-3.75 = 15
-                    child: Text(
-                      widget.item.meta!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      // text-[12px]/[16px]
-                      style: theme.text.caption.copyWith(height: 16 / 12, color: theme.colors.textPlaceholder),
-                    ),
+                  Text(
+                    widget.item.meta!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    // text-label-sm
+                    style: theme.text.labelSm.copyWith(color: widget.muted),
                   ),
               ],
             ),
@@ -390,11 +386,8 @@ class HoronListDetailHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(theme.space.s2_5), // rounded-[10px]
               ),
               child: IconTheme.merge(
-                // [&_svg]:size-4.5, text-sky-700 dark:text-sky-300
-                data: IconThemeData(
-                  size: theme.space.step(4.5),
-                  color: dark ? HoronPalette.sky300 : HoronPalette.sky700,
-                ),
+                // [&_svg]:size-5, text-sky-700 dark:text-sky-300
+                data: IconThemeData(size: theme.space.step(5), color: dark ? HoronPalette.sky300 : HoronPalette.sky700),
                 child: Center(child: icon),
               ),
             ),
@@ -408,10 +401,10 @@ class HoronListDetailHeader extends StatelessWidget {
                 title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                // font-mono text-[16px]/[22px] font-semibold
-                style: theme.text.code.copyWith(
-                  fontSize: 16,
-                  height: 22 / 16,
+                // font-mono text-label-lg font-semibold
+                style: theme.text.labelLg.copyWith(
+                  fontFamily: theme.text.code.fontFamily,
+                  fontFamilyFallback: theme.text.code.fontFamilyFallback,
                   fontWeight: HoronFontWeight.semibold,
                   color: theme.colors.textPrimary,
                 ),
@@ -421,8 +414,8 @@ class HoronListDetailHeader extends StatelessWidget {
                   description!,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  // text-[13px]/[18px]
-                  style: theme.text.bodySm.copyWith(fontSize: 13, height: 18 / 13, color: theme.colors.textSecondary),
+                  // text-body-sm
+                  style: theme.text.bodySm.copyWith(color: theme.colors.textSecondary),
                 ),
             ],
           ),
@@ -460,11 +453,9 @@ class HoronListDetailMeta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final bool dark = theme.brightness == Brightness.dark;
     return DecoratedBox(
       decoration: BoxDecoration(
-        // bg-neutral-50 dark:bg-neutral-800
-        color: dark ? HoronPalette.neutral800 : HoronPalette.neutral50,
+        color: theme.colors.bgSubtle, // bg-bg-subtle
         borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md = 12
       ),
       child: Padding(
@@ -507,14 +498,14 @@ class HoronListDetailMeta extends StatelessWidget {
           item.label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          // text-[12px]/[16px] font-medium
-          style: theme.text.labelSm.copyWith(height: 16 / 12, color: theme.colors.textPlaceholder),
+          // text-label-sm
+          style: theme.text.labelSm.copyWith(color: theme.colors.textSecondary),
         ),
         Text(
           item.value,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          // text-[14px]/[20px] font-medium
+          // text-label-md
           style: theme.text.labelMd.copyWith(color: theme.colors.textPrimary),
         ),
       ],
@@ -576,7 +567,6 @@ class _HoronListDetailInstructionsState extends State<HoronListDetailInstruction
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final bool dark = theme.brightness == Brightness.dark;
     final bool reduce = MediaQuery.disableAnimationsOf(context);
     final String text = widget.value ?? _inner;
 
@@ -596,10 +586,8 @@ class _HoronListDetailInstructionsState extends State<HoronListDetailInstruction
                       widget.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      // text-[13px]/[18px] font-semibold
-                      style: theme.text.labelSm.copyWith(
-                        fontSize: 13,
-                        height: 18 / 13,
+                      // text-label-md font-semibold
+                      style: theme.text.labelMd.copyWith(
                         fontWeight: HoronFontWeight.semibold,
                         color: theme.colors.textPrimary,
                       ),
@@ -624,61 +612,41 @@ class _HoronListDetailInstructionsState extends State<HoronListDetailInstruction
               ),
             ),
             SizedBox(width: theme.space.s2),
-            _GlassButton(label: _editing ? 'Done' : 'Edit', onPressed: () => setState(() => _editing = !_editing)),
+            _SolidButton(
+              label: _editing ? 'Done' : 'Edit',
+              width: theme.space.step(16), // w-16 = 64
+              onPressed: () => setState(() => _editing = !_editing),
+            ),
           ],
         ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            // bg-neutral-50 dark:bg-neutral-800
-            color: dark ? HoronPalette.neutral800 : HoronPalette.neutral50,
-            borderRadius: BorderRadius.circular(theme.space.s2_5), // rounded-[10px]
-            border: Border.all(color: theme.colors.borderDefault),
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: theme.space.s4, // px-4
-              vertical: theme.space.s3_5, // py-3.5
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              child: Text.rich(
-                TextSpan(children: _instructionSpans(text, theme.colors.syntaxKey)),
-                // font-mono text-[12px]/[19px] text-syntax-string
-                style: theme.text.code.copyWith(fontSize: 12, height: 19 / 12, color: theme.colors.syntaxString),
-              ),
-            ),
-          ),
-        ),
+        HoronCodePanel(code: text),
         AnimatedSize(
           duration: reduce ? Duration.zero : HoronMotion.collapseDuration, // motion-collapse 240ms
           curve: HoronMotion.collapseCurve,
           alignment: Alignment.topCenter,
           child: !_editing
               ? const SizedBox(width: double.infinity)
-              : Padding(
-                  padding: EdgeInsets.only(top: theme.space.s1), // mt-1
-                  child: TextField(
-                    controller: _controller,
-                    minLines: 6,
-                    maxLines: null, // rows={6} + resize-y: 여섯 줄에서 시작해 내용만큼 자랍니다
-                    keyboardType: TextInputType.multiline,
-                    style: theme.text.code.copyWith(fontSize: 12, height: 19 / 12, color: theme.colors.textPrimary),
-                    onChanged: (String value) {
-                      setState(() => _inner = value);
-                      widget.onValueChange?.call(value);
-                    },
-                    decoration: InputDecoration(
-                      isDense: true,
-                      filled: true,
-                      fillColor: theme.colors.bgInset, // bg-bg-inset
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: theme.space.s4, // px-4
-                        vertical: theme.space.s3, // py-3
-                      ),
-                      border: _fieldBorder(theme, theme.colors.borderDefault),
-                      enabledBorder: _fieldBorder(theme, theme.colors.borderDefault),
-                      focusedBorder: _fieldBorder(theme, theme.colors.borderFocus, width: 2),
+              : TextField(
+                  controller: _controller,
+                  minLines: 6,
+                  maxLines: null, // rows={6} + resize-y: 여섯 줄에서 시작해 내용만큼 자랍니다
+                  keyboardType: TextInputType.multiline,
+                  style: theme.text.code.copyWith(fontSize: 12, height: 21 / 12, color: theme.colors.textPrimary),
+                  onChanged: (String value) {
+                    setState(() => _inner = value);
+                    widget.onValueChange?.call(value);
+                  },
+                  decoration: InputDecoration(
+                    isDense: true,
+                    filled: true,
+                    fillColor: theme.colors.bgInset, // bg-bg-inset
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: theme.space.s4, // px-4
+                      vertical: theme.space.s3_5, // py-3.5
                     ),
+                    border: _fieldBorder(theme, theme.colors.borderDefault),
+                    enabledBorder: _fieldBorder(theme, theme.colors.borderDefault),
+                    focusedBorder: _fieldBorder(theme, theme.colors.borderFocus, width: 2),
                   ),
                 ),
         ),
@@ -687,33 +655,7 @@ class _HoronListDetailInstructionsState extends State<HoronListDetailInstruction
   }
 }
 
-/// 지시문 한 줄의 키(`name:`)만 문법 키 색으로 나눕니다. React `renderInstructions`와 같습니다.
-List<InlineSpan> _instructionSpans(String text, Color keyColor) {
-  final List<String> lines = text.split('\n');
-  final RegExp keyPattern = RegExp(r'^([\w-]+:)(.*)$');
-  final List<InlineSpan> spans = <InlineSpan>[];
-  int fences = 0;
-  for (int index = 0; index < lines.length; index++) {
-    final String line = lines[index];
-    if (line.trim() == '---') fences += 1;
-    final RegExpMatch? match = fences == 1 ? keyPattern.firstMatch(line) : null;
-    if (match != null) {
-      spans
-        ..add(
-          TextSpan(
-            text: match.group(1),
-            style: TextStyle(color: keyColor),
-          ),
-        )
-        ..add(TextSpan(text: match.group(2)));
-    } else {
-      spans.add(TextSpan(text: line));
-    }
-    if (index < lines.length - 1) spans.add(const TextSpan(text: '\n'));
-  }
-  return spans;
-}
-
+/// 텍스트 영역의 1px 테두리입니다.
 OutlineInputBorder _fieldBorder(HoronThemeData theme, Color color, {double width = 1}) {
   return OutlineInputBorder(
     borderRadius: BorderRadius.circular(theme.space.s2_5), // rounded-[10px]
@@ -790,34 +732,65 @@ class HoronListDetailFooter extends StatelessWidget {
   }
 }
 
-/// `button.tsx`의 `glass`·`sm` 변형입니다.
+/// `button.tsx`의 `solid`·`sm` 변형입니다.
 ///
 /// `button`은 다른 레인의 컴포넌트라 이 파일이 그 자리를 직접 그립니다. 보이는 값은
-/// `h-8`, `px-3`, `text-label-md`, `rounded-full`, `bg-glass-clear`입니다.
-class _GlassButton extends StatelessWidget {
-  const _GlassButton({required this.label, this.onPressed});
+/// `h-8`, `px-3`, `text-label-md`, `rounded-full`, `bg-bg-surface`와 `border-default`입니다.
+class _SolidButton extends StatefulWidget {
+  const _SolidButton({required this.label, this.onPressed, this.width});
 
   final String label;
   final VoidCallback? onPressed;
 
+  /// 고정 폭입니다. React `w-16`처럼 글자 폭과 무관한 자리를 줄 때 씁니다.
+  final double? width;
+
+  @override
+  State<_SolidButton> createState() => _SolidButtonState();
+}
+
+class _SolidButtonState extends State<_SolidButton> {
+  bool _hovered = false;
+
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final bool reduce = MediaQuery.disableAnimationsOf(context);
     return Semantics(
       button: true,
-      enabled: onPressed != null,
-      child: _PressScale(
-        enabled: onPressed != null,
-        onTap: onPressed,
-        child: HoronLiquidGlass(
-          borderRadius: BorderRadius.circular(theme.radius.full), // rounded-full
-          child: SizedBox(
-            height: theme.space.step(8), // sm h-8 = 32
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: theme.space.s3), // px-3
-              child: Center(
-                widthFactor: 1,
-                child: Text(label, maxLines: 1, style: theme.text.labelMd.copyWith(color: theme.colors.textPrimary)),
+      enabled: widget.onPressed != null,
+      child: MouseRegion(
+        cursor: widget.onPressed != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
+        onExit: (PointerExitEvent event) => setState(() => _hovered = false),
+        child: _PressScale(
+          enabled: widget.onPressed != null,
+          onTap: widget.onPressed,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              // bg-bg-surface, hover:bg-bg-subtle, border-border-default
+              color: _hovered ? colors.bgSubtle : colors.bgSurface,
+              borderRadius: BorderRadius.circular(theme.radius.full), // rounded-full
+              border: Border.all(color: colors.borderDefault),
+            ),
+            child: SizedBox(
+              height: theme.space.step(8), // sm h-8 = 32
+              width: widget.width, // w-16 = 64
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: widget.width == null ? theme.space.s3 : 0), // px-3 / px-0
+                child: Center(
+                  widthFactor: 1,
+                  child: AnimatedSwitcher(
+                    duration: reduce ? Duration.zero : HoronMotion.fadeInDuration, // animate-fade-in
+                    child: Text(
+                      widget.label,
+                      key: ValueKey<String>(widget.label),
+                      maxLines: 1,
+                      style: theme.text.labelMd.copyWith(color: colors.textPrimary),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

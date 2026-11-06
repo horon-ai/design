@@ -161,8 +161,10 @@ class _HoronRadioState extends State<HoronRadio> {
           final Color fill = selected
               ? (hovered ? colors.interactivePrimaryHover : colors.interactivePrimary)
               : colors.bgSurface;
+          // React `data-checked:border-interactive-primary` — 선택해도 1.5px 테두리는
+          // 남고 색만 바뀝니다. hover에서는 그 색이 `-hover`가 됩니다.
           final Color borderColor = selected
-              ? Colors.transparent
+              ? (hovered ? colors.interactivePrimaryHover : colors.interactivePrimary)
               : (hovered ? colors.textSecondary : colors.borderStrong);
 
           final Widget circle = AnimatedContainer(
@@ -173,25 +175,33 @@ class _HoronRadioState extends State<HoronRadio> {
             decoration: BoxDecoration(
               color: fill,
               shape: BoxShape.circle,
-              // data-checked:border-0 — 선택되면 테두리가 사라집니다.
-              border: Border.all(color: borderColor, width: selected ? 0 : _borderWidth),
+              border: Border.all(color: borderColor, width: _borderWidth),
             ),
-            child: selected
-                ? Center(
-                    child: TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
-                      duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
-                      curve: HoronMotion.popInCurve,
-                      builder: (BuildContext context, double scale, Widget? child) =>
-                          Transform.scale(scale: scale, child: child),
-                      child: Container(
+            child: Center(
+              // React는 `animate-pop-in`으로 들어오고 `data-ending-style:animate-scale-out`으로
+              // 나갑니다. AnimatedSwitcher가 두 방향의 시간을 나눠 잡습니다.
+              child: AnimatedSwitcher(
+                duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
+                reverseDuration: reduceMotion ? Duration.zero : HoronMotion.scaleOutDuration,
+                switchInCurve: HoronMotion.popInCurve,
+                switchOutCurve: HoronMotion.scaleOutCurve,
+                transitionBuilder: (Widget child, Animation<double> animation) => FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: Tween<double>(begin: HoronMotion.popInScale, end: 1).animate(animation),
+                    child: child,
+                  ),
+                ),
+                child: selected
+                    ? Container(
+                        key: const ValueKey<String>('horon-radio-dot'),
                         width: metrics.dot,
                         height: metrics.dot,
                         decoration: BoxDecoration(color: colors.interactiveOnPrimary, shape: BoxShape.circle),
-                      ),
-                    ),
-                  )
-                : null,
+                      )
+                    : const SizedBox.shrink(key: ValueKey<String>('horon-radio-empty')),
+              ),
+            ),
           );
 
           final Widget content = Row(

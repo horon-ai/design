@@ -28,19 +28,22 @@ const double _panelRadius = 24;
 /// `max-w-130` — 패널이 더 넓어지지 않는 폭 520입니다.
 const double _panelMaxWidth = 520;
 
-/// `size-4.5` — 머리의 스파클과 완료 표식 18입니다.
+/// `size-4.5` — 머리의 Path 아이콘과 완료 표식 18입니다.
 const double _sparkleSize = 18;
 
-/// `size-1.75` — 라이브 점 7입니다.
-const double _liveDotSize = 7;
+/// `size-1.5` — 라이브 점 6입니다.
+const double _liveDotSize = 6;
 
-/// `size-8` — 일시정지 버튼과 보내기 버튼 32입니다.
+/// `size-8` — 보내기 버튼 32입니다.
 const double _iconButtonSize = 32;
+
+/// `size-7.5` — 일시정지 버튼 30입니다.
+const double _pauseButtonSize = 30;
 
 /// `[&>svg]:size-4` — 일시정지·보내기 아이콘 16입니다.
 const double _iconButtonIconSize = 16;
 
-/// `rounded-[10px]` — 일시정지·보내기 버튼과 쪽지 줄의 반경 10입니다.
+/// `rounded-[10px]` — 쪽지 줄의 반경 10입니다.
 const double _controlRadius = 10;
 
 /// `min-h-6.5` — 단계 한 줄의 최소 높이 26입니다.
@@ -49,17 +52,17 @@ const double _stepRowHeight = 26;
 /// `w-5` — 표식이 서는 왼쪽 열의 폭 20입니다.
 const double _markerColumnWidth = 20;
 
-/// `size-4.25` — 할 일 표식의 지름 17입니다.
-const double _todoMarkerSize = 17;
+/// `size-4.5` — 할 일 표식의 지름 18입니다.
+const double _todoMarkerSize = 18;
 
 /// `size-3` — 완료 체크와 "Now" 번개 12입니다.
 const double _markerIconSize = 12;
 
-/// `top-5.5` — 연결선이 시작하는 위쪽 22입니다.
-const double _connectorTop = 22;
+/// `top-[calc(50%+12.5px)]` — 연결선이 줄 가운데에서 12.5 아래로 시작합니다.
+const double _connectorDrop = 12.5;
 
-/// `h-5` — 연결선의 길이 20입니다.
-const double _connectorHeight = 20;
+/// `bottom-[-18px]` — 연결선이 줄 아래로 18 더 내려가 다음 줄과 만납니다.
+const double _connectorOverhang = 18;
 
 /// `w-px` — 연결선의 두께 1입니다.
 const double _connectorWidth = 1;
@@ -75,9 +78,6 @@ const double _noteRemoveIconSize = 14;
 
 /// `h-11` — 조타 상자의 높이 44입니다.
 const double _steerHeight = 44;
-
-/// `rounded-[14px]` — 조타 상자의 반경 14입니다.
-const double _steerRadius = 14;
 
 /// `border-dashed` — 할 일 표식의 점선 획 3과 틈 2입니다.
 const double _dash = 3;
@@ -222,10 +222,10 @@ class _HoronAgentSteeringPanelState extends State<HoronAgentSteeringPanel> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _buildHeader(context, theme),
-              // `h-px bg-overlay-ink-12`.
-              ColoredBox(color: colors.overlayInk12, child: const SizedBox(height: 1)),
+              // `h-px bg-overlay-ink-8`.
+              ColoredBox(color: colors.overlayInk8, child: const SizedBox(height: 1)),
               _buildSteps(context, theme),
-              ColoredBox(color: colors.overlayInk12, child: const SizedBox(height: 1)),
+              ColoredBox(color: colors.overlayInk8, child: const SizedBox(height: 1)),
               _buildFooter(context, theme),
             ],
           ),
@@ -240,12 +240,12 @@ class _HoronAgentSteeringPanelState extends State<HoronAgentSteeringPanel> {
     final HoronSpaceSpec space = theme.space;
 
     return Padding(
-      // `pt-4 pr-4 pb-3.5 pl-4.5`.
-      padding: EdgeInsets.only(top: space.s4, right: space.s4, bottom: space.s3_5, left: space.step(4.5)),
+      // `px-5 pt-4 pb-3.5`.
+      padding: EdgeInsets.only(top: space.s4, right: space.s5, bottom: space.s3_5, left: space.s5),
       child: Row(
         children: <Widget>[
-          // `Sparkle size-4.5 text-text-primary`.
-          Icon(Icons.auto_awesome, size: _sparkleSize, color: colors.textPrimary),
+          // `Path size-4.5 text-text-primary`.
+          Icon(Icons.route, size: _sparkleSize, color: colors.textPrimary),
           SizedBox(width: space.s2_5),
           Expanded(
             child: Column(
@@ -279,7 +279,10 @@ class _HoronAgentSteeringPanelState extends State<HoronAgentSteeringPanel> {
             Flexible(
               child: Text(
                 status,
-                style: theme.text.bodySm.copyWith(color: colors.textSecondary),
+                style: theme.text.bodySm.copyWith(
+                  color: colors.textSecondary,
+                  fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -298,8 +301,8 @@ class _HoronAgentSteeringPanelState extends State<HoronAgentSteeringPanel> {
     final HoronSpaceSpec space = theme.space;
 
     return Padding(
-      // `px-4.5 py-3`.
-      padding: EdgeInsets.symmetric(horizontal: space.step(4.5), vertical: space.s3),
+      // `px-5 py-3`.
+      padding: EdgeInsets.symmetric(horizontal: space.s5, vertical: space.s3),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         // `gap-3`.
@@ -319,37 +322,49 @@ class _HoronAgentSteeringPanelState extends State<HoronAgentSteeringPanel> {
     final int queued = widget.notes.where((HoronSteeringNote note) => !note.applied).length;
 
     return Padding(
-      // `px-4.5 py-3.5`.
-      padding: EdgeInsets.symmetric(horizontal: space.step(4.5), vertical: space.s3_5),
+      // `px-5 py-3.5`.
+      padding: EdgeInsets.symmetric(horizontal: space.s5, vertical: space.s3_5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         // `gap-2.5`.
         spacing: space.s2_5,
         children: <Widget>[
-          if (widget.notes.isNotEmpty) ...<Widget>[
-            Row(
-              spacing: space.s2,
-              children: <Widget>[
-                Text(
-                  // `uppercase text-caption text-text-secondary`.
-                  'Queued for the next step'.toUpperCase(),
-                  style: theme.text.caption.copyWith(color: colors.textSecondary),
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-                HoronKbd(label: '$queued'),
-              ],
+          // `motion-reveal` — 쪽지가 하나도 없으면 이 묶음이 높이 0으로 접힙니다.
+          HoronReveal(
+            collapsed: widget.notes.isEmpty,
+            child: ExcludeFocus(
+              excluding: widget.notes.isEmpty,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                // `gap-2.5`.
+                spacing: space.s2_5,
+                children: <Widget>[
+                  Row(
+                    spacing: space.s2,
+                    children: <Widget>[
+                      Text(
+                        // `text-caption text-text-secondary`.
+                        'Queued for the next step',
+                        style: theme.text.caption.copyWith(color: colors.textSecondary),
+                        maxLines: 1,
+                        softWrap: false,
+                      ),
+                      HoronKbd(label: '$queued'),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    // `gap-2`.
+                    spacing: space.s2,
+                    children: <Widget>[
+                      for (final HoronSteeringNote note in widget.notes)
+                        _NoteRow(note: note, onApplyNow: widget.onApplyNow, onRemoveNote: widget.onRemoveNote),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              // `gap-2`.
-              spacing: space.s2,
-              children: <Widget>[
-                for (final HoronSteeringNote note in widget.notes)
-                  _NoteRow(note: note, onApplyNow: widget.onApplyNow, onRemoveNote: widget.onRemoveNote),
-              ],
-            ),
-          ],
+          ),
           _buildSteerBox(context, theme),
           _buildHints(theme),
         ],
@@ -364,12 +379,12 @@ class _HoronAgentSteeringPanelState extends State<HoronAgentSteeringPanel> {
 
     return Container(
       height: _steerHeight,
-      // `pr-1.5 pl-3.5`.
-      padding: EdgeInsets.only(right: space.s1_5, left: space.s3_5),
+      // `pr-1.5 pl-4` — 입력 알약은 왼쪽 16에서 시작합니다.
+      padding: EdgeInsets.only(right: space.s1_5, left: space.s4),
       decoration: BoxDecoration(
         // `bg-overlay-ink-5`.
         color: colors.overlayInk5,
-        borderRadius: BorderRadius.circular(_steerRadius),
+        borderRadius: BorderRadius.circular(theme.radius.full),
       ),
       child: Row(
         spacing: space.s2,
@@ -480,8 +495,11 @@ class _StepRow extends StatelessWidget {
                   SizedBox(width: space.s3),
                   Text(
                     time,
-                    // `text-caption text-text-secondary`.
-                    style: theme.text.caption.copyWith(color: colors.textSecondary),
+                    // `text-caption text-text-secondary tabular-nums`.
+                    style: theme.text.caption.copyWith(
+                      color: colors.textSecondary,
+                      fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+                    ),
                     maxLines: 1,
                     softWrap: false,
                   ),
@@ -490,11 +508,13 @@ class _StepRow extends StatelessWidget {
             ),
           ),
           if (showConnector)
+            // `absolute top-[calc(50%+12.5px)] bottom-[-18px] left-2.5 w-px` — 표식
+            // 열 안이 아니라 줄에 붙어, 줄 높이가 늘어도 같은 지점에서 시작합니다.
             Positioned(
-              left: (_markerColumnWidth - _connectorWidth) / 2,
-              top: _connectorTop,
+              left: _markerColumnWidth / 2,
+              top: _stepRowHeight / 2 + _connectorDrop,
+              bottom: -_connectorOverhang,
               width: _connectorWidth,
-              height: _connectorHeight,
               child: ColoredBox(
                 // 끝난 단계에서만 라이브 색, 아니면 10% 잉크.
                 color: step.status == HoronSteeringStepStatus.done ? colors.statusLive : colors.overlayInk10,
@@ -537,7 +557,10 @@ class _StepMarker extends StatelessWidget {
 }
 
 /// `rounded-[10px] bg-overlay-ink-4 py-2 pr-2.5 pl-3.5` 쪽지 한 장입니다.
-class _NoteRow extends StatelessWidget {
+///
+/// 제거를 누르면 130ms `pop-out`으로 줄어든 뒤 콜백을 부르고, 적용되면
+/// `motion-swap`으로 Now/Remove 버튼과 적용 알약이 같은 자리에서 교차합니다.
+class _NoteRow extends StatefulWidget {
   const _NoteRow({required this.note, required this.onApplyNow, required this.onRemoveNote});
 
   final HoronSteeringNote note;
@@ -545,52 +568,125 @@ class _NoteRow extends StatelessWidget {
   final ValueChanged<String>? onRemoveNote;
 
   @override
+  State<_NoteRow> createState() => _NoteRowState();
+}
+
+class _NoteRowState extends State<_NoteRow> with SingleTickerProviderStateMixin {
+  late final AnimationController _leave = AnimationController(vsync: this, duration: HoronMotion.popOutDuration);
+  bool _leaving = false;
+
+  @override
+  void dispose() {
+    _leave.dispose();
+    super.dispose();
+  }
+
+  /// `animate-pop-out` — 130ms 줄어든 뒤 제거를 알립니다.
+  void _remove() {
+    if (_leaving) return;
+    final ValueChanged<String>? onRemove = widget.onRemoveNote;
+    if (onRemove == null) return;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      onRemove(widget.note.id);
+      return;
+    }
+    setState(() => _leaving = true);
+    _leave.forward().whenComplete(() => onRemove(widget.note.id));
+  }
+
+  @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
+    final HoronSteeringNote note = widget.note;
 
-    return _Rise(
-      child: Container(
-        padding: EdgeInsets.only(top: space.s2, right: space.s2_5, bottom: space.s2, left: space.s3_5),
-        decoration: BoxDecoration(
-          // `bg-overlay-ink-4`.
-          color: colors.overlayInk4,
-          borderRadius: BorderRadius.circular(_controlRadius),
-        ),
-        child: Row(
-          spacing: space.s2_5,
-          children: <Widget>[
-            Expanded(
-              child: Text(
-                note.text,
-                // `text-body-sm text-text-primary`.
-                style: theme.text.bodySm.copyWith(color: colors.textPrimary),
-              ),
+    final Widget row = Container(
+      padding: EdgeInsets.only(top: space.s2, right: space.s2_5, bottom: space.s2, left: space.s3_5),
+      decoration: BoxDecoration(
+        // `bg-overlay-ink-4`.
+        color: colors.overlayInk4,
+        borderRadius: BorderRadius.circular(_controlRadius),
+      ),
+      child: Row(
+        spacing: space.s2_5,
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              note.text,
+              // `text-body-sm text-text-primary`.
+              style: theme.text.bodySm.copyWith(color: colors.textPrimary),
             ),
-            if (note.applied)
-              // `h-6.5 rounded-full bg-interactive-primary px-2 text-label-sm` 적용 알약.
-              _PillChip(
-                icon: Icons.bolt,
-                label: 'Now',
-                background: colors.interactivePrimary,
-                foreground: colors.textInverse,
-                popIn: true,
-              )
-            else ...<Widget>[
-              _PillChip(
-                icon: Icons.bolt,
-                label: 'Now',
-                background: colors.overlayInk6,
-                pressedBackground: colors.overlayInk10,
-                foreground: colors.textPrimary,
-                onPressed: onApplyNow == null ? null : () => onApplyNow!(note.id),
-              ),
-              _RemoveButton(onPressed: onRemoveNote == null ? null : () => onRemoveNote!(note.id)),
-            ],
-          ],
+          ),
+          _swap(theme, note),
+        ],
+      ),
+    );
+
+    final Widget animated = _leaving
+        ? AnimatedBuilder(
+            animation: _leave,
+            builder: (BuildContext context, Widget? child) {
+              final double t = HoronMotion.popOutCurve.transform(_leave.value);
+              return Opacity(
+                opacity: 1 - t,
+                child: Transform.scale(scale: 1 - (1 - HoronMotion.popOutScale) * t, child: child),
+              );
+            },
+            child: row,
+          )
+        : row;
+
+    return _Rise(child: animated);
+  }
+
+  /// `motion-swap` — 적용 전 Now/Remove와 적용 후 알약을 같은 자리에서 교차시킵니다.
+  ///
+  /// React는 두 층을 겹쳐 두고 `opacity`·`scale`(0.95)을 150ms에 바꿉니다.
+  /// Flutter는 [AnimatedSwitcher]로 같은 전환을 그립니다.
+  Widget _swap(HoronThemeData theme, HoronSteeringNote note) {
+    final HoronColors colors = theme.colors;
+    final HoronSpaceSpec space = theme.space;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final Duration duration = reduceMotion ? Duration.zero : HoronMotion.colorsDuration;
+
+    final Widget before = Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: space.s2,
+      children: <Widget>[
+        _PillChip(
+          icon: Icons.bolt,
+          label: 'Now',
+          background: colors.overlayInk6,
+          pressedBackground: colors.overlayInk10,
+          foreground: colors.textPrimary,
+          onPressed: widget.onApplyNow == null ? null : () => widget.onApplyNow!(note.id),
+        ),
+        _RemoveButton(onPressed: widget.onRemoveNote == null ? null : _remove),
+      ],
+    );
+
+    // `h-6.5 rounded-full bg-interactive-primary px-2 text-label-sm` 적용 알약.
+    final Widget after = _PillChip(
+      icon: Icons.bolt,
+      label: 'Now',
+      background: colors.interactivePrimary,
+      foreground: colors.textInverse,
+      popIn: true,
+    );
+
+    return AnimatedSwitcher(
+      duration: duration,
+      switchInCurve: HoronMotion.colorsCurve,
+      switchOutCurve: HoronMotion.colorsCurve,
+      transitionBuilder: (Widget child, Animation<double> animation) => FadeTransition(
+        opacity: animation,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: HoronMotion.popupEnterScale, end: 1).animate(animation),
+          child: child,
         ),
       ),
+      child: KeyedSubtree(key: ValueKey<bool>(note.applied), child: note.applied ? after : before),
     );
   }
 }
@@ -777,19 +873,20 @@ class _PauseButtonState extends State<_PauseButton> {
             duration: reduceMotion ? Duration.zero : HoronMotion.pressDuration,
             curve: HoronMotion.pressCurve,
             child: AnimatedContainer(
-              width: _iconButtonSize,
-              height: _iconButtonSize,
+              width: _pauseButtonSize,
+              height: _pauseButtonSize,
               duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
               curve: HoronMotion.colorsCurve,
               decoration: BoxDecoration(
                 // `bg-overlay-ink-6`, `hover:bg-overlay-ink-10`.
                 color: _pressed || _hovered ? colors.overlayInk10 : colors.overlayInk6,
-                borderRadius: BorderRadius.circular(_controlRadius),
+                borderRadius: BorderRadius.circular(theme.radius.full),
               ),
-              child: Icon(
-                widget.paused ? Icons.play_arrow : Icons.pause,
-                size: _iconButtonIconSize,
-                color: colors.textPrimary,
+              // `motion-swap` — 재생과 정지가 같은 칸에서 150ms로 교차합니다.
+              child: HoronSwap(
+                hidden: widget.paused,
+                hiddenChild: Icon(Icons.play_arrow, size: _iconButtonIconSize, color: colors.textPrimary),
+                child: Icon(Icons.pause, size: _iconButtonIconSize, color: colors.textPrimary),
               ),
             ),
           ),
@@ -799,7 +896,7 @@ class _PauseButtonState extends State<_PauseButton> {
   }
 }
 
-/// `size-8 rounded-[10px] bg-interactive-primary` 보내기 버튼입니다.
+/// `size-8 rounded-full bg-interactive-primary` 보내기 버튼입니다.
 class _SendButton extends StatefulWidget {
   const _SendButton({this.onPressed});
 
@@ -838,7 +935,7 @@ class _SendButtonState extends State<_SendButton> {
             decoration: BoxDecoration(
               // `bg-interactive-primary text-text-inverse`.
               color: _pressed ? colors.interactivePrimaryPressed : colors.interactivePrimary,
-              borderRadius: BorderRadius.circular(_controlRadius),
+              borderRadius: BorderRadius.circular(theme.radius.full),
             ),
             child: Icon(Icons.arrow_upward, size: _iconButtonIconSize, color: colors.textInverse),
           ),
@@ -848,7 +945,7 @@ class _SendButtonState extends State<_SendButton> {
   }
 }
 
-/// `size-1.75 animate-live-pulse bg-status-live` 라이브 점입니다.
+/// `size-1.5 animate-live-pulse bg-status-live` 라이브 점입니다.
 ///
 /// 웹의 `live-pulse`는 무한 반복이지만, 끝없이 프레임을 예약하는 애니메이션은
 /// 갤러리 스윕의 `pumpAndSettle`을 끝나지 않게 만듭니다. 그래서 Flutter 판은 진입할 때

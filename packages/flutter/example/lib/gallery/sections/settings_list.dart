@@ -6,7 +6,7 @@ import '../surface_group.dart';
 /// `settings_list`의 갤러리 섹션입니다.
 ///
 /// 스위치·키캡·아이콘 타일이 붙은 설정 목록을 solid와 glass 두 표면에 같은
-/// 목록으로 보여 줍니다.
+/// 목록으로 보여 줍니다. 키캡은 `bg-subtle` 바탕에 글자를 트림해 26px 상자에 맞춥니다.
 class HoronSettingsListGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronSettingsListGallerySection({super.key});

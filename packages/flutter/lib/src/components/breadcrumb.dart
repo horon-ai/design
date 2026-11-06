@@ -62,13 +62,7 @@ class HoronBreadcrumb extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               spacing: space.s1_5, // `li`의 `gap-1.5`
               children: <Widget>[
-                if (index > 0)
-                  Icon(
-                    Icons.chevron_right,
-                    // `size-3.5` = 14.
-                    size: space.s3_5,
-                    color: colors.textSecondary,
-                  ),
+                if (index > 0) const _Caret(),
                 Flexible(child: children[index]),
               ],
             ),
@@ -130,10 +124,10 @@ class HoronBreadcrumbItem extends StatelessWidget {
         return AnimatedDefaultTextStyle(
           duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,
           curve: HoronMotion.colorsCurve,
-          style: theme.text.labelMd.copyWith(color: foreground),
+          style: theme.text.labelMd.copyWith(color: foreground, decoration: TextDecoration.none),
           child: Padding(
-            // `py-1 pr-2 pl-1.5`입니다.
-            padding: EdgeInsets.only(top: space.s1, bottom: space.s1, right: space.s2, left: space.s1_5),
+            // `py-1 pr-1.5 pl-1.5`입니다. 오른쪽 여백은 React가 `pr-2`에서 6px로 줄인 값입니다.
+            padding: EdgeInsets.only(top: space.s1, bottom: space.s1, right: space.s1_5, left: space.s1_5),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               spacing: space.s1_5, // gap-1.5
@@ -151,6 +145,25 @@ class HoronBreadcrumbItem extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// `size-3.5 shrink-0` — 조각 사이 구분 캐럿입니다.
+///
+/// React는 캐럿을 `li`와 SVG 양쪽에 `shrink-0`으로 묶어 좁은 폭에서도 줄어들지
+/// 않게 합니다. Flutter 판도 [Flexible] 밖에 두고 고정 크기로 그려 같은 결과를 냅니다.
+class _Caret extends StatelessWidget {
+  const _Caret();
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    return Icon(
+      Icons.chevron_right,
+      // `size-3.5` = 14.
+      size: theme.space.s3_5,
+      color: theme.colors.textSecondary,
     );
   }
 }

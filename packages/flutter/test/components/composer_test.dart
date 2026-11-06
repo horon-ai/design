@@ -4,7 +4,7 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// 메시지 입력 알약의 계약을 확인합니다.
 ///
-/// React `composer.tsx`: regular 유리 알약(여백 8, 간격 8)에 40px 첨부 버튼, 입력칸, 그리고
+/// React `composer.tsx`: veil-field 알약(여백 8, 간격 8)에 40px 첨부 버튼, 입력칸, 그리고
 /// 글이 없으면 음성 버튼, 있으면 잉크색 전송 버튼이 들어갑니다.
 Widget _host(Brightness brightness, Widget child, {double width = 600}) {
   return MaterialApp(
@@ -23,8 +23,17 @@ Widget _host(Brightness brightness, Widget child, {double width = 600}) {
   );
 }
 
-Key? _visibleButtonKey(WidgetTester tester) =>
-    tester.widget<AnimatedSwitcher>(find.byType(AnimatedSwitcher)).child?.key;
+Key? _visibleButtonKey(WidgetTester tester) => _liveIcon(tester, Icons.arrow_upward)
+    ? const ValueKey<String>('horon-composer-send')
+    : const ValueKey<String>('horon-composer-voice');
+
+/// [icon]을 그린 버튼이 지금 눌리는지 여부입니다. `HoronSwap`은 숨은 쪽을
+/// `IgnorePointer`로 감싸 두므로(React `inert`), 가장 가까운 `IgnorePointer`의
+/// `ignoring`으로 지금 보이는 쪽을 가릅니다.
+bool _liveIcon(WidgetTester tester, IconData icon) {
+  final Finder ignore = find.ancestor(of: find.byIcon(icon), matching: find.byType(IgnorePointer)).first;
+  return !tester.widget<IgnorePointer>(ignore).ignoring;
+}
 
 void main() {
   final HoronColors colors = HoronThemeData.light.colors;
@@ -36,23 +45,24 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.byIcon(Icons.add), findsOneWidget);
       expect(find.byIcon(Icons.mic_none), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_upward), findsNothing);
+      // React `motion-swap`은 두 버튼을 모두 트리에 두고 숨은 쪽만 막습니다.
+      expect(_liveIcon(tester, Icons.mic_none), isTrue);
+      expect(_liveIcon(tester, Icons.arrow_upward), isFalse);
     }
   });
 
-  testWidgets('알약은 regular 유리, 56 높이, 20px 아이콘을 쓴다', (WidgetTester tester) async {
+  testWidgets('알약은 veil-field, 56 높이, 20px 아이콘을 쓴다', (WidgetTester tester) async {
     await tester.pumpWidget(_host(Brightness.light, const HoronComposer(surface: HoronComposerSurface.glass)));
 
     expect(tester.getSize(find.byKey(const Key('horon-composer'))).height, space.s2 + 40 + space.s2);
-    // 바탕은 유리 엔진이 그립니다. React `composer.tsx`의 `<LiquidGlass tier="regular" />`와
-    // 같은 순서로, 알약 전체가 하나의 regular 유리 표면입니다.
-    final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
-    expect(find.byType(HoronLiquidGlass), findsOneWidget, reason: '알약이 유리 표면을 깝니다');
-    expect(glass.tier, HoronGlassTier.regular);
+    // React `composer.tsx`의 `veil-field`와 같은 재료를 씁니다. 액체 유리를 겹치지 않습니다.
+    expect(find.byType(HoronLiquidGlass), findsNothing);
+    final HoronVeil veil = tester.widget<HoronVeil>(find.byType(HoronVeil));
+    expect(veil.kind, HoronVeilKind.field);
 
     final Icon attach = tester.widget<Icon>(find.byIcon(Icons.add));
     expect(attach.size, 20);
-    expect(attach.color, colors.textPrimary);
+    expect(attach.color, colors.textSecondary); // Plus className="text-text-secondary"
     final Icon voice = tester.widget<Icon>(find.byIcon(Icons.mic_none));
     expect(voice.size, 20);
     expect(voice.color, colors.textSecondary);
@@ -67,6 +77,27 @@ void main() {
     expect(field.decoration!.hintText, 'Message to bot');
     expect(field.decoration!.hintStyle!.fontSize, 16);
     expect(field.decoration!.hintStyle!.color, colors.textPlaceholder);
+  });
+
+  testWidgets('입력칸이 포커스를 받으면 solid 알약 테두리가 border-strong이 된다', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(Brightness.light, const HoronComposer()));
+
+    BoxDecoration surface() =>
+        tester
+                .widget<AnimatedContainer>(
+                  find
+                      .descendant(of: find.byKey(const Key('horon-composer')), matching: find.byType(AnimatedContainer))
+                      .first,
+                )
+                .decoration!
+            as BoxDecoration;
+
+    expect((surface().border! as Border).top.color, colors.borderDefault);
+
+    // has-[input:focus-visible]:border-border-strong
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    expect((surface().border! as Border).top.color, colors.borderStrong);
   });
 
   testWidgets('글이 생기면 음성 버튼이 전송 버튼으로 바뀐다', (WidgetTester tester) async {
@@ -134,6 +165,7 @@ void main() {
     await tester.pumpWidget(_host(Brightness.light, HoronComposer(disabled: true, onAttach: () => attaches++)));
 
     expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
+    expect(tester.widget<TextField>(find.byType(TextField)).style!.color, colors.textDisabled);
     final Opacity opacity = tester.widget<Opacity>(
       find.ancestor(of: find.byIcon(Icons.add), matching: find.byType(Opacity)).first,
     );

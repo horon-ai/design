@@ -7,6 +7,7 @@
 import type { Localized } from "@/i18n";
 import { componentGroups, components } from "@/data/components";
 import { foundationsNav, primaryNav } from "@/data/nav";
+import { siteHref } from "@/lib/urls";
 
 export interface SearchEntry {
   title: Localized;
@@ -23,17 +24,17 @@ const docPages = primaryNav.filter(
 export const searchIndex: SearchEntry[] = [
   ...components.map((component) => ({
     title: component.title,
-    href: `/components/${component.slug}`,
+    href: siteHref(`/components/${component.slug}`),
     group: groupTitles.get(component.group) ?? { ko: "", en: "" },
   })),
   ...foundationsNav.map((item) => ({
     title: item.label,
-    href: item.href,
+    href: siteHref(item.href),
     group: { ko: "Foundations", en: "Foundations" },
   })),
   ...docPages.map((item) => ({
     title: item.label,
-    href: item.href,
+    href: siteHref(item.href),
     group: { ko: "Docs", en: "Docs" },
   })),
 ];

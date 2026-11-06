@@ -7,7 +7,8 @@ import 'package:horon_ui/horon_ui.dart';
 ///
 /// 변형 어휘가 상태 색뿐이므로 상태를 늘어놓습니다. 태그와 메타가 있는 기본형, 브랜드
 /// 태그와 두 액션이 있는 행, 설명이 없는 최소형, 경고·중립 상태 색, 그리고 폭이 좁을
-/// 때 액션이 아래로 내려가는 모습입니다.
+/// 때 액션이 아래로 내려가는 모습입니다. 상태 알약은 톤별 6px 점을 함께 그리고,
+/// 이름이 한 줄 폭을 넘으면 말줄임하며, 메타는 보조 색입니다.
 class HoronMcpServerRowGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronMcpServerRowGallerySection({super.key});

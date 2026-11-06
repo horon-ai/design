@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -108,12 +109,77 @@ void main() {
       expect(sky.grainAnim, 0);
       expect(sky.dither, 1.1);
       expect(sky.vignette, 0.26);
-      expect(sky.cursor, 1);
+      expect(sky.cursor, 0);
       expect(sky.pointerRadius, 0.84);
       expect(sky.draft, 1.85);
       expect(sky.pointerStrength, 0.16);
       expect(sky.parallax, 0.028);
       expect(sky.maxDpr, 1);
+    });
+
+    test('mirrors FLUE_NIGHT field for field', () {
+      const HoronFlueConfig night = HoronFlueConfig.night;
+      expect(night.bgColor, const Color(0xFF050608));
+      expect(night.colorA, const Color(0xFF07090D));
+      expect(night.colorB, const Color(0xFF0C1A2C));
+      expect(night.colorC, const Color(0xFF1F4A78));
+      expect(night.colorD, const Color(0xFF4F8FD0));
+      expect(night.glow, 0.35);
+      // 나머지 값은 하늘 팔레트와 같습니다.
+      expect(night.speed, HoronFlueConfig.sky.speed);
+      expect(night.cursor, 0);
+    });
+
+    test('resolve picks the night palette in dark and the sky palette in light', () {
+      expect(HoronFlueConfig.resolve(brightness: Brightness.light), HoronFlueConfig.sky);
+      expect(HoronFlueConfig.resolve(brightness: Brightness.dark), HoronFlueConfig.night);
+    });
+
+    test('resolve applies the sidebar tuning per brightness', () {
+      const HoronFlueVariant variant = HoronFlueVariant.sidebar;
+      final HoronFlueConfig light = HoronFlueConfig.resolve(brightness: Brightness.light, variant: variant);
+      expect(light.speed, 0.22);
+      expect(light.smokeScale, 1.9);
+      expect(light.density, 1.85);
+      expect(light.contrast, 1.45);
+      expect(light.midpoint, 0.8);
+      expect(light.glow, 0.3);
+      expect(light.vignette, 0);
+
+      final HoronFlueConfig dark = HoronFlueConfig.resolve(brightness: Brightness.dark, variant: variant);
+      expect(dark.contrast, 1.5);
+      expect(dark.glow, 0.22);
+      expect(dark.vignette, 0);
+      expect(dark.bgColor, const Color(0xFF050608));
+    });
+
+    test('resolve applies the auth tuning per brightness', () {
+      const HoronFlueVariant variant = HoronFlueVariant.auth;
+      final HoronFlueConfig light = HoronFlueConfig.resolve(brightness: Brightness.light, variant: variant);
+      expect(light.width, 1.9);
+      expect(light.spread, 1.3);
+      // dev React `8354345`의 auth 라이트 튜닝입니다. 셰이더 비네트는 검정으로 어두워지므로
+      // 라이트는 비네트 없이 옅은 하늘을 지킵니다.
+      expect(light.density, 1.85);
+      expect(light.midpoint, 0.8);
+      expect(light.glow, 0.3);
+      expect(light.vignette, 0);
+
+      final HoronFlueConfig dark = HoronFlueConfig.resolve(brightness: Brightness.dark, variant: variant);
+      expect(dark.midpoint, 0.76);
+      expect(dark.vignette, 0.45);
+      expect(dark.glow, 0.45);
+    });
+
+    test('a caller config wins over the variant tuning', () {
+      const HoronFlueConfig config = HoronFlueConfig(glow: 0.9);
+      final HoronFlueConfig resolved = HoronFlueConfig.resolve(
+        brightness: Brightness.dark,
+        variant: HoronFlueVariant.auth,
+        config: config,
+      );
+      expect(resolved.glow, 0.9);
+      expect(resolved.bgColor, HoronFlueConfig.sky.bgColor);
     });
   });
 
@@ -184,6 +250,22 @@ void main() {
       expect(frame.mouseWake, Offset.zero);
     });
 
+    test('aimVirtual wanders on two sines and scales with the aspect ratio', () {
+      final HoronFlueDamping damping = HoronFlueDamping();
+      damping.aimVirtual(hostSize);
+      expect(damping.targetX, closeTo(1.6 * 0.12 * math.sin(0.8), 1e-12));
+      expect(damping.targetY, closeTo(0.22 * math.sin(1.3), 1e-12));
+
+      final HoronFlueDamping later = HoronFlueDamping()..advance(1000);
+      later.aimVirtual(hostSize);
+      expect(later.targetX, isNot(closeTo(0, 1e-6)));
+      // 세로 성분은 가로 비율과 무관합니다.
+      expect(
+        later.targetY,
+        closeTo(0.22 * math.sin(later.time * 0.19 + 1.3) + 0.08 * math.sin(later.time * 0.41), 1e-12),
+      );
+    });
+
     test('the three layers converge on the target', () {
       final HoronFlueDamping damping = HoronFlueDamping()..aim(localPosition: const Offset(320, 0), size: hostSize);
       for (int i = 0; i < 400; i++) {
@@ -223,7 +305,9 @@ void main() {
       await drain(tester);
     });
 
-    testWidgets('the auth variant widens the plume on the base palette', (WidgetTester tester) async {
+    testWidgets('the auth variant widens the plume and keeps the light sky free of the vignette', (
+      WidgetTester tester,
+    ) async {
       await pumpFlue(tester, variant: HoronFlueVariant.auth);
       final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
       final HoronFlueConfig config = state.resolvedConfig;
@@ -263,6 +347,8 @@ void main() {
 
   group('HoronFlueBackground', () {
     testWidgets('without a shader it paints the flat bgColor and the tint', (WidgetTester tester) async {
+      // 엔진이 셰이더를 거부한 경우입니다. 테스트 환경은 셰이더를 실을 수 있으므로 직접 막습니다.
+      HoronShaderProbe.loadProgram = (String asset) async => null;
       await pumpFlue(tester);
 
       final HoronThemeData horon = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
@@ -274,10 +360,54 @@ void main() {
         find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == horon.colors.glassRegular),
         findsOneWidget,
       );
-      // 셰이더 캔버스는 없습니다(테스트 환경은 Impeller가 없습니다).
+      // 셰이더가 없으면 캔버스를 붙이지 않습니다.
       expect(find.byKey(horonFlueCanvasKey), findsNothing);
       expect(tester.takeException(), isNull);
 
+      await drain(tester);
+    });
+
+    testWidgets('cursor 0 attaches no pointer listener', (WidgetTester tester) async {
+      await pumpFlue(tester);
+      expect(find.descendant(of: find.byType(HoronFlueBackground), matching: find.byType(Listener)), findsNothing);
+      await drain(tester);
+
+      await pumpFlue(tester, config: HoronFlueConfig.sky.copyWith(cursor: 1));
+      expect(find.descendant(of: find.byType(HoronFlueBackground), matching: find.byType(Listener)), findsOneWidget);
+      await drain(tester);
+    });
+
+    testWidgets('dark theme paints the night bgColor', (WidgetTester tester) async {
+      await pumpFlue(tester, brightness: Brightness.dark);
+      expect(
+        find.byWidgetPredicate(
+          (Widget widget) => widget is ColoredBox && widget.color == HoronFlueConfig.night.bgColor,
+        ),
+        findsOneWidget,
+      );
+      await drain(tester);
+    });
+
+    testWidgets('sidebar and auth lay no tint of their own', (WidgetTester tester) async {
+      for (final HoronFlueVariant variant in <HoronFlueVariant>[HoronFlueVariant.sidebar, HoronFlueVariant.auth]) {
+        await pumpFlue(tester, variant: variant);
+        final HoronThemeData horon = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
+        expect(
+          find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == horon.colors.glassRegular),
+          findsNothing,
+          reason: variant.name,
+        );
+        await drain(tester);
+      }
+    });
+
+    testWidgets('dark theme lays no glass-regular tint over the night palette', (WidgetTester tester) async {
+      await pumpFlue(tester, brightness: Brightness.dark);
+      final HoronThemeData horon = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
+      expect(
+        find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == horon.colors.glassRegular),
+        findsNothing,
+      );
       await drain(tester);
     });
 
@@ -312,6 +442,41 @@ void main() {
       await drain(tester);
     });
 
+    testWidgets('reduced motion switched on while running freezes the frame and resumes the clock', (
+      WidgetTester tester,
+    ) async {
+      await pumpFlue(tester);
+      final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
+      expect(state.ticker.isActive, isTrue);
+
+      await tester.pump(const Duration(milliseconds: 32));
+      final double running = state.frame.time;
+      expect(running, greaterThan(0));
+
+      // React는 열려 있는 동안 켜진 모션 축소에 `cancelAnimationFrame`만 하고 시계를 12로
+      // 되돌리지 않습니다. Flutter도 같은 자리에서 멈춰야 합니다. 축소로 다시 `pumpWidget`
+      // 하는 프레임에서 티커가 한 번 더 진행하므로(0.032 → 0.036167) 비교 기준은 32ms에서
+      // 읽은 값이 아니라 실제로 멈춘 프레임입니다.
+      await pumpFlue(tester, animations: false);
+      expect(state.ticker.isActive, isFalse);
+      final double frozen = state.frame.time;
+      expect(frozen, greaterThanOrEqualTo(running), reason: '켜지는 순간의 프레임에서 멈춥니다');
+      // 감쇠는 한 프레임을 50ms로 자르므로, 다시 그리는 프레임에서 늘어날 수 있는 최대가 한 프레임입니다.
+      expect(frozen, lessThan(running + 0.05), reason: '멈추기 전에 한 프레임 넘게 진행하지 않습니다');
+      expect(frozen, lessThan(12), reason: '정지 시계 12초로 되돌리지 않습니다');
+      expect(state.frame.time, frozen, reason: '켜지는 순간의 프레임에서 멈춥니다');
+
+      await tester.pump(const Duration(milliseconds: 32));
+      expect(state.frame.time, frozen, reason: '켜지는 순간의 프레임에서 멈춥니다');
+
+      await pumpFlue(tester);
+      expect(state.ticker.isActive, isTrue);
+      await tester.pump(const Duration(milliseconds: 32));
+      expect(state.frame.time, greaterThan(frozen), reason: '같은 시계에서 이어 갑니다');
+
+      await drain(tester);
+    });
+
     testWidgets('a paused app stops the ticker and resuming starts it again', (WidgetTester tester) async {
       await pumpFlue(tester);
       final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
@@ -329,7 +494,9 @@ void main() {
     });
 
     testWidgets('pointer steering aims the damping at the normalized position', (WidgetTester tester) async {
-      await pumpFlue(tester);
+      // React의 `FLUE_SKY.cursor`는 0이라 기본값은 포인터를 받지 않습니다. 여기서는
+      // 정규화 식만 검증하려고 `cursor`를 켠 설정을 넣습니다.
+      await pumpFlue(tester, config: HoronFlueConfig.sky.copyWith(cursor: 1));
       final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
       final Rect rect = tester.getRect(find.byType(HoronFlueBackground));
 

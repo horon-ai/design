@@ -153,6 +153,9 @@ void main() {
       ),
     );
 
+    // `size="sm"` 입력입니다. 32px 상자를 따로 두지 않습니다.
+    expect(tester.widget<HoronInput>(find.byType(HoronInput)).size, HoronInputSize.sm);
+
     await tester.enterText(find.byType(TextField), 'ALP');
     await tester.pumpAndSettle();
     expect(controller.query, 'ALP');
@@ -327,6 +330,10 @@ void main() {
         .toList();
     expect((tags[0].decoration! as BoxDecoration).color, theme.colors.bgBrand);
     expect((tags[1].decoration! as BoxDecoration).color, theme.colors.bgSubtle);
+    // `h-6.5 items-center` — 세로 여백 대신 26 고정 높이입니다.
+    expect(tags[0].constraints?.maxHeight, theme.space.step(6.5));
+    expect(tags[0].alignment, Alignment.center);
+    expect(tags[0].padding, EdgeInsets.symmetric(horizontal: theme.space.s2_5));
 
     expect(find.text('Add row'), findsOneWidget);
     expect(find.byIcon(Icons.add), findsOneWidget);
@@ -360,7 +367,7 @@ void main() {
       find.descendant(of: find.byType(HoronDataTableRow).first, matching: find.byType(AnimatedContainer)).first,
     );
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronDataTableRow).first));
-    expect((row.decoration! as BoxDecoration).color, theme.colors.overlayInk3);
+    expect((row.decoration! as BoxDecoration).color, theme.colors.overlayInk4, reason: 'hover:bg-overlay-ink-4');
   });
 
   testWidgets('data_table: the whole table renders in both brightnesses', (WidgetTester tester) async {

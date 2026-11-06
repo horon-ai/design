@@ -33,6 +33,25 @@ const double _resizeLineWidth = 2;
 /// `border-r` — 사이드바 오른쪽 테두리 1px입니다.
 const double _hairline = 1;
 
+/// `transition-[width] duration-200 ease-out-quint` — 폭 전이 200ms입니다.
+///
+/// React는 `resizable`일 때 폭을 전이하고, 끄는 동안에는 `data-resizing`으로
+/// 전이를 끕니다(포인터를 1:1로 따라가야 하므로).
+const Duration _widthDuration = Duration(milliseconds: 200);
+
+/// `after:min-h-11 after:min-w-11` — 터치 영역 44px입니다.
+///
+/// React는 `::after`로 보이는 상자 밖까지 히트 영역을 넓힙니다. 다만 헤더 행이
+/// `h-9`(36)이고 사이드바 `nav`가 `overflow-clip`이라 세로로는 36px까지만 닿습니다.
+/// Flutter 판은 행 높이를 넘지 않는 상자로 같은 히트 영역을 냅니다.
+const double _minTapTarget = 44;
+
+/// 프로젝트 행 "더 보기"의 히트 영역이 보이는 16px 상자 밖으로 나가는 폭입니다.
+///
+/// React는 `after:min-w-11`로 좌우 14px씩 넓히므로, 44px 상자를 14px 왼쪽으로
+/// 옮겨야 보이는 아이콘이 `right-2.5` 자리에 그대로 남습니다.
+const double _projectMoreHitInset = (_minTapTarget - 16) / 2;
+
 /// `rounded-[10px]` — 워크스페이스 스위치·계정 아바타·추가 버튼의 10px 반경입니다.
 const double _radius10 = 10;
 
@@ -88,12 +107,12 @@ const double _dashStroke = 1;
 /// `md` 폭 이상일 때만 트리에 있습니다.
 const Key horonSidebarResizeHandleKey = Key('horon-sidebar-resize-handle');
 
-/// 사이드바 바탕의 세 가지입니다.
+/// 사이드바 바탕의 네 가지입니다.
 ///
-/// React는 `surface: "glass" | "photo"`를 인라인 유니온으로 선언합니다. 이름 붙은
-/// 유니온이 아니라서 variant 게이트가 읽지 않으므로, 이 포트는 공개 enum 대신
-/// 이름 있는 생성자([HoronSidebar.photo], [HoronSidebar.flue])로 같은 선택을 엽니다.
-/// `glass`·`photo`·`flue` 중 `flue`만 Flutter 쪽 추가입니다.
+/// React는 `surface: "glass" | "photo" | "plain"`을 인라인 유니온으로 선언합니다. 이름
+/// 붙은 유니온이 아니라서 variant 게이트가 읽지 않으므로, 이 포트는 공개 enum 대신
+/// 이름 있는 생성자([HoronSidebar.photo], [HoronSidebar.plain], [HoronSidebar.flue])로
+/// 같은 선택을 엽니다. `glass`·`photo`·`plain`·`flue` 중 `flue`만 Flutter 쪽 추가입니다.
 enum _SidebarSurface {
   /// `surface="glass"`, 기본값입니다. 두꺼운 유리 한 겹입니다.
   glass,
@@ -101,16 +120,20 @@ enum _SidebarSurface {
   /// `surface="photo"` — 라이트에서는 Paper 사진 바탕, 다크에서는 두꺼운 유리입니다.
   photo,
 
+  /// `surface="plain"` — 채움도 유리도 없이 뒤 레이아웃의 색을 그대로 쓰고, 오른쪽
+  /// 1px `border-default`로만 경계를 긋습니다.
+  plain,
+
   /// Flutter 전용 — Flue 배경 위에 보통 유리를 얹습니다.
   flue,
 }
 
 /// Figma `Sidebar`(88:848)입니다.
 ///
-/// 280px 두께 유리 기둥에 오른쪽 1px 테두리, 위 16 / 좌우 12 / 아래 12 여백,
-/// 자식 사이 2px 간격을 둡니다. [resizable]이면 오른쪽 가장자리의 8px 손잡이로
-/// 폭을 [minWidth]와 [maxWidth] 사이에서 끕니다. 손잡이는 `md`(768) 폭 이상에서만
-/// 보이고, 그 아래에서는 사이드바가 280 고정입니다.
+/// 280px 기둥에 위 16 / 좌우 12 / 아래 12 여백, 자식 사이 2px 간격을 둡니다.
+/// [resizable]이면 오른쪽 가장자리의 8px 손잡이로 폭을 [minWidth]와 [maxWidth]
+/// 사이에서 끕니다. 손잡이는 `md`(768) 폭 이상에서만 보이고, 그 아래에서는 사이드바가
+/// 280 고정입니다.
 ///
 /// 자식은 [HoronSidebarHeader], [HoronSidebarGroup], [HoronSidebarProject],
 /// [HoronSidebarItem], [HoronSidebarSpacer], [HoronSidebarAddButton],
@@ -142,6 +165,19 @@ class HoronSidebar extends StatefulWidget {
     this.onWidthChange,
     this.resizeLabel = 'Resize sidebar',
   }) : _surface = _SidebarSurface.photo;
+
+  /// `surface="plain"` — 채움과 유리 없이 뒤 레이아웃의 색을 쓰고, 오른쪽 1px
+  /// `border-default`로만 경계를 긋습니다.
+  const HoronSidebar.plain({
+    super.key,
+    required this.children,
+    this.resizable = false,
+    this.defaultWidth = _sidebarWidth,
+    this.minWidth = _sidebarMinWidth,
+    this.maxWidth = _sidebarMaxWidth,
+    this.onWidthChange,
+    this.resizeLabel = 'Resize sidebar',
+  }) : _surface = _SidebarSurface.plain;
 
   /// Flutter 전용 `surface="flue"` — [HoronFlueBackground] 위에 보통 유리를 얹습니다.
   const HoronSidebar.flue({
@@ -252,15 +288,25 @@ class _HoronSidebarState extends State<HoronSidebar> {
         final double available = constraints.hasBoundedWidth ? constraints.maxWidth : MediaQuery.sizeOf(context).width;
         final bool showHandle = widget.resizable && available >= theme.breakpoints.md;
         final double width = showHandle ? _width : _sidebarWidth;
+        // `transition-[width] duration-200 data-resizing:transition-none`입니다. 끄는
+        // 동안에는 전이를 끄고, 키보드·더블 탭처럼 값이 뛰는 경우에만 미끄러집니다.
+        final bool animateWidth = widget.resizable && !_dragging;
 
-        return SizedBox(
-          width: width,
+        return TweenAnimationBuilder<double>(
+          tween: Tween<double>(end: width),
+          duration: animateWidth && !MediaQuery.disableAnimationsOf(context) ? _widthDuration : Duration.zero,
+          curve: HoronMotion.easeOutQuint,
+          builder: (BuildContext context, double animatedWidth, Widget? child) =>
+              SizedBox(width: animatedWidth, child: child),
           child: DecoratedBox(
-            // border-r border-border-default
+            // `surface="plain"`만 `border-r border-border-default`를 얻습니다. glass와
+            // photo는 테두리 없이 유리나 사진 바탕이 경계를 만듭니다.
             decoration: BoxDecoration(
-              border: Border(
-                right: BorderSide(color: colors.borderDefault, width: _hairline),
-              ),
+              border: widget._surface == _SidebarSurface.plain
+                  ? Border(
+                      right: BorderSide(color: colors.borderDefault, width: _hairline),
+                    )
+                  : null,
             ),
             child: Stack(
               fit: StackFit.passthrough,
@@ -290,18 +336,25 @@ class _HoronSidebarState extends State<HoronSidebar> {
   /// 바탕 레이어입니다. React처럼 내용 뒤에 깔고, 내용은 그 위에 그립니다.
   List<Widget> _background(HoronThemeData theme) {
     final bool dark = theme.brightness == Brightness.dark;
+    final HoronColors colors = theme.colors;
     switch (widget._surface) {
       case _SidebarSurface.glass:
         return <Widget>[_glass(theme, HoronGlassTier.thick)];
       case _SidebarSurface.photo:
-        // `bg-sidebar-photo dark:bg-glass-thick dark:bg-none` — 다크에서는 두꺼운 유리만 남습니다.
-        if (dark) return <Widget>[_glass(theme, HoronGlassTier.thick)];
+        // `bg-sidebar-photo dark:bg-glass-thick dark:bg-none` — 다크에서는 사진이 빠지고
+        // 두꺼운 유리 **색**만 남습니다. React도 이 자리에 LiquidGlass 레이어를 두지 않습니다.
+        if (dark) {
+          return <Widget>[Positioned.fill(child: ColoredBox(color: colors.glassThick))];
+        }
         return <Widget>[
           const Positioned.fill(child: ColoredBox(color: HoronPalette.sky50)),
           Positioned.fill(
             child: ColoredBox(color: HoronPalette.baseWhite.withValues(alpha: _photoVeil)),
           ),
         ];
+      case _SidebarSurface.plain:
+        // 채움도 유리도 없이 뒤 레이아웃의 색이 그대로 비칩니다.
+        return const <Widget>[];
       case _SidebarSurface.flue:
         return <Widget>[
           // 유리 겹이 이미 glass-regular 색조를 얹으므로 Flue 자체 색조는 끕니다.
@@ -506,7 +559,8 @@ class _HoronSidebarWorkspaceSwitchState extends State<HoronSidebarWorkspaceSwitc
 /// Figma 사이드바 머리입니다.
 ///
 /// 워크스페이스 전환 버튼과, [onCollapse]가 있을 때만 보이는 28px 접기 버튼을
-/// 한 줄(36px)에 두고 아래로 10px 띄웁니다.
+/// 한 줄(36px)에 두고 아래로 10px 띄웁니다. 접기 버튼은 React처럼 보이는 상자
+/// 28px 밖으로 히트 영역을 넓히고, hover는 6% 잉크, 누르면 10% 잉크를 씁니다.
 class HoronSidebarHeader extends StatelessWidget {
   /// 머리를 만듭니다.
   const HoronSidebarHeader({
@@ -536,7 +590,6 @@ class HoronSidebarHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
 
     return Padding(
@@ -545,47 +598,117 @@ class HoronSidebarHeader extends StatelessWidget {
       child: SizedBox(
         // h-9
         height: space.step(9),
-        child: Row(
-          // gap-1.5
-          spacing: space.s1_5,
+        // React의 `::after`는 레이아웃을 차지하지 않고 보이는 상자 양옆으로 8px씩
+        // 넓어집니다. 그래서 전환 버튼은 28px 자리를 그대로 예약하고, 접기 버튼의
+        // 히트 영역만 `Positioned`로 겹쳐 놓습니다.
+        child: Stack(
           children: <Widget>[
-            Expanded(
-              child: switchSlot ?? HoronSidebarWorkspaceSwitch(initial: initial, name: name),
+            Row(
+              // gap-1.5
+              spacing: space.s1_5,
+              children: <Widget>[
+                Expanded(
+                  child: switchSlot ?? HoronSidebarWorkspaceSwitch(initial: initial, name: name),
+                ),
+                if (onCollapse != null) SizedBox(width: space.step(7)),
+              ],
             ),
             if (onCollapse != null)
-              SizedBox(
-                // size-7
-                width: space.step(7),
-                height: space.step(7),
-                child: FocusableActionDetector(
-                  mouseCursor: SystemMouseCursors.click,
-                  shortcuts: const <ShortcutActivator, Intent>{
-                    SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-                  },
-                  actions: <Type, Action<Intent>>{
-                    ActivateIntent: CallbackAction<ActivateIntent>(
-                      onInvoke: (ActivateIntent intent) {
-                        onCollapse!.call();
-                        return null;
-                      },
-                    ),
-                  },
-                  child: Semantics(
-                    button: true,
-                    label: collapseLabel,
-                    child: GestureDetector(
-                      onTap: onCollapse,
-                      child: Icon(
-                        // @phosphor-icons/react CaretLeft
-                        Icons.chevron_left,
-                        size: _caretLarge,
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                  ),
-                ),
+              Positioned(
+                // `after:min-w-11` — 보이는 28px 상자 중심으로 8px씩 넓힌 44px입니다.
+                // 오른쪽 8px는 React처럼 부모가 잘라 내므로 36px만 닿습니다.
+                top: 0,
+                bottom: 0,
+                right: -space.s2,
+                width: _minTapTarget,
+                child: _CollapseButton(label: collapseLabel, onPressed: onCollapse!),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// `SidebarHeader`의 접기 버튼입니다.
+///
+/// 보이는 상자는 `size-7`(28)이고, React의 `after:min-h-11 after:min-w-11` 히트
+/// 영역을 담은 44×행 높이(36) 슬롯 가운데에 놓입니다. hover는 6% 잉크, 누르면 10%
+/// 잉크이고 라벨은 hover에서 `text-primary`로 올라갑니다.
+class _CollapseButton extends StatefulWidget {
+  const _CollapseButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  State<_CollapseButton> createState() => _CollapseButtonState();
+}
+
+class _CollapseButtonState extends State<_CollapseButton> {
+  bool _hovered = false;
+  bool _pressed = false;
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final HoronSpaceSpec space = theme.space;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+
+    // `hover:bg-overlay-ink-6 active:bg-overlay-ink-10 motion-colors`입니다.
+    final Color fill = _pressed
+        ? colors.overlayInk10
+        : _hovered
+        ? colors.overlayInk6
+        : Colors.transparent;
+
+    return FocusableActionDetector(
+      mouseCursor: SystemMouseCursors.click,
+      onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
+      onShowFocusHighlight: (bool value) => setState(() => _focused = value),
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+        SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+      },
+      actions: <Type, Action<Intent>>{
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (ActivateIntent intent) {
+            widget.onPressed();
+            return null;
+          },
+        ),
+      },
+      child: Semantics(
+        button: true,
+        label: widget.label,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onPressed,
+          onTapDown: (TapDownDetails details) => setState(() => _pressed = true),
+          onTapUp: (TapUpDetails details) => setState(() => _pressed = false),
+          onTapCancel: () => setState(() => _pressed = false),
+          child: Center(
+            child: AnimatedContainer(
+              duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+              curve: HoronMotion.colorsCurve,
+              // size-7 rounded-sm
+              width: space.step(7),
+              height: space.step(7),
+              decoration: BoxDecoration(color: fill, borderRadius: BorderRadius.circular(theme.radius.sm)),
+              foregroundDecoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(theme.radius.sm),
+                border: Border.all(color: _focused ? colors.textBrand : Colors.transparent, width: space.s0_5),
+              ),
+              child: Icon(
+                // @phosphor-icons/react CaretLeft
+                Icons.chevron_left,
+                size: _caretLarge,
+                color: _hovered ? colors.textPrimary : colors.textSecondary,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -596,7 +719,7 @@ class HoronSidebarHeader extends StatelessWidget {
 ///
 /// 32px 행에 12px 반경, 좌우 10px 여백, 10px 간격을 둡니다. [current]인 항목은
 /// 6% 잉크, hover는 4% 잉크입니다. [count]는 오른쪽에, [attention]은 7px 빨간 점으로
-/// 표시합니다.
+/// 표시합니다. [href]가 있으면 React처럼 링크로 읽히고, 없으면 버튼입니다.
 class HoronSidebarItem extends StatefulWidget {
   /// 항목을 만듭니다.
   const HoronSidebarItem({
@@ -606,6 +729,7 @@ class HoronSidebarItem extends StatefulWidget {
     this.count,
     this.attention = false,
     this.current = false,
+    this.href,
     this.onPressed,
   });
 
@@ -624,6 +748,11 @@ class HoronSidebarItem extends StatefulWidget {
 
   /// 지금 보고 있는 항목인지 여부입니다. 참이면 6% 잉크가 남습니다.
   final bool current;
+
+  /// 이 항목이 가리키는 문서의 주소입니다. React의 `href`이고, 값이 있으면 행이
+  /// 링크 시맨틱([Semantics.link])을 얻습니다. 패키지는 주소를 열지 않으므로 실제
+  /// 이동은 [onPressed]가 맡습니다.
+  final Uri? href;
 
   /// 눌렀을 때 부를 콜백입니다.
   final VoidCallback? onPressed;
@@ -652,8 +781,12 @@ class _HoronSidebarItemState extends State<HoronSidebarItem> {
         ? colors.overlayInk4
         : Colors.transparent;
 
+    // React는 `href`가 있으면 `<a>`, 없으면 `<button type="button">`입니다.
+    final bool link = widget.href != null;
+
     return Semantics(
-      button: true,
+      button: !link,
+      link: link,
       selected: widget.current,
       child: FocusableActionDetector(
         enabled: widget.onPressed != null,
@@ -797,6 +930,7 @@ class HoronSidebarGroup extends StatefulWidget {
 
 class _HoronSidebarGroupState extends State<HoronSidebarGroup> {
   late bool _open = widget.defaultOpen;
+  bool _hovered = false;
   bool _focused = false;
 
   void _toggle() {
@@ -810,6 +944,8 @@ class _HoronSidebarGroupState extends State<HoronSidebarGroup> {
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    // `motion-colors hover:text-text-primary` — 라벨과 캐럿이 함께 올라갑니다.
+    final Color foreground = _hovered ? colors.textPrimary : colors.textSecondary;
 
     return Padding(
       // mt-3.5
@@ -821,6 +957,7 @@ class _HoronSidebarGroupState extends State<HoronSidebarGroup> {
         children: <Widget>[
           FocusableActionDetector(
             mouseCursor: SystemMouseCursors.click,
+            onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
             onShowFocusHighlight: (bool value) => setState(() => _focused = value),
             shortcuts: const <ShortcutActivator, Intent>{
               SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
@@ -855,11 +992,11 @@ class _HoronSidebarGroupState extends State<HoronSidebarGroup> {
                       // gap-1
                       spacing: space.s1,
                       children: <Widget>[
-                        Text(
-                          widget.label,
-                          maxLines: 1,
-                          // text-label-md text-text-secondary
-                          style: theme.text.labelMd.copyWith(color: colors.textSecondary),
+                        AnimatedDefaultTextStyle(
+                          duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+                          curve: HoronMotion.colorsCurve,
+                          style: theme.text.labelMd.copyWith(color: foreground),
+                          child: Text(widget.label, maxLines: 1),
                         ),
                         AnimatedRotation(
                           // group-not-data-panel-open:-rotate-90 group-data-panel-open:rotate-0
@@ -870,7 +1007,7 @@ class _HoronSidebarGroupState extends State<HoronSidebarGroup> {
                             // @phosphor-icons/react CaretDown
                             Icons.expand_more,
                             size: _caretSmall,
-                            color: colors.textSecondary,
+                            color: foreground,
                           ),
                         ),
                       ],
@@ -1101,8 +1238,13 @@ class _HoronSidebarAccountState extends State<HoronSidebarAccount> {
 ///
 /// 타일·이름·14px 캐럿을 한 줄(32px)에 두고, 열려 있으면 아래에
 /// [HoronSidebarTree]를 붙입니다. 캐럿은 열렸을 때 90° 돌아 아래를 봅니다.
-/// [actions]가 있으면 행을 hover하거나 포커스가 들어오거나 메뉴가 열려 있을 때
-/// 캐럿을 가리고 그 자리에 겹쳐 보입니다.
+///
+/// [actions]가 있으면 **펼친 상태에서만** 캐럿 대신 16px "더 보기" 버튼을 보이고
+/// 자식이 없는 프로젝트는 항상 보입니다(React `04f963d`의 `actions !== undefined &&
+/// isOpen`·`!hasChildren || isOpen` 규칙). hover·포커스·메뉴 열림은 더 이상 표시
+/// 조건이 아니며 6% 잉크 행 배경만 남깁니다.
+///
+/// [open]이 있으면 controlled, 없으면 [defaultOpen]에서 시작해 스스로 바뀝니다.
 class HoronSidebarProject extends StatefulWidget {
   /// 프로젝트 행을 만듭니다.
   const HoronSidebarProject({
@@ -1140,9 +1282,13 @@ class HoronSidebarProject extends StatefulWidget {
   final ValueChanged<bool>? onOpenChange;
 
   /// "더 보기" 컨트롤입니다. 보통 [HoronSidebarProjectMore]입니다.
+  ///
+  /// 있으면 펼친 상태에서 캐럿 대신 보이고(자식이 없으면 항상), 접으면 캐럿만 남습니다.
   final Widget? actions;
 
-  /// "더 보기" 메뉴가 열려 있는지 여부입니다. 참이면 행에 6% 잉크가 남고 액션이 보입니다.
+  /// "더 보기" 메뉴가 열려 있는지 여부입니다. 참이면 행에 6% 잉크가 남습니다.
+  ///
+  /// React의 `has-data-popup-open` 자리이며, 표시 여부는 [open] 상태가 정합니다.
   final bool menuOpen;
 
   @override
@@ -1158,8 +1304,6 @@ class _HoronSidebarProjectState extends State<HoronSidebarProject> {
 
   bool get _hasChildren => widget.children.isNotEmpty;
 
-  bool get _showActions => widget.menuOpen || _hovered || _focused;
-
   void _toggle() {
     if (!_hasChildren) return;
     final bool next = !_isOpen;
@@ -1174,8 +1318,14 @@ class _HoronSidebarProjectState extends State<HoronSidebarProject> {
     final HoronSpaceSpec space = theme.space;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    // current ? bg-overlay-ink-6 : hover:bg-overlay-ink-6, has-data-popup-open:bg-overlay-ink-6
-    final Color rowFill = widget.current || widget.menuOpen || _hovered ? colors.overlayInk6 : Colors.transparent;
+    // `current ? bg-overlay-ink-6 : hover:bg-overlay-ink-4`, `has-data-popup-open:bg-overlay-ink-6`
+    final Color rowFill = widget.menuOpen
+        ? colors.overlayInk6
+        : _hovered
+        ? colors.overlayInk4
+        : widget.current
+        ? colors.overlayInk6
+        : Colors.transparent;
 
     final Widget row = AnimatedContainer(
       duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
@@ -1225,8 +1375,9 @@ class _HoronSidebarProjectState extends State<HoronSidebarProject> {
                       ),
                       if (_hasChildren)
                         Visibility(
-                          // group-hover/project:invisible — 자리는 남기고 숨깁니다.
-                          visible: !(widget.actions != null && _showActions),
+                          // `actions && isOpen ? invisible` — 열린 프로젝트에서만 캐럿을
+                          // 숨기고 자리는 남깁니다(`visibility:hidden`).
+                          visible: !(widget.actions != null && _isOpen),
                           maintainSize: true,
                           maintainAnimation: true,
                           maintainState: true,
@@ -1251,17 +1402,20 @@ class _HoronSidebarProjectState extends State<HoronSidebarProject> {
           ),
           if (widget.actions != null)
             Positioned(
-              // absolute right-2.5 inset-y-0
+              // absolute right-2.5 inset-y-0 — 히트 영역이 넓어진 만큼 왼쪽으로
+              // 옮겨, 보이는 아이콘은 `right-2.5` 자리에 남깁니다.
               top: 0,
               bottom: 0,
-              right: space.s2_5,
+              right: space.s2_5 - _projectMoreHitInset,
               child: Center(
-                child: AnimatedOpacity(
-                  duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
-                  curve: HoronMotion.colorsCurve,
-                  opacity: _showActions ? 1 : 0,
-                  // 숨김 상태에서도 자리는 차지하지만 탭은 받지 않습니다.
-                  child: IgnorePointer(ignoring: !_showActions, child: widget.actions),
+                child: Visibility(
+                  // `!hasChildren || isOpen ? visible : invisible` — 자식이 없는
+                  // 프로젝트는 항상, 자식이 있으면 펼쳤을 때만 More를 보입니다.
+                  visible: !_hasChildren || _isOpen,
+                  maintainSize: true,
+                  maintainAnimation: true,
+                  maintainState: true,
+                  child: widget.actions!,
                 ),
               ),
             ),
@@ -1305,6 +1459,7 @@ class HoronSidebarProjectMore extends StatefulWidget {
 }
 
 class _HoronSidebarProjectMoreState extends State<HoronSidebarProjectMore> {
+  bool _hovered = false;
   bool _focused = false;
 
   @override
@@ -1312,6 +1467,7 @@ class _HoronSidebarProjectMoreState extends State<HoronSidebarProjectMore> {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     return Semantics(
       button: true,
@@ -1319,6 +1475,7 @@ class _HoronSidebarProjectMoreState extends State<HoronSidebarProjectMore> {
       child: FocusableActionDetector(
         enabled: widget.onPressed != null,
         mouseCursor: widget.onPressed != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
         onShowFocusHighlight: (bool value) => setState(() => _focused = value),
         shortcuts: const <ShortcutActivator, Intent>{SingleActivator(LogicalKeyboardKey.enter): ActivateIntent()},
         actions: <Type, Action<Intent>>{
@@ -1332,22 +1489,33 @@ class _HoronSidebarProjectMoreState extends State<HoronSidebarProjectMore> {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: widget.onPressed,
+          // React `after:min-h-11 after:min-w-11` — 보이는 16px 밖으로 히트 영역을
+          // 넓힙니다. 행 높이가 32라 세로로는 그 안까지만 닿습니다.
           child: SizedBox(
-            // size-4 rounded-xs
-            width: space.step(4),
-            height: space.step(4),
-            child: DecoratedBox(
-              // focus-visible:outline-2 focus-visible:outline-text-brand
-              position: DecorationPosition.foreground,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(theme.radius.xs),
-                border: Border.all(color: _focused ? colors.textBrand : Colors.transparent, width: space.s0_5),
-              ),
-              child: Icon(
-                // @phosphor-icons/react DotsThree
-                Icons.more_horiz,
-                size: space.step(4),
-                color: colors.textPrimary,
+            width: _minTapTarget,
+            height: space.step(8),
+            child: Center(
+              child: AnimatedContainer(
+                duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+                curve: HoronMotion.colorsCurve,
+                // size-4 rounded-xs, `hover:bg-overlay-ink-6`
+                width: space.step(4),
+                height: space.step(4),
+                decoration: BoxDecoration(
+                  color: _hovered && widget.onPressed != null ? colors.overlayInk6 : Colors.transparent,
+                  borderRadius: BorderRadius.circular(theme.radius.xs),
+                ),
+                foregroundDecoration: BoxDecoration(
+                  // focus-visible:outline-2 focus-visible:outline-text-brand
+                  borderRadius: BorderRadius.circular(theme.radius.xs),
+                  border: Border.all(color: _focused ? colors.textBrand : Colors.transparent, width: space.s0_5),
+                ),
+                child: Icon(
+                  // @phosphor-icons/react DotsThree
+                  Icons.more_horiz,
+                  size: space.step(4),
+                  color: colors.textPrimary,
+                ),
               ),
             ),
           ),
@@ -1441,8 +1609,10 @@ class _HoronSidebarAddButtonState extends State<HoronSidebarAddButton> {
                         style: theme.text.labelMd.copyWith(color: colors.textSecondary),
                       ),
                       IconTheme.merge(
-                        // [&>[data-slot=icon]]:size-4
-                        data: IconThemeData(size: space.step(4), color: colors.textSecondary),
+                        // React는 `[&>[data-slot=icon]]:size-4` 규칙을 지웠으므로 아이콘은
+                        // 부모 글자 크기(1em)를 따릅니다. Flutter에는 em 상속이 없어 라벨
+                        // 스타일(`label-md` = 14px)의 글자 크기를 그대로 넘깁니다.
+                        data: IconThemeData(size: theme.text.labelMd.fontSize, color: colors.textSecondary),
                         child:
                             widget.icon ??
                             const Icon(

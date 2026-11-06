@@ -9,8 +9,9 @@ import '../surface_group.dart';
 ///
 /// 연결됨, 다시 연결, 연결 안 됨, 좁은 폭 네 상태를 solid와 glass 두 표면에 같은
 /// 목록으로 놓습니다. 연결됨은 점이 있는 알약, 다시 연결은 위험 테두리와 Reconnect
-/// 버튼, 연결 안 됨은 Plug 아이콘이 있는 Connect 버튼입니다. 마지막 칸은 폭이 좁을
-/// 때 컨트롤이 글자 아래로 내려가는 모습입니다.
+/// 버튼, 연결 안 됨은 Plug 아이콘이 있는 Connect 버튼입니다. 알약과 버튼은 같은 칸에서
+/// 교차 전환하고(`motion-swap`), 유리 표면의 미연결 타일은 6% 잉크로 물러납니다.
+/// 마지막 칸은 폭이 좁을 때 컨트롤이 글자 아래로 내려가는 모습입니다.
 class HoronIntegrationRowGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronIntegrationRowGallerySection({super.key});

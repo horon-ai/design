@@ -2,8 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_veil.dart';
 import '../overlay/horon_menu_anchor.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
@@ -262,9 +261,26 @@ class HoronMenuContent extends StatelessWidget {
   }
 
   Widget _chrome(HoronThemeData theme, HoronColors colors, BorderRadius radius) {
+    // `flex flex-col gap-0.5 p-1.5`.
+    final Widget body = Padding(
+      padding: EdgeInsets.all(theme.space.s1_5),
+      child: _MenuSurfaceScope(
+        surface: surface,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: theme.space.s0_5,
+          children: children,
+        ),
+      ),
+    );
+
+    if (surface == HoronMenuSurface.glass) {
+      // `rounded-xl veil-overlay` — 그림자와 링은 veil이 스스로 그립니다.
+      return HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: body);
+    }
+
     final BoxDecoration decoration = switch (surface) {
-      // `rounded-xl bg-glass-thick` — 채움은 유리 레이어가 그립니다.
-      HoronMenuSurface.glass => BoxDecoration(borderRadius: radius),
       // `rounded-[18px] bg-glass-fill-solid shadow-popover`.
       HoronMenuSurface.solid => BoxDecoration(
         borderRadius: radius,
@@ -284,39 +300,12 @@ class HoronMenuContent extends StatelessWidget {
           ),
         ],
       ),
+      HoronMenuSurface.glass => const BoxDecoration(),
     };
 
     return DecoratedBox(
       decoration: decoration,
-      child: ClipRRect(
-        borderRadius: radius,
-        child: Stack(
-          children: <Widget>[
-            // Paper는 유리 레이어를 그리지 않습니다(`surface === "paper" ? null`).
-            if (surface != HoronMenuSurface.paper)
-              Positioned.fill(
-                child: HoronLiquidGlass(
-                  tier: HoronGlassTier.thick,
-                  borderRadius: radius,
-                  child: const SizedBox.expand(),
-                ),
-              ),
-            // `flex flex-col gap-0.5 p-1.5`.
-            Padding(
-              padding: EdgeInsets.all(theme.space.s1_5),
-              child: _MenuSurfaceScope(
-                surface: surface,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  spacing: theme.space.s0_5,
-                  children: children,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: ClipRRect(borderRadius: radius, child: body),
     );
   }
 }
@@ -343,7 +332,7 @@ class HoronMenuItem extends StatefulWidget {
   /// 앞쪽 아이콘(18px)이나 28px 워크스페이스 타일입니다(React `icon`).
   final Widget? icon;
 
-  /// 라벨 아래 설명입니다(React `description`). 있으면 줄 높이가 46px이 됩니다.
+  /// 라벨 아래 설명입니다(React `description`). 있으면 줄 높이가 48px이 됩니다.
   final String? description;
 
   /// 오른쪽 단축키나 체크 표시입니다(React `trailing`).
@@ -394,11 +383,9 @@ class _HoronMenuItemState extends State<HoronMenuItem> {
     final bool glass = surface == HoronMenuSurface.glass;
     final BorderRadius radius = BorderRadius.circular(glass ? theme.radius.md : _itemRadius);
     final double horizontal = glass ? space.s3 : space.s2_5;
-    final EdgeInsets padding = hasDescription
-        ? EdgeInsets.only(left: space.s2, right: horizontal) // `pl-2`
-        : EdgeInsets.symmetric(horizontal: horizontal);
-    // `description ? h-11.5 : glass ? h-10 : h-9`.
-    final double height = space.step(hasDescription ? 11.5 : (glass ? 10 : 9));
+    final EdgeInsets padding = EdgeInsets.symmetric(horizontal: horizontal);
+    // `description ? h-12 : glass ? h-10 : h-9`.
+    final double height = space.step(hasDescription ? 12 : (glass ? 10 : 9));
 
     final Color base = widget.background ?? (widget.selected ? colors.bgBrand : Colors.transparent);
     // `data-highlighted:bg-overlay-ink-6`, 선택 행은 강조에서도 브랜드를 유지합니다.

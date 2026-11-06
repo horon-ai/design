@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
+import 'package:horon_ui/src/theme/horon_motion.dart';
 
 Widget _host(Widget child, {Brightness brightness = Brightness.light, double? width}) {
   final Widget sized = width == null ? child : SizedBox(width: width, child: child);
@@ -81,9 +82,15 @@ void main() {
     expect(tester.widget<Text>(find.text('filesystem')).style?.fontWeight, HoronFontWeight.semibold);
 
     final Text version = tester.widget<Text>(find.text('v1.4.0'));
-    expect(version.style?.fontSize, 12);
+    // `font-mono text-label-sm text-text-secondary`
+    expect(version.style?.fontSize, theme.text.labelSm.fontSize);
+    expect(version.style?.height, theme.text.labelSm.height);
     expect(version.style?.fontFamily, theme.text.code.fontFamily);
-    expect(version.style?.color, theme.colors.textPlaceholder);
+    expect(version.style?.color, theme.colors.textSecondary);
+
+    final Text author = tester.widget<Text>(find.text('alpox'));
+    expect(author.style?.fontSize, theme.text.labelSm.fontSize);
+    expect(author.style?.color, theme.colors.textSecondary);
 
     final Container badge = tester.widget<Container>(
       find.ancestor(of: find.text('업데이트'), matching: find.byType(Container)).first,
@@ -107,11 +114,21 @@ void main() {
     expect(icon.size, isNull, reason: '크기는 IconTheme이 정합니다');
   });
 
-  testWidgets('the verified badge is a 13px sky circle with an 8px check', (WidgetTester tester) async {
+  testWidgets('the verified badge is a 14px sky circle with an 8px check', (WidgetTester tester) async {
     await tester.pumpWidget(_host(_row(), width: 720));
     final HoronThemeData theme = _themeOf(tester);
 
-    expect(_sizedBox(theme.space.step(3.25)), findsOneWidget);
+    // 14×14 술어는 `Icon`이 만드는 SizedBox도 잡으므로(Update의 `arrow_upward` 14px),
+    // 채움 원과 색으로 배지만 고릅니다.
+    final Finder badge = find.byWidgetPredicate(
+      (Widget widget) =>
+          widget is DecoratedBox &&
+          widget.decoration is BoxDecoration &&
+          (widget.decoration as BoxDecoration).shape == BoxShape.circle &&
+          (widget.decoration as BoxDecoration).color == HoronPalette.sky500,
+    );
+    expect(badge, findsOneWidget);
+    expect(tester.getSize(badge), const Size(14, 14), reason: 'size-3.5 배지');
     final Icon check = tester.widget<Icon>(find.byIcon(Icons.check));
     expect(check.size, theme.space.step(2));
     expect(check.color, HoronPalette.neutral50);
@@ -121,26 +138,27 @@ void main() {
     await tester.pumpWidget(_host(_row(onUpdate: () {}, onMenuPressed: () {}), width: 720));
     final HoronThemeData theme = _themeOf(tester);
 
-    final AnimatedContainer update = tester.widget<AnimatedContainer>(
-      find.ancestor(of: find.text('Update'), matching: find.byType(AnimatedContainer)).first,
-    );
-    expect(update.constraints?.maxHeight, theme.space.step(8), reason: 'Update 버튼 h-8');
-    expect((update.decoration! as BoxDecoration).color, theme.colors.interactivePrimary);
-    expect((update.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.full));
+    // Update는 `Button`의 `solid`·`sm`입니다. dev React가 primary에서 solid로 바꿨습니다.
+    final HoronButton update = tester.widget<HoronButton>(find.byType(HoronButton));
+    expect(update.variant, HoronButtonVariant.solid);
+    expect(update.size, HoronButtonSize.sm);
+    expect(update.label, 'Update');
+    expect(tester.getSize(find.byIcon(Icons.arrow_upward)).width, theme.space.s3_5);
 
     final Finder toggle = _animatedBox(theme.space.step(11), theme.space.step(6.5));
     expect(toggle, findsOneWidget, reason: 'Switch md 44x26');
     expect(_decorationOf(tester, toggle).color, theme.colors.borderStrong);
 
-    final AnimatedContainer overflow = tester.widget<AnimatedContainer>(
-      find.ancestor(of: find.byIcon(Icons.more_horiz), matching: find.byType(AnimatedContainer)).first,
-    );
-    expect(overflow.constraints?.maxHeight, theme.space.step(8), reason: '오버플로 size-8');
-    // Paper `1VKS-0`: 오버플로 반경 8, 아이콘 16
-    expect((overflow.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.sm));
-    final Icon dots = tester.widget<Icon>(find.byIcon(Icons.more_horiz));
-    expect(dots.size, theme.space.s4);
-    expect(dots.color, theme.colors.textPrimary);
+    // 오버플로는 `IconButton`의 `ghost`·`sm`입니다.
+    final HoronIconButton overflow = tester.widget<HoronIconButton>(find.byType(HoronIconButton));
+    expect(overflow.variant, HoronIconButtonVariant.ghost);
+    expect(overflow.size, HoronIconButtonSize.sm);
+    expect(overflow.label, 'More');
+    expect(tester.getSize(find.byIcon(Icons.more_horiz)).width, theme.space.s4, reason: 'IconButton sm 16');
+
+    // 액션 사이 간격은 `gap-2`(8)입니다.
+    final Wrap actions = tester.widget<Wrap>(find.ancestor(of: find.text('Update'), matching: find.byType(Wrap)).first);
+    expect(actions.spacing, theme.space.s2);
   });
 
   testWidgets('the switch reports the toggled value and paints the checked track', (WidgetTester tester) async {
@@ -175,6 +193,28 @@ void main() {
     expect(menus, 1);
     expect(tester.takeException(), isNull);
     expect(theme.space.step(8), 32);
+  });
+
+  testWidgets('the Update button collapses when there is no callback', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(_row(), width: 720));
+    await tester.pumpAndSettle();
+
+    // `motion-reveal-x` — 버튼은 트리에 남지만 자리를 비우고 입력·포커스에서 빠집니다.
+    expect(tester.widget<HoronReveal>(find.byType(HoronReveal)).collapsed, isTrue);
+    expect(tester.getSize(find.byType(HoronReveal)).width, 0);
+    expect(
+      tester
+          .widget<IgnorePointer>(
+            find.ancestor(of: find.byType(HoronButton), matching: find.byType(IgnorePointer)).first,
+          )
+          .ignoring,
+      isTrue,
+    );
+
+    await tester.pumpWidget(_host(_row(onUpdate: () {}), width: 720));
+    await tester.pumpAndSettle();
+    expect(tester.widget<HoronReveal>(find.byType(HoronReveal)).collapsed, isFalse);
+    expect(tester.getSize(find.byType(HoronReveal)).width, greaterThan(0));
   });
 
   testWidgets('moves the actions below the text under the sm breakpoint', (WidgetTester tester) async {

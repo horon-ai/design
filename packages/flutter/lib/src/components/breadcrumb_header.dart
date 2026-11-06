@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
+import 'breadcrumb.dart';
 import 'liquid_glass.dart';
 
 /// `breadcrumb-header.tsx`의 `focus-visible:outline-2`입니다.
@@ -81,8 +82,12 @@ class HoronBreadcrumbHeader extends StatelessWidget {
         spacing: space.s2, // gap-2
         children: <Widget>[
           Expanded(child: _CrumbRow(crumbs: crumbs)),
-          _HeaderIconButton(icon: const Icon(Icons.search), label: searchLabel, onPressed: onSearch),
-          _HeaderIconButton(icon: const Icon(Icons.more_horiz), label: moreLabel, onPressed: onMore),
+          // React는 `onSearch`·`onMore`가 있을 때만 아이콘 버튼을 그립니다. 없으면
+          // 자리도 차지하지 않습니다.
+          if (onSearch != null)
+            _HeaderIconButton(icon: const Icon(Icons.search), label: searchLabel, onPressed: onSearch),
+          if (onMore != null)
+            _HeaderIconButton(icon: const Icon(Icons.more_horiz), label: moreLabel, onPressed: onMore),
         ],
       ),
     );
@@ -132,78 +137,18 @@ class _CrumbRow extends StatelessWidget {
                     color: colors.textSecondary,
                   ),
                 Flexible(
-                  child: _Crumb(crumb: crumbs[index], current: index == crumbs.length - 1),
+                  // React는 `_Crumb` 대신 `BreadcrumbItem`을 그대로 씁니다. 조각 렌더를
+                  // 한 곳으로 모아 타일·현재·링크 스타일이 두 컴포넌트에서 갈라지지 않습니다.
+                  child: HoronBreadcrumbItem(
+                    label: crumbs[index].label,
+                    current: index == crumbs.length - 1,
+                    onTap: crumbs[index].onTap,
+                    tile: crumbs[index].tile,
+                  ),
                 ),
               ],
             ),
         ],
-      ),
-    );
-  }
-}
-
-/// 조각 하나입니다. `py-1 pr-2 pl-1.5 rounded-sm text-label-md`입니다.
-class _Crumb extends StatelessWidget {
-  const _Crumb({required this.crumb, required this.current});
-
-  final HoronBreadcrumbHeaderCrumb crumb;
-  final bool current;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
-    final HoronSpaceSpec space = theme.space;
-    final VoidCallback? onTap = current ? null : crumb.onTap;
-
-    return _Pressable(
-      onTap: onTap,
-      radius: theme.radius.sm,
-      builder: (bool hovered) {
-        final Color foreground = current || hovered ? colors.textPrimary : colors.textSecondary;
-        return AnimatedDefaultTextStyle(
-          duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,
-          curve: HoronMotion.colorsCurve,
-          style: theme.text.labelMd.copyWith(color: foreground),
-          child: Padding(
-            padding: EdgeInsets.only(top: space.s1, bottom: space.s1, right: space.s2, left: space.s1_5),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: space.s1_5,
-              children: <Widget>[
-                if (crumb.tile != null) _CrumbTile(tile: crumb.tile!),
-                Flexible(child: Text(crumb.label, maxLines: 1, overflow: TextOverflow.ellipsis)),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// `size-5 rounded-xs bg-interactive-primary text-label-sm text-text-inverse` 타일입니다.
-class _CrumbTile extends StatelessWidget {
-  const _CrumbTile({required this.tile});
-
-  final Widget tile;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
-    final HoronSpaceSpec space = theme.space;
-    return Container(
-      width: space.step(5), // size-5 = 20
-      height: space.step(5),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(color: colors.interactivePrimary, borderRadius: BorderRadius.circular(theme.radius.xs)),
-      child: IconTheme.merge(
-        data: IconThemeData(size: space.s3_5, color: colors.textInverse),
-        child: DefaultTextStyle.merge(
-          style: theme.text.labelSm.copyWith(color: colors.textInverse),
-          child: tile,
-        ),
       ),
     );
   }
@@ -303,58 +248,6 @@ class _HeaderIconButtonState extends State<_HeaderIconButton> {
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// `motion-colors`와 `focus-visible:outline-2 outline-text-brand`을 옮긴 누름 표면입니다.
-class _Pressable extends StatefulWidget {
-  const _Pressable({required this.onTap, required this.radius, required this.builder});
-
-  final VoidCallback? onTap;
-  final double radius;
-  final Widget Function(bool hovered) builder;
-
-  @override
-  State<_Pressable> createState() => _PressableState();
-}
-
-class _PressableState extends State<_Pressable> {
-  bool _hovered = false;
-  bool _focused = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final bool interactive = widget.onTap != null;
-    final Widget surface = widget.builder(_hovered && interactive);
-
-    return FocusableActionDetector(
-      enabled: interactive,
-      mouseCursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
-      onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-      shortcuts: const <ShortcutActivator, Intent>{
-        SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-        SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
-      },
-      actions: <Type, Action<Intent>>{
-        ActivateIntent: CallbackAction<ActivateIntent>(
-          onInvoke: (ActivateIntent intent) {
-            widget.onTap?.call();
-            return null;
-          },
-        ),
-      },
-      child: GestureDetector(
-        onTap: interactive ? widget.onTap : null,
-        child: _FocusRing(
-          visible: _focused && interactive,
-          radius: widget.radius,
-          color: theme.colors.textBrand,
-          child: surface,
         ),
       ),
     );

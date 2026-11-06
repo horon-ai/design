@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/src/components/spinner.dart';
 import 'package:horon_ui/src/components/tool_call.dart';
@@ -31,7 +32,7 @@ Container cardOf(WidgetTester tester) =>
     tester.widget<Container>(find.descendant(of: find.byType(HoronToolCall), matching: find.byType(Container)).first);
 
 void main() {
-  testWidgets('tool call: the header is a 14px card with a tool chip and a status mark', (WidgetTester tester) async {
+  testWidgets('tool call: the header is a 16px card with a tool chip and a status mark', (WidgetTester tester) async {
     await pumpCall(
       tester,
       const HoronToolCall(
@@ -51,7 +52,8 @@ void main() {
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
     expect(tester.getSize(find.byIcon(Icons.check_circle)), const Size(16, 16));
     expect(decoration.color, theme.colors.bgSurface);
-    expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.radius.lg);
+    // `rounded-2xl`.
+    expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.radius.xl2);
     expect((decoration.border! as Border).top.color, theme.colors.borderDefault);
   });
 
@@ -98,9 +100,26 @@ void main() {
 
     expect((decoration.border! as Border).top.color, theme.colors.borderDanger);
     expect(find.text('Failed'), findsOneWidget);
+    // `WarningCircle size-4` — 상태 아이콘 자리는 16px입니다. React는 트리거의 상태
+    // 아이콘과 오류 상자의 아이콘에 같은 WarningCircle을 두 번 쓰므로, 트리거 범위에서
+    // 하나인지 확인합니다.
+    final Finder trigger = find.ancestor(of: find.text('Failed'), matching: find.byType(GestureDetector)).first;
+    expect(find.descendant(of: trigger, matching: find.byIcon(Icons.error_outline)), findsOneWidget);
+    expect(tester.widget<Icon>(find.byIcon(Icons.error_outline).first).size, 16);
     expect(find.text('The card was declined'), findsOneWidget);
     expect(tester.widget<Text>(find.text('The card was declined')).style!.color, theme.colors.textDanger);
     expect(find.text('RESULT'), findsNothing);
+
+    // `h-7.5 rounded-full` — 재시도는 30 높이 알약입니다.
+    final Finder retry = find.ancestor(of: find.text(theme.strings.retry), matching: find.byType(TextButton)).first;
+    expect(tester.getSize(retry).height, 30);
+    expect(
+      tester.widget<TextButton>(retry).style!.shape!.resolve(<WidgetState>{}),
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(theme.radius.full),
+        side: BorderSide(color: theme.colors.borderDefault),
+      ),
+    );
 
     await tester.tap(find.text(theme.strings.retry));
     await tester.pump();
@@ -135,10 +154,69 @@ void main() {
         initiallyOpen: true,
       ),
     );
+    // `Show all`은 결과 섹션의 footer 슬롯에 놓입니다.
     expect(find.text('Show all'), findsOneWidget);
+    final double footerTop = tester.getTopLeft(find.text('Show all')).dy;
+    final double bodyTop = tester.getTopLeft(find.text('RESULT')).dy;
+    expect(footerTop, greaterThan(bodyTop));
     await tester.tap(find.text('Show all'));
     await tester.pump();
     expect(shown, 1);
+  });
+
+  testWidgets('tool call: the section copy button writes the body and flips to a check', (WidgetTester tester) async {
+    final List<MethodCall> calls = <MethodCall>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (MethodCall call) async {
+      calls.add(call);
+      return null;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+
+    await pumpCall(
+      tester,
+      const HoronToolCall(
+        status: HoronToolCallStatus.done,
+        toolName: 'Web search',
+        summary: 'Searching the web',
+        args: <String, Object?>{'query': 'horon'},
+        result: <String, Object?>{'count': 2},
+        initiallyOpen: true,
+      ),
+    );
+
+    // `aria-label="Copy arguments"` — 섹션마다 복사 버튼이 하나씩입니다.
+    expect(find.bySemanticsLabel('Copy arguments'), findsOneWidget);
+    expect(find.bySemanticsLabel('Copy result'), findsOneWidget);
+    expect(find.byIcon(Icons.content_copy), findsNWidgets(2));
+
+    await tester.tap(find.bySemanticsLabel('Copy arguments'));
+    await tester.pump();
+
+    final MethodCall call = calls.firstWhere((MethodCall call) => call.method == 'Clipboard.setData');
+    expect((call.arguments as Map<Object?, Object?>)['text'], contains('"query": "horon"'));
+    // 복사 직후에는 체크 아이콘 하나로 바뀝니다.
+    expect(find.byIcon(Icons.check), findsOneWidget);
+    expect(find.bySemanticsLabel('Copied'), findsOneWidget);
+
+    // 1.5초 뒤 원래대로 돌아옵니다.
+    await tester.pump(const Duration(milliseconds: 1600));
+    expect(find.byIcon(Icons.check), findsNothing);
+    expect(find.bySemanticsLabel('Copy arguments'), findsOneWidget);
+  });
+
+  testWidgets('tool call: a running call has no copy button for a missing result', (WidgetTester tester) async {
+    await pumpCall(
+      tester,
+      const HoronToolCall(
+        status: HoronToolCallStatus.running,
+        toolName: 'Web search',
+        summary: 'Searching the web',
+        args: <String, Object?>{'query': 'horon'},
+        initiallyOpen: true,
+      ),
+    );
+    expect(find.bySemanticsLabel('Copy arguments'), findsOneWidget);
+    expect(find.bySemanticsLabel('Copy result'), findsNothing);
   });
 
   testWidgets('tool call: every status renders in both brightnesses', (WidgetTester tester) async {

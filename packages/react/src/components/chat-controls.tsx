@@ -87,7 +87,7 @@ export function VoiceInput({
   return (
     <div
       className={cn(
-        "relative flex h-13 w-60 items-center gap-3 overflow-clip rounded-full px-2",
+        "relative flex h-13 w-60 max-w-full min-w-0 items-center gap-3 overflow-clip rounded-full px-2",
         surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
         className,
       )}

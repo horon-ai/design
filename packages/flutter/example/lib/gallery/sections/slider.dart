@@ -4,7 +4,8 @@ import 'package:horon_ui/horon_ui.dart';
 /// Slider 갤러리 섹션입니다.
 ///
 /// Paper 설정 화면의 두 슬라이더(Voice·Speed)를 실제로 움직일 수 있게 두고,
-/// 비활성 상태를 함께 놓았습니다.
+/// 비활성 상태를 함께 놓았습니다. 썸은 grab 커서를 쓰고 hover에서 1.05, 누르는 동안
+/// 1.1로 커집니다(`120ms ease-out-quint`).
 class HoronSliderGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronSliderGallerySection({super.key});

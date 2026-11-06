@@ -1,6 +1,7 @@
 import { Button, HoronWordmark } from "@horon-ai/react";
 
 import { externalLinks, foundationsNav, primaryNav } from "@/data/nav";
+import { siteHref } from "@/lib/urls";
 import type { Localized } from "@/i18n";
 
 import { shellMessages as m } from "./messages";
@@ -29,7 +30,7 @@ function FooterLink({ link }: { link: { href: string; label: Localized } }) {
   return (
     <Button
       variant="link"
-      href={link.href}
+      href={siteHref(link.href)}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
     >
@@ -88,22 +89,22 @@ export function SiteFooter({ year }: SiteFooterProps) {
             </p>
           </div>
 
-          <nav aria-label={m.footerNav.ko} className="grid grid-cols-2 gap-x-12 gap-y-8">
-            <div className="flex flex-col gap-3">
+          <nav aria-label={m.footerNav.ko} className="grid min-w-0 grid-cols-1 gap-x-12 gap-y-8 sm:grid-cols-2">
+            <div className="flex min-w-0 flex-col gap-3">
               <ColumnLabel entry={m.footerMenu} />
-              <ul className="flex flex-col gap-2">
+              <ul className="flex min-w-0 flex-col gap-2">
                 {primaryNav.map((link) => (
-                  <li key={link.href}>
+                  <li key={link.href} className="min-w-0">
                     <FooterLink link={link} />
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex min-w-0 flex-col gap-3">
               <ColumnLabel entry={m.footerMore} />
-              <ul className="flex flex-col gap-2">
+              <ul className="flex min-w-0 flex-col gap-2">
                 {more.map((link) => (
-                  <li key={link.href}>
+                  <li key={link.href} className="min-w-0">
                     <FooterLink link={link} />
                   </li>
                 ))}

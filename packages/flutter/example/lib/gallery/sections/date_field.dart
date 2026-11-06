@@ -5,8 +5,8 @@ import '../surface_group.dart';
 
 /// `date_field`의 갤러리 섹션입니다.
 ///
-/// 빈 필드, 값이 있는 필드, 잘못된 값, 비활성 필드를 solid와 glass 두 표면에
-/// 같은 목록으로 보여 줍니다.
+/// 빈 필드, 값이 있는 필드, 잘못된 값, 비활성 필드, 팝오버 달성을 solid와
+/// veil(glass) 두 표면에 같은 목록으로 보여 줍니다.
 class HoronDateFieldGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronDateFieldGallerySection({super.key});
@@ -26,9 +26,18 @@ class HoronDateFieldGallerySection extends StatelessWidget {
             child: _fields(theme, HoronSurface.solid),
           ),
           SurfaceGroup(
-            label: 'Glass',
+            label: 'Glass · veil-field',
             glass: true,
             child: _fields(theme, HoronSurface.glass),
+          ),
+          Text(
+            'Figma `Date field`(60:244) 280px 필드입니다. 불투명 표면은 포인터를 올리면 '
+            '테두리가 `border-strong`으로 짙어지고, 유리 표면은 `veil-field`라 hover '
+            '테두리가 없습니다. 달력은 `sideOffset={4}`로 필드에서 4px 떨어져 열리고, '
+            '아래에 자리가 모자라면 같은 4px을 두고 위로 뒤집힙니다.',
+            style: theme.text.bodySm.copyWith(
+              color: theme.colors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -62,6 +71,18 @@ class HoronDateFieldGallerySection extends StatelessWidget {
         _Label('비활성'),
         SizedBox(height: theme.space.s2),
         HoronDateField(placeholder: '날짜 선택', surface: surface, disabled: true),
+        SizedBox(height: theme.space.s4),
+        // 팝오버 달력은 필드 표면을 달력에 그대로 넘깁니다(solid → solid, glass → glass).
+        _Label('팝오버 달력'),
+        SizedBox(height: theme.space.s2),
+        HoronDateField(
+          placeholder: '날짜 선택',
+          surface: surface,
+          popover: true,
+          value: DateTime(2026, 11, 5),
+          formatDate: (DateTime date) => '${date.month}/${date.day}',
+          onValueChange: (_) {},
+        ),
       ],
     );
   }

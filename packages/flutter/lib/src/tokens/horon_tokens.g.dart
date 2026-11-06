@@ -1179,7 +1179,13 @@ final class HoronGlassRim {
 /// 두께의 세로 그라디언트 림을 그립니다. 굴절·질감·안쪽 그늘·광택은 없습니다.
 final class HoronGlassTokens {
   /// 모든 글래스 값을 받는 생성자입니다.
-  const HoronGlassTokens({this.blur = 20.0, this.saturate = 1.8, this.rimWidth = 1.0, this.rimMidStop = 0.5});
+  const HoronGlassTokens({
+    // 네 값 모두 `glass.ts`에서 생성됩니다.
+    this.blur = 20.0,
+    this.saturate = 1.8,
+    this.rimWidth = 1.0,
+    this.rimMidStop = 0.5,
+  });
 
   /// 뒤 배경에 거는 가우스 블러의 표준편차입니다(논리 픽셀).
   final double blur;
@@ -1209,6 +1215,115 @@ final class HoronGlassTokens {
 
   /// 밝기 [brightness]에 맞는 림 색입니다.
   HoronGlassRim rimFor(Brightness brightness) => brightness == Brightness.dark ? rimDark : rimLight;
+
+  /// [saturate]의 Filter Effects 채도 행렬입니다.
+  ///
+  /// `ColorFilter.matrix`가 받는 20개 값(행 우선, 알파 행은 단위 행렬)입니다.
+  /// CSS `saturate()`와 같은 계수라서 웹과 Flutter가 같은 색을 냅니다.
+  List<double> get saturateMatrix {
+    final double s = saturate;
+    return <double>[
+      0.213 + 0.787 * s,
+      0.715 - 0.715 * s,
+      0.072 - 0.072 * s,
+      0.0,
+      0.0,
+      0.213 - 0.213 * s,
+      0.715 + 0.285 * s,
+      0.072 - 0.072 * s,
+      0.0,
+      0.0,
+      0.213 - 0.213 * s,
+      0.715 - 0.715 * s,
+      0.072 + 0.928 * s,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+    ];
+  }
+}
+
+/// `glass.ts` `veil.scheme` 한 밝기의 색입니다.
+///
+/// `ring`은 1px 링, `field`·`fieldFocus`는 입력 필드 채움, `overlay`는 74% 오버레이
+/// 채움입니다. 그림자는 CSS `0 2px 10px`·`0 6px 24px`의 오프셋과 블러를 그대로
+/// 옮기고 색만 토큰에서 받습니다.
+final class HoronVeilScheme {
+  /// 여섯 값을 받는 생성자입니다.
+  const HoronVeilScheme({
+    required this.ring,
+    required this.field,
+    required this.fieldFocus,
+    required this.fieldShadow,
+    required this.overlay,
+    required this.overlayShadow,
+  });
+
+  /// 표면 가장자리의 1px 링 색입니다.
+  final Color ring;
+
+  /// 입력 필드의 기본 채움입니다.
+  final Color field;
+
+  /// 입력 필드가 포커스를 받을 때의 채움입니다.
+  final Color fieldFocus;
+
+  /// 필드의 soft shadow입니다(`0 2px 10px`).
+  final List<BoxShadow> fieldShadow;
+
+  /// 오버레이(메뉴·시트·다이얼로그·토스트)의 74% 채움입니다.
+  final Color overlay;
+
+  /// 오버레이의 soft shadow입니다(`0 6px 24px`).
+  final List<BoxShadow> overlayShadow;
+}
+
+/// `glass.ts` `veil`의 가벼운 글래스 재료입니다.
+///
+/// 입력 필드(`field`)와 떠 있는 오버레이(`overlay`)가 씁니다. 아래에서 위로 뒤 배경을
+/// [blur]만큼 흐리고 [saturate]만큼 채도를 올린 다음, 상태별 채움을 덮고,
+/// [ringWidth] 두께의 링과 soft shadow를 그립니다. 림 그라디언트는 없습니다.
+/// 뒤 배경을 필터할 수 없을 때(동작 줄이기 설정)는 `glass-fill-frost` 한 겹으로
+/// 내려갑니다.
+final class HoronVeilTokens {
+  /// 모든 veil 값을 받는 생성자입니다.
+  const HoronVeilTokens({this.blur = 8.0, this.saturate = 1.6, this.ringWidth = 1.0});
+
+  /// 뒤 배경에 거는 가우스 블러의 표준편차입니다(논리 픽셀).
+  final double blur;
+
+  /// 뒤 배경에 거는 채도 배율입니다. Filter Effects `saturate()`와 같은 값입니다.
+  final double saturate;
+
+  /// 표면 가장자리에 그리는 링의 두께입니다(논리 픽셀).
+  final double ringWidth;
+
+  /// 라이트 밝기의 veil 색입니다.
+  static const HoronVeilScheme light = HoronVeilScheme(
+    ring: Color(0x0F17181A),
+    field: Color(0x0F17181A),
+    fieldFocus: Color(0x1717181A),
+    fieldShadow: <BoxShadow>[BoxShadow(color: Color(0x0F17181A), offset: Offset(0.0, 2.0), blurRadius: 10.0)],
+    overlay: Color(0xBDFFFFFF),
+    overlayShadow: <BoxShadow>[BoxShadow(color: Color(0x1A17181A), offset: Offset(0.0, 6.0), blurRadius: 24.0)],
+  );
+
+  /// 다크 밝기의 veil 색입니다.
+  static const HoronVeilScheme dark = HoronVeilScheme(
+    ring: Color(0x0FFFFFFF),
+    field: Color(0x17FFFFFF),
+    fieldFocus: Color(0x1FFFFFFF),
+    fieldShadow: <BoxShadow>[BoxShadow(color: Color(0x0F000000), offset: Offset(0.0, 2.0), blurRadius: 10.0)],
+    overlay: Color(0xBD17181A),
+    overlayShadow: <BoxShadow>[BoxShadow(color: Color(0x4D000000), offset: Offset(0.0, 6.0), blurRadius: 24.0)],
+  );
+
+  /// 밝기 [brightness]에 맞는 veil 색입니다.
+  HoronVeilScheme forBrightness(Brightness brightness) => brightness == Brightness.dark ? dark : light;
 
   /// [saturate]의 Filter Effects 채도 행렬입니다.
   ///

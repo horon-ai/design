@@ -12,6 +12,7 @@ import type { Localized } from "@/i18n";
 import { componentPageMessages as m } from "@/i18n/messages/components-page";
 import DocsLayout from "@/layouts/DocsLayout.astro";
 import { resolveDemoName } from "@/lib/demos";
+import { siteHref } from "@/lib/urls";
 
 export function getStaticPaths() {
   return components.map((component) => ({ params: { slug: component.slug } }));
@@ -56,7 +57,7 @@ function localized(entry: Localized): ReactNode {
 const breadcrumb = [
   { label: m.breadcrumbComponents, href: "/components" },
   ...(group ? [{ label: group.title, href: `/components#${component.group}` }] : []),
-  { label: component.title, href: `/components/${component.slug}` },
+  { label: component.title, href: siteHref(`/components/${component.slug}`) },
 ];
 ---
 
@@ -98,7 +99,7 @@ const breadcrumb = [
     {
       previous ? (
         <ComponentCard
-          href={`/components/${previous.slug}`}
+          href={siteHref(`/components/${previous.slug}`)}
           title={previous.title}
           description={m.previous}
         />
@@ -109,7 +110,7 @@ const breadcrumb = [
     {
       next ? (
         <ComponentCard
-          href={`/components/${next.slug}`}
+          href={siteHref(`/components/${next.slug}`)}
           title={next.title}
           description={m.next}
         />
