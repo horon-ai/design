@@ -32,7 +32,7 @@ function parse(version, where) {
 }
 
 async function publishedVersions(name) {
-	const response = await fetch(`${REGISTRY}/${name.replace("/", "%2f")}`, {
+	const response = await fetch(`${REGISTRY}/${encodeURIComponent(name)}`, {
 		headers: { accept: "application/vnd.npm.install-v1+json" },
 	});
 	if (response.status === 404) return [];
