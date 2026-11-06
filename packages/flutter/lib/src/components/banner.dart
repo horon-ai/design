@@ -25,10 +25,10 @@ enum HoronBannerSurface {
 
 /// `banner.tsx`의 `BannerSize`입니다.
 enum HoronBannerSize {
-  /// `size="sm"` — 최소 높이 32, `body-sm`, 아이콘 16px.
+  /// `size="sm"` — 최소 높이 32, `body-sm`, 아이콘 14px.
   sm,
 
-  /// `size="md"` — Figma 기본 띠(48), `body-md`, 아이콘 18px.
+  /// `size="md"` — Figma 기본 띠(48), `body-md`, 아이콘 16px.
   md,
 
   /// `size="lg"` — 높이 56, `body-lg`, 아이콘 20px.
@@ -39,7 +39,7 @@ typedef _BannerMetrics = ({
   double gap,
   double paddingX,
   double paddingY,
-  double icon,
+  double iconSize,
   TextStyle textStyle,
   TextStyle action,
 });
@@ -49,40 +49,35 @@ _BannerMetrics _metricsOf(HoronBannerSize size, HoronThemeData theme) => switch 
     gap: theme.space.s2,
     paddingX: theme.space.s3,
     paddingY: theme.space.s2,
-    icon: 16,
+    iconSize: 14,
     textStyle: theme.text.bodySm,
     action: theme.text.labelMd,
   ),
   HoronBannerSize.md => (
     gap: theme.space.s3,
     paddingX: theme.space.s4,
-    paddingY: theme.space.s3,
-    icon: 18,
+    paddingY: theme.space.s2_5, // py-2.5
+    iconSize: 16,
     textStyle: theme.text.bodyMd,
     action: theme.text.labelLg,
   ),
   HoronBannerSize.lg => (
     gap: theme.space.s3,
     paddingX: theme.space.s5,
-    paddingY: theme.space.s3_5,
-    icon: 20,
+    paddingY: theme.space.s3, // py-3
+    iconSize: 20,
     textStyle: theme.text.bodyLg,
     action: theme.text.labelLg,
   ),
 };
 
-/// Paper `TYN-1`의 액션 줄 높이입니다. `label-lg`의 22px보다 2px 낮은 20px입니다.
-const double _bannerActionLineHeight = 20;
-
-/// Paper `TYN-1`의 액션 자간입니다. `label-lg`의 -0.08px보다 좁은 -0.04px입니다.
-const double _bannerActionLetterSpacing = -0.04;
-
-/// Figma `Banner`(62:318): 색이 밴 띠를 두른 regular 유리 띠에 18px 아이콘과 밑줄 동작을 얹습니다.
+/// Figma `Banner`(62:318): 색이 밴 띠를 두른 regular 유리 띠에 크기별 아이콘과 밑줄 동작을 얹습니다.
 ///
 /// `banner.tsx`를 옮긴 것입니다. 표면은 `bg-glass-regular`라 [HoronLiquidGlass]가
-/// 뒤에서 칠하고, 테두리·글자는 [tone]이 정합니다. 위험 톤은 화면 낭독기에서
-/// `alert`로, 정보 톤은 `status`로 읽힙니다. 등장할 때 React의
-/// `tab-panel-in 220ms`와 같은 페이드·이동을 씁니다.
+/// 뒤에서 칠하고, 테두리는 [tone]이 정합니다. 본문은 React의 `text-text-primary`대로
+/// 기본 글자색을 쓰고, 아이콘과 밑줄 동작만 톤 색을 입습니다. 위험 톤은 화면
+/// 낭독기에서 `alert`로, 정보 톤은 `status`로 읽힙니다. 등장할 때 React의
+/// `motion-rise`(220ms)와 같은 페이드·이동을 씁니다.
 class HoronBanner extends StatelessWidget {
   /// 띠를 만듭니다.
   const HoronBanner({
@@ -129,20 +124,19 @@ class HoronBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           IconTheme.merge(
-            data: IconThemeData(size: metrics.icon, color: accent),
+            data: IconThemeData(size: metrics.iconSize, color: accent),
             child: icon ?? Icon(danger ? Icons.error_outline : Icons.info_outline),
           ),
           SizedBox(width: metrics.gap),
           Expanded(
-            child: Text(message, style: metrics.textStyle.copyWith(color: accent)),
+            // `text-text-primary` — 톤 색은 아이콘·동작에만 남습니다.
+            child: Text(message, style: metrics.textStyle.copyWith(color: theme.colors.textPrimary)),
           ),
           if (action != null) ...<Widget>[
             SizedBox(width: metrics.gap),
             DefaultTextStyle.merge(
               style: metrics.action.copyWith(
                 color: accent,
-                height: _bannerActionLineHeight / metrics.action.fontSize!,
-                letterSpacing: _bannerActionLetterSpacing,
                 decoration: TextDecoration.underline,
                 decorationColor: accent,
               ),
@@ -154,18 +148,25 @@ class HoronBanner extends StatelessWidget {
     );
 
     final Widget surfaceBody = surface == HoronBannerSurface.glass
-        ? Stack(
-            children: <Widget>[
-              Positioned.fill(
-                child: HoronLiquidGlass(
-                  tier: HoronGlassTier.regular,
-                  borderRadius: radius,
-                  edgeColor: edge,
-                  child: const SizedBox.expand(),
+        ? Container(
+            // `border border-transparent` — solid와 같은 1px 띠를 차지해 높이를 맞춥니다.
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              border: Border.all(color: Colors.transparent),
+            ),
+            child: Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: HoronLiquidGlass(
+                    tier: HoronGlassTier.regular,
+                    borderRadius: radius,
+                    edgeColor: edge,
+                    child: const SizedBox.expand(),
+                  ),
                 ),
-              ),
-              content,
-            ],
+                content,
+              ],
+            ),
           )
         : Container(
             decoration: BoxDecoration(
@@ -186,12 +187,12 @@ class HoronBanner extends StatelessWidget {
     if (!animate) return body;
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 220),
-      curve: HoronMotion.easeOutQuint,
+      duration: HoronMotion.riseDuration,
+      curve: HoronMotion.riseCurve,
       builder: (BuildContext context, double t, Widget? child) {
         return Opacity(
           opacity: t,
-          child: Transform.translate(offset: Offset(0, 4 * (1 - t)), child: child),
+          child: Transform.translate(offset: Offset(0, HoronMotion.riseOffset * (1 - t)), child: child),
         );
       },
       child: body,

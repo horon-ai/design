@@ -40,7 +40,7 @@ export function SkeletonCard({ type = "row", surface = "solid", className }: Ske
       className={cn(
         "relative flex gap-3 overflow-clip rounded-xl p-4",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
-        type === "row" ? "w-75 items-center" : "w-70 flex-col items-start",
+        type === "row" ? "w-75 max-w-full items-center" : "w-70 max-w-full flex-col items-start",
         className,
       )}
     >
@@ -49,25 +49,25 @@ export function SkeletonCard({ type = "row", surface = "solid", className }: Ske
         <>
           <Skeleton shape="pill" className="relative size-9 shrink-0" />
           <div className="relative flex min-w-0 flex-1 flex-col gap-2">
-            <Skeleton className="h-2.5 w-35" />
-            <Skeleton className="h-2 w-50" />
+            <Skeleton className="h-2.5 w-35 max-sm:max-w-full" />
+            <Skeleton className="h-2 w-50 max-sm:max-w-full" />
           </div>
         </>
       )}
       {type === "card" && (
         <>
-          <Skeleton className="relative h-3 w-30" />
-          <Skeleton className="relative h-2 w-62" />
-          <Skeleton className="relative h-2 w-55" />
-          <Skeleton className="relative h-2 w-40" />
-          <Skeleton shape="pill" className="relative h-7 w-20" />
+          <Skeleton className="relative h-3 w-30 max-sm:max-w-full" />
+          <Skeleton className="relative h-2 w-62 max-sm:max-w-full" />
+          <Skeleton className="relative h-2 w-55 max-sm:max-w-full" />
+          <Skeleton className="relative h-2 w-40 max-sm:max-w-full" />
+          <Skeleton shape="pill" className="relative h-7 w-20 max-sm:max-w-full" />
         </>
       )}
       {type === "text" && (
         <>
-          <Skeleton className="relative h-2 w-62" />
-          <Skeleton className="relative h-2 w-59" />
-          <Skeleton className="relative h-2 w-45" />
+          <Skeleton className="relative h-2 w-62 max-sm:max-w-full" />
+          <Skeleton className="relative h-2 w-59 max-sm:max-w-full" />
+          <Skeleton className="relative h-2 w-45 max-sm:max-w-full" />
         </>
       )}
     </div>

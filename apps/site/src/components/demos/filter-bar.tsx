@@ -12,12 +12,12 @@ const withDisabled = items.map((item) => (item.value === "failed" ? { ...item, d
 
 export default function FilterBarDemo() {
   return (
-    <div className="flex w-full flex-col items-center gap-8 rounded-2xl bg-bg-surface p-4 sm:p-8">
-      <div className="flex flex-col items-center gap-3">
+    <div className="flex w-full min-w-0 flex-col items-center gap-8 rounded-2xl bg-bg-surface p-4 sm:p-8">
+      <div className="flex w-full min-w-0 flex-col items-center gap-3">
         <p className="text-caption text-text-secondary">Default</p>
         <FilterBar items={items} defaultValue="all" />
       </div>
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex w-full min-w-0 flex-col items-center gap-3">
         <p className="text-caption text-text-secondary">Selected with a disabled option</p>
         <FilterBar items={withDisabled} defaultValue="review" />
       </div>

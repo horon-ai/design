@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
@@ -115,6 +117,7 @@ class HoronToolCall extends StatefulWidget {
 
 class _HoronToolCallState extends State<HoronToolCall> {
   late bool _open = widget.initiallyOpen;
+  bool _hovered = false;
 
   void _toggle() => setState(() => _open = !_open);
 
@@ -126,10 +129,10 @@ class _HoronToolCallState extends State<HoronToolCall> {
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     return Container(
-      // rounded-lg border bg-bg-surface, 실패만 border-border-danger
+      // rounded-2xl border bg-bg-surface, 실패만 border-border-danger
       decoration: BoxDecoration(
         color: colors.bgSurface,
-        borderRadius: BorderRadius.circular(theme.radius.lg),
+        borderRadius: BorderRadius.circular(theme.radius.xl2),
         border: Border.all(color: failed ? colors.borderDanger : colors.borderDefault),
       ),
       clipBehavior: Clip.antiAlias,
@@ -157,35 +160,54 @@ class _HoronToolCallState extends State<HoronToolCall> {
     return Semantics(
       button: true,
       expanded: _open,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _toggle,
-        child: Padding(
-          // px-4 py-3.5
-          padding: EdgeInsets.symmetric(horizontal: space.s4, vertical: space.s3_5),
-          child: Row(
-            spacing: space.s2_5, // gap-2.5 = 10
-            children: <Widget>[
-              Flexible(child: _toolChip(theme)),
-              Expanded(
-                child: Text(
-                  widget.summary,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis, // truncate
-                  style: theme.text.bodySm.copyWith(color: colors.textSecondary),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _toggle,
+          child: AnimatedContainer(
+            duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+            curve: HoronMotion.colorsCurve,
+            // `px-4 py-3.5 hover:bg-overlay-ink-3`.
+            color: _hovered ? colors.overlayInk3 : Colors.transparent,
+            padding: EdgeInsets.symmetric(horizontal: space.s4, vertical: space.s3_5),
+            child: Row(
+              spacing: space.s2_5, // gap-2.5 = 10
+              children: <Widget>[
+                Flexible(child: _toolChip(theme)),
+                Expanded(
+                  child: Text(
+                    widget.summary,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis, // truncate
+                    style: theme.text.bodySm.copyWith(color: colors.textSecondary),
+                  ),
                 ),
-              ),
-              ?_statusMark(theme),
-              if (widget.elapsed != null)
-                Text(widget.elapsed!, maxLines: 1, style: theme.text.caption.copyWith(color: colors.textSecondary)),
-              AnimatedRotation(
-                // group-data-panel-open:rotate-180, duration-200 ease-out-quint
-                turns: _open ? 0.5 : 0,
-                duration: reduceMotion ? Duration.zero : HoronMotion.popupEnterDuration,
-                curve: HoronMotion.easeOutQuint,
-                child: Icon(Icons.expand_more, size: _iconSize, color: colors.textSecondary),
-              ),
-            ],
+                // `flex size-4` — 상태 아이콘 자리. 상태가 바뀌면 팝으로 갈아 끼웁니다.
+                SizedBox(
+                  width: _iconSize,
+                  height: _iconSize,
+                  child: Center(
+                    child: KeyedSubtree(
+                      key: ValueKey<HoronToolCallStatus>(widget.status),
+                      child: _PopIn(child: _statusIcon(theme)),
+                    ),
+                  ),
+                ),
+                if (widget.status == HoronToolCallStatus.failed)
+                  Text(_failedLabel, maxLines: 1, style: theme.text.labelSm.copyWith(color: colors.textDanger)),
+                if (widget.elapsed != null)
+                  Text(widget.elapsed!, maxLines: 1, style: theme.text.caption.copyWith(color: colors.textSecondary)),
+                AnimatedRotation(
+                  // group-data-panel-open:rotate-180, duration-200 ease-out-quint
+                  turns: _open ? 0.5 : 0,
+                  duration: reduceMotion ? Duration.zero : HoronMotion.popupEnterDuration,
+                  curve: HoronMotion.easeOutQuint,
+                  child: Icon(Icons.expand_more, size: _iconSize, color: colors.textSecondary),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -222,14 +244,11 @@ class _HoronToolCallState extends State<HoronToolCall> {
     );
   }
 
-  Widget? _statusMark(HoronThemeData theme) {
+  Widget _statusIcon(HoronThemeData theme) {
     return switch (widget.status) {
       HoronToolCallStatus.running => const HoronSpinner(), // size="sm" = 16
       HoronToolCallStatus.done => Icon(Icons.check_circle, size: _iconSize, color: theme.colors.statusLive),
-      HoronToolCallStatus.failed => Text(
-        _failedLabel,
-        style: theme.text.labelSm.copyWith(color: theme.colors.textDanger),
-      ),
+      HoronToolCallStatus.failed => Icon(Icons.error_outline, size: _iconSize, color: theme.colors.textDanger),
     };
   }
 
@@ -250,26 +269,32 @@ class _HoronToolCallState extends State<HoronToolCall> {
           if (widget.args != null)
             _Section(
               label: _argumentsLabel,
+              copyText: const JsonEncoder.withIndent('  ').convert(widget.args),
               child: HoronJsonCode(value: widget.args),
             ),
           if (!failed)
             _Section(
               label: _resultLabel,
+              // 결과가 아직 없으면 React처럼 복사 버튼을 그리지 않습니다.
+              copyText: waiting
+                  ? null
+                  : widget.result is String
+                  ? widget.result! as String
+                  : const JsonEncoder.withIndent('  ').convert(widget.result),
+              // `Show all`은 결과 섹션의 footer 슬롯으로 내려갑니다.
+              footer: widget.truncated && !waiting
+                  ? Align(
+                      alignment: Alignment.centerLeft,
+                      child: HoronButton(
+                        variant: HoronButtonVariant.link,
+                        label: _showAllLabel,
+                        onPressed: widget.onShowAll,
+                      ),
+                    )
+                  : null,
               child: waiting
                   ? Text(_waitingLabel, style: theme.text.bodySm.copyWith(color: colors.textSecondary))
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: space.s2, // gap-2 = 8
-                      children: <Widget>[
-                        HoronJsonCode(value: widget.result),
-                        if (widget.truncated)
-                          HoronButton(
-                            variant: HoronButtonVariant.link,
-                            label: _showAllLabel,
-                            onPressed: widget.onShowAll,
-                          ),
-                      ],
-                    ),
+                  : HoronJsonCode(value: widget.result),
             ),
         ],
       ),
@@ -304,14 +329,14 @@ class _HoronToolCallState extends State<HoronToolCall> {
     return TextButton.icon(
       onPressed: widget.onRetry,
       style: TextButton.styleFrom(
-        // px-2.5 py-1.5 rounded-sm border-border-default bg-bg-surface
-        padding: EdgeInsets.symmetric(horizontal: space.s2_5, vertical: space.s1_5),
-        minimumSize: Size.zero,
+        // h-7.5 rounded-full px-2.5 border-border-default bg-bg-surface
+        padding: EdgeInsets.symmetric(horizontal: space.s2_5),
+        minimumSize: const Size(0, 30),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         foregroundColor: colors.textPrimary,
         backgroundColor: colors.bgSurface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(theme.radius.sm),
+          borderRadius: BorderRadius.circular(theme.radius.full),
           side: BorderSide(color: colors.borderDefault),
         ),
       ),
@@ -321,12 +346,47 @@ class _HoronToolCallState extends State<HoronToolCall> {
   }
 }
 
-/// `tool-call.tsx`의 `Section`입니다. 라벨 줄과 본문 상자입니다.
-class _Section extends StatelessWidget {
-  const _Section({required this.label, required this.child});
+/// `tool-call.tsx`의 `Section`입니다. 라벨 줄, 본문 상자, footer 슬롯입니다.
+///
+/// `copyText`가 있으면 라벨 오른쪽에 실제 복사 버튼을 그립니다. 누르면 1.5초 동안
+/// 체크 아이콘으로 바뀌었다가 되돌아옵니다(React의 `copied` 상태).
+class _Section extends StatefulWidget {
+  const _Section({required this.label, required this.child, this.copyText, this.footer});
 
   final String label;
   final Widget child;
+
+  /// 복사할 본문의 평문입니다. 없으면 복사 버튼을 그리지 않습니다.
+  final String? copyText;
+
+  /// 본문 아래에 붙는 슬롯입니다. React의 `footer` prop입니다.
+  final Widget? footer;
+
+  @override
+  State<_Section> createState() => _SectionState();
+}
+
+class _SectionState extends State<_Section> {
+  bool _copied = false;
+  Timer? _revert;
+
+  @override
+  void dispose() {
+    _revert?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _copy() async {
+    final String? text = widget.copyText;
+    if (text == null) return;
+    await Clipboard.setData(ClipboardData(text: text));
+    if (!mounted) return;
+    setState(() => _copied = true);
+    _revert?.cancel();
+    _revert = Timer(const Duration(milliseconds: 1500), () {
+      if (mounted) setState(() => _copied = false);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -339,25 +399,134 @@ class _Section extends StatelessWidget {
       spacing: space.s1_5, // gap-1.5 = 6
       children: <Widget>[
         Row(
+          spacing: space.s2, // gap-2 = 8
           children: <Widget>[
             Expanded(
               child: Text(
-                label.toUpperCase(), // uppercase
+                widget.label.toUpperCase(), // uppercase
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.text.labelSm.copyWith(color: colors.textSecondary),
               ),
             ),
-            Icon(Icons.content_copy, size: _smallIconSize, color: colors.textSecondary),
+            if (widget.copyText != null) _CopyButton(label: widget.label, copied: _copied, onPressed: _copy),
           ],
         ),
         Container(
           // rounded-[10px] bg-bg-subtle px-3.5 py-3
           padding: EdgeInsets.fromLTRB(space.s3_5, space.s3, space.s3_5, space.s3),
           decoration: BoxDecoration(color: colors.bgSubtle, borderRadius: BorderRadius.circular(_boxRadius)),
-          child: child,
+          child: widget.child,
         ),
+        ?widget.footer,
       ],
+    );
+  }
+}
+
+/// `Section` 라벨 줄의 복사 버튼입니다.
+///
+/// 복사 직후에는 `Copied`로 읽히고 1.5초 뒤 `Copy <label>`로 돌아옵니다.
+class _CopyButton extends StatefulWidget {
+  const _CopyButton({required this.label, required this.copied, required this.onPressed});
+
+  final String label;
+  final bool copied;
+  final VoidCallback onPressed;
+
+  @override
+  State<_CopyButton> createState() => _CopyButtonState();
+}
+
+class _CopyButtonState extends State<_CopyButton> {
+  bool _hovered = false;
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final HoronSpaceSpec space = theme.space;
+    final Color foreground = widget.copied
+        ? colors.statusLive
+        : _hovered
+        ? colors.textPrimary
+        : colors.textSecondary;
+
+    return Semantics(
+      button: true,
+      label: widget.copied ? 'Copied' : 'Copy ${widget.label.toLowerCase()}',
+      child: FocusableActionDetector(
+        mouseCursor: SystemMouseCursors.click,
+        onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
+        onShowFocusHighlight: (bool value) => setState(() => _focused = value),
+        shortcuts: const <ShortcutActivator, Intent>{
+          SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+          SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+        },
+        actions: <Type, Action<Intent>>{
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (ActivateIntent intent) {
+              widget.onPressed();
+              return null;
+            },
+          ),
+        },
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onPressed,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              KeyedSubtree(
+                key: ValueKey<bool>(widget.copied),
+                child: _PopIn(
+                  child: Icon(
+                    widget.copied ? Icons.check : Icons.content_copy,
+                    size: _smallIconSize,
+                    color: foreground,
+                  ),
+                ),
+              ),
+              // `focus-visible:outline-2 outline-offset-2` — 레이아웃을 밀지 않는 2px 링.
+              if (_focused)
+                Positioned(
+                  left: -space.s0_5,
+                  top: -space.s0_5,
+                  right: -space.s0_5,
+                  bottom: -space.s0_5,
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: colors.textBrand, width: space.s0_5),
+                        borderRadius: BorderRadius.circular(theme.radius.xs),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// `animate-pop-in` — 나타날 때 0.6에서 1로 커지며 들어옵니다.
+class _PopIn extends StatelessWidget {
+  const _PopIn({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
+      duration: HoronMotion.popInDuration,
+      curve: HoronMotion.popInCurve,
+      builder: (BuildContext context, double scale, Widget? child) => Transform.scale(scale: scale, child: child),
+      child: child,
     );
   }
 }

@@ -31,6 +31,8 @@ void main() {
     expect(find.text('Plan · 2 steps'), findsOneWidget);
     expect(find.text('문서를 정리합니다'), findsOneWidget);
     expect(tester.widget<Text>(find.text('문서를 정리합니다')).style!.fontSize, theme.text.labelLg.fontSize);
+    // `font-semibold` — 제목만 600입니다.
+    expect(tester.widget<Text>(find.text('문서를 정리합니다')).style!.fontWeight, FontWeight.w600);
     expect(find.byIcon(Icons.checklist), findsOneWidget);
   });
 
@@ -65,9 +67,23 @@ void main() {
         elapsed: '3.1s',
       ),
     );
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronPlanCard)));
     expect(find.text('Running · 1 of 2'), findsOneWidget);
     expect(find.text('3.1s'), findsOneWidget);
     expect(find.byType(HoronSpinner), findsOneWidget);
+    // `h-px bg-overlay-ink-8` — 상태 줄 위 구분선은 8% 잉크입니다.
+    expect(
+      tester
+          .widgetList<ColoredBox>(find.byType(ColoredBox))
+          .any((ColoredBox box) => box.color == theme.colors.overlayInk8),
+      isTrue,
+    );
+    expect(
+      tester
+          .widgetList<ColoredBox>(find.byType(ColoredBox))
+          .any((ColoredBox box) => box.color == theme.colors.borderDefault),
+      isFalse,
+    );
   });
 
   testWidgets('plan card: the failed status paints the danger colour and the warning icon', (

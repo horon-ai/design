@@ -6,7 +6,8 @@ import '../surface_group.dart';
 /// `skeleton`의 갤러리 섹션입니다.
 ///
 /// 카드 세 모양을 solid와 glass 두 표면에 같은 목록으로 보여 주고, 블록·알약
-/// 자리표시자를 함께 놓습니다.
+/// 자리표시자를 함께 놓습니다. 카드 껍데기는 `rounded-xl`(20)이고, 반짝임은 트랙
+/// 밖에서 다시 그리지 않습니다(`bg-no-repeat`).
 class HoronSkeletonGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronSkeletonGallerySection({super.key});

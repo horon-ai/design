@@ -55,20 +55,20 @@ export function ToolPermissions({
   return (
     <div
       className={cn(
-        "flex w-full max-w-130 flex-col overflow-clip rounded-2xl border border-border-default bg-bg-surface",
+        "flex w-full max-w-130 min-w-0 flex-col overflow-clip rounded-2xl border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
     >
       <div className="flex h-11 items-center gap-2 border-b border-border-default bg-bg-subtle px-4">
-        <span className="text-label-md font-semibold text-text-primary">{title}</span>
-        <span className="inline-flex h-5 items-center rounded-full bg-overlay-ink-6 px-1.5 text-label-sm text-text-secondary">
+        <span className="min-w-0 truncate text-label-md font-semibold text-text-primary">{title}</span>
+        <span className="inline-flex h-5 shrink-0 items-center rounded-full bg-overlay-ink-6 px-1.5 text-label-sm text-text-secondary">
           <span className="text-trim">{tools.length}</span>
         </span>
-        <span className="flex-1" />
+        <span className="min-w-0 flex-1" />
         <button
           type="button"
-          className="cursor-pointer rounded-sm text-label-sm text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+          className="shrink-0 cursor-pointer rounded-sm text-label-sm whitespace-nowrap text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
           onClick={() => update(Object.fromEntries(tools.map((tool) => [tool.name, "allow" as const])))}
         >
           {allowAllLabel}
@@ -77,11 +77,13 @@ export function ToolPermissions({
       {tools.map((tool) => (
         <div
           key={tool.name}
-          className="flex items-center gap-4 border-b border-border-default px-4 py-3 last:border-b-0"
+          className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border-default px-4 py-3 last:border-b-0"
         >
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div className="flex min-w-0 grow basis-40 flex-col gap-1">
             <span className="truncate font-mono text-code font-medium text-text-primary">{tool.name}</span>
-            {tool.description && <span className="text-caption text-text-secondary">{tool.description}</span>}
+            {tool.description && (
+              <span className="text-caption wrap-break-word text-text-secondary">{tool.description}</span>
+            )}
           </div>
           <SegmentedControl
             aria-label={`${tool.name} permission`}

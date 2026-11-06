@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../contracts/surface.dart';
 import '../glass/horon_surface.dart';
+import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 import 'icon_button.dart';
@@ -88,10 +89,51 @@ class HoronPageHeader extends StatelessWidget {
                 ],
               ),
             ),
-            ?child,
+            if (child != null) _SwapMove(child: child!),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// `animate-swap-move` — 아래 줄 내용이 4px에서 제자리로 올라옵니다.
+///
+/// React의 래퍼는 키가 없어 children이 처음 나타날 때 한 번만 재생합니다. 내용이
+/// 바뀌어도 다시 재생하지 않습니다.
+class _SwapMove extends StatefulWidget {
+  const _SwapMove({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_SwapMove> createState() => _SwapMoveState();
+}
+
+class _SwapMoveState extends State<_SwapMove> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(vsync: this, duration: HoronMotion.swapMoveDuration);
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return widget.child;
+    final Animation<double> curve = CurvedAnimation(parent: _controller, curve: HoronMotion.swapMoveCurve);
+    return AnimatedBuilder(
+      animation: curve,
+      builder: (BuildContext context, Widget? child) =>
+          Transform.translate(offset: Offset(0, HoronMotion.swapMoveOffset * (1 - curve.value)), child: child),
+      child: widget.child,
     );
   }
 }

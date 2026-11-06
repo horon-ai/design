@@ -23,7 +23,7 @@ export function UsageMeter({ label, value, detail, note, surface = "solid", clas
     <Meter.Root
       value={value}
       className={cn(
-        "relative flex w-75 flex-col gap-2 overflow-clip rounded-xl p-4",
+        "relative flex w-full max-w-75 min-w-0 flex-col gap-2 overflow-clip rounded-xl p-4",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         className,
       )}

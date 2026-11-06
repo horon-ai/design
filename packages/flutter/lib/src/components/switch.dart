@@ -30,8 +30,8 @@ const Duration _thumbTransition = Duration(milliseconds: 220);
 ///
 /// 트랙은 꺼짐에서 `border-strong`, 켜짐에서 `interactive-primary`이고 hover에서
 /// 각각 `interactive-secondary-hover`·`interactive-primary-hover`로 바뀝니다. 썸은
-/// 라이트에서 꺼짐 `text-on-ink`·켜짐 `interactive-on-primary`, 다크에서는 둘 다
-/// `bg-default`입니다(`dark:bg-bg-default`).
+/// 밝기와 관계없이 꺼짐 `text-on-ink`·켜짐 `interactive-on-primary`입니다. React가
+/// 다크 전용 썸 예외를 없앴기 때문입니다.
 class HoronSwitch extends StatefulWidget {
   /// 스위치를 만듭니다.
   const HoronSwitch({
@@ -86,13 +86,10 @@ class _HoronSwitchState extends State<HoronSwitch> {
         ? (_hovered && interactive ? colors.interactivePrimaryHover : colors.interactivePrimary)
         : (_hovered && interactive ? colors.interactiveSecondaryHover : colors.borderStrong);
 
-    // dark:bg-bg-default dark:data-checked:bg-bg-default — 다크에서는 썸이 두 상태 모두 표면색입니다.
-    final bool isDark = theme.brightness == Brightness.dark;
-    final Color thumbColor = isDark
-        ? colors.bgDefault
-        : widget.value
-        ? colors.interactiveOnPrimary
-        : colors.textOnInk;
+    // bg-text-on-ink / data-checked:bg-interactive-on-primary — 썸은 밝기와 관계없이
+    // 꺼짐에서 `text-on-ink`, 켜짐에서 `interactive-on-primary`입니다. React는
+    // `Brightness.dark` 전용 썸 분기를 없앴습니다.
+    final Color thumbColor = widget.value ? colors.interactiveOnPrimary : colors.textOnInk;
 
     final Duration thumbDuration = reduceMotion ? Duration.zero : _thumbTransition;
 

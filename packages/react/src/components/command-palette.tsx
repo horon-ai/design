@@ -64,7 +64,8 @@ export function CommandPalette({
           <Dialog.Popup
             aria-label={placeholder}
             className={cn(
-              "relative flex w-140 max-w-full motion-popup flex-col overflow-clip rounded-[24px] p-1.5",
+              // 560px where it fits; the viewport's 8px gutters cap `w-full` below that.
+              "relative flex w-full max-w-140 motion-popup flex-col overflow-clip rounded-[24px] p-1.5",
               surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-palette",
               "duration-240 data-starting-style:translate-y-2",
               className,
@@ -82,7 +83,7 @@ export function CommandPalette({
               onSelect={() => onOpenChange?.(false)}
             />
             {hints && hints.length > 0 && (
-              <div className="relative flex items-center gap-4 px-3 pt-2 pb-1">
+              <div className="relative flex flex-wrap items-center gap-x-4 gap-y-1 px-3 pt-2 pb-1">
                 {hints.map(([key, label]) => (
                   <span key={label} className="flex items-center gap-1.5 text-caption text-text-secondary">
                     <Kbd>{key}</Kbd>

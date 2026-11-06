@@ -6,8 +6,9 @@ import '../surface_group.dart';
 /// `banner`의 갤러리 섹션입니다.
 ///
 /// 정보·위험 두 톤과, 동작이 붙은 경우를 solid와 glass 두 표면에 같은 목록으로
-/// 보여 줍니다. Paper `TY7-1`의 인스턴스 폭 640에 맞춰 넓은 화면에서도 640을 넘지
-/// 않게 둡니다.
+/// 보여 줍니다. 본문은 기본 글자색이고 톤 색은 아이콘과 밑줄 동작에만 남습니다.
+/// 세로 여백은 `py-2.5`/`py-3`이라 한 줄 띠가 48px입니다. Paper `TY7-1`의 인스턴스
+/// 폭 640에 맞춰 넓은 화면에서도 640을 넘지 않게 둡니다.
 class HoronBannerGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronBannerGallerySection({super.key});

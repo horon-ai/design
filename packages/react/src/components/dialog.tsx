@@ -48,7 +48,8 @@ export function DialogContent({
       <BaseDialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center px-4">
         <BaseDialog.Popup
           className={cn(
-            "relative flex max-h-[calc(100dvh-2rem)] w-105 max-w-[calc(100vw-2rem)] flex-col items-start gap-4 overflow-y-auto overscroll-contain rounded-xl p-6 outline-none",
+            // 420px where it fits; the viewport's 16px gutters cap `w-full` below that.
+            "relative flex max-h-[calc(100dvh-2rem)] w-full max-w-105 flex-col items-start gap-4 overflow-y-auto overscroll-contain rounded-xl p-6 outline-none",
             solid ? "bg-bg-surface shadow-[0_24px_64px_#0A142433]" : "veil-overlay",
             "motion-popup duration-240 data-starting-style:translate-y-2",
             className,

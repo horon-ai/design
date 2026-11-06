@@ -21,7 +21,7 @@ export function ChoiceCard({ title, description, badge, badgeTone = "brand", cla
   return (
     <BaseRadio.Root
       className={cn(
-        "group relative flex w-[252px] cursor-pointer items-start gap-3 overflow-clip rounded-2xl border border-border-default bg-bg-surface p-3.5 text-left motion-colors data-checked:border-border-brand data-unchecked:hover:border-border-strong",
+        "group relative flex w-full max-w-[252px] cursor-pointer items-start gap-3 overflow-clip rounded-2xl border border-border-default bg-bg-surface p-3.5 text-left motion-colors data-checked:border-border-brand data-unchecked:hover:border-border-strong",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
         "data-disabled:cursor-not-allowed data-disabled:opacity-40",
         className,

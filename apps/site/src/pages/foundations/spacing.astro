@@ -16,10 +16,15 @@ const steps = Object.entries(spacing);
   <div class="mt-5 flex flex-col gap-2 rounded-xl border border-border-default bg-bg-subtle p-5">
     {
       steps.map(([step, value]) => (
-        <div class="flex items-center gap-4">
-          <span class="w-24 shrink-0 font-mono text-caption text-text-secondary">spacing-{step}</span>
-          <span class="h-4 rounded-xs bg-status-live" style={`width: ${value * 4}px`} />
-          <span class="font-mono text-caption text-text-primary">{value}px</span>
+        // The bar must keep its token width to be readable. Below `sm` the widest bar
+        // no longer fits beside the label, so the bar and its value wrap together as
+        // one line instead of splitting into two.
+        <div class="flex flex-wrap items-center gap-4">
+          <span class="w-20 shrink-0 font-mono text-caption text-text-secondary sm:w-24">spacing-{step}</span>
+          <span class="flex items-center gap-4">
+            <span class="h-4 shrink-0 rounded-xs bg-status-live" style={`width: ${value * 4}px`} />
+            <span class="font-mono text-caption text-text-primary">{value}px</span>
+          </span>
         </div>
       ))
     }

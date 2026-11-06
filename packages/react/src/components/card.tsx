@@ -43,8 +43,9 @@ export function Card({
         // `isolate` makes the card its own stacking context so the glass layer can sit at
         // `-z-10`: behind the title, description and children, above the card's own fill.
         // Without it the absolutely positioned layer paints over static body content and
-        // every screen has to patch the card's className to lift it.
-        "relative isolate flex flex-col items-start gap-2 overflow-clip rounded-xl p-5 text-left motion-colors [&>.liquid-layers]:-z-10",
+        // every screen has to patch the card's className to lift it. `min-w-0` keeps the
+        // grid/flex min-content of the card from widening a narrow parent.
+        "relative isolate flex min-w-0 flex-col items-start gap-2 overflow-clip rounded-xl p-5 text-left motion-colors [&>.liquid-layers]:-z-10",
         surface === "solid" ? "border border-border-default bg-bg-surface" : "bg-glass-thick",
         surface === "frost" && "bg-glass-fill-frost shadow-[0_8px_24px_#0a14240f]",
         selected && (surface === "solid" ? "border-border-brand" : "[--glass-edge:var(--color-border-brand)]"),

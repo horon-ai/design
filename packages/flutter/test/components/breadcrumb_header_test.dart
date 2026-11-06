@@ -93,6 +93,15 @@ void main() {
     handle.dispose();
   });
 
+  testWidgets('crumbs are rendered by BreadcrumbItem so one style owns them', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronBreadcrumbHeader(crumbs: _crumbs())));
+
+    expect(find.byType(HoronBreadcrumbItem), findsNWidgets(3), reason: '조각 렌더는 BreadcrumbItem 하나입니다');
+    final HoronBreadcrumbItem current = tester.widget<HoronBreadcrumbItem>(find.byType(HoronBreadcrumbItem).last);
+    expect(current.current, isTrue, reason: '마지막 조각이 현재 페이지');
+    expect(current.label, '설정');
+  });
+
   testWidgets('a crumb tap calls back only when the crumb is not the current page', (WidgetTester tester) async {
     int taps = 0;
     await tester.pumpWidget(_host(HoronBreadcrumbHeader(crumbs: _crumbs(onWorkspace: () => taps += 1))));
@@ -102,8 +111,31 @@ void main() {
     expect(taps, 1);
   });
 
+  testWidgets('the icon buttons appear only when their handlers are given', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronBreadcrumbHeader(crumbs: _crumbs())));
+    expect(find.byIcon(Icons.search), findsNothing, reason: 'onSearch가 없으면 검색 버튼도 없습니다');
+    expect(find.byIcon(Icons.more_horiz), findsNothing, reason: 'onMore가 없으면 더 보기 버튼도 없습니다');
+
+    await tester.pumpWidget(_host(HoronBreadcrumbHeader(crumbs: _crumbs(), onSearch: () {})));
+    expect(find.byIcon(Icons.search), findsOneWidget);
+    expect(find.byIcon(Icons.more_horiz), findsNothing, reason: '두 콜백은 따로 게이트됩니다');
+
+    await tester.pumpWidget(_host(HoronBreadcrumbHeader(crumbs: _crumbs(), onMore: () {})));
+    expect(find.byIcon(Icons.search), findsNothing);
+    expect(find.byIcon(Icons.more_horiz), findsOneWidget);
+  });
+
   testWidgets('narrow widths wrap the crumb row instead of clipping it', (WidgetTester tester) async {
-    final Widget header = HoronBreadcrumbHeader(crumbs: _crumbs());
+    // 버튼 자리까지 포함한 폭에서 조각이 줄을 바꾸는지 봅니다.
+    final Widget header = HoronBreadcrumbHeader(
+      crumbs: const <HoronBreadcrumbHeaderCrumb>[
+        HoronBreadcrumbHeaderCrumb(label: '워크스페이스 설정과 통합'),
+        HoronBreadcrumbHeaderCrumb(label: '에이전트 관리 목록'),
+        HoronBreadcrumbHeaderCrumb(label: '위험한 도구 승인 기록'),
+      ],
+      onSearch: () {},
+      onMore: () {},
+    );
 
     await tester.pumpWidget(_host(header, width: 1024));
     final double wide = tester.getSize(find.byType(HoronBreadcrumbHeader)).height;

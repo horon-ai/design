@@ -31,13 +31,13 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        "relative flex flex-col gap-1.5 overflow-clip rounded-[28px] p-2",
+        "relative flex max-w-full min-w-0 flex-col gap-1.5 overflow-clip rounded-[28px] p-2",
         surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
         className,
       )}
     >
       {surface === "glass" && <LiquidGlass />}
-      <div className="relative flex h-10 items-center gap-2">
+      <div className="relative flex h-10 min-w-0 items-center gap-2">
         {onBack && <IconButton icon={<CaretLeft />} label={backLabel} onClick={onBack} />}
         <h1 className={cn("min-w-0 flex-1 truncate text-label-lg text-text-primary", !onBack && "pl-2")}>{title}</h1>
         {actions}

@@ -10,13 +10,13 @@ const double _borderWidth = 1.5;
 
 /// `checkbox.tsx`의 `CheckboxSize`입니다.
 enum HoronCheckboxSize {
-  /// `size="sm"` — 18px 상자, 5px 반경, `body-sm`, 아이콘 12px.
+  /// `size="sm"` — 18px 상자, 6px 반경, `body-sm`, 아이콘 12px.
   sm,
 
   /// `size="md"` — 20px 상자, 6px 반경, `body-md`, 아이콘 14px. 기본값입니다.
   md,
 
-  /// `size="lg"` — 24px 상자, 3px 반경, `body-lg`, 아이콘 16px.
+  /// `size="lg"` — 24px 상자, 6px 반경, `body-lg`, 아이콘 16px.
   lg,
 }
 
@@ -25,7 +25,7 @@ typedef _CheckboxMetrics = ({double side, double radius, double gap, double indi
 _CheckboxMetrics _metricsOf(HoronCheckboxSize size, HoronThemeData theme) => switch (size) {
   HoronCheckboxSize.sm => (
     side: theme.space.step(4.5),
-    radius: theme.space.step(1.25),
+    radius: theme.radius.xs,
     gap: theme.space.s2,
     indicator: 12,
     textStyle: theme.text.bodySm,
@@ -39,7 +39,7 @@ _CheckboxMetrics _metricsOf(HoronCheckboxSize size, HoronThemeData theme) => swi
   ),
   HoronCheckboxSize.lg => (
     side: theme.space.step(6),
-    radius: theme.space.step(0.75),
+    radius: theme.radius.xs,
     gap: theme.space.s3,
     indicator: 16,
     textStyle: theme.text.bodyLg,
@@ -112,8 +112,10 @@ class _HoronCheckboxState extends State<HoronCheckbox> {
     final Color fill = _marked
         ? (_hovered && interactive ? colors.interactivePrimaryHover : colors.interactivePrimary)
         : colors.bgSurface;
+    // React `data-checked:border-interactive-primary` — 선택해도 테두리 두께 1.5는 남고
+    // 색만 잉크색으로 바뀝니다. 꺼짐은 `border-border-strong`(hover에서 `text-secondary`)입니다.
     final Color borderColor = _marked
-        ? Colors.transparent
+        ? (_hovered && interactive ? colors.interactivePrimaryHover : colors.interactivePrimary)
         : (_hovered && interactive ? colors.textSecondary : colors.borderStrong);
 
     final Widget box = AnimatedContainer(
@@ -124,25 +126,33 @@ class _HoronCheckboxState extends State<HoronCheckbox> {
       decoration: BoxDecoration(
         color: fill,
         borderRadius: BorderRadius.circular(radius),
-        // data-checked:border-0 data-indeterminate:border-0 — 선택되면 테두리가 사라집니다.
-        border: Border.all(color: borderColor, width: _marked ? 0 : _borderWidth),
+        border: Border.all(color: borderColor, width: _borderWidth),
       ),
-      child: _marked
-          ? Center(
-              child: TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
-                duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
-                curve: HoronMotion.popInCurve,
-                builder: (BuildContext context, double scale, Widget? child) =>
-                    Transform.scale(scale: scale, child: child),
-                child: Icon(
+      child: Center(
+        // React는 `animate-pop-in`으로 들어오고 `data-ending-style:animate-scale-out`으로
+        // 나갑니다. AnimatedSwitcher의 reverseDuration이 나가는 쪽 시간을 나릅니다.
+        child: AnimatedSwitcher(
+          duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
+          reverseDuration: reduceMotion ? Duration.zero : HoronMotion.scaleOutDuration,
+          switchInCurve: HoronMotion.popInCurve,
+          switchOutCurve: HoronMotion.scaleOutCurve,
+          transitionBuilder: (Widget child, Animation<double> animation) => FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: HoronMotion.popInScale, end: 1).animate(animation),
+              child: child,
+            ),
+          ),
+          child: _marked
+              ? Icon(
                   widget.value == null ? Icons.remove : Icons.check,
+                  key: ValueKey<String>(widget.value == null ? 'indeterminate' : 'checked'),
                   size: metrics.indicator,
                   color: colors.interactiveOnPrimary,
-                ),
-              ),
-            )
-          : null,
+                )
+              : const SizedBox.shrink(key: ValueKey<String>('unchecked')),
+        ),
+      ),
     );
 
     final Widget content = Row(

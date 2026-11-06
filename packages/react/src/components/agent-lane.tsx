@@ -32,7 +32,7 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
   return (
     <div
       className={cn(
-        "flex flex-col gap-1.5 rounded-2xl border bg-bg-surface px-4 py-3 motion-colors",
+        "flex min-w-0 flex-col gap-1.5 rounded-2xl border bg-bg-surface px-4 py-3 motion-colors",
         status === "failed" ? "border-border-danger" : "border-border-default",
         className,
       )}
@@ -57,7 +57,7 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
         </span>
         {elapsed && <span className="shrink-0 tabular-nums">{elapsed}</span>}
       </div>
-      <p className="text-label-lg text-text-primary">{task}</p>
+      <p className="min-w-0 text-label-lg wrap-break-word text-text-primary">{task}</p>
       {tool && (
         <div className="flex items-center gap-1.5 text-caption text-text-secondary [&>svg]:size-3.5">
           {tool.icon}
@@ -65,7 +65,14 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
         </div>
       )}
       {output && (
-        <p className={cn("text-body-sm", status === "failed" ? "text-text-danger" : "text-text-primary")}>{output}</p>
+        <p
+          className={cn(
+            "min-w-0 text-body-sm wrap-break-word",
+            status === "failed" ? "text-text-danger" : "text-text-primary",
+          )}
+        >
+          {output}
+        </p>
       )}
       {usage && <p className="text-caption text-text-secondary">{usage}</p>}
     </div>

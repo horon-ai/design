@@ -23,12 +23,16 @@ function applyTheme(dark: boolean): void {
  * truth: BaseLayout's inline script applies the stored value before first
  * paint, and the two icons swap through CSS, so the button needs no React state
  * and cannot disagree with the page after hydration.
+ *
+ * `className` carries the header's narrow-width size rung, so the button keeps
+ * the 44px painted reach while its visible box shrinks below `sm`.
  */
-export function ThemeToggle() {
+export function ThemeToggle({ className }: { className?: string }) {
   const locale = useLocale();
   return (
     <IconButton
       variant="ghost"
+      className={className}
       icon={
         <>
           <Sun className="dark:hidden" />

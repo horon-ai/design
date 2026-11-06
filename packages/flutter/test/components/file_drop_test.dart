@@ -53,23 +53,35 @@ void main() {
     expect(labelLeft - iconRight, greaterThanOrEqualTo(space.s2));
   });
 
-  testWidgets('거부된 파일은 위험 테두리를 쓴다', (WidgetTester tester) async {
+  testWidgets('거부된 파일은 점선을 유지한 채 위험 테두리와 위험 글자를 쓴다', (WidgetTester tester) async {
     await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop(rejected: true)));
     expect(_border('rejected'), findsOneWidget);
     expect(_border('idle'), findsNothing);
+    // React는 `border-style` 전환이 안 되므로 점선을 그대로 두고 안쪽 1px 링으로 알립니다.
+    expect(_strokeOf(tester, 'rejected'), colors.borderDanger);
+    expect(_insetOf(tester, 'rejected'), colors.borderDanger, reason: 'inset 1px 위험 링');
+    expect(
+      tester.widget<Text>(find.text(_label)).style!.color,
+      colors.textDanger,
+      reason: 'data-rejected:text-text-danger',
+    );
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('업로드 중에는 아이콘 대신 진행 표시를 그린다', (WidgetTester tester) async {
+  testWidgets('업로드 중에는 아이콘 대신 진행 표시를 그리고 라벨만 60%로 낮춘다', (WidgetTester tester) async {
     await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop(uploading: true)));
     expect(tester.takeException(), isNull);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(find.byIcon(Icons.file_upload_outlined), findsNothing);
-    // 업로드 중에는 누를 수 없고 `opacity-40`입니다.
-    final Opacity opacity = tester.widget<Opacity>(
+    // React `uploading && "opacity-60"` — 라벨에만 걸고 상자 전체는 흐리지 않습니다.
+    final Opacity labelOpacity = tester.widget<Opacity>(
       find.ancestor(of: find.text(_label), matching: find.byType(Opacity)).first,
     );
-    expect(opacity.opacity, 0.4);
+    expect(labelOpacity.opacity, 0.6, reason: 'uploading 라벨 opacity-60');
+    final Opacity outerOpacity = tester.widget<Opacity>(
+      find.ancestor(of: find.text(_label), matching: find.byType(Opacity)).last,
+    );
+    expect(outerOpacity.opacity, 1, reason: '업로드 중에는 상자를 흐리지 않습니다');
   });
 
   testWidgets('누르면 onTap을 부르고 비활성이면 부르지 않는다', (WidgetTester tester) async {
@@ -135,21 +147,38 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('쉬는 상태는 점선만 그리고 안쪽 링이 없다', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop()));
+    expect(_strokeOf(tester, 'idle'), colors.borderDashed, reason: 'border-border-dashed');
+    expect(_insetOf(tester, 'idle'), isNull, reason: '상태가 없으면 inset 링이 없습니다');
+  });
+
   testWidgets('solid 표면은 bg-surface로 채우고 점선 테두리를 유지한다', (WidgetTester tester) async {
     await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop()));
     expect(_fillColor(tester), colors.bgSurface);
     expect(_border('idle'), findsOneWidget);
     expect(find.byType(HoronLiquidGlass), findsNothing);
+    expect(find.byType(HoronVeil), findsNothing, reason: 'solid은 veil을 쓰지 않습니다');
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('glass 표면은 bg-glass-clear 위에 LiquidGlass 레이어를 깐다', (WidgetTester tester) async {
+  testWidgets('glass 표면은 링 없는 veil-drop 위에 점선 테두리만 남긴다', (WidgetTester tester) async {
     await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop(surface: HoronFileDropSurface.glass)));
-    expect(_fillColor(tester), colors.glassClear);
-    expect(find.byType(HoronLiquidGlass), findsOneWidget);
+    final HoronVeil veil = tester.widget<HoronVeil>(find.byType(HoronVeil));
+    expect(veil.kind, HoronVeilKind.drop, reason: '.veil-drop');
+    expect(find.byType(HoronLiquidGlass), findsNothing);
     // 점선 테두리는 glass에서도 그대로입니다.
     expect(_border('idle'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('라벨은 text-label-md 14/20이다', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(Brightness.light, const HoronFileDrop()));
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronFileDrop)));
+    final TextStyle style = tester.widget<Text>(find.text(_label)).style!;
+    expect(style.fontSize, theme.text.labelMd.fontSize);
+    expect(style.height, theme.text.labelMd.height);
+    expect(style.color, theme.colors.textSecondary);
   });
 
   testWidgets('glass에서도 거부는 위험 테두리로 바뀐다', (WidgetTester tester) async {
@@ -201,6 +230,14 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 }
+
+/// 테두리 선 색입니다. painter는 라이브러리 비공개라 필드만 동적으로 읽습니다.
+Color? _strokeOf(WidgetTester tester, String state) =>
+    (tester.widget<CustomPaint>(_border(state)).painter! as dynamic).color as Color?;
+
+/// 상태별 안쪽 링 색입니다. 없으면 null입니다.
+Color? _insetOf(WidgetTester tester, String state) =>
+    (tester.widget<CustomPaint>(_border(state)).painter! as dynamic).inset as Color?;
 
 /// 표면 채움의 색을 읽습니다.
 Color? _fillColor(WidgetTester tester) {

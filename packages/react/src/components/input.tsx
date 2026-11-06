@@ -36,7 +36,7 @@ export const fieldTextClass: Record<ControlSize, string> = {
 
 export const fieldBoxClass = {
   /** The box is the focus target's container, so the ring is drawn on `:focus-within`, not on the inner input. */
-  base: "motion-colors relative flex items-center overflow-clip rounded-md border focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
+  base: "motion-colors relative flex min-w-0 max-w-full items-center overflow-clip rounded-md border focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
   /** The veil field (globals.css `.veil-field`): no liquid layers, so hosts render no `LiquidGlass`. */
   glass: "veil-field has-[[data-disabled]]:opacity-60 has-[:disabled]:opacity-60",
   solid:

@@ -75,7 +75,13 @@ void main() {
     expect(find.text('Studio'), findsOneWidget);
     expect(find.text('New workspace'), findsOneWidget);
     expect(find.text('Workspace settings'), findsOneWidget);
-    expect(find.byIcon(Icons.check), findsOneWidget, reason: '현재 워크스페이스에만 체크가 붙습니다');
+    // React는 체크를 모든 행에 그려 두고(`transition-opacity`) 현재 행만 불투명하게
+    // 만듭니다. 그래야 선택이 옮겨 갈 때 행 너비가 흔들리지 않습니다.
+    expect(find.byIcon(Icons.check), findsNWidgets(3), reason: '체크는 행마다 자리를 잡습니다');
+    final Iterable<AnimatedOpacity> fades = tester.widgetList<AnimatedOpacity>(
+      find.descendant(of: find.byType(HoronMenuContent), matching: find.byType(AnimatedOpacity)),
+    );
+    expect(fades.where((AnimatedOpacity fade) => fade.opacity == 1).length, 1, reason: '현재 행만 보입니다');
     expect(find.text('4 members'), findsOneWidget, reason: 'meta는 설명 줄입니다');
     expect(find.text('P'), findsOneWidget, reason: '이니셜이 없으면 이름의 첫 글자를 씁니다');
     // `size-7 rounded-sm … text-label-sm text-text-inverse` — 타일 이니셜은 12/16 500입니다.
@@ -91,8 +97,8 @@ void main() {
         .first;
     expect(
       (tester.widget<AnimatedContainer>(current).decoration! as BoxDecoration).color,
-      theme.colors.overlayInk6,
-      reason: '현재 행은 bg-overlay-ink-6입니다',
+      theme.colors.bgBrand,
+      reason: '현재 행은 React `selected`의 bg-bg-brand입니다',
     );
   });
 

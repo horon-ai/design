@@ -93,7 +93,7 @@ void main() {
     expect(decoration.borderRadius, BorderRadius.circular(24)); // rounded-[24px]
   });
 
-  testWidgets('header: the picker moves its 30x28 indicator 32px per step', (WidgetTester tester) async {
+  testWidgets('header: the parallel picker is the sm inset segmented control', (WidgetTester tester) async {
     int? picked;
     await pumpPanel(
       tester,
@@ -106,9 +106,15 @@ void main() {
       ),
     );
     expect(find.text('Bots in parallel'), findsOneWidget);
-    // 기본 선택이 없으면 표시자를 그리지 않습니다.
-    expect(find.byType(AnimatedPositioned), findsOneWidget);
-    expect(tester.widget<AnimatedPositioned>(find.byType(AnimatedPositioned)).left, 32);
+    // React는 `SegmentedControl size="sm" surface="inset"`을 씁니다.
+    final HoronSegmentedControl control = tester.widget<HoronSegmentedControl>(find.byType(HoronSegmentedControl));
+    expect(control.size, HoronSegmentedControlSize.sm);
+    expect(control.surface, HoronSegmentedControlSurface.inset);
+    expect(control.fill, isFalse);
+    expect(control.value, '3');
+    expect(control.items.map((HoronSegmentedItem item) => item.label), <String>['2', '3', '4']);
+    // 인셋 트랙 높이는 5% 잉크 트랙 위 30px 세그먼트 + 3px 여백입니다.
+    expect(tester.getSize(find.byType(HoronSegmentedControl)).height, 36);
 
     await tester.tap(find.text('4'));
     await tester.pumpAndSettle();
@@ -117,7 +123,7 @@ void main() {
 
   testWidgets('header: no options means no picker, no onStop means no button', (WidgetTester tester) async {
     await pumpPanel(tester, const HoronOrchestratorPanel(title: 'Research run', lead: _lead));
-    expect(find.byType(AnimatedPositioned), findsNothing);
+    expect(find.byType(HoronSegmentedControl), findsNothing);
     expect(find.text('Stop'), findsNothing);
   });
 
@@ -223,7 +229,9 @@ void main() {
     );
     final BoxDecoration decoration = box.decoration! as BoxDecoration;
     expect(decoration.color, theme.colors.overlayInk4);
-    expect(decoration.borderRadius, BorderRadius.circular(16)); // rounded-[16px]
+    expect(decoration.borderRadius, BorderRadius.circular(theme.radius.xl2)); // rounded-2xl
+    // `px-4` — 요약 상자는 좌우 16입니다.
+    expect(box.padding, const EdgeInsets.symmetric(horizontal: 16, vertical: 12));
   });
 
   testWidgets('responsive: a 320 phone lays the header out without an exception', (WidgetTester tester) async {

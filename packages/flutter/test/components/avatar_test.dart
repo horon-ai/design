@@ -71,6 +71,21 @@ void main() {
     // Paper `TU8-1`의 링색은 라이트 #FFFFFF·다크 #17181A인 `bg-surface`입니다.
     expect((dot.border! as Border).top.color, theme.colors.bgSurface);
     expect(tester.getSize(find.byType(HoronAvatar)).width, 32);
+
+    // `liveRingClassName` — 뒤 표면 색을 넘기면 링이 그 색으로 바뀝니다.
+    await pumpAvatar(tester, HoronAvatar.initials('MJ', live: true, liveRingColor: theme.colors.bgSubtle));
+    expect((liveDot(tester, theme).border! as Border).top.color, theme.colors.bgSubtle);
+  });
+
+  testWidgets('avatar: the face carries a 1px inset overlay-ink-6 hairline', (WidgetTester tester) async {
+    await pumpAvatar(tester, const HoronAvatar.initials('MJ'));
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronAvatar)));
+    final Container face = tester.widget<Container>(find.byType(Container).first);
+    final BoxDecoration decoration = face.decoration! as BoxDecoration;
+
+    expect(decoration.shape, BoxShape.circle);
+    expect((decoration.border! as Border).top.color, theme.colors.overlayInk6);
+    expect((decoration.border! as Border).top.width, 1, reason: 'inset-ring-1');
   });
 
   testWidgets('avatar: the live dot hangs 1px outside and centres 4/4.5/5.5/8px inside', (WidgetTester tester) async {

@@ -62,7 +62,7 @@ void main() {
     expect(tester.widget<Padding>(padding).padding, EdgeInsets.all(theme.space.step(0.75)), reason: 'p-[3px]');
   });
 
-  testWidgets('each option is a 30px pill with px-3 and the 10% indicator sits on the selection', (
+  testWidgets('each option is a 30px pill with px-4 and the 10% indicator sits on the selection', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(_host(const HoronFilterBar(items: _items)));
@@ -72,8 +72,8 @@ void main() {
     expect(tester.getSize(_option('전체')).height, theme.space.step(7.5), reason: 'h-7.5 = 30');
     expect(
       tester.widget<Container>(_option('전체')).padding,
-      EdgeInsets.symmetric(horizontal: theme.space.s3),
-      reason: 'px-3',
+      EdgeInsets.symmetric(horizontal: theme.space.s4),
+      reason: 'px-4',
     );
     expect(_indicator(theme.colors), findsOneWidget);
 
@@ -110,6 +110,18 @@ void main() {
     await pointer.moveTo(tester.getCenter(find.text('대기')));
     await tester.pump();
     expect(colorOf('대기'), colors.textPrimary, reason: 'hover:text-text-primary');
+
+    // `hover:bg-overlay-ink-5` — 선택되지 않은 옵션만 hover에서 5% 잉크를 깝니다.
+    Color? fillOf(String label) =>
+        (tester
+                    .widget<AnimatedContainer>(
+                      find.ancestor(of: find.text(label), matching: find.byType(AnimatedContainer)).first,
+                    )
+                    .decoration!
+                as BoxDecoration)
+            .color;
+    expect(fillOf('대기'), colors.overlayInk5);
+    expect(fillOf('전체'), Colors.transparent, reason: '선택된 옵션은 표시자가 바탕을 맡습니다');
   });
 
   testWidgets('tapping an option selects it and calls back once', (WidgetTester tester) async {
@@ -132,13 +144,13 @@ void main() {
     expect(indicator.width, option.width);
   });
 
-  testWidgets('a disabled option is 50% opaque and does not select', (WidgetTester tester) async {
+  testWidgets('a disabled option is 40% opaque and does not select', (WidgetTester tester) async {
     final List<String> changes = <String>[];
     await tester.pumpWidget(_host(HoronFilterBar(items: _items, onChanged: changes.add)));
     await tester.pump();
 
     final Finder failed = find.ancestor(of: find.text('실패'), matching: find.byType(Opacity)).first;
-    expect(tester.widget<Opacity>(failed).opacity, 0.5, reason: 'disabled:opacity-50');
+    expect(tester.widget<Opacity>(failed).opacity, 0.4, reason: 'disabled:opacity-40');
 
     await tester.tap(find.text('실패'));
     await tester.pump();

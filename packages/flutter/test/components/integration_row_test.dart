@@ -62,12 +62,18 @@ void main() {
     for (final HoronIntegrationStatus status in HoronIntegrationStatus.values) {
       await tester.pumpWidget(_host(_row(status, onAction: () {}), width: 720));
       await tester.pumpAndSettle();
-      final Color expected = switch (status) {
-        HoronIntegrationStatus.connected => HoronPalette.sky500,
-        HoronIntegrationStatus.reconnect => HoronPalette.sky700,
-        HoronIntegrationStatus.notConnected => theme.colors.interactivePrimary,
+      // bg-sky-500 text-neutral-50 / bg-sky-700 text-neutral-50 / bg-bg-subtle text-text-secondary
+      final (Color expected, Color glyph) = switch (status) {
+        HoronIntegrationStatus.connected => (HoronPalette.sky500, HoronPalette.neutral50),
+        HoronIntegrationStatus.reconnect => (HoronPalette.sky700, HoronPalette.neutral50),
+        HoronIntegrationStatus.notConnected => (theme.colors.bgSubtle, theme.colors.textSecondary),
       };
       expect(_tileColor(tester), expected, reason: status.name);
+      expect(
+        IconTheme.of(tester.element(find.byIcon(Icons.cloud_outlined))).color,
+        glyph,
+        reason: '${status.name} 타일 글자색',
+      );
       final String control = switch (status) {
         HoronIntegrationStatus.connected => 'Connected',
         HoronIntegrationStatus.reconnect => 'Reconnect',

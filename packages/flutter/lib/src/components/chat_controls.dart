@@ -281,12 +281,12 @@ class _HoronVoiceInputState extends State<HoronVoiceInput> with SingleTickerProv
                         width: 36,
                         height: 36,
                         alignment: Alignment.center,
-                        decoration: BoxDecoration(color: theme.colors.textDanger, shape: BoxShape.circle),
+                        decoration: BoxDecoration(color: theme.colors.interactiveDanger, shape: BoxShape.circle),
                         child: Container(
                           width: 12,
                           height: 12,
                           decoration: BoxDecoration(
-                            color: theme.colors.bgSurface,
+                            color: theme.colors.interactiveOnDanger,
                             borderRadius: BorderRadius.circular(_stopSquareRadius),
                           ),
                         ),
@@ -326,11 +326,18 @@ class _HoronVoiceInputState extends State<HoronVoiceInput> with SingleTickerProv
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    widget.elapsed,
-                    maxLines: 1,
-                    softWrap: false,
-                    style: theme.text.labelMd.copyWith(color: theme.colors.textSecondary),
+                  SizedBox(
+                    width: theme.space.step(10), // w-10 = 40
+                    child: Text(
+                      widget.elapsed,
+                      textAlign: TextAlign.end, // text-right
+                      maxLines: 1,
+                      softWrap: false,
+                      style: theme.text.labelMd.copyWith(
+                        color: theme.colors.textSecondary,
+                        fontFeatures: const <FontFeature>[FontFeature.tabularFigures()], // tabular-nums
+                      ),
+                    ),
                   ),
                 ],
               ),

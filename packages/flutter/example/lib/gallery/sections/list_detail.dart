@@ -73,7 +73,7 @@ class HoronListDetailGallerySection extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.start,
           children: <Widget>[
             _Cell(
-              label: 'Header — 40px 타일 · 18px 아이콘',
+              label: 'Header — 40px 타일 · 20px 아이콘',
               width: part,
               child: const HoronListDetailHeader(
                 title: 'researcher',

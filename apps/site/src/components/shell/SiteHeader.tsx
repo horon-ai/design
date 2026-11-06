@@ -1,15 +1,8 @@
-import {
-  Button,
-  IconButton,
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuSeparator,
-  MenuTrigger,
-} from "@horon-ai/react";
+import { Button, IconButton, Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@horon-ai/react";
 import { List } from "@phosphor-icons/react";
 
 import { externalLinks, isActive, primaryNav } from "@/data/nav";
+import { siteHref } from "@/lib/urls";
 import { pick } from "@/i18n";
 import { useLocale } from "@/i18n/react";
 
@@ -23,6 +16,14 @@ export interface SiteHeaderBarProps {
   pathname: string;
 }
 
+/**
+ * Below `sm` the brand lockup, the language button, search, theme and menu have
+ * to share 280px of measure at a 320px viewport. The library's 32px rung keeps
+ * them all on one row; the painted 44px reach (an `after` box) is untouched, and
+ * from `sm` up every button keeps its 40px size.
+ */
+const compactIcon = "size-8 [&_svg]:size-4 sm:size-10 sm:[&_svg]:size-5";
+
 function MobileMenu({ pathname }: SiteHeaderBarProps) {
   const locale = useLocale();
   return (
@@ -33,7 +34,7 @@ function MobileMenu({ pathname }: SiteHeaderBarProps) {
             variant="ghost"
             icon={<List />}
             label={pick(m.menu, locale)}
-            className="lg:hidden"
+            className={`lg:hidden ${compactIcon}`}
           />
         }
       />
@@ -42,22 +43,14 @@ function MobileMenu({ pathname }: SiteHeaderBarProps) {
           <MenuItem
             key={item.href}
             selected={isActive(pathname, item.href)}
-            render={
-              <a
-                href={item.href}
-                aria-current={isActive(pathname, item.href) ? "page" : undefined}
-              />
-            }
+            render={<a href={item.href} aria-current={isActive(pathname, item.href) ? "page" : undefined} />}
           >
             {pick(item.label, locale)}
           </MenuItem>
         ))}
         <MenuSeparator />
         {externalLinks.map((link) => (
-          <MenuItem
-            key={link.href}
-            render={<a href={link.href} target="_blank" rel="noreferrer" />}
-          >
+          <MenuItem key={link.href} render={<a href={link.href} target="_blank" rel="noreferrer" />}>
             {pick(link.label, locale)}
           </MenuItem>
         ))}
@@ -82,16 +75,13 @@ export function SiteHeaderBar({ pathname }: SiteHeaderBarProps) {
 
   return (
     <>
-      <nav
-        aria-label={pick(m.navLabel, locale)}
-        className="hidden flex-1 items-center justify-center lg:flex"
-      >
+      <nav aria-label={pick(m.navLabel, locale)} className="hidden flex-1 items-center justify-center lg:flex">
         <div className="flex items-center gap-0.5 rounded-full border border-glass-border bg-glass-fill-strong p-1">
           {primaryNav.map((item) => (
             <Button
               key={item.href}
               variant="link"
-              href={item.href}
+              href={siteHref(item.href)}
               aria-current={isActive(pathname, item.href) ? "page" : undefined}
               className="rounded-full px-3.5 py-2 leading-[18px] hover:bg-glass-fill"
             >
@@ -114,10 +104,10 @@ export function SiteHeaderBar({ pathname }: SiteHeaderBarProps) {
             {pick(link.label, locale)}
           </Button>
         ))}
-        <LocaleButton className="sm:hidden" />
+        <LocaleButton className={`sm:hidden ${compactIcon}`} />
         <LocaleSwitch className="hidden sm:flex" />
-        <SearchPalette />
-        <ThemeToggle />
+        <SearchPalette className={compactIcon} />
+        <ThemeToggle className={compactIcon} />
         <MobileMenu pathname={pathname} />
       </div>
     </>

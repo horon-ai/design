@@ -58,7 +58,7 @@ class HoronPageHeaderGallerySection extends StatelessWidget {
           child: HoronPageHeader(title: '에이전트 설정', surface: surface),
         ),
         _Sample(
-          label: '동작 버튼과 아래 줄',
+          label: '동작 버튼과 아래 줄 (줄 진입 4px 상승)',
           child: HoronPageHeader(
             title: '지식 베이스',
             surface: surface,

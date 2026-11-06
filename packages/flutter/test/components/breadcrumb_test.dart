@@ -49,6 +49,21 @@ void main() {
     expect(tester.widget<Icon>(carets.first).color, theme.colors.textSecondary);
   });
 
+  testWidgets('the separator caret never shrinks and sits outside the flexible crumb', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronBreadcrumb(children: _crumbs())));
+    final HoronThemeData theme = _theme(tester);
+    final Finder carets = find.byIcon(Icons.chevron_right);
+
+    expect(
+      find.ancestor(of: carets.first, matching: find.byType(Flexible)),
+      findsNothing,
+      reason: 'React는 캐럿을 `shrink-0`으로 Flexible 밖에 둡니다',
+    );
+    for (int index = 0; index < 2; index++) {
+      expect(tester.getSize(carets.at(index)), Size.square(theme.space.s3_5));
+    }
+  });
+
   testWidgets('the leading tile is a 20px ink box with label-sm inverse text', (WidgetTester tester) async {
     await tester.pumpWidget(_host(HoronBreadcrumb(children: _crumbs())));
     final HoronThemeData theme = _theme(tester);
@@ -92,6 +107,23 @@ void main() {
     await tester.tap(find.text('설정'));
     await tester.pump();
     expect(current, 0, reason: 'current면 링크가 아닙니다');
+  });
+
+  testWidgets('a crumb keeps 6px right padding and draws no underline', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(HoronBreadcrumb(children: _crumbs())));
+    final HoronThemeData theme = _theme(tester);
+
+    final Padding padding = tester.widget<Padding>(
+      find.ancestor(of: find.text('에이전트'), matching: find.byType(Padding)).first,
+    );
+    expect(
+      padding.padding,
+      EdgeInsets.only(top: theme.space.s1, bottom: theme.space.s1, right: theme.space.s1_5, left: theme.space.s1_5),
+      reason: 'py-1 pr-1.5 pl-1.5',
+    );
+
+    final DefaultTextStyle style = DefaultTextStyle.of(tester.element(find.text('에이전트')));
+    expect(style.style.decoration, TextDecoration.none, reason: 'no-underline');
   });
 
   testWidgets('narrow widths wrap the crumbs instead of clipping them', (WidgetTester tester) async {

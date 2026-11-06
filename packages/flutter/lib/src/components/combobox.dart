@@ -2,8 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_veil.dart';
 import '../overlay/horon_menu_anchor.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
@@ -64,6 +63,7 @@ typedef _ComboboxMetrics = ({
   double chipHeight,
   double chipGap,
   double chipPaddingX,
+  double chipIcon,
   double icon,
   double check,
   TextStyle fieldText,
@@ -82,6 +82,7 @@ _ComboboxMetrics _metricsOf(HoronComboboxSize size, HoronThemeData theme) => swi
     chipHeight: theme.space.step(5),
     chipGap: theme.space.s0_5,
     chipPaddingX: theme.space.s1_5,
+    chipIcon: 12, // chipClass sm `[&_svg]:size-3`
     icon: 16,
     check: 16,
     fieldText: theme.text.bodySm,
@@ -98,8 +99,9 @@ _ComboboxMetrics _metricsOf(HoronComboboxSize size, HoronThemeData theme) => swi
     chipHeight: theme.space.step(6),
     chipGap: theme.space.s1,
     chipPaddingX: theme.space.s2,
-    icon: 18,
-    check: 18,
+    chipIcon: 14, // chipClass md `[&_svg]:size-3.5`
+    icon: 16, // md `[&_svg]:size-4`
+    check: 16,
     fieldText: theme.text.bodyMd,
     itemText: theme.text.labelMd,
     chipText: theme.text.labelSm,
@@ -114,6 +116,7 @@ _ComboboxMetrics _metricsOf(HoronComboboxSize size, HoronThemeData theme) => swi
     chipHeight: theme.space.step(7),
     chipGap: theme.space.s1,
     chipPaddingX: theme.space.s2_5,
+    chipIcon: 16, // chipClass lg `[&_svg]:size-4`
     icon: 20,
     check: 20,
     fieldText: theme.text.bodyLg,
@@ -121,6 +124,9 @@ _ComboboxMetrics _metricsOf(HoronComboboxSize size, HoronThemeData theme) => swi
     chipText: theme.text.labelMd,
   ),
 };
+
+/// `w-60` — 다중 선택 필드의 폭 240입니다. 칩이 여러 줄로 늘어서므로 폭을 고정합니다.
+const double _multiFieldWidth = 240;
 
 /// 검색과 선택을 합친 필드입니다. React `Combobox`.
 ///
@@ -351,7 +357,7 @@ class _HoronComboboxState extends State<HoronCombobox> {
         child: Row(
           spacing: metrics.gap,
           children: <Widget>[
-            Icon(Icons.search, size: 16, color: colors.textSecondary),
+            Icon(Icons.search, size: metrics.icon, color: colors.textSecondary),
             Expanded(
               child: Text(
                 chosen == null ? widget.placeholder : _shortLabel(chosen),
@@ -373,46 +379,41 @@ class _HoronComboboxState extends State<HoronCombobox> {
     final List<HoronComboboxItem> chosen = <HoronComboboxItem>[
       for (final String value in _selectedValues) ?_find(value),
     ];
-    return ConstrainedBox(
-      constraints: BoxConstraints(minHeight: metrics.fieldHeight),
-      child: HoronFieldBox(
-        surface: widget.surface,
-        invalid: widget.invalid,
-        enabled: !_disabled,
-        padding: EdgeInsets.symmetric(horizontal: metrics.chipPaddingX, vertical: metrics.chipGap),
-        child: Wrap(
-          spacing: metrics.chipGap,
-          runSpacing: metrics.chipGap,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: <Widget>[
-            for (final HoronComboboxItem item in chosen) _chip(context, metrics, item),
-            Text(
-              chosen.isEmpty ? widget.placeholder : '',
-              style: metrics.fieldText.copyWith(color: _disabled ? colors.textDisabled : colors.textPlaceholder),
+    // `w-60` — 폭이 꽉 찬 부모 안에서도 240을 지키도록 왼쪽으로 붙여 느슨한 제약을 줍니다.
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      // 폭·높이를 자식에 맞춰 필드 자체가 240이 되게 합니다(React `w-60`).
+      widthFactor: 1,
+      heightFactor: 1,
+      child: SizedBox(
+        width: _multiFieldWidth,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: metrics.fieldHeight),
+          child: HoronFieldBox(
+            surface: widget.surface,
+            invalid: widget.invalid,
+            enabled: !_disabled,
+            padding: EdgeInsets.symmetric(horizontal: metrics.chipPaddingX, vertical: metrics.chipGap),
+            child: Wrap(
+              spacing: metrics.chipGap,
+              runSpacing: metrics.chipGap,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: <Widget>[
+                for (final HoronComboboxItem item in chosen)
+                  _ComboboxChip(
+                    key: ValueKey<String>('horon-combobox-chip-${item.value}'),
+                    label: _shortLabel(item),
+                    metrics: metrics,
+                    onRemove: _disabled ? null : () => _remove(item.value),
+                  ),
+                Text(
+                  chosen.isEmpty ? widget.placeholder : '',
+                  style: metrics.fieldText.copyWith(color: _disabled ? colors.textDisabled : colors.textPlaceholder),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _chip(BuildContext context, _ComboboxMetrics metrics, HoronComboboxItem item) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
-    return Container(
-      height: metrics.chipHeight,
-      padding: EdgeInsets.only(left: metrics.chipPaddingX, right: metrics.chipGap),
-      decoration: BoxDecoration(color: colors.overlayInk6, borderRadius: BorderRadius.circular(theme.radius.full)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: metrics.chipGap,
-        children: <Widget>[
-          Text(_shortLabel(item), style: metrics.chipText.copyWith(color: colors.textPrimary)),
-          GestureDetector(
-            onTap: _disabled ? null : () => _remove(item.value),
-            child: Icon(Icons.close, size: metrics.chipText.fontSize, color: colors.textSecondary),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -485,76 +486,96 @@ class _HoronComboboxState extends State<HoronCombobox> {
           ),
           child: SizedBox(
             width: math.max(info.anchorRect.width, 256),
-            child: ClipRRect(
-              borderRadius: radius,
-              child: HoronLiquidGlass(
-                tier: HoronGlassTier.thick,
-                borderRadius: radius,
-                child: Padding(
-                  padding: EdgeInsets.all(theme.space.s1_5),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    spacing: theme.space.s1,
-                    children: <Widget>[
-                      SizedBox(
-                        height: metrics.fieldHeight,
-                        child: HoronFieldBox(
-                          surface: HoronInputSurface.solid,
-                          enabled: true,
-                          padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
-                          child: Row(
-                            spacing: metrics.gap,
-                            children: <Widget>[
-                              Icon(Icons.search, size: 16, color: colors.textSecondary),
-                              Expanded(
-                                child: TextField(
-                                  controller: _search,
-                                  focusNode: _searchFocus,
-                                  autofocus: true,
-                                  onChanged: (String value) => setState(() => _query = value),
-                                  style: metrics.fieldText.copyWith(color: colors.textPrimary),
-                                  cursorColor: colors.textPrimary,
-                                  decoration: InputDecoration.collapsed(
-                                    hintText: widget.searchPlaceholder,
-                                    hintStyle: metrics.fieldText.copyWith(color: colors.textPlaceholder),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+            child: widget.surface == HoronInputSurface.glass
+                // React `veil-overlay` — 자체 그림자를 들고 옵니다.
+                ? HoronVeil(
+                    kind: HoronVeilKind.overlay,
+                    borderRadius: radius,
+                    child: Padding(
+                      padding: EdgeInsets.all(theme.space.s1_5),
+                      child: _popupBody(theme, metrics, colors, filtered),
+                    ),
+                  )
+                // React `border border-border-default bg-bg-surface shadow-popover`.
+                : DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: colors.bgSurface,
+                      borderRadius: radius,
+                      border: Border.all(color: colors.borderDefault),
+                      boxShadow: theme.shadows.popover,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: radius,
+                      child: Padding(
+                        padding: EdgeInsets.all(theme.space.s1_5),
+                        child: _popupBody(theme, metrics, colors, filtered),
                       ),
-                      if (filtered.isEmpty)
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: theme.space.s3, vertical: theme.space.s2),
-                          child: Text(
-                            widget.emptyLabel,
-                            style: metrics.fieldText.copyWith(color: colors.textSecondary),
-                          ),
-                        )
-                      else
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxHeight: 256),
-                          child: SingleChildScrollView(
-                            primary: false,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: theme.space.s0_5,
-                              children: <Widget>[
-                                for (final HoronComboboxItem item in filtered) _row(context, metrics, item),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
           ),
         ),
       ),
+    );
+  }
+
+  /// 검색 상자와 결과 목록입니다. 표면과 무관하게 같은 내용을 그립니다.
+  Widget _popupBody(
+    HoronThemeData theme,
+    _ComboboxMetrics metrics,
+    HoronColors colors,
+    List<HoronComboboxItem> filtered,
+  ) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: theme.space.s1,
+      children: <Widget>[
+        SizedBox(
+          height: metrics.fieldHeight,
+          child: HoronFieldBox(
+            surface: HoronInputSurface.solid,
+            enabled: true,
+            padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
+            child: Row(
+              spacing: metrics.gap,
+              children: <Widget>[
+                Icon(Icons.search, size: metrics.icon, color: colors.textSecondary),
+                Expanded(
+                  child: TextField(
+                    controller: _search,
+                    focusNode: _searchFocus,
+                    autofocus: true,
+                    onChanged: (String value) => setState(() => _query = value),
+                    style: metrics.fieldText.copyWith(color: colors.textPrimary),
+                    cursorColor: colors.textPrimary,
+                    decoration: InputDecoration.collapsed(
+                      hintText: widget.searchPlaceholder,
+                      hintStyle: metrics.fieldText.copyWith(color: colors.textPlaceholder),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (filtered.isEmpty)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: theme.space.s3, vertical: theme.space.s2),
+            child: Text(widget.emptyLabel, style: metrics.fieldText.copyWith(color: colors.textSecondary)),
+          )
+        else
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 256),
+            child: SingleChildScrollView(
+              primary: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                spacing: theme.space.s0_5,
+                children: <Widget>[for (final HoronComboboxItem item in filtered) _row(context, metrics, item)],
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -593,6 +614,48 @@ class _HoronComboboxState extends State<HoronCombobox> {
               if (selected) Icon(Icons.check, size: metrics.check, color: colors.textPrimary),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 다중 선택 필드의 칩 하나입니다. React `Combobox.Chip`(`animate-pop-in`).
+///
+/// 칩은 목록에서 고를 때마다 새로 생기므로, 처음 그려질 때 0.6배에서 제 크기로
+/// 커지며 나타납니다. 제거 버튼은 React `ChipRemove`의 `p-0.5` 자리에 14px
+/// (`[&_svg]:size-3.5`) 아이콘을 둡니다.
+class _ComboboxChip extends StatelessWidget {
+  const _ComboboxChip({super.key, required this.label, required this.metrics, this.onRemove});
+
+  final String label;
+  final _ComboboxMetrics metrics;
+  final VoidCallback? onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: HoronMotion.popInScale, end: 1),
+      duration: reduceMotion ? Duration.zero : HoronMotion.popInDuration,
+      curve: HoronMotion.popInCurve,
+      builder: (BuildContext context, double scale, Widget? child) => Transform.scale(scale: scale, child: child),
+      child: Container(
+        height: metrics.chipHeight,
+        padding: EdgeInsets.only(left: metrics.chipPaddingX, right: metrics.chipGap),
+        decoration: BoxDecoration(color: colors.overlayInk6, borderRadius: BorderRadius.circular(theme.radius.full)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: metrics.chipGap,
+          children: <Widget>[
+            Text(label, style: metrics.chipText.copyWith(color: colors.textPrimary)),
+            GestureDetector(
+              onTap: onRemove,
+              child: Icon(Icons.close, size: metrics.chipIcon, color: colors.textSecondary),
+            ),
+          ],
         ),
       ),
     );

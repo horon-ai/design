@@ -1,11 +1,11 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../contracts/surface.dart';
-import '../glass/glass_geometry.dart';
-import '../glass/horon_surface.dart';
+import '../glass/horon_veil.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -22,8 +22,14 @@ const double _listMaxHeight = 384;
 /// `max-h-[min(60dvh,24rem)]`의 `60dvh` — 호스트 높이의 60%입니다.
 const double _listViewportShare = 0.6;
 
-/// `opacity-40` — 스크림 불투명도입니다.
-const double _scrimOpacity = 0.4;
+/// `bg-bg-scrim/32` — 스크림 불투명도입니다.
+const double _scrimOpacity = 0.32;
+
+/// `backdrop-blur-[6px]` — 스크림 뒤 배경 흐림 반경입니다.
+const double _scrimBlur = 6;
+
+/// `size-7` — 검색 아이콘을 감싸는 28px 상자입니다.
+const double _searchIconBox = 28;
 
 /// `size-5` — 검색 아이콘 20px입니다.
 const double _searchIconSize = 20;
@@ -140,12 +146,16 @@ class HoronCommandPalette extends StatelessWidget {
 
     return Stack(
       children: <Widget>[
-        // Dialog.Backdrop: `fixed inset-0 bg-bg-scrim motion-fade opacity-40`.
+        // Dialog.Backdrop: `fixed inset-0 z-50 bg-bg-scrim/32 motion-fade backdrop-blur-[6px]`.
+        // 겹침 순서는 오버레이 삽입 순서가 정하므로(z) 이 스택의 첫 자리가 배경입니다.
         Positioned.fill(
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: dismiss,
-            child: ColoredBox(color: theme.colors.bgScrim.withValues(alpha: _scrimOpacity)),
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: _scrimBlur, sigmaY: _scrimBlur),
+              child: ColoredBox(color: theme.colors.bgScrim.withValues(alpha: _scrimOpacity)),
+            ),
           ),
         ),
         // Dialog.Viewport: `fixed inset-0 flex items-start justify-center px-2 pt-24`.
@@ -182,11 +192,10 @@ class HoronCommandPalette extends StatelessWidget {
   }
 }
 
-/// 팔레트의 유리 상자입니다.
+/// 팔레트의 상자입니다.
 ///
-/// React `Dialog.Popup`의 `bg-glass-fill-frost p-1.5 shadow-palette`와 그 첫 자식인
-/// `LiquidGlass tier="thick"`을 옮겼습니다. 서리 채움을 먼저 깔고 그 위에 유리
-/// 레이어를 얹습니다.
+/// React `Dialog.Popup`의 표면을 옮겼습니다. `solid`는 불투명 채움·테두리·
+/// `shadow-palette`이고, `glass`는 `veil-overlay`라 그림자를 스스로 그립니다.
 class _PaletteSurface extends StatelessWidget {
   const _PaletteSurface({
     required this.groups,
@@ -208,44 +217,42 @@ class _PaletteSurface extends StatelessWidget {
     final BorderRadius radius = BorderRadius.circular(_popupRadius);
     final List<(Widget, String)>? hints = this.hints;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(borderRadius: radius, boxShadow: theme.shadows.palette),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: HoronSurfaceLayer(
-                surface: surface,
-                tier: HoronGlassTier.thick,
-                borderRadius: radius,
-                child: const SizedBox.expand(),
-              ),
+    final Widget body = Padding(
+      padding: EdgeInsets.all(theme.space.s1_5),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          HoronCommandPaletteBody(
+            groups: groups,
+            placeholder: placeholder,
+            closeControl: Semantics(
+              button: true,
+              label: theme.strings.close,
+              child: GestureDetector(onTap: onDismiss, child: const _Kbd('esc')),
             ),
-            Padding(
-              padding: EdgeInsets.all(theme.space.s1_5),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  HoronCommandPaletteBody(
-                    groups: groups,
-                    placeholder: placeholder,
-                    closeControl: Semantics(
-                      button: true,
-                      label: theme.strings.close,
-                      child: GestureDetector(onTap: onDismiss, child: const _Kbd('esc')),
-                    ),
-                    onClose: onDismiss,
-                    onSelect: onDismiss,
-                  ),
-                  if (hints != null && hints.isNotEmpty) _hintBar(theme, hints),
-                ],
-              ),
-            ),
-          ],
-        ),
+            onClose: onDismiss,
+            onSelect: onDismiss,
+          ),
+          if (hints != null && hints.isNotEmpty) _hintBar(theme, hints),
+        ],
       ),
+    );
+
+    if (surface == HoronSurface.glass || surface == HoronSurface.veilOverlay) {
+      // React `veil-overlay` — palette 그림자를 겹치지 않고 veil의 0 6 24만 씁니다.
+      return HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: body);
+    }
+
+    // React `border border-border-default bg-bg-surface shadow-palette`.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.colors.bgSurface,
+        borderRadius: radius,
+        border: Border.all(color: theme.colors.borderDefault),
+        boxShadow: theme.shadows.palette,
+      ),
+      child: ClipRRect(borderRadius: radius, child: body),
     );
   }
 
@@ -254,11 +261,11 @@ class _PaletteSurface extends StatelessWidget {
       padding: EdgeInsets.only(
         left: theme.space.s3,
         right: theme.space.s3,
-        top: theme.space.s2_5,
-        bottom: theme.space.s1_5,
+        top: theme.space.s2,
+        bottom: theme.space.s1,
       ),
       child: Wrap(
-        spacing: theme.space.s3_5,
+        spacing: theme.space.s4,
         runSpacing: theme.space.s1_5,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: <Widget>[
@@ -417,15 +424,22 @@ class _HoronCommandPaletteBodyState extends State<HoronCommandPaletteBody> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          // `relative flex h-12 items-center gap-2.5 px-3.5`.
+          // `relative flex h-12 items-center gap-2.5 px-3`.
           SizedBox(
             height: space.step(12),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: space.s3_5),
+              padding: EdgeInsets.symmetric(horizontal: space.s3),
               child: Row(
                 spacing: space.s2_5,
                 children: <Widget>[
-                  Icon(Icons.search, size: _searchIconSize, color: colors.textSecondary),
+                  // `flex size-7 items-center justify-center` — 28px 상자에 20px 아이콘.
+                  SizedBox(
+                    width: _searchIconBox,
+                    height: _searchIconBox,
+                    child: Center(
+                      child: Icon(Icons.search, size: _searchIconSize, color: colors.textSecondary),
+                    ),
+                  ),
                   Expanded(
                     child: TextField(
                       controller: _controller,
@@ -450,9 +464,9 @@ class _HoronCommandPaletteBodyState extends State<HoronCommandPaletteBody> {
               ),
             ),
           ),
-          // `relative pt-1 pb-1.5` + `h-px bg-overlay-ink-8`.
+          // `relative pt-1` + `h-px bg-overlay-ink-8`.
           Padding(
-            padding: EdgeInsets.only(top: space.s1, bottom: space.s1_5),
+            padding: EdgeInsets.only(top: space.s1),
             child: SizedBox(
               height: _hairline,
               child: ColoredBox(color: colors.overlayInk8),
@@ -484,7 +498,7 @@ class _HoronCommandPaletteBodyState extends State<HoronCommandPaletteBody> {
     var index = 0;
     for (final (HoronCommandGroup group, List<HoronCommandItem> items) in visible) {
       rows.add(
-        // `px-3 pt-2 pb-1 text-caption text-text-secondary`.
+        // `px-3 pt-1 pb-1 text-caption text-text-secondary` + 그룹 `pt-1`.
         Padding(
           padding: EdgeInsets.only(left: space.s3, right: space.s3, top: space.s2, bottom: space.s1),
           child: Text(
@@ -548,11 +562,11 @@ class _CommandRow extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           onTap: onTap,
           child: AnimatedContainer(
-            // `flex h-11 items-center gap-2.5 rounded-md pr-3 pl-2.5 motion-colors`.
+            // `flex h-11 items-center gap-2.5 rounded-md px-3 motion-colors`.
             duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
             curve: HoronMotion.colorsCurve,
             height: space.step(11),
-            padding: EdgeInsets.only(left: space.s2_5, right: space.s3),
+            padding: EdgeInsets.symmetric(horizontal: space.s3),
             decoration: BoxDecoration(
               color: highlighted ? theme.colors.overlayInk6 : Colors.transparent,
               borderRadius: BorderRadius.circular(theme.radius.md),

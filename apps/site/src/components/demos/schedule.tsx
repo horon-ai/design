@@ -31,7 +31,7 @@ function FullCard({ surface }: { surface: "solid" | "glass" }) {
       <ScheduleSection label="Days">
         <WeekdayPicker days={days} defaultValue={["mon", "tue", "wed", "thu", "fri"]} />
       </ScheduleSection>
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <ScheduleSection label="Time">
           <PickerField aria-label="Time" surface="inset" items={times} defaultValue="8:00 AM" />
         </ScheduleSection>

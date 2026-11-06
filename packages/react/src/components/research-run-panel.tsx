@@ -85,12 +85,12 @@ export function ResearchRunPanel({
   return (
     <section
       className={cn(
-        "flex w-full max-w-150 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full max-w-150 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
     >
-      <header className="flex items-center gap-2 px-5 pt-4 pb-3.5">
+      <header className="flex flex-wrap items-center gap-x-2 gap-y-2 px-5 pt-4 pb-3.5">
         <MagnifyingGlass aria-hidden className="size-4 shrink-0 text-text-primary" />
         <h3 className="min-w-0 flex-1 truncate text-label-lg text-text-primary">{title}</h3>
         <button
@@ -114,10 +114,10 @@ export function ResearchRunPanel({
                 type="button"
                 onClick={onToggleStatus}
                 aria-live="polite"
-                className="flex w-full cursor-pointer items-center gap-1.5 rounded-md text-left focus-visible:outline-2 focus-visible:outline-text-brand"
+                className="flex w-full cursor-pointer flex-wrap items-center gap-x-1.5 gap-y-1 rounded-md text-left focus-visible:outline-2 focus-visible:outline-text-brand"
               >
                 <Spinner size={14} />
-                <span className="text-label-md text-text-primary">{statusLabel}</span>
+                <span className="min-w-0 text-label-md text-text-primary">{statusLabel}</span>
                 <span aria-hidden className="h-3 w-0.5 shrink-0 animate-caret rounded-[1px] bg-interactive-primary" />
                 {meta.length > 0 && (
                   <span className="text-caption text-text-secondary tabular-nums">
@@ -132,9 +132,9 @@ export function ResearchRunPanel({
                 <CaretDown aria-hidden className="size-3 shrink-0 text-text-secondary" />
               </button>
             ) : (
-              <div aria-live="polite" className="flex items-center gap-1.5">
+              <div aria-live="polite" className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
                 <Spinner size={14} />
-                <span className="text-label-md text-text-primary">{statusLabel}</span>
+                <span className="min-w-0 text-label-md text-text-primary">{statusLabel}</span>
                 <span aria-hidden className="h-3 w-0.5 shrink-0 animate-caret rounded-[1px] bg-interactive-primary" />
                 {meta.length > 0 && (
                   <span className="text-caption text-text-secondary tabular-nums">

@@ -51,6 +51,9 @@ class HoronResearchRunPanelGallerySection extends StatelessWidget {
               sources: const <String>['J', 'M', 'A'],
               onNewResearch: () {},
               onStop: () {},
+              // 캐럿이 붙은 버튼이 되어 상태 줄과 출처 알약을 눌러 펼칠 수 있습니다.
+              onToggleStatus: () {},
+              onOpenSources: () {},
               onFollowUp: (String value) {},
             ),
           ),

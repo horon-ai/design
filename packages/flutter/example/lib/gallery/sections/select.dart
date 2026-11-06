@@ -5,8 +5,8 @@ import '../surface_group.dart';
 
 /// `select` 갤러리 섹션입니다.
 ///
-/// 필드 트리거와 칩 트리거, 선택·오류·비활성 상태를 solid와 glass 두 표면에 같은
-/// 목록으로 보여 줍니다.
+/// 필드 트리거와 칩 트리거, 선택·오류·비활성 상태를 solid와 veil(glass) 두 표면에
+/// 같은 목록으로 보여 줍니다.
 class HoronSelectGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronSelectGallerySection({super.key});
@@ -38,9 +38,12 @@ class HoronSelectGallerySection extends StatelessWidget {
             child: _selects(theme, HoronInputSurface.glass),
           ),
           Text(
-            'Figma `Select`(58:162) 트리거와 `Select list`(88:495) 목록입니다. 목록은 '
-            '두꺼운 유리(반경 20, 안쪽 여백 6)에 40px 행, 선택 행은 `overlay-ink-6`과 '
-            '18px 체크입니다. 트리거의 캐럿은 16px이고 열리면 180° 돕니다. React의 '
+            'Figma `Select`(58:162) 트리거와 `Select list`(88:495) 목록입니다. glass 표면은 '
+            '`veil-field`이고, 목록은 모든 표면에서 `veil-overlay`(반경 20, 안쪽 여백 6)를 '
+            '씁니다. 행은 40px, 선택 행은 `overlay-ink-6`과 16px 체크입니다. 값 글자는 '
+            '`Input`과 같은 14/16/18 단계이고, 칩은 `label-md` 32px 알약입니다. 불투명 '
+            '표면의 필드는 포인터를 올리면 테두리가 `border-strong`으로 짙어지고, 유리 '
+            '표면은 `veil-field`라 hover 테두리를 그리지 않습니다. React의 '
             '`variant="chip"`은 `export type` 유니온이 아니라서 Flutter에서는 `chip` '
             '불리언으로 받습니다.',
             style: theme.text.bodySm.copyWith(

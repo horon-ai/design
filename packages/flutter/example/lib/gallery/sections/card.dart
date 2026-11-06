@@ -6,7 +6,8 @@ import '../surface_group.dart';
 /// `card`의 갤러리 섹션입니다.
 ///
 /// 기본·상호작용·선택 상태를 solid와 glass 두 표면에 같은 목록으로 보여 주고,
-/// Paper 서리 카드를 따로 놓습니다.
+/// Paper 서리 카드를 따로 놓습니다. 제목 없는 상호작용 카드는 캐럿이 우상단으로
+/// 물러나고, 선택된 카드는 hover에서도 테두리를 브랜드로 유지합니다.
 class HoronCardGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronCardGallerySection({super.key});
@@ -76,9 +77,20 @@ class HoronCardGallerySection extends StatelessWidget {
           width: 320,
           child: HoronCard(
             title: '선택된 카드',
-            description: '브랜드 테두리가 붙습니다.',
+            description: '브랜드 테두리가 붙고 hover에도 유지됩니다.',
             surface: surface,
             selected: true,
+            interactive: true,
+            onTap: () {},
+          ),
+        ),
+        SizedBox(
+          width: 320,
+          child: HoronCard(
+            description: '제목이 없으면 캐럿이 우상단으로 물러납니다.',
+            surface: surface,
+            interactive: true,
+            onTap: () {},
           ),
         ),
       ],

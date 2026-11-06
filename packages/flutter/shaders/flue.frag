@@ -123,17 +123,23 @@ float triDither(vec2 fc) {
   return (a + b - 1.0) / 255.0;
 }
 
+// 원본은 부호 없는 정수 해시(uvec2, ^, >>)로 그레인을 만듭니다. Skia 백엔드가 읽는
+// SkSL에는 부호 없는 정수와 비트 연산이 없어 impellerc가 SkSL을 만들다 멈추고, 그러면
+// Skia로 그리는 기기에서 셰이더가 아예 뜨지 않습니다. 그래서 같은 입력(픽셀 좌표와
+// 초당 24장으로 끊은 프레임 번호)과 같은 분포(균등 난수 둘의 합 − 1, 삼각 분포)를
+// 부동소수 해시로 만듭니다. 그레인은 화소마다 독립인 잡음이라 값 자체가 아니라 분포만
+// 화면에 드러납니다.
+float grainHash(vec3 p3) {
+  p3 = fract(p3 * 0.1031);
+  p3 += dot(p3, p3.zyx + 31.32);
+  return fract((p3.x + p3.y) * p3.z);
+}
+
 float houseGrain(vec2 fc) {
-  uvec2 q = uvec2(fc) * uvec2(1597334677u, 3812015801u) + uint(floor(iTime * 24.0 * uGrainAnim)) * 2654435769u;
-  uint n = q.x ^ q.y;
-  n = n * 1664525u + 1013904223u;
-  n ^= n >> 16u;
-  n *= 2246822519u;
-  n ^= n >> 13u;
-  float a = float(n & 0xffffu) / 65535.0;
-  n *= 3266489917u;
-  n ^= n >> 16u;
-  float b = float(n & 0xffffu) / 65535.0;
+  // 프레임 번호는 시간이 지나면 커져 부동소수 정밀도를 잃으므로 1024장마다 되돌립니다.
+  float frame = mod(floor(iTime * 24.0 * uGrainAnim), 1024.0);
+  float a = grainHash(vec3(floor(fc), frame));
+  float b = grainHash(vec3(floor(fc) + 113.0, frame + 57.0));
   return a + b - 1.0;
 }
 

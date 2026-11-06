@@ -5,8 +5,9 @@ import '../surface_group.dart';
 
 /// `directory_card`의 갤러리 섹션입니다.
 ///
-/// 설명이 있는 카드, 설명이 없는 카드, 추가 버튼이 비활성인 카드를 solid와 glass
-/// 두 표면에 같은 목록으로 보여 줍니다. 추가 버튼은 실제로 눌러 볼 수 있습니다.
+/// 설명이 있는 카드, 설명이 없는 카드, 추가 버튼이 없는 카드를 solid와 glass
+/// 두 표면에 같은 목록으로 보여 줍니다. 추가 버튼은 `onAdd`가 있을 때만 그려지고
+/// 실제로 눌러 볼 수 있습니다.
 class HoronDirectoryCardGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronDirectoryCardGallerySection({super.key});
@@ -58,7 +59,7 @@ class HoronDirectoryCardGallerySection extends StatelessWidget {
         HoronDirectoryCard(
           icon: const Icon(Icons.extension_outlined),
           name: 'Plugins',
-          description: '추가 버튼이 비활성인 상태입니다',
+          description: 'onAdd가 없어 추가 버튼을 그리지 않습니다',
           surface: surface,
         ),
       ],

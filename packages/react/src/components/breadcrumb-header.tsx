@@ -46,7 +46,7 @@ export function BreadcrumbHeader({
       {...props}
     >
       {surface === "glass" && <LiquidGlass />}
-      <nav aria-label="Breadcrumb" className="relative min-w-0 flex-1 overflow-clip">
+      <nav aria-label="Breadcrumb" className="relative min-w-0 flex-1 overflow-x-auto">
         <ol className="flex items-center gap-1.5">
           {crumbs.map((crumb, index) => {
             const current = index === crumbs.length - 1;

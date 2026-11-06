@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_veil.dart';
 import '../overlay/horon_menu_anchor.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
@@ -73,7 +73,7 @@ _SelectMetrics _metricsOf(HoronSelectSize size, HoronThemeData theme) => switch 
     rowHeight: theme.space.step(10),
     rowGap: theme.space.s2_5,
     rowPaddingX: theme.space.s3,
-    check: 18,
+    check: 16,
     rowText: theme.text.labelMd,
   ),
   HoronSelectSize.lg => (
@@ -105,9 +105,9 @@ HoronSelectSize _selectSizeOf(HoronInputGroupSize size) => switch (size) {
 
 /// React `Select`(Figma 58:162 트리거 + 88:495 목록)를 옮긴 셀렉트입니다.
 ///
-/// 트리거는 40px 필드에 16px 캐럿을 두고, Solid 표면만 `body-lg`, 나머지는
-/// `body-md`로 값을 그립니다. 목록은 두꺼운 유리(반경 20, 안쪽 여백 6), 40px 행,
-/// 선택·강조 행에 `overlay-ink-6`과 체크 아이콘(18px)을 씁니다.
+/// 트리거는 `Input`과 같은 14/16/18 텍스트 단계와 16/20px 캐럿을 씁니다. 값의
+/// 글자 크기는 표면에 따라 달라지지 않습니다. 목록은 `veil-overlay`(반경 20,
+/// 안쪽 여백 6), 40px 행, 선택·강조 행에 `overlay-ink-6`과 체크 아이콘을 씁니다.
 ///
 /// React의 `variant="chip"`은 32px `bg-subtle` 알약입니다. 이 값을 public enum으로
 /// 두면 React가 `export type`으로 선언하지 않은 어휘가 되어 variants 게이트가
@@ -178,6 +178,12 @@ class _HoronSelectState extends State<HoronSelect> {
 
   String? _internalValue;
 
+  /// 칩·칸 트리거에 포인터가 올라와 있는지입니다.
+  bool _hovered = false;
+
+  /// 칩·칸 트리거가 키보드 포커스를 받았는지입니다.
+  bool _focused = false;
+
   String? get _value => widget.value ?? _internalValue;
 
   HoronInputGroupScope? get _group => HoronInputGroupScope.maybeOf(context);
@@ -212,6 +218,11 @@ class _HoronSelectState extends State<HoronSelect> {
       child: Builder(
         builder: (BuildContext context) {
           final bool open = MenuController.maybeIsOpenOf(context) ?? false;
+          final Widget trigger = widget.chip
+              ? _buildChipTrigger(context, open)
+              : widget.segment
+              ? _buildSegmentTrigger(context, open)
+              : _buildFieldTrigger(context, open);
           return CompositedTransformTarget(
             link: _link,
             child: Semantics(
@@ -219,14 +230,27 @@ class _HoronSelectState extends State<HoronSelect> {
               label: widget.semanticLabel,
               value: _labelOf(_value) ?? widget.placeholder,
               expanded: open,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: _toggle,
-                child: widget.chip
-                    ? _buildChipTrigger(context, open)
-                    : widget.segment
-                    ? _buildSegmentTrigger(context, open)
-                    : _buildFieldTrigger(context, open),
+              child: FocusableActionDetector(
+                enabled: !_disabled,
+                onShowFocusHighlight: (bool value) => setState(() => _focused = value),
+                shortcuts: const <ShortcutActivator, Intent>{
+                  SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+                  SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+                },
+                actions: <Type, Action<Intent>>{
+                  ActivateIntent: CallbackAction<ActivateIntent>(
+                    onInvoke: (ActivateIntent intent) {
+                      _toggle();
+                      return null;
+                    },
+                  ),
+                },
+                child: MouseRegion(
+                  cursor: _disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
+                  onEnter: (_) => _setHovered(true),
+                  onExit: (_) => _setHovered(false),
+                  child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: _toggle, child: trigger),
+                ),
               ),
             ),
           );
@@ -252,9 +276,8 @@ class _HoronSelectState extends State<HoronSelect> {
         ? colors.textPlaceholder
         : colors.textPrimary;
     if (widget.chip) {
-      // React: `text-[13px]/[18px] font-medium` — 토큰에 없는 13/18만 덮어쓰고
-      // 서체·굵기·자간은 `label-md`에서 가져옵니다.
-      return horon.text.labelMd.copyWith(fontSize: 13, height: 18 / 13, color: color);
+      // React: `text-label-md` — 칩은 13/18 덮어쓰기 없이 토큰 단계를 그대로 씁니다.
+      return horon.text.labelMd.copyWith(color: color);
     }
     if (widget.segment) {
       final HoronSegmentMetrics segment = widget.segment && _group != null
@@ -262,12 +285,8 @@ class _HoronSelectState extends State<HoronSelect> {
           : horonSegmentMetrics(HoronInputGroupSize.md, horon);
       return segment.textStyle.copyWith(color: color);
     }
-    // React는 md-solid만 body-lg를 씁니다. 나머지 크기는 필드 텍스트 단계를 따릅니다.
-    final HoronFieldMetrics field = horonFieldMetrics(_inputSizeOf(widget.size), horon);
-    final TextStyle base = widget.size == HoronSelectSize.md && widget.surface == HoronInputSurface.solid
-        ? horon.text.bodyLg
-        : field.textStyle;
-    return base.copyWith(color: color);
+    // React `fieldTextClass[size]` — 표면과 상관없이 `Input`과 같은 단계(14/16/18)를 씁니다.
+    return horonFieldMetrics(_inputSizeOf(widget.size), horon).textStyle.copyWith(color: color);
   }
 
   Widget _valueText(HoronThemeData horon) {
@@ -296,6 +315,11 @@ class _HoronSelectState extends State<HoronSelect> {
     );
   }
 
+  /// `hover:not-data-disabled:not-data-invalid:border-border-strong` — 불투명 표면의
+  /// 필드는 포인터가 올라오면 `borderStrong` 테두리로 바뀝니다. 유리 표면은
+  /// `veil-field`가 hover 테두리를 그리지 않으므로 React처럼 제외합니다. 그 규칙은
+  /// [HoronFieldBox]가 들고 있고(포커스가 우선, 오류·비활성은 불변), 이 트리거는
+  /// 그 상자를 그대로 씁니다.
   Widget _buildFieldTrigger(BuildContext context, bool open) {
     final HoronThemeData horon = HoronTheme.of(context);
     final _SelectMetrics metrics = _metricsOf(widget.size, horon);
@@ -322,19 +346,24 @@ class _HoronSelectState extends State<HoronSelect> {
     final HoronThemeData horon = HoronTheme.of(context);
     final HoronInputGroupSize groupSize = _group?.size ?? HoronInputGroupSize.md;
     final HoronSegmentMetrics metrics = horonSegmentMetrics(groupSize, horon);
-    return SizedBox(
-      height: double.infinity,
-      child: ColoredBox(
-        color: horon.colors.overlayInk4,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: metrics.gap,
-            children: <Widget>[
-              Flexible(child: _valueText(horon)),
-              if (widget.showIndicator) _caret(horon, open),
-            ],
+    final BorderRadius radius = BorderRadius.all(Radius.circular(horon.radius.md));
+    return _focusRing(
+      horon,
+      radius,
+      SizedBox(
+        height: double.infinity,
+        child: ColoredBox(
+          color: horon.colors.overlayInk4,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: metrics.paddingX),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: metrics.gap,
+              children: <Widget>[
+                Flexible(child: _valueText(horon)),
+                if (widget.showIndicator) _caret(horon, open),
+              ],
+            ),
           ),
         ),
       ),
@@ -343,24 +372,62 @@ class _HoronSelectState extends State<HoronSelect> {
 
   Widget _buildChipTrigger(BuildContext context, bool open) {
     final HoronThemeData horon = HoronTheme.of(context);
-    return AnimatedContainer(
-      duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,
-      curve: HoronMotion.colorsCurve,
-      height: _chipHeight,
-      padding: EdgeInsets.symmetric(horizontal: horon.space.s3),
-      decoration: BoxDecoration(
-        color: horon.colors.bgSubtle,
-        borderRadius: BorderRadius.all(Radius.circular(horon.radius.full)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: horon.space.s1,
-        children: <Widget>[
-          Flexible(child: _valueText(horon)),
-          if (widget.showIndicator) _caret(horon, open),
-        ],
+    return _focusRing(
+      horon,
+      BorderRadius.all(Radius.circular(horon.radius.full)),
+      AnimatedContainer(
+        duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,
+        curve: HoronMotion.colorsCurve,
+        height: _chipHeight,
+        padding: EdgeInsets.symmetric(horizontal: horon.space.s3),
+        decoration: BoxDecoration(
+          // React `hover:not-data-disabled:bg-overlay-ink-8`.
+          color: _hovered && !_disabled ? horon.colors.overlayInk8 : horon.colors.bgSubtle,
+          borderRadius: BorderRadius.all(Radius.circular(horon.radius.full)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: horon.space.s1,
+          children: <Widget>[
+            Flexible(child: _valueText(horon)),
+            if (widget.showIndicator) _caret(horon, open),
+          ],
+        ),
       ),
     );
+  }
+
+  /// `focus-visible:outline-2 outline-offset-2 outline-text-brand` — 칩·칸은
+  /// 트리거 자체가 포커스 대상이라 2px 링을 스스로 그립니다. 필드는
+  /// [HoronFieldBox]의 `focus-within` 테두리가 맡습니다.
+  Widget _focusRing(HoronThemeData horon, BorderRadius radius, Widget child) {
+    if (!_focused) return child;
+    final double gap = horon.space.s0_5;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        Positioned(
+          left: -gap,
+          top: -gap,
+          right: -gap,
+          bottom: -gap,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(radius.topLeft.x + gap)),
+                border: Border.all(color: horon.colors.textBrand, width: 2),
+              ),
+            ),
+          ),
+        ),
+        child,
+      ],
+    );
+  }
+
+  void _setHovered(bool value) {
+    if (_hovered == value) return;
+    setState(() => _hovered = value);
   }
 
   Widget _buildPopup(BuildContext context, RawMenuOverlayInfo info) {
@@ -400,10 +467,19 @@ class _HoronSelectState extends State<HoronSelect> {
           },
           child: SizedBox(
             width: math.max(info.anchorRect.width, _minPopupWidth),
-            child: ClipRRect(
-              borderRadius: radius,
-              child: HoronLiquidGlass(tier: HoronGlassTier.thick, borderRadius: radius, child: list),
-            ),
+            child: widget.surface == HoronInputSurface.glass
+                // React `veil-overlay` — 자체 그림자를 들고 오므로 바깥 그림자를 겹치지 않습니다.
+                ? HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: list)
+                // React `border border-border-default bg-bg-surface shadow-popover`.
+                : DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: horon.colors.bgSurface,
+                      borderRadius: radius,
+                      border: Border.all(color: horon.colors.borderDefault),
+                      boxShadow: horon.shadows.popover,
+                    ),
+                    child: ClipRRect(borderRadius: radius, child: list),
+                  ),
           ),
         ),
       ),

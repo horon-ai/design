@@ -120,7 +120,9 @@ export function Sidebar({
   return (
     <nav
       className={cn(
-        "relative flex w-70 flex-col items-stretch gap-0.5 overflow-clip px-3 pt-4 pb-3",
+        // The column keeps its 280px design width where there is room; a definite-width
+        // parent below that caps it, so it never runs past the container.
+        "relative flex w-70 max-w-full min-w-0 flex-col items-stretch gap-0.5 overflow-clip px-3 pt-4 pb-3",
         resizable && "transition-[width] duration-200 ease-out-quint data-resizing:transition-none",
         surface === "glass" && "bg-glass-thick",
         surface === "photo" && "bg-sidebar-photo dark:bg-glass-thick dark:bg-none",
@@ -436,11 +438,7 @@ export function SidebarProject({
     onOpenChange?.(next);
   };
   return (
-    <Collapsible.Root
-      open={isOpen}
-      onOpenChange={handleOpenChange}
-      className={cn("flex flex-col gap-0.5", className)}
-    >
+    <Collapsible.Root open={isOpen} onOpenChange={handleOpenChange} className={cn("flex flex-col gap-0.5", className)}>
       <div
         className={cn(
           "group/project relative flex h-8 items-center rounded-md has-data-popup-open:bg-overlay-ink-6",
@@ -462,22 +460,14 @@ export function SidebarProject({
           {hasChildren && (
             <span
               aria-hidden
-              className={cn(
-                "flex size-3.5 shrink-0 [&>svg]:size-3.5",
-                actions !== undefined && isOpen && "invisible",
-              )}
+              className={cn("flex size-3.5 shrink-0 [&>svg]:size-3.5", actions !== undefined && isOpen && "invisible")}
             >
               <CaretRight className="transition-transform duration-200 ease-out-quint group-data-panel-open/trigger:rotate-90" />
             </span>
           )}
         </Collapsible.Trigger>
         {actions !== undefined && (
-          <span
-            className={cn(
-              "absolute right-2.5 flex",
-              !hasChildren || isOpen ? "visible" : "invisible",
-            )}
-          >
+          <span className={cn("absolute right-2.5 flex", !hasChildren || isOpen ? "visible" : "invisible")}>
             {actions}
           </span>
         )}

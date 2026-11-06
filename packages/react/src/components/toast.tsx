@@ -15,9 +15,9 @@ const toneIcon: Record<ToastTone, ReactNode> = {
 };
 
 const sizeClass: Record<ToastSize, string> = {
-  sm: "w-80 gap-2 px-3 py-2.5",
-  md: "w-90 gap-3 px-4 py-3.5",
-  lg: "w-100 gap-3.5 px-5 py-4",
+  sm: "w-full max-w-80 gap-2 px-3 py-2.5",
+  md: "w-full max-w-90 gap-3 px-4 py-3.5",
+  lg: "w-full max-w-100 gap-3.5 px-5 py-4",
 };
 
 const iconSizeClass: Record<ToastSize, string> = {
@@ -110,7 +110,14 @@ export function Toaster({ children, size = "md", surface = "solid", className }:
     <BaseToast.Provider>
       {children}
       <BaseToast.Portal>
-        <BaseToast.Viewport className={cn("fixed right-6 bottom-6 z-50 flex flex-col items-end gap-0", className)}>
+        <BaseToast.Viewport
+          className={cn(
+            // `inset-x-6` gives the stack the same 24px gutter on the left as on the
+            // right, so `w-full` toasts stop at the screen edge instead of running off it.
+            "fixed inset-x-6 bottom-6 z-50 flex flex-col items-end gap-0",
+            className,
+          )}
+        >
           <ToastList size={size} surface={surface} />
         </BaseToast.Viewport>
       </BaseToast.Portal>

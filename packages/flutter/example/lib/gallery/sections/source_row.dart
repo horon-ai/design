@@ -3,7 +3,8 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `source_row`의 갤러리 섹션입니다.
 ///
-/// 준비·색인 중·실패 세 상태를 카드로, 목록 변형도 함께 보여 줍니다.
+/// 준비·색인 중·실패 세 상태를 카드로, 목록 변형도 함께 보여 줍니다. 색인 중에는
+/// 진행 막대가 라이브 색으로 차오르고 퍼센트가 36px 상자에서 오른쪽 정렬됩니다.
 class HoronSourceRowGallerySection extends StatelessWidget {
   /// 섹션을 만듭니다.
   const HoronSourceRowGallerySection({super.key});

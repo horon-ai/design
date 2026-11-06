@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:horon_ui/horon_ui.dart';
+import 'package:horon_ui/src/theme/horon_motion.dart';
 
 /// 테마가 적용된 화면에 위젯 하나를 놓습니다.
 Widget _host(Widget child, {Brightness brightness = Brightness.light, double width = 1024}) => MaterialApp(
@@ -82,6 +83,18 @@ void main() {
     expect(find.byIcon(Icons.search), findsOneWidget);
     expect(find.text('필터'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('children rise 4px from below on their first frame (animate-swap-move)', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(const HoronPageHeader(title: '지식 베이스', child: Text('필터'))));
+    final double titleTop = tester.getTopLeft(find.text('지식 베이스')).dy;
+
+    // `swap-move`: translate 0 4px → 0. 첫 프레임에는 4px 아래에서 시작합니다.
+    final double firstGap = tester.getTopLeft(find.text('필터')).dy - titleTop;
+    await tester.pumpAndSettle();
+    final double settledGap = tester.getTopLeft(find.text('필터')).dy - titleTop;
+
+    expect(firstGap - settledGap, closeTo(HoronMotion.swapMoveOffset, 0.5), reason: '4px 상승');
   });
 
   testWidgets('narrow widths truncate the title instead of overflowing', (WidgetTester tester) async {

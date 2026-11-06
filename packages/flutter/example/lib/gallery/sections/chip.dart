@@ -4,7 +4,8 @@ import 'package:horon_ui/horon_ui.dart';
 /// Chip 갤러리 섹션입니다.
 ///
 /// 칩은 선택 상태만 갖습니다. 여러 개를 실제로 눌러 체크와 브랜드 테두리가
-/// 나타나는지, 다시 누르면 사라지는지 확인할 수 있게 두었습니다.
+/// 나타나는지, 다시 누르면 사라지는지 확인할 수 있게 두었습니다. 체크 자리는 폭 0에서
+/// 열리고 아이콘은 불투명도로 나타나므로, 선택을 풀면 표시가 scale-out으로 빠집니다.
 class HoronChipGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronChipGallerySection({super.key});

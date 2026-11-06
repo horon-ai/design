@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
+import 'chat_bubble.dart';
 import 'spinner.dart';
 
 /// `research-run-panel.tsx`의 `max-w-150`입니다. 판의 최대 폭 600입니다.
@@ -35,8 +36,8 @@ const double _caretBarRadius = 1;
 /// `research-run-panel.tsx`의 `max-w-[85%]`입니다. 질문 말풍선의 최대 폭 비율입니다.
 const double _questionWidthFactor = 0.85;
 
-/// `research-run-panel.tsx`의 `-ml-2`입니다. 출처 아바타가 겹치는 정도입니다.
-const double _avatarOverlap = 8;
+/// `research-run-panel.tsx`의 `-ml-1.5`입니다. 출처 아바타가 겹치는 정도입니다.
+const double _avatarOverlap = 6;
 
 /// `research-run-panel.tsx`의 `ring-2`입니다. 출처 아바타의 테두리 두께입니다.
 const double _avatarRing = 2;
@@ -86,6 +87,8 @@ class HoronResearchRunPanel extends StatefulWidget {
     this.queries = const <HoronResearchQuery>[],
     this.sources = const <String>[],
     this.onStop,
+    this.onOpenSources,
+    this.onToggleStatus,
     this.followUpPlaceholder = 'Ask a follow-up',
     this.onFollowUp,
   });
@@ -125,6 +128,12 @@ class HoronResearchRunPanel extends StatefulWidget {
 
   /// 정지 버튼을 눌렀을 때입니다.
   final VoidCallback? onStop;
+
+  /// 출처 알약을 눌렀을 때입니다. 없으면 React처럼 캐럿 없는 정적 라벨입니다.
+  final VoidCallback? onOpenSources;
+
+  /// 실행 중 상태 줄을 눌렀을 때입니다. 없으면 React처럼 캐럿 없는 정적 줄입니다.
+  final VoidCallback? onToggleStatus;
 
   /// 후속 질문 입력의 안내 문구입니다.
   final String followUpPlaceholder;
@@ -264,37 +273,30 @@ class _HoronResearchRunPanelState extends State<HoronResearchRunPanel> with Sing
   }
 
   Widget _body(HoronThemeData theme) {
-    final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
     final String? count = widget.read != null && widget.total != null ? '${widget.read} of ${widget.total} read' : null;
 
     return Padding(
-      // px-5 pt-4.5 pb-4
-      padding: EdgeInsets.fromLTRB(space.s5, space.step(4.5), space.s5, space.s4),
+      // px-5 pt-4 pb-4
+      padding: EdgeInsets.fromLTRB(space.s5, space.s4, space.s5, space.s4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: space.s3, // gap-3 = 12
         children: <Widget>[
           LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              return Align(
-                alignment: Alignment.centerRight, // self-end
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: constraints.maxWidth * _questionWidthFactor),
-                  child: Container(
-                    // px-3.5 py-2.5 rounded-2xl bg-interactive-primary
-                    padding: EdgeInsets.symmetric(horizontal: space.s3_5, vertical: space.s2_5),
-                    decoration: BoxDecoration(
-                      color: colors.interactivePrimary,
-                      borderRadius: BorderRadius.circular(theme.radius.xl2),
-                    ),
-                    child: Text(widget.question, style: theme.text.bodySm.copyWith(color: colors.textInverse)),
-                  ),
-                ),
+              // `max-w-[85%] self-end` — 질문은 `ChatBubble from="me"`입니다.
+              return ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: constraints.maxWidth * _questionWidthFactor),
+                child: HoronChatBubble(fromMe: true, child: Text(widget.question)),
               );
             },
           ),
-          if (widget.running) _statusLine(theme, count),
+          // `motion-reveal` — 실행 중이 아니면 상태 줄이 높이 0으로 접힙니다.
+          HoronReveal(
+            collapsed: !widget.running,
+            child: widget.running ? _statusLine(theme, count) : const SizedBox(width: double.infinity),
+          ),
           if (widget.queries.isNotEmpty) _queries(theme),
           if (widget.sources.isNotEmpty) _sources(theme),
         ],
@@ -305,47 +307,64 @@ class _HoronResearchRunPanelState extends State<HoronResearchRunPanel> with Sing
   Widget _statusLine(HoronThemeData theme, String? count) {
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
-    final List<String> trailing = <String>[
-      if (widget.elapsed != null) '· ${widget.elapsed}',
-      if (count != null) ' · $count',
-    ];
+    final List<String> meta = <String>[?widget.elapsed, ?count];
 
-    return Row(
-      spacing: space.s1_5, // gap-1.5 = 6
-      children: <Widget>[
-        const HoronSpinner(pixelSize: 14),
+    final List<Widget> parts = <Widget>[
+      const HoronSpinner(pixelSize: 14),
+      Flexible(
+        child: Text(
+          widget.statusLabel,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.text.labelMd.copyWith(color: colors.textPrimary), // text-label-md
+        ),
+      ),
+      AnimatedBuilder(
+        animation: _caret,
+        builder: (BuildContext context, Widget? child) =>
+            Opacity(opacity: _caret.value < 0.5 ? 1 : 0, child: child), // caret-blink 50%
+        child: Container(
+          width: _caretBarWidth,
+          height: _caretBarHeight,
+          decoration: BoxDecoration(
+            color: colors.interactivePrimary,
+            borderRadius: BorderRadius.circular(_caretBarRadius),
+          ),
+        ),
+      ),
+      // 캐럿은 수치 앞에 섭니다.
+      if (meta.isNotEmpty)
         Flexible(
           child: Text(
-            widget.statusLabel,
+            meta.join(' · '),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: theme.text.labelMd.copyWith(color: colors.textPrimary), // text-[14px]/[20px] font-medium
-          ),
-        ),
-        if (trailing.isNotEmpty)
-          Flexible(
-            child: Text(
-              trailing.join(),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.text.caption.copyWith(color: colors.textSecondary), // text-[12px]/[18px]
-            ),
-          ),
-        Icon(Icons.expand_more, size: _caretSize, color: colors.textSecondary),
-        AnimatedBuilder(
-          animation: _caret,
-          builder: (BuildContext context, Widget? child) =>
-              Opacity(opacity: _caret.value < 0.5 ? 1 : 0, child: child), // caret-blink 50%
-          child: Container(
-            width: _caretBarWidth,
-            height: _caretBarHeight,
-            decoration: BoxDecoration(
-              color: colors.interactivePrimary,
-              borderRadius: BorderRadius.circular(_caretBarRadius),
+            // `text-caption text-text-secondary tabular-nums`.
+            style: theme.text.caption.copyWith(
+              color: colors.textSecondary,
+              fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
             ),
           ),
         ),
-      ],
+    ];
+
+    // `onToggleStatus`가 없으면 캐럿 없는 정적 줄입니다.
+    if (widget.onToggleStatus == null) {
+      return Row(spacing: space.s1_5, children: parts);
+    }
+    return Semantics(
+      button: true,
+      liveRegion: true,
+      child: _Pressable(
+        onTap: widget.onToggleStatus,
+        builder: (bool pressed, bool hovered) => Row(
+          spacing: space.s1_5, // gap-1.5 = 6
+          children: <Widget>[
+            ...parts,
+            Icon(Icons.expand_more, size: _caretSize, color: colors.textSecondary),
+          ],
+        ),
+      ),
     );
   }
 
@@ -420,36 +439,54 @@ class _HoronResearchRunPanelState extends State<HoronResearchRunPanel> with Sing
   Widget _sources(HoronThemeData theme) {
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
+    final List<Widget> parts = <Widget>[
+      _avatarStack(theme),
+      Flexible(
+        child: Text(
+          widget.read != null && widget.total != null
+              ? '${widget.read} of ${widget.total} sources read'
+              : '${widget.sources.length} sources',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          // `text-label-md text-text-primary tabular-nums`.
+          style: theme.text.labelMd.copyWith(
+            color: colors.textPrimary,
+            fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+          ),
+        ),
+      ),
+    ];
 
+    Widget pill(Color? hoveredFill, List<Widget> children) => Container(
+      height: space.step(9), // h-9 = 36
+      padding: EdgeInsets.only(left: space.s1, right: space.s3), // pl-1 pr-3
+      decoration: BoxDecoration(
+        color: hoveredFill ?? colors.overlayInk5, // bg-overlay-ink-5, hover:bg-overlay-ink-8
+        borderRadius: BorderRadius.circular(theme.radius.full),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: space.s2, // gap-2 = 8
+        children: children,
+      ),
+    );
+
+    // `onOpenSources`가 없으면 캐럿 없는 정적 라벨입니다.
+    if (widget.onOpenSources == null) {
+      return Align(
+        alignment: Alignment.centerLeft, // w-fit
+        child: pill(null, parts),
+      );
+    }
     return Align(
-      alignment: Alignment.centerLeft, // w-fit
-      child: Container(
-        height: space.step(9), // h-9 = 36
-        padding: EdgeInsets.only(left: space.s1, right: space.s3), // pl-1 pr-3
-        decoration: BoxDecoration(
-          color: colors.overlayInk5, // bg-overlay-ink-5
-          borderRadius: BorderRadius.circular(theme.radius.full),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          spacing: space.s2, // gap-2 = 8
-          children: <Widget>[
-            _avatarStack(theme),
-            Flexible(
-              child: Text(
-                '${widget.read ?? 0} of ${widget.total ?? 0} sources read',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.text.labelSm.copyWith(
-                  fontSize: 13, // text-[13px]
-                  height: 18 / 13, // /[18px]
-                  color: colors.textPrimary,
-                ),
-              ),
-            ),
-            Icon(Icons.expand_more, size: _caretSize, color: colors.textSecondary),
-          ],
-        ),
+      alignment: Alignment.centerLeft,
+      child: _Pressable(
+        onTap: widget.onOpenSources,
+        semanticLabel: 'Sources',
+        builder: (bool pressed, bool hovered) => pill(hovered ? colors.overlayInk8 : null, <Widget>[
+          ...parts,
+          Icon(Icons.expand_more, size: _caretSize, color: colors.textSecondary),
+        ]),
       ),
     );
   }
@@ -460,7 +497,7 @@ class _HoronResearchRunPanelState extends State<HoronResearchRunPanel> with Sing
   /// 그립니다. 그래야 폭도 겹친 만큼 줄어듭니다.
   Widget _avatarStack(HoronThemeData theme) {
     final HoronSpaceSpec space = theme.space;
-    final double side = space.step(6.5); // size-6.5 = 26
+    final double side = space.step(7); // size-7 = 28
     final double step = side - _avatarOverlap;
 
     return SizedBox(
@@ -479,23 +516,16 @@ class _HoronResearchRunPanelState extends State<HoronResearchRunPanel> with Sing
     final HoronSpaceSpec space = theme.space;
 
     return Container(
-      width: space.step(6.5),
-      height: space.step(6.5),
+      width: space.step(7),
+      height: space.step(7),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: HoronPalette.sky700, // bg-sky-700
         shape: BoxShape.circle,
         border: Border.all(color: theme.colors.bgSurface, width: _avatarRing), // ring-2 ring-bg-surface
       ),
-      child: Text(
-        initial,
-        maxLines: 1,
-        style: theme.text.labelSm.copyWith(
-          fontSize: 11, // text-[11px]
-          height: 16 / 11, // /[16px]
-          color: HoronPalette.baseWhite, // text-white
-        ),
-      ),
+      // `text-label-sm text-text-on-ink`.
+      child: Text(initial, maxLines: 1, style: theme.text.labelSm.copyWith(color: theme.colors.textOnInk)),
     );
   }
 
@@ -504,12 +534,12 @@ class _HoronResearchRunPanelState extends State<HoronResearchRunPanel> with Sing
     final HoronSpaceSpec space = theme.space;
 
     return Padding(
-      // px-4 pt-1 pb-4
-      padding: EdgeInsets.fromLTRB(space.s4, space.s1, space.s4, space.s4),
+      // px-5 pt-1 pb-4
+      padding: EdgeInsets.fromLTRB(space.s5, space.s1, space.s5, space.s4),
       child: AnimatedContainer(
         duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,
         curve: HoronMotion.colorsCurve,
-        height: space.step(11.5), // h-11.5 = 46
+        height: space.step(11), // h-11 = 44
         padding: EdgeInsets.only(left: space.s4, right: space.s1_5), // pl-4 pr-1.5
         decoration: BoxDecoration(
           color: _focused ? colors.overlayInk8 : colors.overlayInk5, // focus-within:bg-overlay-ink-8
@@ -536,12 +566,15 @@ class _HoronResearchRunPanelState extends State<HoronResearchRunPanel> with Sing
               onTap: widget.running ? widget.onStop : _submit,
               semanticLabel: widget.running ? 'Stop' : 'Send',
               builder: (bool pressed, bool hovered) => Container(
-                width: space.step(8.5), // size-8.5 = 34
-                height: space.step(8.5),
+                width: space.step(8), // size-8 = 32
+                height: space.step(8),
                 decoration: BoxDecoration(color: colors.interactivePrimary, shape: BoxShape.circle),
-                child: widget.running
-                    ? Icon(Icons.stop, size: _smallIconSize, color: colors.textInverse) // size-3.5
-                    : Icon(Icons.arrow_upward, size: _iconSize, color: colors.textInverse), // size-4
+                // `motion-swap` — 정지와 보내기가 같은 원 안에서 교차합니다.
+                child: HoronSwap(
+                  hidden: widget.running,
+                  hiddenChild: Icon(Icons.stop, size: _smallIconSize, color: colors.textInverse), // size-3.5
+                  child: Icon(Icons.arrow_upward, size: _iconSize, color: colors.textInverse), // size-4
+                ),
               ),
             ),
           ],

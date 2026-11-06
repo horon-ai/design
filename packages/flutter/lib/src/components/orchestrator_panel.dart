@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
+import 'segmented_control.dart';
 import 'spinner.dart';
 
 /// `orchestrator-panel.tsx`의 `rounded-[24px]`입니다. 토큰 반경 단계에 24가 없습니다.
@@ -12,23 +13,8 @@ const double _panelRadius = 24;
 /// `rounded-[5px]` — 리드 타일의 반경입니다.
 const double _leadTileRadius = 5;
 
-/// `rounded-[16px]` — 요약 상자의 반경입니다. 토큰의 `xl2`와 같은 16입니다.
-const double _summaryRadius = 16;
-
 /// `size-5.5` — 리드 타일 한 변 22입니다.
 const double _leadTileSize = 22;
-
-/// `p-[3px]` — 병렬 선택 트랙의 안쪽 여백입니다.
-const double _trackInset = 3;
-
-/// `h-7 w-7.5` — 병렬 선택 칸의 높이 28과 폭 30입니다.
-const double _pickerHeight = 28;
-
-/// `h-7 w-7.5`의 폭입니다.
-const double _pickerWidth = 30;
-
-/// 칸 사이 `gap-0.5`(2)를 더한 이동 거리입니다. React는 `translate: index * 32px`입니다.
-const double _pickerStep = _pickerWidth + 2;
 
 /// `h-7.5` — Stop 단추의 높이 30입니다.
 const double _stopHeight = 30;
@@ -213,8 +199,8 @@ class _HoronOrchestratorPanelState extends State<HoronOrchestratorPanel> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Padding(
-            // px-5 pt-4.5 pb-4
-            padding: EdgeInsets.fromLTRB(space.s5, space.step(4.5), space.s5, space.s4),
+            // px-5 pt-4 pb-3.5
+            padding: EdgeInsets.fromLTRB(space.s5, space.s4, space.s5, space.s3_5),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,12 +221,21 @@ class _HoronOrchestratorPanelState extends State<HoronOrchestratorPanel> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     );
+                    // React의 `SegmentedControl size="sm" surface="inset"`입니다.
                     final Widget? picker = widget.parallelOptions != null && widget.parallelOptions!.isNotEmpty
-                        ? _ParallelPicker(
-                            options: widget.parallelOptions!,
-                            value: widget.parallelValue,
-                            label: widget.parallelLabel,
-                            onChanged: widget.onParallelChange,
+                        ? HoronSegmentedControl(
+                            semanticLabel: widget.parallelLabel,
+                            size: HoronSegmentedControlSize.sm,
+                            surface: HoronSegmentedControlSurface.inset,
+                            fill: false,
+                            value: widget.parallelValue == null ? null : '${widget.parallelValue}',
+                            onValueChange: widget.onParallelChange == null
+                                ? null
+                                : (String next) => widget.onParallelChange!(int.parse(next)),
+                            items: <HoronSegmentedItem>[
+                              for (final int option in widget.parallelOptions!)
+                                HoronSegmentedItem(value: '$option', label: '$option'),
+                            ],
                           )
                         : null;
                     final Widget? stop = widget.onStop != null
@@ -279,7 +274,13 @@ class _HoronOrchestratorPanelState extends State<HoronOrchestratorPanel> {
                 _LeadRow(lead: widget.lead),
                 if (widget.plan != null && widget.plan!.isNotEmpty) _plan(theme, widget.plan!),
                 if (widget.children.isNotEmpty) _lanes(widget.children),
-                if (widget.summary != null) _summary(theme, widget.summary!, widget.children.length),
+                // `motion-reveal` — 요약이 없으면 이 자리가 높이 0으로 접힙니다.
+                HoronReveal(
+                  collapsed: widget.summary == null,
+                  child: widget.summary == null
+                      ? const SizedBox(width: double.infinity)
+                      : _summary(theme, widget.summary!, widget.children.length),
+                ),
               ],
             ),
           ),
@@ -329,7 +330,9 @@ class _HoronOrchestratorPanelState extends State<HoronOrchestratorPanel> {
         spacing: space.s2_5, // gap-2.5
         children: <Widget>[
           for (int index = 0; index < lanes.length; index++)
+            // `key` — 레인의 키를 그대로 써서 순서가 바뀌어도 상태가 따라갑니다.
             _Rise(
+              key: lanes[index].key ?? ValueKey<int>(index),
               index: index,
               child: _LaneBranch(last: index == lanes.length - 1, child: lanes[index]),
             ),
@@ -338,18 +341,19 @@ class _HoronOrchestratorPanelState extends State<HoronOrchestratorPanel> {
     );
   }
 
-  /// `rounded-[16px] bg-overlay-ink-4` 요약 상자입니다.
+  /// `rounded-2xl bg-overlay-ink-4` 요약 상자입니다.
   Widget _summary(HoronThemeData theme, HoronOrchestratorSummary summary, int laneCount) {
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
     return _Rise(
       index: laneCount,
       child: Container(
-        // px-3.5 py-3
-        padding: EdgeInsets.symmetric(horizontal: space.s3_5, vertical: space.s3),
+        // `rounded-2xl px-4 py-3`.
+        padding: EdgeInsets.symmetric(horizontal: space.s4, vertical: space.s3),
         decoration: BoxDecoration(
           color: colors.overlayInk4, // bg-overlay-ink-4
-          borderRadius: BorderRadius.circular(_summaryRadius),
+          // `rounded-2xl`.
+          borderRadius: BorderRadius.circular(theme.radius.xl2),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -373,137 +377,6 @@ class _HoronOrchestratorPanelState extends State<HoronOrchestratorPanel> {
             ),
             Text(summary.body, style: theme.text.bodySm.copyWith(color: colors.textSecondary)),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// `role="radiogroup"` 병렬 선택기입니다. 표시자가 280ms에 밀려 옮겨 갑니다.
-class _ParallelPicker extends StatelessWidget {
-  const _ParallelPicker({required this.options, required this.value, required this.label, this.onChanged});
-
-  final List<int> options;
-  final int? value;
-  final String label;
-  final ValueChanged<int>? onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final int selected = value == null ? -1 : options.indexOf(value!);
-
-    return Semantics(
-      container: true,
-      label: label,
-      child: Container(
-        padding: const EdgeInsets.all(_trackInset), // p-[3px]
-        decoration: BoxDecoration(
-          color: theme.colors.overlayInk5, // bg-overlay-ink-5
-          borderRadius: BorderRadius.circular(theme.radius.full),
-        ),
-        child: Stack(
-          children: <Widget>[
-            if (selected >= 0)
-              AnimatedPositioned(
-                // motion-indicator — translate: index * 32px
-                duration: reduceMotion ? Duration.zero : HoronMotion.indicatorDuration,
-                curve: HoronMotion.indicatorCurve,
-                left: selected * _pickerStep,
-                top: 0,
-                width: _pickerWidth,
-                height: _pickerHeight,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: theme.colors.overlayInk10, // bg-overlay-ink-10
-                    borderRadius: BorderRadius.circular(theme.radius.full),
-                  ),
-                ),
-              ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: theme.space.s0_5, // gap-0.5
-              children: <Widget>[
-                for (final int option in options)
-                  _PickerOption(
-                    option: option,
-                    selected: option == value,
-                    onTap: onChanged == null ? null : () => onChanged!(option),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// `h-7 w-7.5 text-label-md` 병렬 선택 칸입니다.
-class _PickerOption extends StatefulWidget {
-  const _PickerOption({required this.option, required this.selected, this.onTap});
-
-  final int option;
-  final bool selected;
-  final VoidCallback? onTap;
-
-  @override
-  State<_PickerOption> createState() => _PickerOptionState();
-}
-
-class _PickerOptionState extends State<_PickerOption> {
-  bool _hovered = false;
-  bool _focused = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
-    final bool interactive = widget.onTap != null;
-    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final Color foreground = widget.selected || _hovered ? colors.textPrimary : colors.textSecondary;
-
-    return Semantics(
-      button: true,
-      selected: widget.selected,
-      inMutuallyExclusiveGroup: true,
-      label: '${widget.option}',
-      child: FocusableActionDetector(
-        enabled: interactive,
-        mouseCursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
-        onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
-        onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-        shortcuts: const <ShortcutActivator, Intent>{
-          SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-          SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
-        },
-        actions: <Type, Action<Intent>>{
-          ActivateIntent: CallbackAction<ActivateIntent>(
-            onInvoke: (ActivateIntent intent) {
-              widget.onTap?.call();
-              return null;
-            },
-          ),
-        },
-        child: GestureDetector(
-          onTap: widget.onTap,
-          child: _FocusRing(
-            visible: _focused && interactive,
-            radius: theme.radius.full,
-            color: colors.textBrand,
-            child: AnimatedDefaultTextStyle(
-              duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
-              curve: HoronMotion.colorsCurve,
-              style: theme.text.labelMd.copyWith(color: foreground),
-              child: Container(
-                width: _pickerWidth, // w-7.5
-                height: _pickerHeight, // h-7
-                alignment: Alignment.center,
-                child: Text('${widget.option}'),
-              ),
-            ),
-          ),
         ),
       ),
     );
@@ -798,7 +671,7 @@ class _ElbowPainter extends CustomPainter {
 
 /// `motion-rise` — opacity 0→1, translate 0 4px→0을 220ms에 재생합니다.
 class _Rise extends StatefulWidget {
-  const _Rise({required this.child, this.index = 0});
+  const _Rise({super.key, required this.child, this.index = 0});
 
   final Widget child;
   final int index;

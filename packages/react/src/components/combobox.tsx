@@ -81,7 +81,8 @@ const multiFieldClass: Record<ComboboxSize, string> = {
 };
 
 /** The popup follows the field's surface (a segment takes its group's): glass is the veil, every solid kind is solid. */
-const popupClass = "relative max-h-80 min-w-(--anchor-width) motion-popup overflow-clip rounded-xl p-1.5 outline-none";
+const popupClass =
+  "relative max-h-80 min-w-(--anchor-width) max-w-[calc(100vw-2rem)] motion-popup overflow-clip rounded-xl p-1.5 outline-none";
 const popupSurfaceClass = (surface: InputSurface) =>
   surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-popover";
 
@@ -126,7 +127,11 @@ export function Combobox(props: ComboboxProps) {
         className="z-50 outline-none"
       >
         <BaseCombobox.Popup
-          className={cn(popupClass, popupSurfaceClass(popupSurface), segment && "flex w-64 flex-col gap-1")}
+          className={cn(
+            popupClass,
+            popupSurfaceClass(popupSurface),
+            segment && "flex w-64 max-w-[calc(100vw-2rem)] flex-col gap-1",
+          )}
         >
           {segment && (
             <div className={cn(fieldBoxClass.base, fieldBoxClass.solid, fieldSizeClass[size], "shrink-0")}>
@@ -217,7 +222,7 @@ export function Combobox(props: ComboboxProps) {
             fieldBoxClass.base,
             fieldBoxClass[surface],
             multiFieldClass[size],
-            "w-60 cursor-text data-disabled:cursor-not-allowed",
+            "w-60 max-w-full cursor-text data-disabled:cursor-not-allowed",
             className,
           )}
         >
@@ -255,7 +260,7 @@ export function Combobox(props: ComboboxProps) {
         <BaseCombobox.InputGroup
           ref={anchor}
           data-invalid={invalid ? "" : undefined}
-          className={cn(fieldBoxClass.base, fieldBoxClass[surface], fieldSizeClass[size], "w-60", className)}
+          className={cn(fieldBoxClass.base, fieldBoxClass[surface], fieldSizeClass[size], "w-60 max-w-full", className)}
         >
           <MagnifyingGlass aria-hidden className="relative shrink-0 text-text-secondary" />
           <BaseCombobox.Input
