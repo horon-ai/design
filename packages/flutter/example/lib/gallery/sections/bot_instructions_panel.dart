@@ -101,6 +101,9 @@ class HoronBotInstructionsPanelGallerySection extends StatelessWidget {
                 instructions: _instructions,
                 tokenCount: 96,
                 example: Text('Hi! Where can I update my invoice address?'),
+                // 두 알약에 처리기를 붙이면 캐럿이 생겨 버튼이 됩니다.
+                onVersionClick: () {},
+                onBotClick: () {},
               ),
             ],
           ),

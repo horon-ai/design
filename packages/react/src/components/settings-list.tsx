@@ -16,7 +16,7 @@ export function SettingsList({ surface = "solid", className, children, ...props 
   return (
     <div
       className={cn(
-        "relative flex flex-col overflow-clip rounded-2xl px-5 [&>:not(.liquid-layers)]:relative",
+        "relative flex min-w-0 flex-col overflow-clip rounded-2xl px-5 [&>:not(.liquid-layers)]:relative",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         className,
       )}
@@ -43,16 +43,16 @@ export function SettingsRow({ title, description, leading, control, className, .
   return (
     <div
       className={cn(
-        "flex items-center border-b border-border-default last:border-b-0",
-        leading ? "gap-3 py-[13px]" : "gap-4 py-4",
+        "flex min-w-0 flex-wrap items-center border-b border-border-default last:border-b-0",
+        leading ? "gap-x-3 gap-y-2 py-[13px]" : "gap-x-4 gap-y-2 py-4",
         className,
       )}
       {...props}
     >
       {leading}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="text-label-md text-text-primary">{title}</span>
-        {description && <span className="text-body-sm text-text-secondary">{description}</span>}
+        <span className="text-label-md wrap-break-word text-text-primary">{title}</span>
+        {description && <span className="text-body-sm wrap-break-word text-text-secondary">{description}</span>}
       </div>
       {control && <div className="flex shrink-0 items-center">{control}</div>}
     </div>

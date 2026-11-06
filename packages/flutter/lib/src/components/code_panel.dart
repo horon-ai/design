@@ -45,7 +45,8 @@ class HoronCodePanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(_panelRadius),
-        border: Border.all(color: theme.colors.borderDefault),
+        // dark:border-border-strong (라이트는 border-default)
+        border: Border.all(color: isDark ? theme.colors.borderStrong : theme.colors.borderDefault),
       ),
       padding: const EdgeInsets.symmetric(horizontal: _panelPaddingX, vertical: _panelPaddingY),
       child: Text(

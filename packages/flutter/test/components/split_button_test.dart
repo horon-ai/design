@@ -46,16 +46,17 @@ void main() {
 
     expect(tester.getSize(_pill()).height, space.step(8));
     expect(tester.widget<ClipRRect>(_pill()).borderRadius, BorderRadius.circular(radius.full));
-    final ColoredBox fill = tester.widget<ColoredBox>(
-      find.descendant(of: _pill(), matching: find.byType(ColoredBox)).first,
+    // 채움은 알약 컨테이너가 소유합니다(React `hover:bg-interactive-primary-hover`).
+    final AnimatedContainer fill = tester.widget<AnimatedContainer>(
+      find.descendant(of: _pill(), matching: find.byType(AnimatedContainer)).first,
     );
-    expect(fill.color, colors.interactivePrimary);
+    expect((fill.decoration! as BoxDecoration).color, colors.interactivePrimary);
 
-    // Paper `1VGK-0`: 라벨은 `text-label-lg`(16px / 22px / 500)입니다.
+    // 32px 알약은 `Button`의 `sm`과 같은 `text-label-md`(14px / 20px / 500)를 씁니다.
     final Text label = tester.widget<Text>(find.text('Run'));
-    final TextStyle paper = HoronThemeData.light.text.labelLg;
-    expect(label.style!.fontSize, paper.fontSize, reason: 'Paper 라벨 16px');
-    expect(label.style!.height, paper.height, reason: 'Paper 줄 높이 22px');
+    final TextStyle paper = HoronThemeData.light.text.labelMd;
+    expect(label.style!.fontSize, paper.fontSize, reason: 'Paper 라벨 14px');
+    expect(label.style!.height, paper.height, reason: 'Paper 줄 높이 20px');
     expect(label.style!.fontWeight, paper.fontWeight);
     expect(label.style!.color, colors.interactiveOnPrimary);
   });
@@ -123,12 +124,21 @@ void main() {
   });
 
   testWidgets('menuOpen이면 캐럿이 180도 돌아간다', (WidgetTester tester) async {
-    await tester.pumpWidget(_host(Brightness.light, const HoronSplitButton(label: 'Run', menuOpen: true)));
+    // 캐럿 절반은 React의 `menu`처럼 `onMenuPressed`가 있을 때만 그립니다.
+    await tester.pumpWidget(
+      _host(Brightness.light, const HoronSplitButton(label: 'Run', menuOpen: true, onMenuPressed: _noop)),
+    );
     final AnimatedRotation rotation = tester.widget<AnimatedRotation>(find.byType(AnimatedRotation));
     expect(rotation.turns, 0.5);
 
-    await tester.pumpWidget(_host(Brightness.light, const HoronSplitButton(label: 'Run')));
+    await tester.pumpWidget(_host(Brightness.light, const HoronSplitButton(label: 'Run', onMenuPressed: _noop)));
     expect(tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).turns, 0);
+  });
+
+  testWidgets('메뉴 콜백이 없으면 캐럿 절반과 구분 막대가 없다', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(Brightness.light, const HoronSplitButton(label: 'Run', onPressed: _noop)));
+    expect(find.byIcon(Icons.expand_more), findsNothing);
+    expect(find.byKey(const Key('horon-split-button-divider')), findsNothing);
   });
 
   testWidgets('좁은 폭에서는 라벨이 줄어들고 넘치지 않는다', (WidgetTester tester) async {

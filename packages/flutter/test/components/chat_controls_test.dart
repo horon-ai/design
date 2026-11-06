@@ -16,7 +16,7 @@ Future<void> pumpControls(WidgetTester tester, Widget child, {Brightness brightn
 void main() {
   testWidgets('jump to latest: 44px clear glass circle with a 20px caret', (WidgetTester tester) async {
     await pumpControls(tester, const HoronJumpToLatest(surface: HoronChatControlSurface.glass));
-    expect(tester.getSize(find.byType(HoronJumpToLatest)), const Size(44, 44));
+    expect(tester.getSize(find.byType(HoronJumpToLatest)), const Size(44, 44)); // size-11
     expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass).first).tier, HoronGlassTier.clear);
     expect(tester.widget<Icon>(find.byIcon(Icons.keyboard_arrow_down)).size, 20);
   });
@@ -39,13 +39,25 @@ void main() {
     expect(find.text('0:07'), findsOneWidget);
     expect(tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass).first).tier, HoronGlassTier.regular);
 
+    // React dev: 버튼은 `bg-interactive-danger`, 정지 사각형은 `bg-interactive-on-danger`입니다.
     final bool hasRedStop = tester.widgetList<Container>(find.byType(Container)).any((Container box) {
       final Decoration? decoration = box.decoration;
       return decoration is BoxDecoration &&
-          decoration.color == theme.colors.textDanger &&
+          decoration.color == theme.colors.interactiveDanger &&
           decoration.shape == BoxShape.circle;
     });
     expect(hasRedStop, isTrue);
+    final bool hasOnDangerSquare = tester.widgetList<Container>(find.byType(Container)).any((Container box) {
+      final Decoration? decoration = box.decoration;
+      return decoration is BoxDecoration && decoration.color == theme.colors.interactiveOnDanger;
+    });
+    expect(hasOnDangerSquare, isTrue);
+
+    // 경과시간은 w-10 우측 정렬 tabular-nums입니다.
+    final Text elapsed = tester.widget<Text>(find.text('0:07'));
+    expect(elapsed.textAlign, TextAlign.end);
+    expect(elapsed.style!.fontFeatures, const <FontFeature>[FontFeature.tabularFigures()]);
+    expect(tester.getSize(find.ancestor(of: find.text('0:07'), matching: find.byType(SizedBox)).first).width, 40);
   });
 
   testWidgets('voice input: custom levels clamp to at least 4px and the stop fires', (WidgetTester tester) async {

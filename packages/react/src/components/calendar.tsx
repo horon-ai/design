@@ -41,9 +41,27 @@ type CommonProps = {
 };
 
 const containerSizeClass: Record<CalendarSize, { default: string; popover: string }> = {
-  sm: { default: "gap-2 p-3", popover: "w-62 gap-1.5 p-3" },
-  md: { default: "gap-3 p-4", popover: "w-77 gap-2 p-3.5" },
-  lg: { default: "gap-3.5 p-4.5", popover: "w-92 gap-2.5 p-4" },
+  // The default calendar fills its parent up to the Figma width (250/314/374px: seven cells plus padding),
+  // so it lands on that size on desktop and folds to the column on a narrow screen. `w-full` rather than a
+  // fixed `w-*` keeps its min-content at zero, which is what lets a flex parent shrink it. The popover is
+  // fixed by design, so it caps against the viewport instead: its positioner is auto-width.
+  //
+  // Below `sm` the frame gives its padding and cell gaps back to the grid: at a 320px viewport the demo
+  // stage leaves 248px, and the desktop 16px padding plus 12px gaps left each day about 21px. The narrower
+  // frame and gap keep every day at or above `min-w-7` (28px), which is the smallest a seven-column month
+  // can be without dropping under the 24px pointer minimum.
+  sm: {
+    default: "w-full max-w-62.5 gap-2 p-3 max-sm:gap-1 max-sm:p-2",
+    popover: "w-62 max-w-[calc(100vw-2rem)] gap-1.5 p-3",
+  },
+  md: {
+    default: "w-full max-w-78.5 gap-3 p-4 max-sm:gap-1 max-sm:p-2",
+    popover: "w-77 max-w-[calc(100vw-2rem)] gap-2 p-3.5",
+  },
+  lg: {
+    default: "w-full max-w-93.5 gap-3.5 p-4.5 max-sm:gap-1 max-sm:p-2",
+    popover: "w-92 max-w-[calc(100vw-2rem)] gap-2.5 p-4",
+  },
 };
 
 const titleSizeClass: Record<CalendarSize, string> = {
@@ -65,28 +83,41 @@ const popoverHeaderSizeClass: Record<CalendarSize, string> = {
 };
 
 const arrowSizeClass: Record<CalendarSize, string> = {
-  sm: "size-6 [&_svg]:size-4",
-  md: "size-7 [&_svg]:size-4.5",
-  lg: "size-8 [&_svg]:size-5",
+  sm: "size-5.5 sm:size-6 [&_svg]:size-3.5 sm:[&_svg]:size-4",
+  md: "size-6 sm:size-7 [&_svg]:size-4 sm:[&_svg]:size-4.5",
+  lg: "size-7 sm:size-8 [&_svg]:size-4.5 sm:[&_svg]:size-5",
 };
 
 const popoverArrowSizeClass: Record<CalendarSize, string> = {
-  sm: "size-7 [&_svg]:size-4",
-  md: "size-8 [&_svg]:size-4.5",
-  lg: "size-10 [&_svg]:size-5",
+  sm: "size-6 sm:size-7 [&_svg]:size-3.5 sm:[&_svg]:size-4",
+  md: "size-7 sm:size-8 [&_svg]:size-4 sm:[&_svg]:size-4.5",
+  lg: "size-9 sm:size-10 [&_svg]:size-4.5 sm:[&_svg]:size-5",
 };
 
 const weekdayHeaderSizeClass: Record<CalendarSize, string> = {
-  sm: "h-5 w-8",
-  md: "h-6 w-10",
-  lg: "h-7 w-12",
+  sm: "h-5 max-w-8",
+  md: "h-6 max-w-10",
+  lg: "h-7 max-w-12",
 };
 
+/**
+ * Seven cells share one seventh of the calendar each and cap at the Figma size for their rung (32/40/48px),
+ * so the grid reads exactly as designed on desktop and narrows instead of overflowing when the calendar is
+ * squeezed. `min-w-0`/`flex-1` keep the calendar's min-content at its padding, which is what lets a parent
+ * flex item shrink it at all; `aspect-square` keeps each target square below the cap.
+ */
 const daySizeClass: Record<CalendarSize, string> = {
-  sm: "size-8",
-  md: "size-10",
-  lg: "size-12",
+  sm: "max-w-8",
+  md: "max-w-10",
+  lg: "max-w-12",
 };
+
+/**
+ * A day cell takes an equal share of the row and never drops below 28px, so a phone grid stays tappable
+ * while a desktop grid keeps the Figma size from `daySizeClass` as its ceiling.
+ */
+const cellFluidClass = "min-w-7 flex-1";
+const dayShapeClass = "aspect-square";
 
 const dayTextClass: Record<CalendarSize, string> = {
   sm: "text-body-sm",
@@ -213,7 +244,10 @@ export function Calendar(props: CalendarProps) {
   return (
     <div
       className={cn(
-        "relative flex flex-col overflow-clip",
+        "relative flex flex-col",
+        // The default grid scrolls sideways rather than clipping when a viewport is narrower than the
+        // 28px cell floor allows; the popover is viewport-capped, so it keeps clipping its corners.
+        variant === "popover" ? "overflow-clip" : "overflow-x-auto overflow-y-clip",
         surface === "solid"
           ? "border border-border-default bg-bg-surface"
           : surface === "glass"
@@ -221,7 +255,7 @@ export function Calendar(props: CalendarProps) {
             : "bg-glass-thick",
         variant === "popover"
           ? cn("rounded-[24px]", containerSizeClass[size].popover)
-          : cn("w-fit rounded-xl", containerSizeClass[size].default),
+          : cn("rounded-xl", containerSizeClass[size].default),
         // Paper renders every popover day on the label scale; the default calendar mixes body and label.
         variant === "popover" && popoverDayTextClass[size],
         className,
@@ -305,7 +339,11 @@ export function Calendar(props: CalendarProps) {
             <span
               key={date.getDay()}
               role="columnheader"
-              className={cn("flex justify-center text-caption text-text-secondary", weekdayHeaderSizeClass[size])}
+              className={cn(
+                "flex justify-center text-caption text-text-secondary",
+                cellFluidClass,
+                weekdayHeaderSizeClass[size],
+              )}
             >
               {weekday.format(date)}
             </span>
@@ -335,6 +373,8 @@ export function Calendar(props: CalendarProps) {
                   onFocus={() => setFocused(date)}
                   className={cn(
                     "relative flex cursor-pointer flex-col items-center justify-center motion-colors",
+                    cellFluidClass,
+                    dayShapeClass,
                     daySizeClass[size],
                     "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
                     between

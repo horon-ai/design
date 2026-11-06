@@ -7,6 +7,7 @@ import 'package:horon_ui/horon_ui.dart';
 ///
 /// 변형 어휘가 없으므로 상태를 늘어놓습니다. 최신 상태, 업데이트 알약과 켜진 스위치,
 /// 인증 배지와 오버플로, 그리고 폭이 좁을 때 액션이 아래로 내려가는 모습입니다.
+/// Update 버튼은 `onUpdate`가 있을 때만 가로로 자리를 열며 나타납니다.
 class HoronPluginRowGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronPluginRowGallerySection({super.key});

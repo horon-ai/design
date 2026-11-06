@@ -52,7 +52,9 @@ export function ListDetail({
   return (
     <div
       className={cn(
-        "relative flex w-full max-w-201.5 overflow-clip rounded-2xl",
+        // Below `sm` the two panes stack: the list would otherwise hold its 250px
+        // and leave the detail pane nothing to render in.
+        "relative flex w-full max-w-201.5 min-w-0 flex-col overflow-clip rounded-2xl sm:flex-row",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         className,
       )}
@@ -63,7 +65,7 @@ export function ListDetail({
         role="listbox"
         aria-label="Items"
         className={cn(
-          "relative flex w-62.5 shrink-0 flex-col gap-3 border-r border-border-default p-2.5",
+          "relative flex w-full shrink-0 flex-col gap-3 border-b border-border-default p-2.5 sm:w-62.5 sm:border-r sm:border-b-0",
           surface === "glass" ? "bg-transparent" : "bg-bg-inset",
         )}
       >
@@ -113,7 +115,7 @@ export type ListDetailHeaderProps = Omit<ComponentProps<"div">, "className" | "t
 /** Detail header: a 40px sky tile with an 18px icon, title and description, actions on the right. */
 export function ListDetailHeader({ icon, title, description, actions, className, ...props }: ListDetailHeaderProps) {
   return (
-    <div className={cn("flex items-center gap-3", className)} {...props}>
+    <div className={cn("flex flex-wrap items-center gap-3", className)} {...props}>
       {icon && (
         <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 [&_svg]:size-5">
           {icon}
@@ -203,7 +205,7 @@ export function ListDetailInstructions({
   const text = value ?? inner;
   return (
     <div className={cn("flex flex-col gap-2", className)} {...props}>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <span className="text-label-md font-semibold text-text-primary">{title}</span>
         {tag && (
           <span className="inline-flex h-5.5 items-center rounded-full bg-overlay-ink-6 px-2 text-label-sm text-text-secondary">
@@ -264,5 +266,10 @@ export function ListDetailFooter({
   className,
   ...props
 }: Omit<ComponentProps<"div">, "className"> & { className?: string }) {
-  return <div className={cn("flex items-center gap-2 border-t border-border-default pt-3.5", className)} {...props} />;
+  return (
+    <div
+      className={cn("flex flex-wrap items-center gap-2 border-t border-border-default pt-3.5", className)}
+      {...props}
+    />
+  );
 }

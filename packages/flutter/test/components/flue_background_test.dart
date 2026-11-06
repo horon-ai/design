@@ -20,20 +20,22 @@ void main() {
 
   Future<void> pumpFlue(
     WidgetTester tester, {
-    HoronFlueConfig config = HoronFlueConfig.sky,
+    HoronFlueConfig? config,
+    HoronFlueVariant variant = HoronFlueVariant.defaultValue,
     Color? tint,
     bool animations = true,
+    Brightness brightness = Brightness.light,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
-        theme: horonTheme(Brightness.light),
+        theme: horonTheme(brightness),
         home: MediaQuery(
           data: MediaQueryData(size: hostSize, disableAnimations: !animations),
           child: Scaffold(
             body: SizedBox(
               width: hostSize.width,
               height: hostSize.height,
-              child: HoronFlueBackground(config: config, tint: tint),
+              child: HoronFlueBackground(variant: variant, config: config, tint: tint),
             ),
           ),
         ),
@@ -64,6 +66,8 @@ void main() {
   });
 
   testWidgets('without a shader the bgColor and the glass-regular tint are painted', (WidgetTester tester) async {
+    // 엔진이 셰이더를 거부한 경우입니다. 테스트 환경은 셰이더를 실을 수 있으므로 직접 막습니다.
+    HoronShaderProbe.loadProgram = (String asset) async => null;
     await pumpFlue(tester);
 
     final HoronThemeData horon = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
@@ -75,7 +79,7 @@ void main() {
       find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == horon.colors.glassRegular),
       findsOneWidget,
     );
-    // 셰이더 캔버스는 위젯 테스트 환경에서 붙지 않습니다.
+    // 셰이더가 없으면 캔버스를 붙이지 않습니다.
     expect(find.byKey(horonFlueCanvasKey), findsNothing);
 
     await drain(tester);
@@ -85,6 +89,52 @@ void main() {
     const Color tint = Color(0x33FF0000);
     await pumpFlue(tester, tint: tint);
     expect(find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == tint), findsOneWidget);
+    await drain(tester);
+  });
+
+  testWidgets('sidebar veils the light smoke with thick glass and auth lays no tint', (WidgetTester tester) async {
+    // React `bg-glass-thick dark:bg-transparent`: 연기가 유리 채움 위에 그려지므로 사이드바는
+    // 라이트에서 80% 흰 유리를 직접 얹습니다.
+    await pumpFlue(tester, variant: HoronFlueVariant.sidebar);
+    final HoronThemeData sidebarTheme = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == sidebarTheme.colors.glassThick),
+      findsOneWidget,
+      reason: 'sidebar light',
+    );
+    expect(
+      find.byWidgetPredicate(
+        (Widget widget) => widget is ColoredBox && widget.color == sidebarTheme.colors.glassRegular,
+      ),
+      findsNothing,
+      reason: 'sidebar light',
+    );
+    await drain(tester);
+
+    await pumpFlue(tester, variant: HoronFlueVariant.auth);
+    final HoronThemeData authTheme = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
+    for (final Color tint in <Color>[authTheme.colors.glassRegular, authTheme.colors.glassThick]) {
+      expect(
+        find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == tint),
+        findsNothing,
+        reason: 'auth light',
+      );
+    }
+    await drain(tester);
+  });
+
+  testWidgets('dark theme paints the night palette with no light tint', (WidgetTester tester) async {
+    await pumpFlue(tester, brightness: Brightness.dark);
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == HoronFlueConfig.night.bgColor),
+      findsOneWidget,
+    );
+    // React `bg-glass-regular dark:bg-transparent`: 다크 기본값에는 색조가 없습니다.
+    final HoronThemeData horon = HoronTheme.of(tester.element(find.byType(HoronFlueBackground)));
+    expect(
+      find.byWidgetPredicate((Widget widget) => widget is ColoredBox && widget.color == horon.colors.glassRegular),
+      findsNothing,
+    );
     await drain(tester);
   });
 
@@ -99,8 +149,16 @@ void main() {
     await drain(tester);
   });
 
+  testWidgets('the public enum mirrors the React variant vocabulary', (WidgetTester tester) async {
+    expect(HoronFlueVariant.values, <HoronFlueVariant>[
+      HoronFlueVariant.defaultValue,
+      HoronFlueVariant.sidebar,
+      HoronFlueVariant.auth,
+    ]);
+  });
+
   testWidgets('pointer steering aims at the normalized position like aim()', (WidgetTester tester) async {
-    await pumpFlue(tester);
+    await pumpFlue(tester, config: HoronFlueConfig.sky.copyWith(cursor: 1));
     final HoronFlueBackgroundState state = tester.state<HoronFlueBackgroundState>(find.byType(HoronFlueBackground));
     final Rect rect = tester.getRect(find.byType(HoronFlueBackground));
 

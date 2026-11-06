@@ -34,7 +34,7 @@ const defaultStages: Record<SourceStatus, SourceStages> = {
 
 const stageFill = { done: "bg-overlay-ink-35", todo: "bg-overlay-ink-8", failed: "bg-accent-red-500-90" } as const;
 const stage = (state: keyof typeof stageFill) =>
-  cn("h-[3px] w-11 overflow-clip rounded-full transition-colors duration-150", stageFill[state]);
+  cn("h-[3px] w-6 overflow-clip rounded-full transition-colors duration-150 sm:w-11", stageFill[state]);
 
 /** Figma `Source row` (Knowledge base): a flat row with a four-stage pipeline (parse, chunk, embed, index). */
 export function SourceRow({
@@ -51,7 +51,7 @@ export function SourceRow({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 px-2 py-3",
+        "flex flex-wrap items-center gap-x-3 gap-y-2 px-2 py-3",
         variant === "list"
           ? "relative after:absolute after:inset-x-2 after:bottom-0 after:h-px after:bg-overlay-ink-8 last:after:hidden"
           : "rounded-[14px] border border-border-default bg-bg-surface px-3",

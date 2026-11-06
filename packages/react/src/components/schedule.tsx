@@ -28,10 +28,11 @@ export type PickerFieldProps = {
   className?: string;
 };
 
+/** The Figma widths (144/160/176px) are the maximum: the field shrinks with a narrow card instead of pushing past it. */
 const triggerSizeClass: Record<PickerFieldSize, string> = {
-  sm: "h-8 w-36 gap-1.5 px-3",
-  md: "h-10 w-40 gap-2 px-3.5",
-  lg: "h-12 w-44 gap-2.5 px-5",
+  sm: "h-8 w-36 max-w-full gap-1.5 px-3",
+  md: "h-10 w-40 max-w-full gap-2 px-3.5",
+  lg: "h-12 w-44 max-w-full gap-2.5 px-5",
 };
 
 const triggerIconSizeClass: Record<PickerFieldSize, string> = {
@@ -88,7 +89,7 @@ export function PickerField({
       <BaseSelect.Trigger
         aria-label={ariaLabel}
         className={cn(
-          "relative flex cursor-pointer items-center rounded-md text-left motion-colors",
+          "relative flex max-w-full min-w-0 cursor-pointer items-center rounded-md text-left motion-colors",
           "focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-brand",
           triggerSizeClass[size],
           surface === "glass"
@@ -115,7 +116,7 @@ export function PickerField({
         <BaseSelect.Positioner sideOffset={8} alignItemWithTrigger={false} className="z-50 outline-none">
           <BaseSelect.Popup
             className={cn(
-              "relative max-h-72 min-w-(--anchor-width) motion-popup overflow-y-auto rounded-xl outline-none",
+              "relative max-h-72 max-w-[calc(100vw-2rem)] min-w-(--anchor-width) motion-popup overflow-y-auto rounded-xl outline-none",
               surface === "solid" ? "border border-border-default bg-bg-surface shadow-popover" : "veil-overlay",
               popupSizeClass[size],
             )}
@@ -164,6 +165,7 @@ const weekdayGroupSizeClass: Record<WeekdayPickerSize, string> = {
   lg: "gap-2",
 };
 
+/** The Figma day circle (32/36/44px) never shrinks; the group wraps instead, so the targets keep their size. */
 const weekdayToggleSizeClass: Record<WeekdayPickerSize, string> = {
   sm: "size-8 text-label-sm",
   md: "size-9 text-label-md",
@@ -187,7 +189,7 @@ export function WeekdayPicker({
       defaultValue={defaultValue}
       onValueChange={(next) => onValueChange?.(next)}
       aria-label={props["aria-label"] ?? "Days"}
-      className={cn("flex items-center", weekdayGroupSizeClass[size], className)}
+      className={cn("flex flex-wrap items-center", weekdayGroupSizeClass[size], className)}
     >
       {days.map((day) => (
         <Toggle
@@ -220,10 +222,11 @@ export type ScheduleCardProps = {
   className?: string;
 };
 
+/** The Figma card widths (340/380/420px) are the maximum: on a narrow screen the card folds to the column width. */
 const cardSizeClass: Record<ControlSize, string> = {
-  sm: "w-85 gap-3 p-4",
-  md: "w-95 gap-4 p-5",
-  lg: "w-105 gap-4 p-5",
+  sm: "w-full max-w-85 gap-3 p-4",
+  md: "w-full max-w-95 gap-4 p-5",
+  lg: "w-full max-w-105 gap-4 p-5",
 };
 
 const cardHeaderSizeClass: Record<ControlSize, string> = {

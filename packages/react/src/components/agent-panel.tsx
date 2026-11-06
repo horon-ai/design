@@ -18,7 +18,7 @@ export function AgentPanel({
   return (
     <section
       className={cn(
-        "flex flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-5 pt-4 pb-2",
+        "flex min-w-0 flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-5 pt-4 pb-2",
         className,
       )}
       {...props}
@@ -103,9 +103,9 @@ export function TaskComposer({
         aria-label={placeholder}
         className="field-sizing-content max-h-40 min-h-5.5 w-full resize-none overflow-y-auto bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
       />
-      <div className="flex items-center gap-1.5">
-        {pickers}
-        <span className="flex-1" />
+      <div className="flex flex-wrap items-center gap-1.5">
+        {pickers && <span className="flex min-w-0 flex-wrap items-center gap-1.5">{pickers}</span>}
+        <span className="min-w-0 flex-1" />
         <Kbd>⌘</Kbd>
         <Kbd>↵</Kbd>
         <button

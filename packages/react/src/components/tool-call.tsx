@@ -52,7 +52,9 @@ function renderJson(value: Json, indent: number): ReactNode[] {
 /** JSON in Geist Mono code style with the Figma syntax colors (key, string, number, punctuation). */
 export function JsonCode({ value, className }: { value: Json; className?: string }) {
   return (
-    <pre className={cn("overflow-x-auto font-mono text-code whitespace-pre-wrap text-syntax-string", className)}>
+    <pre
+      className={cn("max-w-full overflow-x-auto font-mono text-code whitespace-pre-wrap text-syntax-string", className)}
+    >
       {renderJson(value, 0)}
     </pre>
   );
@@ -96,7 +98,7 @@ function Section({
     return () => clearTimeout(timer);
   }, [copied]);
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex min-w-0 flex-col gap-1.5">
       <div className="flex items-center gap-2 text-label-sm text-text-secondary">
         <span className="flex-1 uppercase">{label}</span>
         {copyText !== undefined && (
@@ -119,7 +121,7 @@ function Section({
           </button>
         )}
       </div>
-      <div className="rounded-[10px] bg-bg-subtle px-3.5 py-3">{children}</div>
+      <div className="min-w-0 rounded-[10px] bg-bg-subtle px-3.5 py-3">{children}</div>
       {footer}
     </div>
   );
@@ -144,15 +146,15 @@ export function ToolCall({
     <Collapsible.Root
       defaultOpen={defaultOpen}
       className={cn(
-        "flex flex-col overflow-clip rounded-2xl border bg-bg-surface",
+        "flex w-full min-w-0 flex-col overflow-clip rounded-2xl border bg-bg-surface",
         status === "failed" ? "border-border-danger" : "border-border-default",
         className,
       )}
     >
       <Collapsible.Trigger className="group flex w-full cursor-pointer items-center gap-2.5 px-4 py-3.5 text-left motion-colors hover:bg-overlay-ink-3 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand">
-        <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-overlay-ink-6 py-[3px] pr-2.5 pl-2 text-label-md text-text-primary [&>svg]:size-4 [&>svg]:text-text-secondary">
+        <span className="flex max-w-full min-w-0 shrink items-center gap-1.5 rounded-full bg-overlay-ink-6 py-[3px] pr-2.5 pl-2 text-label-md text-text-primary [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-text-secondary">
           {tool.icon}
-          {tool.name}
+          <span className="min-w-0 truncate">{tool.name}</span>
         </span>
         <span className="min-w-0 flex-1 truncate text-body-sm text-text-secondary">{summary}</span>
         <span className="flex size-4 shrink-0 items-center justify-center">
@@ -172,7 +174,7 @@ export function ToolCall({
         />
       </Collapsible.Trigger>
       <Collapsible.Panel className="motion-collapse">
-        <div className="flex flex-col gap-3.5 px-4 pb-4">
+        <div className="flex min-w-0 flex-col gap-3.5 px-4 pb-4">
           {status === "failed" && error && (
             <div className="flex items-center gap-2.5 rounded-[10px] bg-bg-danger px-3.5 py-3">
               <WarningCircle aria-hidden className="size-4 shrink-0 text-text-danger" />

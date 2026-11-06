@@ -3,8 +3,11 @@ import 'package:horon_ui/horon_ui.dart';
 
 /// `sidebar` 갤러리 섹션입니다.
 ///
-/// 데스크톱 폭에서 세 가지 바탕(glass·photo·flue)과 휴대폰 폭의 280 고정 기둥을
+/// 데스크톱 폭에서 네 가지 바탕(glass·photo·plain·flue)과 휴대폰 폭의 280 고정 기둥을
 /// 나란히 보여 주고, 아래에 폭 조절 손잡이를 실제로 끌어 볼 수 있는 예를 둡니다.
+/// `plain`은 채움과 유리가 없어 뒤 레이아웃의 색이 그대로 비치고 오른쪽 1px 테두리만
+/// 남습니다. 프로젝트 행은 펼친 상태에서만 "더 보기"를 보이고 접히면 캐럿만 남깁니다
+/// (React `04f963d`).
 class HoronSidebarGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronSidebarGallerySection({super.key});
@@ -37,6 +40,14 @@ class HoronSidebarGallerySection extends StatelessWidget {
                   width: 280,
                   height: 560,
                   child: HoronSidebar.photo(children: _content()),
+                ),
+              ),
+              _Sample(
+                label: 'plain',
+                child: SizedBox(
+                  width: 280,
+                  height: 560,
+                  child: HoronSidebar.plain(children: _content()),
                 ),
               ),
               _Sample(
@@ -90,6 +101,13 @@ List<Widget> _content() => <Widget>[
         attention: true,
         onPressed: () {},
       ),
+      // `href`가 있으면 React처럼 링크 시맨틱으로 읽힙니다. 이동은 onPressed가 맡습니다.
+      HoronSidebarItem(
+        icon: const Icon(Icons.menu_book),
+        label: 'Docs',
+        href: Uri.parse('https://horon.ai/docs'),
+        onPressed: () {},
+      ),
     ],
   ),
   HoronSidebarGroup(
@@ -103,6 +121,7 @@ List<Widget> _content() => <Widget>[
       ),
     ],
   ),
+  // 펼친 프로젝트: 캐럿 자리를 "더 보기"가 대신합니다.
   HoronSidebarProject(
     icon: const HoronSidebarProjectTile(child: Icon(Icons.folder)),
     label: 'Paper',
@@ -112,6 +131,14 @@ List<Widget> _content() => <Widget>[
       HoronSidebarItem(label: 'Design sync', onPressed: () {}),
       HoronSidebarItem(label: 'Weekly notes', count: '3', onPressed: () {}),
     ],
+  ),
+  // 접힌 프로젝트: "더 보기"는 숨고 14px 캐럿만 남습니다. 눌러 펼치면 More가 나타납니다.
+  HoronSidebarProject(
+    icon: const HoronSidebarProjectTile(child: Icon(Icons.folder)),
+    label: 'Archive',
+    defaultOpen: false,
+    actions: HoronSidebarProjectMore(onPressed: () {}),
+    children: <Widget>[HoronSidebarItem(label: '2025 회고', onPressed: () {})],
   ),
   const HoronSidebarSpacer(),
   HoronSidebarAddButton(label: 'Add project', onPressed: () {}),
@@ -127,7 +154,8 @@ List<Widget> _content() => <Widget>[
 ///
 /// 오른쪽 가장자리 8px를 끌거나, 손잡이를 눌러 포커스를 준 뒤 화살표·Home·End를
 /// 누르거나, 더블 탭해 기본 폭으로 돌아옵니다. 손잡이는 이 상자가 768보다 넓을 때만
-/// 보입니다.
+/// 보입니다. 끄는 동안은 폭이 포인터를 그대로 따라가고, 키보드·더블 탭처럼 값이
+/// 뛸 때는 200ms로 미끄러집니다(React `transition-[width] data-resizing:transition-none`).
 class _ResizableSample extends StatefulWidget {
   const _ResizableSample();
 

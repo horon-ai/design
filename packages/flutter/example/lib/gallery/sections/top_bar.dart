@@ -62,6 +62,12 @@ class HoronTopBarGallerySection extends StatelessWidget {
             onMore: () {},
           ),
         ),
+        // React는 `onBack`·`onMore`가 없으면 그 버튼을 그리지 않습니다. 두 콜백이
+        // 모두 없으면 알약이 48px로 낮아지고 아바타만 남습니다.
+        _Sample(
+          label: '버튼 없음 (아바타와 제목만)',
+          child: HoronTopBar(title: '도구 실행 결과', surface: surface),
+        ),
         _Sample(
           label: '긴 제목 (한 줄 말줄임)',
           child: HoronTopBar(

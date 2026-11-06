@@ -1,17 +1,17 @@
 // `plugin-row`의 Flutter 대응입니다.
 //
-// React는 `Button`, `Switch`, `Menu`를 다른 파일에서 가져다 씁니다. 이 레인에는 그
-// 컴포넌트가 아직 없으므로, 세 자리를 이 파일의 private 위젯(`_PrimaryButton`,
-// `_ToggleSwitch`, `_OverflowButton`)이 `button.tsx`·`switch.tsx`·`icon-button.tsx`와
-// 같은 값으로 그립니다. `menu`는 메뉴 노드 대신 `onMenuPressed` 콜백으로 바꿨습니다.
-// 메뉴 본문은 호출자가 엽니다.
+// React는 `Button`, `Switch`, `IconButton`, `Menu`를 다른 파일에서 가져다 씁니다.
+// Update는 [HoronButton]의 `primary`·`sm`, 오버플로는 [HoronIconButton]의 `ghost`·`sm`을
+// 그대로 쓰고, `switch.tsx`는 [HoronSwitch]와 값이 같아 `_ToggleSwitch`로 옮겼습니다.
+// `menu`는 메뉴 노드 대신 `onMenuPressed` 콜백으로 바꿨습니다. 메뉴 본문은 호출자가 엽니다.
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
+import 'button.dart';
+import 'icon_button.dart';
 
 /// 역량 칩 하나입니다. React `chips` 원소입니다.
 @immutable
@@ -60,13 +60,13 @@ class HoronPluginRow extends StatelessWidget {
   /// 14/20 이름입니다. 한 줄로 잘립니다.
   final String name;
 
-  /// 이름 옆 모노 12/16 버전입니다.
+  /// 이름 옆 모노 `label-sm` 버전입니다.
   final String? version;
 
   /// 버전 옆 업데이트 알약 글자입니다. 최신이면 생략합니다.
   final String? updateBadge;
 
-  /// 작성자 줄 12/16 글자입니다.
+  /// 작성자 줄 `label-sm` 글자입니다.
   final String? author;
 
   /// 작성자 옆에 인증 배지를 붙입니다.
@@ -190,8 +190,12 @@ class HoronPluginRow extends StatelessWidget {
               Text(
                 version!,
                 maxLines: 1,
-                // font-mono text-[12px]/[16px] text-text-placeholder
-                style: theme.text.code.copyWith(fontSize: 12, height: 16 / 12, color: theme.colors.textPlaceholder),
+                // font-mono text-label-sm text-text-secondary
+                style: theme.text.labelSm.copyWith(
+                  fontFamily: theme.text.code.fontFamily,
+                  fontFamilyFallback: theme.text.code.fontFamilyFallback,
+                  color: theme.colors.textSecondary,
+                ),
               ),
             if (updateBadge != null)
               Container(
@@ -219,14 +223,14 @@ class HoronPluginRow extends StatelessWidget {
                   author!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  // text-[12px]/[16px] text-text-placeholder
-                  style: theme.text.caption.copyWith(height: 16 / 12, color: theme.colors.textPlaceholder),
+                  // text-label-sm text-text-secondary
+                  style: theme.text.labelSm.copyWith(color: theme.colors.textSecondary),
                 ),
               ),
               if (verified)
                 SizedBox(
-                  width: theme.space.step(3.25), // size-3.25 = 13
-                  height: theme.space.step(3.25),
+                  width: theme.space.step(3.5), // size-3.5 = 14
+                  height: theme.space.step(3.5),
                   child: DecoratedBox(
                     decoration: const BoxDecoration(color: HoronPalette.sky500, shape: BoxShape.circle),
                     child: Center(
@@ -281,92 +285,38 @@ class HoronPluginRow extends StatelessWidget {
 
   Widget _actions(HoronThemeData theme) {
     return Wrap(
-      spacing: theme.space.s2_5, // gap-2.5
-      runSpacing: theme.space.s2_5,
+      spacing: theme.space.s2, // gap-2
+      runSpacing: theme.space.s2,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
-        if (onUpdate != null)
-          _PrimaryButton(label: updateLabel, icon: const Icon(Icons.arrow_upward), onPressed: onUpdate),
-        _ToggleSwitch(checked: enabled, label: toggleLabel, onChanged: onEnabledChange),
-        if (onMenuPressed != null) _OverflowButton(label: overflowLabel, onPressed: onMenuPressed!),
-      ],
-    );
-  }
-}
-
-/// `button.tsx`의 `primary`·`sm` 변형입니다. `h-8`, `px-3`, `text-label-md`, 14px 아이콘입니다.
-class _PrimaryButton extends StatefulWidget {
-  const _PrimaryButton({required this.label, required this.onPressed, this.icon});
-
-  final String label;
-  final VoidCallback? onPressed;
-  final Widget? icon;
-
-  @override
-  State<_PrimaryButton> createState() => _PrimaryButtonState();
-}
-
-class _PrimaryButtonState extends State<_PrimaryButton> {
-  bool _hovered = false;
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final bool reduce = MediaQuery.disableAnimationsOf(context);
-    final Color foreground = theme.colors.interactiveOnPrimary;
-    final Color background = _pressed
-        ? theme
-              .colors
-              .interactivePrimaryPressed // active:bg-interactive-primary-pressed
-        : _hovered
-        ? theme
-              .colors
-              .interactivePrimaryHover // hover:bg-interactive-primary-hover
-        : theme.colors.interactivePrimary;
-
-    return Semantics(
-      button: true,
-      enabled: widget.onPressed != null,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
-        onExit: (PointerExitEvent event) => setState(() => _hovered = false),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTapDown: (TapDownDetails details) => setState(() => _pressed = true),
-          onTapUp: (TapUpDetails details) => setState(() => _pressed = false),
-          onTapCancel: () => setState(() => _pressed = false),
-          onTap: widget.onPressed,
-          child: AnimatedScale(
-            scale: _pressed && !reduce ? HoronMotion.pressScale : 1, // motion-press
-            duration: reduce ? Duration.zero : HoronMotion.pressDuration,
-            curve: HoronMotion.pressCurve,
-            child: AnimatedContainer(
-              duration: reduce ? Duration.zero : HoronMotion.colorsDuration, // motion-colors
-              curve: HoronMotion.colorsCurve,
-              height: theme.space.step(8), // sm h-8 = 32
-              padding: EdgeInsets.symmetric(horizontal: theme.space.s3), // px-3
-              decoration: BoxDecoration(
-                color: background,
-                borderRadius: BorderRadius.circular(theme.radius.full), // rounded-full
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: theme.space.s1_5, // gap-1.5
-                children: <Widget>[
-                  if (widget.icon != null)
-                    IconTheme.merge(
-                      data: IconThemeData(size: theme.space.s3_5, color: foreground), // ArrowUp size-3.5 = 14
-                      child: widget.icon!,
-                    ),
-                  Text(widget.label, maxLines: 1, style: theme.text.labelMd.copyWith(color: foreground)),
-                ],
+        // `motion-reveal-x` — 업데이트가 생기면 버튼이 가로로 자리를 열며 나타납니다.
+        HoronReveal(
+          axis: Axis.horizontal,
+          collapsed: onUpdate == null,
+          child: IgnorePointer(
+            ignoring: onUpdate == null,
+            child: ExcludeFocus(
+              excluding: onUpdate == null,
+              child: HoronButton(
+                label: updateLabel,
+                variant: HoronButtonVariant.solid, // variant="solid"
+                size: HoronButtonSize.sm, // size="sm"
+                icon: const Icon(Icons.arrow_upward, size: 14), // ArrowUp size-3.5
+                onPressed: onUpdate,
               ),
             ),
           ),
         ),
-      ),
+        _ToggleSwitch(checked: enabled, label: toggleLabel, onChanged: onEnabledChange),
+        if (onMenuPressed != null)
+          HoronIconButton(
+            icon: const Icon(Icons.more_horiz),
+            label: overflowLabel,
+            variant: HoronIconButtonVariant.ghost, // variant="ghost"
+            size: HoronIconButtonSize.sm, // size="sm"
+            onPressed: onMenuPressed,
+          ),
+      ],
     );
   }
 }
@@ -421,57 +371,6 @@ class _ToggleSwitch extends StatelessWidget {
               width: theme.space.step(5.5), // size-5.5 = 22
               height: theme.space.step(5.5),
               decoration: BoxDecoration(color: thumb, shape: BoxShape.circle),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// `icon-button.tsx`의 `ghost`·`sm` 변형입니다. 32px 상자, 8px 반경, 16px 아이콘입니다.
-class _OverflowButton extends StatefulWidget {
-  const _OverflowButton({required this.label, required this.onPressed});
-
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  State<_OverflowButton> createState() => _OverflowButtonState();
-}
-
-class _OverflowButtonState extends State<_OverflowButton> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final bool reduce = MediaQuery.disableAnimationsOf(context);
-    return Semantics(
-      button: true,
-      label: widget.label,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
-        onExit: (PointerExitEvent event) => setState(() => _hovered = false),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: widget.onPressed,
-          child: AnimatedContainer(
-            duration: reduce ? Duration.zero : HoronMotion.colorsDuration,
-            curve: HoronMotion.colorsCurve,
-            width: theme.space.step(8), // size-8 = 32
-            height: theme.space.step(8),
-            decoration: BoxDecoration(
-              color: _hovered ? theme.colors.overlayInk6 : Colors.transparent, // hover:bg-overlay-ink-6
-              borderRadius: BorderRadius.circular(theme.radius.sm), // Paper `1VKS-0`: 반경 8
-            ),
-            child: Center(
-              child: Icon(
-                Icons.more_horiz,
-                size: theme.space.s4, // Paper `1VKS-0`: 16px 아이콘
-                color: theme.colors.textPrimary,
-              ),
             ),
           ),
         ),

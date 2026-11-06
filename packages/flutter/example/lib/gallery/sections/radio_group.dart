@@ -4,7 +4,8 @@ import 'package:horon_ui/horon_ui.dart';
 /// Radio Group 갤러리 섹션입니다.
 ///
 /// 세 라디오를 실제로 고를 수 있게 두어 선택이 옮겨 다니는지 확인하고, 비활성
-/// 라디오와 라벨 없는 라디오를 함께 놓았습니다.
+/// 라디오와 라벨 없는 라디오를 함께 놓았습니다. 선택해도 1.5px 테두리는 남고 색만
+/// 잉크색으로 바뀌며(hover에서는 `-hover`), 점은 pop-in으로 들어옵니다.
 class HoronRadioGroupGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronRadioGroupGallerySection({super.key});

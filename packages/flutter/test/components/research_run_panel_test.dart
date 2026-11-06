@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:horon_ui/src/components/chat_bubble.dart';
 import 'package:horon_ui/src/components/research_run_panel.dart';
 import 'package:horon_ui/src/components/spinner.dart';
 import 'package:horon_ui/src/theme/horon_theme.dart';
@@ -24,6 +25,13 @@ Future<void> pumpPanel(WidgetTester tester, Widget child, {Brightness brightness
 
 HoronThemeData themeOf(WidgetTester tester) => HoronTheme.of(tester.element(find.byType(HoronResearchRunPanel)));
 
+/// `motion-swap`은 두 아이콘을 트리에 남기고 숨은 쪽만 낭독·포커스에서 뺍니다.
+/// 그래서 지금 보이는 아이콘인지 [ExcludeSemantics]로 확인합니다.
+bool swapVisible(WidgetTester tester, IconData icon) {
+  final Finder slot = find.ancestor(of: find.byIcon(icon), matching: find.byType(ExcludeSemantics)).first;
+  return !tester.widget<ExcludeSemantics>(slot).excluding;
+}
+
 Container panelOf(WidgetTester tester) => tester.widget<Container>(
   find.descendant(of: find.byType(HoronResearchRunPanel), matching: find.byType(Container)).first,
 );
@@ -44,13 +52,18 @@ void main() {
     expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.space.s6);
     expect((decoration.border! as Border).top.color, theme.colors.borderDefault);
 
-    final Text question = tester.widget<Text>(find.text('What changed in the rebuild?'));
-    expect(question.style!.color, theme.colors.textInverse);
+    // 질문은 `ChatBubble from="me"`입니다.
+    expect(find.byType(HoronChatBubble), findsOneWidget);
+    expect(tester.widget<HoronChatBubble>(find.byType(HoronChatBubble)).fromMe, isTrue);
+    final RichText question = tester.widget<RichText>(
+      find.descendant(of: find.text('What changed in the rebuild?'), matching: find.byType(RichText)),
+    );
+    expect(question.text.style!.color, theme.colors.interactiveOnPrimary);
     final Container bubble = tester.widget<Container>(
       find.ancestor(of: find.text('What changed in the rebuild?'), matching: find.byType(Container)).first,
     );
     expect((bubble.decoration! as BoxDecoration).color, theme.colors.interactivePrimary);
-    expect(((bubble.decoration! as BoxDecoration).borderRadius! as BorderRadius).topLeft.x, theme.radius.xl2);
+    expect(((bubble.decoration! as BoxDecoration).borderRadius! as BorderRadius).topLeft.x, theme.radius.xl);
   });
 
   testWidgets('research run panel: running shows the status line, the caret and the queries', (
@@ -63,7 +76,8 @@ void main() {
     final HoronThemeData theme = themeOf(tester);
 
     expect(find.text('Researching'), findsOneWidget);
-    expect(find.text('· 12s · 3 of 8 read'), findsOneWidget);
+    // 캐럿이 수치 앞에 서고, 수치는 `12s · 3 of 8 read`로 이어집니다.
+    expect(find.text('12s · 3 of 8 read'), findsOneWidget);
     expect(find.byType(HoronSpinner), findsNWidgets(2)); // 상태 줄 + 검색 중인 질의
     expect(find.text('horon design system release notes'), findsOneWidget);
     expect(find.text('8 results'), findsOneWidget);
@@ -78,8 +92,8 @@ void main() {
     await pumpPanel(tester, const HoronResearchRunPanel(question: 'What changed?', running: false));
 
     expect(find.text('Researching'), findsNothing);
-    expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
-    expect(find.byIcon(Icons.stop), findsNothing);
+    expect(swapVisible(tester, Icons.arrow_upward), isTrue);
+    expect(swapVisible(tester, Icons.stop), isFalse);
     expect(tester.widget<Icon>(find.byIcon(Icons.arrow_upward)).size, 16);
   });
 
@@ -134,6 +148,12 @@ void main() {
     for (final String initial in <String>['J', 'M', 'A']) {
       expect(find.text(initial), findsOneWidget);
     }
+    // `size-7` — 출처 아바타는 28이고 -ml-1.5(6)씩 겹칩니다.
+    final Finder avatar = find.ancestor(of: find.text('J'), matching: find.byType(Container)).first;
+    expect(tester.getSize(avatar), const Size(28, 28));
+    final double first = tester.getTopLeft(find.text('J')).dx;
+    final double second = tester.getTopLeft(find.text('M')).dx;
+    expect(second - first, 22);
     expect(tester.getSize(find.byIcon(Icons.add)), const Size(14, 14));
   });
 
@@ -159,6 +179,46 @@ void main() {
         expect(tester.takeException(), isNull, reason: '${brightness.name} running=$running');
       }
     }
+  });
+
+  testWidgets('research run panel: the status line and the sources pill report taps when wired', (
+    WidgetTester tester,
+  ) async {
+    int toggles = 0;
+    int opens = 0;
+    await pumpPanel(
+      tester,
+      HoronResearchRunPanel(
+        question: 'What changed?',
+        elapsed: '12s',
+        read: 3,
+        total: 8,
+        sources: const <String>['J', 'M'],
+        onToggleStatus: () => toggles++,
+        onOpenSources: () => opens++,
+      ),
+    );
+
+    // 두 줄 모두 캐럿이 붙은 버튼이 됩니다.
+    expect(find.byIcon(Icons.expand_more), findsNWidgets(2));
+
+    await tester.tap(find.text('Researching'));
+    await tester.pump();
+    expect(toggles, 1);
+
+    await tester.tap(find.text('3 of 8 sources read'));
+    await tester.pump();
+    expect(opens, 1);
+  });
+
+  testWidgets('research run panel: without the callbacks both rows are static labels', (WidgetTester tester) async {
+    await pumpPanel(
+      tester,
+      const HoronResearchRunPanel(question: 'What changed?', elapsed: '12s', read: 3, total: 8, sources: <String>['J']),
+    );
+    expect(find.byIcon(Icons.expand_more), findsNothing);
+    expect(find.text('Researching'), findsOneWidget);
+    expect(find.text('3 of 8 sources read'), findsOneWidget);
   });
 
   testWidgets('research run panel: it fills a phone width and caps at 600 on a desktop', (WidgetTester tester) async {

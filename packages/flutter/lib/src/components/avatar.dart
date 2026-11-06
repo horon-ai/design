@@ -65,12 +65,13 @@ class HoronAvatar extends StatefulWidget {
     this.size = HoronAvatarSize.md,
     this.sky = false,
     this.live = false,
+    this.liveRingColor,
   }) : _kind = _AvatarKind.initials,
        imageUrl = null,
        alt = '';
 
   /// 봇 아바타를 만듭니다. 브랜드 바탕에 로봇 아이콘이 놓입니다.
-  const HoronAvatar.bot({super.key, this.size = HoronAvatarSize.md, this.live = false})
+  const HoronAvatar.bot({super.key, this.size = HoronAvatarSize.md, this.live = false, this.liveRingColor})
     : _kind = _AvatarKind.bot,
       initials = null,
       sky = false,
@@ -85,6 +86,7 @@ class HoronAvatar extends StatefulWidget {
     this.alt = '',
     this.size = HoronAvatarSize.md,
     this.live = false,
+    this.liveRingColor,
   }) : _kind = _AvatarKind.image,
        sky = false;
 
@@ -108,6 +110,11 @@ class HoronAvatar extends StatefulWidget {
 
   /// 오른쪽 아래에 상태 점을 붙입니다.
   final bool live;
+
+  /// 상태 점의 테두리 색입니다. 뒤에 깔린 표면과 맞추려고 엽니다(유리 패널, `bg-subtle`,
+  /// 브랜드 색조). React `liveRingClassName`의 `border-bg-surface` 기본값을 그대로 옮겨
+  /// 넘기지 않으면 [HoronColors.bgSurface]입니다.
+  final Color? liveRingColor;
 
   @override
   State<HoronAvatar> createState() => _HoronAvatarState();
@@ -156,7 +163,12 @@ class _HoronAvatarState extends State<HoronAvatar> with SingleTickerProviderStat
       width: side,
       height: side,
       alignment: Alignment.center,
-      decoration: BoxDecoration(color: background, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: background,
+        shape: BoxShape.circle,
+        // `inset-ring-1 inset-ring-overlay-ink-6` — 1px 안쪽 헤어라인.
+        border: Border.all(color: theme.colors.overlayInk6),
+      ),
       child: switch (widget._kind) {
         _AvatarKind.bot => Icon(Icons.smart_toy_outlined, size: _botIconSize[widget.size], color: foreground),
         _AvatarKind.image => ClipOval(
@@ -196,7 +208,8 @@ class _HoronAvatarState extends State<HoronAvatar> with SingleTickerProviderStat
                   color: theme.colors.statusLive,
                   shape: BoxShape.circle,
                   // Paper `TU8-1`의 링색은 라이트 #FFFFFF·다크 #17181A인 `bg-surface`입니다.
-                  border: Border.all(color: theme.colors.bgSurface, width: 2),
+                  // React `liveRingClassName`은 표면이 다른 곳에서 다른 색을 넘깁니다.
+                  border: Border.all(color: widget.liveRingColor ?? theme.colors.bgSurface, width: 2),
                 ),
               ),
             ),

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
+import 'bot_instructions_panel.dart';
 import 'spinner.dart';
 
 /// `knowledge-base-panel.tsx`의 `rounded-[24px]`입니다. 토큰 반경 단계에 24가 없습니다.
@@ -15,14 +16,8 @@ const double _panelRadius = 24;
 /// `max-w-200` — 800. 좁은 화면에서는 폭을 따라 줄어듭니다.
 const double _maxWidth = 800;
 
-/// `p-0.75` — 알약 트랙의 안쪽 여백 3입니다.
-const double _trayInset = 3;
-
-/// `h-7.5` — 트랙 안 탭의 높이 30입니다.
-const double _tabHeight = 30;
-
-/// `size-8.5` — 설정 단추와 "Add source" 단추의 높이 34입니다.
-const double _headerControlSize = 34;
+/// `size-7.5` — 설정 단추와 "Add source" 단추의 높이 30입니다.
+const double _headerControlSize = 30;
 
 /// `[&>svg]:size-4` — 설정 단추의 아이콘 16입니다.
 const double _settingsIconSize = 16;
@@ -269,150 +264,48 @@ class _HoronKnowledgeBasePanelState extends State<HoronKnowledgeBasePanel> {
       spacing: space.s2, // gap-2
       children: <Widget>[
         Flexible(
-          child: _PillTray(
-            semanticLabel: 'Knowledge base view',
-            selected: _selected,
-            onSelected: _select,
-            tabs: widget.tabs,
+          child: HoronPanelPillTabs(
+            semanticLabel: 'Sources',
+            value: _selected,
+            onValueChange: _select,
+            items: <HoronPanelPillTab>[
+              for (final HoronKnowledgeBaseTab tab in widget.tabs)
+                HoronPanelPillTab(
+                  value: tab.id,
+                  // React는 이름 뒤 개수를 caption으로 따로 그립니다. 공유 알약은 글자 하나를
+                  // 받으므로 개수를 이름에 붙여 정보를 유지합니다.
+                  label: tab.count == null ? tab.label : '${tab.label} ${tab.count}',
+                ),
+            ],
           ),
         ),
         const Spacer(),
-        if (widget.indexing > 0)
-          Row(
+        // React `motion-reveal-x` + `data-collapsed={indexing <= 0}`: 자리를 접고 펴기만 하고
+        // 내용은 트리에 남깁니다. 스피너는 숨은 동안에도 도는 애니메이션이라 0일 때는 올리지
+        // 않습니다(보이지 않는 자리라 화면에는 차이가 없습니다).
+        HoronReveal(
+          axis: Axis.horizontal,
+          collapsed: widget.indexing <= 0,
+          child: Row(
             spacing: space.s2, // gap-2
             children: <Widget>[
-              const HoronSpinner(pixelSize: 13),
-              Text('${widget.indexing} indexing', style: theme.text.caption.copyWith(color: colors.textSecondary)),
+              if (widget.indexing > 0) const HoronSpinner(pixelSize: 12),
+              Text(
+                '${widget.indexing} indexing',
+                style: theme.text.caption.copyWith(
+                  color: colors.textSecondary,
+                  fontFeatures: const <FontFeature>[FontFeature.tabularFigures()], // tabular-nums
+                ),
+              ),
             ],
           ),
+        ),
       ],
     );
   }
 }
 
-/// `role="tablist"` 쟁반입니다.
-///
-/// `rounded-full bg-overlay-ink-5 p-0.75` 트랙에 `h-7.5 px-3` 탭을 담습니다.
-class _PillTray extends StatelessWidget {
-  const _PillTray({required this.tabs, required this.selected, required this.onSelected, this.semanticLabel});
-
-  final List<HoronKnowledgeBaseTab> tabs;
-  final String? selected;
-  final ValueChanged<String> onSelected;
-  final String? semanticLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    return Semantics(
-      container: true,
-      label: semanticLabel,
-      child: Container(
-        padding: const EdgeInsets.all(_trayInset), // p-0.75
-        decoration: BoxDecoration(
-          color: theme.colors.overlayInk5, // bg-overlay-ink-5
-          borderRadius: BorderRadius.circular(theme.radius.full),
-        ),
-        child: Wrap(
-          spacing: theme.space.s0_5, // gap-0.5
-          runSpacing: theme.space.s0_5,
-          children: <Widget>[
-            for (final HoronKnowledgeBaseTab tab in tabs)
-              _TrayTab(tab: tab, selected: tab.id == selected, onTap: () => onSelected(tab.id)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// `h-7.5 rounded-full px-3 text-label-md` 탭 하나입니다.
-class _TrayTab extends StatefulWidget {
-  const _TrayTab({required this.tab, required this.selected, required this.onTap});
-
-  final HoronKnowledgeBaseTab tab;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  State<_TrayTab> createState() => _TrayTabState();
-}
-
-class _TrayTabState extends State<_TrayTab> {
-  bool _hovered = false;
-  bool _focused = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final HoronColors colors = theme.colors;
-    final HoronSpaceSpec space = theme.space;
-    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final Color foreground = widget.selected || _hovered ? colors.textPrimary : colors.textSecondary;
-
-    return Semantics(
-      button: true,
-      selected: widget.selected,
-      inMutuallyExclusiveGroup: true,
-      label: widget.tab.count == null ? widget.tab.label : '${widget.tab.label} ${widget.tab.count}',
-      child: FocusableActionDetector(
-        mouseCursor: SystemMouseCursors.click,
-        onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
-        onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-        shortcuts: const <ShortcutActivator, Intent>{
-          SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-          SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
-        },
-        actions: <Type, Action<Intent>>{
-          ActivateIntent: CallbackAction<ActivateIntent>(
-            onInvoke: (ActivateIntent intent) {
-              widget.onTap();
-              return null;
-            },
-          ),
-        },
-        child: GestureDetector(
-          onTap: widget.onTap,
-          child: _FocusRing(
-            visible: _focused,
-            radius: theme.radius.full,
-            color: colors.textBrand,
-            child: AnimatedContainer(
-              key: ValueKey<String>('kb-tab-${widget.tab.id}'),
-              duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
-              curve: HoronMotion.colorsCurve,
-              height: _tabHeight, // h-7.5
-              padding: EdgeInsets.symmetric(horizontal: space.s3), // px-3
-              decoration: BoxDecoration(
-                // 선택된 탭이 칠하는 bg-overlay-ink-10 입니다.
-                color: widget.selected ? colors.overlayInk10 : Colors.transparent,
-                borderRadius: BorderRadius.circular(theme.radius.full),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: space.s1_5, // gap-1.5
-                children: <Widget>[
-                  Flexible(
-                    child: Text(
-                      widget.tab.label,
-                      style: theme.text.labelMd.copyWith(color: foreground),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  if (widget.tab.count != null)
-                    Text('${widget.tab.count}', style: theme.text.caption.copyWith(color: colors.textSecondary)),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// `size-8.5 rounded-full bg-overlay-ink-5` 아이콘 단추입니다.
+/// `size-7.5 rounded-full bg-overlay-ink-6` 아이콘 단추입니다.
 class _RoundIconButton extends StatefulWidget {
   const _RoundIconButton({required this.label, required this.icon, required this.iconSize, this.onPressed});
 
@@ -456,8 +349,8 @@ class _RoundIconButtonState extends State<_RoundIconButton> {
           height: _headerControlSize,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            // bg-overlay-ink-5, hover:bg-overlay-ink-8
-            color: _hovered && interactive ? colors.overlayInk8 : colors.overlayInk5,
+            // bg-overlay-ink-6, hover:bg-overlay-ink-10
+            color: _hovered && interactive ? colors.overlayInk10 : colors.overlayInk6,
             borderRadius: BorderRadius.circular(theme.radius.full),
           ),
           child: Icon(widget.icon, size: widget.iconSize, color: colors.textPrimary),
@@ -467,7 +360,7 @@ class _RoundIconButtonState extends State<_RoundIconButton> {
   }
 }
 
-/// `h-8.5 rounded-full bg-overlay-ink-5` "Add source" 단추입니다.
+/// `h-7.5 rounded-full bg-overlay-ink-6` "Add source" 단추입니다.
 class _AddSourceButton extends StatefulWidget {
   const _AddSourceButton({this.onPressed});
 
@@ -505,11 +398,11 @@ class _AddSourceButtonState extends State<_AddSourceButton> {
         child: AnimatedContainer(
           duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
           curve: HoronMotion.colorsCurve,
-          height: _headerControlSize, // h-8.5
-          padding: EdgeInsets.only(left: space.s2_5, right: space.s3), // pl-2.5 pr-3
-          // hover:bg-overlay-ink-8
+          height: _headerControlSize, // h-7.5
+          padding: EdgeInsets.only(left: space.s3, right: space.s2_5), // pl-3 pr-2.5
+          // hover:bg-overlay-ink-10
           decoration: BoxDecoration(
-            color: _hovered && interactive ? colors.overlayInk8 : colors.overlayInk5,
+            color: _hovered && interactive ? colors.overlayInk10 : colors.overlayInk6,
             borderRadius: BorderRadius.circular(theme.radius.full),
           ),
           child: Row(

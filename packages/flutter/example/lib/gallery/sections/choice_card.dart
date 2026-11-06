@@ -4,7 +4,8 @@ import 'package:horon_ui/horon_ui.dart';
 /// `choice_card` 갤러리 섹션입니다.
 ///
 /// 카드는 solid 표면 하나입니다. 꺼짐, 켜짐, 중립 배지, 설명만 있는 카드, 비활성
-/// 다섯 상태를 나란히 보여 줍니다.
+/// 다섯 상태를 나란히 보여 줍니다. 꺼진 카드는 hover에서 테두리가 `border-strong`이
+/// 되고, 고리는 선택해도 1.5px 테두리를 유지한 채 안쪽 3.5px가 잉크로 채워집니다.
 class HoronChoiceCardGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronChoiceCardGallerySection({super.key});

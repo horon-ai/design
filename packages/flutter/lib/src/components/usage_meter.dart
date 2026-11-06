@@ -13,9 +13,6 @@ const double _meterWidth = 300;
 /// `usage-meter.tsx`의 `p-4`입니다.
 const double _meterPadding = 16;
 
-/// `usage-meter.tsx`의 `gap-2.5`입니다.
-const double _meterGap = 10;
-
 /// `usage-meter.tsx`의 `h-1.5`입니다.
 const double _meterTrackHeight = 6;
 
@@ -98,11 +95,16 @@ class HoronUsageMeter extends StatelessWidget {
                         ),
                         Text(
                           '${value.round()}%',
-                          style: theme.text.labelMd.copyWith(color: theme.colors.textSecondary),
+                          maxLines: 1,
+                          // `tabular-nums` — 자릿수가 같아 값이 바뀌어도 폭이 흔들리지 않습니다.
+                          style: theme.text.labelMd.copyWith(
+                            color: theme.colors.textSecondary,
+                            fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: _meterGap),
+                    SizedBox(height: theme.space.s2), // gap-2
                     SizedBox(
                       height: _meterTrackHeight,
                       child: ClipRRect(
@@ -124,7 +126,7 @@ class HoronUsageMeter extends StatelessWidget {
                       ),
                     ),
                     if (detail != null || note != null) ...<Widget>[
-                      const SizedBox(height: _meterGap),
+                      SizedBox(height: theme.space.s2), // gap-2
                       Row(
                         children: <Widget>[
                           Expanded(

@@ -44,17 +44,14 @@ function LocalizedText({ m }: { m: Localized }) {
  * (Breadcrumb, Breadcrumb Header) render their own anchors. An anchor inside
  * an anchor is invalid HTML, so the parser closes the outer one and the island
  * below it hydrates empty (React error #418).
+ *
+ * The wrapper carries `min-w-0` so a long unbroken title or description cannot
+ * set its min-content width and overflow a narrow grid column. It only drops
+ * the automatic minimum, so a column that already has a width renders the same.
  */
-export function ComponentCard({
-  href,
-  title,
-  description,
-  children,
-  className,
-  surface,
-}: ComponentCardProps) {
+export function ComponentCard({ href, title, description, children, className, surface }: ComponentCardProps) {
   return (
-    <div className={["relative h-full", className].filter(Boolean).join(" ")}>
+    <div className={["relative h-full min-w-0", className].filter(Boolean).join(" ")}>
       <Card
         interactive
         title={<LocalizedText m={title} />}

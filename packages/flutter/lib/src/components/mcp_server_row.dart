@@ -1,20 +1,18 @@
 // `mcp-server-row`의 Flutter 대응입니다.
 //
-// React는 `Button`, `IconButton`, `Menu`를 다른 파일에서 가져다 씁니다. 이 레인에는 그
-// 컴포넌트가 아직 없으므로 Configure 버튼과 오버플로 버튼을 이 파일의 private 위젯이
-// `button.tsx`(`glass`·`sm`)와 `icon-button.tsx`(`ghost`·`sm`)와 같은 값으로 그립니다.
-// `menu`는 `onMenuPressed` 콜백으로 바꿨습니다.
+// React는 `Button`, `IconButton`, `Menu`를 다른 파일에서 가져다 씁니다. Configure는
+// [HoronButton]의 `solid`·`sm`, 오버플로는 [HoronIconButton]의 `ghost`·`sm`을 그대로
+// 씁니다. `menu`는 메뉴 노드 대신 `onMenuPressed` 콜백으로 바꿨습니다.
 //
 // React의 `withKeys`는 같은 태그가 겹쳐도 React key가 겹치지 않게 접미사를 붙이는
 // 장치입니다. Flutter에는 key가 필요 없으므로 값만 그립니다.
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import '../glass/horon_glass.dart';
-import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
+import 'button.dart';
+import 'icon_button.dart';
 
 /// `mcp-server-row.tsx`의 `McpServerStatusTone`입니다.
 ///
@@ -65,10 +63,10 @@ class HoronMcpServerRow extends StatelessWidget {
   /// 이름 옆 브랜드 색 태그입니다.
   final List<String>? brandTags;
 
-  /// 13/18 설명입니다.
+  /// `body-sm` 설명입니다.
   final String? description;
 
-  /// `·`로 이어 붙이는 12/16 메타 값입니다.
+  /// `·`로 이어 붙이는 `label-sm` 메타 값입니다.
   final List<String>? meta;
 
   /// 오른쪽 상태 알약 글자입니다.
@@ -144,18 +142,15 @@ class HoronMcpServerRow extends StatelessWidget {
       height: theme.space.step(10),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: theme.colors.interactivePrimary, // bg-interactive-primary
+          color: HoronPalette.sky500, // bg-sky-500
           borderRadius: BorderRadius.circular(theme.space.s2_5), // rounded-[10px]
         ),
         child: Center(
           child: Text(
             letters,
             maxLines: 1,
-            // text-[14px]/[20px] font-semibold text-interactive-on-primary
-            style: theme.text.labelMd.copyWith(
-              fontWeight: HoronFontWeight.semibold,
-              color: theme.colors.textInverse, // Paper `1VHS-0` 타일 글자 #F9FAFB
-            ),
+            // text-label-md text-neutral-50
+            style: theme.text.labelMd.copyWith(color: HoronPalette.neutral50),
           ),
         ),
       ),
@@ -166,40 +161,47 @@ class HoronMcpServerRow extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: theme.space.step(0.75), // gap-[3px]
+      spacing: theme.space.s1, // gap-1
       children: <Widget>[
-        Wrap(
-          spacing: theme.space.s2, // gap-2
-          runSpacing: theme.space.s2,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: <Widget>[
-            Text(
-              name,
-              // text-[14px]/[20px] font-semibold text-text-primary
-              style: theme.text.labelMd.copyWith(fontWeight: HoronFontWeight.semibold, color: theme.colors.textPrimary),
-            ),
-            for (final String tag in tags ?? const <String>[])
-              _pill(
-                theme,
-                // bg-overlay-ink-6 dark:bg-bg-surface-6
-                background: theme.brightness == Brightness.dark ? theme.colors.bgSurface6 : theme.colors.overlayInk6,
-                foreground: theme.colors.textSecondary,
-                label: tag,
+        LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) => Wrap(
+            spacing: theme.space.s2, // gap-2
+            runSpacing: theme.space.s2,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: <Widget>[
+              // `max-w-full min-w-0 truncate` — 이름이 한 줄 폭을 넘으면 말줄임합니다.
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis, // truncate
+                  // text-label-md text-text-primary
+                  style: theme.text.labelMd.copyWith(color: theme.colors.textPrimary),
+                ),
               ),
-            for (final String tag in brandTags ?? const <String>[])
-              _pill(
-                theme,
-                background: theme.colors.accentSky500_18, // bg-accent-sky-500-18
-                foreground: theme.colors.textBrand,
-                label: tag,
-              ),
-          ],
+              for (final String tag in tags ?? const <String>[])
+                _pill(
+                  theme,
+                  background: theme.colors.overlayInk6, // bg-overlay-ink-6
+                  foreground: theme.colors.textSecondary,
+                  label: tag,
+                ),
+              for (final String tag in brandTags ?? const <String>[])
+                _pill(
+                  theme,
+                  background: theme.colors.accentSky500_18, // bg-accent-sky-500-18
+                  foreground: theme.colors.textBrand,
+                  label: tag,
+                ),
+            ],
+          ),
         ),
         if (description != null)
           Text(
             description!,
-            // text-[13px]/[18px] text-text-secondary
-            style: theme.text.bodySm.copyWith(fontSize: 13, height: 18 / 13, color: theme.colors.textSecondary),
+            // text-body-sm text-text-secondary
+            style: theme.text.bodySm.copyWith(color: theme.colors.textSecondary),
           ),
         if (meta != null && meta!.isNotEmpty)
           Wrap(
@@ -208,15 +210,11 @@ class HoronMcpServerRow extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
               for (int index = 0; index < meta!.length; index++) ...<Widget>[
-                if (index > 0)
-                  Text(
-                    '·',
-                    style: theme.text.caption.copyWith(height: 16 / 12, color: theme.colors.textPlaceholder),
-                  ),
+                if (index > 0) Text('·', style: theme.text.labelSm.copyWith(color: theme.colors.textSecondary)),
                 Text(
                   meta![index],
-                  // text-[12px]/[16px] text-text-placeholder
-                  style: theme.text.caption.copyWith(height: 16 / 12, color: theme.colors.textPlaceholder),
+                  // text-label-sm text-text-secondary
+                  style: theme.text.labelSm.copyWith(color: theme.colors.textSecondary),
                 ),
               ],
             ],
@@ -232,8 +230,21 @@ class HoronMcpServerRow extends StatelessWidget {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
         _statusPill(theme),
-        _GlassButton(label: configureLabel, icon: const Icon(Icons.settings_outlined), onPressed: onConfigure),
-        if (onMenuPressed != null) _GhostIconButton(label: menuLabel, onPressed: onMenuPressed!),
+        HoronButton(
+          label: configureLabel,
+          variant: HoronButtonVariant.solid, // variant="solid"
+          size: HoronButtonSize.sm, // size="sm"
+          icon: const Icon(Icons.settings_outlined, size: 14), // GearSix size-3.5
+          onPressed: onConfigure,
+        ),
+        if (onMenuPressed != null)
+          HoronIconButton(
+            icon: const Icon(Icons.more_horiz),
+            label: menuLabel,
+            variant: HoronIconButtonVariant.ghost, // variant="ghost"
+            size: HoronIconButtonSize.sm, // size="sm"
+            onPressed: onMenuPressed,
+          ),
       ],
     );
   }
@@ -298,123 +309,8 @@ class HoronMcpServerRow extends StatelessWidget {
       child: Text(
         label,
         maxLines: 1,
-        // text-[12px]/[16px] font-medium
-        style: theme.text.labelSm.copyWith(height: 16 / 12, color: foreground),
-      ),
-    );
-  }
-}
-
-/// `button.tsx`의 `glass`·`sm` 변형입니다. `h-8`, `px-3`, `text-label-md`, 14px 아이콘입니다.
-class _GlassButton extends StatefulWidget {
-  const _GlassButton({required this.label, this.onPressed, this.icon});
-
-  final String label;
-  final VoidCallback? onPressed;
-  final Widget? icon;
-
-  @override
-  State<_GlassButton> createState() => _GlassButtonState();
-}
-
-class _GlassButtonState extends State<_GlassButton> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final bool reduce = MediaQuery.disableAnimationsOf(context);
-    return Semantics(
-      button: true,
-      enabled: widget.onPressed != null,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: widget.onPressed == null ? null : (TapDownDetails details) => setState(() => _pressed = true),
-        onTapUp: widget.onPressed == null ? null : (TapUpDetails details) => setState(() => _pressed = false),
-        onTapCancel: widget.onPressed == null ? null : () => setState(() => _pressed = false),
-        onTap: widget.onPressed,
-        child: AnimatedScale(
-          scale: _pressed && !reduce ? HoronMotion.pressScale : 1, // motion-press
-          duration: reduce ? Duration.zero : HoronMotion.pressDuration,
-          curve: HoronMotion.pressCurve,
-          child: HoronLiquidGlass(
-            borderRadius: BorderRadius.circular(theme.radius.full), // rounded-full
-            child: SizedBox(
-              height: theme.space.step(8), // h-8 = 32
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: theme.space.s3), // px-3
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: theme.space.s1_5, // gap-1.5
-                  children: <Widget>[
-                    if (widget.icon != null)
-                      IconTheme.merge(
-                        // GearSix size-3.5 = 14
-                        data: IconThemeData(size: theme.space.s3_5, color: theme.colors.textPrimary),
-                        child: widget.icon!,
-                      ),
-                    Text(
-                      widget.label,
-                      maxLines: 1,
-                      style: theme.text.labelMd.copyWith(color: theme.colors.textPrimary),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// `icon-button.tsx`의 `ghost`·`sm` 변형입니다. 32px 상자에 8px 반경, 16px 아이콘입니다.
-class _GhostIconButton extends StatefulWidget {
-  const _GhostIconButton({required this.label, required this.onPressed});
-
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  State<_GhostIconButton> createState() => _GhostIconButtonState();
-}
-
-class _GhostIconButtonState extends State<_GhostIconButton> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final HoronThemeData theme = HoronTheme.of(context);
-    final bool reduce = MediaQuery.disableAnimationsOf(context);
-    return Semantics(
-      button: true,
-      label: widget.label,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
-        onExit: (PointerExitEvent event) => setState(() => _hovered = false),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: widget.onPressed,
-          child: AnimatedContainer(
-            duration: reduce ? Duration.zero : HoronMotion.colorsDuration,
-            curve: HoronMotion.colorsCurve,
-            width: theme.space.step(8), // size-8 = 32
-            height: theme.space.step(8),
-            decoration: BoxDecoration(
-              color: _hovered ? theme.colors.overlayInk6 : Colors.transparent, // hover:bg-overlay-ink-6
-              borderRadius: BorderRadius.circular(theme.radius.sm), // Paper `1VHS-0`: 반경 8
-            ),
-            child: Center(
-              child: Icon(
-                Icons.more_horiz,
-                size: theme.space.s4, // IconButton sm [&_svg]:size-4 = 16
-                color: theme.colors.textPrimary,
-              ),
-            ),
-          ),
-        ),
+        // text-label-sm
+        style: theme.text.labelSm.copyWith(color: foreground),
       ),
     );
   }

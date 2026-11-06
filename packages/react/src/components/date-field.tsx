@@ -35,6 +35,13 @@ function defaultFormat(value: Date | DateRange, locale?: string): string {
   return `${start} – ${withYear.format(value.end)}`;
 }
 
+/** The calendar fills its parent, and a popover's positioner is auto-width, so the popup names the width it should take, capped at the viewport. */
+const popupCalendarWidthClass: Record<DateFieldSize, string> = {
+  sm: "w-62.5 max-w-[calc(100vw-2rem)]",
+  md: "w-78.5 max-w-[calc(100vw-2rem)]",
+  lg: "w-93.5 max-w-[calc(100vw-2rem)]",
+};
+
 /** Figma `Date field` (60:244): a 280px field that opens the calendar, in three sizes and two surfaces. */
 export function DateField({
   size = "md",
@@ -57,7 +64,7 @@ export function DateField({
           fieldBoxClass.base,
           fieldBoxClass[surface],
           fieldSizeClass[size],
-          "w-70 cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed",
+          "w-full max-w-70 cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed",
           surface !== "glass" && "hover:enabled:not-data-invalid:border-border-strong",
           triggerClassName,
         )}
@@ -79,7 +86,12 @@ export function DateField({
       <Popover.Portal>
         <Popover.Positioner sideOffset={4} align="start" className="z-50 outline-none">
           <Popover.Popup className="motion-popup">
-            <Calendar {...calendar} size={size} surface={surface === "glass" ? "glass" : "solid"} />
+            <Calendar
+              {...calendar}
+              size={size}
+              surface={surface === "glass" ? "glass" : "solid"}
+              className={popupCalendarWidthClass[size]}
+            />
           </Popover.Popup>
         </Popover.Positioner>
       </Popover.Portal>

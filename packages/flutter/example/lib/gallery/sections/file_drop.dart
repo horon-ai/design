@@ -6,7 +6,9 @@ import '../surface_group.dart';
 /// `file_drop` 갤러리 섹션입니다.
 ///
 /// 기본, 거부된 파일, 업로드 중, 비활성 네 상태를 solid와 glass 두 표면에 같은
-/// 목록으로 보여 줍니다.
+/// 목록으로 보여 줍니다. 테두리 모양은 바뀌지 않으므로 점선은 그대로 두고, 끌어오기와
+/// 거부는 안쪽 1px 링과 색으로 알립니다. 거부는 글자도 위험 색이 되고, 업로드 중에는
+/// 라벨만 60%로 낮아집니다.
 class HoronFileDropGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronFileDropGallerySection({super.key});
@@ -26,7 +28,7 @@ class HoronFileDropGallerySection extends StatelessWidget {
             child: _drops(theme, HoronFileDropSurface.solid),
           ),
           SurfaceGroup(
-            label: 'Glass',
+            label: 'Glass · veil drop',
             glass: true,
             child: _drops(theme, HoronFileDropSurface.glass),
           ),

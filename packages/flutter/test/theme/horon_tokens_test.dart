@@ -174,6 +174,59 @@ void main() {
     });
   });
 
+  group('veil', () {
+    const veil = HoronVeilTokens();
+
+    test('glass.ts veil의 재료 값을 그대로 드러낸다', () {
+      expect(veil.blur, 8);
+      expect(veil.saturate, 1.6);
+      expect(veil.ringWidth, 1);
+    });
+
+    test('라이트 veil 색이 토큰과 같다', () {
+      const HoronVeilScheme light = HoronVeilTokens.light;
+      expect(light.ring, const Color(0x0F17181A));
+      expect(light.field, const Color(0x0F17181A));
+      expect(light.fieldFocus, const Color(0x1717181A));
+      expect(light.fieldShadow.single.color, const Color(0x0F17181A));
+      expect(light.fieldShadow.single.offset, const Offset(0, 2));
+      expect(light.fieldShadow.single.blurRadius, 10);
+      expect(light.overlay, const Color(0xBDFFFFFF));
+      expect(light.overlayShadow.single.color, const Color(0x1A17181A));
+      expect(light.overlayShadow.single.offset, const Offset(0, 6));
+      expect(light.overlayShadow.single.blurRadius, 24);
+    });
+
+    test('다크 veil 색이 토큰과 같다', () {
+      const HoronVeilScheme dark = HoronVeilTokens.dark;
+      expect(dark.ring, const Color(0x0FFFFFFF));
+      expect(dark.field, const Color(0x17FFFFFF));
+      expect(dark.fieldFocus, const Color(0x1FFFFFFF));
+      expect(dark.fieldShadow.single.color, const Color(0x0F000000));
+      expect(dark.overlay, const Color(0xBD17181A));
+      expect(dark.overlayShadow.single.color, const Color(0x4D000000));
+    });
+
+    test('밝기에 맞는 색 묶음을 고른다', () {
+      expect(veil.forBrightness(Brightness.light), HoronVeilTokens.light);
+      expect(veil.forBrightness(Brightness.dark), HoronVeilTokens.dark);
+    });
+
+    test('채도 행렬이 20개 값이고 흰색을 보존한다', () {
+      final List<double> matrix = veil.saturateMatrix;
+      expect(matrix, hasLength(20));
+      expect(matrix[0] + matrix[1] + matrix[2], closeTo(1, 1e-12));
+      expect(matrix[5] + matrix[6] + matrix[7], closeTo(1, 1e-12));
+      expect(matrix[10] + matrix[11] + matrix[12], closeTo(1, 1e-12));
+    });
+
+    test('테마가 veil 그룹을 노출한다', () {
+      expect(HoronThemeData.light.veil.blur, 8);
+      expect(HoronThemeData.dark.veil.ringWidth, 1);
+      expect(horonTheme(Brightness.dark).extension<HoronThemeData>()!.veil.saturate, 1.6);
+    });
+  });
+
   group('반경·간격·그림자·브레이크포인트', () {
     test('반경 단계가 scale.ts와 같다', () {
       expect(HoronRadius.none, 0);

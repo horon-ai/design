@@ -2,8 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import '../glass/glass_geometry.dart';
-import '../glass/horon_glass.dart';
+import '../glass/horon_veil.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
@@ -23,15 +22,6 @@ const double _grabberWidth = 36;
 /// `rounded-[3px]` — 그랩바 반경입니다.
 const double _grabberRadius = 3;
 
-/// `size-8` — 닫기 버튼 상자 32입니다.
-const double _closeSize = 32;
-
-/// `[&_svg]:size-4` — 패널 시트 닫기 아이콘 16입니다.
-const double _closeIconSize = 16;
-
-/// `size-[18px]` — 상세 시트 닫기 아이콘 18입니다.
-const double _detailCloseIconSize = 18;
-
 /// `bg-bg-scrim/32` — 스크림 불투명도입니다.
 const double _scrimOpacity = 0.32;
 
@@ -44,9 +34,6 @@ const Duration _enterDuration = Duration(milliseconds: 320);
 /// `data-ending-style:duration-220` — 시트가 내려가는 시간입니다.
 const Duration _exitDuration = Duration(milliseconds: 220);
 
-/// `0 0 0 1px` — 바깥 고리의 두께입니다.
-const double _outerRingWidth = 1;
-
 /// `icon size-5` — 행 아이콘 20입니다.
 const double _rowIconSize = 20;
 
@@ -55,8 +42,9 @@ const double _rowCaretSize = 16;
 
 /// Figma `Bottom sheet`(Panels 88:808)의 시트 표면입니다.
 ///
-/// React `BottomSheetContent`를 옮긴 것입니다. 그랩바, 제목 줄, 닫기 버튼과 내용을
-/// 담고, 위쪽 두 모서리만 둥급니다.
+/// React `BottomSheetContent`를 옮긴 것입니다. 그랩바, 제목 줄과 내용을 담고,
+/// 위쪽 두 모서리만 둥급니다. 닫기 버튼은 없습니다. 시트는 스크림, Escape,
+/// 그랩바를 아래로 끌기, 호출자의 동작 줄로 닫습니다.
 ///
 /// React는 `variant`(`panel` | `detail`)와 `surface`(`glass` | `solid`)를 컴포넌트
 /// 파일 안의 인라인 유니온으로 선언합니다. 게이트가 읽는 것은 `export type` 선언뿐이라
@@ -66,15 +54,12 @@ const double _rowCaretSize = 16;
 ///
 /// 시트를 띄우려면 [showHoronBottomSheet]를 씁니다. 스크림·화면 배치·올라오는
 /// 전환은 그 함수가 소유하고, 이 위젯은 표면만 그립니다.
-/// Paper 유리 시트의 배경 흐림 반경입니다.
-const double _frostBlur = 24;
 
 class HoronBottomSheet extends StatelessWidget {
   /// 시트의 내용을 받습니다.
   const HoronBottomSheet({
     super.key,
     required this.title,
-    this.closeLabel = 'Close',
     this.detail = false,
     this.solid = true,
     this.floating = false,
@@ -88,19 +73,14 @@ class HoronBottomSheet extends StatelessWidget {
   /// `text-text-primary`로 맞춥니다.
   final Widget title;
 
-  /// 닫기 버튼의 이름입니다. null이면 닫기 버튼을 그리지 않습니다.
-  /// React `closeLabel`(기본 "Close", `null`이면 숨김).
-  final String? closeLabel;
-
   /// Paper의 상세 시트 배치입니다. React `variant="detail"`입니다.
   ///
-  /// 머리글을 왼쪽 위에 붙이고 18px 리듬(gap-4.5)을 쓰며, 닫기 버튼이 투명하고
-  /// 아이콘이 18px입니다.
+  /// 머리글을 왼쪽 위에 붙이고 18px 리듬(gap-4.5)을 씁니다.
   final bool detail;
 
   /// 불투명한 기본 채움입니다. React `surface="solid"`입니다.
   ///
-  /// `bg-bg-default`, 위쪽 20px 모서리, 아래 여백 24px을 쓰고 유리를 깔지 않습니다.
+  /// `bg-bg-surface`, 위쪽 20px 모서리, 아래 여백 24px을 쓰고 veil을 깔지 않습니다.
   final bool solid;
 
   /// 화면 가장자리에서 16px 띄운 패널 시트입니다. React `floating`입니다.
@@ -128,14 +108,12 @@ class HoronBottomSheet extends StatelessWidget {
         ? space.s3
         : space.s1;
     final BorderRadius radius = BorderRadius.vertical(top: Radius.circular(solid ? theme.radius.xl : _glassTopRadius));
-    // React: solid나 floating이면 `<LiquidGlass>`를 그리지 않습니다.
-    final bool glass = !solid && !floating;
-    // dark:shadow-none — 다크에서는 테두리 고리와 안쪽 테두리를 모두 끕니다.
-    final bool rings = glass && theme.brightness != Brightness.dark;
+    // floating은 채움 없이 카드로만 뜨고, solid가 아니면 veil 오버레이를 깝니다.
+    final bool veil = !solid && !floating;
 
     final Widget header = Padding(
-      // 패널은 pt-2.5 pb-2 pl-1, 상세는 여백 없이 왼쪽 위에 붙습니다.
-      padding: detail ? EdgeInsets.zero : EdgeInsets.only(top: space.step(2.5), bottom: space.s2, left: space.s1),
+      // 패널은 pt-2.5 pb-2 pl-2, 상세는 여백 없이 왼쪽 위에 붙습니다.
+      padding: detail ? EdgeInsets.zero : EdgeInsets.only(top: space.step(2.5), bottom: space.s2, left: space.s2),
       child: Row(
         crossAxisAlignment: detail ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         spacing: space.s2,
@@ -148,113 +126,69 @@ class HoronBottomSheet extends StatelessWidget {
               child: title,
             ),
           ),
-          if (closeLabel != null)
-            _Pressable(
-              onTap: onClose ?? () => Navigator.of(context).maybePop(),
-              semanticLabel: closeLabel,
-              ringRadius: theme.radius.full,
-              child: Container(
-                width: _closeSize,
-                height: _closeSize,
-                decoration: BoxDecoration(
-                  // 상세 시트의 닫기는 bg-transparent, 패널은 bg-overlay-ink-6입니다.
-                  color: detail ? Colors.transparent : colors.overlayInk6,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.close,
-                  size: detail ? _detailCloseIconSize : _closeIconSize,
-                  color: colors.textSecondary,
-                ),
-              ),
-            ),
         ],
       ),
     );
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        // 높이 상한이 있는 자리(시트 라우트, 갤러리 미리보기)에서는 본문을 스크롤에
-        // 넣어 화면보다 긴 내용도 잘리지 않게 합니다. 상한이 없으면 그냥 쌓습니다.
+        // 높이 상한이 있는 자리(시트 라우트, 갤러리 미리보기)에서는 제목 줄과 본문을
+        // 함께 스크롤에 넣어 화면보다 긴 내용도 잘리지 않게 합니다. React도
+        // `Drawer.Content`(`min-h-0 flex-1 overflow-y-auto`)가 제목과 본문을 함께
+        // 감쌉니다. 상한이 없으면 그냥 쌓습니다.
         final bool bounded = constraints.hasBoundedHeight;
-        // `shadow-[inset_0_0_0_1px_…,0_0_0_1px_var(--color-overlay-ink-3)]` — 안쪽 고리는
-        // 아래 Stack이, 바깥 1px 잉크 고리는 이 상자가 그립니다.
-        final Widget surface = ClipRRect(
-          borderRadius: radius,
-          child: Stack(
+        final Widget content = Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: gap,
+          children: <Widget>[header, ?child],
+        );
+        final Widget body = Padding(
+          // px-4 pt-2, 아래는 pb-5(veil) 또는 pb-6(불투명)입니다.
+          padding: EdgeInsets.only(left: space.s4, right: space.s4, top: space.s2, bottom: solid ? space.s6 : space.s5),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: gap,
             children: <Widget>[
-              if (glass)
-                Positioned.fill(
-                  // Paper `VBH-1`(라이트)은 `--color-glass-fill-frost`(#FFFFFFE5, 90%)에
-                  // 24px 배경 흐림을 쓰고, 다크 `DKE-0`은 두꺼운 유리(#17181ACC, 80%)입니다.
-                  child: theme.brightness == Brightness.dark
-                      ? HoronLiquidGlass(
-                          tier: HoronGlassTier.thick,
-                          borderRadius: radius,
-                          child: const SizedBox.expand(),
-                        )
-                      : BackdropFilter(
-                          filter: ui.ImageFilter.blur(sigmaX: _frostBlur, sigmaY: _frostBlur),
-                          child: ColoredBox(color: colors.glassFillFrost),
-                        ),
-                ),
-              if (solid) Positioned.fill(child: ColoredBox(color: colors.bgDefault)),
-              if (rings)
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: DecoratedBox(
-                      // shadow-[inset_0_0_0_1px_var(--color-glass-rim-frost)] — 안쪽 1px 테두리입니다.
-                      decoration: BoxDecoration(
-                        borderRadius: radius,
-                        border: Border.all(color: colors.glassRimFrost),
-                      ),
+              // h-[5px] w-9 rounded-[3px] bg-overlay-ink-20 그랩바입니다.
+              // `cursor-grab touch-none active:cursor-grabbing` — 시트를 끌어 내리는
+              // 자리임을 포인터로 알립니다.
+              MouseRegion(
+                cursor: SystemMouseCursors.grab,
+                child: Center(
+                  child: Container(
+                    width: _grabberWidth,
+                    height: _grabberHeight,
+                    decoration: BoxDecoration(
+                      color: colors.overlayInk20,
+                      borderRadius: BorderRadius.circular(_grabberRadius),
                     ),
                   ),
                 ),
-              Padding(
-                // px-4 pt-2, 아래는 pb-5(유리) 또는 pb-6(불투명)입니다.
-                padding: EdgeInsets.only(
-                  left: space.s4,
-                  right: space.s4,
-                  top: space.s2,
-                  bottom: solid ? space.s6 : space.s5,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  spacing: gap,
-                  children: <Widget>[
-                    // h-[5px] w-9 rounded-[3px] bg-overlay-ink-20 그랩바입니다.
-                    Center(
-                      child: Container(
-                        width: _grabberWidth,
-                        height: _grabberHeight,
-                        decoration: BoxDecoration(
-                          color: colors.overlayInk20,
-                          borderRadius: BorderRadius.circular(_grabberRadius),
-                        ),
-                      ),
-                    ),
-                    header,
-                    if (child != null)
-                      if (bounded) Flexible(child: SingleChildScrollView(child: child)) else child!,
-                  ],
-                ),
               ),
+              if (bounded) Flexible(child: SingleChildScrollView(child: content)) else content,
             ],
           ),
         );
 
-        return rings
-            ? DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: radius,
-                  // 바깥 `0 0 0 1px` 고리입니다(레이아웃을 밀지 않도록 그림자로 그립니다).
-                  boxShadow: <BoxShadow>[BoxShadow(color: colors.overlayInk3, spreadRadius: _outerRingWidth)],
-                ),
-                child: surface,
+        final Widget surface = veil
+            // React `veil-overlay` — 링과 0 6 24 그림자를 스스로 그립니다.
+            ? HoronVeil(kind: HoronVeilKind.overlay, borderRadius: radius, child: body)
+            : solid
+            // React `rounded-t-xl bg-bg-surface`.
+            ? ClipRRect(
+                borderRadius: radius,
+                child: ColoredBox(color: colors.bgSurface, child: body),
               )
-            : surface;
+            : body;
+
+        // `max-h-[calc(100dvh-2rem)]` — 화면 높이에서 16px 여백을 뺀 만큼만 커집니다.
+        final double maxHeight = (MediaQuery.sizeOf(context).height - space.s4 * 2).clamp(0, double.infinity);
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: maxHeight),
+          child: surface,
+        );
       },
     );
   }
@@ -291,6 +225,8 @@ class HoronBottomSheetRow extends StatelessWidget {
       // focus-visible:-outline-offset-2 — 테두리를 행 안쪽에 그립니다.
       ringRadius: theme.radius.lg,
       ringInset: true,
+      // `hover:bg-overlay-ink-4`.
+      hoverColor: colors.overlayInk4,
       child: Container(
         height: space.step(12), // h-12 = 48
         padding: EdgeInsets.symmetric(horizontal: space.s2), // px-2
@@ -328,8 +264,8 @@ class HoronBottomSheetRow extends StatelessWidget {
 
 /// `bottom-sheet.tsx`의 `BottomSheetActions`입니다.
 ///
-/// 시트 아래쪽의 동작 줄입니다. React는 `flex gap-2 pt-3` 한 줄이지만, 폭이
-/// 좁아지면 버튼이 넘치므로 [Wrap]으로 줄을 바꿉니다(가로 스크롤은 쓰지 않습니다).
+/// `w-full flex-wrap items-center justify-end gap-2 pt-3` — 폭을 채우고 보조 동작을
+/// 먼저, 주 동작을 오른쪽 끝에 두는 줄입니다. 폭이 좁아지면 [Wrap]이 줄을 바꿉니다.
 class HoronBottomSheetActions extends StatelessWidget {
   /// 동작 줄을 만듭니다.
   const HoronBottomSheetActions({super.key, required this.children});
@@ -342,11 +278,15 @@ class HoronBottomSheetActions extends StatelessWidget {
     final HoronSpaceSpec space = HoronTheme.of(context).space;
     return Padding(
       padding: EdgeInsets.only(top: space.s3), // pt-3
-      child: Wrap(
-        spacing: space.s2,
-        runSpacing: space.s2,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: children,
+      child: SizedBox(
+        width: double.infinity,
+        child: Wrap(
+          alignment: WrapAlignment.end,
+          spacing: space.s2,
+          runSpacing: space.s2,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: children,
+        ),
       ),
     );
   }
@@ -411,7 +351,6 @@ class HoronBottomSheetAction extends StatelessWidget {
 Future<void> showHoronBottomSheet(
   BuildContext context, {
   required Widget title,
-  String? closeLabel = 'Close',
   bool detail = false,
   bool solid = false,
   bool backdrop = true,
@@ -422,7 +361,6 @@ Future<void> showHoronBottomSheet(
   return Navigator.of(context).push<void>(
     _HoronBottomSheetRoute(
       title: title,
-      closeLabel: closeLabel,
       detail: detail,
       solid: solid,
       backdrop: backdrop,
@@ -437,7 +375,6 @@ Future<void> showHoronBottomSheet(
 class _HoronBottomSheetRoute extends RawDialogRoute<void> {
   _HoronBottomSheetRoute({
     required Widget title,
-    required String? closeLabel,
     required bool detail,
     required bool solid,
     required bool backdrop,
@@ -490,7 +427,6 @@ class _HoronBottomSheetRoute extends RawDialogRoute<void> {
                            ).animate(CurvedAnimation(parent: progress, curve: HoronMotion.easeOutQuint)),
                            child: HoronBottomSheet(
                              title: title,
-                             closeLabel: closeLabel,
                              detail: detail,
                              solid: solid,
                              floating: floating,
@@ -507,7 +443,8 @@ class _HoronBottomSheetRoute extends RawDialogRoute<void> {
            );
          },
          barrierDismissible: backdrop,
-         barrierLabel: closeLabel,
+         // 닫기 버튼이 없으므로 스크림·뒤로 가기 안내에 기본 이름을 씁니다.
+         barrierLabel: 'Close',
          // 배경 스크림·블러는 페이지가 직접 그립니다.
          barrierColor: null,
          transitionDuration: _enterDuration,
@@ -534,15 +471,17 @@ class _HoronBottomSheetRoute extends RawDialogRoute<void> {
 /// 것입니다. hover는 데스크톱 포인터에서만 커서를 바꾸고, 누름 상태는 터치에서도
 /// 보입니다.
 class _Pressable extends StatefulWidget {
-  const _Pressable({required this.child, this.onTap, this.semanticLabel, this.ringRadius, this.ringInset = false});
+  const _Pressable({required this.child, this.onTap, this.ringRadius, this.ringInset = false, this.hoverColor});
 
   final Widget child;
   final VoidCallback? onTap;
-  final String? semanticLabel;
   final double? ringRadius;
 
   /// 참이면 고리를 자식 안쪽에 그립니다(`-outline-offset-2`).
   final bool ringInset;
+
+  /// 포인터가 올라왔을 때 까는 바탕입니다. 없으면 hover 채움을 그리지 않습니다.
+  final Color? hoverColor;
 
   @override
   State<_Pressable> createState() => _PressableState();
@@ -551,6 +490,7 @@ class _Pressable extends StatefulWidget {
 class _PressableState extends State<_Pressable> {
   bool _pressed = false;
   bool _focused = false;
+  bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -560,6 +500,19 @@ class _PressableState extends State<_Pressable> {
     final bool enabled = widget.onTap != null;
 
     Widget content = widget.child;
+    final Color? hoverColor = widget.hoverColor;
+    if (hoverColor != null) {
+      // `hover:bg-overlay-ink-4` — 행 바탕을 부드럽게 바꿉니다.
+      content = AnimatedContainer(
+        duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
+        curve: HoronMotion.colorsCurve,
+        decoration: BoxDecoration(
+          color: _hovered ? hoverColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(widget.ringRadius ?? 0),
+        ),
+        child: content,
+      );
+    }
     final double? ringRadius = widget.ringRadius;
     if (_focused && enabled && ringRadius != null) {
       // outline-2 — 레이아웃을 밀지 않도록 자식 바깥(또는 안쪽)에 겹쳐 그립니다.
@@ -592,24 +545,27 @@ class _PressableState extends State<_Pressable> {
       curve: HoronMotion.pressCurve,
       child: Semantics(
         button: true,
-        label: widget.semanticLabel,
         child: FocusableActionDetector(
           enabled: enabled,
           mouseCursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
           onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onTap,
-            onTapDown: (TapDownDetails details) {
-              if (enabled) setState(() => _pressed = true);
-            },
-            onTapUp: (TapUpDetails details) {
-              if (_pressed) setState(() => _pressed = false);
-            },
-            onTapCancel: () {
-              if (_pressed) setState(() => _pressed = false);
-            },
-            child: content,
+          child: MouseRegion(
+            onEnter: (_) => setState(() => _hovered = true),
+            onExit: (_) => setState(() => _hovered = false),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: widget.onTap,
+              onTapDown: (TapDownDetails details) {
+                if (enabled) setState(() => _pressed = true);
+              },
+              onTapUp: (TapUpDetails details) {
+                if (_pressed) setState(() => _pressed = false);
+              },
+              onTapCancel: () {
+                if (_pressed) setState(() => _pressed = false);
+              },
+              child: content,
+            ),
           ),
         ),
       ),

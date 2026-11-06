@@ -54,6 +54,18 @@ void main() {
     expect(titleRow.spacing, theme.space.s2, reason: 'Paper UAP-1: 제목 행 gap 8');
   });
 
+  testWidgets('card: a titleless interactive card puts the caret in the top-right corner', (WidgetTester tester) async {
+    await pumpCard(tester, HoronCard(description: '본문만 있습니다', interactive: true, onTap: () {}));
+    final Rect card = tester.getRect(find.byType(HoronCard));
+    final Rect caret = tester.getRect(find.byIcon(Icons.chevron_right));
+
+    expect(tester.widget<Icon>(find.byIcon(Icons.chevron_right)).size, 16);
+    // `absolute top-5 right-5`는 CSS에서도 테두리 안쪽(padding box)에서 20입니다.
+    // solid 표면의 1px 테두리를 더해 바깥 상자 기준 21입니다.
+    expect(caret.top - card.top, 21, reason: 'border 1 + top-5 20');
+    expect(card.right - caret.right, 21, reason: 'border 1 + right-5 20');
+  });
+
   testWidgets('card: the selected card paints the brand rim', (WidgetTester tester) async {
     await pumpCard(tester, const HoronCard(title: '선택됨', selected: true));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronCard)));

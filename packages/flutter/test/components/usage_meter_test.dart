@@ -44,11 +44,35 @@ void main() {
     expect(fill.widthFactor, closeTo(0.25, 0.001));
   });
 
+  testWidgets('usage meter: the three bands sit 8 apart', (WidgetTester tester) async {
+    await pumpMeter(
+      tester,
+      const HoronUsageMeter(label: 'Tasks', value: 64, detail: '10,000개 중 6,420개', note: '11월 1일 초기화'),
+    );
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronUsageMeter)));
+
+    // gap-2 — 라벨 줄, 트랙, 캡션 줄 사이를 8로 띄웁니다.
+    expect(theme.space.s2, 8);
+    expect(
+      find.descendant(
+        of: find.byType(HoronUsageMeter),
+        matching: find.byWidgetPredicate((Widget widget) => widget is SizedBox && widget.height == theme.space.s2),
+      ),
+      findsNWidgets(2),
+    );
+  });
+
   testWidgets('usage meter: the value clamps to 0-100', (WidgetTester tester) async {
     await pumpMeter(tester, const HoronUsageMeter(label: 'Tasks', value: 140));
     final FractionallySizedBox fill = tester.widget<FractionallySizedBox>(find.byType(FractionallySizedBox));
     expect(fill.widthFactor, closeTo(1, 0.001));
     expect(find.text('140%'), findsOneWidget);
+  });
+
+  testWidgets('usage meter: the percent uses tabular figures', (WidgetTester tester) async {
+    await pumpMeter(tester, const HoronUsageMeter(label: 'Tasks', value: 64));
+    final Text percent = tester.widget<Text>(find.text('64%'));
+    expect(percent.style?.fontFeatures, contains(const FontFeature.tabularFigures()));
   });
 
   testWidgets('usage meter: both brightnesses render', (WidgetTester tester) async {

@@ -12,6 +12,12 @@ enum HoronSurface {
 
   /// 유리 레이어를 까는 표면입니다. 이미지나 유리 패널 위에 씁니다.
   glass,
+
+  /// veil 필드 표면입니다. React `.veil-field`와 같은 입력 계열 표면입니다.
+  veilField,
+
+  /// veil 오버레이 표면입니다. React `.veil-overlay`와 같은 떠 있는 표면입니다.
+  veilOverlay,
 }
 
 /// 카드의 표면입니다. React `card.tsx`의 `glass | frost | solid`.

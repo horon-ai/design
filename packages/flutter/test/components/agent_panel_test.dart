@@ -15,7 +15,7 @@ Future<void> pumpPanel(WidgetTester tester, Widget child, {Brightness brightness
 }
 
 void main() {
-  testWidgets('agent panel: a surface plate with the 24px radius and 16px padding', (WidgetTester tester) async {
+  testWidgets('agent panel: a surface plate with the 24px radius and 20px padding', (WidgetTester tester) async {
     await pumpPanel(tester, const HoronAgentPanel(filter: Text('필터'), children: <Widget>[Text('블록')]));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronAgentPanel)));
     final Container plate = tester.widget<Container>(find.byType(Container).first);
@@ -23,6 +23,16 @@ void main() {
 
     expect(decoration.color, theme.colors.bgSurface);
     expect((decoration.borderRadius! as BorderRadius).topLeft.x, 24);
+    // `px-5` — 판은 좌우 20입니다.
+    expect(plate.padding, const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 8));
+    // React는 필터를 폭 채우는 `div`로 감쌉니다.
+    expect(
+      find.descendant(
+        of: find.byType(HoronAgentPanel),
+        matching: find.byWidgetPredicate((Widget widget) => widget is SizedBox && widget.width == double.infinity),
+      ),
+      findsOneWidget,
+    );
     expect(find.text('필터'), findsOneWidget);
     expect(find.text('블록'), findsOneWidget);
   });
@@ -53,6 +63,17 @@ void main() {
     );
     expect(find.byType(HoronKbd), findsNWidgets(2));
     expect(find.text('Start'), findsOneWidget);
+
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronTaskComposer)));
+    // `rounded-xl` — 작성 상자는 20 반경입니다.
+    final Container box = tester.widget<Container>(find.byType(Container).first);
+    expect((box.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.xl));
+    // `px-4` — 좌우 16입니다.
+    expect(box.padding, const EdgeInsets.only(left: 16, right: 16, top: 14, bottom: 10));
+    // `h-7.5 px-3.5` — 시작 버튼은 높이 30, 좌우 14입니다.
+    final Finder startBox = find.ancestor(of: find.text('Start'), matching: find.byType(Container)).first;
+    expect(tester.getSize(startBox).height, 30);
+    expect(tester.widget<Container>(startBox).padding, const EdgeInsets.symmetric(horizontal: 14));
 
     await tester.enterText(find.byType(TextField), '보드 덱을 만들어 줘');
     await tester.pump();

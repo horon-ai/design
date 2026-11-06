@@ -8,8 +8,8 @@ import '../tokens/horon_tokens.g.dart';
 /// `filter-bar.tsx`의 `focus-visible:outline-2`입니다.
 const double _focusWidth = 2;
 
-/// `disabled:opacity-50`입니다.
-const double _disabledOpacity = 0.5;
+/// `disabled:opacity-40`입니다.
+const double _disabledOpacity = 0.4;
 
 /// `filter-bar.tsx`의 `FilterBarItem`입니다.
 ///
@@ -28,7 +28,7 @@ class HoronFilterBarItem {
   /// 글자 뒤에 붙는 개수입니다.
   final int? count;
 
-  /// 거짓이면 눌리지 않고 `opacity-50`으로 흐려집니다.
+  /// 거짓이면 눌리지 않고 `opacity-40`으로 흐려집니다.
   final bool disabled;
 }
 
@@ -169,7 +169,7 @@ class _HoronFilterBarState extends State<HoronFilterBar> {
   }
 }
 
-/// 필터 옵션 하나입니다. `h-7.5 px-3 rounded-full text-[14px]/[20px] font-medium`입니다.
+/// 필터 옵션 하나입니다. `h-7.5 px-4 rounded-full text-label-md`입니다.
 class _FilterOption extends StatefulWidget {
   const _FilterOption({required this.item, required this.selected, required this.onTap});
 
@@ -193,13 +193,23 @@ class _FilterOptionState extends State<_FilterOption> {
     final bool interactive = !widget.item.disabled;
     final Color foreground = widget.selected || _hovered ? colors.textPrimary : colors.textSecondary;
 
+    // `hover:bg-overlay-ink-5` — 비활성 탭도 hover에서 옅은 잉크를 깝니다.
+    final Duration colorsDuration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : HoronMotion.colorsDuration;
     final Widget surface = AnimatedDefaultTextStyle(
-      duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : HoronMotion.colorsDuration,
+      duration: colorsDuration,
       curve: HoronMotion.colorsCurve,
       style: theme.text.labelMd.copyWith(color: foreground),
-      child: Container(
+      child: AnimatedContainer(
+        duration: colorsDuration,
+        curve: HoronMotion.colorsCurve,
         height: space.step(7.5), // h-7.5 = 30
-        padding: EdgeInsets.symmetric(horizontal: space.s3), // px-3
+        padding: EdgeInsets.symmetric(horizontal: space.s4), // px-4
+        decoration: BoxDecoration(
+          color: !widget.selected && _hovered ? colors.overlayInk5 : Colors.transparent,
+          borderRadius: BorderRadius.circular(theme.radius.full),
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: space.s1_5, // gap-1.5
@@ -208,7 +218,7 @@ class _FilterOptionState extends State<_FilterOption> {
             if (widget.item.count != null)
               Text(
                 '${widget.item.count}',
-                // text-[12px]/[18px]
+                // text-caption
                 style: theme.text.caption.copyWith(color: colors.textSecondary),
                 maxLines: 1,
               ),

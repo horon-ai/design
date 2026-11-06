@@ -23,6 +23,7 @@ const List<HoronComboboxItem> _items = <HoronComboboxItem>[
 Widget _host({
   Brightness brightness = Brightness.light,
   bool multiple = false,
+  HoronInputSurface surface = HoronInputSurface.solid,
   String emptyLabel = 'No results',
   ValueChanged<String?>? onChanged,
   ValueChanged<List<String>>? onValuesChanged,
@@ -39,6 +40,7 @@ Widget _host({
             child: HoronCombobox(
               items: _items,
               multiple: multiple,
+              surface: surface,
               placeholder: multiple ? 'Tags' : 'Country',
               emptyLabel: emptyLabel,
               onChanged: onChanged,
@@ -157,6 +159,50 @@ void main() {
     expect(find.text('Japan'), findsNothing);
     expect(_search, findsOneWidget, reason: '일치 항목이 없어도 목록은 닫히지 않습니다');
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the glass popup is the veil and the multiple field is 240 wide', (WidgetTester tester) async {
+    await tester.pumpWidget(_host(surface: HoronInputSurface.glass, multiple: true));
+    await tester.pump();
+    expect(tester.getSize(find.byType(HoronFieldBox)).width, 240, reason: 'w-60');
+
+    await _open(tester);
+    final Iterable<HoronVeil> veils = tester.widgetList<HoronVeil>(find.byType(HoronVeil));
+    expect(veils.any((HoronVeil veil) => veil.kind == HoronVeilKind.overlay), isTrue, reason: '팝업은 veil-overlay입니다');
+    expect(find.byType(HoronLiquidGlass), findsNothing, reason: '유리 레이어를 겹치지 않습니다');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('md draws the field and chip icons at 16 and 14, lg at 20 and 16', (WidgetTester tester) async {
+    // `md [&_svg]:size-4` — md 단계는 검색·캐럿 아이콘을 16으로 그립니다.
+    await tester.pumpWidget(_host());
+    await tester.pump();
+    expect(tester.widget<Icon>(find.byIcon(Icons.keyboard_arrow_down).first).size, 16, reason: 'md size-4');
+    expect(tester.widget<Icon>(find.byIcon(Icons.search).first).size, 16, reason: 'md [&_svg]:size-4');
+
+    await tester.pumpWidget(_host(multiple: true));
+    await tester.pump();
+    await _open(tester);
+    await tester.tap(find.text('South Korea'));
+    await tester.pumpAndSettle();
+    expect(tester.widget<Icon>(find.byIcon(Icons.close).first).size, 14, reason: 'chip md [&_svg]:size-3.5');
+
+    // `lg` 단계는 한 칸씩 큽니다.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: horonTheme(Brightness.light),
+        home: const Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: HoronCombobox(items: _items, size: HoronComboboxSize.lg),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.widget<Icon>(find.byIcon(Icons.keyboard_arrow_down).first).size, 20, reason: 'lg size-5');
+    expect(tester.widget<Icon>(find.byIcon(Icons.search).first).size, 20, reason: 'lg [&_svg]:size-5');
   });
 
   testWidgets('escape and an outside tap close the list', (WidgetTester tester) async {

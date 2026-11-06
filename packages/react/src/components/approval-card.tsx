@@ -51,7 +51,7 @@ export function ApprovalCard({
   return (
     <div
       className={cn(
-        "relative flex w-90 flex-col items-start overflow-clip rounded-xl p-4 motion-colors",
+        "relative flex w-full max-w-90 min-w-0 flex-col items-start overflow-clip rounded-xl p-4 motion-colors md:w-90",
         surface === "glass"
           ? cn("bg-glass-thick", state === "pending" && "[--glass-edge:var(--color-border-brand)]")
           : cn("border border-border-default bg-bg-surface", state === "pending" && "border-border-brand"),
@@ -67,9 +67,9 @@ export function ApprovalCard({
       </div>
       <p className="relative mt-3 text-label-lg text-text-primary">{title}</p>
       {attachment && (
-        <div className="relative mt-3 flex items-center gap-2 rounded-md bg-overlay-ink-5 px-3 py-2 text-body-sm text-text-primary">
-          <Paperclip aria-hidden className="size-3.5 text-text-secondary" />
-          {attachment}
+        <div className="relative mt-3 flex max-w-full min-w-0 items-center gap-2 rounded-md bg-overlay-ink-5 px-3 py-2 text-body-sm text-text-primary">
+          <Paperclip aria-hidden className="size-3.5 shrink-0 text-text-secondary" />
+          <span className="min-w-0 truncate">{attachment}</span>
         </div>
       )}
       <div className="motion-reveal w-full" data-collapsed={state !== "pending" || undefined}>

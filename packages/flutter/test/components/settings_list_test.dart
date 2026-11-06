@@ -44,9 +44,16 @@ void main() {
         ],
       ),
     );
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronSettingsList)));
     expect(find.text('알림'), findsOneWidget);
     expect(find.text('새 소식이 오면 알려 줍니다'), findsOneWidget);
     expect(find.byType(HoronSwitch), findsOneWidget);
+
+    // 설명은 `text-body-sm`(14/22) 토큰입니다. 13/18 오버라이드를 쓰지 않습니다.
+    final Text description = tester.widget<Text>(find.text('새 소식이 오면 알려 줍니다'));
+    expect(description.style?.fontSize, theme.text.bodySm.fontSize);
+    expect(description.style?.height, theme.text.bodySm.height);
+    expect(description.style?.color, theme.colors.textSecondary);
   });
 
   testWidgets('settings row: a leading tile tightens the gap and the vertical padding', (WidgetTester tester) async {
@@ -86,7 +93,7 @@ void main() {
     expect(withBorder, 1, reason: 'only the first row keeps its bottom border');
   });
 
-  testWidgets('settings keys: each keycap is 26 tall in a 6px radius', (WidgetTester tester) async {
+  testWidgets('settings keys: each keycap is a 26 tall label-sm chip at the xs radius', (WidgetTester tester) async {
     await pumpList(
       tester,
       const HoronSettingsList(
@@ -102,6 +109,19 @@ void main() {
     expect(find.text('⌘'), findsOneWidget);
     expect(find.text('K'), findsOneWidget);
     expect(tester.getSize(find.byType(HoronSettingsKey).first).height, 26);
+
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronSettingsList)));
+    final Container cap = tester.widget<Container>(
+      find.descendant(of: find.byType(HoronSettingsKey).first, matching: find.byType(Container)).first,
+    );
+    expect(
+      (cap.decoration! as BoxDecoration).borderRadius,
+      BorderRadius.circular(theme.radius.xs),
+      reason: 'rounded-xs = 6',
+    );
+    final Text key = tester.widget<Text>(find.text('⌘'));
+    expect(key.style?.fontSize, theme.text.labelSm.fontSize, reason: 'text-label-sm');
+    expect(key.style?.fontWeight, theme.text.labelSm.fontWeight);
   });
 
   testWidgets('settings list: both brightnesses render', (WidgetTester tester) async {

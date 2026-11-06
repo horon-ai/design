@@ -7,6 +7,10 @@ import { defineConfig } from "astro/config";
 // @horon-ai/tokens, so the docs and the library can never drift apart.
 export default defineConfig({
   site: "https://design.horon.ai",
+  // Cloudflare Pages serves each page at `<path>/` and 308s the bare path, so the
+  // slashed form is the canonical one here too: dev and build agree with the host,
+  // and `Astro.url.pathname` always carries the slash the canonical link emits.
+  trailingSlash: "always",
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],

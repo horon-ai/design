@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_surface.dart';
+import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
+import 'icon_button.dart';
 
 /// `message-extras.tsx`의 `size-7.5`입니다. 동작 버튼 상자입니다.
 const double _actionSide = 30;
@@ -107,28 +111,114 @@ class HoronMessageActions extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 spacing: 2,
                 children: <Widget>[
-                  for (final HoronMessageAction action in actions)
-                    Semantics(
-                      button: true,
-                      label: action.label,
-                      child: GestureDetector(
-                        onTap: action.onPressed,
-                        child: Container(
-                          width: _actionSide,
-                          height: _actionSide,
-                          alignment: Alignment.center,
-                          decoration: const BoxDecoration(shape: BoxShape.circle),
-                          child: IconTheme.merge(
-                            data: IconThemeData(size: 16, color: theme.colors.textSecondary),
-                            child: action.icon,
-                          ),
-                        ),
-                      ),
-                    ),
+                  for (final HoronMessageAction action in actions) _MessageActionButton(action: action),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 메시지 동작 하나의 30px 버튼입니다.
+///
+/// React `message-extras.tsx`의 `size-7.5 … motion-press hover:bg-overlay-ink-6
+/// focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand`입니다.
+class _MessageActionButton extends StatefulWidget {
+  const _MessageActionButton({required this.action});
+
+  final HoronMessageAction action;
+
+  @override
+  State<_MessageActionButton> createState() => _MessageActionButtonState();
+}
+
+class _MessageActionButtonState extends State<_MessageActionButton> {
+  bool _hovered = false;
+  bool _pressed = false;
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final bool reduce = MediaQuery.disableAnimationsOf(context);
+    final bool interactive = widget.action.onPressed != null;
+
+    return Semantics(
+      button: true,
+      label: widget.action.label,
+      child: FocusableActionDetector(
+        enabled: interactive,
+        mouseCursor: interactive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
+        onShowFocusHighlight: (bool value) => setState(() => _focused = value),
+        shortcuts: const <ShortcutActivator, Intent>{
+          SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+          SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+        },
+        actions: <Type, Action<Intent>>{
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (ActivateIntent intent) {
+              widget.action.onPressed?.call();
+              return null;
+            },
+          ),
+        },
+        child: GestureDetector(
+          onTap: widget.action.onPressed,
+          onTapDown: (TapDownDetails details) {
+            if (interactive) setState(() => _pressed = true);
+          },
+          onTapUp: (TapUpDetails details) {
+            if (_pressed) setState(() => _pressed = false);
+          },
+          onTapCancel: () {
+            if (_pressed) setState(() => _pressed = false);
+          },
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              AnimatedScale(
+                scale: _pressed && interactive && !reduce ? HoronMotion.pressScale : 1, // motion-press
+                duration: reduce ? Duration.zero : HoronMotion.pressDuration,
+                curve: HoronMotion.pressCurve,
+                child: AnimatedContainer(
+                  duration: reduce ? Duration.zero : HoronMotion.colorsDuration, // motion-colors
+                  curve: HoronMotion.colorsCurve,
+                  width: _actionSide,
+                  height: _actionSide,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    // hover:bg-overlay-ink-6
+                    color: _hovered && interactive ? colors.overlayInk6 : Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconTheme.merge(
+                    data: IconThemeData(size: 16, color: colors.textSecondary), // [&>svg]:size-4
+                    child: widget.action.icon,
+                  ),
+                ),
+              ),
+              if (_focused && interactive)
+                Positioned(
+                  left: -2, // outline-offset-2
+                  top: -2,
+                  right: -2,
+                  bottom: -2,
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: colors.textBrand), // outline-text-brand
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -165,12 +255,14 @@ class HoronAttachment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
+    final bool reduce = MediaQuery.disableAnimationsOf(context);
 
-    return Container(
+    final Widget card = Container(
       width: _attachmentWidth,
-      padding: const EdgeInsets.only(left: 8, right: 12, top: 8, bottom: 8),
+      padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 8), // py-2 pr-2 pl-2
       decoration: BoxDecoration(color: theme.colors.bgSubtle, borderRadius: BorderRadius.circular(theme.radius.lg)),
       child: Row(
+        spacing: 10, // gap-2.5
         children: <Widget>[
           ClipRRect(
             borderRadius: BorderRadius.circular(_attachmentRadius),
@@ -179,26 +271,25 @@ class HoronAttachment extends StatelessWidget {
               height: _attachmentThumb,
               child: imageUrl == null
                   ? ColoredBox(
-                      color: HoronPalette.sky100,
-                      child: Center(child: Icon(Icons.description_outlined, size: 20, color: theme.colors.textPrimary)),
+                      // bg-accent-sky-500-16 text-text-brand
+                      color: theme.colors.accentSky500_16,
+                      child: Center(child: Icon(Icons.description_outlined, size: 20, color: theme.colors.textBrand)),
                     )
                   : Image.network(
                       imageUrl!,
                       fit: BoxFit.cover,
                       errorBuilder: (BuildContext context, Object error, StackTrace? stack) => ColoredBox(
-                        color: HoronPalette.sky100,
-                        child: Center(
-                          child: Icon(Icons.description_outlined, size: 20, color: theme.colors.textPrimary),
-                        ),
+                        color: theme.colors.accentSky500_16,
+                        child: Center(child: Icon(Icons.description_outlined, size: 20, color: theme.colors.textBrand)),
                       ),
                     ),
             ),
           ),
-          const SizedBox(width: 10),
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 1, // gap-px
               children: <Widget>[
                 Text(
                   name,
@@ -216,24 +307,39 @@ class HoronAttachment extends StatelessWidget {
               ],
             ),
           ),
-          if (onRemove != null) ...<Widget>[
-            const SizedBox(width: 8),
-            Semantics(
-              button: true,
-              label: removeLabel,
-              child: GestureDetector(
-                onTap: onRemove,
-                child: Icon(Icons.close, size: 16, color: theme.colors.textSecondary),
+          if (onRemove != null)
+            // `IconButton size="sm"`입니다. 공유 버튼은 44px 터치 상자를 레이아웃에
+            // 포함하므로, 카드 높이가 40px 썸네일을 넘지 않도록 높이만 썸네일에 맞춥니다
+            // (React는 `after:` 의사 요소로 히트 영역을 흐름 밖에 그립니다).
+            SizedBox(
+              height: _attachmentThumb,
+              child: HoronIconButton(
+                size: HoronIconButtonSize.sm,
+                icon: const Icon(Icons.close),
+                label: removeLabel,
+                onPressed: onRemove,
               ),
             ),
-          ],
         ],
       ),
+    );
+
+    // React `motion-rise`: 220ms 동안 4px 아래에서 올라옵니다.
+    if (reduce) return card;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: HoronMotion.riseDuration,
+      curve: HoronMotion.riseCurve,
+      builder: (BuildContext context, double value, Widget? child) => Opacity(
+        opacity: value,
+        child: Transform.translate(offset: Offset(0, (1 - value) * HoronMotion.riseOffset), child: child),
+      ),
+      child: card,
     );
   }
 }
 
-/// Figma `Code block`(109:667): 잉크 표면, 14 반경, 복사 버튼이 있는 6% 헤더, Geist Mono 13/22 코드입니다.
+/// Figma `Code block`(109:667): 잉크 표면, 14 반경, 복사 버튼이 있는 6% 헤더, `text-code` 코드입니다.
 class HoronCodeBlock extends StatefulWidget {
   /// 코드 블록을 만듭니다.
   const HoronCodeBlock({
@@ -262,15 +368,32 @@ class HoronCodeBlock extends StatefulWidget {
 
 class _HoronCodeBlockState extends State<HoronCodeBlock> {
   bool _copied = false;
+  Timer? _reset;
+
+  @override
+  void dispose() {
+    _reset?.cancel();
+    super.dispose();
+  }
+
+  void _markCopied() {
+    if (!mounted) return;
+    setState(() => _copied = true);
+    // React `useEffect`: copied가 참이 되면 1.5초 뒤 스스로 되돌립니다.
+    _reset?.cancel();
+    _reset = Timer(const Duration(milliseconds: 1500), () {
+      if (mounted) setState(() => _copied = false);
+    });
+  }
 
   Future<void> _copy() async {
-    // 플랫폼 클립보드가 없는 환경(테스트, 일부 데스크톱)에서도 버튼이 반응하도록
-    // 복사 실패를 삼키지 않고, 성공·실패와 무관하게 표시만 바꿉니다.
-    if (mounted) setState(() => _copied = true);
+    // React는 `navigator.clipboard?.writeText(code).then(onFulfilled, () => undefined)`로
+    // 실패를 무시하고 성공에만 표시를 바꿉니다.
     try {
       await Clipboard.setData(ClipboardData(text: widget.code));
+      _markCopied();
     } on Object {
-      // 무시합니다: 클립보드 플러그인이 없는 실행 환경입니다.
+      // 실패는 표시를 바꾸지 않습니다(React와 같은 계약).
     }
   }
 
@@ -289,7 +412,7 @@ class _HoronCodeBlockState extends State<HoronCodeBlock> {
           children: <Widget>[
             Container(
               color: theme.colors.bgSurface6,
-              padding: const EdgeInsets.only(left: 14, right: 12, top: 8, bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8), // py-2 pr-3.5 pl-3.5
               child: Row(
                 children: <Widget>[
                   Expanded(
@@ -306,12 +429,25 @@ class _HoronCodeBlockState extends State<HoronCodeBlock> {
                       onTap: _copy,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
+                        spacing: 4, // gap-1
                         children: <Widget>[
-                          Icon(Icons.copy, size: 14, color: theme.colors.textOnInk),
-                          const SizedBox(width: 4),
-                          Text(
-                            _copied ? widget.copiedLabel : widget.copyLabel,
-                            style: theme.text.caption.copyWith(color: theme.colors.textOnInk),
+                          Icon(Icons.copy, size: 14, color: theme.colors.textOnInk), // size-3.5
+                          SizedBox(
+                            width: 40, // min-w-10
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: AnimatedSwitcher(
+                                duration: MediaQuery.disableAnimationsOf(context)
+                                    ? Duration.zero
+                                    : HoronMotion.fadeInDuration, // animate-fade-in
+                                child: Text(
+                                  _copied ? widget.copiedLabel : widget.copyLabel,
+                                  key: ValueKey<bool>(_copied),
+                                  maxLines: 1,
+                                  style: theme.text.caption.copyWith(color: theme.colors.textOnInk),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -323,11 +459,7 @@ class _HoronCodeBlockState extends State<HoronCodeBlock> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.only(left: 14, right: 14, top: 12, bottom: 14),
-              child: Text(
-                widget.code,
-                softWrap: false,
-                style: theme.text.code.copyWith(fontSize: 13, height: 22 / 13, color: theme.colors.textOnInk),
-              ),
+              child: Text(widget.code, softWrap: false, style: theme.text.code.copyWith(color: theme.colors.textOnInk)),
             ),
           ],
         ),

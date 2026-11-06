@@ -4,7 +4,7 @@ import { Backdrop } from "../demo-backdrop";
 
 function Fields({ surface }: { surface: "solid" | "glass" }) {
   return (
-    <div className="flex w-96 flex-col gap-4">
+    <div className="flex w-full max-w-96 flex-col gap-4">
       <TextareaField className="w-full" surface={surface} size="sm" label="Small" maxLength={240} />
       <TextareaField className="w-full" surface={surface} label="Medium" maxLength={240} />
       <TextareaField className="w-full" surface={surface} size="lg" label="Large" maxLength={240} />

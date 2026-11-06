@@ -84,7 +84,7 @@ export function Select({
                 fieldBoxClass.base,
                 fieldBoxClass[surface],
                 fieldSizeClass[size],
-                "w-60",
+                "w-60 max-w-full",
                 surface !== "glass" && "hover:not-data-disabled:not-data-invalid:border-border-strong",
               )
             : segment
@@ -124,7 +124,7 @@ export function Select({
         <BaseSelect.Positioner sideOffset={4} alignItemWithTrigger={false} className="z-50 outline-none">
           <BaseSelect.Popup
             className={cn(
-              "relative min-w-(--anchor-width) motion-popup overflow-clip rounded-xl p-1.5 outline-none",
+              "relative max-w-[calc(100vw-2rem)] min-w-(--anchor-width) motion-popup overflow-clip rounded-xl p-1.5 outline-none",
               popupSurface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-popover",
             )}
           >

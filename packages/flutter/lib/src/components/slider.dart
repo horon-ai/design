@@ -16,11 +16,24 @@ const double _disabledOpacity = 0.4;
 /// 키보드 한 번에 옮기는 비율입니다. React의 화살표 이동과 같은 성격의 보조 동작입니다.
 const double _keyboardStepFraction = 0.05;
 
+/// `duration-120` — 썸의 배율 전환 시간입니다.
+const Duration _thumbDuration = Duration(milliseconds: 120);
+
+/// `ease-out-quint`입니다.
+const Curve _thumbCurve = Curves.easeOutQuint;
+
+/// `hover:scale-105`입니다.
+const double _thumbHoverScale = 1.05;
+
+/// `active:scale-110`입니다.
+const double _thumbActiveScale = 1.1;
+
 /// Paper 설정 화면의 슬라이더(Voice / Speed)입니다.
 ///
 /// 높이 20px 조작부, 8% 잉크 트랙, 잉크로 채운 진행분, 1px 헤어라인과
 /// `0 1px 3px` 그림자가 있는 18px 흰 썸으로 이루어집니다. React는 `w-55`(220px)를
-/// 잡지만 좁은 화면에서는 줄어듭니다.
+/// 잡지만 좁은 화면에서는 줄어듭니다. 썸은 `cursor-grab`이고 hover에서 1.05,
+/// 누르는 동안 1.1로 커지며 `duration-120 ease-out-quint`로 전환합니다.
 class HoronSlider extends StatefulWidget {
   /// 슬라이더를 만듭니다.
   const HoronSlider({
@@ -57,6 +70,8 @@ class HoronSlider extends StatefulWidget {
 
 class _HoronSliderState extends State<HoronSlider> {
   bool _focused = false;
+  bool _hovered = false;
+  bool _active = false;
 
   double get _range => widget.max - widget.min;
 
@@ -103,17 +118,29 @@ class _HoronSliderState extends State<HoronSlider> {
             ? math.min(space.step(_maxWidthUnits), constraints.maxWidth)
             : space.step(_maxWidthUnits);
 
-        final Widget thumb = Container(
-          width: thumbSize,
-          height: thumbSize,
-          decoration: BoxDecoration(
-            color: colors.bgDefault,
-            shape: BoxShape.circle,
-            border: Border.all(color: colors.borderDefault),
-            // shadow-[0_1px_3px_#0000001f] — 그림자 색은 overlay-ink-12 토큰입니다.
-            boxShadow: <BoxShadow>[
-              BoxShadow(color: colors.overlayInk12, blurRadius: space.step(0.75), offset: const Offset(0, 1)),
-            ],
+        // React `hover:scale-105 active:scale-110 transition-[scale] duration-120 ease-out-quint`.
+        final double thumbScale = _active ? _thumbActiveScale : (_hovered ? _thumbHoverScale : 1);
+        final Widget thumb = MouseRegion(
+          cursor: interactive ? SystemMouseCursors.grab : SystemMouseCursors.basic,
+          onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
+          onExit: (PointerExitEvent event) => setState(() => _hovered = false),
+          child: AnimatedScale(
+            scale: interactive ? thumbScale : 1,
+            duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : _thumbDuration,
+            curve: _thumbCurve,
+            child: Container(
+              width: thumbSize,
+              height: thumbSize,
+              decoration: BoxDecoration(
+                color: colors.bgDefault,
+                shape: BoxShape.circle,
+                border: Border.all(color: colors.borderDefault),
+                // shadow-[0_1px_3px_#0000001f] — 그림자 색은 overlay-ink-12 토큰입니다.
+                boxShadow: <BoxShadow>[
+                  BoxShadow(color: colors.overlayInk12, blurRadius: space.step(0.75), offset: const Offset(0, 1)),
+                ],
+              ),
+            ),
           ),
         );
 
@@ -200,14 +227,24 @@ class _HoronSliderState extends State<HoronSlider> {
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTapDown: interactive
-                      ? (TapDownDetails details) => _emitAt(details.localPosition.dx, width, thumbSize)
+                      ? (TapDownDetails details) {
+                          setState(() => _active = true);
+                          _emitAt(details.localPosition.dx, width, thumbSize);
+                        }
                       : null,
+                  onTapUp: interactive ? (TapUpDetails details) => setState(() => _active = false) : null,
+                  onTapCancel: interactive ? () => setState(() => _active = false) : null,
                   onHorizontalDragStart: interactive
-                      ? (DragStartDetails details) => _emitAt(details.localPosition.dx, width, thumbSize)
+                      ? (DragStartDetails details) {
+                          setState(() => _active = true);
+                          _emitAt(details.localPosition.dx, width, thumbSize);
+                        }
                       : null,
                   onHorizontalDragUpdate: interactive
                       ? (DragUpdateDetails details) => _emitAt(details.localPosition.dx, width, thumbSize)
                       : null,
+                  onHorizontalDragEnd: interactive ? (DragEndDetails details) => setState(() => _active = false) : null,
+                  onHorizontalDragCancel: interactive ? () => setState(() => _active = false) : null,
                   child: control,
                 ),
               ),

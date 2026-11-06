@@ -9,20 +9,18 @@ import '../theme/horon_theme.dart';
 /// `skeleton.tsx`의 `rounded-xs`입니다. 블록 자리표시자의 반경입니다.
 const double _skeletonBlockRadius = 6;
 
-/// `SkeletonCard`의 `rounded-[16px]`입니다.
-const double _skeletonCardRadius = 16;
+/// `skeleton.tsx`의 `p-4`입니다.
+const double _skeletonCardPadding = 16;
 
-/// `skeleton.tsx`의 `p-3.5`입니다.
-const double _skeletonCardPadding = 14;
-
-/// `skeleton.tsx`의 `gap-2.5`입니다.
-const double _skeletonCardGap = 10;
+/// `skeleton.tsx`의 `gap-3`입니다.
+const double _skeletonCardGap = 12;
 
 /// 7% 잉크 자리표시자입니다.
 ///
 /// `skeleton.tsx`를 옮긴 것입니다. React의 `shape`는 props 안의 인라인 유니온이라
 /// variant 어휘가 아니므로, Dart는 [pill] 플래그로 받습니다. 반짝임은 React의
-/// `animate-shimmer`와 같은 1.6초 주기로 왼쪽에서 오른쪽으로 지나갑니다.
+/// `animate-shimmer`와 같은 1.6초 주기로 왼쪽에서 오른쪽으로 한 번씩만 지나갑니다
+/// (`bg-no-repeat` — 띠가 트랙 밖에서 되돌아오지 않습니다).
 class HoronSkeleton extends StatefulWidget {
   /// 자리표시자를 만듭니다.
   const HoronSkeleton({super.key, this.width, this.height, this.pill = false});
@@ -78,19 +76,32 @@ class _HoronSkeletonState extends State<HoronSkeleton> with SingleTickerProvider
           borderRadius: radius,
           child: ColoredBox(
             color: theme.colors.overlayInk7,
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (BuildContext context, Widget? child) {
-                return FractionallySizedBox(
-                  widthFactor: 0.3,
-                  alignment: Alignment(-3 + 6 * _controller.value, 0),
+            // `bg-no-repeat` — 띠 하나가 지나가고 트랙 밖에서는 다시 그리지 않습니다.
+            // 0.3 폭 띠를 왼쪽 끝 바깥(-1)에서 오른쪽 바깥(약 3.33)까지 옮깁니다.
+            child: ClipRect(
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (BuildContext context, Widget? child) {
+                    return FractionallySizedBox(
+                      widthFactor: 0.3,
+                      heightFactor: 1,
+                      child: FractionalTranslation(
+                        // 띠 폭이 트랙의 0.3이므로 -1(왼쪽 바깥)에서 1/0.3(오른쪽 바깥)까지
+                        // 옮기면 트랙 전체를 가로지릅니다.
+                        translation: Offset(-1 + 4.3333 * _controller.value, 0),
+                        child: child,
+                      ),
+                    );
+                  },
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(colors: <Color>[Colors.transparent, sheen, Colors.transparent]),
                     ),
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
         ),
@@ -122,7 +133,7 @@ class HoronSkeletonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool row = _kind == _SkeletonCardKind.row;
-    final BorderRadius radius = BorderRadius.circular(_skeletonCardRadius);
+    final BorderRadius radius = BorderRadius.circular(HoronTheme.of(context).radius.xl); // rounded-xl = 20
 
     return Semantics(
       label: 'Loading',
@@ -166,7 +177,7 @@ class HoronSkeletonCard extends StatelessWidget {
                             const HoronSkeleton(width: 120, height: 12),
                             const SizedBox(height: _skeletonCardGap),
                           ],
-                          const HoronSkeleton(width: 252, height: 8),
+                          const HoronSkeleton(width: 248, height: 8),
                           const SizedBox(height: 8),
                           HoronSkeleton(width: _kind == _SkeletonCardKind.card ? 220 : 236, height: 8),
                           const SizedBox(height: 8),

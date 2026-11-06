@@ -36,7 +36,7 @@ export function PlanStep({
   className,
 }: PlanStepProps) {
   return (
-    <div className={cn("flex items-stretch gap-3.5", className)}>
+    <div className={cn("flex min-w-0 items-stretch gap-3.5", className)}>
       <div className="flex shrink-0 flex-col items-center gap-1">
         <span
           className={cn(
@@ -67,7 +67,7 @@ export function PlanStep({
         <div className="flex items-start gap-3">
           <p
             className={cn(
-              "min-w-0 flex-1 text-label-lg",
+              "min-w-0 flex-1 text-label-lg wrap-break-word",
               status === "pending" ? "text-text-secondary" : "text-text-primary",
             )}
           >
@@ -77,8 +77,10 @@ export function PlanStep({
             <span className="shrink-0 text-caption text-text-secondary">{elapsed}</span>
           )}
         </div>
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1.5">
-          {description && <span className="text-body-sm text-text-secondary">{description}</span>}
+        <div className="mt-1.5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1.5">
+          {description && (
+            <span className="min-w-0 text-body-sm wrap-break-word text-text-secondary">{description}</span>
+          )}
           {tool && (
             <span className="rounded-xs bg-bg-subtle px-2 py-0.5 font-mono text-label-md text-text-secondary">
               {tool}
@@ -88,7 +90,7 @@ export function PlanStep({
         <div className="motion-reveal" data-collapsed={status !== "failed" || undefined}>
           <div>
             <div className="mt-1.5 flex flex-col gap-1.5">
-              <p className="text-body-sm text-text-danger">{error}</p>
+              <p className="text-body-sm wrap-break-word text-text-danger">{error}</p>
               {onRetry && (
                 <button
                   type="button"

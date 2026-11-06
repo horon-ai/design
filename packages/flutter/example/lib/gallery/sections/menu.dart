@@ -5,8 +5,9 @@ import '../surface_group.dart';
 
 /// Menu 갤러리 섹션입니다.
 ///
-/// 같은 항목을 solid와 glass 두 표면에 놓고, Paper 표면과 실제로 열리는 트리거를
-/// 따로 둡니다. 항목에는 설명, 선택, 위험, 비활성, 단축키가 모두 들어 있습니다.
+/// 같은 항목을 solid와 veil(glass) 두 표면에 놓고, Paper 표면과 실제로 열리는
+/// 트리거를 따로 둡니다. 항목에는 설명, 선택, 위험, 비활성, 단축키가 모두 들어 있고,
+/// 설명이 있는 행은 48px입니다.
 class HoronMenuGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronMenuGallerySection({super.key});
@@ -29,7 +30,7 @@ class HoronMenuGallerySection extends StatelessWidget {
             ),
           ),
           SurfaceGroup(
-            label: 'Glass',
+            label: 'Glass · veil-overlay',
             glass: true,
             child: HoronMenuContent(
               surface: HoronMenuSurface.glass,

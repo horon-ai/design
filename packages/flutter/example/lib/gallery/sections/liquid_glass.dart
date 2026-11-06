@@ -6,9 +6,10 @@ import '../section_scaffold.dart';
 /// `liquid_glass` 갤러리 섹션입니다.
 ///
 /// 세 티어를 Flue 연기 배경 위에 얹어, 유리가 뒤 배경을 얼마나 흐리고 채도를 올리는지,
-/// 티어별 채움과 가장자리 림이 어떻게 보이는지 눈으로 확인합니다. 배경은 정지
-/// 프레임입니다(`TickerMode`를 끕니다). 그래야 갤러리를 스크롤하는 동안 티커가 돌지
-/// 않고도 색이 고르게 남습니다.
+/// 티어별 채움과 가장자리 림이 어떻게 보이는지 눈으로 확인합니다. 이어서 입력·오버레이가
+/// 쓰는 더 가벼운 veil 재료를 상태별로 보여 줍니다. 배경은 정지 프레임입니다
+/// (`TickerMode`를 끕니다). 그래야 갤러리를 스크롤하는 동안 티커가 돌지 않고도 색이
+/// 고르게 남습니다.
 class HoronLiquidGlassGallerySection extends StatelessWidget {
   /// 기본 생성자입니다.
   const HoronLiquidGlassGallerySection({super.key});
@@ -43,6 +44,27 @@ class HoronLiquidGlassGallerySection extends StatelessWidget {
         ),
       ],
       states: <Widget>[
+        const _VeilCell(label: 'Veil Field — 입력', kind: HoronVeilKind.field),
+        const _VeilCell(
+          label: 'Veil Field — 포커스',
+          kind: HoronVeilKind.field,
+          focused: true,
+        ),
+        const _VeilCell(
+          label: 'Veil Field — 오류',
+          kind: HoronVeilKind.field,
+          invalid: true,
+        ),
+        const _VeilCell(
+          label: 'Veil Overlay — 메뉴·시트',
+          kind: HoronVeilKind.overlay,
+        ),
+        const _VeilCell(
+          label: 'Veil Overlay — 동작 줄이기',
+          kind: HoronVeilKind.overlay,
+          reduceMotion: true,
+        ),
+        const _VeilCell(label: 'Veil Drop — 링 없음', kind: HoronVeilKind.drop),
         const _LiquidCell(
           label: 'Frost — 동작 줄이기 설정',
           child: _ReducedMotion(
@@ -60,7 +82,52 @@ class HoronLiquidGlassGallerySection extends StatelessWidget {
           '1px 림을 위에서 아래로 밝음 → 12% → 30% 그라디언트로 그립니다. 굴절·질감·'
           '안쪽 그늘·광택은 없고, 그림자는 재료가 아니라 컴포넌트가 자기 토큰으로 답니다. '
           '뒤 배경을 필터할 수 없을 때(동작 줄이기 설정)는 glass-fill-frost 한 겹으로 '
-          '그리고 림은 그대로 남깁니다.',
+          '그리고 림은 그대로 남깁니다. veil은 8px 흐림·1.6배 채도에 1px 링과 soft '
+          'shadow를 쓰고, 필드 포커스는 field-focus, 오류는 danger 링, 드롭은 링 없이 '
+          '점선 테두리가 유일한 윤곽입니다.',
+    );
+  }
+}
+
+/// veil 하나를 정지 Flue 배경 위에 얹어 보여 주는 칸입니다.
+class _VeilCell extends StatelessWidget {
+  const _VeilCell({
+    required this.label,
+    required this.kind,
+    this.focused = false,
+    this.invalid = false,
+    this.reduceMotion = false,
+  });
+
+  final String label;
+  final HoronVeilKind kind;
+  final bool focused;
+  final bool invalid;
+  final bool reduceMotion;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget veil = HoronVeil(
+      kind: kind,
+      focused: focused,
+      invalid: invalid,
+      borderRadius: BorderRadius.all(Radius.circular(HoronRadius.md)),
+      child: SizedBox(
+        width: 200,
+        height: 56,
+        child: Center(
+          child: Text(label, style: HoronTheme.of(context).text.labelLg),
+        ),
+      ),
+    );
+    return _LiquidCell(
+      label: label,
+      child: reduceMotion
+          ? MediaQuery(
+              data: MediaQuery.of(context).copyWith(disableAnimations: true),
+              child: veil,
+            )
+          : veil,
     );
   }
 }

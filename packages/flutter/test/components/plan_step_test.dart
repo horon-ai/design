@@ -43,7 +43,16 @@ void main() {
 
   testWidgets('plan step: running shows a spinner, failed a warning and a retry', (WidgetTester tester) async {
     await pumpStep(tester, const HoronPlanStep(status: HoronPlanStepStatus.running, index: 2, title: '분류한다'));
+    final HoronThemeData runningTheme = HoronTheme.of(tester.element(find.byType(HoronPlanStep)));
     expect(find.byType(HoronSpinner), findsOneWidget);
+    // `bg-bg-subtle` — 도는 단계의 표식 상자는 옅은 바탕을 깝니다.
+    expect(
+      tester.widgetList<Container>(find.byType(Container)).any((Container box) {
+        final Decoration? decoration = box.decoration;
+        return decoration is BoxDecoration && decoration.color == runningTheme.colors.bgSubtle;
+      }),
+      isTrue,
+    );
 
     int retries = 0;
     await pumpStep(
@@ -58,6 +67,19 @@ void main() {
     );
     expect(find.text('!'), findsOneWidget);
     expect(find.text('도구가 실패했습니다'), findsOneWidget);
+
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronPlanStep)));
+    // `h-7.5 rounded-full bg-overlay-ink-6 hover:bg-overlay-ink-10` — 재시도는 30 높이 알약입니다.
+    final Finder retry = find.ancestor(of: find.text('Retry from here'), matching: find.byType(TextButton)).first;
+    expect(tester.getSize(retry).height, 30);
+    final ButtonStyle style = tester.widget<TextButton>(retry).style!;
+    expect(style.backgroundColor!.resolve(<WidgetState>{}), theme.colors.overlayInk6);
+    expect(style.backgroundColor!.resolve(<WidgetState>{WidgetState.hovered}), theme.colors.overlayInk10);
+    expect(
+      style.shape!.resolve(<WidgetState>{}),
+      RoundedRectangleBorder(borderRadius: BorderRadius.circular(theme.radius.full)),
+    );
+
     await tester.tap(find.text('Retry from here'));
     await tester.pump();
     expect(retries, 1);

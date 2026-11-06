@@ -26,18 +26,18 @@ export function PlanCard({ label, title, children, status, statusLabel, elapsed,
   return (
     <section
       className={cn(
-        "flex w-full flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
+        "flex w-full min-w-0 flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
         className,
       )}
     >
       <header className="flex flex-col gap-2 px-6 pt-5 pb-3.5">
         {label && (
-          <div className="flex items-center gap-2 text-body-sm text-text-secondary">
+          <div className="flex min-w-0 items-center gap-2 text-body-sm text-text-secondary">
             <ListChecks aria-hidden className="size-4 shrink-0" />
-            {label}
+            <span className="min-w-0 wrap-break-word">{label}</span>
           </div>
         )}
-        <h3 className="text-label-lg font-semibold text-text-primary">{title}</h3>
+        <h3 className="min-w-0 text-label-lg font-semibold wrap-break-word text-text-primary">{title}</h3>
       </header>
       <div className="flex flex-col px-6 pt-1.5 pb-1">{children}</div>
       <Collapsible.Root open={status !== undefined}>
@@ -45,13 +45,13 @@ export function PlanCard({ label, title, children, status, statusLabel, elapsed,
           <div className="h-px bg-overlay-ink-8" />
           <div
             className={cn(
-              "flex items-center gap-2 px-6 pt-3.5 pb-4 text-label-md motion-colors",
+              "flex min-w-0 items-center gap-2 px-6 pt-3.5 pb-4 text-label-md motion-colors",
               status === "failed" ? "text-text-danger" : "text-text-primary",
             )}
           >
             {status === "running" && <Spinner size={14} />}
             {status === "failed" && <WarningCircle aria-hidden className="size-4 shrink-0" />}
-            <span key={String(status)} className="min-w-0 flex-1 animate-fade-in">
+            <span key={String(status)} className="min-w-0 flex-1 animate-fade-in wrap-break-word">
               {statusLabel}
             </span>
             {elapsed && (

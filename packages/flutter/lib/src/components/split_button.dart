@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/horon_motion.dart';
@@ -11,6 +12,8 @@ import '../tokens/horon_tokens.g.dart';
 ///
 /// React는 캐럿을 누르면 자체 `Menu`를 엽니다. Flutter 포트는 메뉴를 소유하지 않고
 /// [onMenuPressed]로 호스트에 넘깁니다. 캐럿 회전은 호스트가 [menuOpen]으로 알려 줍니다.
+/// [onMenuPressed]가 없으면 React의 `menu` 없음과 같이 캐럿 절반과 구분 막대를 그리지
+/// 않고 라벨 절반이 알약 전체를 채웁니다.
 class HoronSplitButton extends StatelessWidget {
   /// 라벨과 두 콜백을 받습니다.
   const HoronSplitButton({
@@ -34,7 +37,11 @@ class HoronSplitButton extends StatelessWidget {
   final VoidCallback? onPressed;
 
   /// 오른쪽 절반(캐럿)을 눌렀을 때 호출됩니다. React의 `MenuTrigger`가 메뉴를 여는 자리입니다.
+  /// 값이 없으면 캐럿 절반을 그리지 않습니다(React `menu ? … : null`).
   final VoidCallback? onMenuPressed;
+
+  /// 캐럿 절반을 그릴지 여부입니다. React의 `menu` 유무입니다.
+  bool get hasMenu => onMenuPressed != null;
 
   /// 두 절반을 모두 흐리게 하고 누를 수 없게 합니다. React `disabled`.
   final bool disabled;
@@ -67,64 +74,119 @@ class HoronSplitButton extends StatelessWidget {
     final HoronSpaceSpec space = theme.space;
     final bool animate = !MediaQuery.disableAnimationsOf(context);
     final Color onPrimary = colors.interactiveOnPrimary;
-    // Paper `1VGK-0`의 라벨은 `text-label-lg`(16/22 500)입니다.
-    final TextStyle labelStyle = theme.text.labelLg.copyWith(color: onPrimary);
+    // `text-label-md` — Paper `1VGK-0`의 32px 알약은 `Button`의 `sm`과 같은 라벨을 씁니다.
+    final TextStyle labelStyle = theme.text.labelMd.copyWith(color: onPrimary);
 
-    return Opacity(
+    // `has-[[data-disabled]]:opacity-40` — 흐림은 알약(컨테이너) 단위입니다.
+    final Widget pill = Opacity(
       opacity: disabled ? _disabledOpacity : 1,
-      child: ClipRRect(
-        key: const Key('horon-split-button'),
-        borderRadius: BorderRadius.circular(theme.radius.full),
-        child: ColoredBox(
-          color: colors.interactivePrimary,
-          child: SizedBox(
-            // `h-8` — 32px.
-            height: space.step(8),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Flexible(
-                  child: _Half(
-                    // `gap-2 rounded-l-full pr-2 pl-4`.
-                    padding: EdgeInsetsDirectional.only(start: space.s4, end: space.s2),
-                    onPressed: disabled ? null : onPressed,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: space.s2,
-                      children: <Widget>[
-                        if (icon != null)
-                          IconTheme.merge(
-                            data: IconThemeData(size: _iconSize, color: onPrimary),
-                            child: icon!,
-                          ),
-                        Flexible(
-                          child: Text(label, style: labelStyle, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        ),
-                      ],
+      child: SizedBox(
+        // `h-8` — 32px.
+        height: space.step(8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Flexible(
+              child: _Half(
+                // `gap-1.5`, 캐럿이 있으면 `rounded-l-full pr-2 pl-3`, 없으면 `rounded-full px-3`.
+                padding: hasMenu
+                    ? EdgeInsetsDirectional.only(start: space.s3, end: space.s2)
+                    : EdgeInsets.symmetric(horizontal: space.s3),
+                onPressed: disabled ? null : onPressed,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: space.s1_5,
+                  children: <Widget>[
+                    if (icon != null)
+                      IconTheme.merge(
+                        data: IconThemeData(size: _iconSize, color: onPrimary),
+                        child: icon!,
+                      ),
+                    Flexible(
+                      child: Text(label, style: labelStyle, maxLines: 1, overflow: TextOverflow.ellipsis),
                     ),
-                  ),
+                  ],
                 ),
-                Container(
-                  key: const Key('horon-split-button-divider'),
-                  width: _dividerWidth,
-                  // `h-4.5` — 18px.
-                  height: space.step(4.5),
-                  color: onPrimary.withValues(alpha: _dividerOpacity),
+              ),
+            ),
+            if (hasMenu) ...<Widget>[
+              Container(
+                key: const Key('horon-split-button-divider'),
+                width: _dividerWidth,
+                // `h-4.5` — 18px.
+                height: space.step(4.5),
+                color: onPrimary.withValues(alpha: _dividerOpacity),
+              ),
+              _Half(
+                // `rounded-r-full pr-4 pl-2`.
+                padding: EdgeInsetsDirectional.only(start: space.s2, end: space.s4),
+                semanticsLabel: menuSemanticsLabel,
+                onPressed: disabled ? null : onMenuPressed,
+                child: AnimatedRotation(
+                  turns: menuOpen ? 0.5 : 0,
+                  duration: animate ? _caretDuration : Duration.zero,
+                  curve: HoronMotion.easeOutQuint,
+                  // `size-3.5` — 14px.
+                  child: Icon(Icons.expand_more, size: space.s3_5, color: onPrimary),
                 ),
-                _Half(
-                  // `rounded-r-full pr-4 pl-2`.
-                  padding: EdgeInsetsDirectional.only(start: space.s2, end: space.s4),
-                  semanticsLabel: menuSemanticsLabel,
-                  onPressed: disabled ? null : onMenuPressed,
-                  child: AnimatedRotation(
-                    turns: menuOpen ? 0.5 : 0,
-                    duration: animate ? _caretDuration : Duration.zero,
-                    curve: HoronMotion.easeOutQuint,
-                    // `size-3.5` — 14px.
-                    child: Icon(Icons.expand_more, size: space.s3_5, color: onPrimary),
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+
+    // `has-[button:active…]:scale-[0.97]` + `hover:bg-interactive-primary-hover` —
+    // 누름 배율과 hover 색도 절반이 아니라 알약 전체에 겁니다.
+    return _PressablePill(enabled: !disabled, radius: BorderRadius.circular(theme.radius.full), child: pill);
+  }
+}
+
+/// 알약 전체에 `motion-press`(0.97)와 hover 짙어짐을 겁니다.
+///
+/// React는 컨테이너에 `transition-[scale,background-color,opacity]`,
+/// `hover:bg-interactive-primary-hover`, `has-[button:active…]:scale-[0.97]`을 둡니다.
+/// 절반마다 배율을 걸면 고정된 알약 안에서 글자만 줄어들므로 여기서 한 번만 겁니다.
+class _PressablePill extends StatefulWidget {
+  const _PressablePill({required this.enabled, required this.radius, required this.child});
+
+  final bool enabled;
+  final BorderRadius radius;
+  final Widget child;
+
+  @override
+  State<_PressablePill> createState() => _PressablePillState();
+}
+
+class _PressablePillState extends State<_PressablePill> {
+  bool _pressed = false;
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final HoronThemeData theme = HoronTheme.of(context);
+    final HoronColors colors = theme.colors;
+    final bool animate = !MediaQuery.disableAnimationsOf(context);
+
+    return MouseRegion(
+      onEnter: (PointerEnterEvent event) => setState(() => _hovered = true),
+      onExit: (PointerExitEvent event) => setState(() => _hovered = false),
+      child: Listener(
+        onPointerDown: widget.enabled ? (PointerDownEvent event) => setState(() => _pressed = true) : null,
+        onPointerUp: widget.enabled ? (PointerUpEvent event) => setState(() => _pressed = false) : null,
+        onPointerCancel: widget.enabled ? (PointerCancelEvent event) => setState(() => _pressed = false) : null,
+        child: AnimatedScale(
+          scale: _pressed ? HoronMotion.pressScale : 1,
+          duration: animate ? HoronMotion.pressDuration : Duration.zero,
+          curve: HoronMotion.pressCurve,
+          child: ClipRRect(
+            key: const Key('horon-split-button'),
+            borderRadius: widget.radius,
+            child: AnimatedContainer(
+              duration: animate ? HoronMotion.colorsDuration : Duration.zero,
+              curve: HoronMotion.colorsCurve,
+              color: _hovered && widget.enabled ? colors.interactivePrimaryHover : colors.interactivePrimary,
+              child: widget.child,
             ),
           ),
         ),
@@ -133,8 +195,8 @@ class HoronSplitButton extends StatelessWidget {
   }
 }
 
-/// 알약의 한쪽 절반입니다. 누르는 동안 0.97로 줄어듭니다(`motion-press`).
-class _Half extends StatefulWidget {
+/// 알약의 한쪽 절반입니다. 누름 배율은 알약 전체가 맡으므로 절반은 누름만 전달합니다.
+class _Half extends StatelessWidget {
   const _Half({required this.child, required this.padding, this.onPressed, this.semanticsLabel});
 
   final Widget child;
@@ -143,42 +205,21 @@ class _Half extends StatefulWidget {
   final String? semanticsLabel;
 
   @override
-  State<_Half> createState() => _HalfState();
-}
-
-class _HalfState extends State<_Half> {
-  bool _pressed = false;
-
-  void _setPressed(bool value) {
-    if (_pressed == value) return;
-    setState(() => _pressed = value);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final bool animate = !MediaQuery.disableAnimationsOf(context);
-    final bool enabled = widget.onPressed != null;
+    final bool enabled = onPressed != null;
 
     return Semantics(
       button: true,
       enabled: enabled,
-      label: widget.semanticsLabel,
+      label: semanticsLabel,
       child: MouseRegion(
         cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: widget.onPressed,
-          onTapDown: enabled ? (TapDownDetails details) => _setPressed(true) : null,
-          onTapUp: enabled ? (TapUpDetails details) => _setPressed(false) : null,
-          onTapCancel: enabled ? () => _setPressed(false) : null,
-          child: AnimatedScale(
-            scale: _pressed ? HoronMotion.pressScale : 1,
-            duration: animate ? HoronMotion.pressDuration : Duration.zero,
-            curve: HoronMotion.pressCurve,
-            child: Padding(
-              padding: widget.padding,
-              child: Center(widthFactor: 1, child: widget.child),
-            ),
+          onTap: onPressed,
+          child: Padding(
+            padding: padding,
+            child: Center(widthFactor: 1, child: child),
           ),
         ),
       ),

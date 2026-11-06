@@ -13,17 +13,20 @@
  * state: `useSyncExternalStore` reads it during render (the server snapshot is
  * `null`) and the only state left is the section in view, which the observer
  * callback sets.
+ *
+ * The desktop column owns the "On this page" label. `inline` renders the same
+ * list as one `SidebarGroup` disclosure instead, for the layout's block under
+ * the page title below `xl`; the disclosure carries the label there.
  */
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
-import { Button } from "@horon-ai/react";
+import { Button, SidebarGroup } from "@horon-ai/react";
 
 import { pick, type Locale } from "@/i18n";
 import { docsMessages } from "@/i18n/messages/docs";
 import { useLocale } from "@/i18n/react";
 
-const HEADING_SELECTOR =
-  "article .prose-docs h2:not(.demo-stage *), article .prose-docs h3:not(.demo-stage *)";
+const HEADING_SELECTOR = "article .prose-docs h2:not(.demo-stage *), article .prose-docs h3:not(.demo-stage *)";
 
 /** Top margin of the reading band; keep it in sync with the observer below. */
 const BAND_TOP = 80;
@@ -83,7 +86,7 @@ function subscribe(): () => void {
   return () => {};
 }
 
-export default function DocsToc() {
+export default function DocsToc({ inline = false }: { inline?: boolean }) {
   const locale = useLocale();
   const getSnapshot = useCallback(() => readHeadings(locale), [locale]);
   const getServerSnapshot = useCallback(() => null, []);
@@ -115,27 +118,46 @@ export default function DocsToc() {
 
   if (items === null || items.length < 2) return null;
 
+  const list = (
+    <ul className="flex flex-col gap-1">
+      {items.map((item) => (
+        <li key={item.id}>
+          <Button
+            variant="link"
+            href={`#${item.id}`}
+            aria-current={item.id === activeId ? "true" : undefined}
+            className={["justify-start text-left whitespace-normal", item.level === 3 && "ml-3"]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            {item.text}
+          </Button>
+        </li>
+      ))}
+    </ul>
+  );
+
+  // Below `md` the layout's sticky column is hidden by design and there is no other way
+  // to reach the page list, so the same list appears as a disclosure under the title.
+  // `SidebarGroup` already owns the caret, the collapse motion and the label style, so no
+  // new component is needed here. The trigger uses the list's own accessible name
+  // ("Sections on this page"): the section drawer above the title is labelled "목차", and
+  // two identical triggers one above the other would be indistinguishable. The spacing
+  // lives inside this branch, so a page with fewer than two headings adds no gap.
+  if (inline) {
+    return (
+      <nav aria-label={pick(docsMessages.tocNav, locale)} className="mt-6 min-w-0 md:hidden">
+        <SidebarGroup label={pick(docsMessages.tocNav, locale)} defaultOpen={false}>
+          {list}
+        </SidebarGroup>
+      </nav>
+    );
+  }
+
   return (
     <>
       <p className="mb-3 text-caption text-text-secondary">{pick(docsMessages.tocLabel, locale)}</p>
-      <nav aria-label={pick(docsMessages.tocNav, locale)}>
-        <ul className="flex flex-col gap-1">
-          {items.map((item) => (
-            <li key={item.id}>
-              <Button
-                variant="link"
-                href={`#${item.id}`}
-                aria-current={item.id === activeId ? "true" : undefined}
-                className={["justify-start text-left whitespace-normal", item.level === 3 && "ml-3"]
-                  .filter(Boolean)
-                  .join(" ")}
-              >
-                {item.text}
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <nav aria-label={pick(docsMessages.tocNav, locale)}>{list}</nav>
     </>
   );
 }

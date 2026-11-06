@@ -16,6 +16,7 @@ import { Sidebar, SidebarGroup, SidebarItem } from "@horon-ai/react";
 
 import { componentGroups, componentsInGroup } from "@/data/components";
 import { foundationsNav, isActive, primaryNav } from "@/data/nav";
+import { siteHref } from "@/lib/urls";
 import { pick, type Locale, type Localized } from "@/i18n";
 import { docsMessages } from "@/i18n/messages/docs";
 import { useLocale } from "@/i18n/react";
@@ -124,7 +125,7 @@ export default function DocsSidebar({ section, currentPath }: DocsSidebarProps) 
 
   const renderEntries = (block: DocsSidebarBlock) =>
     block.entries.map((entry) => (
-      <SidebarItem key={entry.href} href={entry.href} current={entry.current}>
+      <SidebarItem key={entry.href} href={siteHref(entry.href)} current={entry.current}>
         {pick(entry.label, locale)}
       </SidebarItem>
     ));
@@ -149,7 +150,13 @@ export default function DocsSidebar({ section, currentPath }: DocsSidebarProps) 
         </Sidebar>
       </div>
 
-      <nav aria-label={label} className="px-4 pt-3 pb-1 md:px-6 lg:hidden">
+      {/* Below `lg` the section list is one disclosure above the page title. The gutter
+       * matches `.site-shell` (1.25rem, 1.5rem from md) so the trigger lines up with the
+       * breadcrumb under it, and the narrow range trades 4px of vertical padding for the
+       * title: the collapsed row then costs 50px instead of 58px before the breadcrumb.
+       * From `md` up the original spacing and label return, so the 768px render is
+       * unchanged. */}
+      <nav aria-label={label} className="px-5 pt-2 pb-0 md:px-6 md:pt-3 md:pb-1 lg:hidden">
         <SidebarGroup label={pick(docsMessages.tocLabel, locale)} defaultOpen={false}>
           {blocks.map((block) =>
             renderBlock(

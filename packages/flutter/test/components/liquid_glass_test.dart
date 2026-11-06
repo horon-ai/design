@@ -147,6 +147,16 @@ void main() {
     });
   });
 
+  group('separation from the veil', () {
+    testWidgets('the liquid material draws no veil layers', (WidgetTester tester) async {
+      await pumpGlass(tester, const HoronLiquidGlass(child: Text('유리')));
+      // 두 재료를 겹치지 않습니다. veil은 HoronVeil이 따로 그립니다.
+      expect(find.byKey(HoronVeilKeys.backdrop), findsNothing);
+      expect(find.byKey(HoronVeilKeys.fill), findsNothing);
+      expect(find.byKey(HoronVeilKeys.decoration), findsNothing);
+    });
+  });
+
   group('material', () {
     testWidgets('the bare material paints no shadow', (WidgetTester tester) async {
       await pumpGlass(tester, const HoronLiquidGlass(child: Text('유리')));
