@@ -143,7 +143,19 @@ CI(`.github/workflows/ci.yml`)도 같은 lint·typecheck·test·build를 돌립�
 | ----------- | -------------- | ----------------------- | ---------------- | --------------------- |
 | 문서 사이트 | `horon-design` | https://design.horon.ai | `apps/site/dist` | `bun run deploy:site` |
 
-프로젝트는 GitHub 저장소(`horon-ai/design`)가 연결돼 있어 `main`에 푸시하면 자동으로 빌드·배포됩니다. 수동 배포는 `wrangler` CLI가 설치·로그인돼 있어야 합니다(`wrangler login`).
+`main`에 푸시하면 `.github/workflows/publish.yml`이 라이브러리를 npm에 게시한 뒤(라이브러리
+변경이 없으면 게시는 건너뜀) 그 버전을 사이트에 npm에서 설치해 빌드하고 `wrangler pages deploy`로
+배포합니다. 라이브러리가 그대로인 커밋은 npm의 최신 버전으로 배포합니다.
+
+- 저장소의 `apps/site/package.json`은 계속 `workspace:*`입니다. 새 컴포넌트와 데모를 한 커밋에
+  넣고 `dev`에서 바로 빌드할 수 있어야 하기 때문입니다. 게시본 설치는 CI 작업 공간에서만 하며
+  (`.github/scripts/site-use-published.mjs`) 커밋하지 않습니다.
+- 배포에는 저장소 시크릿 `CLOUDFLARE_API_TOKEN`(Account → Cloudflare Pages → Edit)과
+  `CLOUDFLARE_ACCOUNT_ID`가 필요합니다.
+- Cloudflare의 Git 연동 자동 프로덕션 빌드는 이 워크플로가 꺼 둡니다. 켜 두면 `main` 푸시마다
+  저장소 소스로 따로 빌드해 게시본으로 만든 배포를 덮기 때문입니다.
+
+수동 배포(`bun run deploy:site`)는 저장소 소스로 빌드하며 `wrangler` CLI가 설치·로그인돼 있어야 합니다(`wrangler login`).
 
 ## 알아 둘 점
 

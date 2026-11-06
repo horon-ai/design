@@ -1,18 +1,17 @@
-name: Publish npm packages
+name: Publish npm packages and deploy the site
 
-# main에 두 라이브러리의 변경이 올라오면 PATCH 버전을 하나 올려 npm에 게시합니다.
-# 버전은 npm 레지스트리가 정본입니다. 처음에는 0.1.0, 그 뒤로 0.1.1, 0.1.2 … 로 올라가고
-# package.json의 version(0.1.0)은 MAJOR·MINOR 라인만 정하며 저장소에 다시 커밋하지 않습니다.
-# 계산 규칙은 .github/scripts/release-version.mjs에 있습니다.
+# main에 커밋이 올라올 때마다 실행합니다.
+#
+# 1. publish: 두 라이브러리(packages/tokens, packages/react)가 바뀌었으면 PATCH 버전을 하나
+#    올려 npm에 게시합니다. 버전은 npm 레지스트리가 정본입니다. 처음에는 0.1.0, 그 뒤로
+#    0.1.1, 0.1.2 … 로 올라가고 package.json의 version(0.1.0)은 MAJOR·MINOR 라인만 정하며
+#    저장소에 다시 커밋하지 않습니다. 계산 규칙은 .github/scripts/release-version.mjs에 있습니다.
+# 2. site: 방금 게시한 버전(라이브러리가 그대로면 npm의 최신 버전)을 문서 사이트에 npm에서
+#    설치해 빌드하고 Cloudflare Pages(horon-design → design.horon.ai)에 배포합니다.
+#    Cloudflare의 Git 자동 배포는 이 잡이 꺼 두므로, 사이트는 게시가 끝난 뒤에만 바뀝니다.
 on:
   push:
     branches: [main]
-    paths:
-      - "packages/tokens/**"
-      - "packages/react/**"
-      - "bun.lock"
-      - ".github/workflows/publish.yml"
-      - ".github/scripts/release-version.mjs"
   workflow_dispatch:
 
 permissions:
@@ -21,15 +20,54 @@ permissions:
   # npm trusted publishing과 provenance(Sigstore)가 GitHub OIDC 토큰을 씁니다.
   id-token: write
 
-# 두 실행이 동시에 같은 PATCH를 계산하면 한쪽이 409로 깨집니다. 차례로 돌립니다.
+# 두 실행이 동시에 같은 PATCH를 계산하거나 사이트를 엇갈려 배포하지 않도록 차례로 돌립니다.
 concurrency:
   group: publish-npm
   cancel-in-progress: false
 
 jobs:
+  changes:
+    name: detect library changes
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.diff.outputs.packages }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 수동 실행은 언제나 게시합니다. push는 이번에 올라온 커밋 범위에 라이브러리 변경이
+      # 있을 때만 게시하고, 범위를 알 수 없으면(새 브랜치, 강제 푸시) 게시 쪽으로 판단합니다.
+      - name: Compare the pushed range
+        id: diff
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" != "push" ] || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            echo "packages=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          changed=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" -- \
+            packages/tokens packages/react bun.lock \
+            .github/workflows/publish.yml .github/scripts/release-version.mjs)
+          if [ -n "$changed" ]; then
+            echo "$changed"
+            echo "packages=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "라이브러리 변경이 없습니다. 게시를 건너뛰고 사이트만 배포합니다."
+            echo "packages=false" >> "$GITHUB_OUTPUT"
+          fi
+
   publish:
     name: publish @horon-ai/tokens, @horon-ai/react
+    needs: changes
+    if: needs.changes.outputs.packages == 'true'
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -117,3 +155,105 @@ jobs:
           fi
           git tag "$tag" "$GITHUB_SHA"
           git push origin "refs/tags/$tag"
+
+  site:
+    name: deploy design.horon.ai with the published packages
+    needs: [changes, publish]
+    # 게시를 건너뛴 실행(사이트만 바뀐 커밋)도 배포하고, 게시가 실패하면 배포하지 않습니다.
+    if: ${{ !cancelled() && needs.changes.result == 'success' && (needs.publish.result == 'success' || needs.publish.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PAGES_PROJECT: horon-design
+    steps:
+      - name: Check Cloudflare credentials
+        run: |
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo "::error::저장소 시크릿 CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID가 필요합니다. 토큰 권한은 Account → Cloudflare Pages → Edit입니다."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # 방금 게시한 버전, 게시를 건너뛰었으면 npm의 latest를 씁니다.
+      - name: Choose the published version
+        id: version
+        env:
+          PUBLISHED: ${{ needs.publish.outputs.version }}
+        run: |
+          set -euo pipefail
+          version="${PUBLISHED:-}"
+          if [ -z "$version" ]; then
+            version=$(npm view @horon-ai/react version 2>/dev/null || true)
+          fi
+          if [ -z "$version" ]; then
+            echo "::error::npm에 @horon-ai/react가 아직 없습니다. 라이브러리를 먼저 게시하세요(Actions 탭에서 이 워크플로 수동 실행)."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "사이트에 설치할 버전: $version"
+
+      - name: Install the published packages into the site
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          node .github/scripts/site-use-published.mjs "$VERSION"
+          bun install
+          # 저장소 폴더가 아니라 npm에서 받은 그 버전인지 확인합니다.
+          for name in react tokens; do
+            dir=$(cd "apps/site/node_modules/@horon-ai/$name" && pwd -P)
+            installed=$(node -p "require('$dir/package.json').version")
+            echo "@horon-ai/$name@$installed ← $dir"
+            case "$dir" in
+              "$GITHUB_WORKSPACE/packages/"*) echo "::error::@horon-ai/$name이 저장소 폴더로 연결됐습니다."; exit 1 ;;
+            esac
+            if [ "$installed" != "$VERSION" ]; then
+              echo "::error::@horon-ai/$name이 $VERSION이 아니라 $installed로 설치됐습니다."
+              exit 1
+            fi
+          done
+
+      - name: Build the site
+        run: bun run build:site
+
+      # Cloudflare Pages의 Git 연동은 main 푸시마다 저장소 소스로 사이트를 따로 빌드합니다.
+      # 그 빌드가 이 배포를 덮지 않도록 프로덕션 자동 배포를 꺼 둡니다. 이미 꺼져 있으면 그대로 둡니다.
+      - name: Keep Cloudflare Git production builds off
+        run: |
+          set -euo pipefail
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$PAGES_PROJECT"
+          enabled=$(curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$api" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const c=JSON.parse(s).result?.source?.config;console.log(c?c.production_deployments_enabled:"none")})')
+          echo "Git production deployments: $enabled"
+          if [ "$enabled" = "true" ]; then
+            curl -fsS -X PATCH -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "content-type: application/json" \
+              -d '{"source":{"config":{"production_deployments_enabled":false}}}' "$api" >/dev/null
+            echo "Git production deployments를 껐습니다."
+          fi
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          bunx wrangler@4 pages deploy apps/site/dist \
+            --project-name="$PAGES_PROJECT" \
+            --branch=main \
+            --commit-hash="$GITHUB_SHA" \
+            --commit-message="site with @horon-ai/react@$VERSION" \
+            --commit-dirty=true
