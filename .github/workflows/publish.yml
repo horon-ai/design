@@ -14,11 +14,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# 권한은 기본으로 읽기만 주고, 필요한 잡에서만 넓힙니다.
 permissions:
-  # 게시한 버전에 v0.1.N 태그를 남깁니다.
-  contents: write
-  # npm trusted publishing과 provenance(Sigstore)가 GitHub OIDC 토큰을 씁니다.
-  id-token: write
+  contents: read
 
 # 두 실행이 동시에 같은 PATCH를 계산하거나 사이트를 엇갈려 배포하지 않도록 차례로 돌립니다.
 concurrency:
@@ -29,13 +27,16 @@ jobs:
   changes:
     name: detect library changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       packages: ${{ steps.diff.outputs.packages }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       # 수동 실행은 언제나 게시합니다. push는 이번에 올라온 커밋 범위에 라이브러리 변경이
       # 있을 때만 게시하고, 범위를 알 수 없으면(새 브랜치, 강제 푸시) 게시 쪽으로 판단합니다.
@@ -66,14 +67,21 @@ jobs:
     needs: changes
     if: needs.changes.outputs.packages == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      # 게시한 버전에 v0.1.N 태그를 남깁니다.
+      contents: write
+      # npm trusted publishing과 provenance(Sigstore)가 GitHub OIDC 토큰을 씁니다.
+      id-token: write
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: 1.4.3
 
@@ -82,15 +90,24 @@ jobs:
 
       # npm CLI가 게시를 맡습니다. setup-node가 `_authToken=${NODE_AUTH_TOKEN}` 줄이 담긴
       # .npmrc를 만들므로, bun이 그 파일을 읽지 않도록 설치 단계 뒤에 둡니다.
-      # trusted publishing에는 npm 11.5.1 이상이 필요합니다.
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
 
-      - name: Update npm
-        run: npm install -g npm@^11.5.1
+      # trusted publishing과 provenance에는 npm 11.5.1 이상이 필요합니다. Node 24에 딸린
+      # npm으로 충분하므로 따로 설치하지 않고 버전만 확인합니다.
+      - name: Check npm version
+        run: |
+          set -euo pipefail
+          version=$(npm --version)
+          echo "npm $version"
+          if [ "$(printf '%s\n' 11.5.1 "$version" | sort -V | head -n1)" != "11.5.1" ]; then
+            echo "::error::npm $version 은 trusted publishing을 지원하지 않습니다(11.5.1 이상 필요)."
+            exit 1
+          fi
 
       # 게시 전에 CI와 같은 검사를 다시 돌립니다. 깨진 패키지는 npm에 올라가지 않습니다.
       - name: Verify
@@ -143,18 +160,20 @@ jobs:
           done
           npm view "@horon-ai/react@$VERSION" dependencies
 
+      # 체크아웃이 자격 증명을 남기지 않으므로 태그는 GitHub API로 만듭니다.
       - name: Tag the release
         env:
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
           tag="v$VERSION"
-          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" >/dev/null 2>&1; then
             echo "$tag 태그가 이미 있습니다."
             exit 0
           fi
-          git tag "$tag" "$GITHUB_SHA"
-          git push origin "refs/tags/$tag"
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/$tag" -f "sha=$GITHUB_SHA" >/dev/null
+          echo "$tag → $GITHUB_SHA"
 
   site:
     name: deploy design.horon.ai with the published packages
@@ -177,17 +196,20 @@ jobs:
           fi
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: 1.4.3
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
+          package-manager-cache: false
 
       # 방금 게시한 버전, 게시를 건너뛰었으면 npm의 latest를 씁니다.
       - name: Choose the published version
