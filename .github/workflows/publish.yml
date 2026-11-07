@@ -8,7 +8,8 @@ name: Publish npm packages and deploy the site
 #    저장소에 다시 커밋하지 않습니다. 계산 규칙은 .github/scripts/release-version.mjs에 있습니다.
 # 2. site: 방금 게시한 버전(라이브러리가 그대로면 npm의 최신 버전)을 문서 사이트에 npm에서
 #    설치해 빌드하고 Cloudflare Pages(horon-design → design.horon.ai)에 배포합니다.
-#    Cloudflare의 Git 자동 배포는 이 잡이 꺼 두므로, 사이트는 게시가 끝난 뒤에만 바뀝니다.
+#    Cloudflare의 Git 자동 배포도 켜 두어 main 푸시마다 저장소 소스로 바로 빌드되고, 이 잡의
+#    배포가 게시 뒤에 올라와 최종본이 됩니다.
 on:
   push:
     branches: [main]
@@ -277,18 +278,19 @@ jobs:
         run: bun run build:site
 
       # Cloudflare Pages의 Git 연동은 main 푸시마다 저장소 소스로 사이트를 따로 빌드합니다.
-      # 그 빌드가 이 배포를 덮지 않도록 프로덕션 자동 배포를 꺼 둡니다. 이미 꺼져 있으면 그대로 둡니다.
-      - name: Keep Cloudflare Git production builds off
+      # 그 자동 배포를 켜 둡니다. 꺼져 있으면 켜고, 이미 켜져 있으면 그대로 둡니다. 그 빌드는
+      # 푸시 직후 시작해 먼저 끝나므로, 게시를 기다린 이 잡의 배포가 마지막에 올라갑니다.
+      - name: Keep Cloudflare Git production builds on
         run: |
           set -euo pipefail
           api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$PAGES_PROJECT"
           enabled=$(curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$api" \
             | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const c=JSON.parse(s).result?.source?.config;console.log(c?c.production_deployments_enabled:"none")})')
           echo "Git production deployments: $enabled"
-          if [ "$enabled" = "true" ]; then
+          if [ "$enabled" = "false" ]; then
             curl -fsS -X PATCH -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "content-type: application/json" \
-              -d '{"source":{"config":{"production_deployments_enabled":false}}}' "$api" >/dev/null
-            echo "Git production deployments를 껐습니다."
+              -d '{"source":{"config":{"production_deployments_enabled":true}}}' "$api" >/dev/null
+            echo "Git production deployments를 켰습니다."
           fi
 
       - name: Deploy to Cloudflare Pages
