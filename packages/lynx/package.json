@@ -1,7 +1,6 @@
 {
   "name": "@horon-ai/lynx",
   "version": "0.1.0",
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/horon-ai/design.git",
@@ -13,7 +12,9 @@
   ],
   "files": [
     "src",
-    "README.md"
+    "README.md",
+    "tailwind-preset.cjs",
+    "tailwind-preset.d.cts"
   ],
   "publishConfig": {
     "access": "public"

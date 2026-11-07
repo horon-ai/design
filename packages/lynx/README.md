@@ -4,6 +4,8 @@ Horon 디자인 시스템의 ReactLynx 구현입니다. `@horon-ai/react`와 같
 
 ## 설치
 
+이 패키지는 `@horon-ai/react`·`@horon-ai/tokens`와 같은 게시 흐름으로 npm에 `@horon-ai/lynx`로 올라갑니다. 세 패키지는 늘 같은 버전(0.1.x)으로 함께 게시되고, 여기서 쓰는 `@horon-ai/tokens`도 같은 버전입니다.
+
 ```sh
 bun add @horon-ai/lynx @lynx-js/react
 bun add -d tailwindcss@^3 @lynx-js/tailwind-preset
