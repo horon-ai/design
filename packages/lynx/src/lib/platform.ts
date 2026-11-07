@@ -58,7 +58,7 @@ export type ShortcutEvent = {
   shiftKey?: boolean;
 };
 
-const globalProps = () => (typeof lynx === "undefined" ? {} : lynx.__globalProps);
+const globalProps = () => (typeof lynx === "undefined" ? {} : (lynx.__globalProps ?? {}));
 
 const systemPlatform = (): string | undefined => {
   if (typeof SystemInfo === "undefined") return undefined;

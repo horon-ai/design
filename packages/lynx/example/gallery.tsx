@@ -1,17 +1,30 @@
 import { useMemo, useState } from "@lynx-js/react";
 
 import { LiquidGlass } from "../src/components/liquid-glass";
+import { detectOs, detectRuntime, readNavigator } from "../src/lib/platform";
 import { HoronProvider, type ColorScheme, type ThemePlatform } from "../src/provider";
 import { registry } from "./registry.g";
 
 /** Reads the demo, scheme and platform hints the host page passes in `globalProps`. */
 const readHostProps = () => {
   if (typeof lynx === "undefined") return { demo: "", scheme: "", platform: "" };
-  const { demo, scheme, platform } = lynx.__globalProps;
+  const { demo, scheme, platform } = lynx.__globalProps ?? {};
   return { demo: demo ?? "", scheme: scheme ?? "", platform: platform ?? "" };
 };
 
 const isPlatform = (value: string): value is ThemePlatform => value === "desktop" || value === "mobile" || value === "web";
+
+/**
+ * The type board a host gets when it does not pass one: phones read the mobile
+ * board, native desktop shells (LynxExplorer on macOS/Windows) the desktop one,
+ * and the browser engine stays on web.
+ */
+const nativeBoard = (): ThemePlatform => {
+  const hints = readNavigator();
+  if (detectRuntime(hints) === "web") return "web";
+  const os = detectOs(hints);
+  return os === "ios" || os === "android" ? "mobile" : "desktop";
+};
 
 /** A glass pill used for every switch in the gallery chrome. */
 function Pill({ label, onTap }: { label: string; onTap: () => void }) {
@@ -40,7 +53,7 @@ function Pill({ label, onTap }: { label: string; onTap: () => void }) {
 export function Gallery() {
   const host = useMemo(readHostProps, []);
   const [scheme, setScheme] = useState<ColorScheme>(host.scheme === "dark" ? "dark" : "light");
-  const [platform, setPlatform] = useState<ThemePlatform>(isPlatform(host.platform) ? host.platform : "web");
+  const [platform, setPlatform] = useState<ThemePlatform>(isPlatform(host.platform) ? host.platform : nativeBoard());
   const [selected, setSelected] = useState(host.demo);
 
   const entry = registry.find((item) => item.slug === selected);

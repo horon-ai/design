@@ -62,7 +62,7 @@ const ThemeContext = createContext<HoronTheme>(DEFAULT_THEME);
 export const useHoronTheme = (): HoronTheme => useContext(ThemeContext);
 
 /** Reads the host's scheme hint from `globalProps`, when the gallery passes one. */
-const hostScheme = (): ColorScheme => (typeof lynx !== "undefined" && lynx.__globalProps.scheme === "dark" ? "dark" : "light");
+const hostScheme = (): ColorScheme => (typeof lynx !== "undefined" && lynx.__globalProps?.scheme === "dark" ? "dark" : "light");
 
 /**
  * The root of every Horon Lynx tree: it paints the palette, selects the
