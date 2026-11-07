@@ -5,7 +5,14 @@ import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
+/**
+ * Toast severity, which picks the leading icon and its color: `neutral` (info icon, secondary
+ * text), `success` (check, brand color) or `danger` (warning, danger color). Any other Base UI
+ * toast type falls back to `neutral`.
+ */
 export type ToastTone = "neutral" | "success" | "danger";
+
+/** Toast rungs: `sm` 320px, `md` 360px and `lg` 400px wide cards. */
 export type ToastSize = ControlSize;
 
 const toneIcon: Record<ToastTone, ReactNode> = {
@@ -54,7 +61,14 @@ function isTone(value: string | undefined): value is ToastTone {
   return value === "neutral" || value === "success" || value === "danger";
 }
 
-function ToastList({ size, surface }: { size: ToastSize; surface: "solid" | "glass" }) {
+/** Renders the live toast queue; each toast is a Base UI root positioned by the provider's viewport. */
+// prettier-ignore
+function ToastList({ size, surface }: {
+  /** Card rung applied to every toast in the stack. */
+  size: ToastSize;
+  /** `glass` paints each card on the veil; `solid` gives it a surface fill, a border and the popover shadow. */
+  surface: "solid" | "glass";
+}) {
   const { toasts } = BaseToast.useToastManager();
   return toasts.map((toast) => {
     const tone = isTone(toast.type) ? toast.type : "neutral";
@@ -89,21 +103,51 @@ function ToastList({ size, surface }: { size: ToastSize; surface: "solid" | "gla
   });
 }
 
+/** Props of {@link Toaster}: the app subtree it wraps plus the size and surface every toast shares. */
 export type ToasterProps = {
+  /** The app subtree; toasts portal to the viewport on top of it. */
   children?: ReactNode;
-  /** Toast size: `sm` 320px, `md` 360px (default), `lg` 400px; applies to every toast this provider shows. */
+  /** Toast size: `sm` 320px, `md` 360px (default), `lg` 400px; applies to every toast this provider shows. @default "md" */
   size?: ToastSize;
   /**
    * `solid` (default) is an opaque surface card with a default border; `glass` puts it on the veil (`veil-overlay`).
-   * Applies to every toast this provider shows.
+   * Applies to every toast this provider shows. @default "solid"
    */
   surface?: "solid" | "glass";
+  /** Extra classes on the fixed viewport, which sits 24px from the bottom, right and left edges. */
   className?: string;
 };
 
 /**
  * Figma `Toast` (62:307): a 360px card, solid or the veil. Wrap the app once; call
  * `useToast().add({ title, description, type: "success" })` to show one.
+ *
+ * Toasts portal to a fixed bottom-right viewport that stacks upward; each card rises 16px into
+ * place in 240ms, shrinks from 95% as it fades in, and leaves to the right while its height
+ * collapses. The close button clears it, and the whole height/margin tween runs on
+ * `--toast-height`.
+ *
+ * @example
+ * ```tsx
+ * import { Toaster, useToast } from "@horon-ai/react";
+ *
+ * function App() {
+ *   return (
+ *     <Toaster size="md" surface="solid">
+ *       <SaveButton />
+ *     </Toaster>
+ *   );
+ * }
+ *
+ * function SaveButton() {
+ *   const toast = useToast();
+ *   return (
+ *     <button onClick={() => toast.add({ title: "Saved", description: "All changes stored.", type: "success" })}>
+ *       Save
+ *     </button>
+ *   );
+ * }
+ * ```
  */
 export function Toaster({ children, size = "md", surface = "solid", className }: ToasterProps) {
   return (
@@ -125,4 +169,9 @@ export function Toaster({ children, size = "md", surface = "solid", className }:
   );
 }
 
+/**
+ * The toast manager from the nearest {@link Toaster}: `add({ title, description, type })` shows a
+ * toast and returns its id, `close(id)` dismisses one, and `toasts` is the live list the viewport
+ * renders. Calling it without a provider throws.
+ */
 export const useToast = BaseToast.useToastManager;

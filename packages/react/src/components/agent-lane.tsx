@@ -4,20 +4,36 @@ import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { Spinner } from "./spinner";
 
+/** Lifecycle of the lane: `running` shows a spinner and a pulsing tile, `done` a check, `failed` a warning and a danger rim. */
 export type AgentLaneStatus = "running" | "done" | "failed";
 
+/** Props for {@link AgentLane}: the sub-agent identity, its task, and the optional tool, output, usage and timing lines. */
 export type AgentLaneProps = {
+  /** Lifecycle state; also picks the tile shade (sky-400, sky-600, sky-800) and the result icon. */
   status: AgentLaneStatus;
-  bot: { initial: string; name: ReactNode };
+  /** Identity of the sub-agent shown in the header. */
+  bot: {
+    /** One-character tile label, usually the first letter of the name. */
+    initial: string;
+    /** Display name, truncated when the header runs out of room. */
+    name: ReactNode;
+  };
   /** Duration, such as "1.9s". */
   elapsed?: ReactNode;
+  /** The short task line under the header, wrapping onto several lines. */
   task: ReactNode;
   /** 14px tool icon and source, such as "Notion · Q3 metrics dashboard". */
-  tool?: { icon: ReactNode; label: ReactNode };
+  tool?: {
+    /** Tool icon, sized 14px by the row. */
+    icon: ReactNode;
+    /** Tool and source description, truncated to one line. */
+    label: ReactNode;
+  };
   /** Latest output, or the error when failed. */
   output?: ReactNode;
   /** Usage caption, such as "2.6k tokens". */
   usage?: ReactNode;
+  /** Extra classes merged onto the card, for layout inside a lane grid. */
   className?: string;
 };
 
@@ -27,7 +43,20 @@ const botTile: Record<AgentLaneStatus, string> = {
   failed: "bg-sky-800",
 };
 
-/** Figma `Agent lane` (Agent orchestrator 113:953): one sub-agent's card in a fan-out, flat subtle with a red rim on failure. */
+/**
+ * Figma `Agent lane` (Agent orchestrator 113:953): one sub-agent's card in a fan-out, flat subtle with a red rim on failure.
+ *
+ * @example
+ * ```tsx
+ * <AgentLane
+ *   status="running"
+ *   bot={{ initial: "R", name: "Researcher" }}
+ *   task="Gather the Q3 metrics"
+ *   tool={{ icon: <span aria-hidden>N</span>, label: "Notion · Q3 metrics dashboard" }}
+ *   elapsed="1.9s"
+ * />
+ * ```
+ */
 export function AgentLane({ status, bot, elapsed, task, tool, output, usage, className }: AgentLaneProps) {
   return (
     <div

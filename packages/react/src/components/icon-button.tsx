@@ -5,15 +5,31 @@ import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { LiquidGlass } from "./liquid-glass";
 
+/**
+ * Fill and text colour of an icon button:
+ *
+ * - `primary`: solid brand fill with the inverse icon, for the one main action in a cluster.
+ * - `ghost` (default): no fill until hover, primary icon; the common toolbar and row action.
+ * - `glass`: the clear glass disc with a `LiquidGlass` layer, for floating chrome over imagery.
+ * - `solid`: bordered raised surface, for a button that sits on the page background.
+ * - `quiet`: no fill and no liquid layer, secondary icon that turns primary on hover; for dark shells
+ *   and title bars where a glass disc would read as a grey bubble.
+ */
 export type IconButtonVariant = "primary" | "ghost" | "glass" | "solid" | "quiet";
+/** Square footprint: `sm` 32px, `md` 40px, `lg` 48px. */
 export type IconButtonSize = ControlSize;
 
+/** Props of {@link IconButton}: the treatment, the footprint and the glyph. */
 export type IconButtonProps = Omit<ComponentProps<typeof BaseButton>, "className" | "children"> & {
+  /** Treatment, from the list on `IconButtonVariant`. @default "ghost" */
   variant?: IconButtonVariant;
+  /** Square footprint: `sm` 32px, `md` 40px, `lg` 48px, with the icon at 16/20/24px. @default "md" */
   size?: IconButtonSize;
+  /** The glyph. It is wrapped in a positioning span; size it through the button rather than by hand. */
   icon: ReactNode;
   /** Accessible name; the button has no visible text. */
   label: string;
+  /** Extra classes for the button. */
   className?: string;
 };
 
@@ -37,7 +53,28 @@ const variantClass: Record<IconButtonVariant, string> = {
     "text-text-secondary hover:not-data-disabled:bg-overlay-ink-6 hover:not-data-disabled:text-text-primary active:not-data-disabled:bg-overlay-ink-10",
 };
 
-/** Figma `Icon button` (57:167): Primary, Ghost, Glass and Solid in three sizes, plus a fill-free `quiet` variant. */
+/**
+ * Figma `Icon button` (57:167): Primary, Ghost, Glass and Solid in three sizes, plus a fill-free `quiet` variant.
+ *
+ * A round, icon-only Base UI button. `label` becomes `aria-label`, since nothing is visible; the visible
+ * disc is 32/40/48px while an invisible pseudo-element keeps a 44px touch target around it. It renders
+ * `LiquidGlass` inside the `glass` variant only, and disabled state is 40% opacity with `cursor-not-allowed`.
+ *
+ * @example
+ * ```tsx
+ * import { Gear, Plus } from "@phosphor-icons/react";
+ * import { IconButton } from "@horon-ai/react";
+ *
+ * function Actions() {
+ *   return (
+ *     <div className="flex items-center gap-1">
+ *       <IconButton icon={<Plus />} label="New agent" variant="primary" />
+ *       <IconButton icon={<Gear />} label="Settings" />
+ *     </div>
+ *   );
+ * }
+ * ```
+ */
 export function IconButton({ variant = "ghost", size = "md", icon, label, className, ...props }: IconButtonProps) {
   return (
     <BaseButton

@@ -4,21 +4,52 @@ import { Children, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
+/**
+ * Props for {@link ToolCallsHeader}.
+ */
 export type ToolCallsHeaderProps = {
   /** Up to three 14px tool icons, drawn as overlapping 28px chips. */
   icons?: ReactNode;
+  /** Header text; defaults to "Using tools…". @default "Using tools…" */
   title?: ReactNode;
   /** Elapsed time, such as "4.0s". */
   elapsed?: ReactNode;
   /** `ToolCall` cards, stacked 8px apart under the header. */
   children?: ReactNode;
+  /** Starts with the cards shown; the group manages its own open state afterwards. @default true */
   defaultOpen?: boolean;
+  /** Controlled open state; pass `onOpenChange` too when set. */
   open?: boolean;
+  /** Called with the next open state whenever the trigger is pressed. */
   onOpenChange?: (open: boolean) => void;
+  /** Extra classes for the outer card. */
   className?: string;
 };
 
-/** Figma `Tool-calls header` (Agents N11): overlapping tool chips, "Using tools…" and a caret that fold the ToolCall cards below. */
+/**
+ * Figma `Tool-calls header` (Agents N11): overlapping tool chips, "Using tools…" and a caret that fold the ToolCall cards below.
+ *
+ * Only the first three icons are drawn, each as a 28px chip. The trigger is a Base UI collapsible
+ * button that rotates the caret and reveals the children in a `motion-collapse` panel. Pass `open`
+ * and `onOpenChange` to control it, or leave them out and start from `defaultOpen`.
+ *
+ * @example
+ * ```tsx
+ * import { ToolCall, ToolCallsHeader } from "@horon-ai/react";
+ * import { Globe, Terminal } from "@phosphor-icons/react";
+ *
+ * function Example() {
+ *   return (
+ *     <ToolCallsHeader
+ *       icons={[<Globe key="globe" aria-hidden />, <Terminal key="terminal" aria-hidden />]}
+ *       elapsed="4.0s"
+ *     >
+ *       <ToolCall status="done" tool={{ icon: <Globe />, name: "Web search" }} summary="Searched the docs" />
+ *     </ToolCallsHeader>
+ *   );
+ * }
+ * ```
+ */
 export function ToolCallsHeader({
   icons,
   title = "Using tools…",

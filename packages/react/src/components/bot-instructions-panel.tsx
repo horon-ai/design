@@ -6,20 +6,50 @@ import { useActiveIndicator } from "../hooks/use-active-indicator";
 import { useDevice } from "../hooks/use-device";
 import { Kbd } from "./kbd";
 
-type WithClass<T> = Omit<T, "className"> & { className?: string };
+/** Drops the base type's `className` so the panel can own it. */
+type WithClass<T> = Omit<T, "className"> & {
+  /** Extra classes merged onto the root element. */
+  className?: string;
+};
 
+/** Props for {@link PanelPillTabs}: the tab items, the controlled or default selection and the change handler. */
 export type PanelPillTabsProps = {
-  items: { value: string; label: ReactNode }[];
+  /** Tabs in display order; the first one is the default selection. */
+  items: {
+    /** Value handed to `onValueChange` and compared against `value`. */
+    value: string;
+    /** Tab label. */
+    label: ReactNode;
+  }[];
+  /** Controlled selected value; omit it to let the track keep its own selection. */
   value?: string;
+  /** Selection used before the first click, falling back to the first item. */
   defaultValue?: string;
+  /** Fires with the next value on click or arrow-key navigation. */
   onValueChange?: (value: string) => void;
+  /** Accessible name of the tab list. */
   "aria-label"?: string;
+  /** Extra classes merged onto the track, for width overrides. */
   className?: string;
 };
 
 /**
- * The 5% ink pill track shared by the Bot panels (Paper `YNQ-1`): 3px padding, 2px gap, 28px options with
+ * The 5% ink pill track shared by the Bot panels (Paper `YNQ-1`): 3px padding, 2px gap, 30px options with
  * 12px inset and a 10% ink selection that slides between options in 280ms.
+ *
+ * Works controlled (`value`) or uncontrolled (`defaultValue`); the arrow keys wrap around, move the selection
+ * and focus the newly selected tab, while only the selected tab stays in the tab order.
+ *
+ * @example
+ * ```tsx
+ * <PanelPillTabs
+ *   aria-label="Instructions view"
+ *   items={[
+ *     { value: "instructions", label: "Instructions" },
+ *     { value: "example", label: "Example" },
+ *   ]}
+ * />
+ * ```
  */
 export function PanelPillTabs({ items, value, defaultValue, onValueChange, className, ...props }: PanelPillTabsProps) {
   const [inner, setInner] = useState(defaultValue ?? items[0]?.value ?? "");
@@ -82,6 +112,7 @@ export function PanelPillTabs({ items, value, defaultValue, onValueChange, class
   );
 }
 
+/** Chip tint: `sky` the default light blue, `brand` the deeper sky-700, `neutral` grey. */
 export type InstructionVariableTone = "sky" | "brand" | "neutral";
 
 const variableToneClass: Record<InstructionVariableTone, string> = {
@@ -97,26 +128,53 @@ const variableDotClass: Record<InstructionVariableTone, string> = {
 };
 
 /** One piece of an instruction line: plain text, or a `{{variable}}` chip. */
-export type InstructionPart = string | { variable: string; tone?: InstructionVariableTone };
+export type InstructionPart =
+  | string
+  | {
+      /** Variable name, rendered inside the chip without the braces. */
+      variable: string;
+      /** Chip tint. @default "sky" */
+      tone?: InstructionVariableTone;
+    };
 
-export type InstructionVariable = { name: string; tone?: InstructionVariableTone; value: string };
+/** A test value for one `{{variable}}` in the prompt, shown under the instructions. */
+export type InstructionVariable = {
+  /** Variable name shown above the test value. */
+  name: string;
+  /** Dot tint matching the chip in the prompt. @default "sky" */
+  tone?: InstructionVariableTone;
+  /** Test value used when the instruction is run. */
+  value: string;
+};
 
+/** Props for {@link BotInstructionsPanel}: the bot, the prompt lines, the optional example, variables and scenarios, and the run handler. */
 export type BotInstructionsPanelProps = WithClass<Omit<ComponentProps<"section">, "title">> & {
+  /** Panel heading. @default "Instructions" */
   title?: ReactNode;
   /** Version label in the header pill, for example `v4`. */
   version?: string;
   /** Status next to the version, rendered with a live dot. */
   versionStatus?: string;
-  bot: { initial: string; name: string };
-  /** The editable prompt, one array of parts per line. */
+  /** Bot whose prompt is shown; the initial fills the 18px tile. */
+  bot: {
+    /** One-character tile label. */
+    initial: string;
+    /** Bot name next to the tile. */
+    name: string;
+  };
+  /** The prompt text, one array of parts per line, rendered read-only. */
   instructions: InstructionPart[][];
   /** Shown under the Example tab instead of the prompt. */
   example?: ReactNode;
+  /** Prompt length shown at the right of the tab row; hidden when undefined. */
   tokenCount?: number;
   /** Test values for each variable in the prompt. */
   variables?: InstructionVariable[];
+  /** Test scenarios offered as pills under the prompt. */
   scenarios?: string[];
+  /** Scenario selected on first render, falling back to the first scenario. */
   defaultScenario?: string;
+  /** Fires with the selected scenario (or undefined) when Run is pressed; the panel does not run anything itself. */
   onRun?: (scenario: string | undefined) => void;
   /** The last run's output, or a hint until there is one. */
   output?: ReactNode;
@@ -130,13 +188,17 @@ function partKey(part: InstructionPart) {
   return typeof part === "string" ? part : part.variable;
 }
 
+/** Inline rounded chip that stands in for a `{{variable}}` inside a prompt line. */
 function VariableChip({
   tone = "sky",
   className,
   children,
 }: {
+  /** Chip tint. @default "sky" */
   tone?: InstructionVariableTone;
+  /** Extra classes merged onto the chip. */
   className?: string;
+  /** Variable name shown without braces. */
   children: ReactNode;
 }) {
   return (
@@ -153,6 +215,23 @@ function Divider() {
 /**
  * Bot instructions panel (Paper `YN3-1` / `GOZ-0`): a 24px-radius surface with the bot header, an
  * Instructions / Example tab pair over the prompt text with `{{variable}}` chips, and a test-run block.
+ *
+ * The tab and the selected scenario are local state; the panel only reports a run through `onRun`. Output is
+ * re-keyed per run so it animates in every time. A caret blinks at the end of the prompt while the prompt area
+ * has focus. The Run button carries a `Mod+Enter` chip — ⌘↵ on macOS and iOS, Ctrl+Enter elsewhere — which is
+ * hidden on touch devices that show no keyboard hints.
+ *
+ * @example
+ * ```tsx
+ * <BotInstructionsPanel
+ *   version="v4"
+ *   bot={{ initial: "R", name: "Researcher" }}
+ *   instructions={[["Summarise ", { variable: "sheet" }, " for the team."]]}
+ *   variables={[{ name: "sheet", value: "Q3 metrics" }]}
+ *   scenarios={["Weekly digest", "Board update"]}
+ *   onRun={(scenario) => run(scenario)}
+ * />
+ * ```
  */
 export function BotInstructionsPanel({
   title = "Instructions",

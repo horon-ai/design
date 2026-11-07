@@ -8,45 +8,72 @@ import { isModKey } from "../lib/platform";
 import { Kbd } from "./kbd";
 import { Spinner } from "./spinner";
 
+/** Progress of one step: `done` fills the marker green, `active` shows a spinner, `todo` a dashed ring. */
 export type SteeringStepStatus = "done" | "active" | "todo";
 
+/** One step in the steering rail: its label, progress status and optional duration. */
 export type SteeringStep = {
+  /** Stable key for the step. */
   id: string;
+  /** Step text; secondary colour while the step is still `todo`. */
   label: ReactNode;
+  /** Progress marker to draw. */
   status: SteeringStepStatus;
   /** Duration of a finished or running step, such as "1.4s". */
   time?: ReactNode;
 };
 
+/** One steer note: the text and whether it has already been applied. */
 export type SteeringNote = {
+  /** Stable key for the note. */
   id: string;
+  /** The steer text, shown on one row and wrapping as needed. */
   text: ReactNode;
-  /** An applied note has left the queue and carries the "Now" pill. */
+  /** An applied note has left the queue and carries the "Now" pill. @default false */
   applied?: boolean;
 };
 
+/** Props for {@link AgentSteeringPanel}: the task header, the steps, queued notes and the steer handlers. */
 export type AgentSteeringPanelProps = Omit<ComponentProps<"section">, "className" | "title"> & {
+  /** Task name in the header, truncated to one line. */
   title: ReactNode;
+  /** Second header line, such as the bot or workspace, truncated to one line. */
   subtitle?: ReactNode;
   /** The status text beside the live dot, such as "Running · 2m 10s". */
   status?: ReactNode;
+  /** Pauses the live dot pulse and swaps the button to Play; the panel does not stop work on its own. @default false */
   paused?: boolean;
+  /** Fires when the pause/resume button is pressed, with the next paused value. */
   onPausedChange?: (paused: boolean) => void;
+  /** Ordered steps of the running task; the connector under a done step turns live green. */
   steps: SteeringStep[];
+  /** Notes queued for the next step, plus any already applied. @default [] */
   notes?: SteeringNote[];
+  /** Fires with the note id when its "Now" button is pressed, to apply it immediately. */
   onApplyNow?: (id: string) => void;
+  /** Fires with the note id after its pop-out animation ends; remove it from `notes` here. */
   onRemoveNote?: (id: string) => void;
   /** Called with the text typed in the steer box: Enter queues it for the next step, Mod+Enter interrupts now. */
   onSteer?: (text: string, interrupt: boolean) => void;
+  /** Placeholder of the steer input; also its accessible name. @default "Steer the bot…" */
   placeholder?: string;
+  /** Extra classes merged onto the panel, for margins or a width override. */
   className?: string;
 };
 
 const noNotes: SteeringNote[] = [];
-type IndexStyle = CSSProperties & { "--i": number };
+type IndexStyle = CSSProperties & {
+  /** Step index, consumed by the staggered `motion-rise` delay. */
+  "--i": number;
+};
 const indexStyle = (i: number): IndexStyle => ({ "--i": i });
 
-function Marker({ status }: { status: SteeringStepStatus }) {
+/** Marker for one step: green check when done, spinner when active, dashed ring while waiting. */
+// prettier-ignore
+function Marker({ status }: {
+  /** Progress state, also used as the marker's React key so the pop animation replays on change. */
+  status: SteeringStepStatus;
+}) {
   if (status === "done") {
     return (
       <span className="flex size-4.5 animate-pop-in items-center justify-center rounded-full bg-status-live text-text-on-ink">
@@ -58,13 +85,17 @@ function Marker({ status }: { status: SteeringStepStatus }) {
   return <span aria-label="Waiting" className="size-4.5 rounded-full border border-dashed border-border-dashed" />;
 }
 
+/** One queued note: the text, a "Now" action and a remove button, or a filled "Now" pill once applied. */
 function SteeringNoteRow({
   note,
   onApplyNow,
   onRemoveNote,
 }: {
+  /** The note to render; `applied` swaps the actions for the filled pill. */
   note: SteeringNote;
+  /** Called with the note id when "Now" is pressed. */
   onApplyNow?: (id: string) => void;
+  /** Called with the note id when the pop-out animation finishes, so the parent can drop it. */
   onRemoveNote?: (id: string) => void;
 }) {
   const [leaving, setLeaving] = useState(false);
@@ -121,6 +152,25 @@ function SteeringNoteRow({
  * Paper `Agent steering` (Y51-1): a 24px-radius surface panel with the running task header, a step rail, the notes
  * queued for the next step, and a steer box. The live dot pulses every 2s, a step marker swaps with a short pop,
  * new steps rise in 220ms, and send and pause press in 150ms.
+ *
+ * The steer draft is local state: it clears after `onSteer` fires, and the panel never queues a note itself.
+ * Enter queues the text for the next step and Mod+Enter sends it as an interrupt — ⌘Enter on macOS and iOS,
+ * Ctrl+Enter on Windows, Linux and Android. The two hint chips draw the same OS keys through `Kbd` and are
+ * hidden on touch devices that show no keyboard hints. IME composition keystrokes are ignored so Korean and
+ * Japanese input do not submit mid-character.
+ *
+ * @example
+ * ```tsx
+ * <AgentSteeringPanel
+ *   title="Quarterly revenue review"
+ *   status="Running · 2m 10s"
+ *   steps={[
+ *     { id: "read", label: "Read the sheet", status: "done", time: "1.4s" },
+ *     { id: "summarise", label: "Summarise the rows", status: "active" },
+ *   ]}
+ *   onSteer={(text, interrupt) => steer(text, interrupt)}
+ * />
+ * ```
  */
 export function AgentSteeringPanel({
   title,

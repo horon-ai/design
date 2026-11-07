@@ -8,9 +8,24 @@ import { Menu, MenuContent, MenuTrigger } from "./menu";
 
 const pillClass = "inline-flex h-5.5 items-center rounded-full px-2 text-label-sm";
 
+/**
+ * Colour of an MCP server's status pill.
+ *
+ * - `connected` — muted pill with a live dot, the healthy default.
+ * - `warning` — danger-tinted pill with a danger dot, for a server that needs attention.
+ * - `neutral` — muted pill with a placeholder-coloured dot, for an idle or unknown state.
+ */
 export type McpServerStatusTone = "connected" | "warning" | "neutral";
 
-const statusToneClass: Record<McpServerStatusTone, { pill: string; dot: string }> = {
+const statusToneClass: Record<
+  McpServerStatusTone,
+  {
+    /** Classes of the pill itself: background tint and text colour. */
+    pill: string;
+    /** Classes of the 6px dot inside the pill: its fill colour. */
+    dot: string;
+  }
+> = {
   connected: { pill: "bg-overlay-ink-6 text-text-primary", dot: "bg-status-live" },
   warning: { pill: "bg-accent-red-500-14 text-text-danger", dot: "bg-text-danger" },
   neutral: { pill: "bg-overlay-ink-6 text-text-secondary", dot: "bg-text-placeholder" },
@@ -26,29 +41,60 @@ const withKeys = (values: string[] | undefined) => {
   });
 };
 
+/** Props for {@link McpServerRow}: the server identity, its tags and status, and the two actions. */
 export type McpServerRowProps = Omit<ComponentProps<"div">, "className" | "title"> & {
   /** Server name; its first two letters fill the 40px tile unless `initials` is set. */
   name: string;
+  /** Overrides the two-letter tile text derived from `name`; up to two characters read best. */
   initials?: string;
   /** Tags next to the name, such as "Official". */
   tags?: string[];
   /** Tags tinted brand, such as "All devices". */
   brandTags?: string[];
+  /** Body line under the tags, in body-sm secondary colour. */
   description?: ReactNode;
   /** Meta line, joined by "·". */
   meta?: string[];
+  /** Text inside the status pill.
+   * @default "Connected" */
   statusLabel?: ReactNode;
-  /** Colour of the status pill: a live dot by default, a danger tint for a warning, a muted dot for a neutral state. */
+  /** Colour of the status pill: a live dot by default, a danger tint for a warning, a muted dot for a neutral state.
+   * @default "connected" */
   statusTone?: McpServerStatusTone;
+  /** Text of the Configure button.
+   * @default "Configure" */
   configureLabel?: ReactNode;
+  /** Fires when the Configure button is clicked; the button always renders, so pass this to make it do anything. */
   onConfigure?: () => void;
   /** Overflow menu items (`MenuItem`). Hides the overflow button when absent. */
   menu?: ReactNode;
+  /** Accessible label of the overflow button.
+   * @default "More" */
   menuLabel?: string;
+  /** Extra classes on the row `div`, merged after the built-in ones. */
   className?: string;
 };
 
-/** Paper `MCP server row` (1VHS-0): a divided row with a 40px tile, tags, a status pill and two actions. */
+/**
+ * Paper `MCP server row` (1VHS-0): a divided row with a 40px tile, tags, a status pill and two actions.
+ *
+ * A row of a settings list rather than a card: it draws only a bottom border and
+ * drops it on the last child. The main cluster wraps (`basis-40`) so the row stays
+ * usable in a narrow column; its overflow menu opens from the row and portals to
+ * `document.body`.
+ *
+ * @example
+ * ```tsx
+ * <McpServerRow
+ *   name="Linear"
+ *   tags={["Official"]}
+ *   description="Read issues and projects."
+ *   meta={["12 tools", "OAuth"]}
+ *   onConfigure={() => openConfig("linear")}
+ *   menu={<MenuItem>Reconnect</MenuItem>}
+ * />
+ * ```
+ */
 export function McpServerRow({
   name,
   initials,

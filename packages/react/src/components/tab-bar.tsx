@@ -5,17 +5,34 @@ import type { ControlSize } from "../lib/size";
 import { useActiveIndicator } from "../hooks/use-active-indicator";
 import { LiquidGlass } from "./liquid-glass";
 
-export type TabBarItem = { value: string; label: string; icon: ReactNode };
+/** One destination in a {@link TabBar}: its stable value, the accessible name, and the icon shown in the tab. */
+export type TabBarItem = {
+  /** Identifies the tab; compared against the bar's `value`. */
+  value: string;
+  /** Accessible name of the icon-only button. */
+  label: string;
+  /** The tab icon; sized by the bar (20/22/24px per rung). */
+  icon: ReactNode;
+};
+
+/** Tab bar rungs: `sm` 56x40, `md` 64x48 (the Figma size) and `lg` 72x56. */
 export type TabBarSize = ControlSize;
 
+/** Props of {@link TabBar}: the destinations, the selected value, and the track rung and surface. */
 export type TabBarProps = {
+  /** Destinations in display order; each keeps its fixed tap size and scrolls if the row overflows. */
   items: TabBarItem[];
+  /** Currently selected item's `value`; the control is fully controlled. */
   value: string;
+  /** Called with the clicked item's `value`; the bar itself does not change `value`. */
   onValueChange?: (value: string) => void;
-  /** `md` is the 64x48 Figma tab; `sm` is 56x40 and `lg` 72x56. */
+  /** `md` is the 64x48 Figma tab; `sm` is 56x40 and `lg` 72x56. @default "md" */
   size?: TabBarSize;
+  /** `glass` (default) adds the liquid glass layer inside the pill; `flat` keeps the glass fill but omits that layer. @default "glass" */
   surface?: "glass" | "flat";
+  /** Accessible name of the `<nav>` landmark. @default "Main" */
   "aria-label"?: string;
+  /** Extra classes on the scrolling track. */
   className?: string;
 };
 
@@ -35,6 +52,34 @@ const tabClass: Record<TabBarSize, string> = {
  * Figma `Tab bar` (63:441): the mobile bottom navigation, a regular-glass pill
  * with icon-only 64x48 tabs and 22px icons; the current tab is a 10% ink pill
  * that slides to the tab you pick.
+ *
+ * The bar is controlled: it reports clicks through `onValueChange` and marks the matching
+ * item with `aria-current="page"`. Tabs keep their fixed tap size, so an over-wide row scrolls
+ * horizontally instead of shrinking; the moving pill is measured from the current tab and
+ * honours `prefers-reduced-motion`.
+ *
+ * @example
+ * ```tsx
+ * import { useState } from "react";
+ * import { House, MagnifyingGlass, User } from "@phosphor-icons/react";
+ * import { TabBar } from "@horon-ai/react";
+ *
+ * function MobileNav() {
+ *   const [tab, setTab] = useState("home");
+ *   return (
+ *     <TabBar
+ *       aria-label="Sections"
+ *       value={tab}
+ *       onValueChange={setTab}
+ *       items={[
+ *         { value: "home", label: "Home", icon: <House /> },
+ *         { value: "search", label: "Search", icon: <MagnifyingGlass /> },
+ *         { value: "profile", label: "Profile", icon: <User /> },
+ *       ]}
+ *     />
+ *   );
+ * }
+ * ```
  */
 export function TabBar({
   items,

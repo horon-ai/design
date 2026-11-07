@@ -4,12 +4,19 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
-/** `compact` is the 40x24 Paper bot-memory switch and keeps its own rung. */
+/** Shared control rungs plus `compact`, the 40x24 Paper bot-memory switch that keeps its own rung. */
 export type SwitchSize = ControlSize | "compact";
 
+/**
+ * Props of {@link Switch}: Base UI's switch root props (`checked`, `defaultChecked`,
+ * `onCheckedChange`, `disabled`, `name`) plus the rung and the optional inline label.
+ */
 export type SwitchProps = Omit<ComponentProps<typeof BaseSwitch.Root>, "className"> & {
+  /** Track and thumb rung: `sm` 32x20, `md` 44x26, `lg` 52x30, `compact` 40x24. @default "md" */
   size?: SwitchSize;
+  /** When set, the switch sits at the end of a label row and the whole row toggles it. */
   label?: ReactNode;
+  /** Extra classes, applied to the label row when `label` is set and to the switch itself otherwise. */
   className?: string;
 };
 
@@ -38,6 +45,29 @@ const labelClass: Record<SwitchSize, string> = {
  * Switch: MD 44x26 and SM 32x20 tracks with a white thumb 2px in; LG is 52x30; COMPACT 40x24 with an
  * 18px thumb 3px in (Paper bot memory). The thumb stays white on the grey track in both themes and
  * takes the inverse of the ink fill when checked, so the checked state reads the same in dark.
+ *
+ * Renders Base UI's switch button (`role="switch"`, `aria-checked`) and is controlled or
+ * uncontrolled the same way; the thumb springs across in 220ms and the track repaints on hover,
+ * checked and disabled states. With `label` the control becomes a `<label>` row whose text
+ * toggles it, so the switch does not need its own accessible name.
+ *
+ * @example
+ * ```tsx
+ * import { useState } from "react";
+ * import { Switch } from "@horon-ai/react";
+ *
+ * function MemoryToggle() {
+ *   const [remember, setRemember] = useState(true);
+ *   return (
+ *     <Switch
+ *       label="Remember this bot's memory"
+ *       size="compact"
+ *       checked={remember}
+ *       onCheckedChange={setRemember}
+ *     />
+ *   );
+ * }
+ * ```
  */
 export function Switch({ size = "md", label, className, ...props }: SwitchProps) {
   const control = (

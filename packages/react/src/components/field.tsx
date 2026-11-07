@@ -4,8 +4,12 @@ import { createContext, useContext, type ComponentProps } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
-type WithClass<T> = Omit<T, "className"> & { className?: string };
+type WithClass<T> = Omit<T, "className"> & {
+  /** Extra classes appended after the part's own classes. */
+  className?: string;
+};
 
+/** `md` outside a `Field`, so a part rendered on its own keeps the default rung rather than throwing. */
 const FieldSizeContext = createContext<ControlSize>("md");
 
 const gapClass: Record<ControlSize, string> = {
@@ -26,12 +30,38 @@ const metaClass: Record<ControlSize, string> = {
   lg: "text-body-sm",
 };
 
-/** Figma `Field examples` (58:163): label, control and help text, 6/8/10px apart. */
+/**
+ * Figma `Field examples` (58:163): label, control and help text, 6/8/10px apart.
+ *
+ * Wraps Base UI's `Field.Root`, a vertical stack (`max-w-full`, left aligned) whose gaps and text
+ * rungs follow `size` through context, so `FieldLabel`, `FieldDescription` and `FieldError` match the
+ * control without repeating the size. `invalid` (or Base UI's own validation) marks the control inside
+ * the field invalid, and the control's box paints its danger border from that.
+ *
+ * @example
+ * ```tsx
+ * import { Field, FieldDescription, FieldError, FieldLabel, Input } from "@horon-ai/react";
+ *
+ * function EmailField() {
+ *   return (
+ *     <Field size="md">
+ *       <FieldLabel htmlFor="email">Email</FieldLabel>
+ *       <Input id="email" type="email" placeholder="you@example.com" />
+ *       <FieldDescription>We only use it to sign you in.</FieldDescription>
+ *       <FieldError>Enter a valid address.</FieldError>
+ *     </Field>
+ *   );
+ * }
+ * ```
+ */
 export function Field({
   size = "md",
   className,
   ...props
-}: WithClass<Omit<ComponentProps<typeof BaseField.Root>, "size">> & { size?: ControlSize }) {
+}: WithClass<Omit<ComponentProps<typeof BaseField.Root>, "size">> & {
+  /** Control rung shared by every part; sets the gap (6/8/10px) and the label and meta type scales. @default "md" */
+  size?: ControlSize;
+}) {
   return (
     <FieldSizeContext.Provider value={size}>
       <BaseField.Root
@@ -42,6 +72,11 @@ export function Field({
   );
 }
 
+/**
+ * Part of {@link Field}. The control's label (`Field.Label`): `label-sm/md/lg` from the field's size,
+ * primary text, and the disabled colour when its control is disabled. Give it `htmlFor` matching the
+ * control's `id`, which is also what makes clicking the text focus the control.
+ */
 export function FieldLabel({ className, ...props }: WithClass<ComponentProps<typeof BaseField.Label>>) {
   const size = useContext(FieldSizeContext);
   return (
@@ -52,11 +87,22 @@ export function FieldLabel({ className, ...props }: WithClass<ComponentProps<typ
   );
 }
 
+/**
+ * Part of {@link Field}. The help line under the control (`Field.Description`) in secondary text:
+ * `caption` at sm and md, `body-sm` at lg. Always full width so the copy wraps inside the field, and
+ * Base UI wires it to the control as the description for assistive tech.
+ */
 export function FieldDescription({ className, ...props }: WithClass<ComponentProps<typeof BaseField.Description>>) {
   const size = useContext(FieldSizeContext);
   return <BaseField.Description className={cn(metaClass[size], "w-full text-text-secondary", className)} {...props} />;
 }
 
+/**
+ * Part of {@link Field}. The validation message (`Field.Error`) in `text-text-danger` at the field's
+ * meta rung. It stays mounted only while it should show: Base UI renders it when the enclosing field is
+ * invalid, or when `match` is set, and keeps it mounted through its exit — the row collapses from `1fr`
+ * to `0fr` as it fades, so the parts below glide up instead of jumping.
+ */
 export function FieldError({ className, children, ...props }: WithClass<ComponentProps<typeof BaseField.Error>>) {
   const size = useContext(FieldSizeContext);
   // Base UI keeps the message mounted through its exit (`data-ending-style`), so the row can close

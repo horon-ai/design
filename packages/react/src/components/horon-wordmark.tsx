@@ -1,6 +1,14 @@
 import type { ComponentProps } from "react";
 
-export type HoronWordmarkProps = Omit<ComponentProps<"svg">, "children"> & { title?: string };
+/** Props of {@link HoronWordmark}: any svg attribute plus the accessible name. */
+export type HoronWordmarkProps = Omit<ComponentProps<"svg">, "children"> & {
+  /**
+   * Accessible name of the wordmark. It becomes the `aria-label` on the `role="img"` svg, so screen readers
+   * announce it as one image rather than six paths.
+   * @default "Horon"
+   */
+  title?: string;
+};
 
 const PATHS = [
   "M0.0230414 11.2212H1.91244L1.92626 8.60366L1.93548 5.99076H8.47923L8.48845 8.60366L8.50228 11.2212H10.3917L10.4193 8.06449C10.447 5.32717 10.5207 2.68663 10.6267 0.585252L10.6543 0H8.47923V4.2857H1.93548V0H0L0.0230414 11.2212Z",
@@ -14,6 +22,23 @@ const PATHS = [
 /**
  * The UI-size Horon wordmark from the Figma Sidebar (88:808): a 48.7 x 11.5
  * vector in `currentColor`. Scale it with `height`; the width follows.
+ *
+ * Six filled paths trace the letter outlines as one drawing, painted in the current text color, so color it
+ * with the surrounding `text-*` class rather than a `fill` prop. The paths carry no individual names; only
+ * `title` gives the svg its accessible name.
+ *
+ * @example
+ * ```tsx
+ * import { HoronWordmark } from "@horon-ai/react";
+ *
+ * function SidebarBrand() {
+ *   return (
+ *     <div className="flex items-center gap-2 text-text-primary">
+ *       <HoronWordmark height={12} />
+ *     </div>
+ *   );
+ * }
+ * ```
  */
 export function HoronWordmark({ title = "Horon", height = 11.5, ...props }: HoronWordmarkProps) {
   return (

@@ -11,9 +11,13 @@ import { Kbd } from "./kbd";
 const touchCloseClass =
   "flex size-7 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand [&_svg]:size-4";
 
+/** One selectable row of the palette. */
 export type CommandItem = {
+  /** Stable identity and the React key of the row; keep it unique across the palette. */
   value: string;
+  /** Row text; the query also matches it, together with `keywords`. */
   label: string;
+  /** Extra search terms that are not shown, such as an abbreviation or a path. */
   keywords?: string;
   /** 28px leading tile: an initial or a 16px icon. */
   tile?: ReactNode;
@@ -23,31 +27,76 @@ export type CommandItem = {
   meta?: ReactNode;
   /** Right-side hint, usually `<Kbd>`; hidden when the device shows no keyboard hints. */
   hint?: ReactNode;
+  /** Runs when the row is clicked, before the palette closes itself. */
   onSelect?: () => void;
 };
 
-export type CommandGroup = { label: string; items: CommandItem[] };
+/** A titled block of rows; groups are rendered in the order given. */
+export type CommandGroup = {
+  /** Section heading, `caption` secondary text above the rows. */
+  label: string;
+  /** Rows of this section. */
+  items: CommandItem[];
+};
 
+/** Props for {@link CommandPalette}: the dialog state, the grouped rows and the footer hints. */
 export type CommandPaletteProps = {
+  /** Controlled open state; leave it out to let the palette open from its `trigger`. */
   open?: boolean;
+  /** Called with the next open state when the palette opens, closes on Escape, closes on select or its backdrop is pressed. */
   onOpenChange?: (open: boolean) => void;
+  /** Sections of rows, in render order. */
   groups: CommandGroup[];
+  /** Search field placeholder; it also names the dialog (`aria-label`). @default "Search" */
   placeholder?: string;
   /** Shown when the query has no matches; defaults to "No results". */
   empty?: ReactNode;
   /** Footer key hints, such as `[["↑↓", "Move"], ["↵", "Open"]]`; hidden when the device shows no keyboard hints. */
   hints?: [ReactNode, string][];
+  /** Element rendered inside the dialog root as the opener, usually a `DialogTrigger`. */
   trigger?: ReactNode;
   /**
    * `solid` (default) is an opaque palette with a default border. `glass` puts it on the veil (`veil-overlay`).
+   * @default "solid"
    */
   surface?: "solid" | "glass";
+  /** Extra classes on the popup, merged after the surface, radius and motion classes. */
   className?: string;
 };
 
 /**
  * Figma `Command palette` (110:676): a 560px palette, 24px radius, with a 48px search row,
  * grouped 44px results and a key-hint footer.
+ *
+ * A Base UI dialog on a 32% scrim with a 6px blur, anchored to the top of the viewport 96px down rather
+ * than centred. It always renders {@link CommandPaletteBody} with its own close control — an `esc` chip on
+ * devices that show keyboard hints, a 28px `X` tile on touch — and every row select reports
+ * `onOpenChange(false)`. Row hints and the footer hints disappear on those touch devices too. The body
+ * owns filtering and keyboard movement.
+ *
+ * @example
+ * ```tsx
+ * const [open, setOpen] = useState(false);
+ *
+ * <CommandPalette
+ *   open={open}
+ *   onOpenChange={setOpen}
+ *   trigger={<DialogTrigger render={<Button variant="solid" />}>Search</DialogTrigger>}
+ *   groups={[
+ *     {
+ *       label: "Bots",
+ *       items: [
+ *         { value: "weekly", label: "Weekly digest", meta: "Product", hint: <Kbd>↵</Kbd> },
+ *         { value: "inbox", label: "Inbox triage", meta: "Ops" },
+ *       ],
+ *     },
+ *   ]}
+ *   hints={[
+ *     ["↑↓", "Move"],
+ *     ["↵", "Open"],
+ *   ]}
+ * />
+ * ```
  */
 export function CommandPalette({
   open,
@@ -108,17 +157,32 @@ export function CommandPalette({
   );
 }
 
+/** Props for {@link CommandPaletteBody}: the rows plus the close control and the select callback the host owns. */
 export type CommandPaletteBodyProps = {
+  /** Sections of rows, in render order. */
   groups: CommandGroup[];
+  /** Search field placeholder. @default "Search" */
   placeholder?: string;
+  /** Shown when the query has no matches. @default "No results" */
   empty?: ReactNode;
+  /** Accessible name of the fallback `esc` button, used when no `closeControl` is passed. @default "Close" */
   closeLabel?: string;
   /** A ready close control; the dialog passes its own `Dialog.Close` so uncontrolled palettes still close. */
   closeControl?: ReactNode;
+  /** Makes the fallback `esc` button close the palette; without both this and `closeControl` no button renders. */
   onClose?: () => void;
+  /** Called after a row's own `onSelect`, so the host can close its dialog. */
   onSelect?: () => void;
 };
 
+/**
+ * The search row, groups and result rows of a command palette.
+ *
+ * Part of {@link CommandPalette}. Renders a Base UI `Autocomplete` that is always open and inline: the
+ * query filters on label plus keywords (case-insensitive), the first row is highlighted as soon as the
+ * list renders, and arrow keys move through the rows while Enter picks the highlighted one. Escape is left
+ * to the host's close control, which is why this part owns no dialog state.
+ */
 export function CommandPaletteBody({
   groups,
   placeholder = "Search",

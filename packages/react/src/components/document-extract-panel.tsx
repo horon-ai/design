@@ -4,52 +4,97 @@ import { type ComponentProps, type ReactNode, useMemo, useState } from "react";
 import { cn } from "../lib/cn";
 import { PanelPillTabs } from "./bot-instructions-panel";
 
-type WithClass<T> = Omit<T, "className"> & { className?: string };
+/** Strips a section's own `className` so the panel can merge its classes with the caller's. */
+type WithClass<T> = Omit<T, "className"> & {
+  /** Extra classes merged last onto the element. */
+  className?: string;
+};
 
+/** Row state of a plain field: `filled` reads fine, `check` marks a value the extractor is unsure about. */
 export type ExtractFieldStatus = "filled" | "check";
 
+/** One extracted scalar value: one row in the Fields view and one entry in the JSON view. */
 export type ExtractField = {
+  /** Stable identity; confirming a row records this id and drives the footer counters. */
   id: string;
+  /** Row label on the left, 100px wide; also the key in the JSON view. */
   label: string;
+  /** The read value, shown truncated in a button-sized pill. */
   value: string;
   /** Field type shown at the row end, for example `Text` or `Date`. */
   type?: string;
+  /** `check` marks the value for confirmation: the row takes the danger border and a "Check" caption. */
   status?: ExtractFieldStatus;
 };
 
+/** One extracted table: a labelled block with a header row and body rows instead of a single value. */
 export type ExtractTable = {
+  /** Stable identity, counted like a field in the footer. */
   id: string;
+  /** Row label above the table. */
   label: string;
+  /** Field type shown at the row end, such as `Table`. */
   type?: string;
-  columns: { label: string; align?: "start" | "end"; width?: number }[];
+  /** Column definitions, in order; a cell reads its column by index. */
+  columns: {
+    /** Column heading, `caption` secondary text. */
+    label: string;
+    /** Cell alignment; `end` right-aligns numbers. */
+    align?: "start" | "end";
+    /** Fixed column width in px; a column without it shares the free width. */
+    width?: number;
+  }[];
+  /** Body rows; each inner array is one row, matched to `columns` by index. */
   rows: string[][];
 };
 
+/** A labelled section of the Fields view, grouped under a dot and a heading. */
 export type ExtractGroup = {
+  /** Stable identity for the React key. */
   id: string;
+  /** Section heading, `label-md` primary text. */
   label: string;
+  /** Fields and tables of this section, in display order. */
   fields: (ExtractField | ExtractTable)[];
 };
 
+/** Props for {@link DocumentExtractPanel}: the sheet to view, the extracted groups and the footer actions. */
 export type DocumentExtractPanelProps = WithClass<Omit<ComponentProps<"section">, "title">> & {
+  /** Document name in the viewer toolbar; `label-md` primary text, truncated. */
   fileName: string;
+  /** Page indicator at the right of the toolbar. @default "1 / 1" */
   pageLabel?: string;
   /** The paper sheet content. Wrap fields in `ExtractHighlight` to outline what was read. */
   sheet: ReactNode;
+  /** Extracted sections, in display order; the same data feeds the Fields, JSON and Schema views. */
   groups: ExtractGroup[];
+  /** Starting zoom the toolbar shows; 70 draws the sheet at its design size (scale 1) and the range is 30–150. @default 70 */
   defaultZoom?: number;
-  bot?: { initial: string; name: string; elapsed?: string };
+  /** Bot credited in the footer; without it the footer shows no attribution. */
+  bot?: {
+    /** One-letter mark on the 20px brand square. */
+    initial: string;
+    /** Bot name, `caption` secondary text. */
+    name: string;
+    /** Optional run time appended as "· 12s". */
+    elapsed?: string;
+  };
+  /** Fires when the Extract button is pressed; the panel also bumps its run counter, which remounts the active view and replays its entry animation. */
   onExtract?: () => void;
+  /** Fires after Accept all has queued the confirmation of every row, so the confirmed marks land on the next render. */
   onAcceptAll?: () => void;
   /** Makes the file name actionable; without it the name is a plain label. */
   onOpenFile?: () => void;
 };
 
+/** Lowest and highest zoom the toolbar allows, and the step of one press. */
 const ZOOM_MIN = 30;
 const ZOOM_MAX = 150;
 const ZOOM_STEP = 10;
+/** The fit zoom: 100% of the sheet box is drawn at this percent, so the default 70 shows it at its design size. */
 const ZOOM_FIT = 70;
 
+/** Outline colours for `ExtractHighlight`: brand-family tints for reads, neutral and ink for notes and marks. */
 const highlightTone = {
   sky: "border-accent-sky-500-90 bg-accent-sky-500-12",
   brand: "border-accent-sky-700-90 bg-accent-sky-700-12",
@@ -62,7 +107,10 @@ export function ExtractHighlight({
   tone = "sky",
   className,
   ...props
-}: WithClass<ComponentProps<"div">> & { tone?: keyof typeof highlightTone }) {
+}: WithClass<ComponentProps<"div">> & {
+  /** Outline and fill pair: `sky` for a normal read, `brand` for a highlighted one, `neutral` and `ink` for notes. @default "sky" */
+  tone?: keyof typeof highlightTone;
+}) {
   return (
     <div
       className={cn("flex flex-col gap-px rounded-sm border-[1.2px] px-1 py-0.5", highlightTone[tone], className)}
@@ -79,7 +127,12 @@ function isChecked(field: ExtractField, resolved: Set<string>) {
   return field.status === "check" && !resolved.has(field.id);
 }
 
-function Divider({ vertical }: { vertical?: boolean }) {
+/** One hairline between the panel's regions; `vertical` draws it as a column rule for the split layout. */
+// prettier-ignore
+function Divider({ vertical }: {
+  /** Draws a column rule instead of a row rule. */
+  vertical?: boolean;
+}) {
   return (
     <div
       role="separator"
@@ -95,6 +148,31 @@ function stepClass() {
 /**
  * Document extract panel (Paper `YUT-1` / `GWP-0`): a viewer with zoom controls on the left and the extracted
  * fields on the right, with Fields / JSON / Schema views, a per-row confirmation check and an Accept all footer.
+ *
+ * Laid out with container queries, not the viewport: the two columns stack below the 4xl container width and
+ * split above it, with the viewer column fixed at 540px. Zoom runs 30–150 in steps of 10, "Fit" returns to 70
+ * (the sheet's design size), and the sheet is scaled from its top edge, so it never reflows. A field with
+ * `status: "check"` renders as a button that confirms that one row; Accept all confirms every row at once.
+ * The footer counts filled and unresolved rows, keeps a dot per field and credits the bot when `bot` is set.
+ *
+ * @example
+ * ```tsx
+ * <DocumentExtractPanel
+ *   fileName="invoice-0424.pdf"
+ *   groups={[
+ *     {
+ *       id: "vendor",
+ *       label: "Vendor",
+ *       fields: [
+ *         { id: "name", label: "Name", value: "Northwind Supply", type: "Text" },
+ *         { id: "due", label: "Due", value: "Oct 24, 2026", type: "Date", status: "check" },
+ *       ],
+ *     },
+ *   ]}
+ *   sheet={<h1 className="text-title-md">Northwind Supply</h1>}
+ *   onAcceptAll={() => saveExtraction()}
+ * />
+ * ```
  */
 export function DocumentExtractPanel({
   fileName,

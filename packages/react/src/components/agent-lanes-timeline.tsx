@@ -4,58 +4,99 @@ import { type ComponentProps, type CSSProperties, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { Spinner } from "./spinner";
 
+/** Bar tone: done is 6% ink, running is 20% live green, failed is 14% red, waiting is an outlined brand bar. */
 export type LaneTaskTone = "done" | "running" | "failed" | "waiting";
 
+/** One bar on a bot's row: its label, time range in minutes before the window end, tone and optional badge. */
 export type LaneTask = {
+  /** Stable key; also how a `LaneHandoff` refers to this task. */
   id: string;
+  /** Text inside the bar, truncated when the bar is too narrow. */
   label: ReactNode;
+  /** 14px icon before the label. */
   icon?: ReactNode;
+  /** Bar fill and text colour. */
   tone: LaneTaskTone;
   /** Minutes before the end of the window, 0 is now: a task from 28 minutes ago to 16 minutes ago is `-28` to `-16`. */
   start: number;
+  /** Minutes before the end of the window where the bar ends; must be greater than `start`. */
   end: number;
   /** A pill inside the bar, such as "Needs you". */
   badge?: ReactNode;
 };
 
+/** Avatar tint of a bot row: `sky` is sky-500, `steel` sky-700, `neutral` neutral-500 and `ink` the brand fill. */
 export type LaneBotTone = "sky" | "steel" | "neutral" | "ink";
 
+/** One lane in the timeline: the bot's identity, its tag and the task bars on its row. */
 export type LaneBot = {
+  /** Stable key for the row; also the lane order. */
   id: string;
+  /** Bot name shown beside the avatar. */
   name: ReactNode;
+  /** Second line under the name, such as the tools the bot uses. */
   tools?: ReactNode;
+  /** One-character avatar label, usually the first letter of the name. */
   initial: string;
+  /** Avatar fill, chosen to keep neighbouring bots distinct. */
   tone: LaneBotTone;
   /** A small tag next to the name: "Idle", "Needs you". */
   badge?: ReactNode;
+  /** Tag fill: `ink` is the brand fill, `subtle` the default 6% ink. @default "subtle" */
   badgeTone?: "subtle" | "ink";
+  /** Bars on this bot's row; tasks from different bots may overlap in time. */
   tasks: LaneTask[];
 };
 
-export type LaneHandoff = { from: string; to: string };
+/** A dashed curve from one task's end to another task's start, such as a hand-off to the next bot. */
+export type LaneHandoff = {
+  /** Task id the curve starts from. */
+  from: string;
+  /** Task id the curve ends at. */
+  to: string;
+};
 
-export type LaneStatus = { id: string; tone: "live" | "ink"; label: ReactNode };
+/** A legend entry in the header: a dot plus a label. */
+export type LaneStatus = {
+  /** Stable key for the entry. */
+  id: string;
+  /** `live` paints the dot green, `ink` paints it with the brand fill. */
+  tone: "live" | "ink";
+  /** Legend text, such as "2 running". */
+  label: ReactNode;
+};
 
+/** The approval strip below the timeline: one question and its two actions. */
 export type AgentLanesTimelineApproval = {
+  /** The approval question in the strip at the bottom. */
   message: ReactNode;
+  /** Fires when "Later" is pressed. */
   onLater?: () => void;
+  /** Fires when "Approve" is pressed. */
   onApprove?: () => void;
 };
 
+/** Props for {@link AgentLanesTimeline}: the lanes, the time window and optional header, hand-offs and approval strip. */
 export type AgentLanesTimelineProps = Omit<ComponentProps<"section">, "className" | "title"> & {
+  /** Panel heading. @default "Bots" */
   title?: ReactNode;
+  /** Legend entries shown next to the heading. @default [] */
   statuses?: LaneStatus[];
-  /** The range pill at the header's right edge. */
+  /** The range pill at the header's right edge. @default "Last 30m" */
   range?: ReactNode;
+  /** One row per bot, in lane order; at least two row heights are always reserved. */
   bots: LaneBot[];
+  /** Hand-off curves drawn over the rows; a hand-off naming an unknown task is skipped. @default [] */
   handoffs?: LaneHandoff[];
-  /** Window length in minutes; the tick labels sit every five. */
+  /** Window length in minutes; the tick labels sit every five. @default 30 */
   windowMinutes?: number;
-  /** Where the current line sits, in minutes before the end of the window. The line glides to a new value in 280ms. */
+  /** Where the current line sits, in minutes before the end of the window. The line glides to a new value in 280ms. @default 0 */
   cursor?: number;
+  /** Adds the approval strip below the timeline. */
   approval?: AgentLanesTimelineApproval;
   /** Makes the range pill actionable; without it the range renders as a plain label. */
   onRangeClick?: () => void;
+  /** Extra classes merged onto the panel, for margins or a width override. */
   className?: string;
 };
 
@@ -75,7 +116,10 @@ const barTone: Record<LaneTaskTone, string> = {
 
 const noStatuses: LaneStatus[] = [];
 const noHandoffs: LaneHandoff[] = [];
-type RowStyle = CSSProperties & { "--i": number };
+type RowStyle = CSSProperties & {
+  /** Lane index, consumed by the staggered `motion-rise` delay. */
+  "--i": number;
+};
 const rowStyle = (lane: number): RowStyle => ({ top: TOP + lane * ROW, height: ROW, "--i": lane });
 
 const ROW = 64;
@@ -91,6 +135,32 @@ const trackW = (fraction: number) => `calc(${TRACK} * ${fraction})`;
  * Paper `Agent lanes` (YCO-1): a 24px-radius surface panel with one lane per bot on a shared time axis, a current
  * line, hand-off curves between bots and an approval strip. The current line glides in 280ms with the emphasized
  * easing, rows tint on hover in 150ms, and running bars carry a spinner.
+ *
+ * The track has a 700px minimum width and scrolls horizontally, so narrow panels stay readable instead of
+ * squeezing the bars. Times are minutes before the window's end, not timestamps.
+ *
+ * @example
+ * ```tsx
+ * <AgentLanesTimeline
+ *   bots={[
+ *     {
+ *       id: "researcher",
+ *       name: "Researcher",
+ *       initial: "R",
+ *       tone: "sky",
+ *       tasks: [{ id: "pull", label: "Pull metrics", tone: "done", start: -28, end: -16 }],
+ *     },
+ *     {
+ *       id: "writer",
+ *       name: "Writer",
+ *       initial: "W",
+ *       tone: "steel",
+ *       tasks: [{ id: "draft", label: "Draft summary", tone: "running", start: -16, end: 0 }],
+ *     },
+ *   ]}
+ *   handoffs={[{ from: "pull", to: "draft" }]}
+ * />
+ * ```
  */
 export function AgentLanesTimeline({
   title = "Bots",
@@ -106,7 +176,15 @@ export function AgentLanesTimeline({
   ...props
 }: AgentLanesTimelineProps) {
   const ticks = Array.from({ length: windowMinutes / 5 - 1 }, (_, i) => -(windowMinutes - 5 * (i + 1)));
-  const taskAt = new Map<string, { task: LaneTask; lane: number }>();
+  const taskAt = new Map<
+    string,
+    {
+      /** The task the hand-off refers to. */
+      task: LaneTask;
+      /** Lane index of the bot that owns the task, used for the curve's vertical endpoints. */
+      lane: number;
+    }
+  >();
   bots.forEach((bot, lane) => {
     for (const task of bot.tasks) taskAt.set(task.id, { task, lane });
   });

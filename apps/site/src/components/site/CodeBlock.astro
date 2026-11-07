@@ -3,7 +3,7 @@ import { CodePanel } from "@horon-ai/react";
 
 import { CopyButton } from "@/components/site/CopyButton";
 import type { Localized } from "@/i18n";
-import { type CodeTone, highlight } from "@/lib/highlight";
+import { type CodeRole, highlight } from "@/lib/highlight";
 
 interface Props {
   /** One sample for both locales, or one per locale when the comments differ. */
@@ -15,13 +15,25 @@ interface Props {
 const { code, lang = "tsx", title } = Astro.props;
 const label = title ?? lang;
 
-// Token utilities only: the syntax colors and secondary text switch with the theme on their own.
-const toneClass: Record<CodeTone, string | undefined> = {
+// Colors come from the site code palette in site.css: one class per role, so
+// light and dark both switch with the theme instead of one flat color.
+const roleClass: Record<CodeRole, string | undefined> = {
   plain: undefined,
-  key: "text-syntax-key",
-  value: "text-syntax-number",
-  muted: "text-syntax-punctuation",
-  comment: "text-text-secondary",
+  keyword: "site-code-keyword",
+  operator: "site-code-operator",
+  function: "site-code-function",
+  tag: "site-code-tag",
+  type: "site-code-type",
+  attribute: "site-code-attribute",
+  property: "site-code-property",
+  string: "site-code-string",
+  number: "site-code-number",
+  punctuation: "site-code-punctuation",
+  comment: "site-code-comment",
+  "tw-variant": "site-code-tw-variant",
+  "tw-utility": "site-code-tw-utility",
+  "tw-value": "site-code-tw-value",
+  "tw-modifier": "site-code-tw-modifier",
 };
 
 const samples =
@@ -44,7 +56,7 @@ const samples =
           {lines.map((line, index) => (
             <Fragment>
               {index > 0 && "\n"}
-              {line.map((token) => (toneClass[token.tone] ? <span class={toneClass[token.tone]}>{token.content}</span> : token.content))}
+              {line.map((token) => (roleClass[token.role] ? <span class={roleClass[token.role]}>{token.content}</span> : token.content))}
             </Fragment>
           ))}
         </CodePanel>

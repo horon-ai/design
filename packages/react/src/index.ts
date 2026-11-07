@@ -1,3 +1,34 @@
+/**
+ * Horon Design System for React.
+ *
+ * The package holds the 84 Horon components ported from the Figma `Horon` file. Behaviour and
+ * accessibility come from Base UI (`@base-ui/react`); layout and colour come from Tailwind CSS v4
+ * utilities whose values are the `@horon-ai/tokens` variables, so class names such as `text-label-md`
+ * or `bg-glass-regular` are the design tokens themselves. TypeScript source ships as-is, with no
+ * build output, so the consuming bundler compiles it.
+ *
+ * Import everything from the barrel, or one component from its subpath:
+ *
+ * - `import { Button, Card, Input } from "@horon-ai/react"` re-exports every component and its prop types.
+ * - `import { Button } from "@horon-ai/react/components/button"` resolves to the same source file
+ *   through the `./components/*` export map, which keeps a bundle to the components it uses.
+ * - `import { cn } from "@horon-ai/react"` is the tailwind-merge helper that understands the token
+ *   names, so a caller class overrides a component default.
+ * - `import { mountCursorGhost } ...` / `import "@horon-ai/react/cursor-ghost"` adds the desktop
+ *   cursor trail outside React.
+ * - `import { usePlatform, useDevice, useHotkey } from "@horon-ai/react"` reads the OS, the browser or
+ *   desktop shell and the input device, and binds a `Mod+K`-style shortcut. The hooks are barrel-only,
+ *   with no subpath, and the same `lib/platform` helpers (`formatShortcut`, `matchesShortcut`, `isModKey`)
+ *   are exported so a caller's shortcut draws and matches the keys the components use.
+ *
+ * Import `@horon-ai/react/globals.css` once in the app entry stylesheet: it brings in Tailwind CSS v4,
+ * Pretendard, Geist Mono, the generated token theme and the liquid-glass layer styles. Add an `@source`
+ * line beside it that points at the package `src` folder so Tailwind scans the component sources (see
+ * the README for the exact line). Then set `class="dark"` on an ancestor for the dark palette, and
+ * `data-platform="desktop"` or `data-platform="mobile"` to switch the typography board.
+ *
+ * @packageDocumentation
+ */
 export * from "./components/agent-activity";
 export * from "./components/agent-lane";
 export * from "./components/agent-lanes-timeline";
