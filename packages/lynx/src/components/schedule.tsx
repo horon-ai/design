@@ -444,10 +444,20 @@ export type ScheduleCardProps = {
 };
 
 /** The Figma card widths (340/380/420px) are the maximum: on a narrow screen the card folds to the column width. */
+// `self-start` keeps the card at its content height: inside a wrapping row Lynx
+// stretches a flex item to the row's cross size, and the taller content then
+// overflows the shorter card instead of growing it.
 const cardSizeClass: Record<ControlSize, string> = {
-  sm: "w-full max-w-[340px] gap-3 p-4",
-  md: "w-full max-w-[380px] gap-4 p-5",
-  lg: "w-full max-w-[420px] gap-4 p-5",
+  sm: "w-full max-w-[340px] shrink-0 self-start gap-3 p-4",
+  md: "w-full max-w-[380px] shrink-0 self-start gap-4 p-5",
+  lg: "w-full max-w-[420px] shrink-0 self-start gap-4 p-5",
+};
+
+/** The section stack: one column so every section keeps its own height. */
+const cardBodyClass: Record<ControlSize, string> = {
+  sm: "gap-3",
+  md: "gap-4",
+  lg: "gap-4",
 };
 
 const cardHeaderSizeClass: Record<ControlSize, string> = {
@@ -515,8 +525,8 @@ export function ScheduleCard({ title, nextRun, children, size = "md", surface = 
   return (
     <view
       className={cn(
-        "relative flex flex-col items-stretch overflow-hidden rounded-xl",
-        surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
+        "relative flex flex-col items-stretch rounded-xl",
+        surface === "glass" ? "bg-glass-thick overflow-hidden" : "border border-border-default bg-bg-surface",
         cardSizeClass[size],
         className,
       )}
@@ -538,7 +548,7 @@ export function ScheduleCard({ title, nextRun, children, size = "md", surface = 
           <view className="flex min-w-0 flex-1 flex-row items-center overflow-hidden">{title}</view>
         )}
       </view>
-      {children}
+      <view className={cn("relative flex flex-col items-stretch", cardBodyClass[size])}>{children}</view>
       {nextRun ? (
         <view
           className={cn("relative flex flex-row items-center rounded-md bg-accent-sky-500-16", nextRunSizeClass[size])}
@@ -594,7 +604,7 @@ export function ScheduleSection({
   className?: string;
 }) {
   return (
-    <view className={cn("relative flex min-w-0 flex-col", sectionSizeClass[size], className)}>
+    <view className={cn("relative flex min-w-0 shrink-0 flex-col", sectionSizeClass[size], className)}>
       {isPlainText(label) ? (
         <text className={cn("text-text-secondary", sectionLabelSizeClass[size])}>{label}</text>
       ) : (

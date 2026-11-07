@@ -33,7 +33,7 @@ function FullCard({ surface }: { surface: "solid" | "glass" }) {
       <ScheduleSection label="Days">
         <WeekdayPicker days={days} defaultValue={["mon", "tue", "wed", "thu", "fri"]} />
       </ScheduleSection>
-      <view className="flex flex-row flex-wrap gap-3">
+      <view className="flex flex-col gap-3">
         <ScheduleSection label="Time">
           <PickerField aria-label="Time" surface="inset" items={times} defaultValue="8:00 AM" />
         </ScheduleSection>
@@ -54,7 +54,7 @@ function FullCard({ surface }: { surface: "solid" | "glass" }) {
 /** The three rungs, each with its own weekday and time controls. */
 function SizeCards({ surface }: { surface: "solid" | "glass" }) {
   return (
-    <view className="flex flex-row flex-wrap items-start justify-center gap-4">
+    <view className="flex flex-row flex-wrap items-start gap-4">
       {(["sm", "md", "lg"] as const).map((size) => (
         <ScheduleCard key={size} size={size} surface={surface} title="Morning brief">
           <ScheduleSection size={size} label="Days">
@@ -73,7 +73,7 @@ function SizeCards({ surface }: { surface: "solid" | "glass" }) {
 function PickerStates() {
   const [time, setTime] = useState("8:00 AM");
   return (
-    <view className="flex flex-row flex-wrap items-start justify-center gap-4">
+    <view className="flex flex-col items-center gap-4">
       <PickerField aria-label="Solid time" items={times} value={time} onValueChange={(next) => setTime(next ?? time)} />
       <PickerField aria-label="Glass time" surface="glass" items={times} defaultValue="9:00 AM" />
     </view>
@@ -82,20 +82,29 @@ function PickerStates() {
 
 export default function ScheduleDemo() {
   return (
-    <view className="flex w-full flex-col gap-6 p-4">
-      <view className="flex flex-col gap-3">
+    // The gallery holds the app in a fixed viewport-height column (`contain: strict` on `<lynx-view>`),
+    // and Lynx gives every `<view>` `min-height: 0` with `flex-shrink: 1`, so a demo taller than the
+    // viewport is squeezed instead of overflowing it. The squeeze runs down the whole column chain: each
+    // card keeps its own height (`shrink-0` in `ScheduleCard`) while its column collapses, and the next
+    // block then paints over the card. The demo therefore stays inside one screen as three columns of
+    // explicit width and `shrink-0`, so every column keeps its content height and nothing is squeezed.
+    <view className="flex w-full shrink-0 flex-row items-start justify-center gap-4">
+      <view className="flex w-[380px] shrink-0 flex-col gap-2">
         <text className="text-caption text-text-secondary">Solid</text>
-        <view className="flex w-full flex-col items-center gap-4">
-          <FullCard surface="solid" />
-          <SizeCards surface="solid" />
-          <PickerStates />
-        </view>
+        <FullCard surface="solid" />
+        <SizeCards surface="solid" />
       </view>
-      <Backdrop className="flex-col">
+      <view className="flex w-[420px] shrink-0 flex-col gap-2">
         <text className="text-caption text-text-secondary">Glass</text>
-        <FullCard surface="glass" />
-        <SizeCards surface="glass" />
-      </Backdrop>
+        <Backdrop className="flex-col">
+          <FullCard surface="glass" />
+          <SizeCards surface="glass" />
+        </Backdrop>
+      </view>
+      <view className="flex w-[190px] shrink-0 flex-col gap-2">
+        <text className="text-caption text-text-secondary">Pickers</text>
+        <PickerStates />
+      </view>
     </view>
   );
 }
