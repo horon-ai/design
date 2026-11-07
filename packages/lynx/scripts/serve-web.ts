@@ -44,9 +44,17 @@ const server = Bun.serve({
     if (path === "/main.web.bundle" || path === "/main.lynx.bundle") {
       return (await serveFile(`${dist}${path}`)) ?? new Response(`run \`bun run build\` first: ${path} is missing`, { status: 404 });
     }
-    // The client runtime ships under `client_prod/static`, so its URLs carry the
-    // `/static` prefix already: strip it before joining.
-    if (path.startsWith("/static/")) return (await serveFile(`${clientStatic}${path.replace("/static", "")}`)) ?? new Response("not found", { status: 404 });
+    // Two things live under `/static`: the client runtime, which ships as
+    // `client_prod/static`, and whatever rspeedy copied into the bundle's own
+    // `static/` folder (images, fonts). The build's files are checked first so a
+    // ported component's `<image src="/static/image/…">` resolves.
+    if (path.startsWith("/static/")) {
+      return (
+        (await serveFile(`${dist}${path}`)) ??
+        (await serveFile(`${clientStatic}${path.replace("/static", "")}`)) ??
+        new Response("not found", { status: 404 })
+      );
+    }
     return (await serveFile(`${host}${path}`)) ?? new Response("not found", { status: 404 });
   },
 });
