@@ -33,4 +33,9 @@ export default defineConfig({
       preact: preactRoot,
     },
   },
+  // Parallel runs in one checkout would share `dist/.rstest-temp`; set
+  // `RSTEST_DIST` to give each run its own build folder.
+  output: {
+    distPath: { root: process.env.RSTEST_DIST ?? "dist" },
+  },
 });
