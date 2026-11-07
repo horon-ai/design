@@ -9,6 +9,11 @@ name: Publish npm packages and deploy the site
 # 2. site: 방금 게시한 버전(라이브러리가 그대로면 npm의 최신 버전)을 문서 사이트에 npm에서
 #    설치해 빌드하고 Cloudflare Pages(horon-design → design.horon.ai)에 배포합니다.
 #    Cloudflare의 Git 자동 배포는 이 잡이 꺼 두므로, 사이트는 게시가 끝난 뒤에만 바뀝니다.
+# 3. notify: 새 버전을 게시했으면 web·admin·desktop 저장소에 repository_dispatch
+#    `design-published`를 보냅니다. 각 저장소의 design-update.yml이 의존성을 올리고
+#    검사를 통과하면 dev에 병합합니다. 비공개 저장소에 신호를 보내려면 시크릿
+#    DESIGN_DISPATCH_TOKEN(대상 저장소 Contents: Read and write 권한의 fine-grained 토큰)이
+#    필요합니다. 없으면 경고만 남기고, 각 저장소가 하루 한 번 스스로 확인합니다.
 on:
   push:
     branches: [main]
@@ -300,3 +305,30 @@ jobs:
             --commit-hash="$GITHUB_SHA" \
             --commit-message="site with @horon-ai/react@$VERSION" \
             --commit-dirty=true
+
+  notify:
+    name: notify consumer repositories
+    needs: publish
+    if: ${{ needs.publish.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        repo: [horon-ai/web, horon-ai/admin, horon-ai/desktop]
+    steps:
+      - name: Send design-published
+        env:
+          GH_TOKEN: ${{ secrets.DESIGN_DISPATCH_TOKEN }}
+          REPO: ${{ matrix.repo }}
+          VERSION: ${{ needs.publish.outputs.version }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::warning::DESIGN_DISPATCH_TOKEN 시크릿이 없어 $REPO에 신호를 보내지 못했습니다. 그 저장소의 하루 한 번 확인으로 반영됩니다."
+            exit 0
+          fi
+          gh api "repos/$REPO/dispatches" -f event_type=design-published \
+            -F "client_payload[version]=$VERSION" >/dev/null
+          echo "$REPO ← design-published $VERSION"

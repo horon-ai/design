@@ -88,6 +88,11 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 - 직전 실행이 `tokens`만 올리고 `react`에서 실패했다면 빠진 패키지만 같은 버전으로 채웁니다.
 - 게시 전에 lint·typecheck·test·build를 다시 돌리고, 게시한 커밋에 `v0.1.N` 태그를 남깁니다.
   provenance(실행한 워크플로와 커밋이 npm 패키지 페이지에 표시됨)가 붙습니다.
+- 게시가 끝나면 `web`, `admin`, `desktop` 저장소에 `design-published` 신호(repository_dispatch)를
+  보냅니다. 각 저장소의 `.github/workflows/design-update.yml`이 npm 최신 버전으로 의존성을 올리고,
+  검사를 통과하면 `dev`에 병합합니다(실패하면 PR만 열어 둡니다). 신호에는 저장소 시크릿
+  `DESIGN_DISPATCH_TOKEN`(세 저장소에 Contents: Read and write 권한을 준 fine-grained 토큰)이
+  필요하고, 없으면 경고만 남깁니다. 그때는 각 저장소가 하루 한 번 스스로 npm을 확인합니다.
 
 계산 규칙은 `.github/scripts/release-version.mjs`에 있고, 로컬에서 다음 버전을 미리 볼 수 있습니다.
 
