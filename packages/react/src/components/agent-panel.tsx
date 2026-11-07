@@ -1,7 +1,10 @@
 import { CaretDown } from "@phosphor-icons/react";
 import type { ComponentProps, ReactNode } from "react";
 
+import { useDevice } from "../hooks/use-device";
+import { usePlatform } from "../hooks/use-platform";
 import { cn } from "../lib/cn";
+import { isModKey } from "../lib/platform";
 import { Kbd } from "./kbd";
 
 type WithClass<T> = Omit<T, "className"> & { className?: string };
@@ -75,7 +78,7 @@ export type TaskComposerProps = {
   className?: string;
 };
 
-/** Figma task `Composer` (Agent tasks 112:797): a 4% ink box, 18px radius, with pickers, ⌘↵ hint and Start. */
+/** Figma task `Composer` (Agent tasks 112:797): a 4% ink box, 18px radius, with pickers, a Mod+Enter hint and Start. */
 export function TaskComposer({
   placeholder = "Describe a task for a bot",
   value,
@@ -85,6 +88,8 @@ export function TaskComposer({
   startLabel = "Start",
   className,
 }: TaskComposerProps) {
+  const { os } = usePlatform();
+  const { keyboardHints } = useDevice();
   return (
     <div
       className={cn(
@@ -97,7 +102,7 @@ export function TaskComposer({
         value={value}
         onChange={(event) => onValueChange?.(event.target.value)}
         onKeyDown={(event) => {
-          if (event.key === "Enter" && event.metaKey) onStart?.();
+          if (event.key === "Enter" && isModKey(event, os)) onStart?.();
         }}
         placeholder={placeholder}
         aria-label={placeholder}
@@ -106,8 +111,7 @@ export function TaskComposer({
       <div className="flex flex-wrap items-center gap-1.5">
         {pickers && <span className="flex min-w-0 flex-wrap items-center gap-1.5">{pickers}</span>}
         <span className="min-w-0 flex-1" />
-        <Kbd>⌘</Kbd>
-        <Kbd>↵</Kbd>
+        {keyboardHints && <Kbd keys="Mod+Enter" />}
         <button
           type="button"
           onClick={onStart}
