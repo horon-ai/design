@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { componentGroups, components, componentsInGroup } from "@/data/components";
-import { flutterDocsNav, foundationsNav, reactDocsNav } from "@/data/nav";
+import { foundationsNav, lynxDocsNav, reactDocsNav } from "@/data/nav";
 import { pick } from "@/i18n";
 import { siteHref } from "@/lib/urls";
 
@@ -8,7 +8,7 @@ export const GET: APIRoute = ({ site }) => {
   const origin = site?.origin ?? "https://design.horon.ai";
   const link = (path: string) => new URL(siteHref(path), origin).toString();
 
-  const developGroups = [...reactDocsNav, ...flutterDocsNav].flatMap((group) => [
+  const developGroups = [...reactDocsNav, ...lynxDocsNav].flatMap((group) => [
     `### ${pick(group.label, "ko")}`,
     "",
     ...group.items.map((item) => `- [${pick(item.label, "ko")}](${link(item.href)})`),
@@ -24,7 +24,7 @@ export const GET: APIRoute = ({ site }) => {
     "",
     `- [Get Started](${link("/get-started")}): 설치와 첫 화면 구성`,
     `- [Foundations](${link("/foundations")}): 색, 타이포, 간격, 반경, 높이, 모션, 유리 표면`,
-    `- [Develop](${link("/develop")}): React와 Flutter 패키지 사용법`,
+    `- [Develop](${link("/develop")}): React와 Lynx 패키지 사용법`,
     `- [Components](${link("/components")}): 컴포넌트 전체 목록`,
     `- [Mascot](${link("/mascot")}): 마스코트 26컷과 브랜드 팔레트`,
     `- [Updates](${link("/updates")}): 변경 기록`,

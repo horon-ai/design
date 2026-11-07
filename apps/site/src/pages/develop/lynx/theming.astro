@@ -1,0 +1,32 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { lynxBreadcrumb } from "@/data/nav";
+import { lynxSnippets as snippets, lynxThemingMessages as m } from "@/i18n/messages/develop-lynx";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={lynxBreadcrumb(m.title, "/develop/lynx/theming")}
+>
+  <h2><T m={m.providerHeading} /></h2>
+  <p><T m={m.providerBody} /></p>
+  <CodeBlock code={snippets.provider} lang="tsx" title="app.tsx" />
+
+  <h2><T m={m.schemeHeading} /></h2>
+  <p><T m={m.schemeBody} /></p>
+
+  <h2><T m={m.platformHeading} /></h2>
+  <p><T m={m.platformBody} /></p>
+
+  <h2><T m={m.motionHeading} /></h2>
+  <p><T m={m.motionBody} /></p>
+
+  <h2><T m={m.hookHeading} /></h2>
+  <p><T m={m.hookBody} /></p>
+  <h3><T m={m.exampleHeading} /></h3>
+  <CodeBlock code={snippets.themeHook} lang="tsx" title="status.tsx" />
+</DocsLayout>

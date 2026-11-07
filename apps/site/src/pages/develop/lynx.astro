@@ -1,0 +1,51 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { lynxDocsNav } from "@/data/nav";
+import { lynxIntroMessages as m, lynxSnippets as snippets } from "@/i18n/messages/develop-lynx";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+import { siteHref } from "@/lib/urls";
+
+/* The page map is the sidebar itself, minus the page being read, so a label can
+ * never drift from the one the sidebar shows. */
+const docPages = lynxDocsNav
+  .flatMap((group) => group.items)
+  .filter((item) => item.href !== "/develop/lynx");
+---
+
+<DocsLayout title={m.title} description={m.description} section="develop">
+  <h2><T m={m.packageHeading} /></h2>
+  <p><T m={m.packageBody} /></p>
+  <ul>
+    <li><T m={m.itemComponents} /></li>
+    <li><T m={m.itemSameShape} /></li>
+    <li><T m={m.itemPlatforms} /></li>
+    <li><T m={m.itemSource} /></li>
+  </ul>
+
+  <h2><T m={m.quickHeading} /></h2>
+  <p><T m={m.quickBody} /></p>
+
+  <h3><T m={m.stepPackages} /></h3>
+  <CodeBlock code={snippets.install} lang="bash" title="terminal" />
+
+  <h3><T m={m.stepStyles} /></h3>
+  <CodeBlock code={snippets.styles} lang="tsx" title="index.tsx" />
+
+  <h3><T m={m.stepUse} /></h3>
+  <CodeBlock code={snippets.firstComponent} lang="tsx" title="app.tsx" />
+
+  <h2><T m={m.docsHeading} /></h2>
+  <p><T m={m.docsBody} /></p>
+  <ul>
+    {
+      docPages.map((item) => (
+        <li>
+          <a href={siteHref(item.href)}>
+            <T m={item.label} />
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</DocsLayout>

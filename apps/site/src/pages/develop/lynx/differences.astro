@@ -1,0 +1,43 @@
+---
+import T from "@/components/i18n/T.astro";
+import { lynxBreadcrumb } from "@/data/nav";
+import { lynxDifferencesMessages as m } from "@/i18n/messages/develop-lynx";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={lynxBreadcrumb(m.title, "/develop/lynx/differences")}
+>
+  <h2><T m={m.introHeading} /></h2>
+  <p><T m={m.introBody} /></p>
+
+  <h3><T m={m.elementsLabel} /></h3>
+  <p><T m={m.elementsBody} /></p>
+
+  <h3><T m={m.stateLabel} /></h3>
+  <p><T m={m.stateBody} /></p>
+
+  <h3><T m={m.glassLabel} /></h3>
+  <p><T m={m.glassBody} /></p>
+
+  <h3><T m={m.motionLabel} /></h3>
+  <p><T m={m.motionBody} /></p>
+
+  <h3><T m={m.overlayLabel} /></h3>
+  <p><T m={m.overlayBody} /></p>
+
+  <h3><T m={m.calendarLabel} /></h3>
+  <p><T m={m.calendarBody} /></p>
+
+  <h3><T m={m.filesLabel} /></h3>
+  <p><T m={m.filesBody} /></p>
+
+  <h3><T m={m.domLabel} /></h3>
+  <p><T m={m.domBody} /></p>
+
+  <h2><T m={m.sameHeading} /></h2>
+  <p><T m={m.sameBody} /></p>
+</DocsLayout>

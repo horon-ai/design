@@ -1,0 +1,33 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { lynxBreadcrumb } from "@/data/nav";
+import { lynxGalleryMessages as m, lynxSnippets as s } from "@/i18n/messages/develop-lynx";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={lynxBreadcrumb(m.title, "/develop/lynx/gallery")}
+>
+  <h2><T m={m.buildHeading} /></h2>
+  <p><T m={m.buildBody} /></p>
+  <CodeBlock code={s.galleryBuild} lang="bash" title="terminal" />
+
+  <h2><T m={m.webHeading} /></h2>
+  <p><T m={m.webBody} /></p>
+  <CodeBlock code={s.galleryWeb} lang="bash" title="terminal" />
+
+  <h2><T m={m.testHeading} /></h2>
+  <p><T m={m.testBody} /></p>
+  <CodeBlock code={s.galleryTest} lang="bash" title="terminal" />
+
+  <h2><T m={m.parityHeading} /></h2>
+  <p><T m={m.parityBody} /></p>
+  <CodeBlock code={s.galleryParity} lang="bash" title="terminal" />
+
+  <h2><T m={m.generatedHeading} /></h2>
+  <p><T m={m.generatedBody} /></p>
+</DocsLayout>
