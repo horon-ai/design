@@ -15,28 +15,57 @@ import {
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
-type DivProps = Omit<ComponentProps<"div">, "className"> & { className?: string };
-type ButtonProps = Omit<ComponentProps<"button">, "className"> & { className?: string };
+/** A `div` prop set with an optional `className`, used by the parts that render a plain `div`. */
+type DivProps = Omit<ComponentProps<"div">, "className"> & {
+  /** Classes merged onto the element. */
+  className?: string;
+};
+/** A `button` prop set with an optional `className`, used by the parts that render a `button`. */
+type ButtonProps = Omit<ComponentProps<"button">, "className"> & {
+  /** Classes merged onto the button. */
+  className?: string;
+};
 
+/**
+ * Props for {@link Sidebar}. Other `nav` props (`aria-label`, `id`, handlers) land on the column.
+ */
 export type SidebarProps = Omit<ComponentProps<"nav">, "className"> & {
+  /** Classes merged onto the column. */
   className?: string;
   /**
    * `glass` (default) is the thick-glass column. `photo` is the Paper app sidebar: the Horon photo
    * on #EEF3F8 under a 55% white veil, with the thick glass kept for dark mode. `plain` paints no
    * fill or glass, so the column takes the color of the layout behind it, divided by a 1px border.
+   * @default "glass"
    */
   surface?: "glass" | "photo" | "plain";
   /**
    * Drag the right edge to change the width, from the `md` breakpoint (768px) up.
    * Below `md` the handle is hidden and the sidebar keeps its fixed 280px width.
+   * @default false
    */
   resizable?: boolean;
-  /** Starting width in px when `resizable`. Double-clicking the handle returns to it. */
+  /**
+   * Starting width in px when `resizable`. Double-clicking the handle returns to it.
+   * @default 280
+   */
   defaultWidth?: number;
+  /**
+   * Narrowest width in px the handle can drag to.
+   * @default 240
+   */
   minWidth?: number;
+  /**
+   * Widest width in px the handle can drag to.
+   * @default 400
+   */
   maxWidth?: number;
   /** Called with the clamped width as it changes, during a drag too. */
   onWidthChange?: (width: number) => void;
+  /**
+   * Accessible name of the resize handle.
+   * @default "Resize sidebar"
+   */
   resizeLabel?: string;
 };
 
@@ -49,6 +78,27 @@ function clamp(value: number, min: number, max: number): number {
 /**
  * Figma `Sidebar` (88:848): a 280px thick-glass column with a 1px right border, 16/12/12px padding.
  * With `resizable`, an 8px handle on the right edge drags the width between `minWidth` and `maxWidth`.
+ *
+ * Width is uncontrolled: the column keeps its own state, starts at `defaultWidth` and reports every
+ * clamped change through `onWidthChange`. The handle is keyboard operable (arrow keys step 16px,
+ * Home/End jump to the limits) and sits behind `md`; the column never grows past a narrower parent.
+ *
+ * @example
+ * ```tsx
+ * import { Sidebar, SidebarGroup, SidebarHeader, SidebarItem } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <Sidebar resizable onWidthChange={(width) => console.log(width)}>
+ *       <SidebarHeader initial="H" name="Horon" onCollapse={() => {}} />
+ *       <SidebarGroup label="Workspace">
+ *         <SidebarItem current>Home</SidebarItem>
+ *         <SidebarItem count={3}>Inbox</SidebarItem>
+ *       </SidebarGroup>
+ *     </Sidebar>
+ *   );
+ * }
+ * ```
  */
 export function Sidebar({
   className,
@@ -65,7 +115,12 @@ export function Sidebar({
 }: SidebarProps) {
   const [width, setWidth] = useState(() => clamp(defaultWidth, minWidth, maxWidth));
   const [dragging, setDragging] = useState(false);
-  const drag = useRef<{ x: number; width: number } | null>(null);
+  const drag = useRef<{
+    /** Pointer x (px, client coordinate) where the drag started. */
+    x: number;
+    /** Column width (px) at the moment the drag started, so every move applies to a fixed base. */
+    width: number;
+  } | null>(null);
 
   const resize = (next: number) => {
     const clamped = clamp(next, minWidth, maxWidth);
@@ -165,22 +220,46 @@ export function Sidebar({
   );
 }
 
+/**
+ * Props for {@link SidebarHeader}. Renders the workspace switch and an optional collapse button in
+ * one 36px row.
+ */
 export type SidebarHeaderProps = {
   /** Workspace initial shown on the 28px ink tile. */
   initial: ReactNode;
+  /** Workspace name next to the tile; truncated when the column is narrow. */
   name: ReactNode;
   /** Props for the workspace switch button, such as a `MenuTrigger` render target. */
   switchProps?: ButtonProps;
   /** Replaces the default switch, such as a `WorkspaceMenu` whose trigger is a `SidebarWorkspaceSwitch`. */
   switchSlot?: ReactNode;
+  /** Shows the collapse button when set; it receives the click and the caller hides the column. */
   onCollapse?: () => void;
+  /**
+   * Accessible name of the collapse button.
+   * @default "Collapse sidebar"
+   */
   collapseLabel?: string;
+  /** Classes merged onto the header row. */
   className?: string;
 };
 
-export type SidebarWorkspaceSwitchProps = Omit<ButtonProps, "name"> & { initial: ReactNode; name: ReactNode };
+/**
+ * Props for {@link SidebarWorkspaceSwitch}: every button prop except `name`, which is the visible
+ * workspace label instead.
+ */
+export type SidebarWorkspaceSwitchProps = Omit<ButtonProps, "name"> & {
+  /** Workspace initial on the 28px ink tile. */
+  initial: ReactNode;
+  /** Workspace name, truncated in the row. */
+  name: ReactNode;
+};
 
-/** The workspace switch button: 28px ink tile, name and up-down caret. Highlights while its menu is open. */
+/**
+ * The workspace switch button: 28px ink tile, name and up-down caret. Highlights while its menu is open.
+ *
+ * Part of {@link Sidebar}.
+ */
 export function SidebarWorkspaceSwitch({ initial, name, className, ...props }: SidebarWorkspaceSwitchProps) {
   return (
     <button
@@ -201,7 +280,12 @@ export function SidebarWorkspaceSwitch({ initial, name, className, ...props }: S
   );
 }
 
-/** Header: workspace switch (tile, name, up-down caret) and an optional 28px collapse button. 10px gap below. */
+/**
+ * Header: workspace switch (tile, name, up-down caret) and an optional 28px collapse button. 10px gap below.
+ *
+ * Part of {@link Sidebar}. Pass `switchSlot` when the switch must open a menu; otherwise the built-in
+ * `SidebarWorkspaceSwitch` is rendered with `switchProps` spread onto it.
+ */
 export function SidebarHeader({
   initial,
   name,
@@ -228,25 +312,41 @@ export function SidebarHeader({
   );
 }
 
+/**
+ * Props every sidebar row shares, whichever element it renders as.
+ */
 type SidebarItemCommonProps = {
   /** 18px icon, or a `SidebarProjectTile`. */
   icon?: ReactNode;
   /** Count on the right, such as unread items. */
   count?: ReactNode;
-  /** Trailing 7px red dot for attention. */
+  /** Trailing 7px red dot marking the row for attention; the dot itself carries `aria-label="Needs attention"` but no role. */
   attention?: boolean;
+  /** Marks the active row: 6% ink fill and `aria-current="page"`. */
   current?: boolean;
+  /** Classes merged onto the row. */
   className?: string;
 };
 
-/** With `href`, the row is a real link and takes anchor props; without it, a `type="button"` button. */
+/**
+ * With `href`, the row is a real link and takes anchor props; without it, a `type="button"` button.
+ * The `current` flag adds `aria-current="page"` to either.
+ */
 export type SidebarItemProps =
-  | (SidebarItemCommonProps & { href: string } & Omit<ComponentProps<"a">, "className" | "href" | "type">)
-  | (SidebarItemCommonProps & { href?: undefined } & ButtonProps);
+  | (SidebarItemCommonProps & {
+      /** Destination; setting it switches the row to an anchor. */
+      href: string;
+    } & Omit<ComponentProps<"a">, "className" | "href" | "type">)
+  | (SidebarItemCommonProps & {
+      /** Leave it out to render a button instead of a link. */
+      href?: undefined;
+    } & ButtonProps);
 
 /**
  * Figma sidebar `Item`: 32px row, 12px radius, 10px gap; the current item is 6% ink.
  * Pass `href` to render an `<a>` with the same look.
+ *
+ * Part of {@link Sidebar}.
  */
 export function SidebarItem({ icon, count, attention, current, className, children, ...props }: SidebarItemProps) {
   const classes = cn(
@@ -286,11 +386,18 @@ export function SidebarItem({ icon, count, attention, current, className, childr
   );
 }
 
-/** A 22px rounded tile with a 14px inverse icon, for project rows. Set the fill with `className`. */
+/**
+ * A 22px rounded tile with a 14px inverse icon, for project rows. Set the fill with `className`.
+ *
+ * Part of {@link Sidebar}.
+ */
 export function SidebarProjectTile({
   className,
   ...props
-}: Omit<ComponentProps<"span">, "className"> & { className?: string }) {
+}: Omit<ComponentProps<"span">, "className"> & {
+  /** Classes merged onto the tile; the fill color comes from here. */
+  className?: string;
+}) {
   return (
     <span
       className={cn(
@@ -302,14 +409,29 @@ export function SidebarProjectTile({
   );
 }
 
+/**
+ * Props for {@link SidebarGroup}.
+ */
 export type SidebarGroupProps = {
+  /** Group caption; also the collapsible trigger's label. */
   label: ReactNode;
+  /**
+   * Whether the group starts expanded.
+   * @default true
+   */
   defaultOpen?: boolean;
+  /** Rows or projects inside the group. */
   children: ReactNode;
+  /** Classes merged onto the group. */
   className?: string;
 };
 
-/** A collapsible group: 28px label in secondary text with a 14px caret, 14px above. */
+/**
+ * A collapsible group: 28px label in secondary text with a 14px caret, 14px above.
+ *
+ * Part of {@link Sidebar}. The group is uncontrolled after mount; the caret rotates from pointing
+ * right (collapsed) to down (open) and the panel height animates.
+ */
 export function SidebarGroup({ label, defaultOpen = true, children, className }: SidebarGroupProps) {
   return (
     <Collapsible.Root defaultOpen={defaultOpen} className={cn("relative mt-3.5 flex flex-col gap-0.5", className)}>
@@ -340,8 +462,19 @@ function branchesPath(count: number): string {
   return [trunk, ...branches].join("");
 }
 
-/** Figma `Tree`: nested sidebar items with 16px icons, 20px in, joined to the parent by curved connectors. */
-export function SidebarTree({ children, className }: { children: ReactNode; className?: string }) {
+/**
+ * Figma `Tree`: nested sidebar items with 16px icons, 20px in, joined to the parent by curved connectors.
+ *
+ * Part of {@link Sidebar}. The connector is one SVG path computed from the child count, so it
+ * assumes 32px rows with a 2px gap; pass the child rows directly rather than wrapping them.
+ */
+// prettier-ignore
+export function SidebarTree({ children, className }: {
+  /** Child rows; their count and order decide the connector shape. */
+  children: ReactNode;
+  /** Classes merged onto the tree wrapper. */
+  className?: string;
+}) {
   const count = Children.count(children);
   const height = ROW / 2 + (count - 1) * (ROW + GAP) + 0.75;
   return (
@@ -361,18 +494,33 @@ export function SidebarTree({ children, className }: { children: ReactNode; clas
   );
 }
 
-/** Pushes the account card to the bottom. */
+/**
+ * Pushes the account card to the bottom.
+ *
+ * Part of {@link Sidebar}; it grows to fill the remaining column height.
+ */
 export function SidebarSpacer() {
   return <div aria-hidden className="min-h-px flex-1" />;
 }
 
+/**
+ * Props for {@link SidebarAccount}: every button prop plus the identity lines it shows.
+ */
 export type SidebarAccountProps = ButtonProps & {
+  /** Initials on the 36px sky avatar tile. */
   initials: ReactNode;
+  /** Account name. */
   name: ReactNode;
+  /** Email line under the name. */
   email?: ReactNode;
 };
 
-/** Figma sidebar `Account`: a 54px row with a 36px sky avatar tile and an up-down caret. */
+/**
+ * Figma sidebar `Account`: a 54px row with a 36px sky avatar tile and an up-down caret.
+ *
+ * Part of {@link Sidebar}. The row is a button, so pair it with a menu when it should open an
+ * account switcher.
+ */
 export function SidebarAccount({ initials, name, email, className, ...props }: SidebarAccountProps) {
   return (
     <button
@@ -396,13 +544,24 @@ export function SidebarAccount({ initials, name, email, className, ...props }: S
   );
 }
 
+/**
+ * Props for {@link SidebarProject}.
+ */
 export type SidebarProjectProps = {
   /** A `SidebarProjectTile`. */
   icon: ReactNode;
+  /** Project name; truncated in the row. */
   label: ReactNode;
+  /** Marks the active project: 6% ink row and `aria-current="page"`. */
   current?: boolean;
+  /**
+   * Whether the project starts expanded in uncontrolled mode.
+   * @default false
+   */
   defaultOpen?: boolean;
+  /** Expanded state in controlled mode; pass `onOpenChange` with it. */
   open?: boolean;
+  /** Fires with the next expanded state when the row is toggled. */
   onOpenChange?: (open: boolean) => void;
   /**
    * The project's "More" control, such as a `MenuTrigger` whose render target is
@@ -411,6 +570,7 @@ export type SidebarProjectProps = {
   actions?: ReactNode;
   /** Chats and documents in the project, shown in a `SidebarTree` when open. */
   children?: ReactNode;
+  /** Classes merged onto the project block. */
   className?: string;
 };
 
@@ -418,6 +578,10 @@ export type SidebarProjectProps = {
  * Figma sidebar project row (88:848, Menu=Project 314:12407): tile, name and a
  * 14px chevron (down when open). An open project shows the 16px "More" button in
  * place of the chevron, on a 6% ink row; a collapsed project keeps the chevron.
+ *
+ * Part of {@link Sidebar}. The expanded state works uncontrolled (`defaultOpen`) or controlled
+ * (`open` + `onOpenChange`). A project without children renders no panel and no chevron; the
+ * trigger still toggles the open state, and any `actions` stay visible.
  */
 export function SidebarProject({
   icon,
@@ -481,9 +645,23 @@ export function SidebarProject({
   );
 }
 
-export type SidebarProjectMoreProps = ButtonProps & { label?: string };
+/**
+ * Props for {@link SidebarProjectMore}: every button prop plus the accessible label.
+ */
+export type SidebarProjectMoreProps = ButtonProps & {
+  /**
+   * Accessible name of the button.
+   * @default "Project actions"
+   */
+  label?: string;
+};
 
-/** The 16px "More" button of a project row. */
+/**
+ * The 16px "More" button of a project row.
+ *
+ * Part of {@link Sidebar}; its tap target is widened to 44px by a pseudo-element so the small glyph
+ * stays easy to hit.
+ */
 export function SidebarProjectMore({ label = "Project actions", className, ...props }: SidebarProjectMoreProps) {
   return (
     <button
@@ -500,15 +678,24 @@ export function SidebarProjectMore({ label = "Project actions", className, ...pr
   );
 }
 
-export type SidebarAddButtonProps = ButtonProps & { icon?: ReactNode };
+/**
+ * Props for {@link SidebarAddButton}: every button prop plus the trailing icon.
+ */
+export type SidebarAddButtonProps = ButtonProps & {
+  /** Icon after the label; defaults to a 16px plus circle. */
+  icon?: ReactNode;
+};
+
+/** Default trailing icon of {@link SidebarAddButton}. */
+const addIcon = <PlusCircle />;
 
 /**
  * Figma `Add project`: a 36px button with a 1px inside dashed border (4/3 dash,
  * 20% ink), label then a 16px plus-circle, 12px above. The border is an SVG rect
  * so the dash matches; its 2px stroke is clipped to the inner 1px.
+ *
+ * Part of {@link Sidebar}.
  */
-const addIcon = <PlusCircle />;
-
 export function SidebarAddButton({ icon = addIcon, className, children, ...props }: SidebarAddButtonProps) {
   return (
     <button
@@ -539,4 +726,8 @@ export function SidebarAddButton({ icon = addIcon, className, children, ...props
   );
 }
 
+/**
+ * A `div` prop set with an optional `className`, exported so callers can type their own sidebar
+ * pieces the same way the internal parts do.
+ */
 export type { DivProps as SidebarDivProps };

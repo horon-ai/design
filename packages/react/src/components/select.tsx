@@ -7,28 +7,65 @@ import type { ControlSize } from "../lib/size";
 import { fieldBoxClass, fieldSizeClass, fieldTextClass, type InputSurface } from "./input";
 import { inputGroupSegmentClass, useInputGroup } from "./input-group";
 
+/** Field height and text rung of a `field` select: 32/40/48px with 14/16/18px text. */
 export type SelectSize = ControlSize;
+
+/**
+ * One choice in the list.
+ */
 export type SelectItemData = {
+  /** Value reported on selection. */
   value: string;
+  /** Text shown both in the trigger and in the popup row. */
   label: ReactNode;
   /** Shorter text for the trigger once chosen, such as `+82` for "+82 South Korea". */
   selectedLabel?: ReactNode;
+  /** Dims the row and blocks picking it. */
   disabled?: boolean;
 };
 
+/**
+ * Props for {@link Select}. Selection props (`value`, `defaultValue`, `onValueChange`, `name`) pass
+ * through to Base UI's select root.
+ */
 export type SelectProps = Omit<ComponentProps<typeof BaseSelect.Root>, "items" | "children"> & {
+  /** Choices in the popup, in display order. */
   items: SelectItemData[];
+  /**
+   * Text shown in the trigger before a choice is made.
+   * @default "Select"
+   */
   placeholder?: ReactNode;
+  /**
+   * Field height and text rung for `variant="field"`; a `chip` trigger keeps its fixed 32px,
+   * `label-md` size and still uses `size` for its popup rows, and a `segment` takes the enclosing
+   * `InputGroup` size instead.
+   * @default "md"
+   */
   size?: SelectSize;
+  /**
+   * Fill of the field and of its popup; `glass` also switches the popup to the veil. A `chip` uses
+   * it for the popup only, since the chip has its own subtle fill.
+   * @default "solid"
+   */
   surface?: InputSurface;
+  /** Paints the danger border and sets `aria-invalid` on the trigger. */
   invalid?: boolean;
   /**
    * `chip` is the Paper filter chip: a 32px bg-subtle pill, 12px padding, 13/18 medium, sized to its label.
    * `segment` is the tinted prefix or suffix of an `InputGroup`; it takes the group's size and disabled state.
+   * @default "field"
    */
   variant?: "field" | "chip" | "segment";
+  /**
+   * Draws the caret at the right of the trigger; set it to false when the trigger supplies its own
+   * icon.
+   * @default true
+   */
   showIndicator?: boolean;
+  /** Classes merged onto the trigger. */
   className?: string;
+  /** Accessible name of the trigger. */
   "aria-label"?: string;
 };
 
@@ -53,6 +90,29 @@ const triggerFocusClass = "focus-visible:outline-2 focus-visible:outline-offset-
  * text size. The popup is the veil (`veil-overlay`), 20px radius, 40px rows; the chosen row
  * is 6% ink with a check. `variant="chip"` keeps its single 32px chip size;
  * `variant="segment"` follows its `InputGroup`.
+ *
+ * The popup is portalled and positioned under the trigger; rows are highlighted with the keyboard
+ * and marked with a check when chosen. The trigger is a button, not a native `select`, so give it an
+ * `aria-label` or associate a visible label yourself; a wrapping `<label>` does not name it.
+ *
+ * @example
+ * ```tsx
+ * import { Select } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <Select
+ *       aria-label="Country"
+ *       defaultValue="kr"
+ *       items={[
+ *         { value: "kr", label: "South Korea", selectedLabel: "+82" },
+ *         { value: "jp", label: "Japan", selectedLabel: "+81" },
+ *         { value: "us", label: "United States", disabled: true },
+ *       ]}
+ *     />
+ *   );
+ * }
+ * ```
  */
 export function Select({
   items,

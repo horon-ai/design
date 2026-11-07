@@ -8,23 +8,46 @@ import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { LiquidGlass } from "./liquid-glass";
 
+/**
+ * Field size of a picker, on the shared control scale: `sm` 32px, `md` 40px, `lg` 48px.
+ */
 export type PickerFieldSize = ControlSize;
 
+/**
+ * Props for {@link PickerField}. The type is closed: it declares no `disabled` or `name` (and no
+ * other Base UI `Select.Root` prop), so TypeScript rejects them before they reach the root; `items`
+ * is the label list the trigger reads.
+ */
 export type PickerFieldProps = {
-  items: { value: string; label: ReactNode }[];
+  /** Choices in the popup; `value` is what `onValueChange` returns, `label` is what the row and trigger show. */
+  items: {
+    /** Value reported when the item is picked. */
+    value: string;
+    /** Text shown on the trigger and in the popup row. */
+    label: ReactNode;
+  }[];
+  /** Selected value in controlled mode. */
   value?: string;
+  /** Starting value in uncontrolled mode. */
   defaultValue?: string;
+  /** Fires with the newly selected value, or `null` when the choice is cleared, after a pick. */
   onValueChange?: (value: string | null) => void;
-  /** Leading 16px icon; the Time field uses a clock. */
+  /** Leading icon, 16px on `sm` and `md` and 20px on `lg`; the Time field uses a clock. */
   icon?: ReactNode;
   /**
    * `solid` (default) is the opaque surface field with a default border, `glass` the veil field,
    * `inset` the 4% ink field inside the schedule card.
+   * @default "solid"
    */
   surface?: "solid" | "glass" | "inset";
-  /** Field size: `sm` 32px, `md` 40px (default), `lg` 48px; scales width, icon and menu rows. */
+  /**
+   * Field size: `sm` 32px, `md` 40px (default), `lg` 48px; scales width, icon and menu rows.
+   * @default "md"
+   */
   size?: PickerFieldSize;
+  /** Accessible name of the trigger when no visible label is associated with it. */
   "aria-label"?: string;
+  /** Classes merged onto the trigger. */
   className?: string;
 };
 
@@ -73,7 +96,34 @@ const itemIndicatorSizeClass: Record<PickerFieldSize, string> = {
   lg: "[&_svg]:size-5",
 };
 
-/** Figma `Time field` (Routine schedule 110:765): a 160px picker on the same 32/40/48px and 14/16/18 text rungs as `Input`. */
+/**
+ * Figma `Time field` (Routine schedule 110:765): a 160px picker on the same 32/40/48px and 14/16/18 text rungs as `Input`.
+ *
+ * The popup is portalled to the body and aligned under the trigger with an 8px offset, so it can
+ * escape a scrolling card; the caret rotates while it is open. The field never grows past its
+ * rung width but shrinks with a narrow parent.
+ *
+ * @example
+ * ```tsx
+ * import { useState } from "react";
+ * import { PickerField } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   const [time, setTime] = useState("09:00");
+ *   return (
+ *     <PickerField
+ *       aria-label="Start time"
+ *       value={time}
+ *       onValueChange={(next) => setTime(next ?? time)}
+ *       items={[
+ *         { value: "09:00", label: "9:00 AM" },
+ *         { value: "10:00", label: "10:00 AM" },
+ *       ]}
+ *     />
+ *   );
+ * }
+ * ```
+ */
 export function PickerField({
   items,
   icon,
@@ -145,17 +195,39 @@ export function PickerField({
   );
 }
 
+/**
+ * Day circle size: `sm` 32px, `md` 36px, `lg` 44px.
+ */
 export type WeekdayPickerSize = ControlSize;
 
+/**
+ * Props for {@link WeekdayPicker}. It is a multiple-selection toggle group, so `value` and
+ * `onValueChange` carry an array of day values.
+ */
 export type WeekdayPickerProps = {
   /** One entry per day, in display order. */
-  days: { value: string; label: string; name: string }[];
+  days: {
+    /** Value that goes into `value` and `onValueChange`. */
+    value: string;
+    /** Short text on the circle, such as "M". */
+    label: string;
+    /** Accessible name of the toggle, such as "Monday". */
+    name: string;
+  }[];
+  /** Selected day values in controlled mode. */
   value?: string[];
+  /** Selected day values at first render in uncontrolled mode. */
   defaultValue?: string[];
+  /** Fires with the complete next selection whenever a day is toggled on or off. */
   onValueChange?: (value: string[]) => void;
-  /** Day circle size: `sm` 32px, `md` 36px (default), `lg` 44px. */
+  /**
+   * Day circle size: `sm` 32px, `md` 36px (default), `lg` 44px.
+   * @default "md"
+   */
   size?: WeekdayPickerSize;
+  /** Accessible name of the group. */
   "aria-label"?: string;
+  /** Classes merged onto the wrapping flex row. */
   className?: string;
 };
 
@@ -172,7 +244,32 @@ const weekdayToggleSizeClass: Record<WeekdayPickerSize, string> = {
   lg: "size-11 text-label-lg",
 };
 
-/** Figma `Weekday picker` (110:765): 36px round toggles, ink when on and 6% ink when off. */
+/**
+ * Figma `Weekday picker` (110:765): 36px round toggles, ink when on and 6% ink when off.
+ *
+ * Toggling one day does not close the group; each press reports the whole next selection. The
+ * group wraps instead of shrinking its circles, so touch targets stay at least 32px. It is
+ * multiple-selection, so several days can be on at once.
+ *
+ * @example
+ * ```tsx
+ * import { WeekdayPicker } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <WeekdayPicker
+ *       aria-label="Repeat on"
+ *       defaultValue={["mon", "wed", "fri"]}
+ *       days={[
+ *         { value: "mon", label: "M", name: "Monday" },
+ *         { value: "tue", label: "T", name: "Tuesday" },
+ *         { value: "wed", label: "W", name: "Wednesday" },
+ *       ]}
+ *     />
+ *   );
+ * }
+ * ```
+ */
 export function WeekdayPicker({
   days,
   value,
@@ -210,15 +307,28 @@ export function WeekdayPicker({
   );
 }
 
+/**
+ * Props for {@link ScheduleCard}. The card is a plain section: it lays out what you pass and
+ * draws the frame, header and next-run strip around it.
+ */
 export type ScheduleCardProps = {
+  /** Header title next to the repeat icon. */
   title: ReactNode;
-  /** The "Next run" line at the bottom. */
+  /** The "Next run" line at the bottom; without it the strip is not rendered. */
   nextRun?: ReactNode;
+  /** Body of the card, usually a stack of `ScheduleSection` blocks and pickers. */
   children: ReactNode;
-  /** Card size: `sm` 340px, `md` 380px (default), `lg` 420px; scales padding, gaps and text. */
+  /**
+   * Card size: `sm` 340px, `md` 380px (default), `lg` 420px; scales padding, gaps and text.
+   * @default "md"
+   */
   size?: ControlSize;
-  /** `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass card. */
+  /**
+   * `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass card.
+   * @default "solid"
+   */
   surface?: "solid" | "glass";
+  /** Classes merged onto the card. */
   className?: string;
 };
 
@@ -259,7 +369,37 @@ const nextRunIconSizeClass: Record<ControlSize, string> = {
   lg: "size-5",
 };
 
-/** Figma `Routine schedule card` (110:765): a 380px card, 20px padding, 16px gaps, solid or thick glass. */
+/**
+ * Figma `Routine schedule card` (110:765): a 380px card, 20px padding, 16px gaps, solid or thick glass.
+ *
+ * Compose it from `ScheduleSection` blocks holding `WeekdayPicker`, `PickerField` or `Input`
+ * controls. On a narrow column the card folds to the available width instead of overflowing.
+ *
+ * @example
+ * ```tsx
+ * import { PickerField, ScheduleCard, ScheduleSection, WeekdayPicker } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <ScheduleCard title="Morning digest" nextRun="Next run tomorrow at 9:00 AM">
+ *       <ScheduleSection label="Repeat">
+ *         <PickerField
+ *           aria-label="Repeat"
+ *           surface="inset"
+ *           items={[
+ *             { value: "daily", label: "Daily" },
+ *             { value: "weekly", label: "Weekly" },
+ *           ]}
+ *         />
+ *       </ScheduleSection>
+ *       <ScheduleSection label="Days">
+ *         <WeekdayPicker days={[{ value: "mon", label: "M", name: "Monday" }]} />
+ *       </ScheduleSection>
+ *     </ScheduleCard>
+ *   );
+ * }
+ * ```
+ */
 export function ScheduleCard({
   title,
   nextRun,
@@ -298,7 +438,9 @@ export function ScheduleCard({
   );
 }
 
-/** A captioned block inside the schedule card, such as "Repeat" or "Days"; the caption-to-control gap is `Field`'s. */
+/**
+ * A captioned block inside the schedule card, such as "Repeat" or "Days"; the caption-to-control gap is `Field`'s.
+ */
 const sectionSizeClass: Record<ControlSize, string> = {
   sm: "gap-1",
   md: "gap-2",
@@ -311,6 +453,10 @@ const sectionLabelSizeClass: Record<ControlSize, string> = {
   lg: "text-label-sm",
 };
 
+/**
+ * A captioned block inside the schedule card, such as "Repeat" or "Days". Renders the caption in
+ * secondary text above its children, so a card body becomes a stack of labelled controls.
+ */
 export function ScheduleSection({
   label,
   children,
@@ -318,9 +464,16 @@ export function ScheduleSection({
   size = "md",
   className,
 }: {
+  /** Caption above the control, in secondary text. */
   label: ReactNode;
+  /** The control the caption belongs to. */
   children: ReactNode;
+  /**
+   * Matches the size of the controls inside the section; scales the caption rung and the caption gap.
+   * @default "md"
+   */
   size?: ControlSize;
+  /** Classes merged onto the block. */
   className?: string;
 }) {
   return (
