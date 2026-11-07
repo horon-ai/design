@@ -1,6 +1,18 @@
 import { type RefObject, useEffect, useLayoutEffect, useState } from "react";
 
-export type IndicatorRect = { left: number; top: number; width: number; height: number };
+/**
+ * Position of the active item inside its track, in CSS px, taken from the item's `offset*` readings.
+ */
+export type IndicatorRect = {
+  /** Left offset measured from the track, as `offsetLeft` reports it. */
+  left: number;
+  /** Top offset measured from the track, as `offsetTop` reports it. */
+  top: number;
+  /** Width of the active item. */
+  width: number;
+  /** Height of the active item. */
+  height: number;
+};
 
 /**
  * Measures the active item inside a positioned track so one indicator can slide
@@ -8,6 +20,10 @@ export type IndicatorRect = { left: number; top: number; width: number; height: 
  * or `[aria-current="page"]`); the rect follows attribute changes and resizes.
  * `animate` turns true one frame after the first placement, so the indicator
  * lands in place instead of sliding in from 0,0.
+ *
+ * @param track - Ref to the positioned track element that holds the items.
+ * @param selector - CSS selector for the active item, queried inside the track; a missing item yields a null rect.
+ * @returns The measured rect (or `null` before the first measurement) and an `animate` flag for the first frame.
  */
 export function useActiveIndicator(track: RefObject<HTMLElement | null>, selector: string) {
   const [rect, setRect] = useState<IndicatorRect | null>(null);

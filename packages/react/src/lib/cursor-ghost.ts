@@ -12,15 +12,15 @@
  */
 
 export type CursorGhostOptions = {
-  /** Number of arrow copies. */
+  /** Number of arrow copies. @default 5 */
   ghosts?: number;
-  /** Arrow height in CSS px. */
+  /** Arrow height in CSS px. @default 26 */
   size?: number;
-  /** Lerp factor of the first copy toward the pointer, per frame. */
+  /** Lerp factor of the first copy toward the pointer, per frame. @default 0.16 */
   headFollow?: number;
-  /** Blur spread of the last copy in CSS px. */
+  /** Blur spread of the last copy in CSS px. @default 14 */
   smear?: number;
-  /** Arrow fill. Blended with `difference`, so white reads dark on light pages. */
+  /** Arrow fill. Blended with `difference`, so white reads dark on light pages. @default "#FFFFFF" */
   color?: string;
 };
 
@@ -195,6 +195,13 @@ function startEffect({ ghosts, size, headFollow, smear, color }: Required<Cursor
 /**
  * Mounts the Cursor Ghost trail and returns its teardown. The trail appears and
  * disappears on its own as the pointer type or the reduced-motion setting changes.
+ *
+ * Safe to call during server rendering: without a `window`, `document` or `matchMedia`
+ * it returns a no-op teardown. Call it after `<html data-horon-cursor="off">` is set when
+ * you want both the automatic mount suppressed and custom options.
+ *
+ * @param options - Overrides for the trail; omitted keys fall back to the built-in defaults.
+ * @returns A teardown that removes the layer, its listeners and any pending animation frame.
  */
 export function mountCursorGhost(options: CursorGhostOptions = {}): () => void {
   if (typeof window === "undefined" || typeof document === "undefined" || !window.matchMedia) return () => {};
@@ -234,7 +241,10 @@ export function mountCursorGhost(options: CursorGhostOptions = {}): () => void {
 
 function autoMount() {
   if (typeof window === "undefined" || typeof document === "undefined") return;
-  const registry = globalThis as typeof globalThis & { [AUTO_MOUNT_KEY]?: true };
+  const registry = globalThis as typeof globalThis & {
+    /** Set once the automatic mount has run, so a second import does not add another trail. */
+    [AUTO_MOUNT_KEY]?: true;
+  };
   if (registry[AUTO_MOUNT_KEY]) return;
   if (document.documentElement.getAttribute(OPT_OUT_ATTRIBUTE) === "off") return;
   registry[AUTO_MOUNT_KEY] = true;

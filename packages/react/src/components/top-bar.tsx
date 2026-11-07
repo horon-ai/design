@@ -6,21 +6,54 @@ import { Avatar } from "./avatar";
 import { IconButton } from "./icon-button";
 import { LiquidGlass } from "./liquid-glass";
 
+/**
+ * Props for {@link TopBar}.
+ */
 export type TopBarProps = Omit<ComponentProps<"header">, "className" | "title"> & {
+  /** Bar title; truncates to one line and re-runs the fade-in when the text changes. */
   title: ReactNode;
+  /** Second line under the title, muted and truncated. */
   subtitle?: ReactNode;
   /** Shows the live status dot on the avatar. */
   live?: boolean;
+  /** Renders the back IconButton on the left and calls this on press; hidden when omitted. */
   onBack?: () => void;
+  /** Renders the overflow IconButton on the right and calls this on press; hidden when omitted. */
   onMore?: () => void;
+  /** Accessible label of the back button. @default "Back" */
   backLabel?: string;
+  /** Accessible label of the overflow button. @default "More" */
   moreLabel?: string;
-  /** `solid` (default) is an opaque surface bar with a default border; `glass` is the regular glass bar. */
+  /** `solid` (default) is an opaque surface bar with a default border; `glass` is the regular glass bar. @default "solid" */
   surface?: "solid" | "glass";
+  /** Extra classes for the `header` element. */
   className?: string;
 };
 
-/** Paper `Top bar`: back button, bot avatar with a flush live dot, title and subtitle, on solid surface or regular glass. */
+/**
+ * Paper `Top bar`: back button, bot avatar with a flush live dot, title and subtitle, on solid surface or regular glass.
+ *
+ * Renders a rounded `header` with `rounded-full` corners; the glass variant mounts {@link LiquidGlass}
+ * as its first child, so keep the bar inside a positioned parent. Back and overflow buttons only appear
+ * when `onBack` / `onMore` are passed, which keeps the bare title layout for read-only screens.
+ *
+ * @example
+ * ```tsx
+ * import { TopBar } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <TopBar
+ *       title="Research bot"
+ *       subtitle="12 tasks today"
+ *       live
+ *       onBack={() => history.back()}
+ *       onMore={() => console.log("more")}
+ *     />
+ *   );
+ * }
+ * ```
+ */
 export function TopBar({
   title,
   subtitle,

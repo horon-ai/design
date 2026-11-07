@@ -1,6 +1,10 @@
 import { lightColors, primitives, radius, shadow, textStyles } from "@horon-ai/tokens";
 import { extendTailwindMerge } from "tailwind-merge";
 
+/**
+ * One class-name argument accepted by {@link cn}: a class string, or a falsy value that is skipped.
+ * `false`, `null` and `undefined` are common when a class is applied conditionally.
+ */
 export type ClassValue = string | false | null | undefined;
 
 /**
@@ -19,7 +23,15 @@ const merge = extendTailwindMerge({
   },
 });
 
-/** Joins class names, skipping empty values; later classes win over conflicting earlier ones. */
+/**
+ * Joins class names, skipping empty values; later classes win over conflicting earlier ones.
+ *
+ * Use it in every component so a caller's class overrides the component default instead of
+ * duplicating it; the merge is extended with the Horon token names.
+ *
+ * @param values - Any number of class strings or falsy values, applied left to right.
+ * @returns One space-separated class string with conflicting utilities collapsed.
+ */
 export function cn(...values: ClassValue[]): string {
   return merge(values.filter(Boolean).join(" "));
 }

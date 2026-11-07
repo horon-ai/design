@@ -7,10 +7,22 @@ import { cn } from "../lib/cn";
 import { Button } from "./button";
 import { Spinner } from "./spinner";
 
+/**
+ * Any JSON-shaped value: a string, number, boolean, `null`, or an array or object of the same.
+ * `ToolCall` renders `args` and `result` through {@link JsonCode}, so plain objects and arrays are
+ * enough; class instances and functions are not supported.
+ */
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 
 const punctuation = (text: string) => <span className="text-syntax-punctuation">{text}</span>;
 
+/**
+ * Walks a JSON value and returns syntax-highlighted React nodes, nesting one indentation step per level.
+ *
+ * @param value - The JSON value to render.
+ * @param indent - Current nesting depth; 0 for a root value, one extra level per object or array.
+ * @returns A flat list of span nodes for the key, string, number and punctuation syntax colors.
+ */
 function renderJson(value: Json, indent: number): ReactNode[] {
   const pad = "  ".repeat(indent);
   if (value === null || typeof value === "number" || typeof value === "boolean") {
@@ -50,8 +62,20 @@ function renderJson(value: Json, indent: number): ReactNode[] {
   ];
 }
 
-/** JSON in Geist Mono code style with the Figma syntax colors (key, string, number, punctuation). */
-export function JsonCode({ value, className }: { value: Json; className?: string }) {
+/**
+ * JSON in Geist Mono code style with the Figma syntax colors (key, string, number, punctuation).
+ *
+ * Renders a `pre` in the code type token that wraps lines so long values stay inside a narrow card;
+ * it scrolls horizontally only when a single unbreakable token overflows. Used by {@link ToolCall}
+ * for tool arguments and results, and usable on its own.
+ */
+// prettier-ignore
+export function JsonCode({ value, className }: {
+  /** The JSON value to print; see `Json` for the accepted shapes. */
+  value: Json;
+  /** Extra classes for the `pre`, for example a maximum height or `text-code` override. */
+  className?: string;
+}) {
   return (
     <pre
       className={cn("max-w-full overflow-x-auto font-mono text-code whitespace-pre-wrap text-syntax-string", className)}
@@ -61,35 +85,67 @@ export function JsonCode({ value, className }: { value: Json; className?: string
   );
 }
 
+/**
+ * Lifecycle state of a tool call.
+ *
+ * - `running`: a spinner replaces the status icon and the result section shows "Waiting for result…".
+ * - `done`: a live-green check marks the row and the result is printed.
+ * - `failed`: the card border turns danger, an error notice (with an optional Retry button) replaces the result.
+ */
 export type ToolCallStatus = "running" | "done" | "failed";
 
+/**
+ * Props for {@link ToolCall}.
+ */
 export type ToolCallProps = {
+  /** Current lifecycle state; drives the status icon, border and which sections appear. */
   status: ToolCallStatus;
   /** Plain tool name, such as "Web search", with its 16px icon. */
-  tool: { icon: ReactNode; name: ReactNode };
+  tool: {
+    /** A 16px Phosphor icon; it inherits the secondary text color inside the name pill. */
+    icon: ReactNode;
+    /** The visible tool name; truncates when the header runs out of room. */
+    name: ReactNode;
+  };
+  /** One-line description of the call, such as the query that was sent. */
   summary: ReactNode;
+  /** Elapsed time, such as "1.2s"; hidden when omitted. */
   elapsed?: ReactNode;
+  /** Arguments object printed as JSON in an `Arguments` section when defined. */
   args?: Json;
+  /** Result value printed as JSON in a `Result` section while the call is `running` (as a waiting message) or `done`; a `failed` call omits the section in favour of `error`. */
   result?: Json;
+  /** Failure message shown instead of the result section when `status` is `failed`. */
   error?: ReactNode;
+  /** Renders a Retry button on the failure notice; omit it to show the error without a retry. */
   onRetry?: () => void;
   /** The result is cut off; shows a "Show all" link under it. */
   truncated?: boolean;
+  /** Called when the "Show all" link is pressed; only rendered when `truncated` is set and a result exists. */
   onShowAll?: () => void;
+  /** Starts the card expanded; the card manages its own open state afterwards. */
   defaultOpen?: boolean;
+  /** Extra classes for the card root. */
   className?: string;
 };
 
+/**
+ * One labelled block inside the expanded card: an uppercase label row with an optional copy button,
+ * a subtle rounded body, and an optional footer (used for the "Show all" link).
+ */
 function Section({
   label,
   children,
   copyText,
   footer,
 }: {
+  /** Uppercase heading, such as "Arguments"; also names the copy button for screen readers. */
   label: string;
+  /** Body content, normally a {@link JsonCode} block or the waiting message. */
   children: ReactNode;
   /** Plain text of the section body; adds a real copy button when present. */
   copyText?: string;
+  /** Content under the body, such as the truncated "Show all" link. */
   footer?: ReactNode;
 }) {
   const { copied, copy } = useCopyToClipboard(1500);
@@ -118,7 +174,34 @@ function Section({
   );
 }
 
-/** Figma `Tool call` (Tool call card 186:7811): a solid 16px-radius card that expands to arguments and result. */
+/**
+ * Figma `Tool call` (Tool call card 186:7811): a solid 16px-radius card that expands to arguments and result.
+ *
+ * The header trigger is a Base UI collapsible: it shows the tool pill, the summary, a status icon
+ * (spinner, check or warning) and a caret that rotates while open. The expanded body adds the
+ * failure notice with Retry, the JSON `Arguments` section and the `Result` section with copy buttons.
+ * The card is uncontrolled apart from `defaultOpen`; use {@link JsonCode} directly when only the
+ * highlighted JSON is needed.
+ *
+ * @example
+ * ```tsx
+ * import { ToolCall } from "@horon-ai/react";
+ * import { Globe } from "@phosphor-icons/react";
+ *
+ * function Example() {
+ *   return (
+ *     <ToolCall
+ *       status="done"
+ *       tool={{ icon: <Globe />, name: "Web search" }}
+ *       summary="Fetched 8 results for Horon tokens"
+ *       elapsed="1.2s"
+ *       args={{ query: "Horon design tokens" }}
+ *       result={{ results: 8 }}
+ *     />
+ *   );
+ * }
+ * ```
+ */
 export function ToolCall({
   status,
   tool,
