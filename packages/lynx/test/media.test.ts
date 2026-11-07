@@ -24,11 +24,12 @@ describe("evaluateMediaQuery", () => {
     expect(evaluateMediaQuery("screen", desktop)).toBe(false);
   });
 
-  test("stays linear on a long whitespace run (CodeQL polynomial-redos)", () => {
+  test("stays linear on crafted queries (CodeQL polynomial-redos)", () => {
     const spaces = " ".repeat(50_000);
     const started = performance.now();
     expect(evaluateMediaQuery(`(-:${spaces}`, desktop)).toBe(false);
     expect(evaluateMediaQuery(`(-:(${spaces}`, desktop)).toBe(false);
+    expect(evaluateMediaQuery(`(-:${"(-:(".repeat(20_000)}`, desktop)).toBe(false);
     expect(evaluateMediaQuery(`(max-width:${spaces}767px${spaces})`, phone)).toBe(true);
     expect(performance.now() - started).toBeLessThan(500);
   });

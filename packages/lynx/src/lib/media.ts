@@ -51,18 +51,31 @@ type Condition = {
   value: string;
 };
 
+/** A feature name such as `max-width` or `prefers-color-scheme`. */
+const FEATURE = /^[a-z-]+$/;
+
 /**
  * Splits `(min-width: 768px) and (pointer: fine)` into its conditions.
  *
- * The value is captured as one `[^)]+` run and trimmed afterwards. Surrounding
- * it with `\s*` and a lazy quantifier lets the engine try every split of a
- * long whitespace run, which turns a crafted query into polynomial backtracking.
+ * The query is cut at every `)` once and each piece is read from its last `(`,
+ * so the work stays linear in the query length. A single regex scan over the
+ * whole string restarts at every `(` and backtracks through the rest of an
+ * unclosed query, which a crafted query turns into polynomial time.
  */
 function parse(query: string): Condition[] {
-  return [...query.matchAll(/\(\s*([a-z-]+)\s*:([^)]+)\)/gi)].map((match) => ({
-    feature: match[1].toLowerCase(),
-    value: match[2].trim().toLowerCase(),
-  }));
+  const conditions: Condition[] = [];
+  // The text after the last `)` is never closed, so it is not a condition.
+  for (const piece of query.split(")").slice(0, -1)) {
+    const open = piece.lastIndexOf("(");
+    if (open === -1) continue;
+    const body = piece.slice(open + 1);
+    const colon = body.indexOf(":");
+    if (colon === -1) continue;
+    const feature = body.slice(0, colon).trim().toLowerCase();
+    const value = body.slice(colon + 1).trim().toLowerCase();
+    if (FEATURE.test(feature) && value !== "") conditions.push({ feature, value });
+  }
+  return conditions;
 }
 
 /** Reads a px length; `undefined` when the value is not a px length. */
