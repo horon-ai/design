@@ -5,13 +5,24 @@ import { createElement, Fragment, type ReactNode } from "react";
 import CodeBlock from "@/components/site/CodeBlock.astro";
 import LinkTile from "@/components/site/LinkTile.astro";
 import Demo from "@/components/site/Demo.astro";
+import AccessibilitySection from "@/components/site/docs/AccessibilitySection.astro";
+import AnatomySection from "@/components/site/docs/AnatomySection.astro";
+import ExamplesSection from "@/components/site/docs/ExamplesSection.astro";
+import GuidelinesSection from "@/components/site/docs/GuidelinesSection.astro";
+import InstallationSection from "@/components/site/docs/InstallationSection.astro";
+import PropertiesSection from "@/components/site/docs/PropertiesSection.astro";
+import PropsSection from "@/components/site/docs/PropsSection.astro";
+import SpecificationSection from "@/components/site/docs/SpecificationSection.astro";
 import { PreviewTabs } from "@/components/site/PreviewTabs";
 import T from "@/components/i18n/T.astro";
 import { components, componentBySlug, componentGroups } from "@/data/components";
 import type { Localized } from "@/i18n";
 import { componentPageMessages as m } from "@/i18n/messages/components-page";
 import DocsLayout from "@/layouts/DocsLayout.astro";
+import { componentApi, flutterClasses, reactImport } from "@/lib/api";
+import { docBySlug } from "@/lib/component-docs-loader";
 import { resolveDemoName } from "@/lib/demos";
+import { stripBackdrop } from "@/lib/snippet";
 import { siteHref } from "@/lib/urls";
 
 export function getStaticPaths() {
@@ -32,10 +43,15 @@ const sources = import.meta.glob<string>("../../components/demos/*.tsx", {
   import: "default",
   eager: true,
 });
-const snippet = (sources[`../../components/demos/${component.slug}.tsx`] ?? "")
-  .replace(/^import \{ Backdrop \} from "\.\.\/demo-backdrop";\n\n?/m, "")
-  .replace(/<Backdrop[^>]*>\n?/g, "<>\n")
-  .replace(/<\/Backdrop>/g, "</>");
+const snippet = stripBackdrop(sources[`../../components/demos/${component.slug}.tsx`] ?? "");
+
+// The reference sections only exist for components that carry a doc, and the
+// test that guards those docs is the contract the copy is written against.
+const doc = docBySlug(component.slug);
+const api = doc ? componentApi(component.slug) : [];
+const flutter = doc ? flutterClasses(component.slug) : [];
+const reactCode = doc ? reactImport(component.slug) : "";
+
 const index = components.findIndex((entry) => entry.slug === component.slug);
 const previous = index > 0 ? components[index - 1] : undefined;
 const next = index >= 0 && index < components.length - 1 ? components[index + 1] : undefined;
@@ -66,7 +82,6 @@ const breadcrumb = [
   description={component.description}
   section="components"
   breadcrumb={breadcrumb}
-  toc={false}
 >
   <div class="flex flex-wrap items-center gap-2">
     <Badge tone="neutral">@horon-ai/react</Badge>
@@ -91,6 +106,21 @@ const breadcrumb = [
       <CodeBlock code={snippet} title="tsx" />
     </div>
   </PreviewTabs>
+
+  {
+    doc && (
+      <>
+        <InstallationSection reactImport={reactCode} flutterClasses={flutter} />
+        <AnatomySection doc={doc} />
+        <PropertiesSection doc={doc} />
+        <GuidelinesSection doc={doc} />
+        <SpecificationSection doc={doc} />
+        <PropsSection api={api} />
+        <ExamplesSection doc={doc} overlay={component.overlay} />
+        <AccessibilitySection doc={doc} />
+      </>
+    )
+  }
 
   <nav
     class="not-prose mt-16 grid gap-3 border-t border-border-default pt-8 sm:grid-cols-2"

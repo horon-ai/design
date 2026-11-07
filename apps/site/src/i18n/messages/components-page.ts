@@ -1,6 +1,6 @@
 import { defineMessages } from "@/i18n";
 
-/** Copy for `/components/[slug]`: section headings, the missing-preview state and paging. */
+/** Copy for `/components/[slug]`: section headings, the missing-preview state, tables and paging. */
 export const componentPageMessages = defineMessages({
   breadcrumbComponents: { ko: "Components", en: "Components" },
   previewTab: { ko: "Preview", en: "Preview" },
@@ -14,4 +14,36 @@ export const componentPageMessages = defineMessages({
   next: { ko: "다음 →", en: "Next →" },
   /** Accessible name of the previous/next navigation. Static markup uses the Korean string. */
   paging: { ko: "컴포넌트 이동", en: "Component paging" },
+
+  /** Section headings. Their ids are the English anchor names. */
+  sectionInstallation: { ko: "설치", en: "Installation" },
+  sectionAnatomy: { ko: "구성", en: "Anatomy" },
+  sectionProperties: { ko: "속성", en: "Properties" },
+  sectionGuidelines: { ko: "사용 지침", en: "Guidelines" },
+  sectionSpecification: { ko: "사양", en: "Specification" },
+  sectionProps: { ko: "Props", en: "Props" },
+  sectionExamples: { ko: "예시", en: "Examples" },
+  sectionAccessibility: { ko: "접근성", en: "Accessibility" },
+
+  installPackage: { ko: "패키지를 설치합니다.", en: "Install the package." },
+  installImport: { ko: "컴포넌트를 가져옵니다.", en: "Import the component." },
+  installFlutter: { ko: "Flutter 위젯을 가져옵니다.", en: "Import the Flutter widgets." },
+  installFlutterClasses: { ko: "위젯 클래스:", en: "Widget classes:" },
+
+  /** Table headers and paired-card labels. */
+  stateHeader: { ko: "상태", en: "State" },
+  slotHeader: { ko: "슬롯", en: "Slot" },
+  propertyHeader: { ko: "속성", en: "Property" },
+  valueHeader: { ko: "값", en: "Value" },
+  propHeader: { ko: "속성", en: "Prop" },
+  typeHeader: { ko: "타입", en: "Type" },
+  defaultHeader: { ko: "기본값", en: "Default" },
+  descriptionHeader: { ko: "설명", en: "Description" },
+  keyHeader: { ko: "키", en: "Key" },
+  actionHeader: { ko: "동작", en: "Action" },
+  doLabel: { ko: "권장", en: "Do" },
+  dontLabel: { ko: "지양", en: "Don't" },
+  /** Link from a property or guideline to its live example further down. */
+  seeExample: { ko: "예시 보기", en: "See example" },
+  patternPrefix: { ko: "따르는 패턴:", en: "Follows the pattern:" },
 });

@@ -141,17 +141,25 @@ CI(`.github/workflows/ci.yml`)도 같은 lint·typecheck·test·build를 돌립�
 
 문서 사이트를 Cloudflare Pages 프로젝트로 배포합니다. `main`이 프로덕션 브랜치이고 `dev`가 통합 브랜치입니다. 작업은 `dev`에 쌓고 배포할 때 `dev`를 `main`으로 병합합니다.
 
-| 대상        | 프로젝트       | URL                     | 출력             | 수동 배포             |
-| ----------- | -------------- | ----------------------- | ---------------- | --------------------- |
-| 문서 사이트 | `horon-design` | https://design.horon.ai | `apps/site/dist` | `bun run deploy:site` |
+| 환경     | 프로젝트               | URL                             | 트리거 | 출력             |
+| -------- | ---------------------- | ------------------------------- | ------ | ---------------- |
+| 프로덕션 | `horon-design`         | https://design.horon.ai         | `main` | `apps/site/dist` |
+| 스테이징 | `horon-design-staging` | https://staging-design.horon.ai | `dev`  | `apps/site/dist` |
 
-`main`에 푸시하면 `.github/workflows/publish.yml`이 라이브러리를 npm에 게시한 뒤(라이브러리
-변경이 없으면 게시는 건너뜀) 그 버전을 사이트에 npm에서 설치해 빌드하고 `wrangler pages deploy`로
-배포합니다. 라이브러리가 그대로인 커밋은 npm의 최신 버전으로 배포합니다.
+프로덕션은 `main`에 푸시하면 `.github/workflows/publish.yml`이 라이브러리를 npm에 게시한 뒤
+(라이브러리 변경이 없으면 게시는 건너뜀) 그 버전을 사이트에 npm에서 설치해 빌드하고
+`wrangler pages deploy`로 배포합니다. 라이브러리가 그대로인 커밋은 npm의 최신 버전으로 배포합니다.
+
+스테이징은 `dev`에 푸시하면 `.github/workflows/deploy-staging.yml`이 저장소의 워크스페이스
+패키지로 그대로 빌드해 `horon-design-staging`에 배포합니다. 아직 게시하지 않은 라이브러리 변경을
+문서 사이트에서 먼저 확인하려는 것이므로, 산출물에 `X-Robots-Tag: noindex, nofollow`를 붙여
+검색 엔진이 미게시 내용을 색인하지 않게 합니다. 두 프로젝트의 프로덕션 브랜치는 각각 `main`과
+`dev`이고, 워크플로는 그 값에 맞춰 `--branch`를 넘깁니다.
 
 - 저장소의 `apps/site/package.json`은 계속 `workspace:*`입니다. 새 컴포넌트와 데모를 한 커밋에
   넣고 `dev`에서 바로 빌드할 수 있어야 하기 때문입니다. 게시본 설치는 CI 작업 공간에서만 하며
-  (`.github/scripts/site-use-published.mjs`) 커밋하지 않습니다.
+  (`.github/scripts/site-use-published.mjs`) 커밋하지 않습니다. 이 설치 단계는 프로덕션
+  워크플로에만 있고 스테이징 빌드에는 없습니다.
 - 배포에는 저장소 시크릿 `CLOUDFLARE_API_TOKEN`(Account → Cloudflare Pages → Edit)과
   `CLOUDFLARE_ACCOUNT_ID`가 필요합니다.
 - Cloudflare의 Git 연동 자동 프로덕션 빌드는 이 워크플로가 꺼 둡니다. 켜 두면 `main` 푸시마다

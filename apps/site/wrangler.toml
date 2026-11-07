@@ -1,6 +1,11 @@
 # Cloudflare Pages config for the Horon design system site.
-# Project: horon-design  ->  https://design.horon.ai
-# Deploy:  bun run deploy:site   (from the repo root)
+# Projects (both serve the same apps/site/dist output):
+#   horon-design          -> https://design.horon.ai        (production, branch main)
+#   horon-design-staging  -> https://staging-design.horon.ai (staging, branch dev)
+# Deploy:
+#   production: .github/workflows/publish.yml on every main push (npm-published packages)
+#   staging:    .github/workflows/deploy-staging.yml on every dev push (workspace packages, noindex)
+#   locally:    bun run deploy:site   (from the repo root)
 # Requires the `wrangler` CLI to be installed and authenticated
 # (`wrangler login`). CI can authenticate with CLOUDFLARE_API_TOKEN +
 # CLOUDFLARE_ACCOUNT_ID instead.

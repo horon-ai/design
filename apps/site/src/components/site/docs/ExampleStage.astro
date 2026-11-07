@@ -1,0 +1,41 @@
+---
+/**
+ * One reference example, rendered as its own demo stage.
+ *
+ * The example file is compiled by `scripts/generate-demo-wrappers.ts` into
+ * `components/example-wrappers/<slug>/<id>.astro`, which is where the island
+ * comes from. `data-demo` carries `<slug>/<id>` so a test or a screenshot can
+ * find the stage without depending on the surrounding heading order.
+ */
+import T from "@/components/i18n/T.astro";
+import { blockMessages } from "@/i18n/messages/blocks";
+import { getExample } from "@/lib/demos";
+
+interface Props {
+  slug: string;
+  id: string;
+  /** Catalog components that open a panel keep a positioning context and a fixed height. */
+  overlay?: boolean;
+}
+
+const { slug, id, overlay = false } = Astro.props;
+const Example = getExample(slug, id);
+---
+
+<div
+  class:list={[
+    "demo-stage not-prose min-h-40 p-6",
+    overlay && "demo-stage-overlay",
+  ]}
+  data-demo={`${slug}/${id}`}
+>
+  {
+    Example ? (
+      <Example />
+    ) : (
+      <p class="text-body-sm text-text-secondary">
+        <T m={blockMessages.demoUnavailable} />
+      </p>
+    )
+  }
+</div>

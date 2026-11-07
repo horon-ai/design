@@ -1,0 +1,42 @@
+---
+/** The `installation` section: the package command, the import line and the Flutter widgets. */
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import T from "@/components/i18n/T.astro";
+import { componentPageMessages as m } from "@/i18n/messages/components-page";
+
+interface Props {
+  reactImport: string;
+  flutterClasses: string[];
+}
+
+const { reactImport, flutterClasses } = Astro.props;
+---
+
+<section>
+  <h2 id="installation"><T m={m.sectionInstallation} /></h2>
+  <div class="flex flex-col gap-4">
+    <p><T m={m.installPackage} /></p>
+    <CodeBlock code="bun add @horon-ai/react" lang="bash" />
+    <p><T m={m.installImport} /></p>
+    <CodeBlock code={reactImport} lang="tsx" />
+    {
+      flutterClasses.length > 0 && (
+        <>
+          <p>
+            <T m={m.installFlutter} />
+          </p>
+          <CodeBlock code={"import 'package:horon_ui/horon_ui.dart';"} lang="dart" />
+          <p class="text-caption text-text-secondary">
+            <T m={m.installFlutterClasses} />
+            {flutterClasses.map((name, index) => (
+              <>
+                {index > 0 && ", "}
+                <code>{name}</code>
+              </>
+            ))}
+          </p>
+        </>
+      )
+    }
+  </div>
+</section>

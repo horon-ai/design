@@ -1,0 +1,32 @@
+---
+/** The `anatomy` section: what the component is made of, in rendering order. */
+import T from "@/components/i18n/T.astro";
+import { componentPageMessages as m } from "@/i18n/messages/components-page";
+import type { ComponentDoc } from "@/lib/component-docs";
+
+interface Props {
+  doc: ComponentDoc;
+}
+
+const { doc } = Astro.props;
+---
+
+<section>
+  <h2 id="anatomy"><T m={m.sectionAnatomy} /></h2>
+  <div class="flex flex-col gap-4">
+    <p><T m={doc.anatomy.description} /></p>
+    <ol class="flex flex-col gap-3">
+      {
+        doc.anatomy.parts.map((part) => (
+          <li>
+            <span class="font-medium text-text-primary">{part.name}</span>
+            {part.slot && <code class="ml-2">{part.slot}</code>}
+            <span class="mt-1 block">
+              <T m={part.description} />
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

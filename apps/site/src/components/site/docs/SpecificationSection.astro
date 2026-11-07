@@ -1,0 +1,81 @@
+---
+/**
+ * The `specification` section: state/slot tables whose repeated state and slot
+ * cells merge the way a design spec reads.
+ *
+ * The table scrolls inside its own wrapper so a wide row never widens the page
+ * at phone sizes, and `min-w-0` keeps the flex parent from growing to the
+ * table's min-content width.
+ */
+import T from "@/components/i18n/T.astro";
+import { componentPageMessages as m } from "@/i18n/messages/components-page";
+import type { ComponentDoc } from "@/lib/component-docs";
+
+interface Props {
+  doc: ComponentDoc;
+}
+
+const { doc } = Astro.props;
+---
+
+<section>
+  <h2 id="specification"><T m={m.sectionSpecification} /></h2>
+  <div class="flex flex-col gap-8">
+    {
+      doc.specification.map((table) => (
+        <div class="flex flex-col gap-3">
+          <h3 id={`spec-${table.id}`} class="mt-0">
+            <T m={table.title} />
+          </h3>
+          {table.note && (
+            <p class="text-body-sm text-text-secondary">
+              <T m={table.note} />
+            </p>
+          )}
+          <div class="min-w-0 overflow-x-auto">
+            <table class="w-full min-w-160 border-collapse text-left text-body-sm">
+              <thead>
+                <tr class="border-b border-border-strong">
+                  <th scope="col" class="py-2 pr-4 font-medium text-text-secondary">
+                    <T m={m.stateHeader} />
+                  </th>
+                  <th scope="col" class="py-2 pr-4 font-medium text-text-secondary">
+                    <T m={m.slotHeader} />
+                  </th>
+                  <th scope="col" class="py-2 pr-4 font-medium text-text-secondary">
+                    <T m={m.propertyHeader} />
+                  </th>
+                  <th scope="col" class="py-2 font-medium text-text-secondary">
+                    <T m={m.valueHeader} />
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {table.rows.map((row, index) => {
+                  const previous = index > 0 ? table.rows[index - 1] : undefined;
+                  const showState = row.state !== previous?.state;
+                  const showSlot = showState || row.slot !== previous?.slot;
+                  return (
+                    <tr class="border-b border-border-default align-top">
+                      <td class="py-2 pr-4 text-text-primary">{showState ? row.state : ""}</td>
+                      <td class="py-2 pr-4 text-text-secondary">{showSlot ? row.slot : ""}</td>
+                      <td class="py-2 pr-4 text-text-primary">{row.property}</td>
+                      <td class="py-2">
+                        <code>{row.value}</code>
+                        {row.note && (
+                          <span class="mt-1 block text-caption text-text-secondary">
+                            <T m={row.note} />
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>

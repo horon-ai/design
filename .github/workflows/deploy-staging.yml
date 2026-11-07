@@ -1,0 +1,137 @@
+name: Deploy the staging site
+
+# dev에 커밋이 올라올 때마다 스테이징 사이트를 배포합니다.
+#
+# 프로덕션(design.horon.ai)은 main에서 publish.yml이 npm에 게시한 버전으로 빌드합니다.
+# 스테이징(staging-design.horon.ai)은 다르게 빌드합니다. 저장소의 워크스페이스 패키지를
+# 그대로 쓰므로, 아직 npm에 게시하지 않은 라이브러리 변경을 문서 사이트에서 먼저 확인할 수
+# 있습니다. 그래서 스테이징 산출물에는 `X-Robots-Tag: noindex, nofollow`를 붙여 검색
+# 엔진이 미게시 내용을 색인하지 않게 합니다.
+#
+# Cloudflare Pages 프로젝트 horon-design-staging의 프로덕션 브랜치는 dev입니다. 그래서
+# 배포할 때 `--branch=dev`를 넘겨 프로덕션 배포로 올립니다(브랜치 별 미리보기가 아님).
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+# 권한은 기본으로 읽기만 줍니다.
+permissions:
+  contents: read
+
+# 같은 브랜치에서 두 실행이 엇갈려 배포하지 않도록 차례로 돌립니다.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: deploy staging-design.horon.ai
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PAGES_PROJECT: horon-design-staging
+      PAGES_BRANCH: dev
+      SITE_URL: https://horon-design-staging.pages.dev
+    steps:
+      # 배포 대상 환경은 브랜치로만 정합니다. 이 워크플로는 스테이징 전용이라 그 밖의
+      # 브랜치에서 수동 실행하면 조용히 넘어가지 않고 실패합니다.
+      - name: Resolve the environment
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          case "$REF_NAME" in
+            dev)
+              echo "환경: staging ($SITE_URL)"
+              ;;
+            *)
+              echo "::error::이 워크플로는 dev 브랜치에서만 배포합니다(현재: $REF_NAME)."
+              exit 1
+              ;;
+          esac
+
+      - name: Check Cloudflare credentials
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo "::error::저장소 시크릿 CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID가 필요합니다. 토큰 권한은 Account → Cloudflare Pages → Edit입니다."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.3
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # 게시본 설치(.github/scripts/site-use-published.mjs)를 하지 않습니다. 스테이징은
+      # 저장소의 `workspace:*` 패키지를 그대로 쓰는 것이 목적입니다.
+      - name: Build the site
+        run: bun run build:site
+
+      - name: Verify site artifacts
+        run: |
+          set -euo pipefail
+          for artifact in index.html sitemap.xml llms.txt; do
+            if [ ! -s "apps/site/dist/$artifact" ]; then
+              echo "::error::Missing or empty build artifact: apps/site/dist/$artifact"
+              exit 1
+            fi
+          done
+
+      # 스테이징 산출물은 검색에 노출하지 않습니다. Cloudflare Pages는 루트 `_headers`의
+      # 규칙을 읽으므로, 빌드가 이미 만든 `_headers`가 있으면 지우지 않고 덧붙입니다.
+      # 이미 같은 헤더가 있으면 두 번 쓰지 않고 실패합니다.
+      - name: Mark the staging build as noindex
+        run: |
+          set -euo pipefail
+          headers="apps/site/dist/_headers"
+          rule='/*\n  X-Robots-Tag: noindex, nofollow\n'
+          if [ -e "$headers" ]; then
+            if grep -q 'X-Robots-Tag' "$headers"; then
+              echo "::error::$headers 에 이미 X-Robots-Tag가 있습니다. 스테이징 규칙을 덮어쓰지 않고 멈춥니다."
+              exit 1
+            fi
+            printf '\n%b' "$rule" >> "$headers"
+            echo "$headers 에 noindex 규칙을 덧붙였습니다."
+          else
+            printf '%b' "$rule" > "$headers"
+            echo "$headers 를 만들었습니다."
+          fi
+          cat "$headers"
+
+      - name: Deploy to Cloudflare Pages
+        run: |
+          set -euo pipefail
+          bunx wrangler@4 pages deploy apps/site/dist \
+            --project-name="$PAGES_PROJECT" \
+            --branch="$PAGES_BRANCH" \
+            --commit-hash="$GITHUB_SHA" \
+            --commit-message="staging site at $GITHUB_SHA" \
+            --commit-dirty=true
+
+      # 배포 직후에는 전파가 늦을 수 있어 최대 60초 동안 다시 확인합니다.
+      - name: Smoke-check the deployment
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' -H 'cache-control: no-cache' "$SITE_URL/" || true)
+            if [ "$code" = "200" ]; then
+              echo "$SITE_URL/ → 200"
+              exit 0
+            fi
+            echo "$SITE_URL/ → ${code:-000} ($attempt/30). 2초 뒤 다시 봅니다."
+            sleep 2
+          done
+          echo "::error::$SITE_URL/ 이 60초 안에 200을 돌려주지 않았습니다."
+          exit 1
