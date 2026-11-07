@@ -92,10 +92,13 @@ const stringUnions = (source: string): Map<string, string[]> => {
       else if (char === ";" && depth === 0) break;
     }
     const body = source.slice(start, end);
-    const literals = [...body.matchAll(/"([^"\\]*)"|'([^'\\]*)'/g)].map((literal) => literal[1] ?? literal[2]).toSorted();
-    // A union of object members has no literals at the top level; only a plain
-    // string union is comparable, and a missing literal means it is not one.
-    if (literals.length === 0) continue;
+    // Only a plain union of string literals is comparable. A prop object type,
+    // or one built from `Omit<ComponentProps<"div">, "title">`, also carries
+    // literals, but those name DOM attributes rather than a design variant, so
+    // requiring them would compare the wrong thing.
+    const parts = body.split("|").map((part) => part.trim());
+    if (parts.length === 0 || !parts.every((part) => /^(['"]).*\1$/s.test(part))) continue;
+    const literals = parts.map((part) => part.slice(1, -1)).toSorted();
     unions.set(name, literals);
   }
   return unions;
