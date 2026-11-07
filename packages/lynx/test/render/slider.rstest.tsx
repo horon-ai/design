@@ -20,6 +20,11 @@ const layOut = (container: HTMLElement, left: number, width: number, height = 20
   fireEvent.layoutchange(control(container), { detail: { left, width, height, top: 0 } });
 };
 
+/** The vertical control is a column: its height is the travel and its width only the hit area. */
+const layOutColumn = (container: HTMLElement, top: number, height: number, left = 0, width = 30) => {
+  fireEvent.layoutchange(control(container), { detail: { left, top, width, height } });
+};
+
 const value = (container: HTMLElement): string | null => control(container).getAttribute("accessibility-value");
 
 test("a touch on the row jumps the thumb to that share and reports the snapped value", async () => {
@@ -98,3 +103,71 @@ test("a touch before the row has been measured reports nothing instead of assumi
   expect(seen).toEqual([]);
   expect(value(container)).toBe("30");
 });
+
+test("a vertical drag reads the finger's page y and moves the thumb up the column", async () => {
+  const changed: number[] = [];
+  const committed: number[] = [];
+  const { container } = render(
+    <HoronProvider>
+      <Slider
+        aria-label="Pitch"
+        orientation="vertical"
+        min={0}
+        max={10}
+        step={1}
+        defaultValue={0}
+        onValueChange={(next) => changed.push(next)}
+        onValueCommitted={(next) => committed.push(next)}
+      />
+    </HoronProvider>,
+  );
+  // The column starts at page y 100 and is 200px tall, so its bottom edge is y 300 and the range
+  // grows upward: y 100 is max, y 300 is min.
+  layOutColumn(container, 100, 200);
+
+  fireEvent.touchstart(control(container), { detail: { x: 15, y: 300 } });
+  fireEvent.touchmove(control(container), { detail: { x: 15, y: 200 } });
+  fireEvent.touchend(control(container));
+  await Promise.resolve();
+
+  expect(changed).toEqual([5]);
+  expect(committed).toEqual([5]);
+  expect(value(container)).toBe("5");
+});
+
+test("a vertical slider tracks page y, so a sideways-only drag keeps its value", async () => {
+  const changed: number[] = [];
+  const { container } = render(
+    <HoronProvider>
+      <Slider aria-label="Pitch" orientation="vertical" defaultValue={40} onValueChange={(next) => changed.push(next)} />
+    </HoronProvider>,
+  );
+  layOutColumn(container, 0, 200);
+
+  // y 120 is the row for 40 on a 200px column that grows upward, so the landing touch keeps the
+  // value; the sweep that follows only changes page x, which this axis never reads.
+  fireEvent.touchstart(control(container), { detail: { x: 2, y: 120 } });
+  fireEvent.touchmove(control(container), { detail: { x: 28, y: 120 } });
+  await Promise.resolve();
+
+  expect(changed).toEqual([]);
+  expect(value(container)).toBe("40");
+});
+
+test("a vertical touch near the top of the column lands on the high end of the range", async () => {
+  const seen: number[] = [];
+  const { container } = render(
+    <HoronProvider>
+      <Slider aria-label="Pitch" orientation="vertical" defaultValue={0} onValueChange={(next) => seen.push(next)} />
+    </HoronProvider>,
+  );
+  layOutColumn(container, 60, 220);
+
+  // 6px below the column's top edge: almost the whole travel, so almost max.
+  fireEvent.touchstart(control(container), { detail: { x: 15, y: 66 } });
+  await Promise.resolve();
+
+  expect(seen).toEqual([97]);
+  expect(value(container)).toBe("97");
+});
+
