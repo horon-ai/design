@@ -7,9 +7,22 @@ import { cn } from "../lib/cn";
 import { isModKey } from "../lib/platform";
 import { Kbd } from "./kbd";
 
-type WithClass<T> = Omit<T, "className"> & { className?: string };
+/** Drops the base type's `className` so the panel can own it. */
+type WithClass<T> = Omit<T, "className"> & {
+  /** Extra classes merged onto the root element. */
+  className?: string;
+};
 
-/** The solid panel that hosts the Figma Agents blocks (Agent tasks 112:797): surface fill, 24px radius, 16px padding. */
+/**
+ * The solid panel that hosts the Figma Agents blocks (Agent tasks 112:797): surface fill, 24px radius, 16px padding.
+ *
+ * @example
+ * ```tsx
+ * <AgentPanel filter={<FilterBar items={[{ value: "all", label: "All" }]} />}>
+ *   <TaskComposer onStart={start} pickers={<ComposerChip leading="R">Researcher</ComposerChip>} />
+ * </AgentPanel>
+ * ```
+ */
 export function AgentPanel({
   className,
   filter,
@@ -32,13 +45,18 @@ export function AgentPanel({
   );
 }
 
+/** Props for {@link ComposerChip}: a leading tile letter or icon, its fill, and the usual button props. */
 export type ComposerChipProps = WithClass<ComponentProps<"button">> & {
   /** 16px tile initial (bots) or a 14px icon (projects). */
   leading?: ReactNode;
+  /** Tile fill, defaulting to the brand; pass a sky or neutral shade to match the bot it stands for. */
   tileClassName?: string;
 };
 
-/** A 30px 5% ink picker chip with a 12px caret, used for the bot and project in the task composer. */
+/**
+ * A 30px 5% ink picker chip with a 12px caret, used for the bot and project in the task composer.
+ * Part of {@link TaskComposer}; the chip is a plain button, so it needs its own `onClick` or menu wiring.
+ */
 export function ComposerChip({ leading, tileClassName, className, children, ...props }: ComposerChipProps) {
   return (
     <button
@@ -67,18 +85,42 @@ export function ComposerChip({ leading, tileClassName, className, children, ...p
   );
 }
 
+/** Props for {@link TaskComposer}: the draft text, picker chips, the start handler and the labels. */
 export type TaskComposerProps = {
+  /** Placeholder of the textarea; also its accessible name. @default "Describe a task for a bot" */
   placeholder?: string;
+  /** Controlled draft text; leave undefined and pass `onValueChange` to lift the text, or omit both for a free draft. */
   value?: string;
+  /** Fires on every keystroke with the next text, so the caller can hold the draft. */
   onValueChange?: (value: string) => void;
   /** Picker chips, usually two `ComposerChip`s. */
   pickers?: ReactNode;
+  /** Fires on the Start button and on Mod+Enter; the composer does not clear the draft itself. */
   onStart?: () => void;
+  /** Label of the start button. @default "Start" */
   startLabel?: string;
+  /** Extra classes merged onto the box, for margins or width overrides. */
   className?: string;
 };
 
-/** Figma task `Composer` (Agent tasks 112:797): a 4% ink box, 18px radius, with pickers, a Mod+Enter hint and Start. */
+/**
+ * Figma task `Composer` (Agent tasks 112:797): a 4% ink box, 20px radius, with pickers, a key hint and Start.
+ *
+ * The textarea starts at one row and grows with its content up to 160px (`max-h-40`) before it scrolls.
+ * Mod+Enter submits: ⌘Enter on macOS and iOS, Ctrl+Enter on Windows, Linux and Android. The hint is a
+ * `Kbd keys="Mod+Enter"` chip, so it draws the same OS keys, and it is hidden on touch devices that have
+ * no hovering fine pointer.
+ *
+ * @example
+ * ```tsx
+ * <TaskComposer
+ *   value={draft}
+ *   onValueChange={setDraft}
+ *   onStart={start}
+ *   pickers={<ComposerChip leading="R">Researcher</ComposerChip>}
+ * />
+ * ```
+ */
 export function TaskComposer({
   placeholder = "Describe a task for a bot",
   value,

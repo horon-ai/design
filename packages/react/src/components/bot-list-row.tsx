@@ -3,7 +3,9 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { Avatar } from "./avatar";
 
+/** Props for {@link BotListRow}: the bot name, last-activity time and preview, the live and selected states. */
 export type BotListRowProps = Omit<ComponentProps<"button">, "className"> & {
+  /** Bot display name, truncated with an ellipsis when it does not fit. */
   name: ReactNode;
   /** Last activity time, such as "8:41 AM". */
   time?: ReactNode;
@@ -11,11 +13,21 @@ export type BotListRowProps = Omit<ComponentProps<"button">, "className"> & {
   preview?: ReactNode;
   /** Running bots show the live dot on the avatar. */
   live?: boolean;
+  /** The row for the bot currently open in the panel; paints the 10% ink selected fill and sets `aria-pressed`. */
   selected?: boolean;
+  /** Extra classes merged onto the button, for margins or width overrides. */
   className?: string;
 };
 
-/** Figma `Bot list row` (64:456): a flat 12px-padded row; hover 5% ink, selected 10% ink. */
+/**
+ * Figma `Bot list row` (64:456): a flat 12px-padded row; hover 5% ink, selected 10% ink. The whole row is the
+ * button, so the accessible name comes from its text content (name, time and preview).
+ *
+ * @example
+ * ```tsx
+ * <BotListRow name="Researcher" time="8:41 AM" preview="Pulled the Q3 numbers" live selected />
+ * ```
+ */
 export function BotListRow({ name, time, preview, live, selected, className, ...props }: BotListRowProps) {
   return (
     <button

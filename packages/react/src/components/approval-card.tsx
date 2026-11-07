@@ -5,12 +5,16 @@ import { cn } from "../lib/cn";
 import { Button } from "./button";
 import { LiquidGlass } from "./liquid-glass";
 
+/** Lifecycle of the request: `pending` keeps the brand rim and both actions, the other states hide the actions. */
 export type ApprovalState = "pending" | "approved" | "declined";
+/** `solid` paints the raised surface, `glass` layers the glass material for use over imagery. */
 export type ApprovalCardSurface = "solid" | "glass";
 
+/** Props for {@link ApprovalCard}: the state, the question, the optional attachment and the action handlers. */
 export type ApprovalCardProps = {
+  /** Lifecycle state; drives the status dot, status text and whether the actions stay visible. @default "pending" */
   state?: ApprovalState;
-  /** `solid` (default) on raised surfaces, `glass` over imagery and glass panels. */
+  /** `solid` (default) on raised surfaces, `glass` over imagery and glass panels. @default "solid" */
   surface?: ApprovalCardSurface;
   /** Status line, defaults to "Needs your yes", "Approved" or "Declined". */
   status?: ReactNode;
@@ -18,14 +22,29 @@ export type ApprovalCardProps = {
   title: ReactNode;
   /** Name of the attached item. */
   attachment?: ReactNode;
+  /** Fires when the primary action is pressed; the card does not change its own state. */
   onApprove?: () => void;
+  /** Fires when the secondary action is pressed, for deferring without deciding. */
   onLater?: () => void;
+  /** Label of the primary button. @default "Approve" */
   approveLabel?: string;
+  /** Label of the secondary button. @default "Later" */
   laterLabel?: string;
+  /** Extra classes merged onto the card, for margins or a width override. */
   className?: string;
 };
 
-const statusClass: Record<ApprovalState, { dot: string; text: string; label: string }> = {
+const statusClass: Record<
+  ApprovalState,
+  {
+    /** Background of the status dot. */
+    dot: string;
+    /** Text colour of the status line. */
+    text: string;
+    /** Default status line when `status` is omitted. */
+    label: string;
+  }
+> = {
   pending: { dot: "bg-status-live", text: "text-text-brand", label: "Needs your yes" },
   approved: { dot: "bg-text-secondary", text: "text-text-secondary", label: "Approved" },
   declined: { dot: "bg-accent-red-500-90", text: "text-text-danger", label: "Declined" },
@@ -34,6 +53,19 @@ const statusClass: Record<ApprovalState, { dot: string; text: string; label: str
 /**
  * Figma `Approval card` (64:398): the conversation part that asks for an action.
  * Pending keeps the brand rim and the actions.
+ *
+ * Controlled by `state`: the card never flips itself, and once it leaves `pending` the actions collapse and
+ * become inert, so a settled request cannot be answered twice.
+ *
+ * @example
+ * ```tsx
+ * <ApprovalCard
+ *   title="Send the Q3 board deck to the team?"
+ *   attachment="Q3-board-deck.pdf"
+ *   onApprove={send}
+ *   onLater={dismiss}
+ * />
+ * ```
  */
 export function ApprovalCard({
   state = "pending",

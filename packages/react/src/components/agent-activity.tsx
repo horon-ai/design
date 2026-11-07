@@ -5,8 +5,22 @@ import { useReducedMotion } from "../hooks/use-reduced-motion";
 import { cn } from "../lib/cn";
 import { Spinner } from "./spinner";
 
-/** Figma `Thinking` (Agent activity 108:660): a 69x31 subtle pill with three 7px dots at 35/55/80% ink. */
-export function ThinkingIndicator({ label = "Thinking", className }: { label?: string; className?: string }) {
+/**
+ * Figma `Thinking` (Agent activity 108:660): a 69x31 subtle pill with three 7px dots at 35/55/80% ink.
+ * Announced as `role="status"`; the three dots bounce with a 150ms stagger.
+ *
+ * @example
+ * ```tsx
+ * <ThinkingIndicator label="Searching the workspace…" />
+ * ```
+ */
+// prettier-ignore
+export function ThinkingIndicator({ label = "Thinking", className }: {
+  /** Accessible status text, not rendered visibly. @default "Thinking" */
+  label?: string;
+  /** Extra classes merged onto the pill, for margins or alignment. */
+  className?: string;
+}) {
   return (
     <span
       role="status"
@@ -79,13 +93,15 @@ function useRevealedLength(text: string, smooth: boolean, reducedMotion: boolean
   return Math.min(shown, text.length);
 }
 
+/** Props for {@link StreamingText}: the growing answer, whether it is still streaming, and whether chunks are revealed smoothly. */
 export type StreamingTextProps = Omit<ComponentProps<"div">, "className" | "children"> & {
   /** Everything received so far; pass the growing string as chunks arrive. */
   text: string;
-  /** True while more text is coming: the caret shows, and the rest is revealed when it turns false. */
+  /** True while more text is coming: the caret shows, and the rest is revealed when it turns false. @default true */
   streaming?: boolean;
-  /** Reveal arriving chunks a few characters per frame instead of in jumps. Off under reduced motion. */
+  /** Reveal arriving chunks a few characters per frame instead of in jumps. Off under reduced motion. @default true */
   smooth?: boolean;
+  /** Extra classes merged onto the bubble, such as a maximum width. */
   className?: string;
 };
 
@@ -94,6 +110,16 @@ export type StreamingTextProps = Omit<ComponentProps<"div">, "className" | "chil
  * right after the last character and wraps with it. The caret holds still while characters land and blinks
  * while waiting for the next chunk; it goes away when the stream ends. Screen readers get the answer once,
  * when it is complete, instead of every chunk.
+ *
+ * `text` is the whole answer so far, not a delta: passing only the newest chunk would drop earlier text. The
+ * reveal restarts from the shared prefix when `text` is rewritten rather than extended.
+ *
+ * @example
+ * ```tsx
+ * function Answer({ text, done }: { text: string; done: boolean }) {
+ *   return <StreamingText text={text} streaming={!done} />;
+ * }
+ * ```
  */
 export function StreamingText({ text, streaming = true, smooth = true, className, ...props }: StreamingTextProps) {
   const reducedMotion = useReducedMotion();
@@ -124,16 +150,31 @@ export function StreamingText({ text, streaming = true, smooth = true, className
   );
 }
 
+/** Progress of a tool call: `running` shows a spinner, `done` a check, `failed` a warning and danger text. */
 export type ToolStepState = "running" | "done" | "failed";
 
+/** Props for {@link ToolStep}: the tool line, an optional detail line and the progress state. */
 export type ToolStepProps = Omit<ComponentProps<"button">, "className" | "title"> & {
+  /** Progress state, which also picks the leading icon and the title colour. @default "running" */
   state?: ToolStepState;
+  /** The tool call line, truncated to one line. */
   title: ReactNode;
+  /** Optional second line, such as the target or a short result, truncated to one line. */
   detail?: ReactNode;
+  /** Extra classes merged onto the row, for margins. */
   className?: string;
 };
 
-/** Figma `Tool step` (108:660): a flat 12px-radius row with spinner, check or warning, and a caret. */
+/**
+ * Figma `Tool step` (108:660): a flat 12px-radius row with spinner, check or warning, and a caret.
+ * Renders a real `button`, so pass `onClick` to open the call's detail; the caret does not expand anything
+ * on its own.
+ *
+ * @example
+ * ```tsx
+ * <ToolStep state="done" title="Search the web" detail="3 results" onClick={openCall} />
+ * ```
+ */
 export function ToolStep({ state = "running", title, detail, className, ...props }: ToolStepProps) {
   return (
     <button
@@ -158,16 +199,43 @@ export function ToolStep({ state = "running", title, detail, className, ...props
   );
 }
 
-export type WorkLogStep = { id: string; title: ReactNode; detail?: ReactNode; running?: boolean };
+/** One compact line inside a work log. */
+export type WorkLogStep = {
+  /** Stable key for the step. */
+  id: string;
+  /** Step text, truncated to one line. */
+  title: ReactNode;
+  /** Optional second line with a short result or target. */
+  detail?: ReactNode;
+  /** Shows a small spinner instead of the check while the step is still running. */
+  running?: boolean;
+};
 
-/** Figma `Work log` (108:660): a flat subtle card with a wrench summary row and compact steps. */
+/**
+ * Figma `Work log` (108:660): a flat subtle card with a wrench summary row and compact steps. It is a native
+ * `<details open>`, so the summary collapses and expands without extra state; the caret rotates while closed.
+ *
+ * @example
+ * ```tsx
+ * <WorkLog
+ *   summary="4 steps"
+ *   steps={[
+ *     { id: "read", title: "Read the sheet", detail: "18 rows", running: false },
+ *     { id: "write", title: "Draft the summary", running: true },
+ *   ]}
+ * />
+ * ```
+ */
 export function WorkLog({
   summary,
   steps,
   className,
 }: {
+  /** Summary line in the toggle row, such as "4 steps". */
   summary: ReactNode;
+  /** Steps listed under the summary. */
   steps: WorkLogStep[];
+  /** Extra classes merged onto the card, for margins or a width override. */
   className?: string;
 }) {
   return (
