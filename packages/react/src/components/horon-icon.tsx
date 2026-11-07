@@ -81,12 +81,33 @@ import {
 } from "@phosphor-icons/react";
 import type { ComponentProps } from "react";
 
-export type HoronIconProps = Omit<ComponentProps<"svg">, "children"> & { size?: number | string };
+/** Props for the Horon mark: any svg attribute plus a size like a Phosphor icon. */
+export type HoronIconProps = Omit<ComponentProps<"svg">, "children"> & {
+  /** Width and height together: a px number or a CSS length. @default "1em" */
+  size?: number | string;
+};
 
 /**
  * Figma `icon/horon` (256:9116): the line falcon eye that stands in for Horon in
  * navigation. Phosphor has no equivalent, so the path is copied from the Tab bar
  * (63:441) export. It takes `currentColor` and sizes like a Phosphor icon.
+ *
+ * The svg is `aria-hidden` by default and its 22-unit viewBox scales with `size`, so it drops into any place
+ * a Phosphor glyph fits. The default `1em` makes it follow the font size, which is what a row of mixed icons
+ * needs.
+ *
+ * @example
+ * ```tsx
+ * import { HoronIcon } from "@horon-ai/react";
+ *
+ * function BrandMark() {
+ *   return (
+ *     <span className="flex size-10 items-center justify-center rounded-full bg-bg-subtle text-text-primary">
+ *       <HoronIcon size={22} />
+ *     </span>
+ *   );
+ * }
+ * ```
  */
 export function HoronIcon({ size = "1em", ...props }: HoronIconProps) {
   return (
@@ -100,6 +121,9 @@ export function HoronIcon({ size = "1em", ...props }: HoronIconProps) {
  * Paper's icon contract: every icon is a component named `icon/<name>`. `iconNames` is that list in
  * Paper order. Paper draws three sizes (16 in small controls and captions, 20 in buttons and rows,
  * 24 in bars and empty states); 12, 14, 18 and 22 elsewhere in the code stay as they are.
+ *
+ * The tuple is the single source of the registry: `HoronIconName` derives from it and `phosphorGlyphs`
+ * must map every entry except `horon`, so a name added here fails to type-check until it has a glyph.
  */
 export const iconNames = [
   "plus",
@@ -183,6 +207,7 @@ export const iconNames = [
   "plus-circle",
 ] as const;
 
+/** Every registered icon name: a literal union derived from `iconNames`. */
 export type HoronIconName = (typeof iconNames)[number];
 
 const phosphorGlyphs: Record<Exclude<HoronIconName, "horon">, Icon> = {
@@ -266,13 +291,35 @@ const phosphorGlyphs: Record<Exclude<HoronIconName, "horon">, Icon> = {
   "plus-circle": PlusCircle,
 };
 
+/** Props for `HoronGlyph`: the registry name plus the same svg attributes a Phosphor icon takes. */
 export type HoronGlyphProps = Omit<ComponentProps<"svg">, "children" | "ref"> & {
+  /** Which registered glyph to draw; `horon` resolves to the Horon mark instead of a Phosphor icon. */
   name: HoronIconName;
-  /** Paper sizes are 16, 20 and 24. */
+  /** Paper sizes are 16, 20 and 24. @default 20 */
   size?: number | string;
 };
 
-/** Figma `icon/<name>`: resolves a registry name to its glyph. Takes `currentColor`, so the parent's text color drives it. */
+/**
+ * Figma `icon/<name>`: resolves a registry name to its glyph. Takes `currentColor`, so the parent's text color drives it.
+ *
+ * The runtime lookup behind an icon name stored as data (a tool's icon, a settings row): `horon` returns
+ * `HoronIcon`, everything else the matching Phosphor component. Like Phosphor, the svg is `aria-hidden`;
+ * put the meaning on the surrounding button or label. Outside data-driven cases, prefer importing the
+ * Phosphor icon directly so the bundler can tree-shake it.
+ *
+ * @example
+ * ```tsx
+ * import { HoronGlyph, type HoronIconName } from "@horon-ai/react";
+ *
+ * function ToolIcon({ icon }: { icon: HoronIconName }) {
+ *   return (
+ *     <span className="text-text-secondary">
+ *       <HoronGlyph name={icon} size={20} />
+ *     </span>
+ *   );
+ * }
+ * ```
+ */
 export function HoronGlyph({ name, size = 20, ...props }: HoronGlyphProps) {
   if (name === "horon") return <HoronIcon size={size} {...props} />;
   const Glyph = phosphorGlyphs[name];

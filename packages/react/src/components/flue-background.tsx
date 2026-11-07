@@ -3,44 +3,87 @@ import { type CSSProperties, useEffect, useRef } from "react";
 import { useColorScheme } from "../hooks/use-color-scheme";
 import { cn } from "../lib/cn";
 
+/**
+ * Every knob the fragment shader reads. Each key becomes a uniform named `u` plus the capitalised key
+ * (`speed` → `uSpeed`), and a hex string is uploaded as a `vec3`, so add a field here and a matching
+ * uniform in the shader or it silently does nothing. `cursor` and `maxDpr` are engine keys instead: they
+ * never become uniforms and are skipped when uniforms are bound.
+ */
 export type FlueConfig = {
+  /** Flat ground color, hex. Painted on the wrapper, so it is also the fallback when WebGL2 is unavailable. */
   bgColor: string;
+  /** Faintest ramp stop, a near-ground tint that only the thinnest smoke reaches. */
   colorA: string;
+  /** Second ramp stop: the first visible blue of the plume. */
   colorB: string;
+  /** Third ramp stop: the dense body of the plume. */
   colorC: string;
+  /** Densest ramp stop, also the glow color at high density. */
   colorD: string;
+  /** Zoom of the base noise field; larger values make the smoke finer and busier. */
   scale: number;
+  /** Time multiplier, so the drift speed follows it. Larger values scroll faster. */
   speed: number;
+  /** Vertical advection added to the curl field per second, the internal flow of the plume. */
   flow: number;
+  /** Gain of each fbm octave (0..1); lower values keep the coarse shape dominant. */
   roughness: number;
+  /** Frequency step between fbm octaves; larger values add detail at smaller and smaller scale. */
   lacunarity: number;
+  /** Zoom of the density field: larger values make individual wisps smaller. */
   smokeScale: number;
+  /** Amount of curl-noise displacement; higher values swirl the smoke more. */
   curl: number;
+  /** Zoom of the curl potential field, so the swirls themselves change size. */
   curlScale: number;
+  /** Upward drift of the smoke in uv per second. */
   rise: number;
+  /** Vertical frequency multiplier for the density field; larger values compress the wisps vertically. */
   slender: number;
+  /** Half-width (uv) of the vertical corridor the plume is allowed to fill. */
   width: number;
+  /** How much the corridor widens from the bottom to the top of the frame. */
   spread: number;
+  /** How far the pointer's x pushes the top of the plume sideways. */
   lean: number;
+  /** Overall density multiplier before the threshold. */
   density: number;
+  /** Gain around `midpoint`: higher values give a harder edge between ground and smoke. */
   contrast: number;
+  /** Threshold (0..1) where smoke starts to show; higher values leave more of the ground bare. */
   midpoint: number;
+  /** Strength of the `colorD` bloom on the densest part, added as `pow(f, 4)`. */
   glow: number;
+  /** Smoothstep width, over the density value, at which the ground gives way to the ramp; 0 floors at 0.01. */
   sink: number;
+  /** Film-grain strength; 0 turns grain off. */
   grain: number;
+  /** Grain refresh multiplier (24 steps per second at 1); 0 holds one static grain field. */
   grainAnim: number;
+  /** Triangle-dither amplitude added to every channel to stop gradient banding. */
   dither: number;
+  /** Corner darkening; multiplied by the squared uv distance from the centre. */
   vignette: number;
   /** 1 lets the smoke follow the real pointer; 0 (default) ignores it and a slow virtual pointer sways the smoke. */
   cursor: number;
+  /** Radius (uv) of the pointer trail's gaussian falloff. */
   pointerRadius: number;
+  /** How strongly the pointer's velocity drags the smoke along, through the trail. */
   draft: number;
+  /** How much the pointer trail brightens the density, added as `trail * 0.30 * this`. */
   pointerStrength: number;
+  /** How far the whole field shifts against the pointer, in uv. */
   parallax: number;
+  /** Device-pixel-ratio cap for the canvas; 1 halves the pixel count on a 2x screen and keeps the fill cheap. */
   maxDpr: number;
 };
 
-/** The Horon sky palette for Flue. Recolour through these values only, never the shader. */
+/**
+ * The Horon sky palette for Flue. Recolour through these values only, never the shader.
+ *
+ * It is a complete `FlueConfig`, so it doubles as the base every variant tunes on top of, and its
+ * `cursor: 0` / `maxDpr: 1` keep the default cheap: a still-ish plume at 1x pixel density.
+ */
 export const FLUE_SKY: FlueConfig = {
   bgColor: "#eef3f8",
   colorA: "#e3ecf6",
@@ -77,7 +120,12 @@ export const FLUE_SKY: FlueConfig = {
   maxDpr: 1,
 };
 
-/** The night palette for dark mode: near-black ground and blue smoke. Same motion as `FLUE_SKY`. */
+/**
+ * The night palette for dark mode: near-black ground and blue smoke. Same motion as `FLUE_SKY`.
+ *
+ * Only the five colors and `glow` differ; every other number is inherited, so light and dark read as the
+ * same plume in two lights.
+ */
 export const FLUE_NIGHT: FlueConfig = {
   ...FLUE_SKY,
   bgColor: "#050608",
@@ -91,9 +139,18 @@ export const FLUE_NIGHT: FlueConfig = {
 /** Where the smoke is drawn; each place tunes the motion and colour on top of `FLUE_SKY` / `FLUE_NIGHT`. */
 export type FlueVariant = "default" | "sidebar" | "auth";
 
-type FlueTuning = { light: Partial<FlueConfig>; dark: Partial<FlueConfig>; tint: string };
+/** One variant's overrides: values layered over the base palette per scheme, plus the tint laid on top. */
+type FlueTuning = {
+  /** Overrides applied on top of `FLUE_SKY` in light mode. */
+  light: Partial<FlueConfig>;
+  /** Overrides applied on top of `FLUE_NIGHT` in dark mode. */
+  dark: Partial<FlueConfig>;
+  /** Classes for the tint div over the smoke; `""` adds none, and it yields to `tintClassName`. */
+  tint: string;
+};
 
 /**
+ * - `default`: no motion overrides, under a regular glass tint in light mode and none in dark.
  * - `sidebar`: a narrow, tall column under the sidebar's glass. The glass blurs the detail away, so the smoke
  *   is calmer and larger, kept low in the column so the nav labels at the top sit on the quiet part. The canvas
  *   paints above the sidebar's own fill, so in light mode the variant lays the thick glass (80% white) over the
@@ -188,10 +245,13 @@ function activate(gl: WebGL2RenderingContext, program: WebGLProgram): void {
   gl[USE_PROGRAM](program);
 }
 
+/** Props of {@link FlueBackground}: placement, which variant, and per-instance shader overrides. */
 export type FlueBackgroundProps = {
+  /** Extra classes for the wrapper, which is already `absolute inset-0 -z-10 overflow-hidden`. */
   className?: string;
+  /** Inline styles for the wrapper; `backgroundColor` is set from the resolved `bgColor` before these apply. */
   style?: CSSProperties;
-  /** `sidebar` under the sidebar glass, `auth` behind the sign-in screen, `default` otherwise. */
+  /** `sidebar` under the sidebar glass, `auth` behind the sign-in screen, `default` otherwise. @default "default" */
   variant?: FlueVariant;
   /** Overrides on top of the variant's `FLUE_SKY` (light) or `FLUE_NIGHT` (dark) tuning. */
   config?: Partial<FlueConfig>;
@@ -204,6 +264,29 @@ export type FlueBackgroundProps = {
  * It fills its positioned parent behind the content (the parent needs `isolate`) and falls
  * back to the flat `bgColor` when WebGL2 is missing. Reduced motion draws a single still frame.
  * Light mode paints the white-and-sky `FLUE_SKY`; dark mode paints the black-and-blue `FLUE_NIGHT`.
+ *
+ * The wrapper is `absolute inset-0 -z-10`, `pointer-events-none` and `aria-hidden`, with a tint div over the
+ * canvas, so it never intercepts input and the content above it stays readable. Settings resolve as palette +
+ * variant tuning + `config`; the effect is keyed by their JSON, so changing `config` rebuilds the program.
+ * Drawing pauses while the canvas is off-screen (`IntersectionObserver`) or the tab is hidden, and the
+ * device-pixel ratio is capped by `maxDpr`. `cursor` switches the real pointer for a slow virtual one that
+ * wanders on two incommensurate sines — the default, so a pointerless panel still breathes. A context lost
+ * by a previous run leaves the flat color instead of throwing, and cleanup frees this run's GL objects
+ * without dropping the shared context.
+ *
+ * @example
+ * ```tsx
+ * import { FlueBackground } from "@horon-ai/react";
+ *
+ * function Sidebar() {
+ *   return (
+ *     <div className="relative isolate min-h-96 overflow-hidden rounded-xl bg-bg-default">
+ *       <FlueBackground variant="sidebar" config={{ speed: 0.5 }} />
+ *       <nav className="relative p-6 text-text-primary">Navigation</nav>
+ *     </div>
+ *   );
+ * }
+ * ```
  */
 export function FlueBackground({ className, style, variant = "default", config, tintClassName }: FlueBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
