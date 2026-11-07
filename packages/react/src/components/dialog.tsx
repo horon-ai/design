@@ -59,7 +59,7 @@ export type DialogContentProps = Omit<ComponentProps<typeof BaseDialog.Popup>, "
 };
 
 /**
- * Figma `Dialog on scrim` (63:329): a 40% scrim and a 420px veil dialog,
+ * Figma `Dialog on scrim` (63:329): the `bg-scrim` ink at 32% alpha and a 420px veil dialog,
  * 24px padding, title-md heading with a 32px close target, body-md description.
  *
  * Part of {@link Dialog}. Portals to the body over a 6px-blurred scrim and centres through a fixed viewport

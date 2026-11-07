@@ -157,7 +157,7 @@ export type ListDetailHeaderProps = Omit<ComponentProps<"div">, "className" | "t
   className?: string;
 };
 
-/** Detail header: a 40px sky tile with an 18px icon, title and description, actions on the right.
+/** Detail header: a 40px sky tile with a 20px icon, title and description, actions on the right.
  *
  * Part of {@link ListDetail}.
  */

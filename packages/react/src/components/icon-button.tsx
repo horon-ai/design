@@ -58,7 +58,7 @@ const variantClass: Record<IconButtonVariant, string> = {
  *
  * A round, icon-only Base UI button. `label` becomes `aria-label`, since nothing is visible; the visible
  * disc is 32/40/48px while an invisible pseudo-element keeps a 44px touch target around it. It renders
- * `LiquidGlass` inside the `glass` variant only, and disabled state is 40% opacity with no pointer.
+ * `LiquidGlass` inside the `glass` variant only, and disabled state is 40% opacity with `cursor-not-allowed`.
  *
  * @example
  * ```tsx
