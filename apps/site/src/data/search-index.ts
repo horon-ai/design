@@ -17,9 +17,7 @@ export interface SearchEntry {
 
 const groupTitles = new Map(componentGroups.map((group) => [group.id, group.title] as const));
 
-const docPages = primaryNav.filter(
-  (item) => item.href !== "/foundations" && item.href !== "/components",
-);
+const docPages = primaryNav.filter((item) => item.href !== "/foundations" && item.href !== "/components");
 
 export const searchIndex: SearchEntry[] = [
   ...components.map((component) => ({

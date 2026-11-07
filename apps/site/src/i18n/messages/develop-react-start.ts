@@ -89,8 +89,8 @@ export const reactInstallationMessages = defineMessages({
   },
   viteHeading: { ko: "Vite", en: "Vite" },
   viteBody: {
-    ko: "Tailwind는 @tailwindcss/vite 플러그인으로 넣습니다. 이 플러그인이 없으면 globals.css의 @import \"tailwindcss\"가 처리되지 않아 유틸리티 클래스가 생성되지 않습니다.",
-    en: "Tailwind comes in through the @tailwindcss/vite plugin. Without it, the @import \"tailwindcss\" in globals.css is not resolved and no utility classes are generated.",
+    ko: 'Tailwind는 @tailwindcss/vite 플러그인으로 넣습니다. 이 플러그인이 없으면 globals.css의 @import "tailwindcss"가 처리되지 않아 유틸리티 클래스가 생성되지 않습니다.',
+    en: 'Tailwind comes in through the @tailwindcss/vite plugin. Without it, the @import "tailwindcss" in globals.css is not resolved and no utility classes are generated.',
   },
   nextHeading: { ko: "Next.js", en: "Next.js" },
   nextBody: {
@@ -182,8 +182,8 @@ export const reactThemingMessages = defineMessages({
 
   platformHeading: { ko: "플랫폼 글자 크기", en: "Platform type scale" },
   platformBody: {
-    ko: "상위 요소에 data-platform=\"desktop\" 또는 data-platform=\"mobile\"을 두면 13개 글자 스타일의 크기와 줄 높이가 그 플랫폼 값으로 바뀝니다. 값이 없으면 Web입니다. 예를 들어 body-md는 Web 16px, Desktop 14px, Mobile 16px이고 display-lg는 56, 48, 36px입니다.",
-    en: "With data-platform=\"desktop\" or data-platform=\"mobile\" on an ancestor, all 13 text styles take that platform's size and line height. With no value they use the Web values: body-md is 16px on Web, 14px on Desktop and 16px on Mobile, and display-lg is 56, 48 and 36px.",
+    ko: '상위 요소에 data-platform="desktop" 또는 data-platform="mobile"을 두면 13개 글자 스타일의 크기와 줄 높이가 그 플랫폼 값으로 바뀝니다. 값이 없으면 Web입니다. 예를 들어 body-md는 Web 16px, Desktop 14px, Mobile 16px이고 display-lg는 56, 48, 36px입니다.',
+    en: 'With data-platform="desktop" or data-platform="mobile" on an ancestor, all 13 text styles take that platform\'s size and line height. With no value they use the Web values: body-md is 16px on Web, 14px on Desktop and 16px on Mobile, and display-lg is 56, 48 and 36px.',
   },
   platformRule: {
     ko: "새 크기를 만들지 않습니다. 값이 빠졌으면 세 플랫폼 값을 함께 토큰에 추가합니다.",
