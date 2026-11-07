@@ -22,6 +22,15 @@ const bots: LaneBot[] = [
   },
 ];
 
+/** The box `<view>` wrapping the dashed hand-off path, found by the dash pattern only it uses. */
+const curveBox = (container: HTMLElement): HTMLElement => {
+  const glyph = [...container.querySelectorAll("svg[content]")].find((element) =>
+    (element.getAttribute("content") ?? "").includes('stroke-dasharray="3 3"'),
+  );
+  if (!glyph?.parentElement) throw new Error("the hand-off curve was not rendered");
+  return glyph.parentElement;
+};
+
 test("the timeline lays out one row per bot and one bar per task on the track", () => {
   const { container, getByText } = render(
     <HoronProvider scheme="light">
@@ -68,6 +77,68 @@ test("a hand-off naming an unknown task is skipped instead of drawing a curve", 
   expect(withCurve.container.querySelectorAll("svg").length).toBe(
     without.container.querySelectorAll("svg").length + 1,
   );
+});
+
+test("a hand-off between tasks that meet exactly draws a curve of non-zero width centred on the joint", () => {
+  // In `bots` "pull" ends at -16 and "draft" starts at -16, so the raw span is zero.
+  const { container } = render(
+    <HoronProvider scheme="light">
+      <AgentLanesTimeline bots={bots} handoffs={[{ from: "pull", to: "draft" }]} />
+    </HoronProvider>,
+  );
+  const box = curveBox(container);
+
+  expect(parseFloat(box.style.width)).toBeGreaterThan(0);
+  expect(parseFloat(box.style.width)).toBeCloseTo(2, 5);
+  // Centred on the joint at 14/30 of the track, not hanging off its left edge.
+  const centre = parseFloat(box.style.left) + parseFloat(box.style.width) / 2;
+  expect(centre).toBeCloseTo((14 / 30) * 100, 4);
+  // The path still runs down to the target lane instead of collapsing.
+  expect(box.querySelector("svg")?.getAttribute("content")).toContain('d="M0 0 C60 0 40 100 100 100"');
+  expect(parseFloat(box.style.height)).toBeGreaterThan(0);
+});
+
+test("a hand-off curve spans a positive gap and mirrors for a reverse or upward hand-off", () => {
+  const gapped: LaneBot[] = [
+    {
+      id: "a",
+      name: "A",
+      initial: "A",
+      tone: "sky",
+      tasks: [{ id: "first", label: "First", tone: "done", start: -26, end: -20 }],
+    },
+    {
+      id: "b",
+      name: "B",
+      initial: "B",
+      tone: "steel",
+      tasks: [{ id: "second", label: "Second", tone: "done", start: -10, end: 0 }],
+    },
+  ];
+
+  const forward = render(
+    <HoronProvider scheme="light">
+      <AgentLanesTimeline bots={gapped} handoffs={[{ from: "first", to: "second" }]} />
+    </HoronProvider>,
+  );
+  const forwardBox = curveBox(forward.container);
+  expect(parseFloat(forwardBox.style.width)).toBeCloseTo((10 / 30) * 100, 4);
+  expect(parseFloat(forwardBox.style.left)).toBeCloseTo((10 / 30) * 100, 4);
+  expect(forwardBox.querySelector("svg")?.getAttribute("content")).toContain('d="M0 0 C60 0 40 100 100 100"');
+
+  // The same pair the other way: the target task starts before the source task ends, and sits above it.
+  const reverse = render(
+    <HoronProvider scheme="light">
+      <AgentLanesTimeline bots={gapped} handoffs={[{ from: "second", to: "first" }]} />
+    </HoronProvider>,
+  );
+  const reverseBox = curveBox(reverse.container);
+  expect(parseFloat(reverseBox.style.width)).toBeCloseTo((26 / 30) * 100, 4);
+  expect(parseFloat(reverseBox.style.left)).toBeCloseTo((4 / 30) * 100, 4);
+  // The box stays inside the track and the path leaves the source's bottom-right for the target's top-left.
+  expect(parseFloat(reverseBox.style.height)).toBe(64);
+  expect(parseFloat(reverseBox.style.top)).toBe(72);
+  expect(reverseBox.querySelector("svg")?.getAttribute("content")).toContain('d="M100 100 C40 100 60 0 0 0"');
 });
 
 test("the approval strip reports Later and Approve, and is absent without one", async () => {

@@ -148,6 +148,45 @@ const TOP = 40;
 const LABEL_WIDTH = 230;
 const RIGHT_GUTTER = 18;
 
+/** Smallest lit span of a hand-off curve, in percent of the track: 9px at the 452px track minimum, 15px at 760px. */
+const MIN_CURVE_WIDTH = 2;
+
+/**
+ * The four curve paths, named by the corner the curve starts in and the one it ends in: a hand-off that runs
+ * left to right and down is `topLeft`, the reverse direction is `topRight`, and a target lane above the source
+ * flips the vertical ends.
+ */
+const CURVE_PATH = {
+  topLeft: "M0 0 C60 0 40 100 100 100",
+  bottomLeft: "M0 100 C60 100 40 0 100 0",
+  topRight: "M100 0 C40 0 60 100 0 100",
+  bottomRight: "M100 100 C40 100 60 0 0 0",
+};
+
+/**
+ * The box a hand-off curve occupies and the path to draw in it.
+ *
+ * A hand-off whose tasks meet exactly (one ends where the next starts) would be a zero-width box, and a
+ * reverse hand-off (the next task starts before the previous ends) a negative one; both are drawn at the
+ * minimum span centred on the point where the tasks meet instead, with the path mirrored so it still leaves
+ * the `from` task and arrives at the `to` task. A target lane above the source flips the curve vertically the
+ * same way, so the box never has a negative height.
+ */
+const handoffCurve = (x1: number, x2: number, y1: number, y2: number) => {
+  const span = (x2 - x1) * 100;
+  const width = Math.min(Math.max(Math.abs(span), MIN_CURVE_WIDTH), 100);
+  const left = Math.min(Math.max((x1 + x2) * 50 - width / 2, 0), 100 - width);
+  const down = y2 >= y1;
+  const path = down
+    ? span < 0
+      ? CURVE_PATH.topRight
+      : CURVE_PATH.topLeft
+    : span < 0
+      ? CURVE_PATH.bottomRight
+      : CURVE_PATH.bottomLeft;
+  return { left, width, top: Math.min(y1, y2), height: Math.max(Math.abs(y2 - y1), 1), path };
+};
+
 /** Whether a value can be dropped into a `<text>` as its child. */
 const isPlainText = (value: ReactNode): value is string | number =>
   typeof value === "string" || typeof value === "number";
@@ -225,7 +264,7 @@ export function AgentLanesTimeline({
     const x2 = at(b.task.start);
     const y1 = TOP + a.lane * ROW + 32;
     const y2 = TOP + b.lane * ROW + 32;
-    return [{ key: `${from}-${to}`, left: x1 * 100, width: (x2 - x1) * 100, top: y1, height: y2 - y1 }];
+    return [{ key: `${from}-${to}`, ...handoffCurve(x1, x2, y1, y2) }];
   });
 
   return (
@@ -374,11 +413,11 @@ export function AgentLanesTimeline({
                   left: `${curve.left}%`,
                   width: `${curve.width}%`,
                   top: `${curve.top}px`,
-                  height: `${Math.max(curve.height, 1)}px`,
+                  height: `${curve.height}px`,
                 }}
               >
                 <svg
-                  content={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none"><path d="M0 0 C60 0 40 100 100 100" stroke="${theme.color("status-live")}" stroke-width="1.5" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/></svg>`}
+                  content={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none" fill="none"><path d="${curve.path}" stroke="${theme.color("status-live")}" stroke-width="1.5" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/></svg>`}
                   style={{ width: "100%", height: "100%" }}
                 />
               </view>

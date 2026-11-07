@@ -95,14 +95,12 @@ const hostScheme = (): ColorScheme => (typeof lynx !== "undefined" && lynx.__glo
  * ```
  */
 export function HoronProvider({ scheme = "light", platform = "web", reducedMotion = false, children }: HoronProviderProps) {
-  const [resolved, setResolved] = useState<ColorScheme>(scheme === "system" ? "light" : scheme);
+  // `system` is resolved while building the first state, not in an effect, so a
+  // dark host never paints one light frame before the palette switches.
+  const [resolved, setResolved] = useState<ColorScheme>(() => (scheme === "system" ? hostScheme() : scheme));
 
   useEffect(() => {
-    if (scheme !== "system") {
-      setResolved(scheme);
-      return;
-    }
-    setResolved(hostScheme());
+    setResolved(scheme === "system" ? hostScheme() : scheme);
   }, [scheme]);
 
   const theme = useMemo<HoronTheme>(
