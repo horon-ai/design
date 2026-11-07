@@ -7,9 +7,12 @@ import type { ControlSize } from "../lib/size";
 import { fieldBoxClass, fieldSizeClass, fieldTextClass, type InputSurface } from "./input";
 import { inputGroupSegmentClass, useInputGroup } from "./input-group";
 
+/** Height and text rung, shared with the other controls: `sm` 32px, `md` 40px, `lg` 48px. */
 export type ComboboxSize = ControlSize;
 
+/** One option in the list; the `value` is what the field reports and submits. */
 export type ComboboxItemData = {
+  /** Stable identity, reported by `value` / `onValueChange` and submitted with the form. */
   value: string;
   /** Row text and the text the search matches. */
   label: string;
@@ -19,46 +22,71 @@ export type ComboboxItemData = {
   trailing?: ReactNode;
   /** Extra search terms that are not shown, such as `KR` or `Korea`. */
   keywords?: readonly string[];
+  /** Dims the row to 40% and makes it unselectable. */
   disabled?: boolean;
 };
 
+/** Props shared by both value modes; `multiple` selects the mode in {@link ComboboxProps}. */
 type ComboboxBaseProps = {
+  /** Options in list order, in the shape of {@link ComboboxItemData}. */
   items: readonly ComboboxItemData[];
+  /** Text while nothing is chosen, and the field's `aria-label` in the `field` variant. @default "Search" */
   placeholder?: string;
-  /** Placeholder of the search box inside the popup (`segment` variant). */
+  /** Placeholder of the search box inside the popup (`segment` variant). @default "Search" */
   searchPlaceholder?: string;
-  /** Shown in the popup when nothing matches the search. */
+  /** Shown in the popup when nothing matches the search. @default "No results" */
   emptyLabel?: ReactNode;
+  /** Rung of the field, rows and chips. @default "md" */
   size?: ComboboxSize;
+  /** Surface of the field; the popup follows it. @default "solid" */
   surface?: InputSurface;
   /**
    * `field` is a searchable field (the default). `segment` is the tinted prefix or suffix of an
    * `InputGroup`: a button that opens a popup with the search box on top, taking the group's size.
+   * @default "field"
    */
   variant?: "field" | "segment";
+  /** Turns the field or chips border danger red and sets `aria-invalid`; a `segment` trigger gets neither, because the wrapping `InputGroup` owns that border. */
   invalid?: boolean;
+  /** Blocks the field; in a `segment` it also inherits `disabled` from the wrapping `InputGroup`. */
   disabled?: boolean;
   /** Form field name; the submitted value is the item `value`. */
   name?: string;
+  /** Extra classes on the field or trigger, merged after the surface and size classes. */
   className?: string;
+  /** Accessible name of the text field or segment trigger; the placeholder covers it in the `field` variant. */
   "aria-label"?: string;
 };
 
+/** Single-select combobox: `value` / `onValueChange` carry one item `value` or `null`. */
 export type ComboboxSingleProps = ComboboxBaseProps & {
+  /** Single-select mode; the default when the prop is omitted. */
   multiple?: false;
+  /** Controlled choice, as an item `value`; `null` means nothing is chosen. */
   value?: string | null;
+  /** Starting choice of the uncontrolled field. */
   defaultValue?: string | null;
+  /** Fires with the picked item `value`, or `null` when the field is cleared. */
   onValueChange?: (value: string | null) => void;
 };
 
+/** Multi-select combobox: the chosen items show as removable chips and the value is an array of item `value`s. */
 export type ComboboxMultipleProps = ComboboxBaseProps & {
   /** Chosen items show as removable chips in the field. */
   multiple: true;
+  /** Controlled selection, in the order chosen. */
   value?: readonly string[];
+  /** Starting selection of the uncontrolled field. */
   defaultValue?: readonly string[];
+  /** Fires with the full next selection as item `value`s, in the order chosen. */
   onValueChange?: (value: string[]) => void;
 };
 
+/**
+ * Props for {@link Combobox}, a discriminated union on `multiple`: without it the field is single-select
+ * and its value is `string | null`; with `multiple: true` it is multi-select and its value is `readonly string[]`.
+ * Narrow on `props.multiple` before reading `value` or `onValueChange`.
+ */
 export type ComboboxProps = ComboboxSingleProps | ComboboxMultipleProps;
 
 const itemClass: Record<ComboboxSize, string> = {
@@ -96,6 +124,28 @@ const shortLabel = (item: ComboboxItemData) => item.selectedLabel ?? item.label;
  * `multiple`, several items shown as chips. The popup matches `Select`: the veil, rows with
  * a check. `variant="segment"` puts it in an `InputGroup`, such as a country code before a
  * phone number.
+ *
+ * Filtering is a case-insensitive substring match over each item's `label`, `value` and `keywords`,
+ * with the query trimmed first; a blank query keeps every item. The chosen item's `selectedLabel`
+ * (falling back to `label`) is what the field shows, while the form and `onValueChange` carry `value`.
+ * The popup portals to the body, opens 4px below the field and is at least as wide as it; the list scrolls
+ * past 256px and the panel caps at 320px. In `segment` form the popup is a 256px column with its own search
+ * box on top; on `multiple` the field grows and wraps as chips fill it instead of fixing its height.
+ *
+ * @example
+ * ```tsx
+ * const [country, setCountry] = useState<string | null>("+82");
+ *
+ * <Combobox
+ *   aria-label="Country code"
+ *   value={country}
+ *   onValueChange={setCountry}
+ *   items={[
+ *     { value: "+82", label: "+82 South Korea", keywords: ["KR", "Korea"] },
+ *     { value: "+1", label: "+1 United States", keywords: ["US"] },
+ *   ]}
+ * />
+ * ```
  */
 export function Combobox(props: ComboboxProps) {
   const {

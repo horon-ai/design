@@ -26,19 +26,51 @@ import { Checkbox } from "./checkbox";
 import { IconButton } from "./icon-button";
 import { Input } from "./input";
 
-type WithClass<T> = Omit<T, "className"> & { className?: string };
+/** Strips an element's own `className` so a wrapper can merge its classes with the caller's. */
+type WithClass<T> = Omit<T, "className"> & {
+  /** Extra classes merged last onto the element, after the component's own classes. */
+  className?: string;
+};
 
+/** Viewport the table is designed for: `desktop` and `tablet` keep 24px card gutters, `mobile` narrows them to 18px. */
 export type DataTableDevice = "desktop" | "tablet" | "mobile";
 
 /**
  * Figma `Data table`: a solid surface card, 20px radius, 1px default border.
  * `device` sets the gutters: 24px on desktop and tablet, 18px on mobile (where the table scrolls sideways).
+ *
+ * The card is the context every part reads: it publishes `data-device`, which the header, cells and footer
+ * use to switch their padding, and `group/dt`, so the parts can be laid out in any order inside it.
+ *
+ * @example
+ * ```tsx
+ * function BotsTable({ bots }: { bots: { id: string; name: string; owner: string }[] }) {
+ *   const table = useDataTable({
+ *     data: bots,
+ *     columns: [
+ *       { accessorKey: "name", header: "Name" },
+ *       { accessorKey: "owner", header: "Owner" },
+ *     ],
+ *     pageSize: 10,
+ *   });
+ *
+ *   return (
+ *     <DataTable>
+ *       <DataTableView table={table} />
+ *       <DataTablePagination table={table} />
+ *     </DataTable>
+ *   );
+ * }
+ * ```
  */
 export function DataTable({
   device = "desktop",
   className,
   ...props
-}: WithClass<ComponentProps<"div">> & { device?: DataTableDevice }) {
+}: WithClass<ComponentProps<"div">> & {
+  /** Viewport the table is designed for. @default "desktop" */
+  device?: DataTableDevice;
+}) {
   return (
     <div
       data-device={device}
@@ -51,15 +83,24 @@ export function DataTable({
   );
 }
 
+/** Props for {@link DataTableHeader}: an optional leading icon, the heading and trailing actions. */
 export type DataTableHeaderProps = {
   /** 16px icon on the 26px brand tile. */
   icon?: ReactNode;
+  /** Card heading, `label-lg` primary text on one truncated line. */
   title: ReactNode;
   /** Trailing 16px icon buttons. */
   actions?: ReactNode;
+  /** Extra classes on the header row, merged after the padding classes. */
   className?: string;
 };
 
+/**
+ * The card's top row: leading icon tile, title and trailing actions, 24px gutters (18px on mobile).
+ *
+ * Part of {@link DataTable}. The actions column is `text-secondary` with 16px icons and pulls 6px into the
+ * header's vertical padding, so an icon button keeps its own footprint without inflating the row.
+ */
 export function DataTableHeader({ icon, title, actions, className }: DataTableHeaderProps) {
   return (
     <div className={cn("flex items-center gap-3 px-6 py-4.5 group-data-[device=mobile]/dt:px-4.5", className)}>
@@ -76,6 +117,12 @@ export function DataTableHeader({ icon, title, actions, className }: DataTableHe
   );
 }
 
+/**
+ * The scroll container and the `<table>` inside it, with collapsed borders.
+ *
+ * Part of {@link DataTable}. On `device="mobile"` the table switches to its min-content width so the
+ * wrapper scrolls sideways instead of squeezing columns; above that it fills the card.
+ */
 export function DataTableTable({ className, ...props }: WithClass<ComponentProps<"table">>) {
   return (
     <div className="w-full max-w-full min-w-0 overflow-x-auto">
@@ -87,13 +134,21 @@ export function DataTableTable({ className, ...props }: WithClass<ComponentProps
   );
 }
 
-/** Header cell: 52px, 14px icon and label-md secondary text. */
+/**
+ * Header cell: 52px, 14px icon and label-md secondary text.
+ *
+ * Part of {@link DataTable}. It draws the top and bottom hairlines and 24px outer gutters (18px on mobile);
+ * `DataTableView` passes `aria-sort` here for a sortable column, which is why it stays a plain `<th>`.
+ */
 export function DataTableHead({
   icon,
   className,
   children,
   ...props
-}: WithClass<ComponentProps<"th">> & { icon?: ReactNode }) {
+}: WithClass<ComponentProps<"th">> & {
+  /** 14px icon before the label, rendered inside the cell's inline label row. */
+  icon?: ReactNode;
+}) {
   return (
     <th
       className={cn(
@@ -110,11 +165,17 @@ export function DataTableHead({
   );
 }
 
+/** Body row: one bottom hairline; `DataTableView` adds the hover, selected and staggered rise classes. */
 export function DataTableRow({ className, ...props }: WithClass<ComponentProps<"tr">>) {
   return <tr className={cn("border-b border-border-default", className)} {...props} />;
 }
 
-/** Body cell: 52px; body-sm secondary text unless the content sets its own. */
+/**
+ * Body cell: 52px; body-sm secondary text unless the content sets its own.
+ *
+ * Part of {@link DataTable}. It keeps text on one line, uses the same 24/18px outer gutters as the head,
+ * and turns a direct `<label>` into a flex box so a checkbox and its text line up in the cell.
+ */
 export function DataTableCell({ className, ...props }: WithClass<ComponentProps<"td">>) {
   return (
     <td
@@ -127,8 +188,19 @@ export function DataTableCell({ className, ...props }: WithClass<ComponentProps<
   );
 }
 
-/** The 24px ink logo tile with a label-sm initial, beside a label-lg name. */
-export function DataTableItem({ logo, children }: { logo: ReactNode; children: ReactNode }) {
+/**
+ * The 24px ink logo tile with a label-sm initial, beside a label-lg name. Part of {@link DataTable}.
+ *
+ * prettier-ignore keeps the parameter pattern identical to the original instead of letting the formatter
+ * expand the destructured parameter onto separate lines.
+ */
+// prettier-ignore
+export function DataTableItem({ logo, children }: {
+  /** Tile content: a letter, or an icon the caller sizes (the tile is 24px square). */
+  logo: ReactNode;
+  /** The row's name, `label-lg` primary text truncated to the cell. */
+  children: ReactNode;
+}) {
   return (
     <span className="flex items-center gap-2.5">
       <span className="flex size-6 shrink-0 items-center justify-center rounded-xs bg-surface-ink text-label-sm text-text-on-ink">
@@ -139,12 +211,18 @@ export function DataTableItem({ logo, children }: { logo: ReactNode; children: R
   );
 }
 
-/** Figma `Table tag`: brand (sky tint) or neutral (subtle) label, 8px radius. */
+/**
+ * Figma `Table tag`: brand (sky tint) or neutral (subtle) label, 8px radius.
+ * Part of {@link DataTable}; it renders a non-interactive `span` so it fits inside a cell's text flow.
+ */
 export function DataTableTag({
   tone = "brand",
   className,
   ...props
-}: WithClass<ComponentProps<"span">> & { tone?: "brand" | "neutral" }) {
+}: WithClass<ComponentProps<"span">> & {
+  /** `brand` is the sky tint with brand text; `neutral` is the subtle fill with secondary text. @default "brand" */
+  tone?: "brand" | "neutral";
+}) {
   return (
     <span
       className={cn(
@@ -157,9 +235,22 @@ export function DataTableTag({
   );
 }
 
-export type DataTableFooterProps = { onAdd?: () => void; addLabel?: string; hint?: ReactNode; className?: string };
+/** Props for {@link DataTableFooter}: the add-row action and an optional caption hint. */
+export type DataTableFooterProps = {
+  /** Fires when the add-row row is pressed; the footer itself adds nothing. */
+  onAdd?: () => void;
+  /** Text of the add action, `label-md` secondary. @default "Add row" */
+  addLabel?: string;
+  /** Caption at the right edge, such as a total or a keyboard hint. */
+  hint?: ReactNode;
+  /** Extra classes on the footer row, merged after the padding classes. */
+  className?: string;
+};
 
-/** Footer: "Add row" with a 16px plus and a caption hint on the right. */
+/**
+ * Footer: "Add row" with a 16px plus and a caption hint on the right.
+ * Part of {@link DataTable}. The add action takes the free width, so the hint stays pinned right; both wrap onto a second line when narrow.
+ */
 export function DataTableFooter({ onAdd, addLabel = "Add row", hint, className }: DataTableFooterProps) {
   return (
     <div
@@ -181,13 +272,17 @@ export function DataTableFooter({ onAdd, addLabel = "Add row", hint, className }
   );
 }
 
+/** The `meta` a horon column can carry; `DataTableView` reads it for the head icon and the two class hooks. */
 export type DataTableColumnMeta = {
   /** 14px icon before the header label. */
   icon?: ReactNode;
+  /** Extra classes on this column's header cell, such as a width. */
   headClassName?: string;
+  /** Extra classes on each body cell of this column. */
   cellClassName?: string;
 };
 
+/** Empty meta object that gives `columnMeta` its type, so `meta` in a column def is checked against the shape above. */
 const columnMeta: DataTableColumnMeta = {};
 
 /** TanStack Table features every horon data table registers: sorting, filtering, selection, pagination. */
@@ -205,20 +300,54 @@ export const dataTableFeatures = tableFeatures({
   columnMeta,
 });
 
+/** The feature set `dataTableFeatures` builds; the type every column and table instance is parameterised by. */
 export type DataTableFeatures = typeof dataTableFeatures;
+
+/**
+ * A column definition bound to the horon feature set and to the row type.
+ * @typeParam TData - Shape of one row; derive it from the data array so `accessorKey` stays checked.
+ */
 export type DataTableColumn<TData extends RowData> = ColumnDef<DataTableFeatures, TData>;
+
+/**
+ * The table instance `useDataTable` returns; pass it to {@link DataTableView}, {@link DataTableSearch} and {@link DataTablePagination}.
+ * @typeParam TData - Shape of one row, the same one the columns were built from.
+ */
 export type DataTableInstance<TData extends RowData> = ReactTable<DataTableFeatures, TData>;
 
+/**
+ * Options for {@link useDataTable}.
+ * @typeParam TData - Shape of one row.
+ */
 export type UseDataTableOptions<TData extends RowData> = {
+  /** Rows to display; the table never mutates them. */
   data: TData[];
+  /** Column definitions, in display order; see {@link DataTableColumn}. */
   columns: DataTableColumn<TData>[];
+  /** Derives a stable row id from the row and its index; the default id is the row index. */
   getRowId?: (row: TData, index: number) => string;
   /** Rows per page. Omit it to show every row on one page. */
   pageSize?: number;
+  /** Makes every row selectable, which is what the checkbox column from {@link dataTableSelectColumn} toggles. @default false */
   enableRowSelection?: boolean;
 };
 
-/** Builds the TanStack table behind `DataTableView`, `DataTableSearch` and `DataTablePagination`. */
+/**
+ * Builds the TanStack table behind `DataTableView`, `DataTableSearch` and `DataTablePagination`.
+ *
+ * Registers {@link dataTableFeatures} and starts on page 1 with the given `pageSize` (10 by default in
+ * state). Without `pageSize` it turns on manual pagination, so the paginated row model is skipped and every
+ * row renders.
+ *
+ * @typeParam TData - Shape of one row.
+ * @param options - The table options; see {@link UseDataTableOptions}.
+ * @param options.data - Rows to display.
+ * @param options.columns - Column definitions, in display order.
+ * @param options.getRowId - Derives a stable row id; the row index is used when omitted.
+ * @param options.pageSize - Rows per page; omit it to show every row on one page.
+ * @param options.enableRowSelection - Makes rows selectable for the checkbox column.
+ * @returns A table instance to pass to the table parts.
+ */
 export function useDataTable<TData extends RowData>({
   data,
   columns,
@@ -237,7 +366,16 @@ export function useDataTable<TData extends RowData>({
   });
 }
 
-/** Leading checkbox column; the header box selects every row on the current page. */
+/**
+ * Leading checkbox column; the header box selects every row on the current page.
+ *
+ * Part of the {@link DataTable} set. The header box reports indeterminate when only some page rows are
+ * selected, each cell box is labelled "Select row <n>" and is disabled when the table does not allow
+ * selecting that row, and the column is pinned 48px wide and unsortable.
+ *
+ * @typeParam TData - Shape of one row.
+ * @returns A column definition to put first in the `columns` array; it reads the table's own selection state.
+ */
 export function dataTableSelectColumn<TData extends RowData>(): DataTableColumn<TData> {
   return {
     id: "select",
@@ -269,13 +407,29 @@ export function dataTableSelectColumn<TData extends RowData>(): DataTableColumn<
 
 const ariaSort = { asc: "ascending", desc: "descending" } as const;
 
+/**
+ * Props for {@link DataTableView}.
+ * @typeParam TData - Shape of one row.
+ */
 export type DataTableViewProps<TData extends RowData> = {
+  /** Instance from {@link useDataTable}. */
   table: DataTableInstance<TData>;
+  /** Cell shown when the filtered rows are empty. @default "No results." */
   emptyMessage?: ReactNode;
+  /** Extra classes on the `<table>`. */
   className?: string;
 };
 
-/** Renders a `useDataTable` instance with the Figma head and body cells; sortable heads toggle on click. */
+/**
+ * Renders a `useDataTable` instance with the Figma head and body cells; sortable heads toggle on click.
+ *
+ * A sortable head is a button with a three-state caret (none, ascending, descending) and sets `aria-sort` on
+ * the `<th>`; a non-sortable head shows the column's `meta.icon` instead. Rows rise in 30ms apart, hover with
+ * a 4% ink wash, and a selected row keeps the wash on its cells. A sort or page change remounts the
+ * body so the stagger replays. An empty row model renders one full-width cell with `emptyMessage`.
+ *
+ * @typeParam TData - Shape of one row, matching the instance.
+ */
 export function DataTableView<TData extends RowData>({
   table,
   emptyMessage = "No results.",
@@ -358,13 +512,27 @@ export function DataTableView<TData extends RowData>({
   );
 }
 
+/**
+ * Props for {@link DataTableSearch}.
+ * @typeParam TData - Shape of one row.
+ */
 export type DataTableSearchProps<TData extends RowData> = {
+  /** Instance from {@link useDataTable}. */
   table: DataTableInstance<TData>;
+  /** Field placeholder; it is also the `aria-label`. @default "Search" */
   placeholder?: string;
+  /** Extra classes on the input, merged after `min-w-0`. */
   className?: string;
 };
 
-/** Solid search field bound to the table's global filter. */
+/**
+ * Solid search field bound to the table's global filter.
+ * Part of the {@link DataTable} set: it is a small `Input` with a magnifier, writes every keystroke into the
+ * table's global filter and reads the current value back from the table state, so it stays in sync when
+ * something else clears the filter.
+ *
+ * @typeParam TData - Shape of one row.
+ */
 export function DataTableSearch<TData extends RowData>({
   table,
   placeholder = "Search",
@@ -384,12 +552,26 @@ export function DataTableSearch<TData extends RowData>({
   );
 }
 
+/**
+ * Props for {@link DataTablePagination}.
+ * @typeParam TData - Shape of one row.
+ */
 export type DataTablePaginationProps<TData extends RowData> = {
+  /** Instance from {@link useDataTable}. */
   table: DataTableInstance<TData>;
+  /** Extra classes on the row, merged after the padding classes. */
   className?: string;
 };
 
-/** Row count (or selection count) with previous and next page buttons. */
+/**
+ * Row count (or selection count) with previous and next page buttons.
+ *
+ * Part of the {@link DataTable} set. With a selection it reads "n of m selected", otherwise "n rows"
+ * (singular for one); the page label always shows at least one page, and each arrow is disabled at its end
+ * of the range. The count follows the filtered rows, not the raw data.
+ *
+ * @typeParam TData - Shape of one row.
+ */
 export function DataTablePagination<TData extends RowData>({ table, className }: DataTablePaginationProps<TData>) {
   const total = table.getFilteredRowModel().rows.length;
   const selected = table.getFilteredSelectedRowModel().rows.length;

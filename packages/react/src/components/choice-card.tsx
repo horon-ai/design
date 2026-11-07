@@ -2,13 +2,20 @@ import { Radio as BaseRadio } from "@base-ui/react/radio";
 import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
+/**
+ * Props for {@link ChoiceCard}: a radio root plus the card's own title, description and badge slots.
+ * `value`, `disabled` and the other radio props pass straight through to the Base UI radio root.
+ */
 export type ChoiceCardProps = Omit<ComponentProps<typeof BaseRadio.Root>, "className" | "children" | "title"> & {
+  /** Card heading on the title line; `label-md` semibold primary text, wrapped onto as many lines as the card width allows. */
   title: ReactNode;
+  /** Optional second line under the title, rendered as `caption` secondary text. */
   description?: ReactNode;
   /** Pill at the end of the title line, e.g. "Recommended": 22px, 8px padding, 18% sky with brand text (Paper Mobile connection). */
   badge?: ReactNode;
-  /** `brand` (default) is 18% sky with brand text; `neutral` is 6% ink with secondary text. */
+  /** `brand` (default) is 18% sky with brand text; `neutral` is 6% ink with secondary text. @default "brand" */
   badgeTone?: "brand" | "neutral";
+  /** Extra classes on the card root, merged after the layout, border and state classes. */
   className?: string;
 };
 
@@ -16,6 +23,23 @@ export type ChoiceCardProps = Omit<ComponentProps<typeof BaseRadio.Root>, "class
  * Paper `Choice card` (1VXM-0 selected, 1VXR-0 default): a 252px solid card, padding 14, radius 16, gap 12,
  * with a 1px default border that turns brand when selected; no glass.
  * Use inside `RadioGroup`. The 18px radio is a ring: 1.5px grey when off, a 5px ink ring around an 8px core when on.
+ *
+ * The card is a Base UI radio root, so it belongs to a single-select group: arrow keys move the selection,
+ * `value` / `defaultValue` on the group pick the card, and `disabled` drops the card to 40% opacity and blocks
+ * the click. The radio mark is decorative; the accessible name is the card's own text.
+ *
+ * @example
+ * ```tsx
+ * <RadioGroup defaultValue="team">
+ *   <ChoiceCard value="solo" title="Solo" description="One workspace for yourself." />
+ *   <ChoiceCard
+ *     value="team"
+ *     title="Team"
+ *     description="Shared bots, memory and billing."
+ *     badge="Recommended"
+ *   />
+ * </RadioGroup>
+ * ```
  */
 export function ChoiceCard({ title, description, badge, badgeTone = "brand", className, ...props }: ChoiceCardProps) {
   return (
