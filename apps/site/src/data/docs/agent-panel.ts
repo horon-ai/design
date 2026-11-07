@@ -319,8 +319,8 @@ export const doc: ComponentDoc = {
         en: "ComposerChip is a plain button whose children name it. Put the bot or project name there, and add aria-expanded and aria-haspopup yourself when it opens a menu.",
       },
       {
-        ko: "Mod+Enter는 macOS와 iOS에서 ⌘Enter, Windows와 Linux에서 Ctrl+Enter이고 운영체제에 맞춰 키 칩이 그려집니다. 터치 기기에서는 키 힌트가 숨습니다.",
-        en: "Mod+Enter is ⌘Enter on macOS and iOS and Ctrl+Enter on Windows and Linux, and the key chip draws the matching keys. Touch devices hide the hint.",
+        ko: "Mod+Enter는 macOS와 iOS에서 ⌘Enter, Windows, Linux, Android에서 Ctrl+Enter이고 운영체제에 맞춰 키 칩이 그려집니다. 터치 기기에서는 키 힌트가 숨습니다.",
+        en: "Mod+Enter is ⌘Enter on macOS and iOS and Ctrl+Enter on Windows, Linux and Android, and the key chip draws the matching keys. Touch devices hide the hint.",
       },
     ],
     keyboard: [

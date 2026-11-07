@@ -32,8 +32,8 @@ export const doc: ComponentDoc = {
         name: "DataTableTable",
         slot: "DataTableTable",
         description: {
-          ko: "가로 스크롤 컨테이너와 table 요소입니다. mobile에서는 표가 min-content 폭이 되어 옆으로 스크롤합니다.",
-          en: "The sideways scroll container and the table element. On mobile the table takes its min-content width and scrolls sideways.",
+          ko: "가로 스크롤 컨테이너와 table 요소입니다. mobile에서는 표가 max-content 폭이 되어 옆으로 스크롤합니다.",
+          en: "The sideways scroll container and the table element. On mobile the table takes its max-content width and scrolls sideways.",
         },
       },
       {
@@ -112,8 +112,8 @@ export const doc: ComponentDoc = {
         {
           name: "mobile",
           description: {
-            ko: "여백을 18px로 줄이고 표를 min-content 폭으로 바꿔 옆으로 스크롤합니다. 열을 압축하지 않습니다.",
-            en: "Narrows the gutters to 18px and switches the table to its min-content width so it scrolls sideways instead of squeezing columns.",
+            ko: "여백을 18px로 줄이고 표를 max-content 폭으로 바꿔 옆으로 스크롤합니다. 열을 압축하지 않습니다.",
+            en: "Narrows the gutters to 18px and switches the table to its max-content width so it scrolls sideways instead of squeezing columns.",
           },
         },
       ],

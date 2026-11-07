@@ -288,8 +288,8 @@ export const doc: ComponentDoc = {
         en: "The close button and a press on the backdrop both close, so the confirming action always needs its own button inside. Never let a press outside count as confirmation.",
       },
       {
-        ko: "패널은 motion-popup으로 나타나 4px 아래에서 올라옵니다. 동작 줄이기를 켜면 이동 없이 즉시 나타납니다.",
-        en: "The panel appears with motion-popup, rising 4px into place. With reduced motion it appears without the travel.",
+        ko: "패널은 motion-popup으로 나타나 8px 아래에서 올라옵니다. 동작 줄이기를 켜면 이동 없이 즉시 나타납니다.",
+        en: "The panel appears with motion-popup, rising 8px into place. With reduced motion it appears without the travel.",
       },
     ],
     keyboard: [

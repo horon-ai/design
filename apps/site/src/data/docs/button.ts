@@ -33,8 +33,8 @@ export const doc: ComponentDoc = {
         name: "Icon",
         slot: "icon",
         description: {
-          ko: "라벨 앞의 아이콘입니다. sm과 md에서 16px, lg에서 20px이며 라벨 색을 따릅니다.",
-          en: "Leading icon. 16px in sm and md, 20px in lg, colored like the label.",
+          ko: "라벨 앞의 아이콘입니다. sm과 md에서 16px, lg에서 20px, link 변형에서 14px이며 라벨 색을 따릅니다.",
+          en: "Leading icon. 16px in sm and md, 20px in lg and 14px in the link variant, colored like the label.",
         },
       },
       {
@@ -296,7 +296,7 @@ export const doc: ComponentDoc = {
         { state: "link", slot: "Container", property: "height", value: "auto" },
         { state: "link", slot: "Container", property: "padding", value: "0 4px" },
         { state: "link", slot: "Container", property: "gap", value: "6px" },
-        { state: "link", slot: "Container", property: "radius", value: "6px" },
+        { state: "link", slot: "Container", property: "radius", value: "8px" },
         { state: "link", slot: "Label", property: "font", value: "text-label-sm" },
         { state: "link", slot: "Icon", property: "size", value: "14px" },
       ],
@@ -417,7 +417,10 @@ export const doc: ComponentDoc = {
       },
       {
         keys: ["Space"],
-        action: { ko: "버튼의 동작을 실행합니다.", en: "Runs the button's action." },
+        action: {
+          ko: "버튼의 동작을 실행합니다. href로 링크가 된 경우에는 실행하지 않고 페이지를 스크롤합니다.",
+          en: "Runs the button's action. With href it is a link, so Space scrolls the page instead.",
+        },
       },
       {
         keys: ["Tab"],
