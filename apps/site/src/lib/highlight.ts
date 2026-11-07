@@ -295,7 +295,7 @@ const hasScope = (part: Part, prefixes: string[]) => part.scopes.some((scope) =>
 /**
  * Walks the token stream with a little state: the attribute a string belongs
  * to, whether we are inside a class helper call, and where a tag ends. Strings
- * reached from `className`/`class` or a class helper become Twind roles.
+ * reached from `className`/`class` or a class helper become Tailwind roles.
  */
 function classify(lines: Part[][]): CodeToken[][] {
   let attributeName: string | null = null;
@@ -346,6 +346,8 @@ export async function highlight(code: string, lang: string): Promise<CodeToken[]
       lang: language,
       theme: "github-light",
       includeExplanation: "scopeName",
+      // Shiki stops scoping a line after 500ms by default, so a busy build machine would silently drop colors; build time has no such budget.
+      tokenizeTimeLimit: 0,
     });
     return classify(
       lines.map((line) =>
