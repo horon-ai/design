@@ -1,0 +1,428 @@
+@import "./tokens.css";
+
+@tailwind base;
+@tailwind utilities;
+
+/*
+ * Covers the Lynx root element, which has no UA background of its own.
+ */
+page {
+  background-color: var(--color-bg-default);
+}
+
+/* ---------------------------------------------------------------------------
+ * Glass
+ *
+ * Lynx has no `backdrop-filter` and no pseudo-elements, so react's
+ * `.liquid-layers` + `.liquid-layers::after` pair becomes two elements: the
+ * layer draws the vertical rim gradient, and its single child covers everything
+ * but the rim with the frost fill. The result is the same material react paints
+ * where a backdrop cannot be filtered: a frosted fill under a bright-top ring.
+ *
+ * The glass tiers themselves (`bg-glass-clear|regular|thick`) are already
+ * resolved to `--color-glass-fill-frost` in tokens.css, so a host's fill and the
+ * layer's inner fill agree.
+ * ------------------------------------------------------------------------- */
+.liquid-layers {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--glass-rim-top),
+    var(--glass-rim-mid) var(--glass-rim-mid-stop),
+    var(--glass-rim-bottom)
+  );
+}
+
+.liquid-layers-inner {
+  position: absolute;
+  top: var(--glass-rim-width);
+  right: var(--glass-rim-width);
+  bottom: var(--glass-rim-width);
+  left: var(--glass-rim-width);
+  border-radius: inherit;
+  background-color: var(--color-glass-fill-frost);
+}
+
+/* The veil: fields (`veil-field`) and overlays (`veil-overlay`), plus the
+ * ringless drop target (`veil-drop`). Without a backdrop filter the blur is
+ * dropped and the fill becomes the frost value, exactly as react's
+ * `@supports not (...)` branch does. The 1px ring is a box-shadow, which Lynx
+ * supports. */
+.veil-field,
+.veil-overlay,
+.veil-drop {
+  border-color: transparent;
+  background-color: var(--color-glass-fill-frost);
+}
+
+.veil-field {
+  box-shadow: 0 0 0 var(--veil-ring-width) var(--veil-ring);
+}
+
+.veil-overlay {
+  box-shadow: 0 0 0 var(--veil-ring-width) var(--veil-ring);
+}
+
+.veil-drop {
+  box-shadow: none;
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion
+ *
+ * Same easings and keyframe names as `@horon-ai/react`'s globals.css, so a ported
+ * component keeps the same class names and the same rhythm. Tailwind v3 has no
+ * `@utility`, so these are plain utilities in the utilities layer.
+ * ------------------------------------------------------------------------- */
+@layer utilities {
+  /* Optical centering for one-line labels in fixed-height pills. Lynx has no
+   * `text-box`, so the line box is trimmed by the label's own line-height. */
+  .text-trim {
+    line-height: 1;
+  }
+
+  /* Panel, lane and row entrance; stagger with animation-delay: calc(var(--i) * 30ms). */
+  .motion-rise {
+    animation: tab-panel-in 220ms var(--ease-out-quint) both;
+  }
+
+  /* Popups (select, menu, tooltip, dialog): fade and grow from the anchor. */
+  .motion-popup {
+    transform-origin: center;
+    transition-property: opacity, transform;
+    transition-duration: 200ms;
+    transition-timing-function: var(--ease-out-quint);
+  }
+
+  .motion-popup[data-starting-style] {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  .motion-popup[data-ending-style] {
+    opacity: 0;
+    transform: scale(0.97);
+    transition-duration: 130ms;
+    transition-timing-function: ease-in;
+  }
+
+  /* Backdrops and other plain fades. */
+  .motion-fade {
+    transition-property: opacity;
+    transition-duration: 200ms;
+    transition-timing-function: ease-out;
+  }
+
+  .motion-fade[data-starting-style],
+  .motion-fade[data-ending-style] {
+    opacity: 0;
+  }
+
+  /* Collapsible panels: animate to and from the measured height the component
+   * sets as `--collapsible-panel-height`. */
+  .motion-collapse {
+    overflow: hidden;
+    height: var(--collapsible-panel-height);
+    transition-property: height, opacity;
+    transition-duration: 240ms;
+    transition-timing-function: var(--ease-out-quint);
+  }
+
+  .motion-collapse[data-starting-style],
+  .motion-collapse[data-ending-style] {
+    height: 0;
+    opacity: 0;
+  }
+
+  /* Lynx has no `<details>`, so the two reveal utilities below cover what
+   * react's detail-motion utility did; the class is kept for name parity and
+   * animates the same height/opacity pair. */
+  .motion-details {
+    overflow: hidden;
+    transition-property: height, opacity;
+    transition-duration: 240ms;
+    transition-timing-function: var(--ease-out-quint);
+  }
+
+  /* An inline block that opens and closes in place, closed by `data-collapsed`. */
+  .motion-reveal {
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 200ms;
+    transition-timing-function: var(--ease-out-quint);
+  }
+
+  .motion-reveal[data-collapsed] {
+    opacity: 0;
+    overflow: hidden;
+    height: 0;
+  }
+
+  /* The horizontal counterpart of motion-reveal, for a slot beside other content. */
+  .motion-reveal-x {
+    opacity: 1;
+    transition-property: width, opacity;
+    transition-duration: 200ms;
+    transition-timing-function: var(--ease-out-quint);
+  }
+
+  .motion-reveal-x[data-collapsed] {
+    opacity: 0;
+    overflow: hidden;
+    width: 0;
+  }
+
+  /* One slot, two states: stack both children and put data-hidden on the inactive
+   * one, so a control's icon, label or action crossfades instead of swapping. */
+  .motion-swap > * {
+    transition-property: opacity, transform;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-out-quint);
+  }
+
+  .motion-swap > [data-hidden] {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+  }
+
+  /* An indicator that travels between items (tabs, segmented control, tab bar). */
+  .motion-indicator {
+    transition-property: transform, left, top, width, height, opacity;
+    transition-duration: 280ms;
+    transition-timing-function: var(--ease-emphasized);
+  }
+
+  /* Color feedback for pressed, selected and validation states. */
+  .motion-colors {
+    transition-property: color, background-color, border-color, box-shadow, opacity;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  /* Pressable controls: color feedback plus a small press-in. Lynx has no hover;
+   * `:active` is the touch equivalent and is enabled per node. */
+  .motion-press {
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-out-quint);
+  }
+
+  .motion-press:active {
+    transform: scale(0.97);
+  }
+
+  /* Paper sidebar ground: #EEF3F8 under the Horon photo (bottom-anchored cover)
+   * and a 55% white veil. Lynx images are separate nodes, so this utility draws
+   * the flat ground and the veil gradient; the sidebar renders the photo itself. */
+  .bg-sidebar-photo {
+    background-color: #eef3f8;
+    background-image: linear-gradient(#ffffff8c, #ffffff8c);
+    background-size: auto;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}
+
+/* Motion tokens, shared by the utilities above and by components that animate
+ * inline. Lynx understands `animation` and `transition`, so the keyframes stay
+ * CSS instead of a JS animation loop. */
+page,
+.horon-light,
+.dark {
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--color-accent-sky-500-20);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes thinking-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes tab-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pop-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes wave-level {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-shift-next {
+  from {
+    transform: translateX(12px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-shift-prev {
+  from {
+    transform: translateX(-12px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes swap-move {
+  from {
+    transform: translateY(4px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(400%);
+  }
+}
+
+/*
+ * Reduced motion. Lynx cannot read `prefers-reduced-motion`, so the
+ * `HoronProvider` root carries `.horon-reduced-motion` when the user asks for
+ * less motion (its `reducedMotion` prop, or the host's own preference). The
+ * effect is the same one react's media query has: durations collapse.
+ */
+.horon-reduced-motion,
+.horon-reduced-motion .motion-rise,
+.horon-reduced-motion .motion-popup,
+.horon-reduced-motion .motion-fade,
+.horon-reduced-motion .motion-collapse,
+.horon-reduced-motion .motion-details,
+.horon-reduced-motion .motion-reveal,
+.horon-reduced-motion .motion-reveal-x,
+.horon-reduced-motion .motion-swap > *,
+.horon-reduced-motion .motion-indicator,
+.horon-reduced-motion .motion-colors,
+.horon-reduced-motion .motion-press {
+  animation-duration: 0.01ms;
+  animation-iteration-count: 1;
+  transition-duration: 0.01ms;
+}
