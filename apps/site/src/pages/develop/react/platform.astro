@@ -1,0 +1,56 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { reactBreadcrumb } from "@/data/nav";
+import { conceptsMessages as m, conceptsSnippets as s } from "@/i18n/messages/develop-react-concepts";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.platformTitle}
+  description={m.platformDescription}
+  section="develop"
+  breadcrumb={reactBreadcrumb(m.platformTitle, "/develop/react/platform")}
+>
+  <h2><T m={m.platformOsHeading} /></h2>
+  <p><T m={m.platformOsBody} /></p>
+  <ul>
+    <li><T m={m.platformOsIpadosItem} /></li>
+    <li><T m={m.platformOsUnknownItem} /></li>
+    <li><T m={m.platformOsInputItem} /></li>
+  </ul>
+
+  <h2><T m={m.platformRuntimeHeading} /></h2>
+  <p><T m={m.platformRuntimeBody} /></p>
+  <ul>
+    <li><T m={m.platformRuntimeWindowItem} /></li>
+  </ul>
+
+  <h2><T m={m.platformModHeading} /></h2>
+  <p><T m={m.platformModBody} /></p>
+  <ul>
+    <li><T m={m.platformModMacItem} /></li>
+    <li><T m={m.platformModOtherItem} /></li>
+    <li><T m={m.platformModUnknownItem} /></li>
+  </ul>
+  <p><T m={m.platformModIsItem} /></p>
+
+  <h2><T m={m.platformStringHeading} /></h2>
+  <p><T m={m.platformStringBody} /></p>
+  <ul>
+    <li><T m={m.platformStringFormatItem} /></li>
+    <li><T m={m.platformStringMatchItem} /></li>
+    <li><T m={m.platformStringEdgeItem} /></li>
+    <li><T m={m.platformStringMissingItem} /></li>
+  </ul>
+  <CodeBlock code={s.platformDetect} lang="tsx" title="shortcut.ts" />
+
+  <h2><T m={m.platformKbdHeading} /></h2>
+  <p><T m={m.platformKbdBody} /></p>
+  <ul>
+    <li><T m={m.platformKbdSizeItem} /></li>
+    <li><T m={m.platformKbdGuardItem} /></li>
+    <li><T m={m.platformKbdHookItem} /></li>
+  </ul>
+  <CodeBlock code={s.platformKbd} lang="tsx" title="hint.tsx" />
+</DocsLayout>

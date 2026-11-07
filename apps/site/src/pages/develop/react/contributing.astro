@@ -1,0 +1,50 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { reactBreadcrumb } from "@/data/nav";
+import { conceptsMessages as m, conceptsSnippets as s } from "@/i18n/messages/develop-react-concepts";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.contributingTitle}
+  description={m.contributingDescription}
+  section="develop"
+  breadcrumb={reactBreadcrumb(m.contributingTitle, "/develop/react/contributing")}
+>
+  <h2><T m={m.contributingSetupHeading} /></h2>
+  <p><T m={m.contributingSetupBody} /></p>
+  <CodeBlock code={s.repoSetup} lang="bash" title="terminal" />
+  <ul>
+    <li><T m={m.contributingSetupTokensItem} /></li>
+    <li><T m={m.contributingSetupSiteItem} /></li>
+    <li><T m={m.contributingSetupBuildItem} /></li>
+  </ul>
+
+  <h2><T m={m.contributingChecksHeading} /></h2>
+  <p><T m={m.contributingChecksBody} /></p>
+  <ul>
+    <li><T m={m.contributingChecksLintItem} /></li>
+    <li><T m={m.contributingChecksTypeItem} /></li>
+    <li><T m={m.contributingChecksTestItem} /></li>
+    <li><T m={m.contributingChecksBuildItem} /></li>
+  </ul>
+
+  <h2><T m={m.contributingComponentHeading} /></h2>
+  <p><T m={m.contributingComponentBody} /></p>
+  <ul>
+    <li><T m={m.contributingComponentFileItem} /></li>
+    <li><T m={m.contributingComponentBarrelItem} /></li>
+    <li><T m={m.contributingComponentCatalogItem} /></li>
+    <li><T m={m.contributingComponentDemoItem} /></li>
+    <li><T m={m.contributingComponentThumbItem} /></li>
+    <li><T m={m.contributingComponentWrapperItem} /></li>
+  </ul>
+
+  <h2><T m={m.contributingGuardsHeading} /></h2>
+  <p><T m={m.contributingGuardsBarrelBody} /></p>
+  <p><T m={m.contributingGuardsSiteBody} /></p>
+
+  <h2><T m={m.contributingTokensHeading} /></h2>
+  <p><T m={m.contributingTokensBody} /></p>
+</DocsLayout>

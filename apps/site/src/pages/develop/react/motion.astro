@@ -1,0 +1,52 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { reactBreadcrumb } from "@/data/nav";
+import { conceptsMessages as m, conceptsSnippets as s } from "@/i18n/messages/develop-react-concepts";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.motionTitle}
+  description={m.motionDescription}
+  section="develop"
+  breadcrumb={reactBreadcrumb(m.motionTitle, "/develop/react/motion")}
+>
+  <h2><T m={m.motionEasingHeading} /></h2>
+  <p><T m={m.motionEasingBody} /></p>
+  <ul>
+    <li><T m={m.motionEasingOutItem} /></li>
+    <li><T m={m.motionEasingEmphasizedItem} /></li>
+    <li><T m={m.motionEasingSpringItem} /></li>
+  </ul>
+  <p><T m={m.motionEasingDurationBody} /></p>
+
+  <h2><T m={m.motionTokensHeading} /></h2>
+  <p><T m={m.motionTokensBody} /></p>
+  <ul>
+    <li><T m={m.motionTokensInItem} /></li>
+    <li><T m={m.motionTokensOutItem} /></li>
+    <li><T m={m.motionTokensSlideItem} /></li>
+    <li><T m={m.motionTokensLoopItem} /></li>
+    <li><T m={m.motionTokensLoopItem2} /></li>
+  </ul>
+
+  <h2><T m={m.motionUtilitiesHeading} /></h2>
+  <p><T m={m.motionUtilitiesBody} /></p>
+  <ul>
+    <li><T m={m.motionUtilitiesRiseItem} /></li>
+    <li><T m={m.motionUtilitiesPopupItem} /></li>
+    <li><T m={m.motionUtilitiesFadeItem} /></li>
+    <li><T m={m.motionUtilitiesCollapseItem} /></li>
+    <li><T m={m.motionUtilitiesDetailsItem} /></li>
+    <li><T m={m.motionUtilitiesRevealItem} /></li>
+    <li><T m={m.motionUtilitiesSwapItem} /></li>
+    <li><T m={m.motionUtilitiesIndicatorItem} /></li>
+    <li><T m={m.motionUtilitiesFeedbackItem} /></li>
+  </ul>
+  <CodeBlock code={s.motionClasses} lang="tsx" title="example.tsx" />
+
+  <h2><T m={m.motionReducedHeading} /></h2>
+  <p><T m={m.motionReducedBody} /></p>
+  <p><T m={m.motionReducedHookBody} /></p>
+</DocsLayout>
