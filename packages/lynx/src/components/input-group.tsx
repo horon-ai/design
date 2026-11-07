@@ -122,6 +122,10 @@ const PLACEHOLDER_CLASS = "[--placeholder-color:var(--color-text-placeholder)]";
 /** The only part of a Lynx input event a field reads. */
 type LynxTextEvent = { detail: { value: string } };
 
+/** Whether a slot is a bare string, which has to be placed inside a `<text>` to paint on Lynx. */
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
+
 /**
  * Figma `Input group` (60:429): a glass or solid field split into a select segment and an input segment, in three sizes.
  *
@@ -257,14 +261,22 @@ type InputGroupSegmentProps = {
 /**
  * Part of {@link InputGroup}. A fixed-text segment, such as a unit or a `https://` prefix. Takes the group's
  * size (falling back to `md` outside a group), sits on the 4% ink tint, and dims when the group is disabled.
+ *
+ * A bare string child is placed in a `<text>` with the rung's type classes, because Lynx does not paint text
+ * outside a text element and does not inherit font properties from the segment view.
  */
 export function InputGroupSegment({ className, children }: InputGroupSegmentProps) {
   const group = useInputGroup();
+  const size = group?.size ?? "md";
   return (
     <view
-      className={cn(inputGroupSegmentClass[group?.size ?? "md"], group?.disabled && "opacity-60", className)}
+      className={cn(inputGroupSegmentClass[size], group?.disabled && "opacity-60", className)}
     >
-      {children}
+      {isPlainText(children) ? (
+        <text className={cn(fieldTextClass[size], "text-text-primary")}>{children}</text>
+      ) : (
+        children
+      )}
     </view>
   );
 }

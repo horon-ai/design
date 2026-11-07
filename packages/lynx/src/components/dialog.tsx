@@ -150,7 +150,11 @@ export type DialogContentProps = Omit<PortedPopupProps, "className" | "title"> &
   description?: ReactNode;
   /** Label for the close button; hides it when `null`. @default "Close" */
   closeLabel?: string | null;
-  /** Slot marker on the close control, for a surface its own app selects the control by. */
+  /**
+   * Element id put on the close control. React exposed this as `data-slot`, which a DOM query can select;
+   * Lynx has no attribute selectors, so the value becomes the control's `id` and is addressable with
+   * `lynx.createSelectorQuery().select("#<closeSlot>")`.
+   */
   closeSlot?: string;
   /** Tile or icon set before the title (Paper settings modals). */
   leading?: ReactNode;
@@ -245,7 +249,7 @@ export function DialogContent({
                   accessibility-element
                   accessibility-traits="button"
                   accessibility-label={closeLabel}
-                  data-slot={closeSlot}
+                  {...(closeSlot === undefined ? {} : { id: closeSlot })}
                 >
                   <Icon name="X" size={16} color="text-secondary" />
                 </view>

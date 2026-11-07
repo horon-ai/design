@@ -1,5 +1,6 @@
-import { useState, type ReactNode } from "@lynx-js/react";
+import { useRef, useState, type ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
+import type { NodesRef } from "@lynx-js/types/background";
 
 import { Icon } from "../icons";
 import { cn } from "../lib/cn";
@@ -199,7 +200,8 @@ function popupPlacement(anchor: AnchorBox, width: number): CSSProperties {
  * anchored to the field's measured box, 4px below it, dismissed by a transparent full-viewport
  * backdrop and by picking a row. The list scrolls past 256px and the panel caps at 320px; the
  * `segment` column is 256px wide. Keyboard movement is not available on Lynx, so rows are tapped;
- * a single-select pick closes the popup and a multi-select pick keeps it open. On `multiple` the
+ * a single-select pick closes the popup and a multi-select pick keeps it open, clearing both the
+ * query and the search field so the visible text and the unfiltered list agree. On `multiple` the
  * field grows and wraps as chips fill it instead of fixing its height.
  *
  * @example
@@ -250,6 +252,7 @@ export function Combobox(props: ComboboxProps) {
   const [anchor, setAnchor] = useState<AnchorBox | null>(null);
   const [innerSingle, setInnerSingle] = useState<string | null>(props.multiple ? null : (props.defaultValue ?? null));
   const [innerMulti, setInnerMulti] = useState<readonly string[]>(props.multiple ? (props.defaultValue ?? []) : []);
+  const searchInput = useRef<NodesRef | null>(null);
 
   const singleValue = props.multiple ? null : props.value !== undefined ? props.value : innerSingle;
   const chosenSingle = props.multiple ? null : findItem(items, singleValue);
@@ -282,9 +285,25 @@ export function Combobox(props: ComboboxProps) {
     setOpen(true);
   };
 
+  /**
+   * Empties the query and the native search field. A Lynx `<input>` keeps its own text, so dropping the
+   * query state alone would leave the old text in the field while the list showed every item; both are
+   * cleared together so the typed text and the filtered list always agree.
+   */
+  const clearQuery = () => {
+    setQuery("");
+    const element = searchInput.current;
+    if (!element) return;
+    try {
+      element.invoke({ method: "setValue", params: { value: "" } }).exec();
+    } catch {
+      // The render-test element API has no native methods; the empty query state is the observable.
+    }
+  };
+
   const closePopup = () => {
     setOpen(false);
-    setQuery("");
+    clearQuery();
   };
 
   const choose = (item: ComboboxItemData) => {
@@ -296,7 +315,8 @@ export function Combobox(props: ComboboxProps) {
         : [...current, item.value];
       if (props.value === undefined) setInnerMulti(next);
       props.onValueChange?.([...next]);
-      setQuery("");
+      // The popup stays open, so the search field is emptied with the query rather than left stale.
+      clearQuery();
       return;
     }
     if (props.value === undefined) setInnerSingle(item.value);
@@ -320,6 +340,7 @@ export function Combobox(props: ComboboxProps) {
         <Icon name="MagnifyingGlass" size={size === "lg" ? 20 : 16} color="text-secondary" />
       </view>
       <input
+        ref={searchInput}
         className={cn("relative", fieldBoxClass.text, fieldTextClass[size], PLACEHOLDER_CLASS)}
         placeholder={searchPlaceholder}
         bindinput={(event: LynxTextEvent) => setQuery(event.detail.value)}

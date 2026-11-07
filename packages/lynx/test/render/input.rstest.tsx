@@ -6,10 +6,11 @@ declare global {
 }
 
 import "@testing-library/jest-dom";
-import { render } from "@lynx-js/react/testing-library";
+import { act, render } from "@lynx-js/react/testing-library";
 import { expect, rstest, test } from "@rstest/core";
 
 import { Input } from "../../src/components/input";
+import { recordNativeWrites } from "./native-writes";
 import { HoronProvider } from "../../src/provider";
 
 /**
@@ -62,4 +63,38 @@ test("invalid paints the danger border and the class split lands on both parts",
 
   expect(container.querySelector(".border-border-danger")).not.toBeNull();
   expect(field).toHaveClass("extra");
+});
+
+test("an echoed controlled value is not written back, but a foreign one is", async () => {
+  const recorder = recordNativeWrites();
+  try {
+    const onChange = rstest.fn();
+    const view = (value: string) => (
+      <HoronProvider scheme="light">
+        <Input value={value} onChange={onChange} />
+      </HoronProvider>
+    );
+    const written = () => recorder.writes.filter((call) => call.method === "setValue").map((call) => call.value);
+
+    const result = render(view("a"));
+    const field = result.container.querySelector("input");
+    if (!field) throw new Error("no input rendered");
+    // The mount value is unknown to the editor, so it is written once.
+    await act(() => {});
+    expect(written()).toEqual(["a"]);
+
+    // The parent echoes the keystroke it was just handed: the editor already holds
+    // that text, so writing it back would jump the caret to the end.
+    await act(() => typeInto(field, "ab"));
+    result.rerender(view("ab"));
+    await act(() => {});
+    expect(written()).toEqual(["a"]);
+
+    // A value the editor never typed (a form reset) is still written.
+    result.rerender(view("reset"));
+    await act(() => {});
+    expect(written()).toEqual(["a", "reset"]);
+  } finally {
+    recorder.restore();
+  }
 });

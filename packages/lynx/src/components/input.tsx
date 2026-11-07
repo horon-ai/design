@@ -25,9 +25,9 @@ type InputConfirmType = "send" | "search" | "go" | "done" | "next";
 /** Props of {@link Input}: the Lynx input attributes plus the box's size, surface and decorations. */
 export type InputProps = {
   /**
-   * The text the input shows when the caller owns it. A change to this value is
-   * pushed into the native editor through `setValue`, because a Lynx `<input>`
-   * has no controlled `value` attribute.
+   * The text the input shows when the caller owns it. A change that the native editor does not
+   * already hold is pushed into it through `setValue`, because a Lynx `<input>` has no controlled
+   * `value` attribute; a parent echoing the user's own keystrokes writes nothing.
    */
   value?: string;
   /** The text the input starts with when the caller does not own it; the input then keeps its own state. */
@@ -118,6 +118,11 @@ const PLACEHOLDER_CLASS = "[--placeholder-color:var(--color-text-placeholder)]";
 /** The only part of a Lynx input event a field reads. */
 type LynxTextEvent = { detail: { value: string } };
 
+/** Writes a ref from inside an effect or handler, which the immutability lint reads as a post-render mutation. */
+function remember(ref: { current: string | null }, value: string) {
+  ref.current = value;
+}
+
 /**
  * Figma `Input` (58:126): SM, MD and LG, on Glass or Solid surface.
  *
@@ -126,7 +131,8 @@ type LynxTextEvent = { detail: { value: string } };
  * `invalid` paints the box border danger-red. Lynx's `<input>` carries its own text and emits `bindinput`
  * instead of DOM change events, so `onChange` receives the new string rather than an event; a controlled
  * `value` is mirrored into the native editor with the element's `setValue` method, since the element has no
- * `value` attribute.
+ * `value` attribute. The mirror writes only a value the editor does not already hold, so a parent echoing
+ * the keystroke it was just handed leaves the caret and any in-progress composition untouched.
  *
  * @example
  * ```tsx
@@ -171,12 +177,20 @@ export function Input({
       ? cn(fieldBoxClass.glass, disabled && "opacity-60")
       : cn(fieldBoxClass[surface], disabled && "border-border-default bg-bg-subtle", invalid && "border-border-danger");
   const node = useRef<NodesRef | null>(null);
+  /**
+   * The text the native editor is known to hold: the mount text, then every value the field emitted
+   * or wrote. `null` means unknown, so the first controlled value is written.
+   */
+  const editorText = useRef<string | null>(defaultValue ?? null);
 
   // A controlled value can change without an input event (a form reset, a parent rewriting it). The element
-  // keeps its own text, so the new value has to be written back through the native `setValue` method. The
-  // effect only runs when the prop itself changes, so ordinary typing is never interrupted.
+  // keeps its own text, so a value it does not already hold has to be written through the native `setValue`.
+  // A parent that echoes the keystroke it just received sends the same string the editor holds, and writing
+  // that back would move the caret to the end and can interrupt an IME composition, so it is skipped.
   useEffect(() => {
     if (value === undefined) return;
+    if (value === editorText.current) return;
+    remember(editorText, value);
     const element = node.current;
     if (!element) return;
     try {
@@ -188,6 +202,7 @@ export function Input({
 
   const handleInput = (event: LynxTextEvent) => {
     if (disabled || readOnly) return;
+    remember(editorText, event.detail.value);
     onChange?.(event.detail.value);
   };
 

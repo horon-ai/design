@@ -40,6 +40,20 @@ test("tapping the trigger opens the dialog and tapping close closes it", async (
   expect(changes).toEqual([true, false]);
 });
 
+test("the close control takes the closeSlot value as its element id", async () => {
+  const { findByText, container } = render(
+    <HoronProvider>
+      <Dialog defaultOpen>
+        <DialogContent title="Delete workspace?" closeSlot="dialog-close" />
+      </Dialog>
+    </HoronProvider>,
+  );
+
+  await findByText("Delete workspace?");
+  // React selected the control by `data-slot`; Lynx has no attribute selectors, so it is an id.
+  expect(container.querySelector("#dialog-close")).not.toBeNull();
+});
+
 test("a closed dialog renders no overlay content at all", async () => {
   const { container, findByText } = render(<Harness onChange={() => undefined} />);
 

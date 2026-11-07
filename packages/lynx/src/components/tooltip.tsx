@@ -1,4 +1,13 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "@lynx-js/react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
 import type { LayoutChangeLike } from "../hooks";
@@ -27,18 +36,48 @@ type TooltipProviderProps = {
   delay?: number;
   /** Milliseconds before a bubble closes after the pointer leaves. @default 0 */
   closeDelay?: number;
-  /** Milliseconds during which the next tooltip opens instantly after one closed. @default 400 */
+  /**
+   * Milliseconds after a bubble closes during which the next one in the group opens with no delay,
+   * the same instant phase Base UI's delay group keeps. `0` turns the phase off. @default 400
+   */
   timeout?: number;
 };
 
+/** The group's shared state that outlives a single tooltip: the last close, and the delay it implies. */
 type TooltipTimings = {
   delay: number;
   closeDelay: number;
+  /**
+   * The open delay for one tooltip: zero while the group is inside its instant phase and the caller is not
+   * the bubble that just closed. Base UI only skips the delay for an adjacent trigger, not for a reopen.
+   */
+  resolveDelay: (fallback: number, id: object) => number;
+  /** Records that one tooltip in this group just closed, which starts the instant phase for its siblings. */
+  markClosed: (id: object) => void;
 };
 
 const DEFAULT_DELAY = 600;
 
-const TooltipTimingContext = createContext<TooltipTimings>({ delay: DEFAULT_DELAY, closeDelay: 0 });
+const DEFAULT_TIMEOUT = 400;
+
+/** The last close in a group, and which tooltip made it. */
+type LastClose = { id: object; at: number };
+
+/** Writes a ref from inside a callback, which the immutability lint reads as a post-render mutation. */
+function stamp(ref: { current: LastClose | null }, value: LastClose) {
+  ref.current = value;
+}
+
+/**
+ * No provider means no group, so the default has no instant phase: Base UI only opens an adjacent bubble
+ * instantly when a `TooltipProvider` holds both, and a module-level timer would leak between screens.
+ */
+const TooltipTimingContext = createContext<TooltipTimings>({
+  delay: DEFAULT_DELAY,
+  closeDelay: 0,
+  resolveDelay: (fallback) => fallback,
+  markClosed: () => undefined,
+});
 
 /** The trigger's box on the page, measured by `bindlayoutchange`; all values in CSS px. */
 type AnchorRect = {
@@ -138,24 +177,28 @@ export function Tooltip({ children, label, side = "top", delay }: TooltipProps) 
   const [panel, setPanel] = useState<PanelSize>({ width: 0, height: 0 });
   const wait = delay ?? timings.delay;
   const [intent, setIntent] = useState<{ open: boolean; after: number } | null>(null);
+  // A stable identity so the group can tell a sibling's close from this bubble's own.
+  const identity = useMemo<object>(() => ({}), []);
 
   // The pending transition lives in state, so a second tap replaces the first
   // delay through this effect's cleanup instead of letting both timers fire.
   useEffect(() => {
     if (!intent) return undefined;
-    if (intent.after <= 0) {
+    const commit = () => {
       setOpen(intent.open);
+      if (!intent.open) timings.markClosed(identity);
       setIntent(null);
+    };
+    if (intent.after <= 0) {
+      commit();
       return undefined;
     }
-    const timer = setTimeout(() => {
-      setOpen(intent.open);
-      setIntent(null);
-    }, intent.after);
+    const timer = setTimeout(commit, intent.after);
     return () => clearTimeout(timer);
-  }, [intent]);
+  }, [intent, timings, identity]);
 
-  const toggle = () => setIntent({ open: !open, after: open ? timings.closeDelay : wait });
+  const toggle = () =>
+    setIntent({ open: !open, after: open ? timings.closeDelay : timings.resolveDelay(wait, identity) });
 
   const arrow = `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6" fill="${theme.color("interactive-primary")}"><path d="M0.67 1.5h8.66L5 6z"/></svg>`;
   const placement = anchor ? resolveBubble(anchor, panel, side) : null;
@@ -206,14 +249,38 @@ export function Tooltip({ children, label, side = "top", delay }: TooltipProps) 
 }
 
 /**
- * Base UI tooltip provider, re-exported unchanged. Wrap a group of tooltips in it to share hover
+ * Base UI tooltip provider. Wrap a group of tooltips in it to share hover
  * timing, so moving between adjacent triggers does not restart each delay.
  *
- * On Lynx there is no hover: the provider shares the open delay (and the close
- * delay) with every {@link Tooltip} below it, which is the part of Base UI's
- * grouping a tap-driven bubble can honour.
+ * On Lynx there is no hover: the provider shares the open delay, the close delay
+ * and the instant-phase `timeout` with every {@link Tooltip} below it. A bubble
+ * that opens within `timeout` milliseconds of a sibling closing in the same
+ * provider opens with no delay, which is the part of Base UI's delay group a
+ * tap-driven bubble can honour.
  */
-export function TooltipProvider({ children, delay = DEFAULT_DELAY, closeDelay = 0, timeout: _timeout }: TooltipProviderProps) {
-  const value = useMemo<TooltipTimings>(() => ({ delay, closeDelay }), [delay, closeDelay]);
+export function TooltipProvider({
+  children,
+  delay = DEFAULT_DELAY,
+  closeDelay = 0,
+  timeout = DEFAULT_TIMEOUT,
+}: TooltipProviderProps) {
+  // The close record is a ref, not state: it must not re-render the group, and it is read only when
+  // the next bubble is about to open.
+  const lastClose = useRef<LastClose | null>(null);
+  const markClosed = useCallback((id: object) => {
+    stamp(lastClose, { id, at: Date.now() });
+  }, []);
+  const resolveDelay = useCallback(
+    (fallback: number, id: object) => {
+      const closed = lastClose.current;
+      if (timeout <= 0 || closed === null || closed.id === id) return fallback;
+      return Date.now() - closed.at <= timeout ? 0 : fallback;
+    },
+    [timeout],
+  );
+  const value = useMemo<TooltipTimings>(
+    () => ({ delay, closeDelay, resolveDelay, markClosed }),
+    [delay, closeDelay, resolveDelay, markClosed],
+  );
   return <TooltipTimingContext.Provider value={value}>{children}</TooltipTimingContext.Provider>;
 }

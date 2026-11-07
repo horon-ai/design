@@ -11,6 +11,7 @@ import { expect, rstest, test } from "@rstest/core";
 
 import { Combobox, type ComboboxItemData } from "../../src/components/combobox";
 import { HoronProvider } from "../../src/provider";
+import { recordNativeWrites } from "./native-writes";
 
 /** Lynx's `<input>` arrives in the test DOM as a real `HTMLInputElement`, so the bound handler is called
  * from the element's `eventMap` with the event shape the engine sends (`detail.value`). */
@@ -105,4 +106,34 @@ test("a disabled combobox does not open its list on a tap", async () => {
   openList(box);
 
   expect(queryByText("Chief of staff")).toBeNull();
+});
+
+test("a multi-select pick empties the search field with the query", async () => {
+  const recorder = recordNativeWrites();
+  try {
+    const { box, container, findByText, getByText, queryByText } = renderField(
+      <Combobox aria-label="Bots" items={bots} multiple onValueChange={() => {}} />,
+      "Bots",
+    );
+
+    openList(box);
+    await findByText("Chief of staff");
+
+    const field = searchField(container);
+    await act(() => typeInto(field, "wri"));
+    expect(getByText("Writer")).toBeInTheDocument();
+    expect(queryByText("Chief of staff")).toBeNull();
+
+    fireEvent.tap(requireElement(getByText("Writer").parentElement));
+
+    // The popup stays open, but the query is gone, so the list shows every item again…
+    expect(await findByText("Chief of staff")).toBeInTheDocument();
+    expect(getByText("Researcher")).toBeInTheDocument();
+    // …and the native search field was emptied too, not left showing "wri".
+    const clears = recorder.writes.filter((write) => write.method === "setValue");
+    expect(clears.length).toBeGreaterThan(0);
+    expect(clears.at(-1)?.value).toBe("");
+  } finally {
+    recorder.restore();
+  }
 });
