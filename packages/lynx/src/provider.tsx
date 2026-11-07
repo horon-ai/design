@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "@lynx-js/react";
 import { darkColors, lightColors } from "@horon-ai/tokens";
 
+import { supportsBackdropBlur } from "./lib/glass";
+
 /** The two schemes the theme root can paint. */
 export type ColorScheme = "light" | "dark";
 
@@ -122,6 +124,9 @@ export function HoronProvider({ scheme = "light", platform = "web", reducedMotio
     // the provider root is what the palette's background lands on and dark mode
     // does not leave white text on a white page.
     "bg-bg-default",
+    // The tiers read their real translucent value only where `<blur-view>` can
+    // filter; elsewhere they keep the frost fill (see `lib/glass.ts`).
+    supportsBackdropBlur() ? "horon-glass-blur" : "",
     resolved === "dark" ? "dark" : "horon-light",
     `horon-platform-${platform}`,
     reducedMotion ? "horon-reduced-motion" : "",

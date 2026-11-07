@@ -1,31 +1,35 @@
+import { glass } from "@horon-ai/tokens";
+
+import { supportsBackdropBlur } from "../lib/glass";
+
 /**
- * The glass rim from `@horon-ai/tokens` `glass.ts`, adapted to Lynx: Lynx has no
- * `backdrop-filter` and no `::after`, so what react's single `.liquid-layers`
- * span did with a masked pseudo-element is split across two views here.
+ * The glass material from `@horon-ai/tokens` `glass.ts`, the same one Flutter's
+ * `HoronLiquidGlass` draws.
  *
- * The host keeps its tier fill (`glass-clear`, `glass-regular`, `glass-thick`),
- * which on Lynx is already the frost-safe `glass-fill-frost` value that react
- * swaps in when a backdrop cannot be filtered or reduced transparency is
- * requested. Render `<LiquidGlass />` as the first child of a `relative` host
- * with a border radius and no border of its own: the outer view paints the
- * top-bright rim gradient, and its child covers everything inside the rim with
- * the frost fill, so only the 1px ring shows.
+ * Lynx 4.0 ships `<blur-view>`, so this is the real material on every engine
+ * that can filter a backdrop: iOS renders Liquid Glass through
+ * `blur-effect="glass"`, Android and HarmonyOS blur the captured backdrop, and
+ * the web engine turns it into a CSS `backdrop-filter`. A rim gradient is drawn
+ * over it, bright at the top and faint down the sides, exactly as react's
+ * `.liquid-layers` ring does.
  *
- * There is deliberately no `tier` prop, exactly as in react: the fill belongs to
- * the host, so the layer cannot lie about the surface it is drawing. Lynx needs
- * no `isolate` because the layer is painted as the host's first child and the
- * body simply follows it in flow order.
+ * Render it as the first child of a `relative overflow-hidden` host with a
+ * border radius and no border of its own; the rim is the edge. The host keeps
+ * its tier fill (`glass-clear`, `glass-regular`, `glass-thick`), which
+ * `HoronProvider` re-points at the real translucent values when
+ * {@link supportsBackdropBlur} is true and leaves at the frost-safe
+ * `glass-fill-frost` where it is not, so the desktop shells still show a frosted
+ * surface rather than a hole.
  *
- * It takes no props and renders two `accessibility-hidden`-equivalent views with
- * no text, so it is invisible to a screen reader.
+ * It takes no props and renders one layer plus its rim; every visual decision
+ * comes from the host's class list, so the same element serves buttons, headers,
+ * cards and sheets.
  *
  * @example
  * ```tsx
- * import { LiquidGlass } from "@horon-ai/lynx";
- *
  * function GlassCard() {
  *   return (
- *     <view className="relative flex overflow-hidden rounded-xl bg-glass-regular p-4">
+ *     <view className="relative isolate overflow-hidden rounded-xl bg-glass-regular p-4">
  *       <LiquidGlass />
  *       <text className="relative text-label-md text-text-primary">Floating chrome</text>
  *     </view>
@@ -34,9 +38,21 @@
  * ```
  */
 export function LiquidGlass() {
+  const radius = `${glass.blur}px`;
+
   return (
     <view className="liquid-layers" accessibility-element={false}>
-      <view className="liquid-layers-inner" accessibility-element={false} />
+      {supportsBackdropBlur() ? (
+        <blur-view
+          className="liquid-layers-inner"
+          blur-radius={radius}
+          blur-effect="glass"
+          glass-style="regular"
+          glass-interactive
+        />
+      ) : (
+        <view className="liquid-layers-inner" accessibility-element={false} />
+      )}
     </view>
   );
 }

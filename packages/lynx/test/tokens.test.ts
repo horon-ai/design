@@ -30,10 +30,20 @@ describe("generated token css", () => {
   });
 
   test("keeps one colour variable per token, the same count as react's theme.css", () => {
-    const declared = [...commitTokenCss.matchAll(/^\s*--color-[a-z0-9-]+:/gm)].length;
+    // `.horon-glass-blur` re-points the glass tiers at their translucent values, so
+    // it is a deliberate second declaration and is counted on its own below.
+    const palette = commitTokenCss.replace(/\.horon-glass-blur \{[^}]*\}/, "");
+    const declared = [...palette.matchAll(/^\s*--color-[a-z0-9-]+:/gm)].length;
     // Light and the primitives share one block, so the file declares each semantic
     // token once for light and once for dark, plus the primitives once: 91 + 38 + 91.
     expect(declared).toBe(Object.keys(lightColors).length + Object.keys(primitives).length + Object.keys(darkColors).length);
+  });
+
+  test("the glass switch re-points exactly the three tiers", () => {
+    const block = /\.horon-glass-blur \{([^}]*)\}/.exec(commitTokenCss)?.[1] ?? "";
+    const names = [...block.matchAll(/--color-(glass-[a-z-]+):/g)].map((match) => match[1]).toSorted();
+    expect(names).toEqual(["glass-clear", "glass-clear-hover", "glass-clear-pressed", "glass-regular", "glass-thick"]);
+    for (const name of names) expect(block).toContain(`--color-${name}: var(--glass-tier-`);
   });
 
   test("radius, shadow, typography and glass/veil variables exist", () => {

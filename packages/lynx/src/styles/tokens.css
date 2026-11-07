@@ -144,6 +144,12 @@ page,
   --color-mascot-cream: #fbf7f0;
   --color-mascot-gold: #e0921f;
 
+  --glass-tier-clear: #ffffff33;
+  --glass-tier-clear-hover: #ffffff4d;
+  --glass-tier-clear-pressed: #ffffff66;
+  --glass-tier-regular: #ffffff8c;
+  --glass-tier-thick: #ffffffcc;
+
   --glass-blur: 20px;
   --glass-saturate: 1.8;
   --glass-rim-width: 1px;
@@ -327,6 +333,12 @@ page,
   --color-bg-inset: #141518;
   --color-border-dashed: #4a4c4f;
 
+  --glass-tier-clear: #ffffff1a;
+  --glass-tier-clear-hover: #ffffff24;
+  --glass-tier-clear-pressed: #ffffff2e;
+  --glass-tier-regular: #ffffff24;
+  --glass-tier-thick: #ffffff33;
+
   --glass-rim-top: rgba(255, 255, 255, 0.22);
   --glass-rim-mid: rgba(255, 255, 255, 0.04);
   --glass-rim-bottom: rgba(255, 255, 255, 0.1);
@@ -337,6 +349,18 @@ page,
   --veil-field-shadow: rgba(0, 0, 0, 0.06);
   --veil-overlay: rgba(23, 24, 26, 0.74);
   --veil-overlay-shadow: rgba(0, 0, 0, 0.3);
+}
+
+/*
+ * `LiquidGlass` adds this class when the engine can filter a backdrop through
+ * `<blur-view>`; without it the tiers keep the frost fill.
+ */
+.horon-glass-blur {
+  --color-glass-clear: var(--glass-tier-clear);
+  --color-glass-clear-hover: var(--glass-tier-clear-hover);
+  --color-glass-clear-pressed: var(--glass-tier-clear-pressed);
+  --color-glass-regular: var(--glass-tier-regular);
+  --color-glass-thick: var(--glass-tier-thick);
 }
 
 .horon-platform-web {

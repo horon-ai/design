@@ -49,14 +49,13 @@ const veilLines = (scheme: keyof typeof veil.scheme): string[] => [
 ];
 
 /**
- * The three glass tiers, resolved to the frost fill instead of their translucent
- * originals: Lynx has no `backdrop-filter`, which is exactly the condition
- * `@horon-ai/react`'s globals.css degrades for (`@supports not
- * (backdrop-filter: blur(1px))` and `prefers-reduced-transparency: reduce` both
- * swap the fill to `glass-fill-frost` and keep the rim). Keeping the tier names
- * means a ported component keeps its class list; the value is the honest one for
- * this engine. Written into the same declaration slot as the original so the
- * variable list stays one entry per token.
+ * The three glass tiers. Lynx 4.0 ships `<blur-view>`, which filters the backdrop
+ * on iOS, Android, HarmonyOS and the web engine, so the tiers keep their real
+ * translucent values under `.horon-glass-blur`; where the engine cannot filter
+ * (the Clay desktop renderer, an older engine) the tier resolves to the
+ * frost-safe `glass-fill-frost`, the same degrade `@horon-ai/react` draws under
+ * `@supports not (backdrop-filter: blur(1px))`. Keeping the tier names means a
+ * ported component keeps its class list either way.
  */
 const GLASS_TIERS: Record<string, true> = {
   "glass-clear": true,
@@ -68,11 +67,20 @@ const GLASS_TIERS: Record<string, true> = {
 
 const colorLine = ([name, value]: [string, string]) => `  --color-${name}: ${GLASS_TIERS[name] ? "var(--color-glass-fill-frost)" : value};`;
 
+/** The real translucent value of a tier, kept beside the frost degrade under its own name. */
+const tierLine = ([name, value]: [string, string]) =>
+  GLASS_TIERS[name] ? `  --glass-tier-${name.replace("glass-", "")}: ${value};` : undefined;
+
+/** Under `.horon-glass-blur` the tiers read their real value instead of the frost fill. */
+const tierSwitch = Object.keys(GLASS_TIERS).map((name) => `  --color-${name}: var(--glass-tier-${name.replace("glass-", "")});`);
+
 /** `page` is the Lynx root element, the equivalent of react's `html`. */
 function buildTokensCss(): string {
   const light = Object.entries(lightColors).map(colorLine);
   const prims = Object.entries(primitives).map(colorLine);
   const dark = Object.entries(darkColors).map(colorLine);
+  const lightTiers = Object.entries(lightColors).map(tierLine).filter((line): line is string => line !== undefined);
+  const darkTiers = Object.entries(darkColors).map(tierLine).filter((line): line is string => line !== undefined);
 
   const lines: string[] = [
     HEADER,
@@ -93,6 +101,8 @@ function buildTokensCss(): string {
     ".horon-light {",
     ...light,
     ...prims,
+    "",
+    ...lightTiers,
     "",
     `  --glass-blur: ${px(glass.blur)};`,
     `  --glass-saturate: ${glass.saturate};`,
@@ -119,9 +129,19 @@ function buildTokensCss(): string {
     ".dark {",
     ...dark,
     "",
+    ...darkTiers,
+    "",
     ...rimLines("dark"),
     "",
     ...veilLines("dark"),
+    "}",
+    "",
+    "/*",
+    " * `LiquidGlass` adds this class when the engine can filter a backdrop through",
+    " * `<blur-view>`; without it the tiers keep the frost fill.",
+    " */",
+    ".horon-glass-blur {",
+    ...tierSwitch,
     "}",
     "",
     ".horon-platform-web {",
