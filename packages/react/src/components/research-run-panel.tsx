@@ -5,42 +5,112 @@ import { cn } from "../lib/cn";
 import { ChatBubble } from "./chat-bubble";
 import { Spinner } from "./spinner";
 
+/**
+ * One query row in the list under the status line.
+ */
 export type ResearchQuery = {
+  /** Stable key for the row. */
   id: string;
-  /** `searching` shows a spinner and the muted text; `done` a check. */
+  /**
+   * `searching` shows a spinner and the muted text; `done` a check. Anything else (omitted, and
+   * any other value) renders as `done`.
+   * @default "done"
+   */
   state?: "done" | "searching";
+  /** The query text, truncated with an ellipsis when the row runs out of width. */
   text: ReactNode;
   /** Result count shown at the end of the row, such as "8 results". */
   results?: ReactNode;
 };
 
+/**
+ * Props for {@link ResearchRunPanel}. Extra `section` props (`id`, `data-*`, handlers) land on the
+ * outer panel element.
+ */
 export type ResearchRunPanelProps = Omit<ComponentProps<"section">, "title"> & {
+  /**
+   * Header title next to the magnifying glass.
+   * @default "Research"
+   */
   title?: ReactNode;
+  /**
+   * Text of the header button that starts a new run.
+   * @default "New research"
+   */
   newLabel?: ReactNode;
+  /** Fires when the header button is clicked; the button is still rendered without it. */
   onNewResearch?: () => void;
   /** The question bubble, right-aligned. */
   question: ReactNode;
-  /** Shows the spinner, status line and caret while the run works. */
+  /**
+   * Shows the spinner, status line and caret while the run works; when false the status block
+   * collapses and the submit button becomes a send arrow.
+   * @default true
+   */
   running?: boolean;
+  /**
+   * Label in front of the caret in the status line.
+   * @default "Researching"
+   */
   statusLabel?: ReactNode;
+  /** First meta value after the status label, such as "12s"; joins `read`/`total` with a middot. */
   elapsed?: ReactNode;
+  /** Pages read so far; with `total` it renders "N of M read" and drives the sources pill label. */
   read?: number;
+  /** Pages in the run; must be set together with `read` for the count to appear. */
   total?: number;
+  /** Queries resolved so far, drawn under a 1.5px rail with a 30ms stagger per row. */
   queries?: ResearchQuery[];
   /** Initials for the stacked source avatars under the queries. */
   sources?: string[];
+  /** Fires from the round button while `running`, which then shows a stop glyph instead of an arrow. */
   onStop?: () => void;
   /** Makes the sources pill actionable; without it the pill is a plain label. */
   onOpenSources?: () => void;
   /** Makes the running status line expandable; without it the row carries no caret. */
   onToggleStatus?: () => void;
+  /**
+   * Placeholder and accessible name of the follow-up input.
+   * @default "Ask a follow-up"
+   */
   followUpPlaceholder?: string;
+  /** Fires with the raw input value on submit; the field is cleared afterwards. */
   onFollowUp?: (value: string) => void;
 };
 
 const stagger = (index: number) => ({ "--i": index, animationDelay: `calc(var(--i) * 30ms)` }) as CSSProperties;
 
-/** Paper `Research run` (Agents N10): a 24px-radius panel with a header, the question, a live status line and the queries read so far. */
+/**
+ * Paper `Research run` (Agents N10): a 24px-radius panel with a header, the question, a live status line and the queries read so far.
+ *
+ * The panel is presentational: it holds no run state of its own. Submitted follow-ups are handed
+ * to `onFollowUp` and the input is cleared, so the caller appends the new question. While
+ * `running` the status line is announced politely and the round button stops the run instead of
+ * submitting.
+ *
+ * @example
+ * ```tsx
+ * import { ResearchRunPanel } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <ResearchRunPanel
+ *       question="What changed in the EU AI Act this year?"
+ *       statusLabel="Reading sources"
+ *       read={4}
+ *       total={12}
+ *       queries={[
+ *         { id: "1", text: "EU AI Act amendments", results: "8 results" },
+ *         { id: "2", text: "Enforcement timeline", state: "searching" },
+ *       ]}
+ *       sources={["EU", "CE"]}
+ *       onStop={() => {}}
+ *       onFollowUp={(value) => console.log(value)}
+ *     />
+ *   );
+ * }
+ * ```
+ */
 export function ResearchRunPanel({
   title = "Research",
   newLabel = "New research",

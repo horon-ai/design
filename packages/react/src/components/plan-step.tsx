@@ -4,25 +4,65 @@ import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { Spinner } from "./spinner";
 
+/**
+ * State of one step in a plan.
+ *
+ * - `done` — finished: sky marker with a check and a sky rail running to the next step.
+ * - `running` — in progress: spinner on a subtle fill.
+ * - `failed` — stopped with an error: danger marker with `!` and the error line expanded.
+ * - `pending` — not started: outlined marker that shows the step number.
+ */
 export type PlanStepStatus = "done" | "running" | "failed" | "pending";
 
+/**
+ * Props for {@link PlanStep}. Only `status`, `index` and `title` are required; everything else is
+ * optional decoration around the marker and the title line.
+ */
 export type PlanStepProps = {
+  /** Current step state; drives the marker glyph, the marker fill and the rail color. */
   status: PlanStepStatus;
   /** Step number, shown on pending steps. */
   index: number;
+  /** Step title; primary while done, running or failed, secondary while pending. */
   title: ReactNode;
+  /** Secondary line under the title, next to the tool tag. */
   description?: ReactNode;
   /** Tool id in mono, such as "stripe.query". */
   tool?: ReactNode;
+  /** Timing label at the right of the title; rendered only while `done` or `running`. */
   elapsed?: ReactNode;
+  /** Error line under the title, revealed only when `status` is `failed`. */
   error?: ReactNode;
+  /** Adds a "Retry from here" button in the expanded error block; it is inert unless `status` is `failed`. */
   onRetry?: () => void;
   /** Hides the rail line under the last step. */
   last?: boolean;
+  /** Classes merged onto the outer row. */
   className?: string;
 };
 
-/** Figma `Plan step` (Agent plan 191:8296): a 24px marker on a 2px rail, sky when done. */
+/**
+ * Figma `Plan step` (Agent plan 191:8296): a 24px marker on a 2px rail, sky when done.
+ *
+ * Stack the steps of an agent plan vertically and pass `last` to the final one so the rail stops
+ * there. The marker cross-fades on every status change, and the error block collapses unless the
+ * step failed.
+ *
+ * @example
+ * ```tsx
+ * import { PlanStep } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <div>
+ *       <PlanStep status="done" index={1} title="Read the brief" elapsed="2s" />
+ *       <PlanStep status="running" index={2} title="Search the web" tool="web.search" />
+ *       <PlanStep status="pending" index={3} title="Write the summary" last />
+ *     </div>
+ *   );
+ * }
+ * ```
+ */
 export function PlanStep({
   status,
   index,

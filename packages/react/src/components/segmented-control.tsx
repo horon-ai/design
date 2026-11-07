@@ -9,18 +9,43 @@ import { LiquidGlass } from "./liquid-glass";
 
 /** `tab` keeps Paper's page-tab rung beside the three control sizes. */
 export type SegmentedControlSize = ControlSize | "tab";
+
+/**
+ * Track treatment of a segmented control.
+ *
+ * - `solid` — opaque surface track with a default border and a 10% ink selection.
+ * - `glass` — regular glass; the selection is a thick glass pill over it.
+ * - `inset` — 5% ink track, for use inside a routine card.
+ * - `inset-faint` — 4% ink track, for the header filter row.
+ * - `subtle` — `bg-subtle` page-tab tray whose selection is a plain surface pill.
+ */
 export type SegmentedControlSurface = "solid" | "glass" | "inset" | "inset-faint" | "subtle";
 
+/**
+ * Props for {@link SegmentedControl}. The control is single-choice: only one item value is selected.
+ */
 export type SegmentedControlProps = {
-  items: { value: string; label: ReactNode; disabled?: boolean }[];
+  /** Segments in display order; `value` is what `onValueChange` returns and `disabled` dims one segment. */
+  items: {
+    /** Value reported when this segment is chosen. */
+    value: string;
+    /** Text on the segment. */
+    label: ReactNode;
+    /** Disables only this segment; it cannot be selected or focused. */
+    disabled?: boolean;
+  }[];
+  /** Selected value in controlled mode. */
   value?: string;
+  /** Selected value at first render in uncontrolled mode. */
   defaultValue?: string;
+  /** Fires with the chosen value when the selection changes. */
   onValueChange?: (value: string) => void;
   /**
    * `md`: Segmented control (62:379), 36px track, 30px segments, 16px padding.
    * `sm`: one rung down, a 32px track with 26px segments and 10px padding.
    * `lg`: Segmented filter (88:723), 44px track, 36px segments.
    * `tab`: Paper page tabs (Projects Active/Archived), 4px track padding and gap, 32px segments with 14px padding.
+   * @default "md"
    */
   size?: SegmentedControlSize;
   /**
@@ -28,11 +53,17 @@ export type SegmentedControlProps = {
    * `glass` is regular glass. `inset` is the 5% ink track inside the routine card,
    * `inset-faint` the 4% ink track inside the header filter. `subtle` is the bg-subtle page-tab tray whose
    * selection is a plain white pill.
+   * @default "solid"
    */
   surface?: SegmentedControlSurface;
-  /** Segments share the width equally instead of hugging their labels. */
+  /**
+   * Segments share the width equally instead of hugging their labels.
+   * @default size === "md"
+   */
   fill?: boolean;
+  /** Accessible name of the toggle group. */
   "aria-label"?: string;
+  /** Classes merged onto the track. */
   className?: string;
 };
 
@@ -64,6 +95,30 @@ const surfaceClass: Record<SegmentedControlSurface, string> = {
  * thick fill and a 0 1 3 8% shadow, the iOS tab bar selection; dark mode keeps a
  * 10% fill. On the solid and inset tracks it is 10% ink. The pill is the same on
  * every rung, as in `Tabs`.
+ *
+ * The track scrolls horizontally when the segments do not fit, so a long label set never spills.
+ * Pass `aria-label` because the track has no visible name of its own.
+ *
+ * @example
+ * ```tsx
+ * import { useState } from "react";
+ * import { SegmentedControl } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   const [view, setView] = useState("active");
+ *   return (
+ *     <SegmentedControl
+ *       aria-label="Projects"
+ *       value={view}
+ *       onValueChange={setView}
+ *       items={[
+ *         { value: "active", label: "Active" },
+ *         { value: "archived", label: "Archived" },
+ *       ]}
+ *     />
+ *   );
+ * }
+ * ```
  */
 export function SegmentedControl({
   items,

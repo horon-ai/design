@@ -7,29 +7,87 @@ import { IconButton } from "./icon-button";
 import { Menu, MenuContent, MenuTrigger } from "./menu";
 import { Switch } from "./switch";
 
+/**
+ * Props for {@link PluginRow}. The row also forwards every other `div` prop (except `children`)
+ * to the outer element, so `id`, `data-*` and DOM handlers work as usual.
+ */
 export type PluginRowProps = Omit<ComponentProps<"div">, "children"> & {
   /** Two-letter initials shown on the 40px tile. */
   initials: string;
+  /** Plugin name; truncated when the row gets narrow. */
   name: ReactNode;
+  /** Version string drawn in mono next to the name. */
   version?: ReactNode;
   /** Text of the update pill next to the version; omit when up to date. */
   updateBadge?: ReactNode;
+  /** Author line under the name. */
   author?: ReactNode;
+  /** Adds the sky "Verified" check after the author; only shown when `author` is set. */
   verified?: boolean;
   /** Capability chips, each with an optional 11px icon. */
-  chips?: { id: string; label: ReactNode; icon?: ReactNode }[];
+  chips?: {
+    /** Stable key for the chip. */
+    id: string;
+    /** Chip text. */
+    label: ReactNode;
+    /** Optional leading glyph, sized 11px. */
+    icon?: ReactNode;
+  }[];
+  /** Switch state for the plugin. Pass it with `onEnabledChange` to control the toggle. */
   enabled?: boolean;
+  /** Fires with the next switch state when the plugin is enabled or disabled. */
   onEnabledChange?: (enabled: boolean) => void;
-  /** Shows the Update button when set. */
+  /** Shows the Update button when set; without it the button stays collapsed. */
   onUpdate?: () => void;
+  /**
+   * Label of the Update button.
+   * @default "Update"
+   */
   updateLabel?: string;
+  /**
+   * Accessible name of the enable/disable switch.
+   * @default "Enabled"
+   */
   toggleLabel?: string;
+  /**
+   * Accessible name of the overflow menu button.
+   * @default "More"
+   */
   overflowLabel?: string;
   /** Items of the overflow menu; the menu button is hidden without them. */
   menu?: ReactNode;
 };
 
-/** Paper `Plugin row` (Settings 1VKS-0): tile, name with version and update pill, verified author, chips, and Update, Switch and overflow actions. */
+/**
+ * Paper `Plugin row` (Settings 1VKS-0): tile, name with version and update pill, verified author, chips, and Update, Switch and overflow actions.
+ *
+ * Rows stack directly in a list: each one draws its own bottom divider and drops it on the last
+ * child. The Update button collapses when `onUpdate` is missing, and the overflow menu only renders
+ * when `menu` has content.
+ *
+ * @example
+ * ```tsx
+ * import { MenuItem, PluginRow } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <PluginRow
+ *       initials="ST"
+ *       name="Stripe"
+ *       version="2.4.1"
+ *       updateBadge="Update ready"
+ *       author="Stripe"
+ *       verified
+ *       chips={[{ id: "payments", label: "Payments" }]}
+ *       enabled
+ *       onEnabledChange={() => {}}
+ *       onUpdate={() => {}}
+ *       menu={<MenuItem>Uninstall</MenuItem>}
+ *     />
+ *   );
+ * }
+ * ```
+ */
 export function PluginRow({
   initials,
   name,
