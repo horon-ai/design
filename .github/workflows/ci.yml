@@ -83,6 +83,37 @@ jobs:
       - name: Test
         run: bun test
 
+  lynx-render:
+    name: Lynx render tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Cache Bun install cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # ReactLynx 컴포넌트는 Lynx 런타임 위에서만 렌더되므로 루트 `bun test`가
+      # 수집하지 않습니다(`*.rstest.tsx`). 이 잡이 그 렌더·상호작용 테스트를 돌립니다.
+      - name: Render tests
+        run: bun run --cwd packages/lynx test
+
   js-build:
     name: JS build
     runs-on: ubuntu-latest
@@ -114,8 +145,19 @@ jobs:
       - name: Regenerate tokens
         run: bun run tokens
 
+      - name: Regenerate the Lynx package outputs
+        run: |
+          bun run --cwd packages/lynx tokens
+          bun run --cwd packages/lynx icons
+
       - name: Verify token outputs are committed
-        run: git diff --exit-code -- packages/tokens/theme.css packages/flutter/lib/src/tokens/horon_tokens.g.dart
+        run: |
+          git diff --exit-code -- \
+            packages/tokens/theme.css \
+            packages/flutter/lib/src/tokens/horon_tokens.g.dart \
+            packages/lynx/src/styles/tokens.css \
+            packages/lynx/tailwind-preset.cjs \
+            packages/lynx/src/icons/phosphor.g.ts
 
       - name: Build site
         run: bun run build:site

@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "@lynx-js/react",
+    "types": ["@lynx-js/rspeedy/client", "bun"],
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": false
+  },
+  "include": ["src", "example", "test", "scripts", "lynx.config.ts", "rstest.config.ts"],
+  "exclude": ["example/dist", "node_modules"]
+}
