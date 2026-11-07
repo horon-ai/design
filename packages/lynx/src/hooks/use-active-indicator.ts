@@ -21,7 +21,7 @@ export type ActiveIndicator = {
   rect: IndicatorRect | null;
   /** True one frame after the first placement, so the indicator lands instead of sliding in from 0,0. */
   animate: boolean;
-  /** Spread on the positioned track so its own origin is known. */
+  /** Pass as the positioned track's `bindlayoutchange` handler so its own origin is known. */
   bindTrack: (event: LayoutChangeLike) => void;
   /** Spread on item `index`; only the active index's box is kept. */
   bindItem: (index: number) => { bindlayoutchange: (event: LayoutChangeLike) => void };
@@ -48,7 +48,7 @@ const boxOf = (event: LayoutChangeLike) => {
  * between items.
  *
  * Lynx has no `offsetLeft`, `ResizeObserver` or `querySelector`, so measurement is
- * push-based: spread `bindTrack` on the track and `bindItem(index)` on each item,
+ * push-based: pass `bindTrack` as the track's `bindlayoutchange` and spread `bindItem(index)` on each item,
  * and each `layoutchange` reports that node's box relative to the page. The hook
  * subtracts the track's origin and keeps the active item's box, so the indicator
  * that reads `rect` moves with the real layout instead of a guessed percentage.
@@ -67,7 +67,7 @@ const boxOf = (event: LayoutChangeLike) => {
  * function Tabs({ items, value }: { items: string[]; value: number }) {
  *   const { rect, animate, bindTrack, bindItem } = useActiveIndicator(value);
  *   return (
- *     <view className="relative flex gap-1" {...bindTrack}>
+ *     <view className="relative flex gap-1" bindlayoutchange={bindTrack}>
  *       {items.map((item, index) => (
  *         <view key={item} {...bindItem(index)}>
  *           <text>{item}</text>
