@@ -36,7 +36,7 @@ export type ToolPermissionsProps = Omit<ComponentProps<"div">, "className" | "ti
   values?: Record<string, ToolPermission>;
   /** Called with the complete next map whenever one row changes or "Allow all" is pressed. */
   onValuesChange?: (values: Record<string, ToolPermission>) => void;
-  /** Label of the text button that sets every tool to Allow. */
+  /** Label of the text button that sets every tool to Allow. @default "Allow all" */
   allowAllLabel?: ReactNode;
   /** Extra classes for the card root. */
   className?: string;

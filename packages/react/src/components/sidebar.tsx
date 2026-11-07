@@ -682,7 +682,7 @@ export function SidebarProjectMore({ label = "Project actions", className, ...pr
  * Props for {@link SidebarAddButton}: every button prop plus the trailing icon.
  */
 export type SidebarAddButtonProps = ButtonProps & {
-  /** Icon after the label; defaults to a 16px plus circle. */
+  /** Icon after the label; defaults to a 16px plus circle. @default a 16px plus-circle (`PlusCircle`) icon */
   icon?: ReactNode;
 };
 

@@ -25,7 +25,7 @@ export type SourceRowProps = {
   onRetry?: () => void;
   /** `card` is a standalone subtle row; `list` is transparent with a 1px divider, for stacking inside a list. @default "card" */
   variant?: "card" | "list";
-  /** Pipeline stage states; defaults to Parse, Chunk, Embed, Index derived from `status`. */
+  /** Pipeline stage states; defaults to Parse, Chunk, Embed, Index derived from `status`. @default `defaultStages[status]`: `ready` is all `done`, `indexing` is `done, done, active, todo`, `failed` is `done, done, failed, todo` */
   stages?: SourceStages;
   /** Extra classes on the row, which owns the radius, border or divider. */
   className?: string;

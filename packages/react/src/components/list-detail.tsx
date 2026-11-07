@@ -38,7 +38,7 @@ export type ListDetailProps = Omit<ComponentProps<"div">, "className" | "childre
   onValueChange?: (id: string) => void;
   /** Renders the detail pane for the selected item. */
   children: (item: ListDetailItem) => ReactNode;
-  /** `solid` (default) is an opaque surface shell with a default border; `glass` is the thick glass shell. */
+  /** `solid` (default) is an opaque surface shell with a default border; `glass` is the thick glass shell. @default "solid" */
   surface?: "solid" | "glass";
   /** Extra classes on the shell, merged after the built-in ones. */
   className?: string;

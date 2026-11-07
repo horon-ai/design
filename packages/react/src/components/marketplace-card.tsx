@@ -33,7 +33,7 @@ export type MarketplaceCardProps = Omit<ComponentProps<"div">, "children"> & {
   /** Text of the Install button.
    * @default "Install" */
   installLabel?: string;
-  /** `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass card. */
+  /** `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass card. @default "solid" */
   surface?: "solid" | "glass";
 };
 
