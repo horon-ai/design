@@ -4,9 +4,10 @@ export default function KbdDemo() {
   return (
     <div className="flex flex-col items-center gap-6">
       <div className="flex items-center gap-2">
-        <Kbd>⌘</Kbd>
+        <Kbd keys="Mod" />
         <Kbd>K</Kbd>
-        <Kbd>esc</Kbd>
+        <Kbd keys="Escape" />
+        <Kbd keys="Mod+Enter" />
       </div>
       <div className="flex items-center gap-2">
         <Kbd size="sm">K</Kbd>
