@@ -4,23 +4,42 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
+/**
+ * Root of the bottom sheet: owns the open state and the drag/Escape dismissal. Wrap a
+ * {@link BottomSheetTrigger} and a {@link BottomSheetContent}; the sheet is only mounted while open.
+ */
 export const BottomSheet = Drawer.Root;
+/** The element that opens the sheet, forwarded to Base UI's trigger unchanged. */
 export const BottomSheetTrigger = Drawer.Trigger;
+/** A close control for the sheet body; it also dismisses on scrim, Escape and a downward drag. */
 export const BottomSheetClose = Drawer.Close;
 
+/** Props of {@link BottomSheetContent}. */
 export type BottomSheetContentProps = Omit<ComponentProps<typeof Drawer.Popup>, "className" | "title"> & {
+  /** Sheet title, rendered in the drawer's title slot above the children. */
   title: ReactNode;
   /**
    * `panel` is the Figma panel sheet (374px max, label-lg title). `detail` is the Paper detail sheet:
    * full width, 18px rhythm, a caller-built header (tile, title, description) set flush left.
+   * @default "panel"
    */
   variant?: "panel" | "detail";
-  /** `glass` is the veil sheet (`veil-overlay`); `solid` is the Paper workspace sheet: opaque default fill, 20px top corners, 8/24/16 padding. */
+  /**
+   * `glass` is the veil sheet (`veil-overlay`); `solid` is the Paper workspace sheet: opaque default fill, 20px top corners, 8/24/16 padding.
+   * @default "solid"
+   */
   surface?: "glass" | "solid";
-  /** Draws the dimmed, blurred scrim behind the sheet. Paper's floating panel sheet has none. */
+  /**
+   * Draws the dimmed, blurred scrim behind the sheet. Paper's floating panel sheet has none.
+   * @default true
+   */
   backdrop?: boolean;
-  /** Insets the sheet 16px from the sides and bottom edge (Paper's 358px panel sheet) instead of docking it full width. */
+  /**
+   * Insets the sheet 16px from the sides and bottom edge (Paper's 358px panel sheet) instead of docking it full width.
+   * @default false
+   */
   floating?: boolean;
+  /** Extra classes merged onto the sheet popup. */
   className?: string;
 };
 
@@ -28,6 +47,29 @@ export type BottomSheetContentProps = Omit<ComponentProps<typeof Drawer.Popup>, 
  * Figma `Bottom sheet` (Panels 88:808): the veil with 32px top corners, a 36x5 grabber and a
  * label-lg title. There is no close button: the sheet closes on the scrim, on Escape, on a
  * downward drag of the grabber, or through the caller's own bottom action row.
+ *
+ * Portal-mounted above the page (z-50). The popup slides up on open and down on close; the body
+ * scrolls on its own with `overscroll-contain`, and the sheet is capped at `100dvh` minus 2rem.
+ *
+ * @example
+ * ```tsx
+ * import { BottomSheet, BottomSheetAction, BottomSheetActions, BottomSheetContent, BottomSheetTrigger } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <BottomSheet>
+ *       <BottomSheetTrigger>Open sheet</BottomSheetTrigger>
+ *       <BottomSheetContent title="Reminder" floating>
+ *         <p className="text-body-sm text-text-secondary">Every weekday at 9:00</p>
+ *         <BottomSheetActions>
+ *           <BottomSheetAction>Cancel</BottomSheetAction>
+ *           <BottomSheetAction variant="primary">Save</BottomSheetAction>
+ *         </BottomSheetActions>
+ *       </BottomSheetContent>
+ *     </BottomSheet>
+ *   );
+ * }
+ * ```
  */
 export function BottomSheetContent({
   title,
@@ -82,14 +124,17 @@ export function BottomSheetContent({
   );
 }
 
+/** Props of {@link BottomSheetRow}. */
 export type BottomSheetRowProps = Omit<ComponentProps<"button">, "className"> & {
+  /** Leading icon rendered at 20px in secondary text color. */
   icon?: ReactNode;
   /** Current value on the right, such as "On" or "Weekdays". */
   value?: ReactNode;
+  /** Extra classes merged onto the row button. */
   className?: string;
 };
 
-/** A 48px settings row: 20px icon, label, value and a 16px caret. */
+/** A 48px settings row: 20px icon, label, value and a 16px caret. Part of {@link BottomSheetContent}. */
 export function BottomSheetRow({ icon, value, className, children, ...props }: BottomSheetRowProps) {
   return (
     <button
@@ -108,22 +153,31 @@ export function BottomSheetRow({ icon, value, className, children, ...props }: B
   );
 }
 
-/** The action row: secondary first, the primary action at the right edge, 8px apart. */
+/** The action row: secondary first, the primary action at the right edge, 8px apart. Wraps onto a second line when the sheet is too narrow. Part of {@link BottomSheetContent}. */
 export function BottomSheetActions({
   className,
   ...props
-}: Omit<ComponentProps<"div">, "className"> & { className?: string }) {
+}: Omit<ComponentProps<"div">, "className"> & {
+  /** Extra classes merged onto the action row. */
+  className?: string;
+}) {
   return (
     <div className={cn("relative flex w-full flex-wrap items-center justify-end gap-2 pt-3", className)} {...props} />
   );
 }
 
+/** Props of {@link BottomSheetAction}. */
 export type BottomSheetActionProps = Omit<ComponentProps<"button">, "className"> & {
+  /**
+   * `primary` is the filled brand pill, `secondary` the 6% ink pill.
+   * @default "secondary"
+   */
   variant?: "primary" | "secondary";
+  /** Extra classes merged onto the action button. */
   className?: string;
 };
 
-/** The sheet's 44px pill actions: `secondary` is 6% ink, `primary` is ink. */
+/** The sheet's 44px pill actions: `secondary` is 6% ink, `primary` is ink. Part of {@link BottomSheetActions}. */
 export function BottomSheetAction({ variant = "secondary", className, ...props }: BottomSheetActionProps) {
   return (
     <button

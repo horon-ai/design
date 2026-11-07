@@ -5,17 +5,28 @@ import { cn } from "../lib/cn";
 import { PanelPillTabs } from "./bot-instructions-panel";
 import { Switch } from "./switch";
 
-type WithClass<T> = Omit<T, "className"> & { className?: string };
+type WithClass<T> = Omit<T, "className"> & {
+  /** Extra classes merged onto the root element. */
+  className?: string;
+};
 
+/** One switch row of {@link BotMemoryPanel}: a label, an optional description and the Switch state. */
 export type BotMemorySetting = {
+  /** Stable key of the row, passed back to `onSettingChange`. */
   id: string;
+  /** Row title, also used as the switch's `aria-label`. */
   label: string;
+  /** Optional second line under the label, e.g. what the setting does. */
   description?: string;
+  /** Initial switch state; the switch is uncontrolled after mount. */
   defaultChecked?: boolean;
 };
 
+/** One remembered item of {@link BotMemoryPanel}, grouped under its `group` heading. */
 export type BotMemoryItem = {
+  /** Stable key of the memory. */
   id: string;
+  /** The remembered text, on the first line of the row. */
   text: string;
   /** Where the memory came from, for example `From a chat · Oct 8`. */
   source: string;
@@ -25,25 +36,47 @@ export type BotMemoryItem = {
   fresh?: boolean;
 };
 
-export type BotMemoryToast = { title: string; message?: string };
+/** The transient "Memory updated" pill of {@link BotMemoryPanel}: a title and an optional second line. */
+export type BotMemoryToast = {
+  /** Bold pill text, e.g. "Memory updated". */
+  title: string;
+  /** Optional detail shown after the title, e.g. what was saved. */
+  message?: string;
+};
 
+/** Props of {@link BotMemoryPanel}. */
 export type BotMemoryPanelProps = WithClass<Omit<ComponentProps<"section">, "title">> & {
+  /**
+   * Heading of the panel.
+   * @default "Memory"
+   */
   title?: ReactNode;
+  /** Muted second line under the heading, e.g. how many memories are stored. */
   subtitle?: ReactNode;
   /** Fill of the memory meter, 0 to 100. */
   usage: number;
+  /** Switch rows shown under the header, in order. */
   settings?: BotMemorySetting[];
+  /** All memories; they are grouped by `group` and filtered by the pill tabs. */
   memories: BotMemoryItem[];
   /** The "Memory updated" pill; it enters with a pop and leaves through its close button. */
   toast?: BotMemoryToast;
+  /** Fires once the closing pill has finished its exit animation. */
   onToastDismiss?: () => void;
+  /** "Add memory" at the bottom of the panel. */
   onAdd?: () => void;
+  /** Fires when a settings switch is flipped, with the setting `id` and the new state. */
   onSettingChange?: (id: string, checked: boolean) => void;
   /** Makes the search button actionable; without it the icon is a plain decoration. */
   onSearch?: () => void;
 };
 
-function Divider({ inset }: { inset?: boolean }) {
+/** Hairline separator between panel rows. */
+// prettier-ignore
+function Divider({ inset }: {
+  /** Indents the rule by 20px to match the surrounding rows. */
+  inset?: boolean;
+}) {
   return (
     <div className={cn("flex self-stretch", inset && "px-5")}>
       <div role="separator" className="h-px flex-1 bg-overlay-ink-8" />
@@ -54,6 +87,28 @@ function Divider({ inset }: { inset?: boolean }) {
 /**
  * Bot memory panel (Paper `ZO2-1` / `HPY-0`): a 24px-radius surface with a memory meter, two switch rows,
  * a filter pill track, a transient "Memory updated" pill and the grouped memories.
+ *
+ * The meter clamps `usage` to 0–100 and exposes it as a `progressbar`. The filter tabs are built from the
+ * memories' `group` values plus an "All" tab and are component state; each row rises in with a 30ms
+ * stagger. The toast pill shows while a `toast` is passed, plays its exit animation when its close button
+ * is pressed, re-enters with a pop for a new toast object, and calls `onToastDismiss` when the exit
+ * animation ends.
+ *
+ * @example
+ * ```tsx
+ * import { BotMemoryPanel } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <BotMemoryPanel
+ *       usage={42}
+ *       settings={[{ id: "auto", label: "Memory", description: "Let the assistant remember chats", defaultChecked: true }]}
+ *       memories={[{ id: "m1", text: "Prefers Korean replies", source: "From a chat · Oct 8", group: "Preference" }]}
+ *       onAdd={() => {}}
+ *     />
+ *   );
+ * }
+ * ```
  */
 export function BotMemoryPanel({
   title = "Memory",

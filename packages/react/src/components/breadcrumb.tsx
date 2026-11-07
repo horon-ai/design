@@ -4,15 +4,39 @@ import { Children, Fragment, type ComponentProps, type ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
+/** Tray material behind a {@link Breadcrumb} trail: `glass` is the regular glass tray, `solid` the opaque one. */
 export type BreadcrumbSurface = "glass" | "solid";
 
+/** Props of {@link Breadcrumb}. */
 export type BreadcrumbProps = Omit<ComponentProps<"nav">, "className"> & {
   /** `glass` wraps the crumbs in a regular-glass tray, `solid` in an opaque tray. Omitted keeps them bare. */
   surface?: BreadcrumbSurface;
+  /** Extra classes merged onto the navigation element. */
   className?: string;
 };
 
-/** Figma `Breadcrumb` (110:948): crumbs 6px apart with 14px carets; the last crumb is the current page. */
+/**
+ * Figma `Breadcrumb` (110:948): crumbs 6px apart with 14px carets; the last crumb is the current page.
+ *
+ * Renders a `<nav aria-label>` (default `"Breadcrumb"`) holding an ordered list, and inserts an
+ * `aria-hidden` caret between entries. The tray is a grid box so it can shrink below its trail's
+ * min-content; an over-wide trail scrolls inside it rather than truncating labels.
+ *
+ * @example
+ * ```tsx
+ * import { Breadcrumb, BreadcrumbItem } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <Breadcrumb surface="solid">
+ *       <BreadcrumbItem href="/" tile="H">Home</BreadcrumbItem>
+ *       <BreadcrumbItem href="/projects">Projects</BreadcrumbItem>
+ *       <BreadcrumbItem current>Horon</BreadcrumbItem>
+ *     </Breadcrumb>
+ *   );
+ * }
+ * ```
+ */
 export function Breadcrumb({
   surface,
   className,
@@ -53,14 +77,20 @@ export function Breadcrumb({
   );
 }
 
+/** Props of {@link BreadcrumbItem}. */
 export type BreadcrumbItemProps = Omit<ComponentProps<"a">, "className"> & {
   /** Marks the current page: primary text and `aria-current`. */
   current?: boolean;
   /** Leading 20px ink tile, such as the workspace initial. */
   tile?: ReactNode;
+  /** Extra classes merged onto the crumb element. */
   className?: string;
 };
 
+/**
+ * One crumb of {@link Breadcrumb}: an anchor when `href` is set and the crumb is not current,
+ * otherwise a `<span>`. The current crumb renders primary text with `aria-current="page"`.
+ */
 export function BreadcrumbItem({ current, tile, href, className, children, ...props }: BreadcrumbItemProps) {
   const Element = href && !current ? "a" : "span";
   return (

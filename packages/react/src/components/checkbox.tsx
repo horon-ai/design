@@ -5,15 +5,20 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
+/** Box size of {@link Checkbox}; identical to {@link ControlSize}. */
 export type CheckboxSize = ControlSize;
 
+/** Props of {@link Checkbox}. */
 export type CheckboxProps = Omit<ComponentProps<typeof BaseCheckbox.Root>, "className"> & {
+  /** Label rendered after the box inside the same clickable `<label>`. */
   label?: ReactNode;
   /**
    * `md` is the 20px Figma Checkbox, `sm` the 18px box of the Data table (192:9046),
    * `lg` the 24px box.
+   * @default "md"
    */
   size?: CheckboxSize;
+  /** Extra classes merged onto the label wrapper. */
   className?: string;
 };
 
@@ -36,7 +41,23 @@ const indicatorClass: Record<CheckboxSize, string> = {
   lg: "[&_svg]:size-4",
 };
 
-/** Figma `Checkbox` (58:217): a 20px box, 6px radius, with a 10px gap to its label. */
+/**
+ * Figma `Checkbox` (58:217): a 20px box, 6px radius, with a 10px gap to its label.
+ *
+ * A Base UI checkbox: `checked` makes it controlled, otherwise it keeps its own state, and
+ * `defaultChecked` / `onCheckedChange` / `indeterminate` work as in Base UI. Checked and indeterminate
+ * boxes fill with the brand color and show a check or a dash; the wrapper `<label>` dims the whole control
+ * when the input is disabled.
+ *
+ * @example
+ * ```tsx
+ * import { Checkbox } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return <Checkbox label="Remember this chat" defaultChecked />;
+ * }
+ * ```
+ */
 export function Checkbox({ label, size = "md", className, ...props }: CheckboxProps) {
   return (
     <label
