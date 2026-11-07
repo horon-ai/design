@@ -81,6 +81,59 @@ test("the pill is hidden until the active segment has been measured, then covers
   expect(indicator?.style.width).toBe("80px");
 });
 
+test("the pill moves to the segment tapped after both were measured", async () => {
+  const { container } = render(
+    <HoronProvider>
+      <SegmentedControl aria-label="View" defaultValue="chat" items={items} />
+    </HoronProvider>,
+  );
+  const indicator = pill(container);
+  if (!indicator) throw new Error("the pill is missing");
+  const row = indicator.parentElement;
+  if (!row) throw new Error("the pill has no row to measure against");
+  fireEvent.layoutchange(row, { detail: { left: 4, top: 4, width: 268, height: 30 } });
+  fireEvent.layoutchange(segments(container)[0], { detail: { left: 4, top: 4, width: 80, height: 30 } });
+  fireEvent.layoutchange(segments(container)[1], { detail: { left: 84, top: 4, width: 100, height: 30 } });
+  await Promise.resolve();
+  expect(indicator.style.left).toBe("0px");
+  expect(indicator.style.width).toBe("80px");
+
+  // Only the selection changes here: no segment re-lays out, so the pill has to read the
+  // remembered box of the newly active segment (84-4 left, 100 wide).
+  fireEvent.tap(segments(container)[1]);
+  await Promise.resolve();
+  expect(selected(container)).toEqual(["Work"]);
+  expect(indicator.style.left).toBe("80px");
+  expect(indicator.style.width).toBe("100px");
+});
+
+test("no selection draws no pill at all, matching the unselected state", () => {
+  const { container } = render(
+    <HoronProvider>
+      <SegmentedControl aria-label="View" items={items} />
+    </HoronProvider>,
+  );
+
+  expect(selected(container)).toEqual([]);
+  expect(pill(container)).toBeNull();
+});
+
+test("the label size and ink live on the text, not the segment wrapper", () => {
+  const { container } = render(
+    <HoronProvider>
+      <SegmentedControl aria-label="View" defaultValue="chat" size="lg" items={items} />
+    </HoronProvider>,
+  );
+
+  const wrapper = segments(container)[0];
+  const label = wrapper.querySelector("text");
+  if (!label) throw new Error("the segment has no text label");
+  expect(wrapper.className).not.toContain("text-label-lg");
+  expect(label.className).toContain("text-label-lg");
+  expect(label.className).toContain("text-text-primary");
+  expect(segments(container)[1].querySelector("text")?.className).toContain("text-text-secondary");
+});
+
 test("a controlled control stays on the caller's value while still reporting the tap", async () => {
   const seen: string[] = [];
   const { container } = render(

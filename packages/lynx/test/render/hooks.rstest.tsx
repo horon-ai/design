@@ -157,6 +157,22 @@ function UnmeasuredIndicatorProbe() {
   );
 }
 
+/** Reports the placed rect so a case can move `activeIndex` and see the indicator follow. */
+function SwitchableIndicatorProbe({ activeIndex }: { activeIndex: number }) {
+  const { rect, bindTrack, bindItem } = useActiveIndicator(activeIndex);
+  return (
+    <view id="track" bindlayoutchange={bindTrack}>
+      <view id="item-0" {...bindItem(0)}>
+        <text>one</text>
+      </view>
+      <view id="item-1" {...bindItem(1)}>
+        <text>two</text>
+      </view>
+      <text id="state">{rect ? `${rect.left}x${rect.width}` : "none"}</text>
+    </view>
+  );
+}
+
 /** Each probe reports what `copy()` returned next to the hook's own flags on one tap. */
 function useCopyProbe(resetMs?: number) {
   const { copied, copy, supported } = useCopyToClipboard(resetMs);
@@ -336,7 +352,7 @@ test("useActiveIndicator places the indicator from the active item's layoutchang
   expect(indicator().style.width).toBe("0px");
   expect(indicator().style.opacity).toBe("0");
 
-  // The inactive item's box is ignored, so the track alone still draws nothing.
+  // Item 0's box is remembered but index 1 is active, so the track alone still draws nothing.
   fireEvent.layoutchange(container.querySelector("#track")!, { detail: { height: 48, left: 20, top: 10, width: 300 } });
   fireEvent.layoutchange(container.querySelector("#item-0")!, {
     detail: { height: 48, left: 20, top: 10, width: 100 },
@@ -358,6 +374,31 @@ test("useActiveIndicator places the indicator from the active item's layoutchang
   expect(readText({ container }, "#animate")).toBe("false");
   await settle();
   expect(readText({ container }, "#animate")).toBe("true");
+});
+
+test("useActiveIndicator moves to the newly active item's remembered box when the selection changes", async () => {
+  installHost("macOS", 1440, { platform: "macOS" });
+
+  const { container, rerender } = render(<SwitchableIndicatorProbe activeIndex={0} />);
+  fireEvent.layoutchange(container.querySelector("#track")!, { detail: { height: 40, left: 10, top: 10, width: 300 } });
+  fireEvent.layoutchange(container.querySelector("#item-0")!, {
+    detail: { height: 40, left: 10, top: 10, width: 120 },
+  });
+  fireEvent.layoutchange(container.querySelector("#item-1")!, {
+    detail: { height: 40, left: 140, top: 10, width: 160 },
+  });
+  expect(readText({ container }, "#state")).toBe("0x120");
+
+  // Only the selection changes; neither item lays out again, so the indicator has to read item 1's
+  // earlier reading: 140-10 left, 160 wide.
+  rerender(<SwitchableIndicatorProbe activeIndex={1} />);
+  await Promise.resolve();
+  expect(readText({ container }, "#state")).toBe("130x160");
+
+  // Back again, from the boxes remembered before the switch.
+  rerender(<SwitchableIndicatorProbe activeIndex={0} />);
+  await Promise.resolve();
+  expect(readText({ container }, "#state")).toBe("0x120");
 });
 
 test("useActiveIndicator hides the indicator while the active item has no measurement", () => {

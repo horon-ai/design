@@ -153,10 +153,10 @@ export function TabsList({ variant = "pill", surface = "solid", className, child
           surface === "glass" ? "bg-glass-thick shadow-[0_1px_3px_rgba(0,0,0,0.08)]" : "bg-overlay-ink-10",
         )}
         style={{
-          left: rect.left,
-          top: rect.top,
-          width: rect.width,
-          height: rect.height,
+          left: `${rect.left}px`,
+          top: `${rect.top}px`,
+          width: `${rect.width}px`,
+          height: `${rect.height}px`,
           // React darkens the glass pill one step more in the dark scheme.
           backgroundColor: surface === "glass" && theme.scheme === "dark" ? theme.color("overlay-ink-10") : undefined,
         }}
@@ -194,7 +194,7 @@ export function TabsList({ variant = "pill", surface = "solid", className, child
             {rect && variant === "underline" ? (
               <view
                 className={cn("absolute bottom-0 h-0.5 bg-text-primary", animate && "motion-indicator")}
-                style={{ left: rect.left, width: rect.width }}
+                style={{ left: `${rect.left}px`, width: `${rect.width}px` }}
               />
             ) : null}
           </view>

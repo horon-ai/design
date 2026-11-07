@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "@lynx-js/react";
+import { useCallback, useEffect, useRef, useState } from "@lynx-js/react";
 
 /**
  * Position of the active item inside its track, in CSS px, taken from the item's
@@ -23,7 +23,7 @@ export type ActiveIndicator = {
   animate: boolean;
   /** Pass as the positioned track's `bindlayoutchange` handler so its own origin is known. */
   bindTrack: (event: LayoutChangeLike) => void;
-  /** Spread on item `index`; only the active index's box is kept. */
+  /** Spread on item `index`; every item's box is remembered so a selection change can place the indicator. */
   bindItem: (index: number) => { bindlayoutchange: (event: LayoutChangeLike) => void };
 };
 
@@ -52,6 +52,9 @@ const boxOf = (event: LayoutChangeLike) => {
  * and each `layoutchange` reports that node's box relative to the page. The hook
  * subtracts the track's origin and keeps the active item's box, so the indicator
  * that reads `rect` moves with the real layout instead of a guessed percentage.
+ * Every item's last box is remembered, so changing `activeIndex` places the
+ * indicator from that item's earlier reading even though its layout did not change
+ * and the engine reports nothing new for it.
  * `animate` turns true one frame after the first placement.
  *
  * Layout events arrive asynchronously, so the first frame draws no indicator
@@ -86,18 +89,17 @@ export function useActiveIndicator(activeIndex: number): ActiveIndicator {
   const [rect, setRect] = useState<IndicatorRect | null>(null);
   const [animate, setAnimate] = useState(false);
   const trackRef = useRef({ left: 0, top: 0 });
-  const itemRef = useRef<IndicatorRect | null>(null);
+  // The last box every item reported, keyed by index. An item only reports `layoutchange` when
+  // its own box changes, so a selection change alone never re-fires it for the newly active item;
+  // keeping every box is what lets the effect below place the indicator from a remembered reading.
+  const itemsRef = useRef(new Map<number, IndicatorRect>());
+  const activeRef = useRef(activeIndex);
 
-  useEffect(() => {
-    if (!rect || animate) return undefined;
-    const timer = setTimeout(() => setAnimate(true), 16);
-    return () => clearTimeout(timer);
-  }, [rect, animate]);
-
-  /** Recomputes the rect whenever either the track or the active item moved. */
-  const publish = () => {
-    const item = itemRef.current;
+  /** Publishes the remembered box of the active item, rebased onto the track origin. */
+  const publish = useCallback(() => {
+    const item = itemsRef.current.get(activeRef.current);
     if (!item) {
+      // An item that has never reported stays unplaced, rather than collapsing to the track corner.
       setRect(null);
       return;
     }
@@ -110,7 +112,20 @@ export function useActiveIndicator(activeIndex: number): ActiveIndicator {
     setRect((previous) =>
       previous && previous.left === next.left && previous.top === next.top && previous.width === next.width && previous.height === next.height ? previous : next,
     );
-  };
+  }, []);
+
+  // A selection change publishes the newly active item's remembered box, because nothing else
+  // fires for it: its own layout did not change, only which item the indicator points at.
+  useEffect(() => {
+    activeRef.current = activeIndex;
+    publish();
+  }, [activeIndex, publish]);
+
+  useEffect(() => {
+    if (!rect || animate) return undefined;
+    const timer = setTimeout(() => setAnimate(true), 16);
+    return () => clearTimeout(timer);
+  }, [rect, animate]);
 
   const bindTrack = (event: LayoutChangeLike) => {
     const box = boxOf(event);
@@ -120,9 +135,8 @@ export function useActiveIndicator(activeIndex: number): ActiveIndicator {
 
   const bindItem = (index: number) => ({
     bindlayoutchange: (event: LayoutChangeLike) => {
-      if (index !== activeIndex) return;
-      itemRef.current = boxOf(event);
-      publish();
+      itemsRef.current.set(index, boxOf(event));
+      if (index === activeRef.current) publish();
     },
   });
 

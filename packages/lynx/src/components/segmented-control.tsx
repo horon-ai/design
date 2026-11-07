@@ -74,10 +74,21 @@ const trackClass: Record<SegmentedControlSize, string> = {
 };
 
 const segmentClass: Record<SegmentedControlSize, string> = {
-  sm: "h-[26px] px-2.5 text-label-sm",
-  md: "h-[30px] px-4 text-label-md",
-  lg: "h-9 px-4 text-label-lg",
-  tab: "h-8 px-3.5 text-label-md",
+  sm: "h-[26px] px-2.5",
+  md: "h-[30px] px-4",
+  lg: "h-9 px-4",
+  tab: "h-8 px-3.5",
+};
+
+/**
+ * The rung's type weight and size. Lynx does not inherit `font-size`/`color` into a `<text>`, so
+ * these live on the label itself while `segmentClass` keeps the segment's box.
+ */
+const segmentTextClass: Record<SegmentedControlSize, string> = {
+  sm: "text-label-sm",
+  md: "text-label-md",
+  lg: "text-label-lg",
+  tab: "text-label-md",
 };
 
 const surfaceClass: Record<SegmentedControlSurface, string> = {
@@ -95,9 +106,11 @@ const surfaceClass: Record<SegmentedControlSurface, string> = {
  * The pill is positioned from the measured box of the active segment: `useActiveIndicator`
  * listens to `bindlayoutchange` on the segments and returns the active one's rect, so the pill
  * travels the real distance between two different label widths instead of a guessed percentage.
- * The first frame draws no pill (measurement arrives asynchronously), and the spring
- * `motion-indicator` class is only added once the pill has been placed, so it lands instead of
- * flying in from the corner.
+ * A control with no selected value draws no pill at all, matching the `unselected` accessibility
+ * state of every segment. The first frame of a selected pill draws nothing (measurement arrives
+ * asynchronously), and the spring `motion-indicator` class is only added once the pill has been
+ * placed, so it lands instead of flying in from the corner. The label's type size and ink sit on
+ * the `<text>` itself, because a Lynx `<text>` does not inherit either from its wrapper.
  *
  * Only Play and Radio Group can clear a previous pick, so the control holds its own selection
  * when `value` is not passed. A Lynx view cannot scroll inside a measured pill, so the track
@@ -139,7 +152,8 @@ export function SegmentedControl({
   const [own, setOwn] = useState<string | undefined>(defaultValue);
   const selected = value === undefined ? own : value;
   const activeIndex = items.findIndex((item) => item.value === selected);
-  const { rect, animate, bindTrack, bindItem } = useActiveIndicator(activeIndex < 0 ? 0 : activeIndex);
+  // A control with nothing selected measures no item, so the hook yields a null rect and no pill.
+  const { rect, animate, bindTrack, bindItem } = useActiveIndicator(activeIndex);
 
   const pick = (next: string, unavailable: boolean | undefined) => {
     if (unavailable || next === selected) return;
@@ -150,11 +164,11 @@ export function SegmentedControl({
   // The measured row holds the segments and the pill. A filled row shares the track, so it takes
   // the whole width; a hugging row keeps each segment's own padding and scrolls inside the track
   // when the set is wider than the caller's box, which is what react's `overflow-x-auto` does.
-  const row = (
-    <view
-      className={cn("relative flex flex-row items-center gap-0.5", fill && "w-full min-w-0")}
-      bindlayoutchange={bindTrack}
-    >
+  // Nothing selected means nothing to point at, so there is no pill at all — the accessibility
+  // state is `unselected` on every segment. Once something is selected the pill still waits,
+  // invisible, for the active item's first measurement.
+  const indicator =
+    activeIndex < 0 ? null : (
       <view
         className={cn(
           "pointer-events-none absolute overflow-hidden rounded-full",
@@ -183,13 +197,20 @@ export function SegmentedControl({
       >
         {surface === "glass" ? <LiquidGlass /> : null}
       </view>
+    );
+
+  const row = (
+    <view
+      className={cn("relative flex flex-row items-center gap-0.5", fill && "w-full min-w-0")}
+      bindlayoutchange={bindTrack}
+    >
+      {indicator}
       {items.map((item, index) => (
         <view
           key={item.value}
           className={cn(
             "relative flex min-w-0 flex-row items-center justify-center whitespace-nowrap rounded-full motion-colors",
             item.disabled && "opacity-40",
-            item.value === selected ? "text-text-primary" : "text-text-secondary active:text-text-primary",
             segmentClass[size],
             // Filled segments share the track; hugging segments keep the padding their rung gives them.
             fill ? "flex-1" : "shrink-0",
@@ -202,7 +223,21 @@ export function SegmentedControl({
           accessibility-value={item.value === selected ? "selected" : "unselected"}
           {...bindItem(index)}
         >
-          {typeof item.label === "string" ? <text className="text-trim">{item.label}</text> : item.label}
+          {typeof item.label === "string" ? (
+            <text
+              className={cn(
+                "text-trim",
+                // A Lynx `<text>` does not inherit size or colour from its wrapper, so the rung's
+                // type and the selected/unselected ink go on the text node itself.
+                segmentTextClass[size],
+                item.value === selected ? "text-text-primary" : "text-text-secondary active:text-text-primary",
+              )}
+            >
+              {item.label}
+            </text>
+          ) : (
+            item.label
+          )}
         </view>
       ))}
     </view>
