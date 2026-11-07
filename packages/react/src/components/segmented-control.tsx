@@ -4,7 +4,7 @@ import { type ReactNode, useRef } from "react";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
-import { useActiveIndicator } from "../lib/use-active-indicator";
+import { useActiveIndicator } from "../hooks/use-active-indicator";
 import { LiquidGlass } from "./liquid-glass";
 
 /** `tab` keeps Paper's page-tab rung beside the three control sizes. */

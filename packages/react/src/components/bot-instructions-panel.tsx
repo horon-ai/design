@@ -2,7 +2,7 @@ import { CaretDown, Play } from "@phosphor-icons/react";
 import { type ComponentProps, type KeyboardEvent, type ReactNode, useRef, useState } from "react";
 
 import { cn } from "../lib/cn";
-import { useActiveIndicator } from "../lib/use-active-indicator";
+import { useActiveIndicator } from "../hooks/use-active-indicator";
 import { Kbd } from "./kbd";
 
 type WithClass<T> = Omit<T, "className"> & { className?: string };
