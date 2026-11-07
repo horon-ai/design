@@ -4,14 +4,37 @@ import { Children, isValidElement, type ComponentProps, type ReactNode } from "r
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
+/**
+ * Visual treatment of {@link Button}.
+ *
+ * - `primary` — filled brand button, for the single main action of a screen or dialog.
+ * - `glass` — clear glass fill with a {@link LiquidGlass} layer, for chrome floating over imagery.
+ * - `solid` — bordered surface button, for secondary actions on a page.
+ * - `danger` — filled destructive action, such as delete.
+ * - `link` — size-independent text-only button; its `aria-current="page"` / `aria-current="true"` state
+ *   colors it like primary text, which is how an active navigation link is marked.
+ */
 export type ButtonVariant = "primary" | "glass" | "solid" | "danger" | "link";
+/**
+ * Height and text rung of a non-`link` {@link Button}, identical to {@link ControlSize}:
+ * `sm` 32px `label-md`, `md` 40px `label-lg`, `lg` 48px `label-lg`.
+ */
 export type ButtonSize = "sm" | "md" | "lg";
 
 type ButtonCommonProps = {
+  /**
+   * Visual treatment; `link` ignores the size rungs.
+   * @default "primary"
+   */
   variant?: ButtonVariant;
+  /**
+   * Height and label rung of the control; `link` stays text-only.
+   * @default "md"
+   */
   size?: ButtonSize;
   /** Leading icon; sized 16px (sm, md) or 20px (lg) and colored like the label. */
   icon?: ReactNode;
+  /** Extra classes appended last, so a caller can add width, margins or overrides. */
   className?: string;
 };
 
@@ -49,7 +72,29 @@ const variantClass: Record<ButtonVariant, string> = {
   link: "h-auto gap-1.5 rounded-sm px-1 text-label-sm text-text-secondary motion-colors hover:not-data-disabled:text-text-primary aria-[current=page]:text-text-primary aria-[current=true]:text-text-primary [&_svg]:size-3.5",
 };
 
-/** Figma `Button` (55:339): Primary, Glass, Solid and Danger in three sizes, plus a text-only `link` variant (size-independent). */
+/**
+ * Figma `Button` (55:339): Primary, Glass, Solid and Danger in three sizes, plus a text-only `link` variant (size-independent).
+ *
+ * Renders a Base UI button, or a real `<a>` once `href` is set (button-only attributes such as `type`,
+ * `disabled` and `form*` are then dropped instead of reaching the DOM). Sizes `sm` and `md` paint an
+ * invisible 44px hit area around the 32/40px control without moving it. A non-`link` button also accepts
+ * an `icon` before the label and, on `glass`, a {@link LiquidGlass} layer beneath its content.
+ *
+ * @example
+ * ```tsx
+ * import { Button } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <div className="flex items-center gap-2">
+ *       <Button onClick={() => save()}>Save changes</Button>
+ *       <Button variant="solid" size="sm">Cancel</Button>
+ *       <Button variant="link" href="/settings">Settings</Button>
+ *     </div>
+ *   );
+ * }
+ * ```
+ */
 export function Button({
   variant = "primary",
   size = "md",

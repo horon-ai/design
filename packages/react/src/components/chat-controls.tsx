@@ -4,11 +4,16 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
+/** Material of the chat controls: `solid` on raised surfaces, `glass` over imagery and glass panels. */
 export type ChatControlSurface = "solid" | "glass";
 
 type ButtonProps = Omit<ComponentProps<"button">, "className"> & {
+  /** Extra classes merged onto the control button. */
   className?: string;
-  /** `solid` (default) on raised surfaces, `glass` over imagery and glass panels. */
+  /**
+   * `solid` (default) on raised surfaces, `glass` over imagery and glass panels.
+   * @default "solid"
+   */
   surface?: ChatControlSurface;
 };
 
@@ -20,7 +25,22 @@ const surfaceClass: Record<ChatControlSurface, string> = {
   solid: "border border-border-default bg-bg-surface hover:bg-bg-subtle active:bg-interactive-secondary-hover",
 };
 
-/** Figma `Jump to latest` (Chat controls 88:659): a 44px clear-glass circle with a 20px caret. */
+/**
+ * Figma `Jump to latest` (Chat controls 88:659): a 44px clear-glass circle with a 20px caret.
+ *
+ * A square icon button with `aria-label` (default `"Jump to latest"`) that surfaces with the
+ * `motion-rise` entrance and forwards `onClick`; the caller's handler performs the scroll to the
+ * newest message.
+ *
+ * @example
+ * ```tsx
+ * import { JumpToLatest } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return <JumpToLatest surface="glass" onClick={() => scrollToLatest()} />;
+ * }
+ * ```
+ */
 export function JumpToLatest({
   surface = "solid",
   className,
@@ -40,7 +60,12 @@ export function JumpToLatest({
   );
 }
 
-/** Figma `New messages` (88:659): a 40px clear-glass pill with a 16px caret and a label. */
+/**
+ * Figma `New messages` (88:659): a 40px clear-glass pill with a 16px caret and a label.
+ *
+ * A peer of {@link JumpToLatest} for the "there are unread messages above" case; the child is the label
+ * and all button attributes are forwarded.
+ */
 export function NewMessagesPill({ surface = "solid", className, children, ...props }: ButtonProps) {
   return (
     <button
@@ -58,21 +83,49 @@ export function NewMessagesPill({ surface = "solid", className, children, ...pro
 /** Bar heights of the Figma waveform, in px. */
 const WAVEFORM = [8, 14, 22, 12, 26, 18, 10, 20, 28, 16, 9, 18, 24, 12, 7, 15, 21, 11];
 
+/** Props of {@link VoiceInput}. */
 export type VoiceInputProps = {
   /** Elapsed time, such as "0:07". */
   elapsed: ReactNode;
-  /** 0-1 levels for the 18 bars; defaults to the Figma waveform. */
+  /** 0-1 levels for the 18 bars; defaults to the Figma waveform. Each level is scaled to 4–28px. */
   levels?: number[];
-  /** Animates the waveform while true; set false once recording stops. */
+  /**
+   * Animates the waveform while true; set false once recording stops.
+   * @default true
+   */
   recording?: boolean;
+  /** Fires when the red stop button is pressed. */
   onStop?: () => void;
+  /**
+   * Accessible label of the stop button.
+   * @default "Stop recording"
+   */
   stopLabel?: string;
-  /** `solid` (default) on raised surfaces, `glass` over imagery and glass panels. */
+  /**
+   * `solid` (default) on raised surfaces, `glass` over imagery and glass panels.
+   * @default "solid"
+   */
   surface?: ChatControlSurface;
+  /** Extra classes merged onto the pill. */
   className?: string;
 };
 
-/** Figma `Voice input` (88:659): a 52px pill with a red stop button, waveform and timer. */
+/**
+ * Figma `Voice input` (88:659): a 52px pill with a red stop button, waveform and timer.
+ *
+ * The 18 bars keep the Figma heights unless `levels` is passed, in which case each 0-1 level maps to a
+ * 4–28px bar. With `recording` the bars run the `wave` animation on a 120ms stagger; the whole waveform
+ * is `aria-hidden`, so only the stop button and the elapsed text reach assistive technology.
+ *
+ * @example
+ * ```tsx
+ * import { VoiceInput } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return <VoiceInput elapsed="0:07" recording onStop={() => stopRecording()} />;
+ * }
+ * ```
+ */
 export function VoiceInput({
   elapsed,
   levels,

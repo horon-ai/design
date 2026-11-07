@@ -4,31 +4,52 @@ import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
-export type DateRange = { start: Date | null; end: Date | null };
+/**
+ * An inclusive date range for {@link Calendar} in `range` mode: both `start` and `end` are selected days,
+ * only those two endpoints are stored and the days between them are derived on render. Both ends are
+ * `null` before the first click, and `end` stays `null` while the user is picking the second day.
+ */
+export type DateRange = {
+  /** First selected day, or `null` when the range is empty. */
+  start: Date | null;
+  /** Last selected day; stays `null` until the second click completes the range. */
+  end: Date | null;
+};
+/** Day-cell rung of {@link Calendar}; identical to {@link ControlSize} (`sm` 32px, `md` 40px, `lg` 48px cells). */
 export type CalendarSize = ControlSize;
 
 type CommonProps = {
   /** First visible month; defaults to the selected date or today. */
   defaultMonth?: Date;
+  /**
+   * Controlled visible month. While set, the arrows and keyboard month changes only report
+   * through `onMonthChange` and the component keeps no month state of its own.
+   */
   month?: Date;
+  /** Fires with the first day of the month the user navigated to (arrows, or keyboard focus crossing a boundary). */
   onMonthChange?: (month: Date) => void;
+  /** Days for which this returns true render disabled and cannot be selected. */
   isDateDisabled?: (date: Date) => boolean;
   /** BCP 47 locale for the month title, weekdays and day labels. */
   locale?: string;
-  /** 0 = Sunday (the Figma calendar), 1 = Monday. */
+  /** 0 = Sunday (the Figma calendar), 1 = Monday. @default 0 */
   weekStartsOn?: 0 | 1;
+  /** Extra classes merged onto the calendar frame. */
   className?: string;
+  /** The day drawn as today, with the brand text color and the live dot; defaults to the real date at mount. */
   today?: Date;
   /**
    * `default` is the day picker calendar (60:245): centered title-sm month.
    * `popover` is the `Calendar popover` (88:495): 24px radius, left label-lg
    * month and 32px round arrow buttons on the right.
+   * @default "default"
    */
   variant?: "default" | "popover";
   /**
    * `solid` (default) is an opaque surface with a default border. `glass` puts it on the veil (`veil-overlay`),
    * the material of the `DateField` popup; `flat` keeps the 80% white fill of the old thick glass
    * without it (Paper Schedule mini calendar).
+   * @default "solid"
    */
   surface?: "glass" | "flat" | "solid";
   /** Days drawn as subtle ink circles in the day cell size, e.g. the week the schedule shows; selection still draws on top. */
@@ -36,11 +57,20 @@ type CommonProps = {
   /**
    * Day cell size: `sm` 32px, `md` 40px (default, the Figma size), `lg` 48px.
    * Scales the header, padding, weekday row and day text with the cells.
+   * @default "md"
    */
   size?: CalendarSize;
 };
 
-const containerSizeClass: Record<CalendarSize, { default: string; popover: string }> = {
+const containerSizeClass: Record<
+  CalendarSize,
+  {
+    /** Classes for the `default` variant: fills the parent up to the Figma width. */
+    default: string;
+    /** Classes for the `popover` variant: fixed Figma width, capped by the viewport. */
+    popover: string;
+  }
+> = {
   // The default calendar fills its parent up to the Figma width (250/314/374px: seven cells plus padding),
   // so it lands on that size on desktop and folds to the column on a narrow screen. `w-full` rather than a
   // fixed `w-*` keeps its min-content at zero, which is what lets a flex parent shrink it. The popover is
@@ -140,10 +170,31 @@ const popoverDayTextClass: Record<CalendarSize, string> = {
   lg: "[&_[role=gridcell]]:text-label-lg",
 };
 
+/**
+ * Props of {@link Calendar}. `mode` switches the value shape: `single` (the default) works with one
+ * `Date`, `range` with a {@link DateRange}; the callback always receives the same shape.
+ */
 export type CalendarProps = CommonProps &
   (
-    | { mode?: "single"; value?: Date | null; onValueChange?: (value: Date) => void }
-    | { mode: "range"; value?: DateRange; onValueChange?: (value: DateRange) => void }
+    | {
+        /** Pick one day. @default "single" */
+        mode?: "single";
+        /** Selected day, or `null` when nothing is selected. */
+        value?: Date | null;
+        /** Fires when a day is clicked, with the newly selected day. */
+        onValueChange?: (value: Date) => void;
+      }
+    | {
+        /** Pick a start and an end day. */
+        mode: "range";
+        /** Current range; omitted means both ends are empty. */
+        value?: DateRange;
+        /**
+         * Fires on every click: the first click sets `start` and clears `end`, the second sets `end`,
+         * and a click before `start` restarts the range at that day.
+         */
+        onValueChange?: (value: DateRange) => void;
+      }
   );
 
 const startOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -162,7 +213,26 @@ function monthGrid(month: Date, weekStartsOn: 0 | 1): Date[] {
   return Array.from({ length: weeks * 7 }, (_, index) => addDays(start, index));
 }
 
-/** Figma `Day` (60:125) inside the `Calendar` of the day picker example (60:245). */
+/**
+ * Figma `Day` (60:125) inside the `Calendar` of the day picker example (60:245).
+ *
+ * A one-month grid with `grid`/`row`/`gridcell` roles and an `aria-label` on every day. The month starts
+ * from `defaultMonth`, else the selected day, else today, and slides between months with the arrow
+ * buttons; `month` makes that controlled. Arrow keys move focus by a day, a week vertically, and bring
+ * the focused month into view; only the focused day is tabbable. The variant controls the frame
+ * (`default` centered header, `popover` left title with round arrows) and `surface` its material.
+ *
+ * @example
+ * ```tsx
+ * import { useState } from "react";
+ * import { Calendar, type DateRange } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   const [range, setRange] = useState<DateRange>({ start: null, end: null });
+ *   return <Calendar mode="range" value={range} onValueChange={setRange} weekStartsOn={1} />;
+ * }
+ * ```
+ */
 export function Calendar(props: CalendarProps) {
   const {
     defaultMonth,

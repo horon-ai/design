@@ -5,11 +5,17 @@ import { Children, type ComponentProps, useState } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
+/** Height and label rung of {@link Chip}; identical to {@link ControlSize} (`sm` 28px, `md` 32px, `lg` 36px). */
 export type ChipSize = ControlSize;
 
+/** Props of {@link Chip}. */
 export type ChipProps = Omit<ComponentProps<typeof Toggle>, "className"> & {
-  /** `md` is the 32px Figma Chip; `sm` is 28px and `lg` 36px. */
+  /**
+   * `md` is the 32px Figma Chip; `sm` is 28px and `lg` 36px.
+   * @default "md"
+   */
   size?: ChipSize;
+  /** Extra classes merged onto the toggle button. */
   className?: string;
 };
 
@@ -32,7 +38,28 @@ const checkIconClass: Record<ChipSize, string> = {
   lg: "size-4",
 };
 
-/** Figma `Chip` (61:302): a 32px solid toggle, no glass; selected shows a check, the brand border and brand text. */
+/**
+ * Figma `Chip` (61:302): a 32px solid toggle, no glass; selected shows a check, the brand border and brand text.
+ *
+ * A Base UI toggle: `pressed` makes it controlled, otherwise it keeps its own state and reports through
+ * `onPressedChange`. The check is in a `0`-width slot that opens on press, so an unselected chip never
+ * reserves the icon space; the slot only animates after the first toggle, so a chip that mounts pressed
+ * does not flash it. An element child is laid out in a row at the label gap.
+ *
+ * @example
+ * ```tsx
+ * import { Chip } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <div className="flex flex-wrap gap-2">
+ *       <Chip defaultPressed>Documents</Chip>
+ *       <Chip>Images</Chip>
+ *     </div>
+ *   );
+ * }
+ * ```
+ */
 export function Chip({ size = "md", className, children, onPressedChange, ...props }: ChipProps) {
   // The exit animation only plays after the first toggle, so a chip that mounts unpressed never flashes the check.
   const [toggled, setToggled] = useState(false);

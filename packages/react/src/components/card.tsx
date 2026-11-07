@@ -5,8 +5,11 @@ import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
+/** Props of {@link Card}. */
 export type CardProps = Omit<ComponentProps<"div">, "className" | "title"> & {
+  /** Card heading on the title row, wrapping inside the card instead of truncating; the caret joins this row. */
   title?: ReactNode;
+  /** Body line under the title, in body-sm secondary text. */
   description?: ReactNode;
   /** Shows the trailing caret, for cards that open something. */
   interactive?: boolean;
@@ -17,12 +20,38 @@ export type CardProps = Omit<ComponentProps<"div">, "className" | "title"> & {
   /**
    * `solid` (default) is an opaque surface with a default border. `glass` is the thick glass.
    * `frost` is the Paper home board card: the same glass with the denser frost fill and a 0 8 24 6% drop.
+   * @default "solid"
    */
   surface?: "glass" | "frost" | "solid";
+  /** Extra classes merged onto the rendered root. */
   className?: string;
 };
 
-/** Figma `Card` (63:310): a 320px thick-glass card, 20px padding and radius, Default / Interactive / Selected. */
+/**
+ * Figma `Card` (63:310): a 320px thick-glass card, 20px padding and radius, Default / Interactive / Selected.
+ *
+ * `render` swaps the root element through Base UI's `useRender` (e.g. `<button />` or `<a />`); the glass
+ * layer is isolated behind the content, so the card never needs a stacking-context patch from the caller.
+ * `interactive` adds the caret, hover rim and press scale, `selected` the brand rim
+ * (`[data-selected]` is set too), and children render in a full-width block under the description.
+ *
+ * @example
+ * ```tsx
+ * import { Card } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <Card
+ *       interactive
+ *       surface="frost"
+ *       title="Weekly digest"
+ *       description="A summary of everything the assistant saved this week."
+ *       render={<button type="button" />}
+ *     />
+ *   );
+ * }
+ * ```
+ */
 export function Card({
   title,
   description,
