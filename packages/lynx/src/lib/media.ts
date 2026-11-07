@@ -51,9 +51,15 @@ type Condition = {
   value: string;
 };
 
-/** Splits `(min-width: 768px) and (pointer: fine)` into its conditions. */
+/**
+ * Splits `(min-width: 768px) and (pointer: fine)` into its conditions.
+ *
+ * The value is captured as one `[^)]+` run and trimmed afterwards. Surrounding
+ * it with `\s*` and a lazy quantifier lets the engine try every split of a
+ * long whitespace run, which turns a crafted query into polynomial backtracking.
+ */
 function parse(query: string): Condition[] {
-  return [...query.matchAll(/\(\s*([a-z-]+)\s*:\s*([^)]+?)\s*\)/gi)].map((match) => ({
+  return [...query.matchAll(/\(\s*([a-z-]+)\s*:([^)]+)\)/gi)].map((match) => ({
     feature: match[1].toLowerCase(),
     value: match[2].trim().toLowerCase(),
   }));
