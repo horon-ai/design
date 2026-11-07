@@ -1,10 +1,8 @@
 ---
 import T from "@/components/i18n/T.astro";
-import { ComponentCard } from "@/components/site/ComponentCard";
-import Demo from "@/components/site/Demo.astro";
+import CatalogTile from "@/components/site/CatalogTile.astro";
 import { componentGroups, componentsInGroup } from "@/data/components";
-import { blockMessages } from "@/i18n/messages/blocks";
-import { resolveDemoName } from "@/lib/demos";
+import { getThumbnail } from "@/lib/thumbnails";
 import { siteHref } from "@/lib/urls";
 
 interface Props {
@@ -12,7 +10,10 @@ interface Props {
 }
 
 const { group } = Astro.props;
-const items = componentsInGroup(group.id);
+const items = componentsInGroup(group.id).map((component) => ({
+  component,
+  Thumbnail: getThumbnail(component.slug),
+}));
 ---
 
 <section class="not-prose">
@@ -21,68 +22,13 @@ const items = componentsInGroup(group.id);
     <span class="text-caption text-text-secondary">{items.length}</span>
   </div>
   <p class="mt-1.5 text-body-sm text-text-secondary"><T m={group.description} /></p>
-  <div class="mt-8 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 xl:grid-cols-3">
+  <ul class="catalog-grid mt-8">
     {
-      items.map((component) => {
-        const demoName = component.overlay ? undefined : resolveDemoName(component.slug);
-        return (
-          <ComponentCard
-            href={siteHref(`/components/${component.slug}`)}
-            title={component.title}
-            description={component.description}
-            className="min-w-0"
-          >
-            <div class="demo-tile min-w-0">
-              {demoName ? (
-                <div class="demo-fit pointer-events-none" inert>
-                  <Demo name={demoName} />
-                </div>
-              ) : (
-                <span class="text-body-sm text-text-secondary">
-                  <T m={blockMessages.previewUnavailable} />
-                </span>
-              )}
-            </div>
-          </ComponentCard>
-        );
-      })
+      items.map(({ component, Thumbnail }) => (
+        <CatalogTile href={siteHref(`/components/${component.slug}`)} title={component.title}>
+          {Thumbnail && <Thumbnail />}
+        </CatalogTile>
+      ))
     }
-  </div>
+  </ul>
 </section>
-
-<script>
-  /* Each index preview is laid out at its natural size and scaled down to fit
-   * its 16:9 tile, so wide demos (Composer) and tall ones (Calendar, Schedule)
-   * are shown whole instead of being cut off by the tile. The script only sets
-   * the `--demo-fit` custom property; the tile owns the transform. */
-  const MAX_SCALE = 0.8;
-
-  /* `max-width` caps the preview box, but a row that cannot wrap still spills
-   * past it, so the scale reads the scroll size, which includes the overflow. */
-  function fit(preview: HTMLElement) {
-    const tile = preview.parentElement;
-    const contentWidth = Math.max(preview.offsetWidth, preview.scrollWidth);
-    const contentHeight = Math.max(preview.offsetHeight, preview.scrollHeight);
-    if (!tile || contentWidth === 0 || contentHeight === 0) return;
-    const style = getComputedStyle(tile);
-    const width = tile.clientWidth - Number.parseFloat(style.paddingLeft) - Number.parseFloat(style.paddingRight);
-    const height = tile.clientHeight - Number.parseFloat(style.paddingTop) - Number.parseFloat(style.paddingBottom);
-    const scale = Math.min(MAX_SCALE, width / contentWidth, height / contentHeight);
-    preview.style.setProperty("--demo-fit", String(scale));
-  }
-
-  const observer = new ResizeObserver((entries) => {
-    for (const entry of entries) {
-      const target = entry.target as HTMLElement;
-      const preview = target.matches(".demo-fit")
-        ? target
-        : target.querySelector<HTMLElement>(":scope > .demo-fit");
-      if (preview) fit(preview);
-    }
-  });
-
-  for (const preview of document.querySelectorAll<HTMLElement>(".demo-fit")) {
-    observer.observe(preview);
-    if (preview.parentElement) observer.observe(preview.parentElement);
-  }
-</script>

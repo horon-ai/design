@@ -3,7 +3,7 @@ import { Badge, EmptyState } from "@horon-ai/react";
 import { createElement, Fragment, type ReactNode } from "react";
 
 import CodeBlock from "@/components/site/CodeBlock.astro";
-import { ComponentCard } from "@/components/site/ComponentCard";
+import LinkTile from "@/components/site/LinkTile.astro";
 import Demo from "@/components/site/Demo.astro";
 import { PreviewTabs } from "@/components/site/PreviewTabs";
 import T from "@/components/i18n/T.astro";
@@ -93,12 +93,12 @@ const breadcrumb = [
   </PreviewTabs>
 
   <nav
-    class="mt-16 grid gap-6 border-t border-border-default pt-8 sm:grid-cols-2"
+    class="not-prose mt-16 grid gap-3 border-t border-border-default pt-8 sm:grid-cols-2"
     aria-label={m.paging.ko}
   >
     {
       previous ? (
-        <ComponentCard
+        <LinkTile
           href={siteHref(`/components/${previous.slug}`)}
           title={previous.title}
           description={m.previous}
@@ -109,7 +109,7 @@ const breadcrumb = [
     }
     {
       next ? (
-        <ComponentCard
+        <LinkTile
           href={siteHref(`/components/${next.slug}`)}
           title={next.title}
           description={m.next}

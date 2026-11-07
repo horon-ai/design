@@ -1,48 +1,29 @@
 ---
-import { ComponentCard } from "@/components/site/ComponentCard";
-import T from "@/components/i18n/T.astro";
-import { foundationsNav } from "@/data/nav";
-import { fill } from "@/i18n/messages/fill";
+import CatalogTile from "@/components/site/CatalogTile.astro";
+import FoundationThumbnail, { type FoundationThumbnailId } from "@/components/site/FoundationThumbnail.astro";
 import { foundationsIndexMessages as m } from "@/i18n/messages/foundations-index";
+import type { Localized } from "@/i18n";
 import DocsLayout from "@/layouts/DocsLayout.astro";
 import { siteHref } from "@/lib/urls";
 
-const items = [
-  { href: "/foundations/tokens", title: m.designTokenTitle, description: m.designTokenBody },
-  { href: "/foundations/color", title: m.colorTitle, description: m.colorBody },
-  {
-    href: "/foundations/typography",
-    title: m.typographyTitle,
-    description: m.typographyBody,
-  },
-  { href: "/foundations/spacing", title: m.spacingTitle, description: m.spacingBody },
-  { href: "/foundations/radius", title: m.radiusTitle, description: m.radiusBody },
-  { href: "/foundations/glass", title: m.glassTitle, description: m.glassBody },
+const items: { id: FoundationThumbnailId; href: string; title: Localized }[] = [
+  { id: "tokens", href: "/foundations/tokens", title: m.designTokenTitle },
+  { id: "color", href: "/foundations/color", title: m.colorTitle },
+  { id: "typography", href: "/foundations/typography", title: m.typographyTitle },
+  { id: "spacing", href: "/foundations/spacing", title: m.spacingTitle },
+  { id: "radius", href: "/foundations/radius", title: m.radiusTitle },
+  { id: "glass", href: "/foundations/glass", title: m.glassTitle },
 ];
-
-const listCount = fill(m.count, { count: foundationsNav.length - 1 });
 ---
 
-<DocsLayout
-  title={m.title}
-  section="foundations"
-  description={m.description}
->
-  <p><T m={m.intro} /></p>
-
-  <div class="mt-8 grid gap-3 sm:grid-cols-2">
+<DocsLayout title={m.title} section="foundations" description={m.description} wide>
+  <ul class="catalog-grid not-prose">
     {
       items.map((item) => (
-        <ComponentCard
-          href={siteHref(item.href)}
-          title={item.title}
-          description={item.description}
-        />
+        <CatalogTile href={siteHref(item.href)} title={item.title}>
+          <FoundationThumbnail id={item.id} />
+        </CatalogTile>
       ))
     }
-  </div>
-
-  <h2><T m={m.flowHeading} /></h2>
-  <p><T m={m.flowBody} /></p>
-  <p><T m={listCount} /></p>
+  </ul>
 </DocsLayout>

@@ -9,12 +9,20 @@ export interface NavItem {
   label: Localized;
   href: string;
   description?: Localized;
+  /** Shown as a dropdown in the header instead of a plain link. */
+  children?: NavItem[];
 }
+
+export const developNav: NavItem[] = [
+  { label: { ko: "React", en: "React" }, href: "/develop/react" },
+  { label: { ko: "Flutter", en: "Flutter" }, href: "/develop/flutter" },
+];
 
 export const primaryNav: NavItem[] = [
   { label: { ko: "Get Started", en: "Get Started" }, href: "/get-started" },
   { label: { ko: "Foundations", en: "Foundations" }, href: "/foundations" },
   { label: { ko: "Components", en: "Components" }, href: "/components" },
+  { label: { ko: "Develop", en: "Develop" }, href: "/develop", children: developNav },
   { label: { ko: "Mascot", en: "Mascot" }, href: "/mascot" },
   { label: { ko: "Updates", en: "Updates" }, href: "/updates" },
 ];

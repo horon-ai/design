@@ -1,5 +1,5 @@
-import { IconButton } from "@horon-ai/react";
-import { Moon, Sun } from "@phosphor-icons/react";
+import { IconButton, MenuItem, MenuLabel } from "@horon-ai/react";
+import { Check, Moon, Sun } from "@phosphor-icons/react";
 
 import { pick } from "@/i18n";
 import { useLocale } from "@/i18n/react";
@@ -44,5 +44,24 @@ export function ThemeToggle({ className }: { className?: string }) {
         applyTheme(!document.documentElement.classList.contains("dark"));
       }}
     />
+  );
+}
+
+/**
+ * The same choice inside the mobile menu. The checkmarks swap through the
+ * `dark` class like the header icons, so the items need no React state either.
+ */
+export function ThemeMenuItems() {
+  const locale = useLocale();
+  return (
+    <>
+      <MenuLabel>{pick(m.themeLabel, locale)}</MenuLabel>
+      <MenuItem trailing={<Check className="dark:hidden" />} onClick={() => applyTheme(false)}>
+        {pick(m.themeLight, locale)}
+      </MenuItem>
+      <MenuItem trailing={<Check className="hidden dark:block" />} onClick={() => applyTheme(true)}>
+        {pick(m.themeDark, locale)}
+      </MenuItem>
+    </>
   );
 }

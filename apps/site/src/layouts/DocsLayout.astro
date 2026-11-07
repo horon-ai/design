@@ -3,27 +3,29 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import DocsBreadcrumb from "@/components/site/DocsBreadcrumb";
 import DocsSidebar from "@/components/site/DocsSidebar";
 import DocsToc from "@/components/site/DocsToc";
-import Footer from "@/components/site/Footer.astro";
 import T from "@/components/i18n/T.astro";
 import { primaryNav } from "@/data/nav";
 import { siteHref } from "@/lib/urls";
 import type { Localized } from "@/i18n";
 import { docsMessages } from "@/i18n/messages/docs";
 
-export type DocsSection = "get-started" | "foundations" | "components" | "mascot" | "updates";
+export type DocsSection = "get-started" | "foundations" | "components" | "develop" | "mascot" | "updates";
 
 interface Props {
   /** Page title. A plain string is Korean-only; `Localized` renders both. */
   title: string | Localized;
   description?: string | Localized;
   section: DocsSection;
-  /** `false` leaves the table of contents empty; its column stays so the text does not move. */
+  /** `false` drops the table of contents and its column. */
   toc?: boolean;
+  /** Overview pages (a catalog grid) use the whole column instead of the 900px reading width, with no TOC. */
+  wide?: boolean;
   /** Crumbs between the section and the page. Omit to get `Home / Section / Page`. */
   breadcrumb?: { label: string | Localized; href: string }[];
 }
 
-const { title, description, section, toc = true, breadcrumb } = Astro.props;
+const { title, description, section, toc = true, wide = false, breadcrumb } = Astro.props;
+const showToc = toc && !wide;
 
 const both = (value: string | Localized): Localized =>
   typeof value === "string" ? { ko: value, en: value } : value;
@@ -45,12 +47,18 @@ const crumbs = [
 ];
 ---
 
-<BaseLayout title={title} description={description} footer={false}>
-  <DocsSidebar section={section} currentPath={currentPath} client:load />
+<BaseLayout title={title} description={description}>
+  {/* One frame for every docs page, capped at `--site-max` and centered like the
+   * header row above it: a sticky 240px sidebar, the article, and the TOC rail
+   * from `xl`. Reading pages keep a 900px column on the article's left edge, so
+   * the title sits at the same x on every page; overview pages use the full
+   * article width. Below `lg` the sidebar collapses into a disclosure above the
+   * article, so the frame stacks. */}
+  <div class="mx-auto w-full max-w-(--site-max) lg:flex lg:items-start">
+    <DocsSidebar section={section} currentPath={currentPath} client:load />
 
-  <div class="flex items-start lg:ml-60">
-    <article class="site-shell site-band min-w-0 flex-1">
-      <div class="max-w-3xl">
+    <article class="docs-main min-w-0 flex-1">
+      <div class:list={[!wide && "max-w-225"]}>
         <DocsBreadcrumb items={crumbs} client:load />
 
         <header>
@@ -66,25 +74,23 @@ const crumbs = [
           }
         </header>
 
-        {/* Below `xl` the sticky TOC column is hidden by design; that stays. But below
-         * `md` there is no way at all to reach the page list, so the same list appears
-         * here as a collapsed block under the title. `DocsToc` renders nothing until the
-         * article has two or more headings, so a short page adds no empty row.
-         * `client:media` matches the `md:hidden` rule: the block only hydrates where it
-         * can show, and from `md` up the page keeps exactly the current layout. */}
-        {toc && <DocsToc inline client:media="(max-width: 767px)" />}
+        {/* Below `xl` the TOC rail is hidden, and below `md` the section sidebar is
+         * too, so the same list appears as a collapsed block under the title.
+         * `DocsToc` renders nothing until the article has two or more headings. */}
+        {showToc && <DocsToc inline client:media="(max-width: 767px)" />}
 
         <div class="prose-docs mt-10">
           <slot />
         </div>
-
-        <Footer />
       </div>
     </article>
 
-    {/* Reserved on every docs page from xl, filled or not, so the text column never shifts. */}
-    <aside class="hidden xl:sticky xl:top-(--site-header-h) xl:block xl:max-h-[calc(100dvh-var(--site-header-h))] xl:w-50 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pt-16 xl:pr-4 xl:pb-16">
-      {toc && <DocsToc client:load />}
-    </aside>
+    {
+      showToc && (
+        <aside class="hidden xl:sticky xl:top-(--site-header-h) xl:block xl:max-h-[calc(100dvh-var(--site-header-h))] xl:w-50 xl:shrink-0 xl:self-start xl:overflow-y-auto xl:pt-14 xl:pr-6 xl:pb-14">
+          <DocsToc client:load />
+        </aside>
+      )
+    }
   </div>
 </BaseLayout>

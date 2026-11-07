@@ -1,5 +1,5 @@
-import { IconButton, MenuItem, MenuLabel, SegmentedControl } from "@horon-ai/react";
-import { Check, Translate } from "@phosphor-icons/react";
+import { MenuItem, MenuLabel, SegmentedControl } from "@horon-ai/react";
+import { Check } from "@phosphor-icons/react";
 
 import { localeLabels, locales, pick, setLocale } from "@/i18n";
 import { useLocale } from "@/i18n/react";
@@ -23,23 +23,6 @@ export function LocaleSwitch({ className }: { className?: string }) {
         value,
         label: value === "ko" ? localeLabels.ko : localeLabels.en,
       }))}
-    />
-  );
-}
-
-/**
- * Below `sm` the segmented track does not fit next to the logo, search and
- * menu buttons, so the header keeps one icon button that flips the locale.
- */
-export function LocaleButton({ className }: { className?: string }) {
-  const locale = useLocale();
-  return (
-    <IconButton
-      variant="ghost"
-      icon={<Translate />}
-      label={pick(m.language, locale)}
-      className={className}
-      onClick={() => setLocale(locale === "ko" ? "en" : "ko")}
     />
   );
 }

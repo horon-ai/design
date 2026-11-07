@@ -31,14 +31,16 @@ export default function DocsBreadcrumb({ items }: DocsBreadcrumbProps) {
 
   return (
     <>
-      <Breadcrumb aria-label={label} className="mb-4 sm:hidden">
+      {/* Each crumb link carries 6px of inline padding for its hover/focus box; the
+       * negative margin puts the first label on the title's left edge. */}
+      <Breadcrumb aria-label={label} className="mb-4 -ml-1.5 sm:hidden">
         {compact.map((item, index) => (
           <BreadcrumbItem key={item.href} href={item.href} current={index === compact.length - 1}>
             {pick(item.label, locale)}
           </BreadcrumbItem>
         ))}
       </Breadcrumb>
-      <Breadcrumb aria-label={label} className="mb-4 hidden sm:grid">
+      <Breadcrumb aria-label={label} className="mb-4 -ml-1.5 hidden sm:grid">
         {items.map((item, index) => (
           <BreadcrumbItem key={item.href} href={item.href} current={index === last}>
             {pick(item.label, locale)}

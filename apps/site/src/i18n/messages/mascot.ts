@@ -13,9 +13,6 @@ export const mascotMessages = defineMessages({
     en: "A round falcon. Horus gave it the eye, ON keeps it awake. The head is a rectangle with heavily rounded corners and two short feather tufts on top. The face plate is a warm cream oval, and the large round eyes each carry one small white highlight.",
   },
 
-  specCuts: { ko: "Cuts", en: "Cuts" },
-  specSize: { ko: "Size", en: "Size" },
-  specFormat: { ko: "Format", en: "Format" },
 
   appliedTitle: { ko: "사이트 적용", en: "Site usage" },
   appliedBody: {

@@ -1,0 +1,24 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { developMessages as m, developSnippets as snippets } from "@/i18n/messages/develop";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout title={m.reactTitle} description={m.reactDescription} section="develop">
+  <h2><T m={m.installTitle} /></h2>
+  <p><T m={m.reactInstallBody} /></p>
+  <CodeBlock code={snippets.reactInstall} lang="bash" title="terminal" />
+
+  <h2><T m={m.stylesTitle} /></h2>
+  <p><T m={m.stylesBody} /></p>
+  <CodeBlock code={snippets.reactStyles} lang="tsx" title="main.tsx" />
+
+  <h2><T m={m.useTitle} /></h2>
+  <p><T m={m.reactUseBody} /></p>
+  <CodeBlock code={snippets.reactUse} lang="tsx" title="example.tsx" />
+
+  <h2><T m={m.repoTitle} /></h2>
+  <p><T m={m.repoBody} /></p>
+  <CodeBlock code={snippets.repo} lang="bash" title="terminal" />
+</DocsLayout>
