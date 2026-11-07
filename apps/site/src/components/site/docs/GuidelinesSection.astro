@@ -1,0 +1,63 @@
+---
+/**
+ * The `guidelines` section: each rule with its optional Do / Don't pair.
+ *
+ * The cards are the site's own chrome, not a library component: they carry the
+ * brand accent for a rule to follow and the danger accent for one to avoid, and
+ * both accents come from tokens.
+ */
+import ExampleStage from "@/components/site/docs/ExampleStage.astro";
+import T from "@/components/i18n/T.astro";
+import { componentPageMessages as m } from "@/i18n/messages/components-page";
+import type { ComponentDoc } from "@/lib/component-docs";
+
+interface Props {
+  doc: ComponentDoc;
+  overlay?: boolean;
+}
+
+const { doc, overlay = false } = Astro.props;
+---
+
+<section>
+  <h2 id="guidelines"><T m={m.sectionGuidelines} /></h2>
+  <div class="flex flex-col gap-8">
+    {
+      doc.guidelines.map((guideline) => (
+        <div class="flex flex-col gap-3">
+          <h3 id={`guideline-${guideline.id}`} class="mt-0">
+            <T m={guideline.title} />
+          </h3>
+          <p>
+            <T m={guideline.body} />
+          </p>
+          {(guideline.do || guideline.dont) && (
+            <div class="grid gap-3 sm:grid-cols-2">
+              {guideline.do && (
+                <div class="rounded-xl border border-border-brand bg-bg-brand p-4">
+                  <p class="font-medium text-text-brand">
+                    <T m={m.doLabel} />
+                  </p>
+                  <p class="mt-1 text-body-sm text-text-primary">
+                    <T m={guideline.do} />
+                  </p>
+                </div>
+              )}
+              {guideline.dont && (
+                <div class="rounded-xl border border-border-danger bg-bg-danger p-4">
+                  <p class="font-medium text-text-danger">
+                    <T m={m.dontLabel} />
+                  </p>
+                  <p class="mt-1 text-body-sm text-text-primary">
+                    <T m={guideline.dont} />
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+          {guideline.example && <ExampleStage slug={doc.slug} id={guideline.example} overlay={overlay} />}
+        </div>
+      ))
+    }
+  </div>
+</section>

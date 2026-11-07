@@ -1,0 +1,48 @@
+---
+/**
+ * The `properties` section: one heading per documented prop, its accepted
+ * values and, when the doc names one, the live example that shows it.
+ */
+import ExampleStage from "@/components/site/docs/ExampleStage.astro";
+import T from "@/components/i18n/T.astro";
+import { componentPageMessages as m } from "@/i18n/messages/components-page";
+import type { ComponentDoc } from "@/lib/component-docs";
+
+interface Props {
+  doc: ComponentDoc;
+  overlay?: boolean;
+}
+
+const { doc, overlay = false } = Astro.props;
+---
+
+<section>
+  <h2 id="properties"><T m={m.sectionProperties} /></h2>
+  <div class="flex flex-col gap-8">
+    {
+      doc.properties.map((property) => (
+        <div class="flex flex-col gap-3">
+          <h3 id={`property-${property.id}`} class="mt-0">
+            <T m={property.title} />
+          </h3>
+          <p>
+            <T m={property.description} />
+          </p>
+          {property.values && (
+            <dl class="flex flex-col gap-2 rounded-xl border border-border-default bg-bg-subtle p-4">
+              {property.values.map((value) => (
+                <div class="flex flex-col gap-1 sm:flex-row sm:gap-3">
+                  <dt class="shrink-0 font-mono text-caption text-text-primary">{value.name}</dt>
+                  <dd class="text-body-sm">
+                    <T m={value.description} />
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          {property.example && <ExampleStage slug={doc.slug} id={property.example} overlay={overlay} />}
+        </div>
+      ))
+    }
+  </div>
+</section>

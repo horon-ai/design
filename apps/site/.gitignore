@@ -1,4 +1,5 @@
 dist/
 .astro/
 src/components/demo-wrappers/
+src/components/example-wrappers/
 public/mascots/

@@ -1,0 +1,59 @@
+---
+/**
+ * The `examples` section: one Preview / Code pair per example file, with the
+ * code read straight from `src/components/examples/<slug>/<id>.tsx`.
+ */
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import ExampleStage from "@/components/site/docs/ExampleStage.astro";
+import { PreviewTabs } from "@/components/site/PreviewTabs";
+import T from "@/components/i18n/T.astro";
+import { componentPageMessages as m } from "@/i18n/messages/components-page";
+import type { ComponentDoc } from "@/lib/component-docs";
+import { stripBackdrop } from "@/lib/snippet";
+
+interface Props {
+  doc: ComponentDoc;
+  overlay?: boolean;
+}
+
+const { doc, overlay = false } = Astro.props;
+
+const sources = import.meta.glob<string>("../../../components/examples/*/*.tsx", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+
+/** Keyed by `<slug>/<id>`, the same path tail the glob reports. */
+const sourceByExample = new Map<string, string>();
+for (const [path, source] of Object.entries(sources)) {
+  const key = path.split("/").slice(-2).join("/").replace(/\.tsx$/, "");
+  sourceByExample.set(key, source);
+}
+---
+
+<section>
+  <h2 id="examples"><T m={m.sectionExamples} /></h2>
+  <div class="flex flex-col gap-10">
+    {
+      doc.examples.map((example) => (
+        <div class="flex flex-col gap-3">
+          <h3 id={`example-${example.id}`} class="mt-0">
+            <T m={example.title} />
+          </h3>
+          <p>
+            <T m={example.description} />
+          </p>
+          <PreviewTabs client:load previewLabel={m.previewTab} codeLabel={m.codeTab}>
+            <div slot="preview">
+              <ExampleStage slug={doc.slug} id={example.id} overlay={overlay} />
+            </div>
+            <div slot="code">
+              <CodeBlock code={stripBackdrop(sourceByExample.get(`${doc.slug}/${example.id}`) ?? "")} lang="tsx" />
+            </div>
+          </PreviewTabs>
+        </div>
+      ))
+    }
+  </div>
+</section>

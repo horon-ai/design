@@ -1,0 +1,83 @@
+---
+/**
+ * The `props` section: the table comes from the TypeScript program in
+ * `src/lib/api.ts`, so names, types, defaults and JSDoc are the library's own.
+ *
+ * Only props the library declares are listed; everything a component inherits
+ * from Base UI or from React's HTML attributes is summarised in one line with
+ * its count, because those tables belong to the upstream packages.
+ */
+import T from "@/components/i18n/T.astro";
+import { componentPageMessages as m } from "@/i18n/messages/components-page";
+import type { ComponentApi } from "@/lib/api";
+
+interface Props {
+  api: ComponentApi[];
+}
+
+const { api } = Astro.props;
+---
+
+<section>
+  <h2 id="props"><T m={m.sectionProps} /></h2>
+  <div class="flex flex-col gap-8">
+    {
+      api.map((entry) => {
+        const koItems = entry.inherited.map((group) => `${group.source} ${group.count}개`);
+        const enItems = entry.inherited.map((group) => `${group.source} (${group.count})`);
+        return (
+          <div class="flex flex-col gap-3">
+            <h3 id={`api-${entry.name.toLowerCase()}`} class="mt-0">
+              <code>{entry.name}</code>
+            </h3>
+            {entry.description && <p>{entry.description}</p>}
+            {entry.props.length > 0 && (
+              <div class="min-w-0 overflow-x-auto">
+                <table class="w-full min-w-160 border-collapse text-left text-body-sm">
+                  <thead>
+                    <tr class="border-b border-border-strong">
+                      <th scope="col" class="py-2 pr-4 font-medium text-text-secondary">
+                        <T m={m.propHeader} />
+                      </th>
+                      <th scope="col" class="py-2 pr-4 font-medium text-text-secondary">
+                        <T m={m.typeHeader} />
+                      </th>
+                      <th scope="col" class="py-2 pr-4 font-medium text-text-secondary">
+                        <T m={m.defaultHeader} />
+                      </th>
+                      <th scope="col" class="py-2 font-medium text-text-secondary">
+                        <T m={m.descriptionHeader} />
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {entry.props.map((prop) => (
+                      <tr class="border-b border-border-default align-top">
+                        <td class="py-2 pr-4">
+                          <code>{prop.optional ? `${prop.name}?` : prop.name}</code>
+                        </td>
+                        <td class="py-2 pr-4">
+                          <code>{prop.type}</code>
+                        </td>
+                        <td class="py-2 pr-4">
+                          {prop.defaultValue ? <code>{prop.defaultValue}</code> : <span class="text-text-secondary">—</span>}
+                        </td>
+                        <td class="py-2">{prop.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {entry.inherited.length > 0 && (
+              <p class="text-caption text-text-secondary">
+                <span data-locale-text="ko" lang="ko">{`이 밖에 ${koItems.join(", ")}를 그대로 받습니다.`}</span>
+                <span data-locale-text="en" lang="en">{`Also accepts every prop of ${enItems.join(", ")}.`}</span>
+              </p>
+            )}
+          </div>
+        );
+      })
+    }
+  </div>
+</section>
