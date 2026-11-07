@@ -20,6 +20,21 @@ import {
 } from "../../src/components/sidebar";
 import { HoronProvider } from "../../src/provider";
 
+/**
+ * The resize handle sits behind the `md` breakpoint, which Lynx reads from
+ * `SystemInfo`; the testing environment resets those globals between cases, so a
+ * case that needs the handle installs a desktop-width viewport first.
+ */
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+
+function installViewport(width: number): void {
+  const environment = Reflect.get(globalThis, "lynxTestingEnv");
+  const background = isRecord(environment) ? environment.backgroundThread : undefined;
+  const global = isRecord(background) ? background.globalThis : undefined;
+  if (!isRecord(global) || !isRecord(global.SystemInfo)) throw new Error("the Lynx testing environment is not installed");
+  Object.assign(global.SystemInfo, { pixelHeight: 1600, pixelRatio: 2, pixelWidth: width * 2, platform: "web" });
+}
+
 /** The one node whose accessibility label matches, inside the rendered tree. */
 const byLabel = (container: Element, label: string): Element => {
   const node = container.querySelector(`[accessibility-label="${label}"]`);
@@ -110,14 +125,15 @@ test("a link row announces itself as a link instead of a button", () => {
   const { container } = render(
     <HoronProvider scheme="light">
       <Sidebar>
-        <SidebarItem href="/projects" current onClick={onNav}>
+        <SidebarItem href="/projects" current aria-label="Projects" onClick={onNav}>
           Projects
         </SidebarItem>
       </Sidebar>
     </HoronProvider>,
   );
 
-  const row = byLabel(container, "");
+  const row = byLabel(container, "Projects");
+  expect(row.getAttribute("accessibility-traits")).toBe("link");
   fireEvent.tap(row);
   expect(onNav).toHaveBeenCalledTimes(1);
 });
@@ -127,7 +143,7 @@ test("heading, workspace switch, tree, add button and account all render their s
     <HoronProvider scheme="light">
       <Sidebar surface="photo">
         <SidebarHeader initial="H" name="Horon HQ" />
-        <SidebarWorkspaceSwitch initial="H" name="Horon HQ" />
+        <SidebarWorkspaceSwitch initial="W" name="Workspace switch" />
         <SidebarTree>
           <SidebarItem>API rate limits</SidebarItem>
           <SidebarItem>Release notes v0.4</SidebarItem>
@@ -140,6 +156,7 @@ test("heading, workspace switch, tree, add button and account all render their s
   );
 
   expect(getByText("Horon HQ")).toBeInTheDocument();
+  expect(getByText("Workspace switch")).toBeInTheDocument();
   expect(getByText("API rate limits")).toBeInTheDocument();
   expect(getByText("Add project")).toBeInTheDocument();
   expect(getByText("Alpox")).toBeInTheDocument();
@@ -236,13 +253,41 @@ test("a closed project keeps its chevron and hides the more button, and an open 
     </HoronProvider>,
   );
 
-  // Collapsed: the actions slot is transparent, so the row still reads as closed.
-  const actions = byLabel(container, "Project actions").parentElement!;
-  expect(actions.className).toContain("opacity-0");
+  // Collapsed: react drew the slot `invisible`; Lynx leaves it unpainted so an
+  // invisible control cannot be tapped either.
+  expect(container.querySelector('[accessibility-label="Project actions"]')).toBeNull();
 
   fireEvent.tap(getByText("Horon app"));
   expect(queryByText("Kickoff notes")).toBeInTheDocument();
-  expect(byLabel(container, "Project actions").parentElement!.className).not.toContain("opacity-0");
+  expect(byLabel(container, "Project actions")).toBeInTheDocument();
+});
+
+test("a drag on the resize handle reports clamped widths and never leaves the range", async () => {
+  installViewport(1280);
+  const widths: number[] = [];
+  const { container } = render(
+    <HoronProvider scheme="light">
+      <Sidebar resizable minWidth={240} maxWidth={400} defaultWidth={280} onWidthChange={(width) => widths.push(width)}>
+        <SidebarItem>Inbox</SidebarItem>
+      </Sidebar>
+    </HoronProvider>,
+  );
+
+  const handle = byLabel(container, "Resize sidebar");
+  fireEvent.touchstart(handle, { detail: { x: 280 } });
+  fireEvent.touchmove(handle, { detail: { x: 320 } });
+  await Promise.resolve();
+  expect(widths).toEqual([320]);
+
+  // Well past `maxWidth`: the reported width stops at the limit.
+  fireEvent.touchmove(handle, { detail: { x: 2000 } });
+  await Promise.resolve();
+  expect(widths.at(-1)).toBe(400);
+
+  fireEvent.touchend(handle);
+  fireEvent.touchmove(handle, { detail: { x: 100 } });
+  await Promise.resolve();
+  expect(widths.at(-1)).toBe(400);
 });
 
 test("the account row announces itself as a button and keeps its email line", () => {

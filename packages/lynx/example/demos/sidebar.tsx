@@ -61,7 +61,9 @@ export default function SidebarDemo() {
 
   return (
     <view className="flex w-full flex-col gap-6 p-4">
-      <Backdrop className="justify-start">
+      <Backdrop>
+        {/* react's demo used a full-width row so the column hugs the left edge of the sky. */}
+        <view className="flex w-full flex-row items-start">
         {collapsed ? (
           <view
             className="flex flex-row items-center rounded-md border border-border-default bg-bg-surface px-3 py-2"
@@ -73,7 +75,7 @@ export default function SidebarDemo() {
             <text className="text-label-md text-text-primary">expand sidebar</text>
           </view>
         ) : (
-          <Sidebar className="h-[900px]" onWidthChange={() => undefined}>
+          <Sidebar resizable className="h-[900px]" onWidthChange={() => undefined}>
             <SidebarHeader
               initial={current.name.charAt(0)}
               name={current.name}
@@ -152,10 +154,11 @@ export default function SidebarDemo() {
             </Menu>
           </Sidebar>
         )}
+        </view>
       </Backdrop>
       {/* The Paper surface: the Horon photo under a white veil, kept for the light scheme. */}
-      <Backdrop className="justify-start">
-        <Sidebar surface="photo" className="h-[420px]">
+      <Backdrop>
+        <Sidebar surface="photo" resizable className="h-[420px]">
           <SidebarHeader initial="P" name="Photo surface" />
           <SidebarItem icon={<Icon name="Bell" size={18} color="text-secondary" />} current>
             Inbox
