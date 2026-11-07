@@ -4,26 +4,46 @@ import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { Spinner } from "./spinner";
 
+/**
+ * Task lifecycle states a {@link TaskRow} renders: `running` shows a spinner and Cancel,
+ * `review` a check and Review, `failed` a warning and Retry, `done` a muted check and Archive.
+ */
 export type TaskStatus = "running" | "review" | "failed" | "done";
 
+/** Props of {@link TaskRow}: the task's state and texts plus the actions offered for that state. */
 export type TaskRowProps = {
+  /** Drives the status icon, the message color and which actions appear. */
   status: TaskStatus;
+  /** Task name, one truncated line at `label-lg`. */
   title: ReactNode;
   /** Elapsed time, such as "1m 56s". */
   elapsed?: ReactNode;
   /** Bot initial and name. */
-  bot: { initial: string; name: ReactNode; tileClassName?: string };
+  bot: {
+    /** One or two characters shown in the 18px tile; falls back to the status color when `tileClassName` is absent. */
+    initial: string;
+    /** Bot name after the tile, kept on one line. */
+    name: ReactNode;
+    /** Overrides the status-driven tile fill; the text is forced to `text-inverse` when set. */
+    tileClassName?: string;
+  };
+  /** Project shown after the bot name, separated by a dot and a folder icon. */
   project?: ReactNode;
   /** Status line: the current step, the result or the error. */
   message: ReactNode;
   /** Caption after the message, such as "2 drafts · 1 calendar change". */
   detail?: ReactNode;
+  /** Called by the Cancel pill; shown only while `running`. */
   onCancel?: () => void;
+  /** Called by the Retry pill; shown only when `failed`. */
   onRetry?: () => void;
+  /** Called by the Review pill; shown only when `review`. */
   onReview?: () => void;
+  /** Called by the archive icon button; shown when `review` or `done`. */
   onArchive?: () => void;
-  /** `card` is a standalone subtle row; `list` is transparent with a 1px divider, for stacking inside a list. */
+  /** `card` is a standalone subtle row; `list` is transparent with a 1px divider, for stacking inside a list. @default "card" */
   variant?: "card" | "list";
+  /** Extra classes on the row container, which owns the radius and divider. */
   className?: string;
 };
 
@@ -37,7 +57,33 @@ const botTile: Record<TaskStatus, string> = {
 const pill =
   "motion-press flex h-7.5 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-full px-3 text-label-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand";
 
-/** Figma `Task row` (Agent tasks 112:939): a flat subtle row, 16px radius, with Running / Review / Failed / Done. */
+/**
+ * Figma `Task row` (Agent tasks 112:939): a flat subtle row, 16px radius, with Running / Review / Failed / Done.
+ *
+ * The status drives the icon, the message color and the one primary action offered: Cancel while
+ * running, Retry when failed, Review when waiting for a person, and Archive once review or done.
+ * Every state change animates in with the shared pop/fade motion.
+ *
+ * @example
+ * ```tsx
+ * import { TaskRow } from "@horon-ai/react";
+ *
+ * function RunningTask() {
+ *   return (
+ *     <TaskRow
+ *       status="running"
+ *       title="Draft the Q4 launch note"
+ *       elapsed="1m 56s"
+ *       bot={{ initial: "H", name: "Horon" }}
+ *       project="Launch"
+ *       message="Writing the second draft"
+ *       detail="2 drafts · 1 calendar change"
+ *       onCancel={() => cancelTask("launch-note")}
+ *     />
+ *   );
+ * }
+ * ```
+ */
 export function TaskRow({
   status,
   title,

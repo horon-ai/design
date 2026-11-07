@@ -5,21 +5,55 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { Menu, MenuContent, MenuTrigger } from "./menu";
 
+/**
+ * Props of {@link SplitButton}: the Base UI button props (`onClick`, `disabled`, `type`, plus
+ * aria attributes) with the label, icon and menu the split pill adds.
+ */
 export type SplitButtonProps = Omit<ComponentProps<typeof BaseButton>, "className" | "children"> & {
-  /** Primary action label. */
+  /** Primary action label, rendered at `label-md` inside the left half. */
   children: ReactNode;
   /** 16px leading icon. */
   icon?: ReactNode;
-  /** Menu items (`MenuItem`, `MenuSeparator`) opened by the caret. */
+  /** Menu items (`MenuItem`, `MenuSeparator`) opened by the caret. Without it the pill is a single full-round button. */
   menu?: ReactNode;
+  /** Accessible name of the caret trigger. @default "More actions" */
   menuLabel?: string;
+  /** Extra classes on the pill container, which owns the fill, the press scale and the disabled dim. */
   className?: string;
 };
 
 const halfClass =
   "relative inline-flex h-full cursor-pointer items-center select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-disabled:cursor-not-allowed";
 
-/** Paper `Split button` (1VGK-0): one primary pill on `Button`'s 32px rung, two hit areas split by a 1x18 bar. */
+/**
+ * Paper `Split button` (1VGK-0): one primary pill on `Button`'s 32px rung, two hit areas split by a 1x18 bar.
+ *
+ * The container owns the primary fill, the 0.97 press scale and the 40% disabled dim, so both halves
+ * stay one pill; the caret opens the menu aligned to the end and rotates while the popup is open.
+ * Without `menu` there is no divider or caret and the button keeps a full round shape.
+ *
+ * @example
+ * ```tsx
+ * import { MenuItem, SplitButton } from "@horon-ai/react";
+ *
+ * function Publish() {
+ *   return (
+ *     <SplitButton
+ *       menuLabel="Publish options"
+ *       onClick={() => publishNow()}
+ *       menu={
+ *         <>
+ *           <MenuItem onClick={() => schedulePublish()}>Schedule</MenuItem>
+ *           <MenuItem onClick={() => saveDraft()}>Save as draft</MenuItem>
+ *         </>
+ *       }
+ *     >
+ *       Publish
+ *     </SplitButton>
+ *   );
+ * }
+ * ```
+ */
 export function SplitButton({
   children,
   icon,

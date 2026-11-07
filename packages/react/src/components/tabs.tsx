@@ -5,23 +5,61 @@ import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { LiquidGlass } from "./liquid-glass";
 
+/** Tab rungs, shared with `ControlSize`: `sm` 26px, `md` 30px and `lg` 36px tab height. */
 export type TabsSize = ControlSize;
 
 /** `Tabs` owns the size; every `TabsTab` inside reads it so one list stays on one rung. */
 const TabsSizeContext = createContext<ControlSize>("md");
 
+/**
+ * Shape of a tab list: `pill` is the tray of rounded pill tabs, `underline` is a bare
+ * text row with a 2px bar that slides under the active tab.
+ */
 export type TabsListVariant = "pill" | "underline";
 
 /** `TabsList` owns the variant; its `TabsTab`s read it to drop the pill shape on the underline list. */
 const TabsVariantContext = createContext<TabsListVariant>("pill");
 
-type WithClass<T> = Omit<T, "className"> & { className?: string };
+/** Drops the native `className` slot and re-adds it as optional, so every part takes extra classes. */
+type WithClass<T> = Omit<T, "className"> & {
+  /** Extra classes appended after the part's own classes, so conflicting utilities win. */
+  className?: string;
+};
 
+/**
+ * The root of a tab set (Figma `Tabs` example 62:353): it stacks the list and panels in a
+ * 16px-gap column, caps at its container, and provides the size rung every `TabsTab` inside
+ * reads. It is controlled or uncontrolled like Base UI's tabs (`value`/`defaultValue` plus
+ * `onValueChange`), and panels are matched to tabs by `value`.
+ *
+ * @example
+ * ```tsx
+ * import { Tabs, TabsList, TabsPanel, TabsTab } from "@horon-ai/react";
+ *
+ * function SettingsTabs() {
+ *   return (
+ *     <Tabs defaultValue="general">
+ *       <TabsList variant="underline">
+ *         <TabsTab value="general">General</TabsTab>
+ *         <TabsTab value="billing" count={3}>
+ *           Billing
+ *         </TabsTab>
+ *       </TabsList>
+ *       <TabsPanel value="general">General settings</TabsPanel>
+ *       <TabsPanel value="billing">Three open invoices</TabsPanel>
+ *     </Tabs>
+ *   );
+ * }
+ * ```
+ */
 export function Tabs({
   size = "md",
   className,
   ...props
-}: WithClass<ComponentProps<typeof BaseTabs.Root>> & { size?: TabsSize }) {
+}: WithClass<ComponentProps<typeof BaseTabs.Root>> & {
+  /** Rung for this tab set: tab heights of 26px (`sm`), 30px (`md`) or 36px (`lg`). @default "md" */
+  size?: TabsSize;
+}) {
   return (
     <TabsSizeContext.Provider value={size}>
       <BaseTabs.Root className={cn("flex max-w-full min-w-0 flex-col gap-4", className)} {...props} />
@@ -44,6 +82,8 @@ const listClass: Record<TabsSize, string> = {
  *
  * `variant="underline"` is the document variant: no tray, a full-width 1px default border under
  * the tabs, and a 2px primary bar that slides under the active tab. `surface` does not apply to it.
+ *
+ * Part of {@link Tabs}; it also provides the variant every `TabsTab` inside reads.
  */
 export function TabsList({
   variant = "pill",
@@ -52,9 +92,9 @@ export function TabsList({
   children,
   ...props
 }: WithClass<ComponentProps<typeof BaseTabs.List>> & {
-  /** `pill` (default) is the tray of pill tabs; `underline` is a text row with a sliding underline. */
+  /** `pill` (default) is the tray of pill tabs; `underline` is a text row with a sliding underline. @default "pill" */
   variant?: TabsListVariant;
-  /** `solid` (default) is an opaque surface tray with a default border; `glass` is the regular glass tray. */
+  /** `solid` (default) is an opaque surface tray with a default border; `glass` is the regular glass tray. @default "solid" */
   surface?: "solid" | "glass";
 }) {
   const size = useContext(TabsSizeContext);
@@ -112,7 +152,14 @@ const countClass: Record<TabsSize, string> = {
   lg: "h-6 px-2",
 };
 
-/** Figma `Tabs` (62:335): a pill tab; the list's indicator draws the selection under the active tab. */
+/**
+ * Figma `Tabs` (62:335): a pill tab; the list's indicator draws the selection under the active tab.
+ *
+ * Part of {@link Tabs}. The tab takes its height, text and icon size from the surrounding
+ * `Tabs`; on an underline list it drops the pill radius and side padding. Base UI marks it
+ * `role="tab"` with `aria-selected`, and hover or the active state moves the label to the
+ * primary text color.
+ */
 export function TabsTab({
   className,
   icon,
@@ -157,6 +204,13 @@ export function TabsTab({
   );
 }
 
+/**
+ * The content region of one tab, rendered by Base UI with `role="tabpanel"` and matched to a
+ * `TabsTab` by `value`. The outline is suppressed, and a panel swap slides the content in 4px
+ * over the shared 200ms swap move; a change in content height is not animated.
+ *
+ * Part of {@link Tabs}.
+ */
 export function TabsPanel({ className, ...props }: WithClass<ComponentProps<typeof BaseTabs.Panel>>) {
   return <BaseTabs.Panel className={cn("animate-swap-move outline-none", className)} {...props} />;
 }
