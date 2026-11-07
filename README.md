@@ -21,7 +21,7 @@ packages/
   flutter/      horon_ui           Flutter 컴포넌트 + example 갤러리 앱
 ```
 
-컴포넌트 레이어는 웹의 `@horon-ai/react`와 Flutter의 `horon_ui` 둘이고, 둘은 같은 토큰 정본을 읽습니다. site가 `@horon-ai/react`를 소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. `packages/flutter`는 Dart 패키지라 `package.json`이 없어 bun 워크스페이스 밖에 있고, `dart`·`flutter` 명령으로 검사합니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다.
+컴포넌트 레이어는 웹의 `@horon-ai/react`, 모바일의 Flutter `horon_ui`, Lynx 앱의 `@horon-ai/lynx` 셋이고, 셋은 같은 토큰 정본을 읽습니다. site가 `@horon-ai/react`를 소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. `packages/flutter`는 Dart 패키지라 `package.json`이 없어 bun 워크스페이스 밖에 있고, `dart`·`flutter` 명령으로 검사합니다. `packages/lynx`는 `@horon-ai/react`의 84개 컴포넌트를 ReactLynx로 옮긴 포트로, `test/parity.test.ts`가 두 패키지의 슬러그·export 이름·variant 리터럴을 대조합니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다.
 
 ```tsx
 import { Button, Card, Input } from "@horon-ai/react";

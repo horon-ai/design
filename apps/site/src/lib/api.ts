@@ -1,12 +1,12 @@
 /**
  * Reads the library's own source to document an API instead of duplicating it.
  *
- * The page renders a props table, an import line and the Flutter class names,
- * and each of those has exactly one source of truth: `packages/react/src/
- * components/<slug>.tsx` and `packages/flutter/lib/src/components/<slug>.dart`.
- * A TypeScript program over the package entry point resolves default values,
- * JSDoc and inherited prop groups, so a renamed prop breaks the docs build
- * rather than silently shipping a stale table.
+ * The page renders a props table and the import lines a reader copies, and each
+ * of those has exactly one source of truth: `packages/react/src/components/
+ * <slug>.tsx` for the table and the React line, `packages/lynx/src/components/
+ * <slug>.tsx` for the Lynx line. A TypeScript program over the package entry
+ * point resolves default values, JSDoc and inherited prop groups, so a renamed
+ * prop breaks the docs build rather than silently shipping a stale table.
  *
  * The program is built once per process and cached; each page asks for one
  * component out of it.
@@ -34,7 +34,7 @@ export interface ComponentApi {
 }
 
 const ENTRY = join("packages", "react", "src", "index.ts");
-const FLUTTER_DIR = join("packages", "flutter", "lib", "src", "components");
+const LYNX_DIR = join("packages", "lynx", "src", "components");
 /** Long type strings are replaced by their alias so the table stays one line per row. */
 const MAX_TYPE_LENGTH = 120;
 /** An import line longer than this wraps one name per line. */
@@ -361,26 +361,33 @@ export function componentApi(slug: string): ComponentApi[] {
   return api;
 }
 
+/** One `import { … } from "<pkg>"` line, wrapped one name per line past the limit. */
+function importLine(names: string[], pkg: string): string {
+  const single = `import { ${names.join(", ")} } from "${pkg}";`;
+  if (single.length <= MAX_IMPORT_LENGTH) return single;
+  return ["import {", ...names.map((name) => `  ${name},`), `} from "${pkg}";`].join("\n");
+}
+
 /** The import line a reader copies: every PascalCase value export of the file. */
 export function reactImport(slug: string): string {
   const source = componentSource(slug);
   const names = source ? exportedComponentNames(source) : [];
 
   if (names.length === 0) return 'import * as horon from "@horon-ai/react";';
-  const single = `import { ${names.join(", ")} } from "@horon-ai/react";`;
-  if (single.length <= MAX_IMPORT_LENGTH) return single;
-  return ["import {", ...names.map((name) => `  ${name},`), '} from "@horon-ai/react";'].join("\n");
+  return importLine(names, "@horon-ai/react");
 }
 
-/** Public `Horon*` classes the Flutter package ships for this component. */
-export function flutterClasses(slug: string): string[] {
-  // Dart files are snake_case: `icon-button` lives in `icon_button.dart`.
-  const path = join(findRoot(), FLUTTER_DIR, `${slug.replaceAll("-", "_")}.dart`);
-  if (!existsSync(path)) return [];
+/**
+ * The Lynx import line for the same component, read from
+ * `packages/lynx/src/components/<slug>.tsx`. Empty when the port does not exist
+ * or the file exports nothing a caller can render.
+ */
+export function lynxImport(slug: string): string {
+  const path = join(findRoot(), LYNX_DIR, `${slug}.tsx`);
+  if (!existsSync(path)) return "";
 
-  const names: string[] = [];
-  for (const match of readFileSync(path, "utf8").matchAll(/^class (Horon[A-Za-z0-9_]+)/gm)) {
-    names.push(match[1]);
-  }
-  return names;
+  const source = ts.createSourceFile(path, readFileSync(path, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const names = exportedComponentNames(source);
+  if (names.length === 0) return "";
+  return importLine(names, "@horon-ai/lynx");
 }

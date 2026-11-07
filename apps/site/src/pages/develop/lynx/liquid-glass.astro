@@ -1,0 +1,27 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { lynxBreadcrumb } from "@/data/nav";
+import { lynxGlassMessages as m, lynxSnippets as s } from "@/i18n/messages/develop-lynx";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={lynxBreadcrumb(m.title, "/develop/lynx/liquid-glass")}
+>
+  <h2><T m={m.elementHeading} /></h2>
+  <p><T m={m.elementBody} /></p>
+  <p><T m={m.saturateNote} /></p>
+
+  <h2><T m={m.fallbackHeading} /></h2>
+  <p><T m={m.fallbackBody} /></p>
+
+  <h2><T m={m.hostHeading} /></h2>
+  <p><T m={m.hostBody} /></p>
+  <p><T m={m.contentNote} /></p>
+  <h3><T m={m.exampleHeading} /></h3>
+  <CodeBlock code={s.glassHost} lang="tsx" title="floating-bar.tsx" />
+</DocsLayout>

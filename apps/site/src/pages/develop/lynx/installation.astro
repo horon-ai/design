@@ -1,0 +1,46 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { lynxBreadcrumb } from "@/data/nav";
+import { lynxInstallationMessages as m, lynxSnippets as snippets } from "@/i18n/messages/develop-lynx";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={lynxBreadcrumb(m.title, "/develop/lynx/installation")}
+>
+  <h2><T m={m.packagesHeading} /></h2>
+  <p><T m={m.packagesBody} /></p>
+  <CodeBlock code={snippets.install} lang="bash" title="terminal" />
+
+  <h2><T m={m.devHeading} /></h2>
+  <p><T m={m.devBody} /></p>
+  <CodeBlock code={snippets.installDev} lang="bash" title="terminal" />
+
+  <h2><T m={m.tailwindHeading} /></h2>
+  <p><T m={m.tailwindBody} /></p>
+  <CodeBlock code={snippets.tailwindConfig} lang="js" title="tailwind.config.cjs" />
+  <p><T m={m.tailwindOrderNote} /></p>
+
+  <h2><T m={m.postcssHeading} /></h2>
+  <p><T m={m.postcssBody} /></p>
+  <CodeBlock code={snippets.postcssConfig} lang="js" title="postcss.config.cjs" />
+
+  <h2><T m={m.bundlerHeading} /></h2>
+  <p><T m={m.bundlerBody} /></p>
+  <CodeBlock code={snippets.lynxConfig} lang="ts" title="lynx.config.ts" />
+
+  <h2><T m={m.entryHeading} /></h2>
+  <p><T m={m.entryBody} /></p>
+  <CodeBlock code={snippets.entry} lang="tsx" title="index.tsx" />
+
+  <h2><T m={m.sourceHeading} /></h2>
+  <p><T m={m.sourceBody} /></p>
+
+  <h2><T m={m.checkHeading} /></h2>
+  <p><T m={m.checkBody} /></p>
+  <CodeBlock code={snippets.check} lang="tsx" title="check.tsx" />
+</DocsLayout>

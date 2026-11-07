@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 // main에 올라온 커밋으로 게시할 버전을 정합니다. publish.yml이 실행합니다.
 //
-// - 버전 라인(major.minor)은 packages/{tokens,react}/package.json이 정합니다. 두 값은 같아야 합니다.
+// - 버전 라인(major.minor)은 packages/{tokens,react,lynx}/package.json이 정합니다. 세 값은 같아야 합니다.
 // - npm에 아직 아무것도 없으면 `<라인>.0`(지금은 0.1.0)으로 시작합니다.
 // - 이미 게시된 버전이 있으면 PATCH만 하나 올립니다. npm의 라인과 package.json의 라인이
 //   다르면(MAJOR·MINOR 변경) 게시하지 않고 실패합니다.
-// - 직전 실행이 tokens만 올리고 react에서 실패했다면, 빠진 패키지만 같은 버전으로 채웁니다.
+// - 직전 실행이 일부 패키지만 올리고 도중에 실패했다면, 빠진 패키지만 같은 버전으로 채웁니다.
 //
 // 사용법: node .github/scripts/release-version.mjs [--write]
-//   --write  계산한 버전을 두 package.json에 적습니다(CI 작업 공간 안에서만, 커밋하지 않음).
+//   --write  계산한 버전을 세 package.json에 적습니다(CI 작업 공간 안에서만, 커밋하지 않음).
 // 결과 버전은 표준 출력 마지막 줄과, GITHUB_OUTPUT이 있으면 `version=` 줄로 남깁니다.
 
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
@@ -16,6 +16,7 @@ import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 const PACKAGES = [
 	{ name: "@horon-ai/tokens", file: "packages/tokens/package.json" },
 	{ name: "@horon-ai/react", file: "packages/react/package.json" },
+	{ name: "@horon-ai/lynx", file: "packages/lynx/package.json" },
 ];
 const REGISTRY = process.env.NPM_REGISTRY_URL ?? "https://registry.npmjs.org";
 const STABLE = /^(\d+)\.(\d+)\.(\d+)$/;
@@ -51,7 +52,7 @@ const [first] = manifests;
 for (const m of manifests) {
 	if (m.version !== first.version) {
 		fail(
-			`${first.name}(${first.version})와 ${m.name}(${m.version})의 package.json 버전이 다릅니다. 두 패키지는 같은 버전으로 게시합니다.`,
+			`${first.name}(${first.version})와 ${m.name}(${m.version})의 package.json 버전이 다릅니다. 세 패키지는 같은 버전으로 게시합니다.`,
 		);
 	}
 }

@@ -1,0 +1,6 @@
+{
+  "extends": ["../../.oxlintrc.json"],
+  "rules": {
+    "no-underscore-dangle": ["error", { "allow": ["__globalProps"] }]
+  }
+}

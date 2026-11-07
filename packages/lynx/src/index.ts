@@ -1,0 +1,127 @@
+/**
+ * Horon Design System for ReactLynx.
+ *
+ * The same 84 components as `@horon-ai/react`, with the same slugs, the same
+ * export names, the same variant literals and the same `@horon-ai/tokens`
+ * values, re-implemented with Lynx elements instead of DOM elements. Design
+ * tokens arrive as the Tailwind v3 class names react uses (`text-label-md`,
+ * `bg-glass-regular`, `rounded-xl`), so a ported component keeps its class list.
+ *
+ * Import everything from the barrel, or one component from its subpath:
+ *
+ * - `import { Button, Card, Input } from "@horon-ai/lynx"` re-exports every component.
+ * - `import { Button } from "@horon-ai/lynx/components/button"` resolves through the
+ *   `./components/*` export map, which keeps a bundle to the components it uses.
+ * - `import "@horon-ai/lynx/globals.css"` brings in the tokens and the motion, glass and
+ *   veil utilities; `src/styles/tokens.css` alone is the variable layer.
+ * - `import preset from "@horon-ai/lynx/tailwind-preset"` adds the token utilities to a
+ *   Tailwind v3 config, beside `@lynx-js/tailwind-preset`.
+ *
+ * Wrap the tree in `HoronProvider` for the palette and the platform type board, then
+ * read `useHoronTheme()` anywhere below it.
+ *
+ * @packageDocumentation
+ */
+export * from "./components/agent-activity";
+export * from "./components/agent-lane";
+export * from "./components/agent-lanes-timeline";
+export * from "./components/agent-panel";
+export * from "./components/agent-steering-panel";
+export * from "./components/approval-card";
+export * from "./components/avatar";
+export * from "./components/badge";
+export * from "./components/banner";
+export * from "./components/bot-instructions-panel";
+export * from "./components/bot-list-row";
+export * from "./components/bot-memory-panel";
+export * from "./components/bottom-sheet";
+export * from "./components/breadcrumb";
+export * from "./components/breadcrumb-header";
+export * from "./components/button";
+export * from "./components/calendar";
+export * from "./components/card";
+export * from "./components/chat-bubble";
+export * from "./components/chat-controls";
+export * from "./components/checkbox";
+export * from "./components/chip";
+export * from "./components/choice-card";
+export * from "./components/code-panel";
+export * from "./components/combobox";
+export * from "./components/command-palette";
+export * from "./components/composer";
+export * from "./components/data-table";
+export * from "./components/date-field";
+export * from "./components/dialog";
+export * from "./components/directory-card";
+export * from "./components/document-extract-panel";
+export * from "./components/empty-state";
+export * from "./components/field";
+export * from "./components/file-drop";
+export * from "./components/filter-bar";
+export * from "./components/flue-background";
+export * from "./components/horon-icon";
+export * from "./components/horon-wordmark";
+export * from "./components/icon-button";
+export * from "./components/input";
+export * from "./components/input-group";
+export * from "./components/integration-row";
+export * from "./components/kbd";
+export * from "./components/knowledge-base-panel";
+export * from "./components/liquid-glass";
+export * from "./components/list-detail";
+export * from "./components/marketplace-card";
+export * from "./components/mcp-server-row";
+export * from "./components/menu";
+export * from "./components/message-extras";
+export * from "./components/modal";
+export * from "./components/orchestrator-panel";
+export * from "./components/page-header";
+export * from "./components/plan-card";
+export * from "./components/plan-step";
+export * from "./components/plugin-row";
+export * from "./components/progress";
+export * from "./components/radio-group";
+export * from "./components/research-run-panel";
+export * from "./components/schedule";
+export * from "./components/segmented-control";
+export * from "./components/select";
+export * from "./components/settings-list";
+export * from "./components/sidebar";
+export * from "./components/skeleton";
+export * from "./components/slider";
+export * from "./components/source-row";
+export * from "./components/spinner";
+export * from "./components/split-button";
+export * from "./components/switch";
+export * from "./components/tab-bar";
+export * from "./components/tabs";
+export * from "./components/task-row";
+export * from "./components/textarea";
+export * from "./components/textarea-field";
+export * from "./components/toast";
+export * from "./components/tool-call";
+export * from "./components/tool-calls-header";
+export * from "./components/tool-permissions";
+export * from "./components/tooltip";
+export * from "./components/top-bar";
+export * from "./components/usage-meter";
+export * from "./components/workspace-menu";
+export * from "./hooks";
+export { HoronProvider, useHoronTheme, type ColorScheme, type ColorToken, type HoronProviderProps, type HoronTheme, type ThemePlatform } from "./provider";
+export { Icon, PHOSPHOR, iconNames, useIconColor, type IconColor, type IconName, type IconProps, type IconWeight } from "./icons";
+export { cn, type ClassValue } from "./lib/cn";
+export { evaluateMediaQuery, readViewport, type MediaSnapshot } from "./lib/media";
+export {
+  detectOs,
+  detectRuntime,
+  formatShortcut,
+  isModKey,
+  matchesShortcut,
+  readNavigator,
+  type Os,
+  type PlatformInput,
+  type Runtime,
+  type RuntimeWindow,
+  type ShortcutEvent,
+} from "./lib/platform";
+export type { ControlSize } from "./lib/size";
