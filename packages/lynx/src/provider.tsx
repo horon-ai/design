@@ -118,6 +118,10 @@ export function HoronProvider({ scheme = "light", platform = "web", reducedMotio
     "flex-col",
     "w-full",
     "h-full",
+    // React paints this on `body` from the same token; Lynx has no document, so
+    // the provider root is what the palette's background lands on and dark mode
+    // does not leave white text on a white page.
+    "bg-bg-default",
     resolved === "dark" ? "dark" : "horon-light",
     `horon-platform-${platform}`,
     reducedMotion ? "horon-reduced-motion" : "",
