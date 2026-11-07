@@ -6,7 +6,7 @@
  */
 import type { Localized } from "@/i18n";
 import { componentGroups, components } from "@/data/components";
-import { foundationsNav, primaryNav } from "@/data/nav";
+import { developNav, foundationsNav, primaryNav } from "@/data/nav";
 import { siteHref } from "@/lib/urls";
 
 export interface SearchEntry {
@@ -31,6 +31,11 @@ export const searchIndex: SearchEntry[] = [
     title: item.label,
     href: siteHref(item.href),
     group: { ko: "Foundations", en: "Foundations" },
+  })),
+  ...developNav.map((item) => ({
+    title: item.label,
+    href: siteHref(item.href),
+    group: { ko: "Develop", en: "Develop" },
   })),
   ...docPages.map((item) => ({
     title: item.label,

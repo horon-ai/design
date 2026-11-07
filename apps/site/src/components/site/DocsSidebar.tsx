@@ -2,7 +2,7 @@
  * The docs section sidebar.
  *
  * Desktop (`lg` and up) is the library `Sidebar` (plain surface, the layout's own
- * color) fixed to the left edge under the header and scrolling on its own: one
+ * color), sticky in the docs frame's first column under the header and scrolling on its own: one
  * `SidebarGroup` per block, one `SidebarItem` per entry. Below `lg`
  * the same blocks collapse under a single `SidebarGroup` disclosure so the
  * navigation does not push the page title down.
@@ -15,7 +15,7 @@ import { Fragment, useLayoutEffect, useRef } from "react";
 import { Sidebar, SidebarGroup, SidebarItem } from "@horon-ai/react";
 
 import { componentGroups, componentsInGroup } from "@/data/components";
-import { foundationsNav, isActive, primaryNav } from "@/data/nav";
+import { developNav, foundationsNav, isActive, primaryNav } from "@/data/nav";
 import { siteHref } from "@/lib/urls";
 import { pick, type Locale, type Localized } from "@/i18n";
 import { docsMessages } from "@/i18n/messages/docs";
@@ -58,6 +58,22 @@ export function docsSidebarBlocks(section: string, currentPath: string): DocsSid
           href: item.href,
           current: item.href === "/foundations" ? currentPath === "/foundations" : isActive(currentPath, item.href),
         })),
+      },
+    ];
+  }
+
+  if (section === "develop") {
+    return [
+      {
+        key: "develop",
+        entries: [
+          { label: docsMessages.overview, href: "/develop", current: currentPath === "/develop" },
+          ...developNav.map((item) => ({
+            label: item.label,
+            href: item.href,
+            current: isActive(currentPath, item.href),
+          })),
+        ],
       },
     ];
   }
@@ -143,20 +159,19 @@ export default function DocsSidebar({ section, currentPath }: DocsSidebarProps) 
     <>
       <div
         ref={scroller}
-        className="hidden lg:fixed lg:top-(--site-header-h) lg:bottom-0 lg:left-0 lg:z-10 lg:block lg:w-60 lg:overflow-y-auto lg:pl-[env(safe-area-inset-left)]"
+        className="hidden lg:sticky lg:top-(--site-header-h) lg:block lg:h-[calc(100dvh-var(--site-header-h))] lg:w-60 lg:shrink-0 lg:overflow-y-auto lg:pl-[env(safe-area-inset-left)]"
       >
-        <Sidebar aria-label={label} surface="plain" className="min-h-full w-full">
+        <Sidebar aria-label={label} surface="plain" className="min-h-full w-full border-r-0">
           {blocks.map((block) => renderBlock(block, true))}
         </Sidebar>
       </div>
 
-      {/* Below `lg` the section list is one disclosure above the page title. The gutter
-       * matches `.site-shell` (1.25rem, 1.5rem from md) so the trigger lines up with the
-       * breadcrumb under it, and the narrow range trades 4px of vertical padding for the
-       * title: the collapsed row then costs 50px instead of 58px before the breadcrumb.
-       * From `md` up the original spacing and label return, so the 768px render is
-       * unchanged. */}
-      <nav aria-label={label} className="px-5 pt-2 pb-0 md:px-6 md:pt-3 md:pb-1 lg:hidden">
+      {/* Below `lg` the section list is one disclosure above the page title. The
+       * trigger has 10px of its own inline padding, so the nav gutter is the article
+       * gutter (1.25rem, 1.5rem from md) minus 10px: the label then starts on the
+       * breadcrumb's left edge. The narrow range trades 4px of vertical padding for
+       * the title. */}
+      <nav aria-label={label} className="px-2.5 pt-2 pb-0 md:px-3.5 md:pt-3 md:pb-1 lg:hidden">
         <SidebarGroup label={pick(docsMessages.tocLabel, locale)} defaultOpen={false}>
           {blocks.map((block) =>
             renderBlock(

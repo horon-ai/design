@@ -1,39 +1,17 @@
 ---
 import ComponentGroupSection from "@/components/site/ComponentGroupSection.astro";
-import T from "@/components/i18n/T.astro";
-import { componentCount, componentGroups } from "@/data/components";
-import { fill } from "@/i18n/messages/fill";
+import { componentGroups } from "@/data/components";
 import { componentsIndexMessages as m } from "@/i18n/messages/components-index";
 import DocsLayout from "@/layouts/DocsLayout.astro";
-import { demoCount } from "@/lib/demos";
-
-const title = fill(m.title, { count: componentCount });
-const stats = [
-  { label: m.statTotal, value: componentCount },
-  { label: m.statPreviews, value: demoCount() },
-  { label: m.statGroups, value: componentGroups.length },
-];
 ---
 
 <DocsLayout
-  title={title}
+  title={m.title}
   section="components"
   description={m.description}
+  wide
 >
-  <p><T m={m.lead} /></p>
-
-  <dl class="mt-10 flex flex-wrap gap-x-10 gap-y-4">
-    {
-      stats.map((stat) => (
-        <div>
-          <dt class="text-caption text-text-secondary"><T m={stat.label} /></dt>
-          <dd class="mt-1 text-title-md text-text-primary">{stat.value}</dd>
-        </div>
-      ))
-    }
-  </dl>
-
-  <div class="space-y-16 pt-12">
+  <div class="space-y-16">
     {componentGroups.map((group) => <ComponentGroupSection group={group} />)}
   </div>
 </DocsLayout>

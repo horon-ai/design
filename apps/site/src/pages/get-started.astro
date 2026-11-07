@@ -1,71 +1,63 @@
 ---
 import T from "@/components/i18n/T.astro";
-import CodeBlock from "@/components/site/CodeBlock.astro";
-import { ComponentCard } from "@/components/site/ComponentCard";
+import LinkTile from "@/components/site/LinkTile.astro";
 import { componentCount } from "@/data/components";
 import { externalLinks } from "@/data/nav";
+import type { Localized } from "@/i18n";
 import { fill } from "@/i18n/messages/fill";
-import { getStartedMessages as m, getStartedSnippets as snippets } from "@/i18n/messages/get-started";
+import { getStartedMessages as m } from "@/i18n/messages/get-started";
 import { siteHref } from "@/lib/urls";
 import DocsLayout from "@/layouts/DocsLayout.astro";
 
-// The page follows the shape other design system docs share: pick a path,
-// install, explore the guides, then where to get help.
-const paths = [
-  { href: "/foundations", title: m.designPathTitle, description: m.designPathBody },
-  { href: "#install", title: m.developPathTitle, description: m.developPathBody },
-  { href: "/llms.txt", title: m.aiPathTitle, description: m.aiPathBody },
-];
-
-const guides = [
-  { href: "/foundations", title: m.foundationsTitle, description: m.foundationsBody },
-  { href: "/foundations/tokens", title: m.tokensTitle, description: m.tokensBody },
-  { href: "/components", title: m.componentsTitle, description: fill(m.componentsBody, { count: componentCount }) },
-  { href: "/mascot", title: m.mascotTitle, description: m.mascotBody },
-];
-
 const github = externalLinks.find((link) => link.href.includes("github.com"))?.href ?? "https://github.com/horon-ai/design";
-const help = [
-  { href: github, title: m.githubTitle, description: m.githubBody },
-  { href: "/updates", title: m.updatesTitle, description: m.updatesBody },
+
+const sections: { title: Localized; links: { href: string; title: Localized; description: Localized }[] }[] = [
+  {
+    title: m.systemTitle,
+    links: [
+      { href: "/foundations", title: m.foundationsTitle, description: m.foundationsBody },
+      { href: "/components", title: m.componentsTitle, description: fill(m.componentsBody, { count: componentCount }) },
+      { href: "/mascot", title: m.mascotTitle, description: m.mascotBody },
+    ],
+  },
+  {
+    title: m.developTitle,
+    links: [
+      { href: "/develop/react", title: m.reactTitle, description: m.reactBody },
+      { href: "/develop/flutter", title: m.flutterTitle, description: m.flutterBody },
+      { href: "/llms.txt", title: m.aiTitle, description: m.aiBody },
+    ],
+  },
+  {
+    title: m.helpTitle,
+    links: [
+      { href: github, title: m.githubTitle, description: m.githubBody },
+      { href: "/updates", title: m.updatesTitle, description: m.updatesBody },
+    ],
+  },
 ];
 ---
 
 <DocsLayout title={m.title} description={m.description} section="get-started">
-  <h2><T m={m.pathsTitle} /></h2>
-  <div class="grid gap-4 sm:grid-cols-3">
-    {paths.map((path) => <ComponentCard href={siteHref(path.href)} title={path.title} description={path.description} />)}
-  </div>
+  <h2><T m={m.whatTitle} /></h2>
+  <p><T m={m.whatBody} /></p>
 
-  <h2 id="install"><T m={m.installTitle} /></h2>
-  <p><T m={m.installNote} /></p>
-
-  <h3><T m={m.stepRepoTitle} /></h3>
-  <p><T m={m.stepRepoBody} /></p>
-  <CodeBlock code={snippets.repo} lang="bash" title="terminal" />
-
-  <h3><T m={m.stepStylesTitle} /></h3>
-  <p><T m={m.stepStylesBody} /></p>
-  <CodeBlock code={snippets.styles} lang="tsx" title="main.tsx" />
-
-  <h3><T m={m.stepUseTitle} /></h3>
-  <p><T m={m.stepUseBody} /></p>
-  <CodeBlock code={snippets.use} lang="tsx" title="example.tsx" />
-
-  <h3><T m={m.stepSiteTitle} /></h3>
-  <p><T m={m.stepSiteBody} /></p>
-  <CodeBlock code={snippets.site} lang="bash" title="terminal" />
-
-  <h2><T m={m.guidesTitle} /></h2>
-  <div class="grid gap-4 sm:grid-cols-2">
-    {guides.map((guide) => <ComponentCard href={siteHref(guide.href)} title={guide.title} description={guide.description} />)}
-  </div>
-
-  <h2><T m={m.boundariesTitle} /></h2>
-  <p><T m={m.boundariesBody} /></p>
-
-  <h2><T m={m.helpTitle} /></h2>
-  <div class="grid gap-4 sm:grid-cols-2">
-    {help.map((item) => <ComponentCard href={siteHref(item.href)} title={item.title} description={item.description} />)}
-  </div>
+  {
+    sections.map((section) => (
+      <>
+        <h2>
+          <T m={section.title} />
+        </h2>
+        <div class="not-prose grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {section.links.map((link) => (
+            <LinkTile
+              href={link.href.startsWith("http") ? link.href : siteHref(link.href)}
+              title={link.title}
+              description={link.description}
+            />
+          ))}
+        </div>
+      </>
+    ))
+  }
 </DocsLayout>

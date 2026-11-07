@@ -1,0 +1,79 @@
+---
+import { LiquidGlass } from "@horon-ai/react";
+
+export type FoundationThumbnailId = "tokens" | "color" | "typography" | "spacing" | "radius" | "glass";
+
+interface Props {
+  id: FoundationThumbnailId;
+}
+
+/* Static pictures for the Foundations overview, drawn on the 400×225
+ * `.thumb-canvas` from the same token classes the library uses, so every
+ * swatch, step and radius is the real value. */
+const { id } = Astro.props;
+const swatches = ["bg-sky-100", "bg-sky-300", "bg-sky-500", "bg-sky-700", "bg-sky-900"];
+const spaces = ["w-4", "w-8", "w-12", "w-16", "w-24"];
+const radii = ["rounded-xs", "rounded-lg", "rounded-full"];
+const tokens = ["--color-text-primary", "--radius-md", "--text-body-md"];
+---
+
+{
+  id === "tokens" && (
+    <div class="flex flex-col items-start gap-2">
+      {tokens.map((token) => (
+        <code class="rounded-md border border-border-default bg-bg-surface px-3 py-1.5 font-mono text-body-sm text-text-primary">
+          {token}
+        </code>
+      ))}
+    </div>
+  )
+}
+{
+  id === "color" && (
+    <div class="flex items-center gap-2">
+      {swatches.map((swatch) => (
+        <span class:list={["size-14 rounded-lg", swatch]} />
+      ))}
+    </div>
+  )
+}
+{
+  id === "typography" && (
+    <div class="flex items-end gap-6">
+      <span class="text-display-lg leading-none text-text-primary">Aa</span>
+      <div class="flex flex-col gap-1 pb-1">
+        <span class="text-title-md text-text-primary">Title</span>
+        <span class="text-body-md text-text-secondary">Body text</span>
+        <span class="text-caption text-text-secondary">Caption</span>
+      </div>
+    </div>
+  )
+}
+{
+  id === "spacing" && (
+    <div class="flex flex-col items-start gap-2.5">
+      {spaces.map((space) => (
+        <span class:list={["h-4 rounded-xs bg-sky-500/80", space]} />
+      ))}
+    </div>
+  )
+}
+{
+  id === "radius" && (
+    <div class="flex items-center gap-4">
+      {radii.map((radius) => (
+        <span class:list={["size-20 border-2 border-sky-500 bg-sky-500/10", radius]} />
+      ))}
+    </div>
+  )
+}
+{
+  id === "glass" && (
+    <div class="grid h-40 w-80 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--color-sky-100),var(--color-sky-400)_55%,var(--color-sky-700))] dark:bg-[linear-gradient(135deg,var(--color-sky-700),var(--color-sky-900)_55%,var(--color-sky-950))]">
+      <div class="relative isolate flex h-14 w-52 items-center justify-center rounded-full bg-glass-regular text-label-lg text-text-primary">
+        <LiquidGlass />
+        Liquid glass
+      </div>
+    </div>
+  )
+}

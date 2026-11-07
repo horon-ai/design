@@ -1,0 +1,23 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { developMessages as m, developSnippets as snippets } from "@/i18n/messages/develop";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout title={m.flutterTitle} description={m.flutterDescription} section="develop">
+  <h2><T m={m.installTitle} /></h2>
+  <p><T m={m.flutterInstallBody} /></p>
+  <CodeBlock code={snippets.flutterPubspec} lang="yaml" title="pubspec.yaml" />
+
+  <h2><T m={m.themeTitle} /></h2>
+  <p><T m={m.themeBody} /></p>
+  <CodeBlock code={snippets.flutterTheme} lang="dart" title="main.dart" />
+
+  <h2><T m={m.useTitle} /></h2>
+  <p><T m={m.flutterUseBody} /></p>
+  <CodeBlock code={snippets.flutterUse} lang="dart" title="home_screen.dart" />
+
+  <h2><T m={m.tokensTitle} /></h2>
+  <p><T m={m.tokensBody} /></p>
+</DocsLayout>

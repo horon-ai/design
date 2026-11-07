@@ -1,7 +1,10 @@
-import { ArrowElbowDownLeft, ArrowUp, Check, Lightning, Path, Pause, Play, X } from "@phosphor-icons/react";
+import { ArrowUp, Check, Lightning, Path, Pause, Play, X } from "@phosphor-icons/react";
 import { type ComponentProps, type CSSProperties, type ReactNode, useState } from "react";
 
+import { useDevice } from "../hooks/use-device";
+import { usePlatform } from "../hooks/use-platform";
 import { cn } from "../lib/cn";
+import { isModKey } from "../lib/platform";
 import { Kbd } from "./kbd";
 import { Spinner } from "./spinner";
 
@@ -33,7 +36,7 @@ export type AgentSteeringPanelProps = Omit<ComponentProps<"section">, "className
   notes?: SteeringNote[];
   onApplyNow?: (id: string) => void;
   onRemoveNote?: (id: string) => void;
-  /** Called with the text typed in the steer box: Enter queues it for the next step, ⌘Enter interrupts now. */
+  /** Called with the text typed in the steer box: Enter queues it for the next step, Mod+Enter interrupts now. */
   onSteer?: (text: string, interrupt: boolean) => void;
   placeholder?: string;
   className?: string;
@@ -135,6 +138,8 @@ export function AgentSteeringPanel({
   ...props
 }: AgentSteeringPanelProps) {
   const [draft, setDraft] = useState("");
+  const { os } = usePlatform();
+  const { keyboardHints } = useDevice();
   const queued = notes.filter((note) => !note.applied);
   const submit = (interrupt: boolean) => {
     const text = draft.trim();
@@ -236,7 +241,7 @@ export function AgentSteeringPanel({
               if (event.nativeEvent.isComposing || event.keyCode === 229) return;
               if (event.key === "Enter") {
                 event.preventDefault();
-                submit(event.metaKey || event.ctrlKey);
+                submit(isModKey(event, os));
               }
             }}
             placeholder={placeholder}
@@ -253,21 +258,18 @@ export function AgentSteeringPanel({
           </button>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-caption text-text-secondary">
-          <span className="flex items-center gap-1.25">
-            <Kbd>
-              <ArrowElbowDownLeft aria-hidden />
-            </Kbd>
-            next step
-          </span>
-          <span className="flex items-center gap-1.25">
-            <Kbd>⌘</Kbd>
-            <Kbd>
-              <ArrowElbowDownLeft aria-hidden />
-            </Kbd>
-            interrupt now
-          </span>
-        </div>
+        {keyboardHints && (
+          <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-caption text-text-secondary">
+            <span className="flex items-center gap-1.25">
+              <Kbd keys="Enter" />
+              next step
+            </span>
+            <span className="flex items-center gap-1.25">
+              <Kbd keys="Mod+Enter" />
+              interrupt now
+            </span>
+          </div>
+        )}
       </div>
     </section>
   );

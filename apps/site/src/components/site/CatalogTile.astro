@@ -1,0 +1,24 @@
+---
+import T from "@/components/i18n/T.astro";
+import type { Localized } from "@/i18n";
+
+interface Props {
+  href: string;
+  title: Localized;
+}
+
+const { href, title } = Astro.props;
+---
+
+{/* One catalog entry, shared by the Components and Foundations overviews: a plain
+    16:9 thumbnail with the title link under it. The slot is static HTML drawn on
+    the fixed 400×225 `.thumb-canvas`; it never hydrates, and `inert` keeps it out
+    of the tab order so the title link (stretched over the tile) is the only target. */}
+<li class="group relative min-w-0">
+  <div class="thumb-tile" aria-hidden="true" inert>
+    <div class="thumb-canvas"><slot /></div>
+  </div>
+  <a href={href} class="mt-3 block text-title-sm text-text-primary no-underline after:absolute after:inset-0">
+    <T m={title} />
+  </a>
+</li>

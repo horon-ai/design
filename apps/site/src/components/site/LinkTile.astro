@@ -1,0 +1,35 @@
+---
+import { ArrowRight } from "@phosphor-icons/react";
+
+import T from "@/components/i18n/T.astro";
+import type { Localized } from "@/i18n";
+
+interface Props {
+  href: string;
+  title: Localized;
+  description?: Localized;
+}
+
+const { href, title, description } = Astro.props;
+const external = /^https?:/.test(href);
+---
+
+{/* A plain filled link tile: no border, the title with an arrow, one line under
+    it. Shared by Get Started, Develop and the component paging so every docs
+    page links out the same way. */}
+<a
+  href={href}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noreferrer" : undefined}
+  class="motion-colors group flex min-w-0 flex-col gap-1 rounded-xl bg-bg-subtle px-5 py-4 text-text-primary no-underline hover:bg-bg-inset"
+>
+  <span class="flex items-center justify-between gap-3 text-label-lg">
+    <T m={title} />
+    <ArrowRight className="size-4 shrink-0 text-text-secondary transition-transform group-hover:translate-x-0.5" />
+  </span>
+  {description && (
+    <span class="text-body-sm text-text-secondary">
+      <T m={description} />
+    </span>
+  )}
+</a>

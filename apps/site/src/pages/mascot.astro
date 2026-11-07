@@ -1,6 +1,6 @@
 ---
-import { Button, Card, HoronWordmark } from "@horon-ai/react";
-import { createElement, Fragment, type ReactNode } from "react";
+import { Button, HoronWordmark } from "@horon-ai/react";
+import { Fragment } from "react";
 
 import T from "@/components/i18n/T.astro";
 import {
@@ -8,10 +8,8 @@ import {
   mascotImageUrl,
   mascotPalette,
   mascotSourceUrl,
-  mascotSpec,
   stateMascots,
 } from "@/data/mascots";
-import type { Localized } from "@/i18n";
 import { mascotMessages as m } from "@/i18n/messages/mascot";
 import DocsLayout from "@/layouts/DocsLayout.astro";
 
@@ -35,39 +33,16 @@ const swatchClass: Record<string, string> = {
 
 const rules = [m.rule1, m.rule2, m.rule3, m.rule4, m.rule5];
 
-/** React nodes for library props, using the same two-span markup as `T.astro`. */
-function localized(entry: Localized): ReactNode {
-  return createElement(
-    Fragment,
-    null,
-    createElement("span", { "data-locale-text": "ko", lang: "ko" }, entry.ko),
-    createElement("span", { "data-locale-text": "en", lang: "en" }, entry.en),
-  );
-}
-
 ---
 
 <DocsLayout title={m.pageTitle} description={m.description} section="mascot">
   <p><T m={m.body} /></p>
-  <dl class="flex flex-wrap gap-x-10 gap-y-4">
-    <div>
-      <dt class="text-caption text-text-secondary"><T m={m.specCuts} /></dt>
-      <dd class="mt-1 text-title-md text-text-primary">{mascotSpec.count}</dd>
-    </div>
-    <div>
-      <dt class="text-caption text-text-secondary"><T m={m.specSize} /></dt>
-      <dd class="mt-1 text-title-md text-text-primary">{mascotSpec.size}</dd>
-    </div>
-    <div>
-      <dt class="text-caption text-text-secondary"><T m={m.specFormat} /></dt>
-      <dd class="mt-1 text-label-lg text-text-primary"><T m={mascotSpec.format} /></dd>
-    </div>
-  </dl>
 
   <h2><T m={m.appliedTitle} /></h2>
   <p><T m={m.appliedBody} /></p>
-  <div class="grid gap-4 md:grid-cols-2">
-    <Card title={localized(m.lockupTitle)}>
+  <div class="grid items-start gap-4 md:grid-cols-2">
+    <section class="not-prose rounded-xl bg-bg-subtle p-6">
+      <h3 class="mb-4 text-label-lg text-text-primary"><T m={m.lockupTitle} /></h3>
       <div class="flex items-center gap-2.5">
         <img src={mascotImageUrl("face")} alt="" width="30" height="30" class="size-8 object-contain dark:rounded-full dark:bg-sky-100 dark:p-0.5" />
         <HoronWordmark />
@@ -89,9 +64,10 @@ function localized(entry: Localized): ReactNode {
           ))
         }
       </div>
-    </Card>
+    </section>
 
-    <Card title={localized(m.faviconTitle)}>
+    <section class="not-prose rounded-xl bg-bg-subtle p-6">
+      <h3 class="mb-4 text-label-lg text-text-primary"><T m={m.faviconTitle} /></h3>
       <div class="flex flex-wrap items-center gap-4">
         <img src="/icon.png" alt={m.faviconAlt.ko} width="64" height="64" class="size-16 rounded-lg" />
         <img src="/apple-icon.png" alt={m.appleIconAlt.ko} width="56" height="56" class="size-14 rounded-lg" />
@@ -109,7 +85,7 @@ function localized(entry: Localized): ReactNode {
         loading="lazy"
         class="mt-5 w-full rounded-md border border-border-default"
       />
-    </Card>
+    </section>
   </div>
 
   <h2><T m={m.paletteTitle} /></h2>

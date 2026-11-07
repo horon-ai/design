@@ -82,5 +82,18 @@ export * from "./components/tooltip";
 export * from "./components/top-bar";
 export * from "./components/usage-meter";
 export * from "./components/workspace-menu";
+export * from "./hooks";
 export { cn, type ClassValue } from "./lib/cn";
 export { mountCursorGhost, type CursorGhostOptions } from "./lib/cursor-ghost";
+export {
+  detectOs,
+  detectRuntime,
+  formatShortcut,
+  isModKey,
+  matchesShortcut,
+  type Os,
+  type PlatformInput,
+  type Runtime,
+  type RuntimeWindow,
+  type ShortcutEvent,
+} from "./lib/platform";

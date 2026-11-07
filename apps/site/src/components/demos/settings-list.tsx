@@ -1,8 +1,17 @@
-import { SettingsKey, SettingsKeys, SettingsList, SettingsRow, SettingsSwitch } from "@horon-ai/react";
+import {
+  formatShortcut,
+  SettingsKey,
+  SettingsKeys,
+  SettingsList,
+  SettingsRow,
+  SettingsSwitch,
+  usePlatform,
+} from "@horon-ai/react";
 
 import { Backdrop } from "../demo-backdrop";
 
 function Rows({ surface }: { surface: "solid" | "glass" }) {
+  const { os } = usePlatform();
   return (
     <SettingsList surface={surface} className="w-full max-w-120">
       <SettingsRow
@@ -21,7 +30,7 @@ function Rows({ surface }: { surface: "solid" | "glass" }) {
         description="Open the command palette from anywhere."
         control={
           <SettingsKeys>
-            <SettingsKey>⌘</SettingsKey>
+            <SettingsKey>{formatShortcut("Mod", os)}</SettingsKey>
             <SettingsKey>K</SettingsKey>
           </SettingsKeys>
         }

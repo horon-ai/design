@@ -45,6 +45,18 @@ export const shellMessages = defineMessages({
     ko: "테마 전환",
     en: "Switch theme",
   },
+  themeLabel: {
+    ko: "테마",
+    en: "Theme",
+  },
+  themeLight: {
+    ko: "라이트",
+    en: "Light",
+  },
+  themeDark: {
+    ko: "다크",
+    en: "Dark",
+  },
   language: {
     ko: "언어",
     en: "Language",

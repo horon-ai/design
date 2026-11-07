@@ -1,7 +1,7 @@
 import { type ComponentProps, type ReactNode, useRef, useState } from "react";
 
 import { cn } from "../lib/cn";
-import { useActiveIndicator } from "../lib/use-active-indicator";
+import { useActiveIndicator } from "../hooks/use-active-indicator";
 
 export type FilterBarItem = {
   value: string;

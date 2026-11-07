@@ -2,7 +2,8 @@ import { CaretDown, Play } from "@phosphor-icons/react";
 import { type ComponentProps, type KeyboardEvent, type ReactNode, useRef, useState } from "react";
 
 import { cn } from "../lib/cn";
-import { useActiveIndicator } from "../lib/use-active-indicator";
+import { useActiveIndicator } from "../hooks/use-active-indicator";
+import { useDevice } from "../hooks/use-device";
 import { Kbd } from "./kbd";
 
 type WithClass<T> = Omit<T, "className"> & { className?: string };
@@ -174,6 +175,7 @@ export function BotInstructionsPanel({
   const [tab, setTab] = useState("instructions");
   const [scenario, setScenario] = useState(defaultScenario ?? scenarios?.[0]);
   const [runCount, setRunCount] = useState(0);
+  const { keyboardHints } = useDevice();
 
   return (
     <section
@@ -342,7 +344,9 @@ export function BotInstructionsPanel({
               >
                 <Play aria-hidden className="size-3.5" />
                 Run
-                <Kbd className="bg-bg-surface-6 text-text-inverse/80">⌘↵</Kbd>
+                {keyboardHints && (
+                  <Kbd keys="Mod+Enter" className="bg-bg-surface-6 text-text-inverse/80" />
+                )}
               </button>
             </div>
           </div>

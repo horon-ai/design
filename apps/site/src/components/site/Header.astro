@@ -15,13 +15,15 @@ const pathname = Astro.url.pathname;
   class="sticky top-0 z-50 overflow-x-clip border-b border-glass-rim-strong bg-glass-regular pt-[env(safe-area-inset-top)]"
 >
   <LiquidGlass />
-  <div class="site-shell relative flex h-16 items-center gap-3 lg:h-18">
+  {/* Full-bleed like a docs app: the brand sits on the sidebar's left edge, the
+   * section nav is centered on the viewport (`1fr auto 1fr`), actions sit on the right. */}
+  <div class="site-bar relative flex h-16 items-center gap-3 lg:grid lg:h-18 lg:grid-cols-[1fr_auto_1fr]">
     {/* The brand link stays in Astro: it is plain navigation with no client
      * state, and the library has no lockup component that carries the wordmark. */}
     <a
       href="/"
       aria-label={m.home.ko}
-      class="flex shrink-0 items-center gap-2.5 text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+      class="flex shrink-0 items-center gap-2.5 justify-self-start text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
     >
       <HoronIcon size={24} />
       <HoronWordmark title="" aria-hidden="true" className="h-5 w-auto lg:h-6" />

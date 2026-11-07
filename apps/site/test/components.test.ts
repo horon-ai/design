@@ -4,6 +4,7 @@ import { components } from "../src/data/components";
 
 const componentsDir = `${import.meta.dir}/../../../packages/react/src/components`;
 const demosDir = `${import.meta.dir}/../src/components/demos`;
+const thumbnailsDir = `${import.meta.dir}/../src/components/thumbnails`;
 
 const listFiles = (dir: string, pattern: string): string[] => [...new Bun.Glob(pattern).scanSync(dir)].toSorted();
 
@@ -11,6 +12,7 @@ const withoutExtension = (file: string) => file.replace(/\.tsx$/, "");
 
 const componentSlugs = listFiles(componentsDir, "*.tsx").map(withoutExtension);
 const demoSlugs = listFiles(demosDir, "*.tsx").map(withoutExtension);
+const thumbnailSlugs = listFiles(thumbnailsDir, "*.tsx").map(withoutExtension);
 const catalogSlugs = components.map((component) => component.slug);
 
 describe("docs site coverage", () => {
@@ -22,6 +24,10 @@ describe("docs site coverage", () => {
     for (const slug of componentSlugs) {
       expect(demoSlugs).toContain(slug);
     }
+  });
+
+  test("every catalog entry has an index thumbnail and no thumbnail is orphaned", () => {
+    expect(thumbnailSlugs.toSorted()).toEqual(catalogSlugs.toSorted());
   });
 
   test("every component has a catalog entry", () => {

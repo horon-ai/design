@@ -56,8 +56,10 @@ export interface SiteFooterProps {
 /**
  * Site footer: the website's footer band. The band paints `bg-bg-subtle` with a
  * top border, the wordmark is set at `h-8`, the brand line is the brand link,
- * and each column carries a mono uppercase label. `.site-shell` supplies the
- * page measure and safe insets; `.site-footer` adds the bottom home-indicator
+ * and each column carries a mono uppercase label. The band is full-bleed like
+ * the header; `.site-bar` caps the row at `--site-max` with the header's gutter,
+ * so the content lines up with the logo and the docs frame. `.site-footer` adds
+ * the bottom home-indicator
  * inset. Rendered statically (no client island) — links are library link
  * Buttons and the text carries both locales.
  */
@@ -66,7 +68,7 @@ export function SiteFooter({ year }: SiteFooterProps) {
 
   return (
     <footer className="site-footer mt-12 border-t border-border-default bg-bg-subtle lg:mt-16">
-      <div className="site-shell flex flex-col gap-8 pt-10 pb-6">
+      <div className="site-bar flex flex-col gap-8 pt-10 pb-6">
         <div className="flex flex-col gap-10 md:flex-row md:justify-between">
           <div className="flex flex-col gap-4">
             <Button

@@ -10,6 +10,9 @@
    * sticky rails) reads this instead of repeating a pixel value. */
   :root {
     --site-header-h: calc(4rem + env(safe-area-inset-top));
+    /* The outer frame shared by the header row and the docs frame (sidebar,
+     * article, TOC). Wider screens center it instead of stretching. */
+    --site-max: 90rem;
   }
 
   @media (min-width: 1024px) {
@@ -67,6 +70,50 @@
     }
   }
 
+  /* The header row: the background stays full-bleed on `<header>`, the row is
+   * capped at `--site-max` and centered with the docs frame below it. Small
+   * screens share the shell gutter; from `lg` the gutter matches the docs
+   * sidebar's item inset, so the logo lines up with the sidebar column. */
+  .site-bar {
+    width: 100%;
+    max-width: var(--site-max);
+    margin-inline: auto;
+    padding-inline: calc(1.25rem + env(safe-area-inset-left)) calc(1.25rem + env(safe-area-inset-right));
+  }
+
+  @media (min-width: 768px) {
+    .site-bar {
+      padding-inline: calc(1.5rem + env(safe-area-inset-left)) calc(1.5rem + env(safe-area-inset-right));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site-bar {
+      /* 1.375rem = the sidebar's 12px inset plus its 10px item padding, so the
+       * logo starts on the same x as the sidebar labels. */
+      padding-inline: calc(1.375rem + env(safe-area-inset-left)) calc(1.375rem + env(safe-area-inset-right));
+    }
+  }
+
+  /* The docs article beside the sidebar. It fills the remaining width; the
+   * gutter matches the shell below `lg` so the mobile section disclosure and
+   * the breadcrumb line up, and widens to 2rem beside the sidebar. */
+  .docs-main {
+    padding: 2.5rem calc(1.25rem + env(safe-area-inset-right)) 4rem calc(1.25rem + env(safe-area-inset-left));
+  }
+
+  @media (min-width: 768px) {
+    .docs-main {
+      padding-inline: calc(1.5rem + env(safe-area-inset-left)) calc(1.5rem + env(safe-area-inset-right));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .docs-main {
+      padding: 3.5rem 2rem 5rem;
+    }
+  }
+
   /* Vertical rhythm for a top-level band of the page. Components inside keep
    * their own gaps; this only owns the distance between bands. */
   .site-band {
@@ -119,15 +166,9 @@
      * every descendant keeps that width inside the frame instead of pushing
      * the document wide. An element that owns a horizontal scroller still
      * scrolls: capping the box does not cap its content, so `CodePanel`, the
-     * data table and the filter bar keep their intended overflow.
-     * Index previews are excluded because `.demo-fit` scales them by transform
-     * to their 16:9 tile already. */
+     * data table and the filter bar keep their intended overflow. */
     .demo-stage :where(*) {
       max-width: 100%;
-    }
-
-    .demo-tile .demo-stage :where(*) {
-      max-width: none;
     }
   }
 
@@ -147,35 +188,63 @@
     justify-content: center;
   }
 
-  /* Index previews are cropped to 16:9 on their own surface; no library component owns that frame. */
-  .demo-tile {
-    position: relative;
+  /* The overview grid shared by Components and Foundations: one column, two from
+   * `sm`, three from `xl`. It resets list styling because prose would add bullets. */
+  .catalog-grid {
     display: grid;
-    place-items: center;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    padding: calc(var(--spacing) * 6);
-    border-radius: var(--radius-sm);
-    background: color-mix(in oklab, var(--color-bg-subtle) 60%, transparent);
+    grid-template-columns: minmax(0, 1fr);
+    gap: calc(var(--spacing) * 8) calc(var(--spacing) * 6);
+    padding: 0;
+    list-style: none;
   }
 
-  /* ComponentGroupSection scales each preview through --demo-fit; this is the box the script transforms. */
-  .demo-fit {
+  @media (min-width: 640px) {
+    .catalog-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .catalog-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* Catalog thumbnails sit on a plain 16:9 surface with no border or card
+   * chrome; the title below is the link. Thumbnails are authored for a fixed
+   * 400×225 canvas, and the canvas scales with the tile: `tan(atan2(a, b))`
+   * is a/b as a plain number, so the scale follows the tile width in CSS alone
+   * and no script measures anything. */
+  .thumb-tile {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: var(--color-bg-subtle);
+    container-type: inline-size;
+    transition: background-color 160ms var(--ease-out-quint);
+  }
+
+  .group:hover .thumb-tile {
+    background: var(--color-bg-inset);
+  }
+
+  .thumb-canvas {
+    --thumb-scale: tan(atan2(100cqw, 400px));
     position: absolute;
     top: 50%;
     left: 50%;
-    width: max-content;
-    max-width: 40rem;
-    transform: translate(-50%, -50%) scale(var(--demo-fit, 0.7));
-    transform-origin: center;
+    display: grid;
+    place-items: center;
+    width: 400px;
+    height: 225px;
+    translate: -50% -50%;
+    scale: var(--thumb-scale);
+    transition: scale 600ms var(--ease-out-quint);
   }
 
-  /* Inside a tile the stage has nothing to supply: the tile owns surface, ratio and padding. */
-  .demo-tile .demo-stage {
-    min-height: 0;
-    padding: 0;
-    border-radius: 0;
-    background: transparent;
+  .group:hover .thumb-canvas {
+    scale: calc(var(--thumb-scale) * 1.04);
   }
 
   /* DocsLayout wraps page prose in this slot, so headings, lists and inline code are styled by descendant selectors no library component exposes; every value below is a token. */
@@ -192,7 +261,9 @@
     margin-top: var(--paragraph-body-md);
   }
 
-  .prose-docs h2:not(.demo-stage *) {
+  /* Headings inside a demo stage or a `.not-prose` block (catalog thumbnails,
+   * release cards) keep the library's own typography and spacing. */
+  .prose-docs h2:not(:is(.demo-stage, .not-prose) *) {
     margin-top: calc(var(--spacing) * 16);
     margin-bottom: calc(var(--spacing) * 6);
     font-size: var(--text-title-md);
@@ -207,7 +278,7 @@
     margin-top: 0;
   }
 
-  .prose-docs h3:not(.demo-stage *) {
+  .prose-docs h3:not(:is(.demo-stage, .not-prose) *) {
     margin-top: calc(var(--spacing) * 10);
     margin-bottom: calc(var(--spacing) * 4);
     font-size: var(--text-title-sm);
@@ -217,8 +288,8 @@
   }
 
   /* Headings keep the ink colour of the surrounding prose; the library only sets it on its own components. */
-  .prose-docs h2:not(.demo-stage *),
-  .prose-docs h3:not(.demo-stage *) {
+  .prose-docs h2:not(:is(.demo-stage, .not-prose) *),
+  .prose-docs h3:not(:is(.demo-stage, .not-prose) *) {
     color: var(--color-text-primary);
   }
 
@@ -236,22 +307,23 @@
     text-underline-offset: calc(var(--spacing) * 0.75);
   }
 
-  /* Preflight strips list markers and indentation; document lists keep both. */
-  .prose-docs ul,
-  .prose-docs ol {
+  /* Preflight strips list markers and indentation; document lists keep both.
+   * Lists that are layout (`.not-prose`: catalog grids, release cards) and the
+   * lists inside them keep the library's reset. */
+  .prose-docs :is(ul, ol):not(.not-prose, .not-prose *) {
     padding-left: calc(var(--spacing) * 5);
   }
 
-  .prose-docs ul {
+  .prose-docs ul:not(.not-prose, .not-prose *) {
     list-style: disc;
   }
 
-  .prose-docs ol {
+  .prose-docs ol:not(.not-prose, .not-prose *) {
     list-style: decimal;
   }
 
   /* Items need a tighter gap than the block rhythm. */
-  .prose-docs li + li {
+  .prose-docs :is(ul, ol):not(.not-prose, .not-prose *) > li + li {
     margin-top: calc(var(--spacing) * 1.5);
   }
 

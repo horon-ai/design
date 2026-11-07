@@ -1,4 +1,5 @@
 import {
+  formatShortcut,
   HoronIcon,
   HoronWordmark,
   Menu,
@@ -18,6 +19,7 @@ import {
   SidebarProjectTile,
   SidebarSpacer,
   SidebarWorkspaceSwitch,
+  usePlatform,
   WorkspaceMenu,
 } from "@horon-ai/react";
 import {
@@ -98,6 +100,7 @@ function ProjectMenu() {
 export function DemoSidebar({ background }: { background?: ReactNode }) {
   const [workspace, setWorkspace] = useState("hq");
   const current = workspaces.find((item) => item.id === workspace) ?? workspaces[0];
+  const { os } = usePlatform();
   return (
     <Sidebar resizable className={background ? "isolate h-190" : "h-190"}>
       {background}
@@ -147,7 +150,7 @@ export function DemoSidebar({ background }: { background?: ReactNode }) {
         <MenuTrigger render={<SidebarAccount initials="AL" name="Alpox" email="alpoxdev@gmail.com" />} />
         <MenuContent surface="solid" side="top" className="w-64">
           <MenuLabel className="pb-1.5 text-body-sm">alpoxdev@gmail.com</MenuLabel>
-          <MenuItem icon={<GearSix />} trailing="⌘,">
+          <MenuItem icon={<GearSix />} trailing={formatShortcut("Mod+,", os)}>
             Settings
           </MenuItem>
           <MenuItem icon={<Drop />}>Usage</MenuItem>

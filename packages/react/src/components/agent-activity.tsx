@@ -1,6 +1,7 @@
 import { CaretDown, CaretRight, CheckCircle, WarningCircle, Wrench } from "@phosphor-icons/react";
 import { type ComponentProps, type ReactNode, useEffect, useRef, useState } from "react";
 
+import { useReducedMotion } from "../hooks/use-reduced-motion";
 import { cn } from "../lib/cn";
 import { Spinner } from "./spinner";
 
@@ -37,7 +38,7 @@ function codePointEnd(text: string, end: number): number {
  * bursty chunks read as steady typing; otherwise, and under reduced motion, everything shows at once.
  * Text that no longer extends what was shown (a rewrite) restarts from the shared prefix.
  */
-function useRevealedLength(text: string, smooth: boolean): number {
+function useRevealedLength(text: string, smooth: boolean, reducedMotion: boolean): number {
   const [shown, setShown] = useState(text.length);
   const shownRef = useRef(text.length);
   const previous = useRef(text);
@@ -54,7 +55,7 @@ function useRevealedLength(text: string, smooth: boolean): number {
     while (shared < start && text[shared] === before[shared]) shared++;
     start = shared;
 
-    if (!smooth || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (!smooth || reducedMotion) {
       set(text.length);
       return undefined;
     }
@@ -73,7 +74,7 @@ function useRevealedLength(text: string, smooth: boolean): number {
       if (length < text.length) frame = requestAnimationFrame(tick);
     });
     return () => cancelAnimationFrame(frame);
-  }, [text, smooth]);
+  }, [text, smooth, reducedMotion]);
 
   return Math.min(shown, text.length);
 }
@@ -95,7 +96,8 @@ export type StreamingTextProps = Omit<ComponentProps<"div">, "className" | "chil
  * when it is complete, instead of every chunk.
  */
 export function StreamingText({ text, streaming = true, smooth = true, className, ...props }: StreamingTextProps) {
-  const shown = useRevealedLength(text, streaming && smooth);
+  const reducedMotion = useReducedMotion();
+  const shown = useRevealedLength(text, streaming && smooth, reducedMotion);
   const typing = shown < text.length;
   return (
     <div

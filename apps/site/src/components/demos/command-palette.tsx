@@ -1,4 +1,4 @@
-import { Button, CommandPalette, Kbd } from "@horon-ai/react";
+import { Button, CommandPalette, formatShortcut, Kbd, usePlatform } from "@horon-ai/react";
 import { Folder, Plus } from "@phosphor-icons/react";
 import { useState } from "react";
 
@@ -42,7 +42,7 @@ const groups = [
         label: "New bot",
         tile: <Plus />,
         tileClassName: "bg-overlay-ink-5 text-text-primary",
-        hint: <Kbd>⌘N</Kbd>,
+        hint: <Kbd keys="Mod+N" />,
       },
     ],
   },
@@ -56,12 +56,14 @@ const hints: [string, string][] = [
 export default function CommandPaletteDemo() {
   const [glassOpen, setGlassOpen] = useState(false);
   const [solidOpen, setSolidOpen] = useState(false);
+  const { os } = usePlatform();
+  const shortcut = formatShortcut("Mod+K", os);
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="flex flex-col items-center gap-4">
         <p className="text-caption text-text-secondary">Solid</p>
         <Button variant="solid" onClick={() => setSolidOpen(true)}>
-          Search ⌘K
+          Search {shortcut}
         </Button>
         <CommandPalette
           surface="solid"
@@ -75,7 +77,7 @@ export default function CommandPaletteDemo() {
       <Backdrop className="flex-col">
         <p className="text-caption text-text-secondary">Glass</p>
         <Button variant="glass" onClick={() => setGlassOpen(true)}>
-          Search ⌘K
+          Search {shortcut}
         </Button>
         <CommandPalette
           surface="glass"

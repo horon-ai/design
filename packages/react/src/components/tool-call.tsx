@@ -1,7 +1,8 @@
 import { Collapsible } from "@base-ui/react/collapsible";
 import { ArrowClockwise, CaretDown, Check, CheckCircle, Copy, WarningCircle } from "@phosphor-icons/react";
-import { useEffect, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
+import { useCopyToClipboard } from "../hooks/use-copy-to-clipboard";
 import { cn } from "../lib/cn";
 import { Button } from "./button";
 import { Spinner } from "./spinner";
@@ -91,12 +92,7 @@ function Section({
   copyText?: string;
   footer?: ReactNode;
 }) {
-  const [copied, setCopied] = useState(false);
-  useEffect(() => {
-    if (!copied) return undefined;
-    const timer = setTimeout(() => setCopied(false), 1500);
-    return () => clearTimeout(timer);
-  }, [copied]);
+  const { copied, copy } = useCopyToClipboard(1500);
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
       <div className="flex items-center gap-2 text-label-sm text-text-secondary">
@@ -105,12 +101,7 @@ function Section({
           <button
             type="button"
             aria-label={copied ? "Copied" : `Copy ${label.toLowerCase()}`}
-            onClick={() => {
-              navigator.clipboard?.writeText(copyText).then(
-                () => setCopied(true),
-                () => undefined,
-              );
-            }}
+            onClick={() => copy(copyText)}
             className="flex motion-press cursor-pointer items-center justify-center rounded-sm hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
           >
             {copied ? (

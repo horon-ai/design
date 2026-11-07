@@ -2,7 +2,7 @@ import { type ReactNode, useRef } from "react";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
-import { useActiveIndicator } from "../lib/use-active-indicator";
+import { useActiveIndicator } from "../hooks/use-active-indicator";
 import { LiquidGlass } from "./liquid-glass";
 
 export type TabBarItem = { value: string; label: string; icon: ReactNode };

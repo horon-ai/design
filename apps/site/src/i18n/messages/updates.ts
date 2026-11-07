@@ -4,9 +4,10 @@ import { defineMessages } from "@/i18n";
 export const updatesMessages = defineMessages({
   title: { ko: "Updates", en: "Updates" },
   description: {
-    ko: "디자인 시스템이 바뀐 기록입니다. 값이 바뀌었는지, 어떤 컴포넌트가 늘었는지 시간순으로 남깁니다.",
-    en: "A record of changes to the design system, newest first: which values changed and which components are new.",
+    ko: "Horon 디자인 시스템의 릴리스 노트입니다.",
+    en: "Release notes for the Horon Design System.",
   },
+  releaseNotesTitle: { ko: "Release Notes", en: "Release Notes" },
 
   brandTitle: { ko: "Brand 기준으로 이름과 문구 정리", en: "Name and copy aligned with the Brand guide" },
   brandItem1: {

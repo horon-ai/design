@@ -1,4 +1,14 @@
-import { Button, Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger } from "@horon-ai/react";
+import {
+  Button,
+  formatShortcut,
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuLabel,
+  MenuSeparator,
+  MenuTrigger,
+  usePlatform,
+} from "@horon-ai/react";
 import { ArrowsClockwise, Copy, Gear, Paperclip, SignOut, Trash, User } from "@phosphor-icons/react";
 
 import { Backdrop } from "../demo-backdrop";
@@ -6,11 +16,12 @@ import { Backdrop } from "../demo-backdrop";
 type Surface = "solid" | "glass";
 
 function ActionsMenu({ surface }: { surface: Surface }) {
+  const { os } = usePlatform();
   return (
     <Menu>
       <MenuTrigger render={<Button variant={surface === "glass" ? "glass" : "solid"} />}>Message actions</MenuTrigger>
       <MenuContent surface={surface}>
-        <MenuItem icon={<Copy />} trailing="⌘C">
+        <MenuItem icon={<Copy />} trailing={formatShortcut("Mod+C", os)}>
           Copy
         </MenuItem>
         <MenuItem icon={<ArrowsClockwise />}>Regenerate</MenuItem>
