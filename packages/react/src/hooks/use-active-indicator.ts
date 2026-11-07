@@ -21,9 +21,36 @@ export type IndicatorRect = {
  * `animate` turns true one frame after the first placement, so the indicator
  * lands in place instead of sliding in from 0,0.
  *
+ * Measuring happens in a layout effect, so a server render draws no indicator: `rect` starts `null`, and the
+ * first client pass places the item before paint while `animate` stays false.
+ *
  * @param track - Ref to the positioned track element that holds the items.
  * @param selector - CSS selector for the active item, queried inside the track; a missing item yields a null rect.
  * @returns The measured rect (or `null` before the first measurement) and an `animate` flag for the first frame.
+ *
+ * @example
+ * ```tsx
+ * import { useActiveIndicator } from "@horon-ai/react";
+ *
+ * function Tabs({ items, value }: { items: string[]; value: string }) {
+ *   const track = useRef<HTMLDivElement>(null);
+ *   const { rect, animate } = useActiveIndicator(track, '[aria-current="page"]');
+ *   return (
+ *     <div ref={track} className="relative flex gap-1">
+ *       {items.map((item) => (
+ *         <button key={item} aria-current={item === value ? "page" : undefined}>
+ *           {item}
+ *         </button>
+ *       ))}
+ *       <span
+ *         aria-hidden
+ *         className={animate ? "pointer-events-none absolute rounded-full motion-indicator" : "pointer-events-none absolute rounded-full"}
+ *         style={{ ...rect, opacity: rect ? 1 : 0 }}
+ *       />
+ *     </div>
+ *   );
+ * }
+ * ```
  */
 export function useActiveIndicator(track: RefObject<HTMLElement | null>, selector: string) {
   const [rect, setRect] = useState<IndicatorRect | null>(null);
