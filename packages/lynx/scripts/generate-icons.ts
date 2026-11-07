@@ -9,15 +9,17 @@
  * path.
  *
  * Sources of truth: the imports in `packages/react/src/**\/*.tsx` decide which
- * icons exist, and the `weight="..."` props on their JSX usages decide which
- * weights are needed for each icon (default `regular`). Run
- * `bun scripts/generate-icons.ts`.
+ * icons the components need, and the demo site's sources add the ones only a
+ * demo uses, because the gallery demos are ports of those same demos. The
+ * `weight="..."` props on their JSX usages decide which weights are needed for
+ * each icon (default `regular`). Run `bun scripts/generate-icons.ts`.
  */
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 const pkg = `${import.meta.dir}/..`;
 const reactSrc = `${pkg}/../react/src`;
+const appSrc = `${pkg}/../../apps/site/src`;
 const assets = `${pkg}/node_modules/@phosphor-icons/core/assets`;
 
 const WEIGHTS = ["thin", "light", "regular", "bold", "fill", "duotone"] as const;
@@ -34,9 +36,11 @@ const kebab = (name: string) =>
     .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2")
     .toLowerCase();
 
-/** Every source file of the React package, with its text. */
+/** Every source file whose phosphor imports decide the icon set, with its text. */
 const reactSources: { file: string; text: string }[] = await Promise.all(
-  [...new Bun.Glob("**/*.tsx").scanSync(reactSrc)].map(async (file) => ({ file, text: await Bun.file(join(reactSrc, file)).text() })),
+  [reactSrc, appSrc]
+    .flatMap((dir) => [...new Bun.Glob("**/*.tsx").scanSync(dir)].map((file) => join(dir, file)))
+    .map(async (path) => ({ file: path.slice(pkg.length + 1), text: await Bun.file(path).text() })),
 );
 
 /** Icon names imported from `@phosphor-icons/react`, with the files that import them. */
