@@ -1,6 +1,8 @@
 import type { ComponentProps } from "react";
 
+import { usePlatform } from "../hooks/use-platform";
 import { cn } from "../lib/cn";
+import { formatShortcut } from "../lib/platform";
 import type { ControlSize } from "../lib/size";
 
 export type KbdSize = ControlSize;
@@ -8,6 +10,8 @@ export type KbdSize = ControlSize;
 export type KbdProps = Omit<ComponentProps<"kbd">, "className"> & {
   /** Chip size: `sm` tighter caption, `md` the Command palette chip (default), `lg` label-sm with more padding. */
   size?: KbdSize;
+  /** Shortcut such as `Mod+Enter`, drawn with the OS's key labels (`⌘↵` / `Ctrl+Enter`) instead of children. */
+  keys?: string;
   className?: string;
 };
 
@@ -19,7 +23,8 @@ const sizeClass: Record<KbdSize, string> = {
 };
 
 /** Figma `Kbd` (Command palette 110:676): a 6% ink chip with caption text. */
-export function Kbd({ size = "md", className, children, ...props }: KbdProps) {
+export function Kbd({ size = "md", keys, className, children, ...props }: KbdProps) {
+  const { os } = usePlatform();
   return (
     <kbd
       className={cn(
@@ -29,7 +34,9 @@ export function Kbd({ size = "md", className, children, ...props }: KbdProps) {
       )}
       {...props}
     >
-      <span className="inline-flex items-center gap-[inherit] text-trim">{children}</span>
+      <span className="inline-flex items-center gap-[inherit] text-trim">
+        {keys === undefined ? children : formatShortcut(keys, os)}
+      </span>
     </kbd>
   );
 }

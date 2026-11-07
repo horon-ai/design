@@ -1,10 +1,15 @@
 import { Autocomplete } from "@base-ui/react/autocomplete";
 import { Dialog } from "@base-ui/react/dialog";
-import { MagnifyingGlass } from "@phosphor-icons/react";
+import { MagnifyingGlass, X } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 
+import { useDevice } from "../hooks/use-device";
 import { cn } from "../lib/cn";
 import { Kbd } from "./kbd";
+
+/** Close control shape for pointers that never reach a key: a 28px icon tile instead of the esc chip. */
+const touchCloseClass =
+  "flex size-7 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand [&_svg]:size-4";
 
 export type CommandItem = {
   value: string;
@@ -16,7 +21,7 @@ export type CommandItem = {
   tileClassName?: string;
   /** Caption after the label, such as the workspace. */
   meta?: ReactNode;
-  /** Right-side hint, usually `<Kbd>`. */
+  /** Right-side hint, usually `<Kbd>`; hidden when the device shows no keyboard hints. */
   hint?: ReactNode;
   onSelect?: () => void;
 };
@@ -30,7 +35,7 @@ export type CommandPaletteProps = {
   placeholder?: string;
   /** Shown when the query has no matches; defaults to "No results". */
   empty?: ReactNode;
-  /** Footer key hints, such as `[["↑↓", "Move"], ["↵", "Open"]]`. */
+  /** Footer key hints, such as `[["↑↓", "Move"], ["↵", "Open"]]`; hidden when the device shows no keyboard hints. */
   hints?: [ReactNode, string][];
   trigger?: ReactNode;
   /**
@@ -55,6 +60,7 @@ export function CommandPalette({
   surface = "solid",
   className,
 }: CommandPaletteProps) {
+  const { keyboardHints } = useDevice();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       {trigger}
@@ -76,13 +82,16 @@ export function CommandPalette({
               placeholder={placeholder}
               empty={empty}
               closeControl={
-                <Dialog.Close aria-label="Close" className="motion-press cursor-pointer">
-                  <Kbd>esc</Kbd>
+                <Dialog.Close
+                  aria-label="Close"
+                  className={keyboardHints ? "motion-press cursor-pointer" : touchCloseClass}
+                >
+                  {keyboardHints ? <Kbd keys="Escape" /> : <X aria-hidden />}
                 </Dialog.Close>
               }
               onSelect={() => onOpenChange?.(false)}
             />
-            {hints && hints.length > 0 && (
+            {keyboardHints && hints && hints.length > 0 && (
               <div className="relative flex flex-wrap items-center gap-x-4 gap-y-1 px-3 pt-2 pb-1">
                 {hints.map(([key, label]) => (
                   <span key={label} className="flex items-center gap-1.5 text-caption text-text-secondary">
@@ -119,6 +128,7 @@ export function CommandPaletteBody({
   onClose,
   onSelect,
 }: CommandPaletteBodyProps) {
+  const { keyboardHints } = useDevice();
   return (
     <Autocomplete.Root
       open
@@ -138,8 +148,13 @@ export function CommandPaletteBody({
         />
         {closeControl ??
           (onClose === undefined ? null : (
-            <button type="button" aria-label={closeLabel} className="motion-press cursor-pointer" onClick={onClose}>
-              <Kbd>esc</Kbd>
+            <button
+              type="button"
+              aria-label={closeLabel}
+              className={keyboardHints ? "motion-press cursor-pointer" : touchCloseClass}
+              onClick={onClose}
+            >
+              {keyboardHints ? <Kbd keys="Escape" /> : <X aria-hidden />}
             </button>
           ))}
       </div>
@@ -179,7 +194,7 @@ export function CommandPaletteBody({
                   <span className="truncate text-label-md text-text-primary">{item.label}</span>
                   {item.meta && <span className="shrink-0 text-caption text-text-secondary">{item.meta}</span>}
                   <span className="flex-1" />
-                  {item.hint}
+                  {keyboardHints && item.hint}
                 </Autocomplete.Item>
               )}
             </Autocomplete.Collection>
