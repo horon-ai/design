@@ -28,7 +28,8 @@ export type FileDropProps = Omit<ComponentProps<"input">, "className" | "type" |
 
 /**
  * Paper `File drop` (1VWI-0): a 1.5px dashed r10 target, icon 16 and a 13/18 500 label centred with gap 8.
- * Dragging swaps the dashes for a 1px brand rim; no shake or bounce. Solid fills with the raised surface,
+ * Dragging keeps the dashed edge and repaints it in the brand border, adds a 1px inset brand rim and, on
+ * `solid`, shifts the fill to `bg-bg-subtle`; no shake or bounce. Solid fills with the raised surface,
  * glass sits on the veil (`veil-drop`) and keeps the dashed border as its only outline.
  *
  * The target is a `<label>` around a screen-reader-only `<input type="file">`, so a click opens the native
