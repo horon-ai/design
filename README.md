@@ -88,6 +88,8 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 - 직전 실행이 `tokens`만 올리고 `react`에서 실패했다면 빠진 패키지만 같은 버전으로 채웁니다.
 - 게시 전에 lint·typecheck·test·build를 다시 돌리고, 게시한 커밋에 `v0.1.N` 태그를 남깁니다.
   provenance(실행한 워크플로와 커밋이 npm 패키지 페이지에 표시됨)가 붙습니다.
+- 게시가 끝나면 `web`, `admin`, `desktop` 저장소의 Renovate가 새 버전을 찾아 각 저장소의 `dev`로
+  업데이트 PR을 엽니다(설정은 각 저장소의 `renovate.json`). 이 저장소에서 따로 보낼 신호는 없습니다.
 
 계산 규칙은 `.github/scripts/release-version.mjs`에 있고, 로컬에서 다음 버전을 미리 볼 수 있습니다.
 
