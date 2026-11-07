@@ -1,6 +1,6 @@
-import { CommandPalette, IconButton, Kbd, type CommandGroup } from "@horon-ai/react";
+import { CommandPalette, IconButton, useHotkey, type CommandGroup } from "@horon-ai/react";
 import { MagnifyingGlass } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { searchIndex } from "@/data/search-index";
 import { pick, type Locale } from "@/i18n";
@@ -47,16 +47,7 @@ export function SearchPalette({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const groups = buildGroups(locale);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() !== "k") return;
-      if (!event.metaKey && !event.ctrlKey) return;
-      event.preventDefault();
-      setOpen((current) => !current);
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, []);
+  useHotkey("Mod+K", () => setOpen((current) => !current));
 
   return (
     <>
@@ -75,8 +66,8 @@ export function SearchPalette({ className }: { className?: string }) {
         placeholder={pick(m.searchPlaceholder, locale)}
         empty={pick(m.searchEmpty, locale)}
         hints={[
-          [<Kbd key="move">↑↓</Kbd>, pick(m.searchMove, locale)],
-          [<Kbd key="open">↵</Kbd>, pick(m.searchOpen, locale)],
+          ["↑↓", pick(m.searchMove, locale)],
+          ["↵", pick(m.searchOpen, locale)],
         ]}
       />
     </>
