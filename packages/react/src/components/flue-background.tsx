@@ -1,5 +1,6 @@
-import { type CSSProperties, useEffect, useRef, useSyncExternalStore } from "react";
+import { type CSSProperties, useEffect, useRef } from "react";
 
+import { useColorScheme } from "../hooks/use-color-scheme";
 import { cn } from "../lib/cn";
 
 export type FlueConfig = {
@@ -133,21 +134,6 @@ const FLUE_VARIANTS: Record<FlueVariant, FlueTuning> = {
   },
 };
 
-/** Follows the `.dark` class on <html>, the switch the theme uses. */
-function subscribeScheme(onChange: () => void): () => void {
-  const observer = new MutationObserver(onChange);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-  return () => observer.disconnect();
-}
-
-function useDarkScheme(): boolean {
-  return useSyncExternalStore(
-    subscribeScheme,
-    () => document.documentElement.classList.contains("dark"),
-    () => false,
-  );
-}
-
 const ENGINE_KEYS = new Set(["cursor", "maxDpr"]);
 
 const VERT = `#version 300 es
@@ -221,7 +207,7 @@ export type FlueBackgroundProps = {
  */
 export function FlueBackground({ className, style, variant = "default", config, tintClassName }: FlueBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const dark = useDarkScheme();
+  const dark = useColorScheme() === "dark";
   const tuning = FLUE_VARIANTS[variant];
   const settings = { ...(dark ? FLUE_NIGHT : FLUE_SKY), ...(dark ? tuning.dark : tuning.light), ...config };
   const key = JSON.stringify(settings);

@@ -1,6 +1,7 @@
 import { Copy, FileText, X } from "@phosphor-icons/react";
-import { useEffect, useState, type ComponentProps, type ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
+import { useCopyToClipboard } from "../hooks/use-copy-to-clipboard";
 import { cn } from "../lib/cn";
 import { IconButton } from "./icon-button";
 import { LiquidGlass } from "./liquid-glass";
@@ -119,25 +120,14 @@ export function CodeBlock({
   className,
   ...props
 }: CodeBlockProps) {
-  const [copied, setCopied] = useState(false);
-  useEffect(() => {
-    if (!copied) return undefined;
-    const timer = setTimeout(() => setCopied(false), 1500);
-    return () => clearTimeout(timer);
-  }, [copied]);
-  const copy = () => {
-    navigator.clipboard?.writeText(code).then(
-      () => setCopied(true),
-      () => undefined,
-    );
-  };
+  const { copied, copy } = useCopyToClipboard(1500);
   return (
     <div className={cn("flex flex-col overflow-clip rounded-lg bg-surface-ink", className)} {...props}>
       <div className="flex items-center gap-2 bg-bg-surface-6 py-2 pr-3.5 pl-3.5 text-caption text-text-on-ink">
         <span className="min-w-0 flex-1 opacity-70">{language}</span>
         <button
           type="button"
-          onClick={copy}
+          onClick={() => copy(code)}
           className="flex shrink-0 motion-press cursor-pointer items-center gap-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
         >
           <Copy aria-hidden className="size-3.5 shrink-0" />
