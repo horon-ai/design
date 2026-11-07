@@ -4,19 +4,25 @@ import { type ComponentProps, type DragEvent, type ReactNode, useId, useState } 
 import { cn } from "../lib/cn";
 import { Spinner } from "./spinner";
 
+/**
+ * How the drop target is painted: `solid` fills it with the raised surface (`bg-bg-surface`), `glass`
+ * leaves it transparent on the veil so imagery behind shows through.
+ */
 export type FileDropSurface = "solid" | "glass";
 
+/** Props of {@link FileDrop}: the native file input attributes plus the target's own state. */
 export type FileDropProps = Omit<ComponentProps<"input">, "className" | "type" | "children" | "onDrop"> & {
-  /** Label next to the icon. */
+  /** Label next to the icon. @default "Drop files here or click to upload" */
   label?: ReactNode;
   /** Shows a spinner in place of the icon while files upload. */
   uploading?: boolean;
   /** Danger rim for a rejected file. */
   rejected?: boolean;
-  /** Called with the dropped files. */
+  /** Called with the dropped or picked files, in picker order; fires on both drop and native file input change. */
   onFiles?: (files: File[]) => void;
   /** `solid` (default) fills the target with the raised surface; `glass` puts it on the veil over imagery. */
   surface?: FileDropSurface;
+  /** Extra classes for the label that forms the target. */
   className?: string;
 };
 
@@ -24,6 +30,34 @@ export type FileDropProps = Omit<ComponentProps<"input">, "className" | "type" |
  * Paper `File drop` (1VWI-0): a 1.5px dashed r10 target, icon 16 and a 13/18 500 label centred with gap 8.
  * Dragging swaps the dashes for a 1px brand rim; no shake or bounce. Solid fills with the raised surface,
  * glass sits on the veil (`veil-drop`) and keeps the dashed border as its only outline.
+ *
+ * The target is a `<label>` around a screen-reader-only `<input type="file">`, so a click opens the native
+ * picker and the control stays keyboard reachable; the focus ring is drawn on the label through
+ * `has-[:focus-visible]`. Drops land in `onFiles` with `DataTransfer.files`, and the input's change event
+ * also calls `onFiles` before forwarding `onChange`. While `uploading`, the icon becomes a spinner, the
+ * input is disabled and drops are ignored; `rejected` paints a danger rim. The target is capped at 550px
+ * and never wider than its parent.
+ *
+ * @example
+ * ```tsx
+ * import { useState } from "react";
+ * import { FileDrop } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   const [uploading, setUploading] = useState(false);
+ *   return (
+ *     <FileDrop
+ *       accept=".pdf,.png"
+ *       label="Drop contracts here or click to upload"
+ *       uploading={uploading}
+ *       onFiles={(files) => {
+ *         setUploading(true);
+ *         void upload(files).finally(() => setUploading(false));
+ *       }}
+ *     />
+ *   );
+ * }
+ * ```
  */
 export function FileDrop({
   label = "Drop files here or click to upload",
