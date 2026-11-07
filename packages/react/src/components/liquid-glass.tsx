@@ -18,6 +18,22 @@
  *
  * Without backdrop-filter support, or with reduced transparency requested, the
  * fill turns to `glass-fill-frost` and the rim stays (see `globals.css`).
+ *
+ * It takes no props and renders a single `aria-hidden` span; every visual
+ * decision comes from the host's class list, so the same element serves buttons,
+ * headers, cards and sheets.
+ *
+ * @example
+ * ```tsx
+ * function GlassCard() {
+ *   return (
+ *     <div className="relative isolate overflow-clip rounded-xl bg-glass-regular p-4">
+ *       <LiquidGlass />
+ *       <span className="relative">Floating chrome over the backdrop</span>
+ *     </div>
+ *   );
+ * }
+ * ```
  */
 export function LiquidGlass() {
   return <span aria-hidden className="liquid-layers" />;

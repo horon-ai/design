@@ -4,28 +4,71 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
+/**
+ * Root of a modal; owns open state. Re-exported from Base UI's `Dialog.Root`, so
+ * it accepts `open`, `defaultOpen`, `onOpenChange` and `modal`.
+ */
 export const Modal = BaseDialog.Root;
+
+/**
+ * The element that opens the modal. Base UI gives it the expanded state and the
+ * `aria-controls` link to the popup; use `render` to make an existing button the
+ * trigger.
+ *
+ * Part of {@link ModalContent}.
+ */
 export const ModalTrigger = BaseDialog.Trigger;
+
+/**
+ * A button that closes the modal when clicked. Any `Button`-like element can be
+ * its child; it also returns focus to the trigger.
+ *
+ * Part of {@link ModalContent}.
+ */
 export const ModalClose = BaseDialog.Close;
 
+/**
+ * Width step of the modal popup.
+ *
+ * - `sm` — 400px, for a short form.
+ * - `md` — 560px, the default reading width.
+ * - `lg` — 720px, for a wide editor or table.
+ */
 export type ModalSize = "sm" | "md" | "lg";
+
+/**
+ * Surface of the modal popup.
+ *
+ * - `solid` — the opaque page fill with a `0 24 64` shadow.
+ * - `glass` — the `veil-overlay` material, for a modal that floats over content.
+ */
 export type ModalSurface = "solid" | "glass";
 
-type DivProps = Omit<ComponentProps<"div">, "className"> & { className?: string };
+type DivProps = Omit<ComponentProps<"div">, "className"> & {
+  /** Extra classes on the element, merged after the built-in ones. */
+  className?: string;
+};
 
+/** Props for {@link ModalContent}: title and description, the size and surface, and an optional footer. */
 export type ModalContentProps = Omit<ComponentProps<typeof BaseDialog.Popup>, "className" | "title"> & {
+  /** Modal heading, rendered as the `Dialog.Title` that labels the popup. */
   title: ReactNode;
+  /** Supporting line under the title, rendered as the `Dialog.Description`. */
   description?: ReactNode;
-  /** Width: `sm` 400px, `md` 560px (default), `lg` 720px. Never wider than the viewport minus 32px. */
+  /** Width: `sm` 400px, `md` 560px (default), `lg` 720px. Never wider than the viewport minus 32px.
+   * @default "md" */
   size?: ModalSize;
-  /** `solid` (default) is the opaque page fill with a 0 24 64 shadow; `glass` is the veil (`veil-overlay`). */
+  /** `solid` (default) is the opaque page fill with a 0 24 64 shadow; `glass` is the veil (`veil-overlay`).
+   * @default "solid" */
   surface?: ModalSurface;
   /** Tile or icon before the title. */
   leading?: ReactNode;
-  /** Label for the close button; hides it when `null`. */
+  /** Label for the close button; hides it when `null`.
+   * @default "Close" */
   closeLabel?: string | null;
   /** `ModalFooter`, kept below the scrolling body. */
   footer?: ReactNode;
+  /** Extra classes on the popup, merged after the built-in ones. */
   className?: string;
 };
 
@@ -39,6 +82,30 @@ const widthClass: Record<ModalSize, string> = {
  * A modal for work that needs a form or a longer read, where `Dialog` is a short confirmation. It has three
  * fixed parts: a header (title, description and close), a body that scrolls on its own once the modal reaches
  * the viewport height, and a footer whose actions sit at the right. 24px padding, 20px radius, 32% scrim.
+ *
+ * The popup portals to `document.body` and renders its own backdrop and centred
+ * viewport, so it is unaffected by the caller's stacking context; Base UI traps
+ * focus, closes on Escape and on backdrop press, and restores focus to the
+ * trigger. Only the body scrolls: the header and footer stay put.
+ *
+ * @example
+ * ```tsx
+ * <Modal>
+ *   <ModalTrigger render={<Button variant="solid" />}>Rename workspace</ModalTrigger>
+ *   <ModalContent
+ *     title="Rename workspace"
+ *     description="This changes the name for every member."
+ *     footer={
+ *       <ModalFooter>
+ *         <ModalClose render={<Button variant="solid" />}>Cancel</ModalClose>
+ *         <Button onClick={save}>Save</Button>
+ *       </ModalFooter>
+ *     }
+ *   >
+ *     <Input aria-label="Workspace name" defaultValue="Horon" />
+ *   </ModalContent>
+ * </Modal>
+ * ```
  */
 export function ModalContent({
   title,

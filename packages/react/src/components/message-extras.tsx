@@ -7,7 +7,13 @@ import { IconButton } from "./icon-button";
 import { LiquidGlass } from "./liquid-glass";
 
 /** Figma `Date separator` (Message extras 109:667): caption between two 10% ink lines. */
-export function DateSeparator({ children, className }: { children: ReactNode; className?: string }) {
+// prettier-ignore
+export function DateSeparator({ children, className }: {
+  /** Caption text between the rules, such as "Today" or "Mar 4". */
+  children: ReactNode;
+  /** Extra classes on the row, merged after the built-in ones. */
+  className?: string;
+}) {
   return (
     <div role="separator" className={cn("flex items-center gap-3", className)}>
       <span className="h-px flex-1 bg-overlay-ink-10" />
@@ -17,17 +23,43 @@ export function DateSeparator({ children, className }: { children: ReactNode; cl
   );
 }
 
-export type MessageAction = { label: string; icon: ReactNode; onClick?: () => void };
+/** One button of a {@link MessageActions} pill. */
+export type MessageAction = {
+  /** Accessible label of the button; also its React key, so keep labels unique within a pill. */
+  label: string;
+  /** 16px glyph; sized by the pill's `[&>svg]:size-4`. */
+  icon: ReactNode;
+  /** Fires on click. */
+  onClick?: () => void;
+};
 
-/** Figma `Message actions` (109:667): a pill of 30px icon buttons with 16px icons, solid or regular glass. */
+/**
+ * Figma `Message actions` (109:667): a pill of 30px icon buttons with 16px icons, solid or regular glass.
+ *
+ * Hovering a button fills a circle behind the glyph; each button carries its
+ * label as `aria-label` and the pill exposes `role="toolbar"`. With
+ * `surface="glass"` it paints a `LiquidGlass` layer and the buttons sit above it.
+ *
+ * @example
+ * ```tsx
+ * <MessageActions
+ *   actions={[
+ *     { label: "Copy", icon: <Copy />, onClick: () => copy(text) },
+ *     { label: "Regenerate", icon: <ArrowsClockwise />, onClick: regenerate },
+ *   ]}
+ * />
+ * ```
+ */
 export function MessageActions({
   actions,
   surface = "solid",
   className,
 }: {
+  /** Buttons of the pill, rendered in order; each needs a unique label. */
   actions: MessageAction[];
   /** `solid` (default) is an opaque surface pill with a default border; `glass` is the regular glass pill. */
   surface?: "solid" | "glass";
+  /** Extra classes on the pill, merged after the built-in ones. */
   className?: string;
 }) {
   return (
@@ -55,14 +87,20 @@ export function MessageActions({
   );
 }
 
+/** Props for {@link Attachment}: what the file is, how it looks and whether it can be removed. */
 export type AttachmentProps = {
+  /** File name, truncated to one line. */
   name: ReactNode;
   /** Caption, such as "PDF · 2.4 MB". */
   detail?: ReactNode;
   /** Image thumbnail URL; files show a document icon on a sky tile. */
   thumbnail?: string;
+  /** Renders the 32px remove button when set. */
   onRemove?: () => void;
+  /** Accessible label of the remove button.
+   * @default "Remove" */
   removeLabel?: string;
+  /** Extra classes on the card, merged after the built-in ones. */
   className?: string;
 };
 
@@ -103,11 +141,19 @@ export function Attachment({ name, detail, thumbnail, onRemove, removeLabel = "R
   );
 }
 
+/** Props for {@link CodeBlock}: the code text, its language caption and the copy-button labels. */
 export type CodeBlockProps = Omit<ComponentProps<"div">, "className" | "children"> & {
+  /** Source text, rendered verbatim inside a `<code>` in a horizontal scroller. */
   code: string;
+  /** Caption in the header bar, such as "tsx"; the space is kept even when empty. */
   language?: string;
+  /** Copy-button text before the copy succeeds.
+   * @default "Copy" */
   copyLabel?: string;
+  /** Copy-button text for 1500ms after a successful copy.
+   * @default "Copied" */
   copiedLabel?: string;
+  /** Extra classes on the outer `div`, merged after the built-in ones. */
   className?: string;
 };
 

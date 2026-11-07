@@ -5,23 +5,59 @@ import { cn } from "../lib/cn";
 import { Button } from "./button";
 import { LiquidGlass } from "./liquid-glass";
 
+/** Props for {@link MarketplaceCard}: identity, copy, capability chips and the install action. */
 export type MarketplaceCardProps = Omit<ComponentProps<"div">, "children"> & {
   /** Two-letter initials shown on the 40px ink tile. */
   initials: string;
+  /** Card title on the row beside the tile; truncated in one line. */
   name: ReactNode;
+  /** Publisher line under the name, in caption colour. */
   author?: ReactNode;
+  /** Body copy under the header; any length, wrapped by the paragraph. */
   description?: ReactNode;
   /** Capability chips, each with an optional 11px icon. */
-  chips?: { id: string; label: ReactNode; icon?: ReactNode }[];
+  chips?: {
+    /** Stable key for this chip; also its React key. */
+    id: string;
+    /** Chip text. */
+    label: ReactNode;
+    /** Optional leading icon, rendered at 12px by the chip's `[&_svg]:size-3`. */
+    icon?: ReactNode;
+  }[];
+  /** Rating value shown after a filled star, such as "4.8". Hides the star when unset. */
   score?: ReactNode;
+  /** Install-count caption, separated from the score by a middle dot when both are set. */
   installs?: ReactNode;
+  /** Renders the Install button in the footer when set; receives the native click event. */
   onInstall?: () => void;
+  /** Text of the Install button.
+   * @default "Install" */
   installLabel?: string;
   /** `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass card. */
   surface?: "solid" | "glass";
 };
 
-/** Paper `Marketplace card` (Settings 1VMY-0): solid or thick glass column with tile header, description, chips and a footer with rating and Install. */
+/**
+ * Paper `Marketplace card` (Settings 1VMY-0): solid or thick glass column with tile header, description, chips and a footer with rating and Install.
+ *
+ * The card is a plain `div`, so any extra native attribute (`data-*`, `id`,
+ * `onClick`) passes through. With `surface="glass"` it paints a `LiquidGlass`
+ * layer and every child is positioned to stay above it.
+ *
+ * @example
+ * ```tsx
+ * <MarketplaceCard
+ *   initials="GH"
+ *   name="GitHub"
+ *   author="by Horon"
+ *   description="Read repositories and open pull requests."
+ *   chips={[{ id: "official", label: "Official" }]}
+ *   score="4.8"
+ *   installs="12k installs"
+ *   onInstall={() => install("github")}
+ * />
+ * ```
+ */
 export function MarketplaceCard({
   initials,
   name,

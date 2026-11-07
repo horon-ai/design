@@ -5,32 +5,51 @@ import { cn } from "../lib/cn";
 import { PanelPillTabs } from "./bot-instructions-panel";
 import { Spinner } from "./spinner";
 
+/** One pill tab of {@link KnowledgeBasePanel}, such as "All" or "Documents". */
 export type KnowledgeBaseTab = {
+  /** Stable identifier; it is the tab's value and React key. */
   id: string;
+  /** Tab text. */
   label: ReactNode;
+  /** Optional count drawn in caption colour right of the label. */
   count?: number;
 };
 
+/** Props for {@link KnowledgeBasePanel}: header, tabs, indexing state and the dropzone handler. */
 export type KnowledgeBasePanelProps = Omit<ComponentProps<"section">, "className" | "title" | "onChange"> & {
+  /** Panel heading, rendered as the `h3`. */
   title: ReactNode;
   /** The 12/18 line under the title: sources, chunks, bots. */
   meta?: ReactNode;
+  /** Pills of the tab tray, in display order. */
   tabs: KnowledgeBaseTab[];
+  /** Controlled selected tab id. Leave unset to let the component hold the selection itself. */
   value?: string;
+  /** Initial selected tab when uncontrolled. Falls back to the first tab. */
   defaultValue?: string;
+  /** Fires with the new tab id when a pill is clicked. */
   onValueChange?: (id: string) => void;
-  /** Shows the spinner and "N indexing" at the right of the tabs when above zero. */
+  /** Shows the spinner and "N indexing" at the right of the tabs when above zero.
+   * @default 0 */
   indexing?: number;
+  /** Fires when the round settings button is clicked; the button always renders. */
   onSettings?: () => void;
+  /** Fires when "Add source" is clicked; the button always renders. */
   onAddSource?: () => void;
   /** Called with the files dropped on the dropzone or picked with Browse. Omit to hide the dropzone. */
   onFiles?: (files: File[]) => void;
+  /** Headline inside the dropzone.
+   * @default "Drop files here, or browse" */
   dropTitle?: ReactNode;
+  /** Supporting line under the dropzone headline.
+   * @default "PDF, DOCX, Markdown or TXT · Notion, Google Drive and websites from Add source" */
   dropHint?: ReactNode;
-  /** Pipeline column labels shown above the list; hidden on narrow widths. */
+  /** Pipeline column labels shown above the list; hidden on narrow widths.
+   * @default ["Parse", "Chunk", "Embed", "Index"] */
   stages?: string[];
   /** The list rows, usually `SourceRow variant="list"`. */
   children?: ReactNode;
+  /** Extra classes on the panel `section`, merged after the built-in ones. */
   className?: string;
 };
 
@@ -40,6 +59,25 @@ const defaultStages = ["Parse", "Chunk", "Embed", "Index"];
  * Paper `Knowledge base` (XVM-1): a 24px-radius surface panel with a header, a pill tab tray, a table head, a
  * flat divided source list and a dashed dropzone. The selected tab pill travels in 280ms, the dropzone border and
  * fill change in 150ms while a file is over it, and indexing progress fills are animated by the rows.
+ *
+ * The dropzone is a `<label>` wrapping a visually hidden multi-file input, so
+ * clicking it opens the file picker as well as accepting a drag; the input is
+ * cleared after each pick so the same file can be chosen twice. Passing `onFiles`
+ * is what makes the dropzone appear.
+ *
+ * @example
+ * ```tsx
+ * <KnowledgeBasePanel
+ *   title="Knowledge base"
+ *   meta="3 sources · 128 chunks"
+ *   tabs={[{ id: "all", label: "All", count: 3 }]}
+ *   indexing={2}
+ *   onAddSource={openSourcePicker}
+ *   onFiles={upload}
+ * >
+ *   <SourceRow variant="list" status="ready" icon={<FileText />} name="README.md" detail="24 chunks" />
+ * </KnowledgeBasePanel>
+ * ```
  */
 export function KnowledgeBasePanel({
   title,

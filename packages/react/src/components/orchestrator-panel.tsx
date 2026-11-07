@@ -5,20 +5,26 @@ import { cn } from "../lib/cn";
 import { SegmentedControl } from "./segmented-control";
 import { Spinner } from "./spinner";
 
+/** The lead bot row at the top of {@link OrchestratorPanel}. */
 export type OrchestratorLead = {
   /** One letter shown in the 22px ink tile. */
   initial: string;
+  /** Bot name, next to the tile. */
   name: ReactNode;
-  /** Role caption next to the name, such as "Lead". */
+  /** Role caption next to the name, such as "Lead". Defaults to "Lead" when unset.
+   * @default "Lead" */
   role?: ReactNode;
   /** Status text, such as "1 working". */
   status?: ReactNode;
   /** Shows the 13px spinner while the lead waits on its lanes. */
   running?: boolean;
+  /** Timing label at the right, in caption colour. */
   elapsed?: ReactNode;
 };
 
+/** One step of the lead's plan, listed under its row. */
 export type OrchestratorPlanItem = {
+  /** Step text; also the React key, so keep steps unique. */
   label: string;
   /** Dot color of the lane that runs this step, such as "bg-sky-600". Defaults to the live blue. */
   dotClassName?: string;
@@ -26,35 +32,73 @@ export type OrchestratorPlanItem = {
   running?: boolean;
 };
 
+/** The closing summary card of {@link OrchestratorPanel}. */
 export type OrchestratorSummary = {
+  /** Title of the card.
+   * @default "Summary" */
   title?: ReactNode;
   /** Right-aligned count, such as "1 of 3 returned". */
   count?: ReactNode;
+  /** Body text of the summary. */
   body: ReactNode;
 };
 
+/** Props for {@link OrchestratorPanel}: the header controls, the lead and its plan, the lanes and the summary. */
 export type OrchestratorPanelProps = {
+  /** Panel heading, rendered as the `h3`. */
   title: ReactNode;
   /** Label before the segmented picker, such as "Bots in parallel". */
   parallelLabel?: ReactNode;
-  /** Choices of the parallel picker. */
+  /** Choices of the parallel picker. The picker only renders when this is set. */
   parallelOptions?: number[];
+  /** Controlled picked value; the picker is uncontrolled-looking when unset. */
   parallelValue?: number;
+  /** Fires with the picked number, converted from the segmented control's string value. */
   onParallelChange?: (value: number) => void;
+  /** Text of the Stop button.
+   * @default "Stop" */
   stopLabel?: ReactNode;
   /** Renders the Stop button when set. */
   onStop?: () => void;
+  /** The lead row: tile, name, role, status and elapsed. */
   lead: OrchestratorLead;
+  /** Steps under the lead; each row rises in with a 30ms stagger. Hides the list when empty. */
   plan?: OrchestratorPlanItem[];
   /** `AgentLane` cards; the branch connector draws one elbow per lane. */
   children?: ReactNode;
+  /** Closing summary card; the reveal wrapper collapses when unset. */
   summary?: OrchestratorSummary;
+  /** Extra classes on the panel `section`, merged after the built-in ones. */
   className?: string;
 };
 
 const stagger = (index: number) => ({ "--i": index, animationDelay: `calc(var(--i) * 30ms)` }) as CSSProperties;
 
-/** Figma `Orchestrator` (Agents N1): a 24px-radius solid panel, header with a parallel picker and Stop, a lead row, its plan, branching lanes and a summary. */
+/**
+ * Figma `Orchestrator` (Agents N1): a 24px-radius solid panel, header with a parallel picker and Stop, a lead row, its plan, branching lanes and a summary.
+ *
+ * Renders a lead bot that fans work out to lane cards: the connector draws one
+ * elbow per child and a vertical trunk between them, and the plan rows and lane
+ * cards rise in with a 30ms stagger. The summary does not rise; it is revealed by
+ * the `motion-reveal` wrapper around it. Every part is optional except `title` and
+ * `lead`, so the panel works as a bare lead view too.
+ *
+ * @example
+ * ```tsx
+ * <OrchestratorPanel
+ *   title="Orchestrator"
+ *   parallelOptions={[1, 2, 3]}
+ *   parallelValue={2}
+ *   onParallelChange={setParallel}
+ *   onStop={stop}
+ *   lead={{ initial: "H", name: "Horon", status: "2 working", running: true }}
+ *   plan={[{ label: "Collect sources" }, { label: "Draft the summary", running: true }]}
+ *   summary={{ count: "0 of 2 returned", body: "Lanes are still running." }}
+ * >
+ *   <AgentLane status="running" bot={{ initial: "R", name: "Researcher" }} task="Collect sources" />
+ * </OrchestratorPanel>
+ * ```
+ */
 export function OrchestratorPanel({
   title,
   parallelLabel = "Bots in parallel",
