@@ -22,6 +22,11 @@
  *
  * @packageDocumentation
  */
+export * from "./components/agent-activity";
+export * from "./components/agent-lane";
+export * from "./components/agent-lanes-timeline";
+export * from "./components/agent-panel";
+export * from "./components/agent-steering-panel";
 export * from "./components/approval-card";
 export * from "./components/avatar";
 export * from "./components/badge";
@@ -69,15 +74,19 @@ export * from "./components/mcp-server-row";
 export * from "./components/menu";
 export * from "./components/message-extras";
 export * from "./components/modal";
+export * from "./components/orchestrator-panel";
 export * from "./components/page-header";
 export * from "./components/plan-card";
 export * from "./components/plan-step";
 export * from "./components/plugin-row";
 export * from "./components/progress";
 export * from "./components/radio-group";
+export * from "./components/research-run-panel";
+export * from "./components/schedule";
 export * from "./components/segmented-control";
 export * from "./components/select";
 export * from "./components/settings-list";
+export * from "./components/sidebar";
 export * from "./components/skeleton";
 export * from "./components/slider";
 export * from "./components/source-row";
@@ -90,6 +99,9 @@ export * from "./components/task-row";
 export * from "./components/textarea";
 export * from "./components/textarea-field";
 export * from "./components/toast";
+export * from "./components/tool-call";
+export * from "./components/tool-calls-header";
+export * from "./components/tool-permissions";
 export * from "./components/tooltip";
 export * from "./components/top-bar";
 export * from "./components/usage-meter";

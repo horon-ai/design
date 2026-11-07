@@ -7,19 +7,8 @@
  * directories, so the gate turns green as the port fills in instead of staying
  * red for the whole migration, and the ledger cannot drift from the sources.
  *
- * 12 of 84 React slugs are still unported.
+ * Every React slug now has a Lynx component.
  */
 export const pendingComponents: readonly string[] = [
-  "agent-activity",
-  "agent-lane",
-  "agent-lanes-timeline",
-  "agent-panel",
-  "agent-steering-panel",
-  "orchestrator-panel",
-  "research-run-panel",
-  "schedule",
-  "sidebar",
-  "tool-call",
-  "tool-calls-header",
-  "tool-permissions",
+
 ];
