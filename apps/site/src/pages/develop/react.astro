@@ -1,24 +1,51 @@
 ---
 import T from "@/components/i18n/T.astro";
 import CodeBlock from "@/components/site/CodeBlock.astro";
-import { developMessages as m, developSnippets as snippets } from "@/i18n/messages/develop";
+import { reactDocsNav } from "@/data/nav";
+import { reactIntroMessages as m, reactStartSnippets as snippets } from "@/i18n/messages/develop-react-start";
 import DocsLayout from "@/layouts/DocsLayout.astro";
+import { siteHref } from "@/lib/urls";
+
+/* The page map is the sidebar itself, minus the page being read, so a label can
+ * never drift from the one the sidebar shows. */
+const docPages = reactDocsNav
+  .flatMap((group) => group.items)
+  .filter((item) => item.href !== "/develop/react");
 ---
 
-<DocsLayout title={m.reactTitle} description={m.reactDescription} section="develop">
-  <h2><T m={m.installTitle} /></h2>
-  <p><T m={m.reactInstallBody} /></p>
-  <CodeBlock code={snippets.reactInstall} lang="bash" title="terminal" />
+<DocsLayout title={m.title} description={m.description} section="develop">
+  <h2><T m={m.packageHeading} /></h2>
+  <p><T m={m.packageBody} /></p>
+  <ul>
+    <li><T m={m.itemComponents} /></li>
+    <li><T m={m.itemTokens} /></li>
+    <li><T m={m.itemHooks} /></li>
+    <li><T m={m.itemSource} /></li>
+  </ul>
 
-  <h2><T m={m.stylesTitle} /></h2>
-  <p><T m={m.stylesBody} /></p>
-  <CodeBlock code={snippets.reactStyles} lang="tsx" title="main.tsx" />
+  <h2><T m={m.quickHeading} /></h2>
+  <p><T m={m.quickBody} /></p>
 
-  <h2><T m={m.useTitle} /></h2>
-  <p><T m={m.reactUseBody} /></p>
-  <CodeBlock code={snippets.reactUse} lang="tsx" title="example.tsx" />
+  <h3><T m={m.stepPackages} /></h3>
+  <CodeBlock code={snippets.install} lang="bash" title="terminal" />
 
-  <h2><T m={m.repoTitle} /></h2>
-  <p><T m={m.repoBody} /></p>
-  <CodeBlock code={snippets.repo} lang="bash" title="terminal" />
+  <h3><T m={m.stepStyles} /></h3>
+  <CodeBlock code={snippets.styles} lang="css" title="styles.css" />
+
+  <h3><T m={m.stepUse} /></h3>
+  <CodeBlock code={snippets.firstComponent} lang="tsx" title="inbox.tsx" />
+
+  <h2><T m={m.docsHeading} /></h2>
+  <p><T m={m.docsBody} /></p>
+  <ul>
+    {
+      docPages.map((item) => (
+        <li>
+          <a href={siteHref(item.href)}>
+            <T m={item.label} />
+          </a>
+        </li>
+      ))
+    }
+  </ul>
 </DocsLayout>

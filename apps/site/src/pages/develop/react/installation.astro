@@ -1,0 +1,46 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { reactBreadcrumb } from "@/data/nav";
+import {
+  reactInstallationMessages as m,
+  reactStartSnippets as snippets,
+} from "@/i18n/messages/develop-react-start";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={reactBreadcrumb(m.title, "/develop/react/installation")}
+>
+  <h2><T m={m.packagesHeading} /></h2>
+  <p><T m={m.packagesBody} /></p>
+  <CodeBlock code={snippets.install} lang="bash" title="terminal" />
+  <p><T m={m.npmBody} /></p>
+  <CodeBlock code={snippets.installNpm} lang="bash" title="terminal" />
+
+  <h2><T m={m.peerHeading} /></h2>
+  <p><T m={m.peerBody} /></p>
+  <CodeBlock code={snippets.peers} lang="json" title="package.json" />
+
+  <h2><T m={m.localHeading} /></h2>
+  <p><T m={m.localBody} /></p>
+  <CodeBlock code={snippets.localPath} lang="json" title="package.json" />
+
+  <h2><T m={m.bundlerHeading} /></h2>
+  <p><T m={m.bundlerBody} /></p>
+
+  <h3><T m={m.viteHeading} /></h3>
+  <p><T m={m.viteBody} /></p>
+  <CodeBlock code={snippets.viteConfig} lang="ts" title="vite.config.ts" />
+
+  <h3><T m={m.nextHeading} /></h3>
+  <p><T m={m.nextBody} /></p>
+  <CodeBlock code={snippets.nextConfig} lang="ts" title="next.config.ts" />
+
+  <h2><T m={m.checkHeading} /></h2>
+  <p><T m={m.checkBody} /></p>
+  <CodeBlock code={snippets.check} lang="tsx" title="check.tsx" />
+</DocsLayout>
