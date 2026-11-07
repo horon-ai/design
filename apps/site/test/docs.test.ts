@@ -86,10 +86,29 @@ describe("extractor", () => {
     const line = reactImport("button");
     expect(line).toContain("Button");
     expect(line).toContain('"@horon-ai/react"');
+    // Re-bound primitives (`export const Dialog = BaseDialog.Root`) are imports a reader needs too.
+    const dialog = reactImport("dialog");
+    for (const name of ["Dialog", "DialogTrigger", "DialogClose", "DialogContent"]) {
+      expect(dialog).toContain(name);
+    }
+  });
+
+  test("own props that shadow inherited ones stay in the table", { timeout: TIMEOUT }, () => {
+    const slider = componentApi("slider").flatMap((entry) => entry.props.map((row) => row.name));
+    expect(slider).toContain("aria-label");
+  });
+
+  test("imported and nested aliases expand to their literals", { timeout: TIMEOUT }, () => {
+    const size = componentApi("settings-list")
+      .flatMap((entry) => entry.props)
+      .find((row) => row.name === "size");
+    expect(size?.type).toBe('"sm" | "md" | "lg" | "compact"');
   });
 
   test("flutterClasses", { timeout: TIMEOUT }, () => {
     expect(flutterClasses("button")).toContain("HoronButton");
+    // Dart files are snake_case, slugs are kebab-case.
+    expect(flutterClasses("icon-button")).toContain("HoronIconButton");
     expect(flutterClasses("not-a-real-component")).toEqual([]);
   });
 });

@@ -46,7 +46,3 @@ export function getExample(slug: string, id: string): AstroComponentFactory | un
 export function demoCount(): number {
   return wrappers.size;
 }
-
-export function exampleCount(): number {
-  return exampleWrappers.size;
-}

@@ -65,6 +65,36 @@ export const doc: ComponentDoc = {
   },
   properties: [
     {
+      id: "size",
+      title: { ko: "size", en: "size" },
+      description: {
+        ko: "SettingsSwitch의 트랙과 썸 크기입니다. SettingsSwitch는 Switch를 그대로 감싸고 기본값을 md로 둡니다.",
+        en: "Track and thumb size of SettingsSwitch. SettingsSwitch wraps Switch unchanged and defaults to md.",
+      },
+      values: [
+        {
+          name: "sm",
+          description: { ko: "32x20 트랙입니다. 좁은 행에 씁니다.", en: "A 32x20 track for tight rows." },
+        },
+        {
+          name: "md",
+          description: { ko: "44x26 트랙입니다. 기본값입니다.", en: "A 44x26 track. The default." },
+        },
+        {
+          name: "lg",
+          description: { ko: "52x30 트랙입니다.", en: "A 52x30 track." },
+        },
+        {
+          name: "compact",
+          description: {
+            ko: "40x24 트랙입니다. 봇 메모리 패널의 스위치와 같은 크기입니다.",
+            en: "A 40x24 track, the same size as the bot memory panel switch.",
+          },
+        },
+      ],
+      example: "switches",
+    },
+    {
       id: "surface",
       title: { ko: "surface", en: "surface" },
       description: {

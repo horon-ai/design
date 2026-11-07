@@ -43,5 +43,7 @@ export const componentPageMessages = defineMessages({
   actionHeader: { ko: "동작", en: "Action" },
   doLabel: { ko: "권장", en: "Do" },
   dontLabel: { ko: "지양", en: "Don't" },
+  /** Link from a property or guideline to its live example further down. */
+  seeExample: { ko: "예시 보기", en: "See example" },
   patternPrefix: { ko: "따르는 패턴:", en: "Follows the pattern:" },
 });

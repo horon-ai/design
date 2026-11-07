@@ -131,10 +131,10 @@ export const doc: ComponentDoc = {
       id: "group-label",
       title: { ko: "그룹에도 이름이 필요합니다", en: "Name the group" },
       body: {
-        ko: "그룹의 aria-label은 선택지들이 무엇에 대한 것인지 말합니다. Field의 FieldLabel을 쓰면 그 라벨이 그룹의 이름이 되도록 연결합니다.",
-        en: "The group's aria-label says what the options are about. Inside a Field, connect the FieldLabel so it names the group.",
+        ko: "그룹의 이름은 선택지들이 무엇에 대한 것인지 말합니다. 화면에 보이는 제목이 있으면 그 id를 aria-labelledby로 연결하고, 없으면 aria-label을 붙입니다. Field는 컨트롤 하나를 감싸므로 라디오 여러 개를 Field 안에 넣지 않습니다.",
+        en: "The group's name says what the options are about. Point aria-labelledby at a visible heading, or set aria-label when there is none. Field wraps a single control, so do not put several radios inside one Field.",
       },
-      example: "sizes",
+      example: "basic",
     },
   ],
   specification: [

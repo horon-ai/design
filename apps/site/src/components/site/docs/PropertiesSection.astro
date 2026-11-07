@@ -1,19 +1,18 @@
 ---
 /**
  * The `properties` section: one heading per documented prop, its accepted
- * values and, when the doc names one, the live example that shows it.
+ * values and, when the doc names one, a link to the live example that shows it.
  */
-import ExampleStage from "@/components/site/docs/ExampleStage.astro";
+import ExampleLink from "@/components/site/docs/ExampleLink.astro";
 import T from "@/components/i18n/T.astro";
 import { componentPageMessages as m } from "@/i18n/messages/components-page";
 import type { ComponentDoc } from "@/lib/component-docs";
 
 interface Props {
   doc: ComponentDoc;
-  overlay?: boolean;
 }
 
-const { doc, overlay = false } = Astro.props;
+const { doc } = Astro.props;
 ---
 
 <section>
@@ -40,7 +39,7 @@ const { doc, overlay = false } = Astro.props;
               ))}
             </dl>
           )}
-          {property.example && <ExampleStage slug={doc.slug} id={property.example} overlay={overlay} />}
+          {property.example && <ExampleLink doc={doc} id={property.example} />}
         </div>
       ))
     }

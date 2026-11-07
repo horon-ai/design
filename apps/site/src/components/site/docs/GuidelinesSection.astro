@@ -6,17 +6,16 @@
  * brand accent for a rule to follow and the danger accent for one to avoid, and
  * both accents come from tokens.
  */
-import ExampleStage from "@/components/site/docs/ExampleStage.astro";
+import ExampleLink from "@/components/site/docs/ExampleLink.astro";
 import T from "@/components/i18n/T.astro";
 import { componentPageMessages as m } from "@/i18n/messages/components-page";
 import type { ComponentDoc } from "@/lib/component-docs";
 
 interface Props {
   doc: ComponentDoc;
-  overlay?: boolean;
 }
 
-const { doc, overlay = false } = Astro.props;
+const { doc } = Astro.props;
 ---
 
 <section>
@@ -55,7 +54,7 @@ const { doc, overlay = false } = Astro.props;
               )}
             </div>
           )}
-          {guideline.example && <ExampleStage slug={doc.slug} id={guideline.example} overlay={overlay} />}
+          {guideline.example && <ExampleLink doc={doc} id={guideline.example} />}
         </div>
       ))
     }

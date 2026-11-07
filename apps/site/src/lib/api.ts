@@ -125,9 +125,17 @@ function defaultTag(symbol: ts.Symbol, checker: ts.TypeChecker): string | undefi
 /** The union a type alias points at, when `node` is a reference such as `ButtonVariant`. */
 function referencedUnion(node: ts.TypeNode, checker: ts.TypeChecker): ts.UnionTypeNode | undefined {
   if (!ts.isTypeReferenceNode(node)) return undefined;
-  const symbol = checker.getSymbolAtLocation(node.typeName);
+  const reference = checker.getSymbolAtLocation(node.typeName);
+  // An imported alias resolves to its import specifier first; follow it to the declaration.
+  const symbol =
+    reference !== undefined && (reference.flags & ts.SymbolFlags.Alias) !== 0
+      ? checker.getAliasedSymbol(reference)
+      : reference;
   for (const declaration of symbol?.getDeclarations() ?? []) {
-    if (ts.isTypeAliasDeclaration(declaration) && ts.isUnionTypeNode(declaration.type)) return declaration.type;
+    if (!ts.isTypeAliasDeclaration(declaration)) continue;
+    if (ts.isUnionTypeNode(declaration.type)) return declaration.type;
+    // `type SelectSize = ControlSize`: follow the chain to the union it names.
+    return referencedUnion(declaration.type, checker);
   }
   return undefined;
 }
@@ -148,16 +156,26 @@ function propertyTypeNode(prop: ts.Symbol): ts.TypeNode | undefined {
 function declaredLiterals(prop: ts.Symbol, checker: ts.TypeChecker): string[] | undefined {
   const node = propertyTypeNode(prop);
   if (node === undefined) return undefined;
+  const names = literalMembers(node, checker);
+  return names !== undefined && names.length >= 2 ? names : undefined;
+}
+
+/**
+ * The string literals a type node spells, following aliases and nested unions
+ * (`type SwitchSize = ControlSize | "compact"`), or `undefined` as soon as a
+ * member is anything other than a string literal or `undefined`.
+ */
+function literalMembers(node: ts.TypeNode, checker: ts.TypeChecker): string[] | undefined {
+  if (node.kind === ts.SyntaxKind.UndefinedKeyword) return [];
+  if (ts.isLiteralTypeNode(node)) return ts.isStringLiteral(node.literal) ? [node.literal.text] : undefined;
   const union = ts.isUnionTypeNode(node) ? node : referencedUnion(node, checker);
   if (union === undefined) return undefined;
 
-  const members = union.types.filter((member) => member.kind !== ts.SyntaxKind.UndefinedKeyword);
-  if (members.length < 2) return undefined;
-
   const names: string[] = [];
-  for (const member of members) {
-    if (!ts.isLiteralTypeNode(member) || !ts.isStringLiteral(member.literal)) return undefined;
-    names.push(member.literal.text);
+  for (const member of union.types) {
+    const nested = literalMembers(member, checker);
+    if (nested === undefined) return undefined;
+    names.push(...nested);
   }
   return names;
 }
@@ -231,6 +249,37 @@ function componentDeclarations(source: ts.SourceFile): ComponentDeclaration[] {
   return declared;
 }
 
+/**
+ * Every PascalCase value the file exports, in source order: the components plus
+ * re-bound primitives such as `export const Dialog = BaseDialog.Root`. Object
+ * and array literals (palettes, registries) and SCREAMING_CASE constants are
+ * data, not something a reader imports to render.
+ */
+function exportedComponentNames(source: ts.SourceFile): string[] {
+  const names: string[] = [];
+  for (const statement of source.statements) {
+    if (ts.isFunctionDeclaration(statement)) {
+      if (statement.name !== undefined && isExported(statement) && /^[A-Z][a-z0-9]/.test(statement.name.text)) {
+        names.push(statement.name.text);
+      }
+      continue;
+    }
+    if (!ts.isVariableStatement(statement) || !isExported(statement)) continue;
+    for (const declaration of statement.declarationList.declarations) {
+      if (!ts.isIdentifier(declaration.name) || !/^[A-Z][a-z0-9]/.test(declaration.name.text)) continue;
+      const initializer = declaration.initializer;
+      if (
+        initializer !== undefined &&
+        (ts.isObjectLiteralExpression(initializer) || ts.isArrayLiteralExpression(initializer))
+      ) {
+        continue;
+      }
+      names.push(declaration.name.text);
+    }
+  }
+  return names;
+}
+
 /** The props of one component: own rows for the table, inherited props counted per source. */
 function propsOf(
   signature: ts.Signature,
@@ -246,7 +295,12 @@ function propsOf(
   const groups = new Map<string, number>();
 
   for (const prop of type.getProperties()) {
-    const propDeclaration = prop.getDeclarations()?.[0];
+    // A prop the component re-declares can also exist on the HTML or Base UI
+    // props it extends; it is own whenever any declaration lives in the library.
+    const declarations = prop.getDeclarations() ?? [];
+    const propDeclaration =
+      declarations.find((entry) => entry.getSourceFile().fileName.replace(/\\/g, "/").includes(ownPrefix)) ??
+      declarations[0];
     // Compared as a path segment, not against the resolved root: the checker
     // reports real paths, which differ from the root when it is reached
     // through a symlink.
@@ -279,6 +333,8 @@ function propsOf(
 /** The program's copy of `packages/react/src/components/<slug>.tsx`, matched by path tail. */
 function componentSource(slug: string): ts.SourceFile | undefined {
   const suffix = `/packages/react/src/components/${slug}.tsx`;
+  // The program is built lazily by `getChecker`; build it here too so callers need no order.
+  getChecker();
   return program
     ?.getSourceFiles()
     .find((file) => file.fileName.replace(/\\/g, "/").endsWith(suffix));
@@ -308,7 +364,7 @@ export function componentApi(slug: string): ComponentApi[] {
 /** The import line a reader copies: every PascalCase value export of the file. */
 export function reactImport(slug: string): string {
   const source = componentSource(slug);
-  const names = (source ? componentDeclarations(source) : []).map((declaration) => declaration.name.text);
+  const names = source ? exportedComponentNames(source) : [];
 
   if (names.length === 0) return 'import * as horon from "@horon-ai/react";';
   const single = `import { ${names.join(", ")} } from "@horon-ai/react";`;
@@ -318,7 +374,8 @@ export function reactImport(slug: string): string {
 
 /** Public `Horon*` classes the Flutter package ships for this component. */
 export function flutterClasses(slug: string): string[] {
-  const path = join(findRoot(), FLUTTER_DIR, `${slug}.dart`);
+  // Dart files are snake_case: `icon-button` lives in `icon_button.dart`.
+  const path = join(findRoot(), FLUTTER_DIR, `${slug.replaceAll("-", "_")}.dart`);
   if (!existsSync(path)) return [];
 
   const names: string[] = [];
