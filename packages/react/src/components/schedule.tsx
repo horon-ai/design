@@ -438,9 +438,7 @@ export function ScheduleCard({
   );
 }
 
-/**
- * A captioned block inside the schedule card, such as "Repeat" or "Days"; the caption-to-control gap is `Field`'s.
- */
+/** Vertical gap between a section's caption and its control, per size. */
 const sectionSizeClass: Record<ControlSize, string> = {
   sm: "gap-1",
   md: "gap-2",
