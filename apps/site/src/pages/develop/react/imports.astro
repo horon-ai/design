@@ -1,0 +1,50 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { reactBreadcrumb } from "@/data/nav";
+import { conceptsMessages as m, conceptsSnippets as s } from "@/i18n/messages/develop-react-concepts";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.importsTitle}
+  description={m.importsDescription}
+  section="develop"
+  breadcrumb={reactBreadcrumb(m.importsTitle, "/develop/react/imports")}
+>
+  <h2><T m={m.importsEntryHeading} /></h2>
+  <p><T m={m.importsEntryBody} /></p>
+  <ul>
+    <li><T m={m.importsEntryBarrelItem} /></li>
+    <li><T m={m.importsEntrySubpathItem} /></li>
+    <li><T m={m.importsEntryBundleItem} /></li>
+  </ul>
+  <CodeBlock code={s.importsBarrel} lang="tsx" title="example.tsx" />
+  <CodeBlock code={s.importsSubpath} lang="tsx" title="example.tsx" />
+
+  <h2><T m={m.importsPropsHeading} /></h2>
+  <p><T m={m.importsPropsBody} /></p>
+  <ul>
+    <li><T m={m.importsPropsTypeItem} /></li>
+    <li><T m={m.importsPropsForwardItem} /></li>
+  </ul>
+  <CodeBlock code={s.importsTypes} lang="tsx" title="panel.tsx" />
+
+  <h2><T m={m.importsHelpersHeading} /></h2>
+  <p><T m={m.importsHelpersBody} /></p>
+  <ul>
+    <li><T m={m.importsHelpersCnItem} /></li>
+    <li><T m={m.importsHelpersHookItem} /></li>
+  </ul>
+  <CodeBlock code={s.importsHelpers} lang="tsx" title="example.ts" />
+
+  <h2><T m={m.importsClientHeading} /></h2>
+  <p><T m={m.importsClientBody} /></p>
+  <ul>
+    <li><T m={m.importsClientItem} /></li>
+  </ul>
+  <CodeBlock code={s.importsClient} lang="tsx" title="setting.tsx" />
+
+  <h2><T m={m.importsGhostHeading} /></h2>
+  <p><T m={m.importsGhostBody} /></p>
+</DocsLayout>

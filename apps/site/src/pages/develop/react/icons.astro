@@ -1,0 +1,31 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { reactBreadcrumb } from "@/data/nav";
+import { reactIconsMessages as m, reactStartSnippets as snippets } from "@/i18n/messages/develop-react-start";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={reactBreadcrumb(m.title, "/develop/react/icons")}
+>
+  <h2><T m={m.phosphorHeading} /></h2>
+  <p><T m={m.phosphorBody} /></p>
+  <CodeBlock code={snippets.phosphorInstall} lang="bash" title="terminal" />
+  <CodeBlock code={snippets.phosphorUse} lang="tsx" title="search-hint.tsx" />
+
+  <h2><T m={m.passHeading} /></h2>
+  <p><T m={m.passBody} /></p>
+  <CodeBlock code={snippets.componentIcons} lang="tsx" title="toolbar.tsx" />
+
+  <h2><T m={m.sizeHeading} /></h2>
+  <p><T m={m.sizeBody} /></p>
+  <CodeBlock code={snippets.iconSizing} lang="tsx" title="delete-hint.tsx" />
+
+  <h2><T m={m.horonHeading} /></h2>
+  <p><T m={m.horonBody} /></p>
+  <CodeBlock code={snippets.horonIcon} lang="tsx" title="brand.tsx" />
+</DocsLayout>

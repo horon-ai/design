@@ -1,0 +1,44 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { reactBreadcrumb } from "@/data/nav";
+import { conceptsMessages as m, conceptsSnippets as s } from "@/i18n/messages/develop-react-concepts";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.ghostTitle}
+  description={m.ghostDescription}
+  section="develop"
+  breadcrumb={reactBreadcrumb(m.ghostTitle, "/develop/react/cursor-ghost")}
+>
+  <h2><T m={m.ghostWhatHeading} /></h2>
+  <p><T m={m.ghostWhatBody} /></p>
+  <ul>
+    <li><T m={m.ghostWhatCursorItem} /></li>
+    <li><T m={m.ghostWhatLayerItem} /></li>
+    <li><T m={m.ghostWhatBlendItem} /></li>
+  </ul>
+
+  <h2><T m={m.ghostWhenHeading} /></h2>
+  <p><T m={m.ghostWhenBody} /></p>
+  <p><T m={m.ghostWhenImportBody} /></p>
+
+  <h2><T m={m.ghostOffHeading} /></h2>
+  <p><T m={m.ghostOffBody} /></p>
+  <ul>
+    <li><T m={m.ghostOffItem} /></li>
+  </ul>
+
+  <h2><T m={m.ghostOptionsHeading} /></h2>
+  <p><T m={m.ghostOptionsBody} /></p>
+  <ul>
+    <li><T m={m.ghostOptionsGhostsItem} /></li>
+    <li><T m={m.ghostOptionsSizeItem} /></li>
+    <li><T m={m.ghostOptionsFollowItem} /></li>
+    <li><T m={m.ghostOptionsSmearItem} /></li>
+    <li><T m={m.ghostOptionsColorItem} /></li>
+  </ul>
+  <CodeBlock code={s.ghostOptions} lang="tsx" title="cursor.ts" />
+  <p><T m={m.ghostOptionsTeardownBody} /></p>
+</DocsLayout>

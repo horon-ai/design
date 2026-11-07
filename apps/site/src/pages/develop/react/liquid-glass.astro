@@ -1,0 +1,45 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { reactBreadcrumb } from "@/data/nav";
+import { conceptsMessages as m, conceptsSnippets as s } from "@/i18n/messages/develop-react-concepts";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.glassTitle}
+  description={m.glassDescription}
+  section="develop"
+  breadcrumb={reactBreadcrumb(m.glassTitle, "/develop/react/liquid-glass")}
+>
+  <h2><T m={m.glassMaterialHeading} /></h2>
+  <p><T m={m.glassMaterialBody} /></p>
+  <ul>
+    <li><T m={m.glassMaterialBackdropItem} /></li>
+    <li><T m={m.glassMaterialFillItem} /></li>
+    <li><T m={m.glassMaterialRimItem} /></li>
+  </ul>
+
+  <h2><T m={m.glassHostHeading} /></h2>
+  <p><T m={m.glassHostBody} /></p>
+  <ul>
+    <li><T m={m.glassHostFirstItem} /></li>
+    <li><T m={m.glassHostStackItem} /></li>
+    <li><T m={m.glassHostZItem} /></li>
+    <li><T m={m.glassHostBodyItem} /></li>
+    <li><T m={m.glassHostFillItem} /></li>
+    <li><T m={m.glassHostTierItem} /></li>
+  </ul>
+  <CodeBlock code={s.glassHost} lang="tsx" title="floating-bar.tsx" />
+
+  <h2><T m={m.glassFallbackHeading} /></h2>
+  <p><T m={m.glassFallbackBody} /></p>
+
+  <h2><T m={m.glassCardHeading} /></h2>
+  <p><T m={m.glassCardBody} /></p>
+  <CodeBlock code={s.glassCard} lang="tsx" title="cards.tsx" />
+
+  <h2><T m={m.glassWhereHeading} /></h2>
+  <p><T m={m.glassWhereBody} /></p>
+  <p><T m={m.glassWhereVeilBody} /></p>
+</DocsLayout>
