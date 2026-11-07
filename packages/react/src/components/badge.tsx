@@ -3,16 +3,27 @@ import type { ComponentProps } from "react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
-/** `surface` is the white (raised surface) pill with a 1px default border and primary text. */
+/** Tint of the pill and its dot; `neutral` is the default.
+ *
+ * - `neutral`: 6% ink pill with secondary text, the default.
+ * - `brand`: sky-tinted pill with brand text, for counts and states tied to the brand.
+ * - `danger`: red-tinted pill with danger text, for errors and destructive states.
+ * - `solid`: filled brand pill with on-primary text, for the strongest emphasis.
+ * - `surface`: the white (raised surface) pill with a 1px default border and primary text.
+ */
 export type BadgeTone = "neutral" | "brand" | "danger" | "solid" | "surface";
+/** Size token shared with the form controls (`sm`, `md`, `lg`); the rendered heights are documented on {@link Badge}. */
 export type BadgeSize = ControlSize;
 
+/** Props for {@link Badge}: the tone, size, optional status dot and extra span props. */
 export type BadgeProps = Omit<ComponentProps<"span">, "className"> & {
+  /** Colour treatment of the pill and its dot. @default "neutral" */
   tone?: BadgeTone;
   /** Leading status dot; 4px (sm), 6px (md) or 8px (lg). */
   dot?: boolean;
-  /** `md` is the 22px Figma Badge; `sm` 20px and `lg` 26px. */
+  /** `md` is the 22px Figma Badge; `sm` 20px and `lg` 26px. @default "md" */
   size?: BadgeSize;
+  /** Extra classes merged onto the pill, for margins or alignment. */
   className?: string;
 };
 
@@ -44,7 +55,17 @@ const dotClass: Record<BadgeTone, string> = {
   surface: "bg-text-primary",
 };
 
-/** Figma `Badge` (61:283): a 22px translucent pill with label-sm text. */
+/**
+ * Figma `Badge` (61:283): a 22px translucent pill with label-sm text. Renders a non-interactive `span`, so it can
+ * sit inside buttons, list rows and headings without changing their layout height.
+ *
+ * @example
+ * ```tsx
+ * <Badge tone="brand" dot>
+ *   Running
+ * </Badge>
+ * ```
+ */
 export function Badge({ tone = "neutral", dot, size = "md", className, children, ...props }: BadgeProps) {
   return (
     <span

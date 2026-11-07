@@ -4,26 +4,32 @@ import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 
+/** Diameter of the avatar: `sm` 24px, `md` 32px, `lg` 40px, `xl` 56px. */
 export type AvatarSize = "sm" | "md" | "lg" | "xl";
 
+/** Props for {@link Avatar}: the avatar type and size, the image source, fallback content and the live dot. */
 export type AvatarProps = {
-  /** `initials` (default), `bot` (robot on the brand tint) or `image`. */
+  /** `initials` (default), `bot` (robot on the brand tint) or `image`. @default "initials" */
   type?: "initials" | "bot" | "image";
+  /** Diameter token; also scales the initials, the bot icon and the live dot. @default "md" */
   size?: AvatarSize;
   /** Image URL for `type="image"`; initials show while it loads or if it fails. */
   src?: string;
+  /** Alternative text for `type="image"`; pass `""` when the name is already shown next to the avatar. @default "" */
   alt?: string;
   /** Initials, or any fallback content. */
   children?: ReactNode;
-  /** Shows the live status dot at the bottom right. */
+  /** Shows the live status dot at the bottom right. @default false */
   live?: boolean;
-  /** Initials colour: `neutral` (default) or `sky`, the Paper account profile avatar (sky-100 fill, sky-700 text). */
+  /** Initials colour: `neutral` (default) or `sky`, the Paper account profile avatar (sky-100 fill, sky-700 text). @default "neutral" */
   tone?: "neutral" | "sky";
   /**
    * Border colour of the live dot, so it matches the surface behind it (glass panels, `bg-subtle`, brand tints).
    * Defaults to `border-bg-surface`.
+   * @default "border-bg-surface"
    */
   liveRingClassName?: string;
+  /** Extra classes merged onto the wrapper, for positioning or a custom size override. */
   className?: string;
 };
 
@@ -55,7 +61,17 @@ const typeClass = {
   image: "bg-sky-200 text-text-secondary",
 } as const;
 
-/** Figma `Avatar` (61:347): Initials, Bot and Image in four sizes, with an optional live dot. */
+/**
+ * Figma `Avatar` (61:347): Initials, Bot and Image in four sizes, with an optional live dot. Built on Base UI's
+ * avatar primitive, so an image that fails to load falls back to the children instead of a broken icon.
+ *
+ * @example
+ * ```tsx
+ * <Avatar type="image" size="lg" src={user.photoUrl} alt="" live>
+ *   {initials}
+ * </Avatar>
+ * ```
+ */
 export function Avatar({
   type = "initials",
   size = "md",
