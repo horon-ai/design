@@ -78,8 +78,8 @@ export const lynxInstallationMessages = defineMessages({
     en: "Stack two presets: @lynx-js/tailwind-preset selects the utility set Lynx supports, then @horon-ai/lynx/tailwind-preset adds the token classes on top. The order matters: the token preset goes second so classes such as text-label-md, text-text-primary and bg-glass-regular are generated.",
   },
   tailwindOrderNote: {
-    ko: "presets 배열은 [lynxPreset, horonPreset] 순서입니다. preflight는 Lynx에 DOM이 없어 끕니다.",
-    en: "The presets array is [lynxPreset, horonPreset] in that order. Preflight is off because Lynx has no DOM.",
+    ko: "presets 배열은 [lynxPreset, horonPreset] 순서입니다. preflight는 Lynx에 DOM이 없어 끕니다. content에는 이 패키지의 소스 경로도 넣습니다. @horon-ai/lynx는 TypeScript 소스를 그대로 배포하고 globals.css의 @tailwind utilities는 소비자의 content로 생성되므로, node_modules/@horon-ai/lynx/src를 스캔하지 않으면 컴포넌트 안에서만 쓰는 클래스가 만들어지지 않습니다.",
+    en: "The presets array is [lynxPreset, horonPreset] in that order. Preflight is off because Lynx has no DOM. The content array also lists this package's source: @horon-ai/lynx ships TypeScript source and globals.css runs @tailwind utilities against the consumer's content, so classes used only inside the components are never generated unless Tailwind scans node_modules/@horon-ai/lynx/src.",
   },
 
   postcssHeading: { ko: "PostCSS 설정", en: "PostCSS config" },
@@ -324,7 +324,7 @@ bun add -d tailwindcss@^3 @lynx-js/tailwind-preset`,
 const horonPreset = require("@horon-ai/lynx/tailwind-preset");
 
 module.exports = {
-  content: ["./src/**/*.{ts,tsx}"],
+  content: ["./src/**/*.{ts,tsx}", "./node_modules/@horon-ai/lynx/src/**/*.{ts,tsx}"],
   presets: [lynxPreset, horonPreset],
   corePlugins: { preflight: false },
 };`,

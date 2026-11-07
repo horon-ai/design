@@ -19,11 +19,13 @@ const lynxPreset = require("@lynx-js/tailwind-preset");
 const horonPreset = require("@horon-ai/lynx/tailwind-preset");
 
 module.exports = {
-  content: ["./src/**/*.{ts,tsx}"],
+  content: ["./src/**/*.{ts,tsx}", "./node_modules/@horon-ai/lynx/src/**/*.{ts,tsx}"],
   presets: [lynxPreset, horonPreset],
   corePlugins: { preflight: false },
 };
 ```
+
+`content`에 `./node_modules/@horon-ai/lynx/src/**/*.{ts,tsx}`를 넣는 이유는 이 패키지가 TypeScript 소스를 그대로 배포하기 때문입니다. `globals.css`의 `@tailwind utilities`는 소비자의 `content`를 보고 클래스를 만들므로, 패키지 소스를 스캔하지 않으면 컴포넌트 안에서만 쓰는 클래스가 CSS에 빠집니다.
 
 ```tsx
 // 앱 진입점
