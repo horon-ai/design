@@ -15,7 +15,7 @@ export type MarketplaceCardProps = Omit<ComponentProps<"div">, "children"> & {
   author?: ReactNode;
   /** Body copy under the header; any length, wrapped by the paragraph. */
   description?: ReactNode;
-  /** Capability chips, each with an optional 11px icon. */
+  /** Capability chips, each with an optional 12px icon. */
   chips?: {
     /** Stable key for this chip; also its React key. */
     id: string;
