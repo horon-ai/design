@@ -269,8 +269,9 @@ export type FlueBackgroundProps = {
  * canvas, so it never intercepts input and the content above it stays readable. Settings resolve as palette +
  * variant tuning + `config`; the effect is keyed by their JSON, so changing `config` rebuilds the program.
  * Drawing pauses while the canvas is off-screen (`IntersectionObserver`) or the tab is hidden, and the
- * device-pixel ratio is capped by `maxDpr`. `cursor` switches the real pointer for a slow virtual one that
- * wanders on two incommensurate sines — the default, so a pointerless panel still breathes. A context lost
+ * device-pixel ratio is capped by `maxDpr`. `cursor: 0` (the default) swaps the real pointer for a slow
+ * virtual one that wanders on two incommensurate sines, so a pointerless panel still breathes; `cursor: 1`
+ * follows the real pointer. A context lost
  * by a previous run leaves the flat color instead of throwing, and cleanup frees this run's GL objects
  * without dropping the shared context.
  *
