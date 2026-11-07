@@ -338,3 +338,106 @@
     color: var(--color-text-primary);
   }
 }
+
+/* Code sample palette. These are site-only colours for the docs reader, not
+ * design tokens, so the Figma-sourced token set in packages/tokens stays
+ * untouched. Role names match CodeRole in src/lib/highlight.ts. */
+:root {
+  --site-code-keyword: #cf222e;
+  --site-code-operator: #cf222e;
+  --site-code-function: #8250df;
+  --site-code-tag: #116329;
+  --site-code-type: #953800;
+  --site-code-attribute: #0550ae;
+  --site-code-property: #0550ae;
+  --site-code-string: #0a3069;
+  --site-code-number: #0550ae;
+  --site-code-punctuation: #57606a;
+  --site-code-comment: #59636e;
+  --site-code-tw-variant: #8250df;
+  --site-code-tw-utility: #116329;
+  --site-code-tw-value: #953800;
+  --site-code-tw-modifier: #cf222e;
+}
+
+.dark {
+  --site-code-keyword: #ff7b72;
+  --site-code-operator: #ff7b72;
+  --site-code-function: #d2a8ff;
+  --site-code-tag: #7ee787;
+  --site-code-type: #ffa657;
+  --site-code-attribute: #79c0ff;
+  --site-code-property: #79c0ff;
+  --site-code-string: #a5d6ff;
+  --site-code-number: #79c0ff;
+  --site-code-punctuation: #8b949e;
+  --site-code-comment: #8b949e;
+  --site-code-tw-variant: #d2a8ff;
+  --site-code-tw-utility: #7ee787;
+  --site-code-tw-value: #ffa657;
+  --site-code-tw-modifier: #ff7b72;
+}
+
+@layer components {
+  .site-code-keyword {
+    color: var(--site-code-keyword);
+  }
+
+  .site-code-operator {
+    color: var(--site-code-operator);
+  }
+
+  .site-code-function {
+    color: var(--site-code-function);
+  }
+
+  .site-code-tag {
+    color: var(--site-code-tag);
+  }
+
+  .site-code-type {
+    color: var(--site-code-type);
+  }
+
+  .site-code-attribute {
+    color: var(--site-code-attribute);
+  }
+
+  .site-code-property {
+    color: var(--site-code-property);
+  }
+
+  .site-code-string {
+    color: var(--site-code-string);
+  }
+
+  .site-code-number {
+    color: var(--site-code-number);
+  }
+
+  .site-code-punctuation {
+    color: var(--site-code-punctuation);
+  }
+
+  /* Comments are italic as well as muted. */
+  .site-code-comment {
+    color: var(--site-code-comment);
+    font-style: italic;
+  }
+
+  .site-code-tw-variant {
+    color: var(--site-code-tw-variant);
+  }
+
+  .site-code-tw-utility {
+    color: var(--site-code-tw-utility);
+  }
+
+  .site-code-tw-value {
+    color: var(--site-code-tw-value);
+  }
+
+  .site-code-tw-modifier {
+    color: var(--site-code-tw-modifier);
+  }
+}
