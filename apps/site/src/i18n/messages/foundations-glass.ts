@@ -9,16 +9,16 @@ export const foundationsGlassMessages = defineMessages({
   },
   layersHeading: { ko: "레이어", en: "Layers" },
   layersBody: {
-    ko: "아래에서 위로 세 겹입니다. React의 LiquidGlass와 Flutter의 HoronLiquidGlass가 @horon-ai/tokens의 같은 값을 읽습니다.",
-    en: "Three layers, bottom to top. React's LiquidGlass and Flutter's HoronLiquidGlass read the same values from @horon-ai/tokens.",
+    ko: "아래에서 위로 세 겹입니다. React의 LiquidGlass와 Lynx의 LiquidGlass가 @horon-ai/tokens의 같은 값을 읽습니다. Lynx는 <blur-view>로 배경을 거르고, 이 요소가 채도 값을 받지 않아 흐림만 겁니다. 지원하지 않는 엔진은 glass-fill-frost 채움으로 떨어집니다.",
+    en: "Three layers, bottom to top. React's LiquidGlass and Lynx's LiquidGlass read the same values from @horon-ai/tokens. Lynx filters the backdrop with <blur-view>, which takes no saturation value, so it blurs only. Engines without it fall back to the glass-fill-frost fill.",
   },
   backdropItem: {
-    ko: "배경: 뒤 내용을 {blur}px 흐리게 하고 채도를 {saturate}%로 올립니다.",
-    en: "Backdrop: blurs what is behind by {blur}px and raises saturation to {saturate}%.",
+    ko: "배경: 뒤 내용을 {blur}px 흐리게 하고 채도를 {saturate}%로 올립니다. Lynx의 <blur-view>는 흐림만 겁니다.",
+    en: "Backdrop: blurs what is behind by {blur}px and raises saturation to {saturate}%. Lynx's <blur-view> blurs only.",
   },
   fillItem: {
-    ko: "채움: glass-clear, glass-regular, glass-thick 중 하나입니다. React는 호스트가 칠하고 Flutter는 위젯이 칠합니다.",
-    en: "Fill: one of glass-clear, glass-regular, or glass-thick. In React the host paints it; in Flutter the widget does.",
+    ko: "채움: glass-clear, glass-regular, glass-thick 중 하나입니다. React와 Lynx 모두 호스트가 칠합니다. Lynx의 HoronProvider는 <blur-view>를 쓸 수 있는 엔진에서 반투명 값으로 바꾸고, 쓸 수 없으면 glass-fill-frost를 유지합니다.",
+    en: "Fill: one of glass-clear, glass-regular, or glass-thick. In both React and Lynx the host paints it. Lynx's HoronProvider swaps in the translucent value on engines that can use <blur-view> and keeps glass-fill-frost where it cannot.",
   },
   borderItem: {
     ko: "테두리: 가장자리 안쪽 {width}px 링입니다. 위가 가장 밝고({top}), 가운데에서 옅어졌다가({mid}) 아래에서 조금 다시 밝아집니다({bottom}). 다크 모드는 더 옅습니다.",

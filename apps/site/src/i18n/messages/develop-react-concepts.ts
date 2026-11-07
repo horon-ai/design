@@ -78,8 +78,8 @@ export const conceptsMessages = defineMessages({
   },
   glassMaterialHeading: { ko: "재질", en: "The material" },
   glassMaterialBody: {
-    ko: "LiquidGlass는 @horon-ai/tokens의 glass.ts 값을 그대로 씁니다. Flutter의 HoronLiquidGlass도 같은 값을 읽어 web, desktop(WebView2, WKWebView), iOS, Android가 같은 모습이 됩니다.",
-    en: "LiquidGlass reads the values in glass.ts from @horon-ai/tokens. Flutter's HoronLiquidGlass reads the same values, so web, desktop (WebView2, WKWebView), iOS and Android look the same.",
+    ko: "LiquidGlass는 @horon-ai/tokens의 glass.ts 값을 그대로 씁니다. Lynx의 LiquidGlass도 같은 값을 읽고, 배경은 <blur-view>로 겁니다. iOS는 Liquid Glass, web은 CSS backdrop-filter, Android와 HarmonyOS는 캡처 블러를 쓰고, 지원하지 않는 엔진은 glass-fill-frost로 떨어집니다. <blur-view>가 채도 값을 받지 않아 Lynx에서는 saturate(1.8)가 빠집니다.",
+    en: "LiquidGlass reads the values in glass.ts from @horon-ai/tokens. Lynx's LiquidGlass reads the same values and filters the backdrop with <blur-view>: iOS renders Liquid Glass, the web engine turns it into a CSS backdrop-filter, and Android and HarmonyOS blur the captured backdrop. Engines without it fall back to glass-fill-frost. <blur-view> takes no saturation value, so saturate(1.8) is dropped in Lynx.",
   },
   glassMaterialBackdropItem: {
     ko: "배경: 뒤 내용을 20px 흐리게 하고 채도를 180%로 올립니다.",
