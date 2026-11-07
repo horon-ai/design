@@ -38,5 +38,6 @@ dist-ssr
 # .omo runtime (harness state is local only, never tracked)
 .omo/
 .hyper/
+.omd/
 
 .verify/
