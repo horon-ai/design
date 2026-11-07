@@ -3,27 +3,54 @@ import { type ComponentProps, type ReactNode, useState } from "react";
 import { cn } from "../lib/cn";
 import { SegmentedControl } from "./segmented-control";
 
+/**
+ * Permission a tool can be given.
+ *
+ * - `allow`: runs without asking.
+ * - `ask`: asks for confirmation before each call; the fallback when a `ToolPermissionItem` has no `defaultValue`.
+ * - `off`: the tool is disabled.
+ */
 export type ToolPermission = "allow" | "ask" | "off";
 
+/**
+ * One tool row in {@link ToolPermissions}.
+ */
 export type ToolPermissionItem = {
+  /** Tool name, shown in mono type; also the key used in `values`. */
   name: string;
+  /** Caption under the name, such as what the tool reads or writes. */
   description?: ReactNode;
   /** Starting choice for the uncontrolled component; defaults to `ask`. */
   defaultValue?: ToolPermission;
 };
 
+/**
+ * Props for {@link ToolPermissions}.
+ */
 export type ToolPermissionsProps = Omit<ComponentProps<"div">, "className" | "title" | "onChange"> & {
+  /** Header title, such as "Tool access". */
   title: ReactNode;
+  /** One row per tool, in display order; the row count also fills the header pill. */
   tools: ToolPermissionItem[];
   /** Controlled choices keyed by tool name. */
   values?: Record<string, ToolPermission>;
+  /** Called with the complete next map whenever one row changes or "Allow all" is pressed. */
   onValuesChange?: (values: Record<string, ToolPermission>) => void;
   /** Label of the text button that sets every tool to Allow. */
   allowAllLabel?: ReactNode;
+  /** Extra classes for the card root. */
   className?: string;
 };
 
-const options: { value: ToolPermission; label: string }[] = [
+/**
+ * Segmented control options in display order; each row renders the same Allow / Ask / Off triple.
+ */
+const options: {
+  /** Permission stored for the tool when this segment is picked. */
+  value: ToolPermission;
+  /** Segment label shown to the user. */
+  label: string;
+}[] = [
   { value: "allow", label: "Allow" },
   { value: "ask", label: "Ask" },
   { value: "off", label: "Off" },
@@ -34,6 +61,27 @@ const options: { value: ToolPermission; label: string }[] = [
  * carries the group title, a count pill and an "Allow all" text button; below it one divided row per tool
  * with a mono name, a description and a small solid Allow / Ask / Off segmented control. 16px side padding
  * on every row so the names, the header title and the controls line up.
+ *
+ * The component is uncontrolled by default, seeding each row from `ToolPermissionItem.defaultValue`
+ * (or `ask`). Pass `values` and `onValuesChange` to control every row at once; the controlled map wins
+ * over the internal state, and the internal copy is still updated on each change.
+ *
+ * @example
+ * ```tsx
+ * import { ToolPermissions } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <ToolPermissions
+ *       title="Tool access"
+ *       tools={[
+ *         { name: "web_search", description: "Read public pages", defaultValue: "allow" },
+ *         { name: "shell", description: "Run local commands" },
+ *       ]}
+ *     />
+ *   );
+ * }
+ * ```
  */
 export function ToolPermissions({
   title,

@@ -4,7 +4,11 @@ import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
+/**
+ * Props for {@link UsageMeter}.
+ */
 export type UsageMeterProps = {
+  /** What the meter measures, such as "Tasks used"; sits left of the percentage. */
   label: ReactNode;
   /** 0-100. */
   value: number;
@@ -12,12 +16,34 @@ export type UsageMeterProps = {
   detail?: ReactNode;
   /** Right caption, such as "Resets Nov 1". */
   note?: ReactNode;
-  /** `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass card. */
+  /** `solid` (default) is an opaque surface card with a default border; `glass` is the thick glass card. @default "solid" */
   surface?: "solid" | "glass";
+  /** Extra classes for the meter root. */
   className?: string;
 };
 
-/** Figma `Usage meter` (in Loading 109:733): a card with a 6px sky fill, solid or thick glass. */
+/**
+ * Figma `Usage meter` (in Loading 109:733): a card with a 6px sky fill, solid or thick glass.
+ *
+ * Built on Base UI `Meter`, so the percentage is exposed to assistive technology and the fill
+ * animates its width over 400ms. The fill is the single `sky-500` accent; the card caps at 300px wide.
+ *
+ * @example
+ * ```tsx
+ * import { UsageMeter } from "@horon-ai/react";
+ *
+ * function Example() {
+ *   return (
+ *     <UsageMeter
+ *       label="Tasks"
+ *       value={64}
+ *       detail="6,420 of 10,000 tasks"
+ *       note="Resets Nov 1"
+ *     />
+ *   );
+ * }
+ * ```
+ */
 export function UsageMeter({ label, value, detail, note, surface = "solid", className }: UsageMeterProps) {
   return (
     <Meter.Root
