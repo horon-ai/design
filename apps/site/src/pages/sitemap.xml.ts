@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { components } from "@/data/components";
-import { foundationsNav } from "@/data/nav";
+import { flutterDocsNav, foundationsNav, reactDocsNav } from "@/data/nav";
 import { siteHref } from "@/lib/urls";
 
 const pages = [
@@ -10,6 +10,9 @@ const pages = [
   "/components",
   "/mascot",
   "/updates",
+  "/develop",
+  ...reactDocsNav.flatMap((group) => group.items.map((item) => item.href)),
+  ...flutterDocsNav.flatMap((group) => group.items.map((item) => item.href)),
   ...foundationsNav.filter((item) => item.href !== "/foundations").map((item) => item.href),
   ...components.map((component) => `/components/${component.slug}`),
 ];

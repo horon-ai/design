@@ -15,7 +15,7 @@ import { Fragment, useLayoutEffect, useRef } from "react";
 import { Sidebar, SidebarGroup, SidebarItem } from "@horon-ai/react";
 
 import { componentGroups, componentsInGroup } from "@/data/components";
-import { developNav, foundationsNav, isActive, primaryNav } from "@/data/nav";
+import { flutterDocsNav, foundationsNav, isActive, primaryNav, reactDocsNav, type NavGroup } from "@/data/nav";
 import { siteHref } from "@/lib/urls";
 import { pick, type Locale, type Localized } from "@/i18n";
 import { docsMessages } from "@/i18n/messages/docs";
@@ -41,12 +41,26 @@ interface DocsSidebarBlock {
   entries: DocsSidebarEntry[];
 }
 
+/** A docs nav group rendered as one labelled sidebar block, matched by exact path. */
+function sidebarBlock(group: NavGroup, currentPath: string): DocsSidebarBlock {
+  return {
+    key: group.key,
+    label: group.label,
+    entries: group.items.map((item) => ({
+      label: item.label,
+      href: item.href,
+      current: currentPath === item.href,
+    })),
+  };
+}
+
 /**
  * The one place the docs layout reads the site data modules. Labels are
  * `Localized` and stay untouched here so the components pick per render; the
- * `current` flag is the only computed value, and it mirrors the old sidebar's
- * rules (the Foundations overview is exact-match only, everything else uses
- * `isActive`).
+ * `current` flag is the only computed value. The Foundations list and the
+ * Develop section match on an exact path: `/develop` and `/develop/react`
+ * both head their section, so a prefix match would highlight the index on
+ * every child page.
  */
 export function docsSidebarBlocks(section: string, currentPath: string): DocsSidebarBlock[] {
   if (section === "foundations") {
@@ -65,16 +79,10 @@ export function docsSidebarBlocks(section: string, currentPath: string): DocsSid
   if (section === "develop") {
     return [
       {
-        key: "develop",
-        entries: [
-          { label: docsMessages.overview, href: "/develop", current: currentPath === "/develop" },
-          ...developNav.map((item) => ({
-            label: item.label,
-            href: item.href,
-            current: isActive(currentPath, item.href),
-          })),
-        ],
+        key: "overview",
+        entries: [{ label: docsMessages.overview, href: "/develop", current: currentPath === "/develop" }],
       },
+      ...[...reactDocsNav, ...flutterDocsNav].map((group) => sidebarBlock(group, currentPath)),
     ];
   }
 
