@@ -18,7 +18,7 @@ export type PageHeaderProps = {
   actions?: ReactNode;
   /** Content under the top row, such as a `SegmentedControl` filter. Animates in with `swap-move` when it appears. */
   children?: ReactNode;
-  /** `solid` (default) is an opaque surface header with a default border; `glass` is the regular glass header. */
+  /** `solid` (default) is an opaque surface header with a default border; `glass` is the regular glass header. @default "solid" */
   surface?: "solid" | "glass";
   /** Extra classes on the `header` element, merged after the built-in ones. */
   className?: string;

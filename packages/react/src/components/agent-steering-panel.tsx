@@ -47,7 +47,7 @@ export type AgentSteeringPanelProps = Omit<ComponentProps<"section">, "className
   onPausedChange?: (paused: boolean) => void;
   /** Ordered steps of the running task; the connector under a done step turns live green. */
   steps: SteeringStep[];
-  /** Notes queued for the next step, plus any already applied. */
+  /** Notes queued for the next step, plus any already applied. @default [] */
   notes?: SteeringNote[];
   /** Fires with the note id when its "Now" button is pressed, to apply it immediately. */
   onApplyNow?: (id: string) => void;

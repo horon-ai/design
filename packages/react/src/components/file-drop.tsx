@@ -20,7 +20,7 @@ export type FileDropProps = Omit<ComponentProps<"input">, "className" | "type" |
   rejected?: boolean;
   /** Called with the dropped or picked files, in picker order; fires on both drop and native file input change. */
   onFiles?: (files: File[]) => void;
-  /** `solid` (default) fills the target with the raised surface; `glass` puts it on the veil over imagery. */
+  /** `solid` (default) fills the target with the raised surface; `glass` puts it on the veil over imagery. @default "solid" */
   surface?: FileDropSurface;
   /** Extra classes for the label that forms the target. */
   className?: string;

@@ -41,7 +41,7 @@ export type DialogContentProps = Omit<ComponentProps<typeof BaseDialog.Popup>, "
   title: ReactNode;
   /** Optional `body-md` secondary paragraph under the title, wired to the popup's description. */
   description?: ReactNode;
-  /** Label for the close button; hides it when `null`. */
+  /** Label for the close button; hides it when `null`. @default "Close" */
   closeLabel?: string | null;
   /** Slot marker on the close control, for a surface its own app selects the control by. */
   closeSlot?: string;

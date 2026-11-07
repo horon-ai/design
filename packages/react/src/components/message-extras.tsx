@@ -57,7 +57,7 @@ export function MessageActions({
 }: {
   /** Buttons of the pill, rendered in order; each needs a unique label. */
   actions: MessageAction[];
-  /** `solid` (default) is an opaque surface pill with a default border; `glass` is the regular glass pill. */
+  /** `solid` (default) is an opaque surface pill with a default border; `glass` is the regular glass pill. @default "solid" */
   surface?: "solid" | "glass";
   /** Extra classes on the pill, merged after the built-in ones. */
   className?: string;

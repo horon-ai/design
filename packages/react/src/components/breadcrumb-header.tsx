@@ -28,7 +28,7 @@ export type BreadcrumbHeaderProps = Omit<ComponentProps<"header">, "className"> 
   searchLabel?: string;
   /** Accessible label of the more button. @default "More" */
   moreLabel?: string;
-  /** `solid` (default) on the page, `glass` over imagery and glass panels. */
+  /** `solid` (default) on the page, `glass` over imagery and glass panels. @default "solid" */
   surface?: "solid" | "glass";
   /** Extra classes merged onto the header. */
   className?: string;

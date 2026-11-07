@@ -80,13 +80,13 @@ export type AgentLanesTimelineApproval = {
 export type AgentLanesTimelineProps = Omit<ComponentProps<"section">, "className" | "title"> & {
   /** Panel heading. @default "Bots" */
   title?: ReactNode;
-  /** Legend entries shown next to the heading. */
+  /** Legend entries shown next to the heading. @default [] */
   statuses?: LaneStatus[];
   /** The range pill at the header's right edge. @default "Last 30m" */
   range?: ReactNode;
   /** One row per bot, in lane order; at least two row heights are always reserved. */
   bots: LaneBot[];
-  /** Hand-off curves drawn over the rows; a hand-off naming an unknown task is skipped. */
+  /** Hand-off curves drawn over the rows; a hand-off naming an unknown task is skipped. @default [] */
   handoffs?: LaneHandoff[];
   /** Window length in minutes; the tick labels sit every five. @default 30 */
   windowMinutes?: number;

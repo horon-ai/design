@@ -47,7 +47,7 @@ export type OrchestratorSummary = {
 export type OrchestratorPanelProps = {
   /** Panel heading, rendered as the `h3`. */
   title: ReactNode;
-  /** Label before the segmented picker, such as "Bots in parallel". */
+  /** Label before the segmented picker, such as "Bots in parallel". @default "Bots in parallel" */
   parallelLabel?: ReactNode;
   /** Choices of the parallel picker. The picker only renders when this is set. */
   parallelOptions?: number[];

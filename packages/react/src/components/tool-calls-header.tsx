@@ -10,13 +10,13 @@ import { cn } from "../lib/cn";
 export type ToolCallsHeaderProps = {
   /** Up to three 14px tool icons, drawn as overlapping 28px chips. */
   icons?: ReactNode;
-  /** Header text; defaults to "Using tools…". */
+  /** Header text; defaults to "Using tools…". @default "Using tools…" */
   title?: ReactNode;
   /** Elapsed time, such as "4.0s". */
   elapsed?: ReactNode;
   /** `ToolCall` cards, stacked 8px apart under the header. */
   children?: ReactNode;
-  /** Starts with the cards shown; the group manages its own open state afterwards. */
+  /** Starts with the cards shown; the group manages its own open state afterwards. @default true */
   defaultOpen?: boolean;
   /** Controlled open state; pass `onOpenChange` too when set. */
   open?: boolean;
