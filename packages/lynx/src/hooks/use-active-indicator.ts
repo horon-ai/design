@@ -110,7 +110,13 @@ export function useActiveIndicator(activeIndex: number): ActiveIndicator {
       height: item.height,
     };
     setRect((previous) =>
-      previous && previous.left === next.left && previous.top === next.top && previous.width === next.width && previous.height === next.height ? previous : next,
+      previous &&
+      previous.left === next.left &&
+      previous.top === next.top &&
+      previous.width === next.width &&
+      previous.height === next.height
+        ? previous
+        : next,
     );
   }, []);
 

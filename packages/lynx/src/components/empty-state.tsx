@@ -3,7 +3,8 @@ import type { ReactNode } from "@lynx-js/react";
 import { cn } from "../lib/cn";
 
 /** Text slots take a string so the token classes can sit on a `<text>`; a node keeps its own styling. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** Props for {@link EmptyState}: an optional illustration, the copy and one action. */
 export type EmptyStateProps = {
@@ -40,7 +41,7 @@ export function EmptyState({ illustration, title, description, action, className
   return (
     <view
       className={cn(
-        "flex w-full max-w-[360px] motion-rise flex-col items-center gap-3 px-6 py-8 text-center",
+        "motion-rise flex w-full max-w-[360px] flex-col items-center gap-3 px-6 py-8 text-center",
         className,
       )}
     >
@@ -48,12 +49,12 @@ export function EmptyState({ illustration, title, description, action, className
         <view className="flex size-[140px] shrink-0 items-center justify-center">{illustration}</view>
       ) : null}
       <view className="w-full">
-        {isPlainText(title) ? <text className="text-title-md text-center text-text-primary">{title}</text> : title}
+        {isPlainText(title) ? <text className="text-center text-title-md text-text-primary">{title}</text> : title}
       </view>
       {description ? (
         <view className="w-full self-stretch">
           {isPlainText(description) ? (
-            <text className="text-body-md text-center text-text-secondary">{description}</text>
+            <text className="text-center text-body-md text-text-secondary">{description}</text>
           ) : (
             description
           )}

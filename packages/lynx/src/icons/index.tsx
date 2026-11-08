@@ -66,11 +66,15 @@ export function Icon({ name, size = 16, weight = "regular", color = "text-primar
     const svg = glyphs[weight] ?? glyphs.regular;
     if (!svg) return "";
     const fill = isHexColor(color) ? color : theme.color(color);
-    return svg.replaceAll("__COLOR__", fill);
+    // Lynx's main thread runs ES2019, which has no String.prototype.replaceAll.
+    return svg.split("__COLOR__").join(fill);
   }, [name, weight, color, theme]);
 
   return (
-    <view className={cn("flex items-center justify-center", className)} style={{ width: `${size}px`, height: `${size}px` }}>
+    <view
+      className={cn("flex items-center justify-center", className)}
+      style={{ width: `${size}px`, height: `${size}px` }}
+    >
       <svg content={content} style={{ width: `${size}px`, height: `${size}px` }} />
     </view>
   );

@@ -53,11 +53,7 @@ export default function AgentActivityDemo() {
           Replay
         </Button>
         <ToolStep state="running" title="Searching Gmail" detail="41 emails from last night" />
-        <ToolStep
-          state="failed"
-          title="Couldn't open the calendar"
-          detail="Calendar needs to be reconnected"
-        />
+        <ToolStep state="failed" title="Couldn't open the calendar" detail="Calendar needs to be reconnected" />
         <WorkLog
           summary="Worked for 42s · 3 steps"
           steps={[

@@ -70,7 +70,7 @@ export function AgentPanel({
   return (
     <view
       className={cn(
-        "flex min-w-0 flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-5 pt-4 pb-2",
+        "flex min-w-0 flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-5 pb-2 pt-4",
         className,
       )}
       style={style}
@@ -122,7 +122,7 @@ export function ComposerChip({
   return (
     <view
       className={cn(
-        "flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-5 pr-2.5 pl-2 motion-press",
+        "motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-5 pl-2 pr-2.5",
         disabled ? "opacity-40" : "active:bg-overlay-ink-10",
         className,
       )}
@@ -245,10 +245,7 @@ export function TaskComposer({
 
   return (
     <view
-      className={cn(
-        "flex flex-col gap-3.5 rounded-xl bg-overlay-ink-4 px-4 pt-3.5 pb-2.5 motion-colors",
-        className,
-      )}
+      className={cn("motion-colors flex flex-col gap-3.5 rounded-xl bg-overlay-ink-4 px-4 pb-2.5 pt-3.5", className)}
       style={focused ? FOCUS_RING : undefined}
     >
       <textarea
@@ -270,7 +267,7 @@ export function TaskComposer({
         <view className="min-w-0 flex-1" />
         {keyboardHints ? <Kbd keys="Mod+Enter" /> : null}
         <view
-          className="flex h-[30px] shrink-0 flex-row items-center rounded-full bg-interactive-primary px-3.5 motion-press active:bg-interactive-primary-hover"
+          className="motion-press flex h-[30px] shrink-0 flex-row items-center rounded-full bg-interactive-primary px-3.5 active:bg-interactive-primary-hover"
           bindtap={onStart}
           accessibility-element
           accessibility-traits="button"

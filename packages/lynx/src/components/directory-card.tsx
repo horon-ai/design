@@ -70,7 +70,7 @@ export function DirectoryCard({
   return (
     <view
       className={cn(
-        "relative flex flex-row items-center gap-3 overflow-hidden rounded-2xl py-3 pr-3 pl-3",
+        "relative flex flex-row items-center gap-3 overflow-hidden rounded-2xl py-3 pl-3 pr-3",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         className,
       )}

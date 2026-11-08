@@ -188,7 +188,7 @@ export function Button({
   );
 
   const classes = cn(
-    "relative flex shrink-0 flex-row items-center justify-center overflow-hidden whitespace-nowrap select-none",
+    "relative flex shrink-0 select-none flex-row items-center justify-center overflow-hidden whitespace-nowrap",
     variant === "link" ? "" : "motion-press rounded-full",
     variant === "link" ? "" : sizeClass[size],
     disabled ? "opacity-40" : "cursor-pointer",
@@ -217,10 +217,19 @@ export function Button({
       {variant === "glass" && <LiquidGlass />}
       {icon ? (
         <view className="relative flex shrink-0 flex-row items-center">
-          {tintIcon(icon, variant === "link" ? LINK_ICON_SIZE : iconSize[size], current ? "text-primary" : iconColor[variant])}
+          {tintIcon(
+            icon,
+            variant === "link" ? LINK_ICON_SIZE : iconSize[size],
+            current ? "text-primary" : iconColor[variant],
+          )}
         </view>
       ) : null}
-      <view className={cn("relative flex flex-row items-center", hasElementChild && (variant === "link" ? "gap-1.5" : size === "sm" ? "gap-1.5" : "gap-2"))}>
+      <view
+        className={cn(
+          "relative flex flex-row items-center",
+          hasElementChild && (variant === "link" ? "gap-1.5" : size === "sm" ? "gap-1.5" : "gap-2"),
+        )}
+      >
         {isPlain ? (
           <text
             className={cn(

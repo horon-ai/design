@@ -175,7 +175,7 @@ export function TextareaField({
       </view>
       <view
         className={cn(
-          "relative flex w-full overflow-hidden rounded-md border motion-colors",
+          "motion-colors relative flex w-full overflow-hidden rounded-md border",
           boxClass[size],
           boxSurface,
         )}
@@ -203,18 +203,8 @@ export function TextareaField({
         />
       </view>
       {description || error || maxLength !== undefined ? (
-        <view
-          className={cn(
-            "flex w-full flex-row items-center gap-2 motion-colors",
-          )}
-        >
-          <text
-            className={cn(
-              "min-w-0 flex-1",
-              metaClass[size],
-              invalid ? "text-text-danger" : "text-text-secondary",
-            )}
-          >
+        <view className={cn("motion-colors flex w-full flex-row items-center gap-2")}>
+          <text className={cn("min-w-0 flex-1", metaClass[size], invalid ? "text-text-danger" : "text-text-secondary")}>
             {invalid ? error : description}
           </text>
           {maxLength === undefined ? null : (

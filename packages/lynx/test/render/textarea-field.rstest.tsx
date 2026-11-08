@@ -29,7 +29,13 @@ const renderField = (element: React.ReactElement) => {
 test("the counter follows typing", async () => {
   const onChange = rstest.fn();
   const { container, field } = renderField(
-    <TextareaField label="Instructions" hint="Optional" description="The bot reads this." maxLength={240} onChange={onChange} />,
+    <TextareaField
+      label="Instructions"
+      hint="Optional"
+      description="The bot reads this."
+      maxLength={240}
+      onChange={onChange}
+    />,
   );
 
   expect(container.textContent).toContain("0 / 240");
@@ -42,7 +48,12 @@ test("the counter follows typing", async () => {
 
 test("an error replaces the description and turns the footer red", () => {
   const { container } = renderField(
-    <TextareaField label="Instructions" description="The bot reads this." error="Add at least 40 characters." maxLength={240} />,
+    <TextareaField
+      label="Instructions"
+      description="The bot reads this."
+      error="Add at least 40 characters."
+      maxLength={240}
+    />,
   );
 
   expect(container.textContent).toContain("Add at least 40 characters.");

@@ -17,7 +17,13 @@ function Fields({ surface }: { surface: "solid" | "glass" }) {
         description="The bot reads this before every task."
         maxLength={240}
       />
-      <TextareaField className="w-full" surface={surface} label="Instructions" defaultValue="Skip newsletters." maxLength={240} />
+      <TextareaField
+        className="w-full"
+        surface={surface}
+        label="Instructions"
+        defaultValue="Skip newsletters."
+        maxLength={240}
+      />
       <TextareaField
         className="w-full"
         surface={surface}

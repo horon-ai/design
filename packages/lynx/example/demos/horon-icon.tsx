@@ -30,7 +30,11 @@ export default function HoronIconDemo() {
 
       <view className="flex flex-row flex-wrap gap-2">
         {iconNames.map((name) => (
-          <view key={name} className="motion-colors flex flex-col items-center gap-2 rounded-lg px-2 py-3" style={{ width: "7.5rem" }}>
+          <view
+            key={name}
+            className="motion-colors flex flex-col items-center gap-2 rounded-lg px-2 py-3"
+            style={{ width: "7.5rem" }}
+          >
             <HoronGlyph name={name} size={24} />
             <text className="max-w-full text-caption text-text-secondary">{name}</text>
           </view>

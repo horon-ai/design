@@ -113,7 +113,7 @@ export function Textarea({
   readOnly = false,
   id,
   size = "md",
-  invalid = false,
+  invalid,
   surface = "solid",
   className,
   textareaClassName,

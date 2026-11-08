@@ -17,7 +17,11 @@ export default function EmptyStateDemo() {
         title="Meet your first bot"
         description="Give it a role and a task. It keeps working after you close the laptop."
         action={
-          <view className="rounded-md bg-interactive-primary px-4 py-2" accessibility-element accessibility-traits="button">
+          <view
+            className="rounded-md bg-interactive-primary px-4 py-2"
+            accessibility-element
+            accessibility-traits="button"
+          >
             <text className="text-label-lg text-text-inverse">Create a bot</text>
           </view>
         }
@@ -27,7 +31,11 @@ export default function EmptyStateDemo() {
         title="Nothing matches"
         description="Try another name or clear the filter."
         action={
-          <view className="rounded-md bg-interactive-primary px-4 py-2" accessibility-element accessibility-traits="button">
+          <view
+            className="rounded-md bg-interactive-primary px-4 py-2"
+            accessibility-element
+            accessibility-traits="button"
+          >
             <text className="text-label-lg text-text-inverse">Clear filter</text>
           </view>
         }

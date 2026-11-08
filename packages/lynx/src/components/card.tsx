@@ -47,7 +47,8 @@ export type CardProps = Omit<PortedElementProps["div"], "className" | "title"> &
  * Text slots take a string so the component can put the token classes on a `<text>`;
  * Lynx does not inherit colour or type, so a caller's own node keeps its own styling.
  */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * Figma `Card` (63:310): a 320px thick-glass card, 20px padding and radius, Default / Interactive / Selected.
@@ -93,11 +94,11 @@ export function Card({
         // `min-w-0` keeps the grid/flex min-content of the card from widening a
         // narrow parent; the glass layer is the first child and paints in flow
         // order, so nothing needs a stacking-context patch.
-        "relative flex min-w-0 flex-col items-start gap-2 overflow-hidden rounded-xl p-5 text-left motion-colors",
+        "motion-colors relative flex min-w-0 flex-col items-start gap-2 overflow-hidden rounded-xl p-5 text-left",
         surface === "solid" ? "border border-border-default bg-bg-surface" : "bg-glass-thick",
         surface === "frost" && "bg-glass-fill-frost shadow-[0_8px_24px_#0a14240f]",
         selected && (surface === "solid" ? "border-border-brand" : "border border-border-brand"),
-        interactive && "active:scale-[0.99] transition-transform duration-150 ease-out",
+        interactive && "transition-transform duration-150 ease-out active:scale-[0.99]",
         className,
       )}
       style={style}

@@ -115,7 +115,8 @@ function popupPlacement(anchor: AnchorRect, panel: PanelSize): CSSProperties {
   return { top, left, minWidth: anchor.width };
 }
 
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** Lynx has no hover, so react's hover border becomes the pressed border. */
 const triggerFocusClass = "active:border-border-strong";
@@ -179,9 +180,13 @@ export function PickerField({
     <>
       <view
         className={cn(
-          "relative max-w-full min-w-0 rounded-md motion-colors",
+          "motion-colors relative min-w-0 max-w-full rounded-md",
           triggerSizeClass[size],
-          surface === "glass" ? "veil-field" : surface === "inset" ? "bg-overlay-ink-4" : "border border-border-default bg-bg-surface",
+          surface === "glass"
+            ? "veil-field"
+            : surface === "inset"
+              ? "bg-overlay-ink-4"
+              : "border border-border-default bg-bg-surface",
           surface !== "glass" && triggerFocusClass,
           className,
         )}
@@ -199,7 +204,9 @@ export function PickerField({
         {chosen === null ? (
           <view className="relative flex min-w-0 flex-1 flex-row items-center" />
         ) : isPlainText(chosen) ? (
-          <text className={cn("relative min-w-0 flex-1 truncate text-text-primary", valueSizeClass[size])}>{chosen}</text>
+          <text className={cn("relative min-w-0 flex-1 truncate text-text-primary", valueSizeClass[size])}>
+            {chosen}
+          </text>
         ) : (
           <view className="relative flex min-w-0 flex-1 flex-row items-center overflow-hidden">{chosen}</view>
         )}
@@ -227,7 +234,7 @@ export function PickerField({
           />
           <view
             className={cn(
-              "fixed z-50 flex flex-col overflow-hidden rounded-xl motion-popup max-w-[calc(100vw-2rem)]",
+              "motion-popup fixed z-50 flex max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-xl",
               size === "sm" ? "p-1" : size === "lg" ? "p-2" : "p-1.5",
               surface === "solid" ? "border border-border-default bg-bg-surface shadow-popover" : "veil-overlay",
             )}
@@ -235,7 +242,9 @@ export function PickerField({
             bindlayoutchange={(event: LayoutChangeLike) => {
               const box = boxOf(event);
               setPanel((previous) =>
-                previous.width === box.width && previous.height === box.height ? previous : { width: box.width, height: box.height },
+                previous.width === box.width && previous.height === box.height
+                  ? previous
+                  : { width: box.width, height: box.height },
               );
             }}
             accessibility-element
@@ -249,7 +258,7 @@ export function PickerField({
                     <view
                       key={item.value}
                       className={cn(
-                        "flex flex-row items-center rounded-md motion-colors active:bg-overlay-ink-6",
+                        "motion-colors flex flex-row items-center rounded-md active:bg-overlay-ink-6",
                         size === "sm" ? "h-8 gap-2 px-2.5" : size === "lg" ? "h-12 gap-3 px-4" : "h-10 gap-2.5 px-3",
                         selected && "bg-overlay-ink-6",
                       )}
@@ -271,7 +280,12 @@ export function PickerField({
                         <view className="flex min-w-0 flex-1 flex-row items-center overflow-hidden">{item.label}</view>
                       )}
                       {selected ? (
-                        <Icon name="Check" size={triggerIconSize[size]} color="text-primary" className="animate-pop-in" />
+                        <Icon
+                          name="Check"
+                          size={triggerIconSize[size]}
+                          color="text-primary"
+                          className="animate-pop-in"
+                        />
                       ) : null}
                     </view>
                   );
@@ -398,7 +412,7 @@ export function WeekdayPicker({
           <view
             key={day.value}
             className={cn(
-              "flex shrink-0 flex-row items-center justify-center rounded-full motion-press",
+              "motion-press flex shrink-0 flex-row items-center justify-center rounded-full",
               weekdayToggleSizeClass[size],
               on ? "bg-interactive-primary" : "bg-overlay-ink-6",
             )}
@@ -408,7 +422,9 @@ export function WeekdayPicker({
             accessibility-label={day.name}
             accessibility-value={on ? "selected" : "not selected"}
           >
-            <text className={cn(weekdayTextSizeClass[size], on ? "text-interactive-on-primary" : "text-text-secondary")}>
+            <text
+              className={cn(weekdayTextSizeClass[size], on ? "text-interactive-on-primary" : "text-text-secondary")}
+            >
               {day.label}
             </text>
           </view>
@@ -521,12 +537,19 @@ const nextRunIconSize: Record<ControlSize, number> = { sm: 14, md: 16, lg: 20 };
  * }
  * ```
  */
-export function ScheduleCard({ title, nextRun, children, size = "md", surface = "solid", className }: ScheduleCardProps) {
+export function ScheduleCard({
+  title,
+  nextRun,
+  children,
+  size = "md",
+  surface = "solid",
+  className,
+}: ScheduleCardProps) {
   return (
     <view
       className={cn(
         "relative flex flex-col items-stretch rounded-xl",
-        surface === "glass" ? "bg-glass-thick overflow-hidden" : "border border-border-default bg-bg-surface",
+        surface === "glass" ? "overflow-hidden bg-glass-thick" : "border border-border-default bg-bg-surface",
         cardSizeClass[size],
         className,
       )}

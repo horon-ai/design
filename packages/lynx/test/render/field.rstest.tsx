@@ -59,3 +59,42 @@ test("match shows the error without an invalid field", () => {
 
   expect(container.textContent).toContain("Use at least 3 characters.");
 });
+
+test("a passed style reaches the field stack", () => {
+  const { container } = renderField(<Field style={{ marginTop: "7px" }} />);
+  // The provider's theme root is the container's first element; the field stack is its first child.
+  expect(container.firstElementChild?.firstElementChild).toHaveStyle({ marginTop: "7px" });
+});
+
+test("a passed style reaches the label", async () => {
+  const { findByText } = renderField(
+    <Field>
+      <FieldLabel style={{ marginTop: "7px" }}>Bot name</FieldLabel>
+    </Field>,
+  );
+
+  expect(await findByText("Bot name")).toHaveStyle({ marginTop: "7px" });
+});
+
+test("a passed style reaches the description", async () => {
+  const { findByText } = renderField(
+    <Field>
+      <FieldDescription style={{ marginTop: "7px" }}>Shown in chat.</FieldDescription>
+    </Field>,
+  );
+
+  expect(await findByText("Shown in chat.")).toHaveStyle({ marginTop: "7px" });
+});
+
+test("a passed style reaches the error row", async () => {
+  const { findByText } = renderField(
+    <Field>
+      <FieldError match style={{ marginTop: "7px" }}>
+        Use at least 3 characters.
+      </FieldError>
+    </Field>,
+  );
+
+  const message = await findByText("Use at least 3 characters.");
+  expect(message.parentElement).toHaveStyle({ marginTop: "7px" });
+});

@@ -173,7 +173,7 @@ export function StreamingText({ text, streaming = true, smooth = true, className
   return (
     <view
       className={cn(
-        "w-fit max-w-full flex-row items-end rounded-xl border border-border-default bg-bg-surface px-4 py-3 break-all",
+        "w-fit max-w-full flex-row items-end break-all rounded-xl border border-border-default bg-bg-surface px-4 py-3",
         className,
       )}
       style={style}
@@ -182,7 +182,7 @@ export function StreamingText({ text, streaming = true, smooth = true, className
       accessibility-label={streaming ? undefined : text}
       {...(id === undefined ? {} : { id })}
     >
-      <text className="min-w-0 text-body-sm whitespace-pre-wrap text-text-primary">{text.slice(0, shown)}</text>
+      <text className="min-w-0 whitespace-pre-wrap text-body-sm text-text-primary">{text.slice(0, shown)}</text>
       {streaming ? (
         <view
           className="ml-px w-0.5 shrink-0 rounded-[1px] bg-interactive-primary"
@@ -250,7 +250,7 @@ export function ToolStep({ state = "running", title, detail, className, onClick,
   return (
     <view
       className={cn(
-        "flex w-full min-w-0 flex-row items-center gap-2.5 rounded-md border border-border-default bg-bg-surface px-2.5 py-2 motion-press",
+        "motion-press flex w-full min-w-0 flex-row items-center gap-2.5 rounded-md border border-border-default bg-bg-surface px-2.5 py-2",
         disabled ? "opacity-40" : "active:bg-overlay-ink-3",
         className,
       )}
@@ -265,12 +265,7 @@ export function ToolStep({ state = "running", title, detail, className, onClick,
       {state === "failed" ? <Icon name="WarningCircle" size={16} color="text-danger" /> : null}
       <view className="flex min-w-0 flex-1 flex-col gap-px">
         {isPlainText(title) ? (
-          <text
-            className={cn(
-              "truncate text-label-md",
-              state === "failed" ? "text-text-danger" : "text-text-primary",
-            )}
-          >
+          <text className={cn("truncate text-label-md", state === "failed" ? "text-text-danger" : "text-text-primary")}>
             {title}
           </text>
         ) : (
@@ -339,12 +334,12 @@ export function WorkLog({
   return (
     <view
       className={cn(
-        "flex w-full max-w-[340px] min-w-0 flex-col rounded-[16px] border border-border-default bg-bg-surface p-1.5",
+        "flex w-full min-w-0 max-w-[340px] flex-col rounded-[16px] border border-border-default bg-bg-surface p-1.5",
         className,
       )}
     >
       <view
-        className="flex min-w-0 flex-row items-center gap-2 px-2.5 py-1.5 motion-press active:bg-overlay-ink-3"
+        className="motion-press flex min-w-0 flex-row items-center gap-2 px-2.5 py-1.5 active:bg-overlay-ink-3"
         bindtap={toggle}
         accessibility-element
         accessibility-traits="button"
@@ -353,11 +348,7 @@ export function WorkLog({
       >
         <Icon name="Wrench" size={14} color="text-secondary" />
         <view className="min-w-0 flex-1">
-          {isPlainText(summary) ? (
-            <text className="text-caption text-text-secondary">{summary}</text>
-          ) : (
-            summary
-          )}
+          {isPlainText(summary) ? <text className="text-caption text-text-secondary">{summary}</text> : summary}
         </view>
         <view
           className="flex shrink-0 flex-row items-center justify-center"
@@ -381,11 +372,13 @@ export function WorkLog({
                 ) : (
                   <view className="min-w-0">{step.title}</view>
                 )}
-                {step.detail
-                  ? isPlainText(step.detail)
-                    ? <text className="truncate text-caption text-text-secondary">{step.detail}</text>
-                    : <view className="min-w-0">{step.detail}</view>
-                  : null}
+                {step.detail ? (
+                  isPlainText(step.detail) ? (
+                    <text className="truncate text-caption text-text-secondary">{step.detail}</text>
+                  ) : (
+                    <view className="min-w-0">{step.detail}</view>
+                  )
+                ) : null}
               </view>
             </view>
           ))

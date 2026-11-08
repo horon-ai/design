@@ -15,9 +15,32 @@ function Fields({ surface, onChange }: { surface: "solid" | "glass"; onChange: (
   return (
     <>
       <view className="flex flex-row flex-wrap items-end justify-center gap-3">
-        <Select aria-label="Bot" items={items} surface={surface} size="sm" placeholder="Small" className="w-44" onValueChange={onChange} />
-        <Select aria-label="Bot" items={items} surface={surface} placeholder="Medium" className="w-44" onValueChange={onChange} />
-        <Select aria-label="Bot" items={items} surface={surface} size="lg" placeholder="Large" className="w-44" onValueChange={onChange} />
+        <Select
+          aria-label="Bot"
+          items={items}
+          surface={surface}
+          size="sm"
+          placeholder="Small"
+          className="w-44"
+          onValueChange={onChange}
+        />
+        <Select
+          aria-label="Bot"
+          items={items}
+          surface={surface}
+          placeholder="Medium"
+          className="w-44"
+          onValueChange={onChange}
+        />
+        <Select
+          aria-label="Bot"
+          items={items}
+          surface={surface}
+          size="lg"
+          placeholder="Large"
+          className="w-44"
+          onValueChange={onChange}
+        />
       </view>
       <Select aria-label="Bot" items={items} surface={surface} placeholder="Select a bot" onValueChange={onChange} />
       <Select
@@ -55,7 +78,14 @@ export default function SelectDemo() {
           <Select variant="chip" aria-label="Filter" items={items} placeholder="Filter" onValueChange={setPicked} />
           <Select variant="chip" aria-label="Filter" items={items} defaultValue="writer" onValueChange={setPicked} />
           <Select variant="segment" aria-label="Role" items={items} defaultValue="chief" onValueChange={setPicked} />
-          <Select variant="segment" aria-label="Role" items={items} defaultValue="chief" disabled onValueChange={setPicked} />
+          <Select
+            variant="segment"
+            aria-label="Role"
+            items={items}
+            defaultValue="chief"
+            disabled
+            onValueChange={setPicked}
+          />
         </view>
       </view>
     </view>

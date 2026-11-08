@@ -39,7 +39,10 @@ export function useMediaQuery(query: string, serverValue = false): boolean {
   useEffect(() => {
     if (typeof lynx === "undefined" || typeof lynx.getJSModule !== "function") return undefined;
     const emitter = lynx.getJSModule("GlobalEventEmitter") as
-      | { addListener: (name: string, listener: () => void) => void; removeListener: (name: string, listener: () => void) => void }
+      | {
+          addListener: (name: string, listener: () => void) => void;
+          removeListener: (name: string, listener: () => void) => void;
+        }
       | undefined;
     if (!emitter) return undefined;
     const onResize = () => setViewport(readViewport());

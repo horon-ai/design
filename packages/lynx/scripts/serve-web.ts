@@ -40,9 +40,13 @@ const server = Bun.serve({
     const url = new URL(request.url);
     const path = decodeURIComponent(url.pathname);
 
-    if (path === "/" || path === "/index.html") return (await serveFile(`${host}/index.html`)) ?? new Response("host page missing", { status: 500 });
+    if (path === "/" || path === "/index.html")
+      return (await serveFile(`${host}/index.html`)) ?? new Response("host page missing", { status: 500 });
     if (path === "/main.web.bundle" || path === "/main.lynx.bundle") {
-      return (await serveFile(`${dist}${path}`)) ?? new Response(`run \`bun run build\` first: ${path} is missing`, { status: 404 });
+      return (
+        (await serveFile(`${dist}${path}`)) ??
+        new Response(`run \`bun run build\` first: ${path} is missing`, { status: 404 })
+      );
     }
     // Two things live under `/static`: the client runtime, which ships as
     // `client_prod/static`, and whatever rspeedy copied into the bundle's own

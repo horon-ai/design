@@ -153,11 +153,23 @@ export function MenuTrigger({
 
 /** The placement vocabulary of the popup, so the two axes keep React's own indexed-access spelling. */
 type MenuPosition = {
-  /** Which side of the anchor the popup prefers. */
-  side: "top" | "bottom" | "left" | "right";
+  /**
+   * Which side of the anchor the popup prefers, in Base UI's full vocabulary. `inline-start` and
+   * `inline-end` are the logical sides of a flow-relative anchor: Lynx lays this popup out LTR only,
+   * so they resolve to `left` and `right` and an RTL host is not honoured.
+   */
+  side: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
   /** How the popup lines up on the other axis. */
   align: "start" | "center" | "end";
 };
+
+/** The physical side a requested `side` resolves to; the inline pair maps to left and right (LTR only). */
+function physicalSide(side: MenuPosition["side"] | undefined): "top" | "bottom" | "left" | "right" {
+  if (side === "top" || side === "left" || side === "right") return side;
+  if (side === "inline-start") return "left";
+  if (side === "inline-end") return "right";
+  return "bottom";
+}
 
 /** Props for {@link MenuContent}: the surface variant and the popup placement. */
 export type MenuContentProps = {
@@ -170,7 +182,11 @@ export type MenuContentProps = {
    * @default "solid"
    */
   surface?: MenuSurface;
-  /** Preferred side of the anchor the popup opens on; flips when it does not fit. */
+  /**
+   * Preferred side of the anchor the popup opens on; flips when it does not fit. `inline-start` and
+   * `inline-end` resolve to `left` and `right`, because this popup is laid out LTR only.
+   * @default "bottom"
+   */
   side?: MenuPosition["side"];
   /** Alignment of the popup against the anchor.
    * @default "start" */
@@ -178,10 +194,15 @@ export type MenuContentProps = {
   /** Gap in px between the anchor and the popup.
    * @default 8 */
   sideOffset?: number;
-  /** Offset in px along the alignment axis. */
+  /** Offset in px along the alignment axis.
+   * @default 0 */
   alignOffset?: number;
   /** Extra classes merged onto the popup. */
   className?: string;
+  /** Inline style, merged onto the popup's own placement. */
+  style?: CSSProperties;
+  /** Element id of the popup, so a host can address it. */
+  id?: string;
   /** The rows of the menu, usually {@link MenuItem} parts. */
   children?: ReactNode;
 };
@@ -199,6 +220,11 @@ export const menuPopupClass = {
 
 /** The popup's own box, measured after it paints, so `center`/`end` can be exact. */
 type PanelSize = { width: number; height: number };
+
+/** A Lynx inline style takes lengths as px strings; a bare number is dropped by the element engine. */
+function px(value: number): string {
+  return `${value}px`;
+}
 
 /**
  * The popup's inline position, computed from the trigger's box.
@@ -225,36 +251,36 @@ function popupPlacement(
   const fitsRight = !known || anchor.left + anchor.width + sideOffset + panel.width <= viewport.width;
   const fitsLeft = !known || anchor.left - sideOffset - panel.width >= 0;
 
-  let resolved = side;
-  if (side === "bottom" && !fitsBottom && fitsTop) resolved = "top";
-  else if (side === "top" && !fitsTop && fitsBottom) resolved = "bottom";
-  else if (side === "right" && !fitsRight && fitsLeft) resolved = "left";
-  else if (side === "left" && !fitsLeft && fitsRight) resolved = "right";
+  const requested = physicalSide(side);
+  let resolved = requested;
+  if (requested === "bottom" && !fitsBottom && fitsTop) resolved = "top";
+  else if (requested === "top" && !fitsTop && fitsBottom) resolved = "bottom";
+  else if (requested === "right" && !fitsRight && fitsLeft) resolved = "left";
+  else if (requested === "left" && !fitsLeft && fitsRight) resolved = "right";
 
+  // Only the axis keys the placement actually sets are written: a key present with `undefined`
+  // makes Lynx drop the whole style object, which would leave the popup unpositioned.
+  const startLeft =
+    align === "center" ? anchor.left + anchor.width / 2 - panel.width / 2 + alignOffset : anchor.left + alignOffset;
+  const endRight = viewport.width - anchor.left - anchor.width + alignOffset;
+  const startTop =
+    align === "center" ? anchor.top + anchor.height / 2 - panel.height / 2 + alignOffset : anchor.top + alignOffset;
+  const endBottom = anchor.top + anchor.height - panel.height - alignOffset;
+
+  // Lengths are written as px strings: Lynx applies an inline style object key by key, and a bare
+  // number is dropped by the element engine, leaving the popup unpositioned.
   if (resolved === "top") {
-    return {
-      bottom: viewport.height - anchor.top + sideOffset,
-      left: align === "end" ? undefined : align === "center" ? anchor.left + anchor.width / 2 - panel.width / 2 + alignOffset : anchor.left + alignOffset,
-      right: align === "end" ? viewport.width - anchor.left - anchor.width + alignOffset : undefined,
-    };
+    const bottom = px(viewport.height - anchor.top + sideOffset);
+    return align === "end" ? { bottom, right: px(endRight) } : { bottom, left: px(startLeft) };
   }
   if (resolved === "left") {
-    return {
-      right: viewport.width - anchor.left + sideOffset,
-      top: align === "end" ? anchor.top + anchor.height - panel.height - alignOffset : align === "center" ? anchor.top + anchor.height / 2 - panel.height / 2 + alignOffset : anchor.top + alignOffset,
-    };
+    return { right: px(viewport.width - anchor.left + sideOffset), top: px(align === "end" ? endBottom : startTop) };
   }
   if (resolved === "right") {
-    return {
-      left: anchor.left + anchor.width + sideOffset,
-      top: align === "end" ? anchor.top + anchor.height - panel.height - alignOffset : align === "center" ? anchor.top + anchor.height / 2 - panel.height / 2 + alignOffset : anchor.top + alignOffset,
-    };
+    return { left: px(anchor.left + anchor.width + sideOffset), top: px(align === "end" ? endBottom : startTop) };
   }
-  return {
-    top: anchor.top + anchor.height + sideOffset,
-    left: align === "end" ? undefined : align === "center" ? anchor.left + anchor.width / 2 - panel.width / 2 + alignOffset : anchor.left + alignOffset,
-    right: align === "end" ? viewport.width - anchor.left - anchor.width + alignOffset : undefined,
-  };
+  const top = px(anchor.top + anchor.height + sideOffset);
+  return align === "end" ? { top, right: px(endRight) } : { top, left: px(startLeft) };
 }
 
 /**
@@ -298,6 +324,8 @@ export function MenuContent({
   sideOffset = 8,
   alignOffset = 0,
   className,
+  style,
+  id,
   children,
 }: MenuContentProps) {
   const { open, setOpen, anchor } = useMenuContext("MenuContent");
@@ -317,17 +345,20 @@ export function MenuContent({
       />
       <view
         className={cn(
-          "fixed z-50 flex flex-col gap-0.5 overflow-hidden p-1.5 motion-popup",
+          "motion-popup fixed z-50 flex flex-col gap-0.5 overflow-hidden p-1.5",
           surface === "glass" ? "w-[220px]" : surface === "paper" ? "w-[304px]" : "w-[256px]",
           "max-w-[calc(100vw-2rem)]",
           menuPopupClass[surface],
           className,
         )}
-        style={placement}
+        style={{ ...placement, ...style }}
+        id={id}
         bindlayoutchange={(event: LayoutChangeLike) => {
           const box = boxOf(event);
           setPanel((previous) =>
-            previous.width === box.width && previous.height === box.height ? previous : { width: box.width, height: box.height },
+            previous.width === box.width && previous.height === box.height
+              ? previous
+              : { width: box.width, height: box.height },
           );
         }}
       >
@@ -362,6 +393,10 @@ export type MenuItemProps = {
   label?: string;
   /** Extra classes merged onto the row. */
   className?: string;
+  /** Inline style, merged onto the row's own. */
+  style?: CSSProperties;
+  /** Element id of the row, so a host can address it. */
+  id?: string;
   /** The row's label. */
   children?: ReactNode;
 };
@@ -384,6 +419,8 @@ export function MenuItem({
   onClick,
   label,
   className,
+  style,
+  id,
   children,
 }: MenuItemProps) {
   const surface = useContext(SurfaceContext);
@@ -392,13 +429,15 @@ export function MenuItem({
   return (
     <view
       className={cn(
-        "relative flex w-full flex-row items-center gap-2.5 motion-colors active:bg-overlay-ink-6",
+        "motion-colors relative flex w-full flex-row items-center gap-2.5 active:bg-overlay-ink-6",
         surface === "glass" ? "rounded-md px-3" : "rounded-[10px] px-2.5",
         description ? "h-12" : surface === "glass" ? "h-10" : "h-9",
         selected && "bg-bg-brand active:bg-bg-brand",
         disabled && "opacity-40",
         className,
       )}
+      style={style}
+      id={id}
       bindtap={() => {
         if (disabled) return;
         if (closeOnClick) setOpen(false);
@@ -409,7 +448,12 @@ export function MenuItem({
       accessibility-label={label}
     >
       {icon ? (
-        <view className={cn("flex shrink-0 flex-row items-center", danger ? "text-text-danger" : surface === "glass" ? "text-text-secondary" : "text-text-primary")}>
+        <view
+          className={cn(
+            "flex shrink-0 flex-row items-center",
+            danger ? "text-text-danger" : surface === "glass" ? "text-text-secondary" : "text-text-primary",
+          )}
+        >
           {icon}
         </view>
       ) : null}
@@ -422,10 +466,18 @@ export function MenuItem({
   );
 }
 
-/** Props of {@link MenuSeparator}: extra classes on the rule's wrapper. */
+/** Props of {@link MenuSeparator}: which way the rule runs, and extra classes on its wrapper. */
 type MenuSeparatorProps = {
+  /**
+   * `horizontal` (the default) separates stacked rows with a 1px line across the popup; `vertical`
+   * draws a 16px column rule instead, for splitting two groups that sit side by side.
+   * @default "horizontal"
+   */
+  orientation?: "horizontal" | "vertical";
   /** Extra classes merged onto the rule's wrapper. */
   className?: string;
+  /** Inline style, merged onto the rule's own. */
+  style?: CSSProperties;
 };
 
 /**
@@ -437,11 +489,22 @@ type MenuSeparatorProps = {
  *
  * Part of {@link MenuContent}.
  */
-export function MenuSeparator({ className }: MenuSeparatorProps) {
+export function MenuSeparator({ orientation = "horizontal", className, style }: MenuSeparatorProps) {
   const surface = useContext(SurfaceContext);
+  const vertical = orientation === "vertical";
   return (
-    <view className={cn("relative flex flex-row py-1", surface === "glass" ? "px-1.5" : "px-2.5", className)} accessibility-element={false}>
-      <view className="h-px flex-1 bg-overlay-ink-8" />
+    <view
+      className={cn(
+        "relative flex flex-row",
+        vertical ? "h-4 items-center" : "py-1",
+        surface === "glass" ? "px-1.5" : "px-2.5",
+        className,
+      )}
+      style={style}
+      accessibility-element={false}
+      accessibility-role-description="separator"
+    >
+      <view className={cn("bg-overlay-ink-8", vertical ? "h-full w-px" : "h-px flex-1")} />
     </view>
   );
 }
@@ -457,7 +520,7 @@ type MenuLabelProps = {
 /** A caption heading for a group of items, such as "Workspaces" or the account email. */
 export function MenuLabel({ className, children }: MenuLabelProps) {
   return (
-    <view className={cn("relative px-2.5 pt-2 pb-1", className)}>
+    <view className={cn("relative px-2.5 pb-1 pt-2", className)}>
       <text className="text-caption text-text-secondary">{children}</text>
     </view>
   );
@@ -475,10 +538,7 @@ type MenuTileProps = {
 export function MenuTile({ className, children }: MenuTileProps) {
   return (
     <view
-      className={cn(
-        "flex size-7 shrink-0 items-center justify-center rounded-sm bg-interactive-primary",
-        className,
-      )}
+      className={cn("flex size-7 shrink-0 items-center justify-center rounded-sm bg-interactive-primary", className)}
     >
       <text className="text-label-sm text-text-inverse">{children}</text>
     </view>

@@ -59,6 +59,13 @@ test("a disabled textarea never emits", () => {
   expect(onChange).not.toHaveBeenCalled();
 });
 
+test("a textarea without the invalid flag keeps the default border", () => {
+  const { container } = renderField(<Textarea placeholder="Add a note" />);
+
+  expect(container.querySelector(".border-border-danger")).toBeNull();
+  expect(container.querySelector(".border-border-default")).not.toBeNull();
+});
+
 test("an invalid textarea paints the danger border", () => {
   const { container } = renderField(<Textarea invalid placeholder="Add a note" />);
 

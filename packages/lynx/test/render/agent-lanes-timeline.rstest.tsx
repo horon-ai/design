@@ -74,9 +74,7 @@ test("a hand-off naming an unknown task is skipped instead of drawing a curve", 
   );
 
   // Only the real hand-off adds a curve, so the unknown one leaves one fewer SVG behind.
-  expect(withCurve.container.querySelectorAll("svg").length).toBe(
-    without.container.querySelectorAll("svg").length + 1,
-  );
+  expect(withCurve.container.querySelectorAll("svg").length).toBe(without.container.querySelectorAll("svg").length + 1);
 });
 
 test("a hand-off between tasks that meet exactly draws a curve of non-zero width centred on the joint", () => {
@@ -146,10 +144,7 @@ test("the approval strip reports Later and Approve, and is absent without one", 
   const onApprove = rstest.fn();
   const { getByText } = render(
     <HoronProvider scheme="light">
-      <AgentLanesTimeline
-        bots={bots}
-        approval={{ message: "Send to 12 investors?", onLater, onApprove }}
-      />
+      <AgentLanesTimeline bots={bots} approval={{ message: "Send to 12 investors?", onLater, onApprove }} />
     </HoronProvider>,
   );
 

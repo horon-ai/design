@@ -19,7 +19,13 @@ test("a failed step shows its error line and the retry pill fires the handler", 
   let retried = 0;
   const { container, findByText } = render(
     <HoronProvider>
-      <PlanStep status="failed" index={2} title="Build the metrics slide" error="timed out after 30s" onRetry={() => (retried += 1)} />
+      <PlanStep
+        status="failed"
+        index={2}
+        title="Build the metrics slide"
+        error="timed out after 30s"
+        onRetry={() => (retried += 1)}
+      />
     </HoronProvider>,
   );
 

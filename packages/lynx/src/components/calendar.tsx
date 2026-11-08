@@ -240,7 +240,11 @@ const weekdayNarrow = (locale: string | undefined, date: Date): string => {
 };
 
 const fullDayLabel = (locale: string | undefined, date: Date): string => {
-  if (hasIntl()) return new Intl.DateTimeFormat(locale, { dateStyle: "full" }).format(date);
+  // Spelled out instead of `dateStyle: "full"`, an ES2020 option an ES2019 Intl ignores.
+  if (hasIntl())
+    return new Intl.DateTimeFormat(locale, { weekday: "long", year: "numeric", month: "long", day: "numeric" }).format(
+      date,
+    );
   return `${WEEKDAYS[date.getDay()]}, ${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 };
 
@@ -330,14 +334,36 @@ export function Calendar(props: CalendarProps) {
   };
 
   const arrows: Array<{ label: string; step: number; icon: ReactNode }> = [
-    { label: "Previous month", step: -1, icon: <Icon name="CaretLeft" size={variant === "popover" ? popoverArrowIconSize[size] : arrowIconSize[size]} color="text-secondary" weight="bold" /> },
-    { label: "Next month", step: 1, icon: <Icon name="CaretRight" size={variant === "popover" ? popoverArrowIconSize[size] : arrowIconSize[size]} color="text-secondary" weight="bold" /> },
+    {
+      label: "Previous month",
+      step: -1,
+      icon: (
+        <Icon
+          name="CaretLeft"
+          size={variant === "popover" ? popoverArrowIconSize[size] : arrowIconSize[size]}
+          color="text-secondary"
+          weight="bold"
+        />
+      ),
+    },
+    {
+      label: "Next month",
+      step: 1,
+      icon: (
+        <Icon
+          name="CaretRight"
+          size={variant === "popover" ? popoverArrowIconSize[size] : arrowIconSize[size]}
+          color="text-secondary"
+          weight="bold"
+        />
+      ),
+    },
   ];
 
   /** One round arrow button; Lynx has no `<button>`, so the view reports itself as one. */
   const arrow = (label: string, step: number, icon: ReactNode, boxClass: string) => (
     <view
-      className={cn("flex motion-press flex-row items-center justify-center rounded-full", boxClass)}
+      className={cn("motion-press flex flex-row items-center justify-center rounded-full", boxClass)}
       bindtap={() => setMonth(addMonths(month, step))}
       accessibility-element
       accessibility-traits="button"
@@ -359,7 +385,9 @@ export function Calendar(props: CalendarProps) {
           : surface === "glass"
             ? "veil-overlay"
             : "bg-glass-thick",
-        variant === "popover" ? cn("rounded-[24px]", containerSizeClass[size].popover) : cn("rounded-xl", containerSizeClass[size].default),
+        variant === "popover"
+          ? cn("rounded-[24px]", containerSizeClass[size].popover)
+          : cn("rounded-xl", containerSizeClass[size].default),
         className,
       )}
     >
@@ -369,7 +397,12 @@ export function Calendar(props: CalendarProps) {
             <text
               key={title}
               className={cn("text-text-primary", popoverTitleSizeClass[size])}
-              style={{ animationName: "fade-in", animationDuration: "160ms", animationTimingFunction: EASE_OUT_QUINT, animationFillMode: "both" }}
+              style={{
+                animationName: "fade-in",
+                animationDuration: "160ms",
+                animationTimingFunction: EASE_OUT_QUINT,
+                animationFillMode: "both",
+              }}
             >
               {title}
             </text>
@@ -385,7 +418,12 @@ export function Calendar(props: CalendarProps) {
             <text
               key={title}
               className={cn("w-full text-center text-text-primary", titleSizeClass[size])}
-              style={{ animationName: "fade-in", animationDuration: "160ms", animationTimingFunction: EASE_OUT_QUINT, animationFillMode: "both" }}
+              style={{
+                animationName: "fade-in",
+                animationDuration: "160ms",
+                animationTimingFunction: EASE_OUT_QUINT,
+                animationFillMode: "both",
+              }}
             >
               {title}
             </text>
@@ -411,7 +449,10 @@ export function Calendar(props: CalendarProps) {
         >
           <view className="flex flex-row">
             {days.slice(0, 7).map((date) => (
-              <view key={date.getDay()} className={cn("flex flex-row justify-center", cellFluidClass, weekdayHeaderSizeClass[size])}>
+              <view
+                key={date.getDay()}
+                className={cn("flex flex-row justify-center", cellFluidClass, weekdayHeaderSizeClass[size])}
+              >
                 <text className="text-caption text-text-secondary">{weekdayNarrow(locale, date)}</text>
               </view>
             ))}
@@ -429,7 +470,7 @@ export function Calendar(props: CalendarProps) {
                   <view
                     key={date.toDateString()}
                     className={cn(
-                      "relative flex flex-col motion-colors items-center justify-center",
+                      "motion-colors relative flex flex-col items-center justify-center",
                       cellFluidClass,
                       dayShapeClass,
                       daySizeClass[size],
@@ -453,13 +494,14 @@ export function Calendar(props: CalendarProps) {
                           ? "text-text-primary"
                           : selected
                             ? cn("text-text-inverse", dayEmphasisClass[size])
-                            : !between && (disabled
-                              ? cn("text-text-disabled", dayTextClass[size])
-                              : outside
-                                ? cn("text-text-placeholder", dayTextClass[size])
-                                : isToday
-                                  ? cn("text-text-brand", dayEmphasisClass[size])
-                                  : cn("text-text-primary", dayTextClass[size])),
+                            : !between &&
+                              (disabled
+                                ? cn("text-text-disabled", dayTextClass[size])
+                                : outside
+                                  ? cn("text-text-placeholder", dayTextClass[size])
+                                  : isToday
+                                    ? cn("text-text-brand", dayEmphasisClass[size])
+                                    : cn("text-text-primary", dayTextClass[size])),
                         between && dayTextClass[size],
                       )}
                     >

@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
 import { cn } from "../lib/cn";
@@ -48,6 +49,8 @@ export type CheckboxProps = {
   size?: CheckboxSize;
   /** Extra classes merged onto the row; `"className"` is the one member the React root took from the native element and now receives as a plain prop */
   className?: string;
+  /** Inline style, merged onto the row's own. */
+  style?: CSSProperties;
 };
 
 /**
@@ -119,6 +122,7 @@ export function Checkbox({
   readOnly = false,
   indeterminate = false,
   id,
+  style,
   "aria-label": ariaLabel,
 }: CheckboxRootProps) {
   const [own, setOwn] = useState(defaultChecked);
@@ -135,18 +139,24 @@ export function Checkbox({
 
   return (
     <view
-      className={cn("inline-flex max-w-full min-w-0 flex-row items-center", labelClass[size], disabled && "opacity-40", className)}
+      className={cn(
+        "inline-flex min-w-0 max-w-full flex-row items-center",
+        labelClass[size],
+        disabled && "opacity-40",
+        className,
+      )}
       bindtap={toggle}
       accessibility-element
       accessibility-traits={disabled ? "disabled" : "button"}
       accessibility-role-description="checkbox"
       accessibility-label={ariaLabel}
       accessibility-value={indeterminate ? "mixed" : isChecked ? "checked" : "unchecked"}
+      style={style}
       {...(id === undefined ? {} : { id })}
     >
       <view
         className={cn(
-          "flex shrink-0 flex-row items-center justify-center border-[1.5px] bg-bg-surface motion-colors",
+          "motion-colors flex shrink-0 flex-row items-center justify-center border-[1.5px] bg-bg-surface",
           boxClass[size],
           filled
             ? "border-interactive-primary bg-interactive-primary active:border-interactive-primary-hover active:bg-interactive-primary-hover"
@@ -156,9 +166,19 @@ export function Checkbox({
         {filled ? (
           <view
             className="flex items-center justify-center"
-            style={{ animationName: "pop-in", animationDuration: "220ms", animationTimingFunction: EASE_SPRING, animationFillMode: "both" }}
+            style={{
+              animationName: "pop-in",
+              animationDuration: "220ms",
+              animationTimingFunction: EASE_SPRING,
+              animationFillMode: "both",
+            }}
           >
-            <Icon name={indeterminate ? "Minus" : "Check"} size={glyphSize[size]} color="interactive-on-primary" weight="bold" />
+            <Icon
+              name={indeterminate ? "Minus" : "Check"}
+              size={glyphSize[size]}
+              color="interactive-on-primary"
+              weight="bold"
+            />
           </view>
         ) : null}
       </view>

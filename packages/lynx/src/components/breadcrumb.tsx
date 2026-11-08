@@ -142,7 +142,7 @@ export function BreadcrumbItem({ current, tile, href, onTap, className, children
   return (
     <view
       className={cn(
-        "flex flex-row items-center gap-1.5 rounded-sm py-1 pr-1.5 pl-1.5 whitespace-nowrap motion-colors",
+        "motion-colors flex flex-row items-center gap-1.5 whitespace-nowrap rounded-sm py-1 pl-1.5 pr-1.5",
         current ? "text-text-primary" : "text-text-secondary",
         tappable && "active:opacity-70",
         className,
@@ -154,7 +154,7 @@ export function BreadcrumbItem({ current, tile, href, onTap, className, children
     >
       {tile ? (
         <view className="flex size-5 shrink-0 items-center justify-center rounded-xs bg-interactive-primary">
-          <text className="text-label-sm text-center text-text-inverse">{tile}</text>
+          <text className="text-center text-label-sm text-text-inverse">{tile}</text>
         </view>
       ) : null}
       <text className={cn("text-label-md", current ? "text-text-primary" : "text-text-secondary")}>{children}</text>

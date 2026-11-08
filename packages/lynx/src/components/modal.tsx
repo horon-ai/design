@@ -9,6 +9,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
 import { cn } from "../lib/cn";
@@ -166,6 +167,8 @@ export type ModalContentProps = Omit<PortedPopupProps, "className" | "title"> & 
   footer?: ReactNode;
   /** Extra classes on the popup, merged after the built-in ones. */
   className?: string;
+  /** Inline style, merged onto the popup's own. */
+  style?: CSSProperties;
   /** The body between the header and the footer. */
   children?: ReactNode;
 };
@@ -177,7 +180,8 @@ const widthClass: Record<ModalSize, string> = {
 };
 
 /** Text slots take a string so the component can put the token classes on a `<text>`. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * A modal for work that needs a form or a longer read, where `Dialog` is a short confirmation. It has three
@@ -217,6 +221,7 @@ export function ModalContent({
   closeLabel = "Close",
   footer,
   className,
+  style,
   children,
 }: ModalContentProps) {
   const { open, setOpen } = useContext(ModalContext);
@@ -233,14 +238,15 @@ export function ModalContent({
         className={cn(
           // The 16px viewport padding caps `w-full`, so the popup never exceeds
           // the screen even on the narrowest phone.
-          "relative flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-xl motion-rise",
+          "motion-rise relative flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-xl",
           widthClass[size],
           surface === "solid" ? "bg-bg-surface shadow-[0_24px_64px_#0A142433]" : "veil-overlay",
           className,
         )}
+        style={style}
         catchtap={() => undefined}
       >
-        <view className={cn("flex shrink-0 flex-row items-start px-6 pt-6 pb-4", leading ? "gap-3.5" : "gap-2")}>
+        <view className={cn("flex shrink-0 flex-row items-start px-6 pb-4 pt-6", leading ? "gap-3.5" : "gap-2")}>
           {leading}
           <view className="flex min-w-0 flex-1 flex-col gap-1">
             {isPlainText(title) ? (
@@ -260,7 +266,7 @@ export function ModalContent({
           </view>
           {closeLabel !== null && (
             <view
-              className="-mt-1 -mr-2 flex size-8 shrink-0 items-center justify-center rounded-full text-text-secondary motion-press motion-colors active:bg-overlay-ink-6"
+              className="motion-press motion-colors -mr-2 -mt-1 flex size-8 shrink-0 items-center justify-center rounded-full text-text-secondary active:bg-overlay-ink-6"
               bindtap={() => setOpen(false)}
               hit-slop="6px"
               accessibility-element
@@ -300,7 +306,7 @@ export type ModalFooterProps = {
 /** The modal's action row: actions at the right, secondary first and primary last, 8px apart, 24px padding. */
 export function ModalFooter({ className, children }: ModalFooterProps) {
   return (
-    <view className={cn("flex shrink-0 flex-row items-center justify-end gap-2 px-6 pt-4 pb-6", className)}>
+    <view className={cn("flex shrink-0 flex-row items-center justify-end gap-2 px-6 pb-6 pt-4", className)}>
       {children}
     </view>
   );

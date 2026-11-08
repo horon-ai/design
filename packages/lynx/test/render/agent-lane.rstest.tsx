@@ -14,7 +14,10 @@ test("a running lane spins, names its bot and shows the tool and usage lines", (
         bot={{ initial: "R", name: "Researcher" }}
         elapsed="1.9s"
         task="Portfolio metrics"
-        tool={{ icon: <Icon name="MagnifyingGlass" size={14} color="text-secondary" />, label: "Notion · Q3 metrics dashboard" }}
+        tool={{
+          icon: <Icon name="MagnifyingGlass" size={14} color="text-secondary" />,
+          label: "Notion · Q3 metrics dashboard",
+        }}
         usage="2.6k tokens"
       />
     </HoronProvider>,

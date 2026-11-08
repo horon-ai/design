@@ -27,11 +27,7 @@ function Extras({ surface }: { surface: "solid" | "glass" }) {
       </view>
       <DateSeparator>Today</DateSeparator>
       {removed ? null : (
-        <Attachment
-          name="Q3 board deck v5.pdf"
-          detail="PDF · 2.4 MB"
-          onRemove={() => setRemoved(true)}
-        />
+        <Attachment name="Q3 board deck v5.pdf" detail="PDF · 2.4 MB" onRemove={() => setRemoved(true)} />
       )}
       <CodeBlock language="bash" code={"horon routine run weekly-report \\\n  --to alpoxdev@gmail.com"} />
       <text className="text-caption text-text-secondary">{`picked: ${picked}`}</text>

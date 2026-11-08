@@ -1,4 +1,5 @@
 import { Children, cloneElement, isValidElement, useState, type ReactNode } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon, type IconProps } from "../icons";
 import { cn } from "../lib/cn";
@@ -40,6 +41,8 @@ export type SplitButtonProps = Omit<PortedButtonAttributes, "className" | "child
   menuLabel?: string;
   /** Extra classes on the pill container, which owns the fill, the press scale and the disabled dim. */
   className?: string;
+  /** Inline style, merged onto the pill container's own. */
+  style?: CSSProperties;
 };
 
 /** The shared half classes: one hit area of the pill, its own rounding on the outer edge. */
@@ -47,7 +50,9 @@ const halfClass = "relative flex h-full flex-row items-center";
 
 /** Sizes a caller's icon through the pill, as react's `[&_svg]:size-4` did. */
 const tintIcon = (node: ReactNode): ReactNode =>
-  isValidElement<IconProps>(node) && node.type === Icon ? cloneElement(node, { size: 16, color: "interactive-on-primary" }) : node;
+  isValidElement<IconProps>(node) && node.type === Icon
+    ? cloneElement(node, { size: 16, color: "interactive-on-primary" })
+    : node;
 
 /**
  * Paper `Split button` (1VGK-0): one primary pill on `Button`'s 32px rung, two hit areas split by a 1x18 bar.
@@ -90,6 +95,7 @@ export function SplitButton({
   menuLabel = "More actions",
   disabled = false,
   className,
+  style,
   onClick,
   type: _type,
   name: _name,
@@ -98,7 +104,9 @@ export function SplitButton({
 }: SplitButtonProps) {
   const [open, setOpen] = useState(false);
   const isPlain = typeof children === "string" || typeof children === "number";
-  const hasElementChild = Children.toArray(children).some((child) => typeof child !== "string" && typeof child !== "number");
+  const hasElementChild = Children.toArray(children).some(
+    (child) => typeof child !== "string" && typeof child !== "number",
+  );
 
   return (
     <view
@@ -109,9 +117,14 @@ export function SplitButton({
         disabled ? "opacity-40" : "motion-press",
         className,
       )}
+      style={style}
     >
       <view
-        className={cn(halfClass, "overflow-hidden", menu ? "gap-1.5 rounded-l-full pl-3 pr-2" : "gap-1.5 rounded-full px-3")}
+        className={cn(
+          halfClass,
+          "overflow-hidden",
+          menu ? "gap-1.5 rounded-l-full pl-3 pr-2" : "gap-1.5 rounded-full px-3",
+        )}
         bindtap={disabled ? undefined : onClick}
         accessibility-element
         accessibility-traits={disabled ? "disabled" : "button"}
@@ -120,12 +133,19 @@ export function SplitButton({
       >
         {icon ? <view className="relative flex shrink-0 flex-row items-center">{tintIcon(icon)}</view> : null}
         <view className={cn("relative flex flex-row items-center", hasElementChild && "gap-1.5")}>
-          {isPlain ? <text className="relative text-label-md text-interactive-on-primary text-trim">{children}</text> : children}
+          {isPlain ? (
+            <text className="text-trim relative text-label-md text-interactive-on-primary">{children}</text>
+          ) : (
+            children
+          )}
         </view>
       </view>
       {menu ? (
         <>
-          <view className={cn("h-[18px] w-px shrink-0 bg-interactive-on-primary opacity-25")} accessibility-elements-hidden />
+          <view
+            className={cn("h-[18px] w-px shrink-0 bg-interactive-on-primary opacity-25")}
+            accessibility-elements-hidden
+          />
           <Menu open={open} onOpenChange={setOpen}>
             <MenuTrigger
               disabled={disabled}

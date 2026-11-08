@@ -95,7 +95,7 @@ export function Badge({ tone = "neutral", dot, size = "md", className, children,
   return (
     <view
       className={cn(
-        "flex shrink-0 flex-row items-center justify-center rounded-full whitespace-nowrap",
+        "flex shrink-0 flex-row items-center justify-center whitespace-nowrap rounded-full",
         sizeClass[size],
         toneClass[tone],
         className,
@@ -105,7 +105,12 @@ export function Badge({ tone = "neutral", dot, size = "md", className, children,
       accessibility-role-description="text"
       {...(id === undefined ? {} : { id })}
     >
-      {dot && <view className={cn("shrink-0 rounded-full", dotSizeClass[size], dotClass[tone])} accessibility-element={false} />}
+      {dot && (
+        <view
+          className={cn("shrink-0 rounded-full", dotSizeClass[size], dotClass[tone])}
+          accessibility-element={false}
+        />
+      )}
       <view className="flex flex-row items-center">
         {typeof children === "string" || typeof children === "number" ? (
           <text className={cn("text-trim", textClass[tone])}>{children}</text>

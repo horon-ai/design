@@ -86,7 +86,13 @@ export default function OrchestratorPanelDemo() {
           task="Portfolio metrics"
           output="Revenue up 18%, burn down to $210k a month"
         />
-        <Lane initial="W" name="Writer" elapsed="3.4s" task="Draft the update email" output="Draft ready: 4 sections, 320 words" />
+        <Lane
+          initial="W"
+          name="Writer"
+          elapsed="3.4s"
+          task="Draft the update email"
+          output="Draft ready: 4 sections, 320 words"
+        />
         <Lane
           initial="I"
           name="Inbox triage"

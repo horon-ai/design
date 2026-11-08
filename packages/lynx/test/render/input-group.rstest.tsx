@@ -53,6 +53,17 @@ test("the prefix and suffix segments frame the input and typing emits", () => {
   expect(onChange).toHaveBeenCalledWith("horon");
 });
 
+test("onValueChange reports the text and the change reason alongside onChange", () => {
+  const onChange = rstest.fn();
+  const onValueChange = rstest.fn();
+  const { field } = renderGroup(<InputGroup placeholder="Website" onChange={onChange} onValueChange={onValueChange} />);
+
+  typeInto(field, "horon");
+
+  expect(onChange).toHaveBeenCalledWith("horon");
+  expect(onValueChange).toHaveBeenCalledWith("horon", { reason: "input" });
+});
+
 test("a disabled group disables the input and never emits", () => {
   const onChange = rstest.fn();
   const { container, field } = renderGroup(
@@ -75,6 +86,12 @@ test("a disabled group disables the input and never emits", () => {
   expect(container.querySelector(".opacity-60")).not.toBeNull();
 });
 
+test("a caller style is merged onto the box", () => {
+  const { container } = renderGroup(<InputGroup placeholder="Website" style={{ width: "260px" }} />);
+
+  expect(container.querySelector(".rounded-md")?.getAttribute("style")).toContain("width: 260px");
+});
+
 test("an invalid group paints the danger border and the hairline", () => {
   const { container } = renderGroup(
     <InputGroup
@@ -94,10 +111,7 @@ test("an invalid group paints the danger border and the hairline", () => {
 
 test("a plain-string segment child is painted inside a text node", () => {
   const { container } = renderGroup(
-    <InputGroup
-      placeholder="horon.ai"
-      prefix={<InputGroupSegment>https://</InputGroupSegment>}
-    />,
+    <InputGroup placeholder="horon.ai" prefix={<InputGroupSegment>https://</InputGroupSegment>} />,
   );
 
   // Lynx paints no text outside a `<text>`; a bare string child must be wrapped at the rung's type size.

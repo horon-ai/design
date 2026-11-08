@@ -7,7 +7,9 @@ import { HoronProvider } from "../../src/provider";
 
 /** The one tab whose label matches, inside the rendered tree. */
 const tabByName = (container: HTMLElement, label: string): Element => {
-  const node = [...container.querySelectorAll("view")].find((element) => element.getAttribute("accessibility-label") === label);
+  const node = [...container.querySelectorAll("view")].find(
+    (element) => element.getAttribute("accessibility-label") === label,
+  );
   if (!node) throw new Error(`no tab named ${label}`);
   return node;
 };
@@ -96,6 +98,46 @@ test("the pill follows the tapped tab from the boxes remembered before the switc
   await Promise.resolve();
   expect(pill(container)?.style.left).toBe("90px");
   expect(pill(container)?.style.width).toBe("120px");
+});
+
+test("a vertical set lays the tab list out as a column", () => {
+  const { container } = render(
+    <HoronProvider scheme="light">
+      <Tabs defaultValue="alpha" orientation="vertical">
+        <TabsList>
+          <TabsTab value="alpha">Alpha</TabsTab>
+          <TabsTab value="beta">Beta</TabsTab>
+        </TabsList>
+      </Tabs>
+    </HoronProvider>,
+  );
+
+  const wrapper = container.querySelector(".shrink-0");
+  const track = wrapper?.parentElement;
+  if (!track) throw new Error("the tabs have no track");
+  expect(track.getAttribute("class")).toContain("flex-col");
+  expect(track.getAttribute("class")).not.toContain("flex-row");
+});
+
+test("a caller style lands on every tab part's own root", () => {
+  const { container } = render(
+    <HoronProvider scheme="light">
+      <Tabs defaultValue="alpha" style={{ width: "300px" }}>
+        <TabsList style={{ width: "301px" }}>
+          <TabsTab value="alpha" style={{ width: "302px" }}>
+            Alpha
+          </TabsTab>
+        </TabsList>
+        <TabsPanel value="alpha" style={{ width: "303px" }}>
+          Alpha panel
+        </TabsPanel>
+      </Tabs>
+    </HoronProvider>,
+  );
+
+  for (const width of [300, 301, 302, 303]) {
+    expect(container.querySelector(`[style*="width: ${width}px"]`)).not.toBeNull();
+  }
 });
 
 test("the count pill and the active label are painted from the selected value", () => {

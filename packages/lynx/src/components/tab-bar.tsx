@@ -82,7 +82,15 @@ const tabClass: Record<TabBarSize, string> = {
  * }
  * ```
  */
-export function TabBar({ items, value, onValueChange, size = "md", surface = "glass", className, "aria-label": ariaLabel = "Main" }: TabBarProps) {
+export function TabBar({
+  items,
+  value,
+  onValueChange,
+  size = "md",
+  surface = "glass",
+  className,
+  "aria-label": ariaLabel = "Main",
+}: TabBarProps) {
   const activeIndex = items.findIndex((item) => item.value === value);
   const { rect, animate, bindTrack, bindItem } = useActiveIndicator(activeIndex);
 
@@ -91,7 +99,7 @@ export function TabBar({ items, value, onValueChange, size = "md", surface = "gl
       className={cn(
         // Tabs keep their fixed 56/64/72px tap size; when the row is wider than the
         // container the track scrolls instead of squeezing the icons.
-        "relative flex w-fit max-w-full min-w-0 flex-row items-center overflow-hidden rounded-full bg-glass-regular",
+        "relative flex w-fit min-w-0 max-w-full flex-row items-center overflow-hidden rounded-full bg-glass-regular",
         trackClass[size],
         className,
       )}
@@ -117,7 +125,7 @@ export function TabBar({ items, value, onValueChange, size = "md", surface = "gl
               <view
                 key={item.value}
                 className={cn(
-                  "relative flex shrink-0 flex-row motion-press items-center justify-center rounded-full",
+                  "motion-press relative flex shrink-0 flex-row items-center justify-center rounded-full",
                   tabClass[size],
                   current ? "text-text-primary" : "text-text-secondary",
                 )}

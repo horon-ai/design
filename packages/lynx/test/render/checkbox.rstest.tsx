@@ -75,3 +75,13 @@ test("an indeterminate box reads as mixed and draws a dash rather than a check",
   expect(container.querySelector("svg")).not.toBeNull();
   expect(container.querySelector("[class*='bg-interactive-primary']")).not.toBeNull();
 });
+
+test("a passed style reaches the checkbox row", () => {
+  const { container } = render(
+    <HoronProvider>
+      <Checkbox label="Styled" style={{ marginTop: "7px" }} />
+    </HoronProvider>,
+  );
+
+  expect(control(container)).toHaveStyle({ marginTop: "7px" });
+});

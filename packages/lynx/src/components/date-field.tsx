@@ -145,8 +145,8 @@ export function DateField({
   size = "md",
   surface = "solid",
   placeholder = "Pick a date",
-  invalid = false,
-  disabled = false,
+  invalid,
+  disabled,
   format,
   triggerClassName,
   ...calendar
@@ -199,7 +199,9 @@ export function DateField({
             {text}
           </text>
         ) : (
-          <text className={cn("relative min-w-0 flex-1 overflow-hidden", fieldTextClass[size], "text-text-placeholder")}>
+          <text
+            className={cn("relative min-w-0 flex-1 overflow-hidden", fieldTextClass[size], "text-text-placeholder")}
+          >
             {placeholder}
           </text>
         )}
@@ -214,12 +216,14 @@ export function DateField({
             accessibility-element={false}
           />
           <view
-            className="fixed z-50 motion-popup"
+            className="motion-popup fixed z-50"
             style={placement}
             bindlayoutchange={(event: LayoutChangeLike) => {
               const box = boxOf(event);
               setPanel((previous) =>
-                previous.width === box.width && previous.height === box.height ? previous : { width: box.width, height: box.height },
+                previous.width === box.width && previous.height === box.height
+                  ? previous
+                  : { width: box.width, height: box.height },
               );
             }}
           >

@@ -88,7 +88,10 @@ function jsonLines(value: Json, indent: number): JsonLine[] {
  * <JsonCode value={{ query: "Horon design tokens", limit: 5 }} />
  * ```
  */
-export function JsonCode({ value, className }: {
+export function JsonCode({
+  value,
+  className,
+}: {
   /** The JSON value to print; see `Json` for the accepted shapes. */
   value: Json;
   /** Extra classes for the block, for example a maximum height or `text-code` override. */
@@ -113,12 +116,8 @@ export function JsonCode({ value, className }: {
     >
       <view className="flex flex-col">
         {lines.map((line) => (
-          <view
-            key={line.id}
-            className="flex flex-row items-start"
-            style={{ paddingLeft: `${line.indent * 14}px` }}
-          >
-            <text className="font-mono text-code whitespace-nowrap">
+          <view key={line.id} className="flex flex-row items-start" style={{ paddingLeft: `${line.indent * 14}px` }}>
+            <text className="whitespace-nowrap font-mono text-code">
               {line.tokens.map((token) => (
                 <text key={token.id} className={toneClass[token.tone]}>
                   {token.text}
@@ -204,7 +203,7 @@ function Section({
         </view>
         {copyText !== undefined && supported ? (
           <view
-            className="flex flex-row items-center justify-center rounded-sm motion-press active:opacity-70"
+            className="motion-press flex flex-row items-center justify-center rounded-sm active:opacity-70"
             bindtap={() => copy(copyText)}
             accessibility-element
             accessibility-traits="button"
@@ -278,13 +277,13 @@ export function ToolCall({
       )}
     >
       <view
-        className="flex w-full flex-row items-center gap-2.5 px-4 py-3.5 motion-colors active:bg-overlay-ink-3"
+        className="motion-colors flex w-full flex-row items-center gap-2.5 px-4 py-3.5 active:bg-overlay-ink-3"
         bindtap={() => setOpen((value) => !value)}
         accessibility-element
         accessibility-traits="button"
         accessibility-value={open ? "expanded" : "collapsed"}
       >
-        <view className="flex max-w-full min-w-0 shrink flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 py-[3px] pr-2.5 pl-2">
+        <view className="flex min-w-0 max-w-full shrink flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 py-[3px] pl-2 pr-2.5">
           {tool.icon}
           <text className="min-w-0 truncate text-label-md text-text-primary">{tool.name}</text>
         </view>
@@ -317,7 +316,7 @@ export function ToolCall({
               <text className="min-w-0 flex-1 text-body-sm text-text-danger">{error}</text>
               {onRetry ? (
                 <view
-                  className="flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full border border-border-default bg-bg-surface px-2.5 motion-press"
+                  className="motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full border border-border-default bg-bg-surface px-2.5"
                   bindtap={onRetry}
                   accessibility-element
                   accessibility-traits="button"

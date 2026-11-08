@@ -100,7 +100,7 @@ export function MessageActions({
       {actions.map((action) => (
         <view
           key={action.label}
-          className="relative flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full text-text-secondary motion-press motion-colors active:bg-overlay-ink-6 cursor-pointer"
+          className="motion-press motion-colors relative flex size-[30px] shrink-0 cursor-pointer flex-row items-center justify-center rounded-full text-text-secondary active:bg-overlay-ink-6"
           bindtap={action.onClick}
           accessibility-element
           accessibility-traits="button"
@@ -146,7 +146,7 @@ export function Attachment({ name, detail, thumbnail, onRemove, removeLabel = "R
   return (
     <view
       className={cn(
-        "flex w-full max-w-[280px] min-w-0 flex-row motion-rise items-center gap-2.5 rounded-lg bg-bg-subtle py-2 pr-2 pl-2",
+        "motion-rise flex w-full min-w-0 max-w-[280px] flex-row items-center gap-2.5 rounded-lg bg-bg-subtle py-2 pl-2 pr-2",
         className,
       )}
     >
@@ -165,11 +165,19 @@ export function Attachment({ name, detail, thumbnail, onRemove, removeLabel = "R
       <view className="flex min-w-0 flex-1 flex-col gap-px">
         <text className="overflow-hidden text-ellipsis whitespace-nowrap text-label-md text-text-primary">{name}</text>
         {detail ? (
-          <text className="overflow-hidden text-ellipsis whitespace-nowrap text-caption text-text-secondary">{detail}</text>
+          <text className="overflow-hidden text-ellipsis whitespace-nowrap text-caption text-text-secondary">
+            {detail}
+          </text>
         ) : null}
       </view>
       {onRemove ? (
-        <IconButton size="sm" icon={<Icon name="X" />} label={removeLabel} onClick={onRemove} className="text-text-secondary" />
+        <IconButton
+          size="sm"
+          icon={<Icon name="X" />}
+          label={removeLabel}
+          onClick={onRemove}
+          className="text-text-secondary"
+        />
       ) : null}
     </view>
   );
@@ -215,13 +223,17 @@ export function CodeBlock({
 }: CodeBlockProps) {
   const { copied, copy } = useCopyToClipboard(1500);
   return (
-    <view className={cn("flex flex-col overflow-hidden rounded-lg bg-surface-ink", className)} style={style} {...(id === undefined ? {} : { id })}>
-      <view className="flex flex-row items-center gap-2 bg-bg-surface-6 py-2 pr-3.5 pl-3.5">
+    <view
+      className={cn("flex flex-col overflow-hidden rounded-lg bg-surface-ink", className)}
+      style={style}
+      {...(id === undefined ? {} : { id })}
+    >
+      <view className="flex flex-row items-center gap-2 bg-bg-surface-6 py-2 pl-3.5 pr-3.5">
         <view className="min-w-0 flex-1">
           <text className="text-caption text-text-on-ink opacity-70">{language}</text>
         </view>
         <view
-          className="flex shrink-0 flex-row items-center gap-1 motion-press cursor-pointer"
+          className="motion-press flex shrink-0 cursor-pointer flex-row items-center gap-1"
           bindtap={() => copy(code)}
           accessibility-element
           accessibility-traits="button"
@@ -235,8 +247,8 @@ export function CodeBlock({
         </view>
       </view>
       <scroll-view scroll-orientation="horizontal" scroll-bar-enable={false} className="overflow-hidden">
-        <view className="px-3.5 pt-3 pb-3.5">
-          <text className="font-mono whitespace-pre text-code text-text-on-ink">{code}</text>
+        <view className="px-3.5 pb-3.5 pt-3">
+          <text className="whitespace-pre font-mono text-code text-text-on-ink">{code}</text>
         </view>
       </scroll-view>
     </view>

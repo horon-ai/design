@@ -88,7 +88,7 @@ export function ApprovalCard({
   return (
     <view
       className={cn(
-        "relative flex w-full max-w-[360px] min-w-0 flex-col items-start overflow-hidden rounded-xl p-4 motion-colors",
+        "motion-colors relative flex w-full min-w-0 max-w-[360px] flex-col items-start overflow-hidden rounded-xl p-4",
         surface === "glass"
           ? cn("bg-glass-thick", state === "pending" && pendingEdge)
           : cn("border border-border-default bg-bg-surface", state === "pending" && pendingEdge),
@@ -96,8 +96,8 @@ export function ApprovalCard({
       )}
     >
       {surface === "glass" && <LiquidGlass />}
-      <view className={cn("relative flex flex-row items-center gap-1.5 motion-colors", tone.text)}>
-        <view className={cn("size-2 shrink-0 rounded-full motion-colors", tone.dot)} accessibility-element={false} />
+      <view className={cn("motion-colors relative flex flex-row items-center gap-1.5", tone.text)}>
+        <view className={cn("motion-colors size-2 shrink-0 rounded-full", tone.dot)} accessibility-element={false} />
         <text
           key={state}
           className={cn("text-label-sm", tone.text)}
@@ -115,10 +115,12 @@ export function ApprovalCard({
         <text className="text-label-lg text-text-primary">{title}</text>
       </view>
       {attachment ? (
-        <view className="relative mt-3 flex max-w-full min-w-0 flex-row items-center gap-2 rounded-md bg-overlay-ink-5 px-3 py-2">
+        <view className="relative mt-3 flex min-w-0 max-w-full flex-row items-center gap-2 rounded-md bg-overlay-ink-5 px-3 py-2">
           <Icon name="Paperclip" size={14} color="text-secondary" />
           <view className="min-w-0 flex-1">
-            <text className="overflow-hidden text-ellipsis whitespace-nowrap text-body-sm text-text-primary">{attachment}</text>
+            <text className="overflow-hidden text-ellipsis whitespace-nowrap text-body-sm text-text-primary">
+              {attachment}
+            </text>
           </view>
         </view>
       ) : null}

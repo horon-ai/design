@@ -76,3 +76,19 @@ test("the checked thumb is translated across the track and the resting one is no
   expect(control(on.container).querySelector(".translate-x-\\[18px\\]")).not.toBeNull();
   expect(control(off.container).querySelector(".translate-x-0")).not.toBeNull();
 });
+
+test("a passed style reaches the root that takes the className", () => {
+  const labelled = render(
+    <HoronProvider>
+      <Switch label="Morning brief" style={{ marginTop: "7px" }} />
+    </HoronProvider>,
+  );
+  const bare = render(
+    <HoronProvider>
+      <Switch aria-label="Morning brief" style={{ marginTop: "7px" }} />
+    </HoronProvider>,
+  );
+
+  expect(control(labelled.container)).toHaveStyle({ marginTop: "7px" });
+  expect(control(bare.container)).toHaveStyle({ marginTop: "7px" });
+});

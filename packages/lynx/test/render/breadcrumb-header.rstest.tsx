@@ -41,7 +41,13 @@ test("the search and more buttons call their handlers and the last crumb is the 
 test("custom labels name the buttons instead of the defaults", async () => {
   const { container, findByText } = render(
     <HoronProvider scheme="light">
-      <BreadcrumbHeader crumbs={crumbs} onSearch={() => undefined} searchLabel="Find" moreLabel="Actions" onMore={() => undefined} />
+      <BreadcrumbHeader
+        crumbs={crumbs}
+        onSearch={() => undefined}
+        searchLabel="Find"
+        moreLabel="Actions"
+        onMore={() => undefined}
+      />
     </HoronProvider>,
   );
 

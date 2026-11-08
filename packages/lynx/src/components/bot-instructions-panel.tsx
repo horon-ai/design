@@ -85,7 +85,7 @@ export function PanelPillTabs({ items, value, defaultValue, onValueChange, class
   return (
     <view
       className={cn(
-        "relative flex max-w-full min-w-0 flex-row items-center gap-0.5 overflow-hidden rounded-full bg-overlay-ink-5 p-[3px]",
+        "relative flex min-w-0 max-w-full flex-row items-center gap-0.5 overflow-hidden rounded-full bg-overlay-ink-5 p-[3px]",
         className,
       )}
       bindlayoutchange={bindTrack}
@@ -110,7 +110,7 @@ export function PanelPillTabs({ items, value, defaultValue, onValueChange, class
           <view key={item.value} className="relative shrink-0" {...bindItem(index)}>
             <view
               className={cn(
-                "flex h-[30px] flex-row items-center rounded-full px-3 whitespace-nowrap motion-colors",
+                "motion-colors flex h-[30px] flex-row items-center whitespace-nowrap rounded-full px-3",
                 active ? "text-text-primary" : "text-text-secondary active:text-text-primary",
               )}
               bindtap={() => select(item.value)}
@@ -121,7 +121,7 @@ export function PanelPillTabs({ items, value, defaultValue, onValueChange, class
               {typeof item.label === "string" || typeof item.label === "number" ? (
                 <text
                   className={cn(
-                    "text-label-md whitespace-nowrap",
+                    "whitespace-nowrap text-label-md",
                     active ? "text-text-primary" : "text-text-secondary",
                   )}
                 >
@@ -323,12 +323,12 @@ export function BotInstructionsPanel({
   return (
     <view
       className={cn(
-        "flex w-full max-w-[620px] min-w-0 flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full min-w-0 max-w-[620px] flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       {...(id === undefined ? {} : { id })}
     >
-      <view className="flex flex-row flex-wrap items-center gap-2 px-5 pt-4 pb-3.5">
+      <view className="flex flex-row flex-wrap items-center gap-2 px-5 pb-3.5 pt-4">
         <view className="min-w-0">
           {typeof title === "string" || typeof title === "number" ? (
             <text className="text-label-lg text-text-primary">{title}</text>
@@ -339,7 +339,7 @@ export function BotInstructionsPanel({
         {version ? (
           onVersionClick ? (
             <view
-              className="flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 motion-press active:bg-overlay-ink-10"
+              className="motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 active:bg-overlay-ink-10"
               bindtap={onVersionClick}
               accessibility-element
               accessibility-traits="button"
@@ -359,7 +359,7 @@ export function BotInstructionsPanel({
         <view className="min-w-0 flex-1" />
         {onBotClick ? (
           <view
-            className="flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5 motion-press active:bg-overlay-ink-10"
+            className="motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pl-1.5 pr-2.5 active:bg-overlay-ink-10"
             bindtap={onBotClick}
             accessibility-element
             accessibility-traits="button"
@@ -372,7 +372,7 @@ export function BotInstructionsPanel({
             <Icon name="CaretDown" size={12} color="text-secondary" />
           </view>
         ) : (
-          <view className="flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5">
+          <view className="flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pl-1.5 pr-2.5">
             <view className="flex size-[18px] flex-row items-center justify-center rounded-[5px] bg-interactive-primary">
               <text className="text-label-sm text-text-inverse">{bot.initial}</text>
             </view>
@@ -381,7 +381,7 @@ export function BotInstructionsPanel({
         )}
       </view>
       <Divider />
-      <view className="flex flex-col gap-1 px-5 pt-3 pb-3.5">
+      <view className="flex flex-col gap-1 px-5 pb-3.5 pt-3">
         <view className="flex flex-row items-center gap-2 pb-2">
           <PanelPillTabs
             aria-label="Instructions view"
@@ -399,7 +399,7 @@ export function BotInstructionsPanel({
         </view>
         <view
           key={tab}
-          className="flex motion-rise flex-col gap-1 rounded-lg"
+          className="motion-rise flex flex-col gap-1 rounded-lg"
           focusable
           bindfocus={() => setFocused(true)}
           bindblur={() => setFocused(false)}
@@ -458,7 +458,7 @@ export function BotInstructionsPanel({
       {variables || scenarios ? (
         <>
           <Divider />
-          <view className="flex flex-col gap-2.5 px-5 pt-3 pb-3.5">
+          <view className="flex flex-col gap-2.5 px-5 pb-3.5 pt-3">
             {variables ? (
               <view className="flex flex-row flex-wrap gap-2">
                 {variables.map((variable) => (
@@ -485,7 +485,7 @@ export function BotInstructionsPanel({
               ) : null}
               <view className="min-w-0 flex-1" />
               <view
-                className="flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-interactive-primary pr-3 pl-3.5 motion-press active:bg-interactive-primary-hover"
+                className="motion-press flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-interactive-primary pl-3.5 pr-3 active:bg-interactive-primary-hover"
                 bindtap={() => {
                   setRunCount((count) => count + 1);
                   onRun?.(scenario);
@@ -505,7 +505,7 @@ export function BotInstructionsPanel({
       {output === undefined ? null : (
         <view
           key={runCount}
-          className="motion-rise bg-overlay-ink-3 px-5 pt-3.5 pb-4"
+          className="motion-rise bg-overlay-ink-3 px-5 pb-4 pt-3.5"
           accessibility-role-description="status"
         >
           {typeof output === "string" || typeof output === "number" ? (

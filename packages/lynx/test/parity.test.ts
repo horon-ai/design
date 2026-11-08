@@ -37,7 +37,8 @@ const EXCLUDED_EXPORTS = new Map([
   ["CursorGhostOptions", "DOM-only: the option type of mountCursorGhost"],
 ]);
 
-const listTsx = (dir: string): string[] => [...new Bun.Glob("*.tsx").scanSync(dir)].map((file) => file.replace(/\.tsx$/, "")).toSorted();
+const listTsx = (dir: string): string[] =>
+  [...new Bun.Glob("*.tsx").scanSync(dir)].map((file) => file.replace(/\.tsx$/, "")).toSorted();
 
 /** Value export names declared in one source file, the same reading `exports.test.ts` uses. */
 const valueExports = (source: string): string[] => {
@@ -51,7 +52,8 @@ const valueExports = (source: string): string[] => {
       if (match) names.add(match[2] ?? match[1]);
     }
   }
-  for (const match of source.matchAll(/export\s+(?:async\s+)?(?:function|const|let|var|class)\s+([A-Za-z0-9_$]+)/g)) names.add(match[1]);
+  for (const match of source.matchAll(/export\s+(?:async\s+)?(?:function|const|let|var|class)\s+([A-Za-z0-9_$]+)/g))
+    names.add(match[1]);
   return [...names].toSorted();
 };
 
@@ -133,7 +135,10 @@ describe("@horon-ai/lynx ↔ @horon-ai/react parity", () => {
           const lynxNames = valueExports(lynx);
           const absent = reactNames.filter((name) => !lynxNames.includes(name));
           const extra = lynxNames.filter((name) => !reactNames.includes(name));
-          return [...absent.map((name) => `${slug}: missing value ${name}`), ...extra.map((name) => `${slug}: extra value ${name}`)];
+          return [
+            ...absent.map((name) => `${slug}: missing value ${name}`),
+            ...extra.map((name) => `${slug}: extra value ${name}`),
+          ];
         }),
       )
     ).flat();
@@ -201,7 +206,9 @@ describe("@horon-ai/lynx ↔ @horon-ai/react parity", () => {
 
 describe("the bun test suite stays free of the Lynx runtime", () => {
   test("no file under test/ imports @lynx-js/react", async () => {
-    const files = [...new Bun.Glob("**/*.{ts,tsx}").scanSync(import.meta.dir)].filter((file) => !file.endsWith(".rstest.tsx"));
+    const files = [...new Bun.Glob("**/*.{ts,tsx}").scanSync(import.meta.dir)].filter(
+      (file) => !file.endsWith(".rstest.tsx"),
+    );
     const offenders = (
       await Promise.all(
         files.map(async (file) => {

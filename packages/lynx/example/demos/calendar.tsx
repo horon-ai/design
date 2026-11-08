@@ -35,7 +35,11 @@ export default function CalendarDemo() {
         <text className="text-caption text-text-secondary">Popover, range and disabled days</text>
         <view className="flex flex-row flex-wrap items-start justify-center gap-4">
           <Calendar variant="popover" />
-          <Calendar mode="range" weekStartsOn={1} isDateDisabled={(date) => date.getDay() === 0 || date.getDay() === 6} />
+          <Calendar
+            mode="range"
+            weekStartsOn={1}
+            isDateDisabled={(date) => date.getDay() === 0 || date.getDay() === 6}
+          />
         </view>
       </view>
     </view>

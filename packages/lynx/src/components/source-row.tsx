@@ -58,7 +58,8 @@ const stageBar = (state: keyof typeof stageFill, wide: boolean) =>
   cn("h-[3px] overflow-hidden rounded-full", wide ? "w-11" : "w-6", stageFill[state]);
 
 /** Whether a value can be dropped into a `<text>` as its child. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** The tile is 32px and React sized its glyph through `[&>svg]:size-4`; `<Icon>` takes the px number. */
 const TILE_ICON_SIZE = 16;
@@ -121,15 +122,13 @@ export function SourceRow({
           : icon}
       </view>
       <view className="flex min-w-0 grow flex-col gap-0.5">
-        {isPlainText(name) ? (
-          <text className="truncate text-label-md text-text-primary">{name}</text>
-        ) : (
-          name
-        )}
+        {isPlainText(name) ? <text className="truncate text-label-md text-text-primary">{name}</text> : name}
         <view className="flex flex-row items-center gap-1">
           {status === "failed" ? <Icon name="WarningCircle" size={12} color="text-danger" /> : null}
           {isPlainText(detail) ? (
-            <text className={cn("truncate text-caption", status === "failed" ? "text-text-danger" : "text-text-secondary")}>
+            <text
+              className={cn("truncate text-caption", status === "failed" ? "text-text-danger" : "text-text-secondary")}
+            >
               {detail}
             </text>
           ) : (
@@ -180,7 +179,7 @@ export function SourceRow({
         ) : null}
         {status === "failed" ? (
           <view
-            className="flex h-[30px] flex-row items-center rounded-full bg-overlay-ink-6 px-3 motion-press"
+            className="motion-press flex h-[30px] flex-row items-center rounded-full bg-overlay-ink-6 px-3"
             bindtap={onRetry}
             accessibility-element
             accessibility-traits="button"

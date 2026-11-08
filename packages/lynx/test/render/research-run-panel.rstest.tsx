@@ -65,9 +65,7 @@ test("a running panel shows the live status line and every query row", async () 
     </HoronProvider>,
   );
 
-  expect(
-    getByText("Which seed investors led AI agent rounds in Korea this year?"),
-  ).toBeInTheDocument();
+  expect(getByText("Which seed investors led AI agent rounds in Korea this year?")).toBeInTheDocument();
   expect(getByText("Reading sources")).toBeInTheDocument();
   // The two meta values are separate text runs joined by a middot.
   expect(container.textContent).toContain("12s");
@@ -132,11 +130,7 @@ test("a finished panel folds the status line away and the sources pill submits n
 test("a panel with no queries and no sources still renders the question and the field", () => {
   const { container, getByText } = render(
     <HoronProvider scheme="light">
-      <ResearchRunPanel
-        question="Start a run"
-        running={false}
-        followUpPlaceholder="Ask a follow-up"
-      />
+      <ResearchRunPanel question="Start a run" running={false} followUpPlaceholder="Ask a follow-up" />
     </HoronProvider>,
   );
 
@@ -147,9 +141,7 @@ test("a panel with no queries and no sources still renders the question and the 
   expect(container.querySelector(".bg-sky-700")).toBeNull();
   expect(byLabel(container, "Ask a follow-up")).toBe(field(container));
 
-  const panel = [...container.querySelectorAll("view")].find((element) =>
-    element.className.includes("rounded-[24px]"),
-  );
+  const panel = [...container.querySelectorAll("view")].find((element) => element.className.includes("rounded-[24px]"));
   expect(panel?.className).toContain("max-w-[600px]");
   expect(panel?.className).toContain("border-border-default");
 });

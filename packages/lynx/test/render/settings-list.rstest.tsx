@@ -42,7 +42,15 @@ test("a disabled row control ignores the tap and a keycap row reports no change"
   const { container, findByText } = render(
     <HoronProvider>
       <SettingsList>
-        <SettingsRow title="Quick command" control={<SettingsKeys><SettingsKey>⌘</SettingsKey><SettingsKey>K</SettingsKey></SettingsKeys>} />
+        <SettingsRow
+          title="Quick command"
+          control={
+            <SettingsKeys>
+              <SettingsKey>⌘</SettingsKey>
+              <SettingsKey>K</SettingsKey>
+            </SettingsKeys>
+          }
+        />
         <SettingsRow
           title="Managed by admin"
           control={<SettingsSwitch disabled aria-label="Managed" onCheckedChange={(next) => seen.push(next)} />}

@@ -4,7 +4,8 @@ import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
 /** Text slots take a string so the token classes can sit on a `<text>`; a node keeps its own styling. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * Props for {@link UsageMeter}.
@@ -64,7 +65,7 @@ export function UsageMeter({ label, value, detail, note, surface = "solid", clas
   return (
     <view
       className={cn(
-        "relative flex w-full max-w-[300px] min-w-0 flex-col gap-2 overflow-hidden rounded-xl p-4",
+        "relative flex w-full min-w-0 max-w-[300px] flex-col gap-2 overflow-hidden rounded-xl p-4",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         className,
       )}
@@ -78,7 +79,7 @@ export function UsageMeter({ label, value, detail, note, surface = "solid", clas
         <view className="min-w-0 flex-1">
           {isPlainText(label) ? <text className="text-label-md text-text-primary">{label}</text> : label}
         </view>
-        <text className="shrink-0 text-label-md text-text-secondary tabular-nums">{`${Math.round(percent)}%`}</text>
+        <text className="shrink-0 text-label-md tabular-nums text-text-secondary">{`${Math.round(percent)}%`}</text>
       </view>
       <view className="relative h-1.5 w-full overflow-hidden rounded-full bg-overlay-ink-8">
         <view

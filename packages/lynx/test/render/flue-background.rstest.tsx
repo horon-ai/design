@@ -13,7 +13,9 @@ const rgb = (hex: string): string => {
 
 /** The painted gradient layers of one render, found by the ramp they carry inline. */
 const plumes = (container: HTMLElement): SVGViewElement[] =>
-  [...container.querySelectorAll("view")].filter((element) => element.style.backgroundImage.includes("linear-gradient"));
+  [...container.querySelectorAll("view")].filter((element) =>
+    element.style.backgroundImage.includes("linear-gradient"),
+  );
 
 test("the smoke is decorative: it renders no text at all", () => {
   const { container } = render(

@@ -6,7 +6,8 @@ import { TopBar } from "../../src/components/top-bar";
 import { HoronProvider } from "../../src/provider";
 
 /** The bar announces its two actions by their accessible labels, which is what a screen reader reads. */
-const action = (container: HTMLElement, label: string): Element | null => container.querySelector(`[accessibility-label="${label}"]`);
+const action = (container: HTMLElement, label: string): Element | null =>
+  container.querySelector(`[accessibility-label="${label}"]`);
 
 test("the back and overflow buttons fire their own handlers", async () => {
   const seen: string[] = [];
@@ -33,7 +34,13 @@ test("the accessible labels follow backLabel and moreLabel", async () => {
   const seen: string[] = [];
   const { container } = render(
     <HoronProvider>
-      <TopBar title="Research bot" backLabel="Back to bots" moreLabel="Routine actions" onBack={() => seen.push("back")} onMore={() => seen.push("more")} />
+      <TopBar
+        title="Research bot"
+        backLabel="Back to bots"
+        moreLabel="Routine actions"
+        onBack={() => seen.push("back")}
+        onMore={() => seen.push("more")}
+      />
     </HoronProvider>,
   );
 

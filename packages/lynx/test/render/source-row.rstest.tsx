@@ -43,7 +43,13 @@ test("a failed source shows the red detail and retries", async () => {
 test("an indexing source paints the progress share on the active stage bar", async () => {
   const { container, findByText } = render(
     <HoronProvider>
-      <SourceRow status="indexing" icon={<Icon name="Globe" />} name="help.horon.ai" detail="140 of 296 chunks" progress={62} />
+      <SourceRow
+        status="indexing"
+        icon={<Icon name="Globe" />}
+        name="help.horon.ai"
+        detail="140 of 296 chunks"
+        progress={62}
+      />
     </HoronProvider>,
   );
 

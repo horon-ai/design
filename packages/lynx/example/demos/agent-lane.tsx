@@ -11,7 +11,10 @@ export default function AgentLaneDemo() {
           bot={{ initial: "R", name: "Researcher" }}
           elapsed="1.9s"
           task="Portfolio metrics"
-          tool={{ icon: <Icon name="MagnifyingGlass" size={14} color="text-secondary" />, label: "Notion · Q3 metrics dashboard" }}
+          tool={{
+            icon: <Icon name="MagnifyingGlass" size={14} color="text-secondary" />,
+            label: "Notion · Q3 metrics dashboard",
+          }}
           output="Revenue up 18%, burn down to $210k a month"
           usage="2.6k tokens"
         />
@@ -20,7 +23,10 @@ export default function AgentLaneDemo() {
           bot={{ initial: "I", name: "Inbox triage" }}
           elapsed="1.2s"
           task="Collect open investor questions"
-          tool={{ icon: <Icon name="EnvelopeSimple" size={14} color="text-secondary" />, label: "Gmail · investor threads, last 30 days" }}
+          tool={{
+            icon: <Icon name="EnvelopeSimple" size={14} color="text-secondary" />,
+            label: "Gmail · investor threads, last 30 days",
+          }}
           output="Gmail access expired. Reconnect to continue."
           usage="0.4k tokens"
         />

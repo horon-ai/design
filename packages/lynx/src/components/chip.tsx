@@ -123,7 +123,7 @@ export function Chip({
   return (
     <view
       className={cn(
-        "relative flex shrink-0 flex-row items-center justify-center motion-press rounded-full border whitespace-nowrap",
+        "motion-press relative flex shrink-0 flex-row items-center justify-center whitespace-nowrap rounded-full border",
         sizeClass[size],
         disabled ? "opacity-40" : "cursor-pointer",
         "border-border-default bg-bg-surface",
@@ -159,7 +159,12 @@ export function Chip({
               : undefined
           }
         >
-          <Icon name="Check" size={checkIconSize[size]} weight="bold" color={isPressed ? "text-brand" : "text-secondary"} />
+          <Icon
+            name="Check"
+            size={checkIconSize[size]}
+            weight="bold"
+            color={isPressed ? "text-brand" : "text-secondary"}
+          />
         </view>
       </view>
       <view className={cn("relative flex flex-row items-center", hasElementChild && "gap-1.5")}>

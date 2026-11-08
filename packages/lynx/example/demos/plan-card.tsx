@@ -51,15 +51,25 @@ export default function PlanCardDemo() {
         statusLabel={failed ? "Stopped · step 4 failed" : "Running · 4 of 5"}
         elapsed={failed ? undefined : "0.8s"}
       >
-        <Step index={1} title="Pull Q3 revenue and ARR" detail="Monthly revenue, ARR and net retention" tool="stripe.query" />
-        <Step index={2} title="Summarize product launches" detail="Shipped projects and adoption" tool="linear.search" />
+        <Step
+          index={1}
+          title="Pull Q3 revenue and ARR"
+          detail="Monthly revenue, ARR and net retention"
+          tool="stripe.query"
+        />
+        <Step
+          index={2}
+          title="Summarize product launches"
+          detail="Shipped projects and adoption"
+          tool="linear.search"
+        />
         <Step index={3} title="Draft the board memo" detail="One page, wins, risks and asks" tool="docs.write" />
         <Step index={4} title="Build the KPI slides" detail="Six charts in the board template" tool="slides.create" />
         <Step index={5} title="Send the draft to Maya for review" tool="gmail.draft" last />
       </PlanCard>
       <view className="flex flex-row items-center gap-2">
         <view
-          className="flex flex-row items-center gap-1.5 rounded-full border border-border-default bg-bg-surface px-3 py-1.5 motion-press"
+          className="motion-press flex flex-row items-center gap-1.5 rounded-full border border-border-default bg-bg-surface px-3 py-1.5"
           bindtap={() => setFailed((value) => !value)}
           accessibility-element
           accessibility-traits="button"

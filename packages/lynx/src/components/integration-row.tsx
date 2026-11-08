@@ -97,7 +97,7 @@ export function IntegrationRow({
   return (
     <view
       className={cn(
-        "relative flex min-w-0 flex-row flex-wrap items-center gap-x-3 gap-y-2 overflow-hidden rounded-2xl py-3 pr-3.5 pl-3",
+        "relative flex min-w-0 flex-row flex-wrap items-center gap-x-3 gap-y-2 overflow-hidden rounded-2xl py-3 pl-3 pr-3.5",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         status === "reconnect" && "border border-border-danger",
         className,
@@ -106,7 +106,7 @@ export function IntegrationRow({
       {surface === "glass" && <LiquidGlass />}
       <view
         className={cn(
-          "relative flex size-10 shrink-0 flex-row items-center justify-center rounded-[10px] motion-colors",
+          "motion-colors relative flex size-10 shrink-0 flex-row items-center justify-center rounded-[10px]",
           surface === "glass" && status === "not-connected" ? "bg-overlay-ink-6" : tileClass[status],
         )}
       >
@@ -117,7 +117,9 @@ export function IntegrationRow({
       <view className="relative flex min-w-0 grow basis-40 flex-col gap-0.5">
         <text className="truncate text-label-md text-text-primary">{name}</text>
         {detail ? (
-          <text className={cn("truncate text-caption", status === "reconnect" ? "text-text-danger" : "text-text-secondary")}>
+          <text
+            className={cn("truncate text-caption", status === "reconnect" ? "text-text-danger" : "text-text-secondary")}
+          >
             {detail}
           </text>
         ) : null}
@@ -126,12 +128,12 @@ export function IntegrationRow({
         {isConnected ? (
           <view className="flex h-[30px] flex-row items-center justify-center gap-1.5 rounded-full bg-accent-sky-500-18 px-3">
             <view className="size-1.5 rounded-full bg-status-live" />
-            <text className="text-label-sm whitespace-nowrap text-text-primary">{connectedLabel}</text>
+            <text className="whitespace-nowrap text-label-sm text-text-primary">{connectedLabel}</text>
           </view>
         ) : (
           <view
             className={cn(
-              "flex h-[30px] flex-row items-center justify-center gap-1.5 rounded-full px-3 motion-press",
+              "motion-press flex h-[30px] flex-row items-center justify-center gap-1.5 rounded-full px-3",
               status === "reconnect" ? "bg-accent-red-500-14" : "bg-interactive-primary",
             )}
             bindtap={onAction}
@@ -141,7 +143,7 @@ export function IntegrationRow({
             {status === "not-connected" ? <Icon name="Plug" size={14} color="text-primary" /> : null}
             <text
               className={cn(
-                "text-label-sm whitespace-nowrap",
+                "whitespace-nowrap text-label-sm",
                 status === "reconnect" ? "text-text-danger" : "text-text-inverse",
               )}
             >

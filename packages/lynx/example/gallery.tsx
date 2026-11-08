@@ -12,7 +12,8 @@ const readHostProps = () => {
   return { demo: demo ?? "", scheme: scheme ?? "", platform: platform ?? "" };
 };
 
-const isPlatform = (value: string): value is ThemePlatform => value === "desktop" || value === "mobile" || value === "web";
+const isPlatform = (value: string): value is ThemePlatform =>
+  value === "desktop" || value === "mobile" || value === "web";
 
 /**
  * The type board a host gets when it does not pass one: phones read the mobile
@@ -61,11 +62,14 @@ export function Gallery() {
 
   return (
     <HoronProvider scheme={scheme} platform={platform}>
-      <view className="flex flex-col w-full h-full">
+      <view className="flex h-full w-full flex-col">
         <view className="flex flex-row items-center justify-between border-b border-border-default px-4 py-3">
           <text className="text-title-sm text-text-primary">Horon Lynx</text>
           <view className="flex flex-row items-center gap-2">
-            <Pill label={scheme === "dark" ? "Light" : "Dark"} onTap={() => setScheme(scheme === "dark" ? "light" : "dark")} />
+            <Pill
+              label={scheme === "dark" ? "Light" : "Dark"}
+              onTap={() => setScheme(scheme === "dark" ? "light" : "dark")}
+            />
             <Pill label={platform} onTap={() => setPlatform(platform === "mobile" ? "desktop" : "mobile")} />
           </view>
         </view>
@@ -77,7 +81,7 @@ export function Gallery() {
         ) : null}
 
         {Demo ? (
-          <view className="flex flex-col w-full">
+          <view className="flex w-full flex-col">
             <view className="flex flex-row items-center justify-between border-b border-border-default px-4 py-2">
               <text className="text-label-md text-text-secondary">{selected}</text>
               <view
@@ -90,18 +94,18 @@ export function Gallery() {
                 <text className="text-label-sm text-text-secondary">back</text>
               </view>
             </view>
-            <view className="flex flex-col w-full p-4">
+            <view className="flex w-full flex-col p-4">
               <Demo />
             </view>
           </view>
         ) : null}
 
         {!selected ? (
-          <view className="flex flex-col w-full p-2">
+          <view className="flex w-full flex-col p-2">
             {registry.map((item) => (
               <view
                 key={item.slug}
-                className="flex flex-row items-center justify-between rounded-md px-3 py-2 motion-colors"
+                className="motion-colors flex flex-row items-center justify-between rounded-md px-3 py-2"
                 bindtap={() => setSelected(item.slug)}
                 accessibility-element
                 accessibility-traits="button"

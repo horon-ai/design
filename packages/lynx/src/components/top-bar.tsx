@@ -44,7 +44,8 @@ export type TopBarProps = Omit<PortedElementProps["header"], "className" | "titl
 };
 
 /** Text slots take a string so the bar can put the type token on its own `<text>`; Lynx does not inherit type. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * Paper `Top bar`: back button, bot avatar with a flush live dot, title and subtitle, on solid surface or regular glass.
@@ -138,7 +139,10 @@ export function TopBar({
         }}
       >
         {isPlainText(title) ? (
-          <text className="overflow-hidden text-ellipsis whitespace-nowrap text-label-lg text-text-primary" text-maxline="1">
+          <text
+            className="overflow-hidden text-ellipsis whitespace-nowrap text-label-lg text-text-primary"
+            text-maxline="1"
+          >
             {title}
           </text>
         ) : (
@@ -146,7 +150,10 @@ export function TopBar({
         )}
         {subtitle ? (
           isPlainText(subtitle) ? (
-            <text className="overflow-hidden text-ellipsis whitespace-nowrap text-caption text-text-secondary" text-maxline="1">
+            <text
+              className="overflow-hidden text-ellipsis whitespace-nowrap text-caption text-text-secondary"
+              text-maxline="1"
+            >
               {subtitle}
             </text>
           ) : (

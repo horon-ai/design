@@ -83,3 +83,16 @@ test("a controlled dialog reports the request without moving itself", async () =
   // The caller owns the state, so the panel stays closed.
   expect(queryByText("Rename workspace")).toBeNull();
 });
+
+test("a passed style reaches the dialog panel", async () => {
+  const { container, findByText } = render(
+    <HoronProvider>
+      <Dialog defaultOpen>
+        <DialogContent title="Rename workspace" style={{ marginTop: "7px" }} />
+      </Dialog>
+    </HoronProvider>,
+  );
+
+  await findByText("Rename workspace");
+  expect(container.querySelector(".motion-rise")).toHaveStyle({ marginTop: "7px" });
+});

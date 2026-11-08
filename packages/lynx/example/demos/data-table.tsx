@@ -31,9 +31,7 @@ const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "nume
 /** A cell renderer with the column's own context type, so the columns below share them. */
 type ToolCell = NonNullable<DataTableColumn<Tool>["cell"]>;
 
-const nameCell: ToolCell = ({ row }) => (
-  <DataTableItem logo={row.original.logo}>{row.original.name}</DataTableItem>
-);
+const nameCell: ToolCell = ({ row }) => <DataTableItem logo={row.original.logo}>{row.original.name}</DataTableItem>;
 const tagCell: ToolCell = ({ row }) => <DataTableTag tone={row.original.tone}>{row.original.tag}</DataTableTag>;
 const renewsCell: ToolCell = ({ row }) => dateFormat.format(row.original.renews);
 

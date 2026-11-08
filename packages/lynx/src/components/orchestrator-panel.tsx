@@ -74,7 +74,8 @@ export type OrchestratorPanelProps = {
 };
 
 /** Whether a value can be dropped into a `<text>` as its child. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** React staggered rows with `--i`; Lynx writes the delay as a plain inline duration. */
 const stagger = (index: number): CSSProperties => ({ animationDelay: `${index * 30}ms` });
@@ -142,7 +143,7 @@ export function OrchestratorPanel({
       accessibility-element
       accessibility-role-description="summary"
     >
-      <view className="flex flex-col gap-3 px-5 pt-4 pb-3.5">
+      <view className="flex flex-col gap-3 px-5 pb-3.5 pt-4">
         {isPlainText(title) ? (
           <text className="text-label-lg text-text-primary">{title}</text>
         ) : (
@@ -167,7 +168,7 @@ export function OrchestratorPanel({
           <view className="min-w-0 flex-1" />
           {onStop ? (
             <view
-              className="flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 px-3 motion-press active:bg-overlay-ink-10"
+              className="motion-press flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 px-3 active:bg-overlay-ink-10"
               bindtap={onStop}
               accessibility-element
               accessibility-traits="button"
@@ -182,11 +183,8 @@ export function OrchestratorPanel({
           ) : null}
         </view>
       </view>
-      <view
-        className="h-px bg-overlay-ink-8"
-        accessibility-role-description="separator"
-      />
-      <view className="flex flex-col gap-2.5 px-5 pt-4 pb-5">
+      <view className="h-px bg-overlay-ink-8" accessibility-role-description="separator" />
+      <view className="flex flex-col gap-2.5 px-5 pb-5 pt-4">
         <view className="flex flex-row flex-wrap items-center gap-2">
           <view className="flex h-[22px] w-[22px] shrink-0 flex-row items-center justify-center rounded-[5px] bg-interactive-primary">
             <text className="text-trim text-label-sm text-text-inverse">{lead.initial}</text>
@@ -220,16 +218,25 @@ export function OrchestratorPanel({
           ) : null}
         </view>
         {plan && plan.length > 0 ? (
-          <view className="flex flex-col gap-1.5 pt-0.5 pb-1 pl-[30px]">
+          <view className="flex flex-col gap-1.5 pb-1 pl-[30px] pt-0.5">
             {plan.map((item, index) => (
               <view
                 key={item.label}
-                className="flex min-w-0 flex-row items-center gap-2.5 motion-rise"
+                className="motion-rise flex min-w-0 flex-row items-center gap-2.5"
                 style={stagger(index)}
               >
                 <view
                   className="flex shrink-0 flex-row items-center"
-                  style={item.running ? { animationName: "live-pulse", animationDuration: "2s", animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)", animationIterationCount: "infinite" } : undefined}
+                  style={
+                    item.running
+                      ? {
+                          animationName: "live-pulse",
+                          animationDuration: "2s",
+                          animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                          animationIterationCount: "infinite",
+                        }
+                      : undefined
+                  }
                   accessibility-elements-hidden
                 >
                   <view className={cn("h-1.5 w-1.5 rounded-full", item.dotClassName ?? "bg-status-live")} />
@@ -245,7 +252,7 @@ export function OrchestratorPanel({
               {lanes.map((lane, index) => (
                 <view
                   key={isValidElement(lane) && lane.key != null ? lane.key : `lane-${index}`}
-                  className="relative motion-rise"
+                  className="motion-rise relative"
                   style={stagger(index)}
                 >
                   <view
@@ -267,10 +274,7 @@ export function OrchestratorPanel({
           </view>
         ) : null}
         {summary ? (
-          <view
-            className="flex flex-col gap-1 rounded-2xl bg-overlay-ink-4 px-4 py-3"
-            style={stagger(lanes.length)}
-          >
+          <view className="flex flex-col gap-1 rounded-2xl bg-overlay-ink-4 px-4 py-3" style={stagger(lanes.length)}>
             <view className="flex flex-row items-center gap-2">
               <view className="flex min-w-0 flex-1 flex-row items-center">
                 {isPlainText(summary.title ?? "Summary") ? (

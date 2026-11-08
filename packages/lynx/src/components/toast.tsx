@@ -164,22 +164,20 @@ function ToastList({ size, surface }: { size: ToastSize; surface: "solid" | "gla
           <view
             key={toast.id}
             className={cn(
-              "relative mt-3 flex flex-row items-start overflow-hidden rounded-lg motion-rise",
+              "motion-rise relative mt-3 flex flex-row items-start overflow-hidden rounded-lg",
               surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-popover",
               sizeClass[size],
             )}
           >
             <view className="relative flex shrink-0 items-start">{toneIcon(tone, iconSize[size])}</view>
             <view className={cn("relative flex min-w-0 flex-1 flex-col", contentGapClass[size])}>
-              {toast.title ? (
-                <text className={cn("text-text-primary", titleClass[size])}>{toast.title}</text>
-              ) : null}
+              {toast.title ? <text className={cn("text-text-primary", titleClass[size])}>{toast.title}</text> : null}
               {toast.description ? (
                 <text className={cn("text-text-secondary", descriptionClass[size])}>{toast.description}</text>
               ) : null}
             </view>
             <view
-              className="relative flex shrink-0 items-center justify-center motion-press motion-colors active:opacity-70"
+              className="motion-press motion-colors relative flex shrink-0 items-center justify-center active:opacity-70"
               bindtap={() => closeToast(toast.id)}
               hit-slop="6px"
               accessibility-element

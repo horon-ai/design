@@ -198,7 +198,7 @@ export function Sidebar({
     <view
       className={cn(
         // A definite width where there is room; `max-w-full` lets a narrower parent cap the column.
-        "relative flex w-[280px] max-w-full min-w-0 flex-col items-stretch gap-0.5 overflow-hidden px-3 pt-4 pb-3",
+        "relative flex w-[280px] min-w-0 max-w-full flex-col items-stretch gap-0.5 overflow-hidden px-3 pb-3 pt-4",
         surface === "glass" && "bg-glass-thick",
         surface === "plain" && "border-r border-border-default",
         surface === "photo" && (theme.scheme === "dark" ? "bg-glass-thick" : "bg-[#eef3f8]"),
@@ -236,7 +236,7 @@ export function Sidebar({
         >
           <view
             className={cn(
-              "absolute inset-y-0 right-0 w-0.5 motion-colors",
+              "motion-colors absolute inset-y-0 right-0 w-0.5",
               dragging ? "bg-text-brand" : "bg-transparent",
             )}
           />
@@ -281,7 +281,8 @@ export type SidebarWorkspaceSwitchProps = Omit<ButtonProps, "name"> & {
   name: ReactNode;
 };
 
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * The workspace switch button: 28px ink tile, name and up-down caret. React highlighted it while its
@@ -295,7 +296,7 @@ export function SidebarWorkspaceSwitch({ initial, name, className, onClick, ...p
   return (
     <view
       className={cn(
-        "flex h-9 min-w-0 flex-1 flex-row items-center gap-1.5 rounded-[10px] pr-1 pl-2 motion-colors active:bg-overlay-ink-6",
+        "motion-colors flex h-9 min-w-0 flex-1 flex-row items-center gap-1.5 rounded-[10px] pl-2 pr-1 active:bg-overlay-ink-6",
         active && "bg-overlay-ink-6",
         className,
       )}
@@ -345,7 +346,7 @@ export function SidebarHeader({
       {switchSlot ?? <SidebarWorkspaceSwitch {...switchProps} name={name} initial={initial} />}
       {onCollapse ? (
         <view
-          className="relative flex size-7 shrink-0 flex-row items-center justify-center rounded-sm text-text-secondary motion-colors active:bg-overlay-ink-10"
+          className="motion-colors relative flex size-7 shrink-0 flex-row items-center justify-center rounded-sm text-text-secondary active:bg-overlay-ink-10"
           bindtap={onCollapse}
           hit-slop="8px"
           accessibility-element
@@ -404,7 +405,7 @@ export function SidebarItem({ icon, count, attention, current, className, childr
   return (
     <view
       className={cn(
-        "relative flex h-8 w-full shrink-0 flex-row items-center gap-2.5 rounded-md px-2.5 motion-colors",
+        "motion-colors relative flex h-8 w-full shrink-0 flex-row items-center gap-2.5 rounded-md px-2.5",
         current ? "bg-overlay-ink-6" : "active:bg-overlay-ink-4",
         className,
       )}
@@ -506,7 +507,7 @@ export function SidebarGroup({ label, defaultOpen = true, children, className }:
   return (
     <view className={cn("relative mt-3.5 flex shrink-0 flex-col gap-0.5", className)}>
       <view
-        className="flex h-7 flex-row items-center gap-1 self-start rounded-sm px-2.5 motion-colors active:bg-overlay-ink-4"
+        className="motion-colors flex h-7 flex-row items-center gap-1 self-start rounded-sm px-2.5 active:bg-overlay-ink-4"
         bindtap={() => setOpen(!open)}
         accessibility-element
         accessibility-traits="button"
@@ -530,9 +531,7 @@ export function SidebarGroup({ label, defaultOpen = true, children, className }:
           <Icon name="CaretDown" size={14} color="text-secondary" />
         </view>
       </view>
-      {open ? (
-        <view className="flex shrink-0 flex-col gap-0.5 motion-fade">{children}</view>
-      ) : null}
+      {open ? <view className="motion-fade flex shrink-0 flex-col gap-0.5">{children}</view> : null}
     </view>
   );
 }
@@ -543,7 +542,7 @@ const GAP = 2;
 /** Connector path of the Figma `Tree`: one 1.5px line with a 9px curve into the middle of each child row. */
 function branchesPath(count: number): string {
   const centers = Array.from({ length: count }, (_, index) => ROW / 2 + index * (ROW + GAP));
-  const last = centers.at(-1) ?? 0;
+  const last = centers[centers.length - 1] ?? 0;
   const trunk = `M0.75 0V${last - 9}`;
   const branches = centers.map((center) => {
     const start = center - 9;
@@ -614,7 +613,7 @@ export function SidebarAccount({ initials, name, email, className, onClick, ...p
   return (
     <view
       className={cn(
-        "relative flex w-full shrink-0 flex-row items-center gap-2.5 rounded-lg py-2 pr-2 pl-1.5 motion-colors active:bg-overlay-ink-4",
+        "motion-colors relative flex w-full shrink-0 flex-row items-center gap-2.5 rounded-lg py-2 pl-1.5 pr-2 active:bg-overlay-ink-4",
         className,
       )}
       style={props.style}
@@ -714,7 +713,7 @@ export function SidebarProject({
     <view className={cn("flex flex-col gap-0.5", className)}>
       <view
         className={cn(
-          "relative flex h-8 shrink-0 flex-row items-center rounded-md motion-colors",
+          "motion-colors relative flex h-8 shrink-0 flex-row items-center rounded-md",
           current ? "bg-overlay-ink-6" : "active:bg-overlay-ink-4",
         )}
       >
@@ -778,11 +777,16 @@ export type SidebarProjectMoreProps = ButtonProps & {
  * Part of {@link Sidebar}; its tap target is widened to 44px by `hit-slop` so the small glyph stays
  * easy to hit without moving the painted box.
  */
-export function SidebarProjectMore({ label = "Project actions", className, onClick, ...props }: SidebarProjectMoreProps) {
+export function SidebarProjectMore({
+  label = "Project actions",
+  className,
+  onClick,
+  ...props
+}: SidebarProjectMoreProps) {
   return (
     <view
       className={cn(
-        "relative flex size-4 flex-row items-center justify-center rounded-xs motion-colors active:bg-overlay-ink-6",
+        "motion-colors relative flex size-4 flex-row items-center justify-center rounded-xs active:bg-overlay-ink-6",
         className,
       )}
       style={props.style}
@@ -820,7 +824,7 @@ export function SidebarAddButton({ icon, className, children, onClick, ...props 
   return (
     <view
       className={cn(
-        "relative mt-2 flex h-9 w-full shrink-0 flex-row items-center justify-center gap-1.5 rounded-[10px] motion-colors active:bg-overlay-ink-4",
+        "motion-colors relative mt-2 flex h-9 w-full shrink-0 flex-row items-center justify-center gap-1.5 rounded-[10px] active:bg-overlay-ink-4",
         className,
       )}
       style={props.style}

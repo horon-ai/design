@@ -8,7 +8,13 @@ import { HoronProvider } from "../../src/provider";
 test("a running plan shows the label, title, steps and the status footer", () => {
   const { container, getByText } = render(
     <HoronProvider scheme="light">
-      <PlanCard label="Plan · 3 steps" title="Ship the parser" status="running" statusLabel="Running · 1 of 3" elapsed="0.8s">
+      <PlanCard
+        label="Plan · 3 steps"
+        title="Ship the parser"
+        status="running"
+        statusLabel="Running · 1 of 3"
+        elapsed="0.8s"
+      >
         <view>
           <text>Read the spec</text>
         </view>
@@ -30,7 +36,12 @@ test("a running plan shows the label, title, steps and the status footer", () =>
 test("a failed plan swaps the spinner for a warning and tints the footer danger", () => {
   const { container, getByText } = render(
     <HoronProvider scheme="light">
-      <PlanCard label="Plan · 2 steps" title="Reply to the thread" status="failed" statusLabel="Stopped · step 2 failed" />
+      <PlanCard
+        label="Plan · 2 steps"
+        title="Reply to the thread"
+        status="failed"
+        statusLabel="Stopped · step 2 failed"
+      />
     </HoronProvider>,
   );
 

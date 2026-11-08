@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
@@ -25,7 +26,12 @@ type RadioGroupContextValue = {
 };
 
 /** What a radio outside any group reads: nothing selected, nothing to select into. */
-const DEFAULT_GROUP: RadioGroupContextValue = { value: undefined, select: () => undefined, disabled: false, readOnly: false };
+const DEFAULT_GROUP: RadioGroupContextValue = {
+  value: undefined,
+  select: () => undefined,
+  disabled: false,
+  readOnly: false,
+};
 
 const RadioGroupContext = createContext<RadioGroupContextValue>(DEFAULT_GROUP);
 
@@ -58,6 +64,8 @@ export type RadioGroupProps = {
   size?: RadioSize;
   /** Classes merged onto the group column, which stacks radios 12px apart; `"className"` is the React member, declared here instead of forwarded to a native element. */
   className?: string;
+  /** Inline style, merged onto the group column's own. */
+  style?: CSSProperties;
   /** The radios to group. */
   children?: ReactNode;
 };
@@ -99,6 +107,7 @@ type RadioGroupRootProps = RadioGroupProps & {
 export function RadioGroup({
   size = "md",
   className,
+  style,
   value,
   defaultValue,
   onValueChange,
@@ -130,6 +139,7 @@ export function RadioGroup({
           accessibility-element
           accessibility-role-description="radiogroup"
           accessibility-label={ariaLabel}
+          style={style}
           {...(id === undefined ? {} : { id })}
         >
           {children}
@@ -171,15 +181,17 @@ const EASE_SPRING = "cubic-bezier(0.34, 1.3, 0.64, 1)";
  * `required`) are spelled out here because Lynx has no Base UI root to forward them to.
  */
 export type RadioProps = {
-  /**
-   * The value this radio reports to its group when picked. Base UI kept it optional, so a radio
-   * without one is still valid: it selects itself and reports nothing to the group.
-   */
-  value?: string;
+  /** The value this radio reports to its group when picked, required as Base UI's `Radio.Root` has it. */
+  value: string;
   /** Text or node after the mark; tapping it picks the radio because both sit in one row. */
   label?: ReactNode;
   /** Locks this radio on its own, on top of the lock the group applies. @default false */
   disabled?: boolean;
+  /**
+   * Refuses a pick without dimming the mark: the radio stays readable and announced, but a tap never
+   * selects it. Stacks with the group's own `readOnly`, as Base UI's `Radio.Root` did.
+   */
+  readOnly?: boolean;
   /** Marks the radio as required by a form. Accepted for call-site parity; Lynx has no form submission. */
   required?: boolean;
   /** Element id of the row. */
@@ -188,6 +200,8 @@ export type RadioProps = {
   size?: RadioSize;
   /** Classes merged onto the row; `"className"` is the React member, declared here instead of forwarded to a native element. */
   className?: string;
+  /** Inline style, merged onto the row's own. */
+  style?: CSSProperties;
 };
 
 /**
@@ -222,13 +236,23 @@ type RadioRootProps = RadioProps & {
  * }
  * ```
  */
-export function Radio({ value, label, disabled = false, id, size, className, "aria-label": ariaLabel }: RadioRootProps) {
+export function Radio({
+  value,
+  label,
+  disabled = false,
+  readOnly,
+  id,
+  size,
+  className,
+  style,
+  "aria-label": ariaLabel,
+}: RadioRootProps) {
   const groupSize = useContext(RadioSizeContext);
   const group = useContext(RadioGroupContext);
   const [own, setOwn] = useState(false);
   const resolvedSize = size ?? groupSize;
   const dimmed = disabled || group.disabled;
-  const blocked = dimmed || group.readOnly;
+  const blocked = dimmed || group.readOnly || readOnly === true;
   // A group value owns the pick; a lone radio falls back to its own flag so the control is still
   // usable outside a RadioGroup.
   const isSelected = group.value === undefined ? own : group.value === value;
@@ -236,23 +260,29 @@ export function Radio({ value, label, disabled = false, id, size, className, "ar
   const pick = () => {
     if (blocked) return;
     setOwn(true);
-    if (value !== undefined) group.select(value);
+    group.select(value);
   };
 
   return (
     <view
-      className={cn("inline-flex max-w-full min-w-0 flex-row items-center", labelClass[resolvedSize], dimmed && "opacity-40", className)}
+      className={cn(
+        "inline-flex min-w-0 max-w-full flex-row items-center",
+        labelClass[resolvedSize],
+        dimmed && "opacity-40",
+        className,
+      )}
       bindtap={pick}
       accessibility-element
       accessibility-traits={dimmed ? "disabled" : "button"}
       accessibility-role-description="radio"
       accessibility-label={ariaLabel}
       accessibility-value={isSelected ? "selected" : "unselected"}
+      style={style}
       {...(id === undefined ? {} : { id })}
     >
       <view
         className={cn(
-          "flex shrink-0 flex-row items-center justify-center rounded-full border-[1.5px] bg-bg-surface motion-colors",
+          "motion-colors flex shrink-0 flex-row items-center justify-center rounded-full border-[1.5px] bg-bg-surface",
           circleClass[resolvedSize],
           isSelected
             ? "border-interactive-primary bg-interactive-primary active:border-interactive-primary-hover active:bg-interactive-primary-hover"
@@ -262,7 +292,12 @@ export function Radio({ value, label, disabled = false, id, size, className, "ar
         {isSelected ? (
           <view
             className={cn("rounded-full bg-interactive-on-primary", dotClass[resolvedSize])}
-            style={{ animationName: "pop-in", animationDuration: "220ms", animationTimingFunction: EASE_SPRING, animationFillMode: "both" }}
+            style={{
+              animationName: "pop-in",
+              animationDuration: "220ms",
+              animationTimingFunction: EASE_SPRING,
+              animationFillMode: "both",
+            }}
           />
         ) : null}
       </view>

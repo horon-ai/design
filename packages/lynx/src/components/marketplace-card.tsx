@@ -17,7 +17,8 @@ type PortedElementProps = {
 };
 
 /** Text slots take a string so the token classes can sit on a `<text>`; a node keeps its own styling. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** React sized a chip glyph through `[&_svg]:size-3`; `<Icon>` takes the px number. */
 const CHIP_ICON_SIZE = 12;
@@ -137,11 +138,7 @@ export function MarketplaceCard({
         {score ? (
           <view className="flex flex-row items-center gap-1.5">
             <Icon name="Star" size={14} weight="fill" color={MASCOT_GOLD} />
-            {isPlainText(score) ? (
-              <text className="text-label-sm text-text-primary">{score}</text>
-            ) : (
-              score
-            )}
+            {isPlainText(score) ? <text className="text-label-sm text-text-primary">{score}</text> : score}
           </view>
         ) : null}
         {score && installs ? <text className="text-caption text-text-placeholder">·</text> : null}

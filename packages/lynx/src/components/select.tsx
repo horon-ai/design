@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "@lynx-js/react";
+import { useEffect, useRef, useState, type ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
 import type { LayoutChangeLike } from "../hooks";
@@ -27,6 +27,26 @@ export type SelectItemData = {
 };
 
 /**
+ * What asked for the popup to open or close, mirroring the `reason` on Base UI's change details.
+ * Lynx can tell its three open-state gestures apart: a trigger tap, a backdrop tap and a row pick.
+ */
+export type SelectOpenChangeReason = "trigger-press" | "outside-press" | "item-press";
+
+/**
+ * Details of an open-state request, the Lynx counterpart of Base UI's
+ * `Select.Root.ChangeEventDetails`. The native event Base UI also carries has no Lynx equivalent,
+ * since a tap arrives as a plain `bindtap` with no browser event to hand on.
+ */
+export type SelectOpenChangeEventDetails = {
+  /** What asked for the change. */
+  reason: SelectOpenChangeReason;
+  /** Keeps the popup where it is: an uncontrolled select then drops the request. */
+  cancel: () => void;
+  /** Whether `cancel` has been called. */
+  isCanceled: boolean;
+};
+
+/**
  * The selection members react forwarded to Base UI's select root. Lynx has no root to forward to, so the
  * members a caller actually uses are declared here and handed to the trigger and the popup.
  */
@@ -37,6 +57,52 @@ type PortedSelectAttributes = {
   defaultValue?: string | null;
   /** Fires with the chosen value when a row is picked. */
   onValueChange?: (value: string) => void;
+  /**
+   * Whether the popup is open. Passing it makes the popup controlled: every tap then reports the
+   * requested state through `onOpenChange`, and the popup moves only when this prop does.
+   */
+  open?: boolean;
+  /**
+   * Whether the popup is open at first render, when the caller does not own the state.
+   * @default false
+   */
+  defaultOpen?: boolean;
+  /**
+   * Fires with the requested state and why, before an uncontrolled popup moves. Calling
+   * `eventDetails.cancel()` keeps it where it is.
+   */
+  onOpenChange?: (open: boolean, eventDetails?: SelectOpenChangeEventDetails) => void;
+  /**
+   * Fires with the settled state once the popup has painted open or closed. Lynx paints the popup in
+   * place with no exit transition, so this lands with the change rather than after a closing animation.
+   */
+  onOpenChangeComplete?: (open: boolean) => void;
+  /**
+   * Lets the popup open for browsing while keeping a row pick from changing the value, without the
+   * dimmed look and the disabled announcement `disabled` gives. The chosen value still shows.
+   * @default false
+   */
+  readOnly?: boolean;
+  /**
+   * Whether the open popup blocks the page behind it. `true` paints the full-viewport backdrop that
+   * swallows taps and closes on them; `false` paints no backdrop, so taps reach the page and the popup
+   * closes only on the trigger or a row, since Lynx has no document-level press to watch for.
+   * @default true
+   */
+  modal?: boolean;
+  /**
+   * Turns a row's value into the text the trigger shows once it is chosen, taking the place of the
+   * item's `selectedLabel` and `label`, as Base UI's `itemToStringLabel` does.
+   */
+  itemToStringLabel?: (item: string) => string;
+  /**
+   * Decides whether a row's value is the chosen one, for the selected marking and the trigger's label.
+   * Use it when the caller's value is written differently from the item's, such as in another case.
+   * @default Object.is
+   */
+  isItemEqualToValue?: (item: string, value: string) => boolean;
+  /** Inline style, merged onto the trigger's own. */
+  style?: CSSProperties;
   /** Blocks the trigger and the popup, dims the trigger and announces it as disabled. */
   disabled?: boolean;
   /** Form field name. Accepted for call-site parity; Lynx has no form submission. */
@@ -158,10 +224,16 @@ function popupPlacement(anchor: AnchorRect, panel: PanelSize): CSSProperties {
   return { top, left, minWidth: anchor.width };
 }
 
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** Lynx has no hover, so react's hover border becomes the pressed border. */
 const triggerFocusClass = "active:border-border-strong";
+
+/** Writes a ref from inside an effect, which the immutability lint reads as a post-render mutation. */
+function settle(ref: { current: boolean }, value: boolean) {
+  ref.current = value;
+}
 
 /**
  * Figma `Select` (58:162) trigger with the `Select list` (88:495) popup: a field with the
@@ -172,8 +244,10 @@ const triggerFocusClass = "active:border-border-strong";
  *
  * React portalled the popup and positioned it with Base UI; Lynx has neither, so the popup is a
  * `position: fixed` view painted in place, anchored to the trigger's `layoutchange` box, at least as
- * wide as the trigger and closed by a transparent full-viewport backdrop. Rows are tapped rather than
- * highlighted with the keyboard, and every row announces itself as a button.
+ * wide as the trigger and closed by a transparent full-viewport backdrop, which `modal={false}`
+ * removes so the page behind stays tappable. Rows are tapped rather than highlighted with the
+ * keyboard, and every row announces itself as a button. The open state is owned here or, with `open`,
+ * by the caller, who hears every request through `onOpenChange` and can cancel it.
  *
  * @example
  * ```tsx
@@ -199,7 +273,7 @@ export function Select({
   placeholder = "Select",
   size: ownSize = "md",
   surface = "solid",
-  invalid = false,
+  invalid,
   variant = "field",
   showIndicator = true,
   className,
@@ -207,6 +281,15 @@ export function Select({
   value: controlledValue,
   defaultValue = null,
   onValueChange,
+  open: controlledOpen,
+  defaultOpen = false,
+  onOpenChange,
+  onOpenChangeComplete,
+  readOnly = false,
+  modal = true,
+  itemToStringLabel,
+  isItemEqualToValue = Object.is,
+  style,
   disabled: ownDisabled,
   name: _name,
   required: _required,
@@ -220,20 +303,46 @@ export function Select({
   const disabled = ownDisabled ?? (segment ? group?.disabled : undefined) ?? false;
 
   const [internalValue, setInternalValue] = useState<string | null>(defaultValue);
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const [anchor, setAnchor] = useState<AnchorRect | null>(null);
   const [panel, setPanel] = useState<PanelSize>({ width: 0, height: 0 });
 
+  const open = controlledOpen === undefined ? uncontrolledOpen : controlledOpen;
   const value = controlledValue === undefined ? internalValue : controlledValue;
-  const current = items.find((entry) => entry.value === value) ?? null;
-  const shown = current ? (current.selectedLabel ?? current.label) : placeholder;
-  const isPlaceholder = !current;
+  const current = value === null ? null : (items.find((entry) => isItemEqualToValue(entry.value, value)) ?? null);
+  const formatted = itemToStringLabel !== undefined && value !== null ? itemToStringLabel(value) : null;
+  const shown = formatted ?? (current ? (current.selectedLabel ?? current.label) : placeholder);
+  const isPlaceholder = formatted === null && !current;
+
+  // Base UI fired `onOpenChange` before moving and let its details cancel the move; the same order
+  // keeps a caller's guard working. A controlled popup never moves on its own, only reports.
+  const requestOpen = (next: boolean, reason: SelectOpenChangeReason) => {
+    const details: SelectOpenChangeEventDetails = {
+      reason,
+      isCanceled: false,
+      cancel() {
+        details.isCanceled = true;
+      },
+    };
+    onOpenChange?.(next, details);
+    if (details.isCanceled) return;
+    if (controlledOpen === undefined) setUncontrolledOpen(next);
+  };
+
+  // Base UI completed the change once the popup's transition ended; the Lynx popup mounts and
+  // unmounts in one commit, so the settled state is the state itself. The first render is not a change.
+  const settledOpen = useRef(open);
+  useEffect(() => {
+    if (settledOpen.current === open) return;
+    settle(settledOpen, open);
+    onOpenChangeComplete?.(open);
+  }, [open, onOpenChangeComplete]);
 
   const choose = (item: SelectItemData) => {
-    if (disabled || item.disabled) return;
+    if (disabled || readOnly || item.disabled) return;
     if (controlledValue === undefined) setInternalValue(item.value);
     onValueChange?.(item.value);
-    setOpen(false);
+    requestOpen(false, "item-press");
   };
 
   const placement = anchor ? popupPlacement(anchor, panel) : null;
@@ -256,13 +365,17 @@ export function Select({
               )
             : segment
               ? cn(inputGroupSegmentClass[size], "flex-row text-left")
-              : cn("relative flex h-8 flex-row items-center gap-1 rounded-full bg-bg-subtle px-3", !disabled && "active:bg-overlay-ink-8"),
+              : cn(
+                  "relative flex h-8 flex-row items-center gap-1 rounded-full bg-bg-subtle px-3",
+                  !disabled && "active:bg-overlay-ink-8",
+                ),
           "motion-colors",
           className,
         )}
+        style={style}
         bindtap={() => {
           if (disabled) return;
-          setOpen(!open);
+          requestOpen(!open, "trigger-press");
         }}
         bindlayoutchange={(event: LayoutChangeLike) => setAnchor(boxOf(event))}
         accessibility-element
@@ -303,29 +416,33 @@ export function Select({
 
       {open && placement ? (
         <>
-          <view
-            className="fixed"
-            style={{ top: 0, left: 0, right: 0, bottom: 0 }}
-            bindtap={() => setOpen(false)}
-            accessibility-element={false}
-          />
+          {modal ? (
+            <view
+              className="fixed"
+              style={{ top: 0, left: 0, right: 0, bottom: 0 }}
+              bindtap={() => requestOpen(false, "outside-press")}
+              accessibility-element={false}
+            />
+          ) : null}
           <view
             className={cn(
-              "fixed z-50 flex flex-col gap-0.5 overflow-hidden rounded-xl p-1.5 motion-popup max-w-[calc(100vw-2rem)]",
+              "motion-popup fixed z-50 flex max-w-[calc(100vw-2rem)] flex-col gap-0.5 overflow-hidden rounded-xl p-1.5",
               popupSurface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-popover",
             )}
             style={placement}
             bindlayoutchange={(event: LayoutChangeLike) => {
               const box = boxOf(event);
               setPanel((previous) =>
-                previous.width === box.width && previous.height === box.height ? previous : { width: box.width, height: box.height },
+                previous.width === box.width && previous.height === box.height
+                  ? previous
+                  : { width: box.width, height: box.height },
               );
             }}
             accessibility-element
             accessibility-role-description="listbox"
           >
             {items.map((item) => {
-              const selected = item.value === value;
+              const selected = value !== null && isItemEqualToValue(item.value, value);
               return (
                 <view
                   key={item.value}
@@ -341,7 +458,9 @@ export function Select({
                   accessibility-value={selected ? "selected" : undefined}
                 >
                   {isPlainText(item.label) ? (
-                    <text className={cn("min-w-0 flex-1 overflow-hidden text-text-primary", rowTextClass[size])}>{item.label}</text>
+                    <text className={cn("min-w-0 flex-1 overflow-hidden text-text-primary", rowTextClass[size])}>
+                      {item.label}
+                    </text>
                   ) : (
                     <view className="flex min-w-0 flex-1 flex-row items-center overflow-hidden">{item.label}</view>
                   )}

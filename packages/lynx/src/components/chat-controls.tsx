@@ -127,7 +127,7 @@ export function NewMessagesPill({
       className={cn(
         controlBase,
         surfaceClass[surface],
-        "h-10 shrink-0 gap-1.5 pr-4 pl-3.5",
+        "h-10 shrink-0 gap-1.5 pl-3.5 pr-4",
         disabled ? "opacity-40" : "",
         className,
       )}
@@ -209,14 +209,14 @@ export function VoiceInput({
   return (
     <view
       className={cn(
-        "relative flex h-[52px] w-60 max-w-full min-w-0 flex-row items-center gap-3 overflow-hidden rounded-full px-2",
+        "relative flex h-[52px] w-60 min-w-0 max-w-full flex-row items-center gap-3 overflow-hidden rounded-full px-2",
         surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
         className,
       )}
     >
       {surface === "glass" && <LiquidGlass />}
       <view
-        className="relative flex size-9 shrink-0 flex-row items-center justify-center rounded-full bg-interactive-danger motion-press cursor-pointer"
+        className="motion-press relative flex size-9 shrink-0 cursor-pointer flex-row items-center justify-center rounded-full bg-interactive-danger"
         hit-slop="2px"
         bindtap={onStop}
         accessibility-element
@@ -226,7 +226,10 @@ export function VoiceInput({
       >
         <view className="size-3 rounded-[3px] bg-interactive-on-danger" accessibility-element={false} />
       </view>
-      <view className="relative flex min-w-0 flex-1 flex-row items-center gap-[3px] overflow-hidden" accessibility-element={false}>
+      <view
+        className="relative flex min-w-0 flex-1 flex-row items-center gap-[3px] overflow-hidden"
+        accessibility-element={false}
+      >
         {bars.map((bar, position) => (
           <view
             key={bar.id}
@@ -247,7 +250,7 @@ export function VoiceInput({
           />
         ))}
       </view>
-      <text className="relative w-10 shrink-0 text-right text-label-md whitespace-nowrap text-text-secondary">
+      <text className="relative w-10 shrink-0 whitespace-nowrap text-right text-label-md text-text-secondary">
         {elapsed}
       </text>
     </view>

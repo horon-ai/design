@@ -61,7 +61,8 @@ export type ListDetailProps = Omit<PortedElementProps["div"], "className" | "chi
 };
 
 /** Text slots take a string so the component can put the token classes on a `<text>`; Lynx does not inherit type. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** Tailwind's `sm` rung: below it the two panes stack instead of squeezing the detail pane. */
 const STACK_QUERY = "(max-width: 639px)";
@@ -118,7 +119,7 @@ export function ListDetail({
       className={cn(
         // Below `sm` the two panes stack: the list would otherwise hold its 250px
         // and leave the detail pane nothing to render in.
-        "relative flex w-full max-w-[806px] min-w-0 flex-col overflow-hidden rounded-2xl",
+        "relative flex w-full min-w-0 max-w-[806px] flex-col overflow-hidden rounded-2xl",
         stacked ? "" : "flex-row",
         surface === "glass" ? "bg-glass-thick" : "border border-border-default bg-bg-surface",
         className,
@@ -154,7 +155,7 @@ export function ListDetail({
                 <view
                   key={item.id}
                   className={cn(
-                    "relative flex flex-col gap-1 rounded-[10px] px-3 py-2.5 motion-colors",
+                    "motion-colors relative flex flex-col gap-1 rounded-[10px] px-3 py-2.5",
                     isSelected ? "bg-overlay-ink-6 active:bg-overlay-ink-8" : "active:bg-overlay-ink-4",
                   )}
                   bindtap={() => {
@@ -169,7 +170,7 @@ export function ListDetail({
                   <view className="flex flex-row items-center gap-2">
                     {isPlainText(item.title) ? (
                       <text
-                        className="min-w-0 overflow-hidden font-mono text-ellipsis whitespace-nowrap text-label-md text-text-primary"
+                        className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-label-md text-text-primary"
                         text-maxline="1"
                       >
                         {item.title}
@@ -191,7 +192,7 @@ export function ListDetail({
           </view>
         ))}
       </scroll-view>
-      <view key={selected?.id} className="relative flex min-w-0 flex-1 flex-col gap-5 px-6 py-[22px] motion-rise">
+      <view key={selected?.id} className="motion-rise relative flex min-w-0 flex-1 flex-col gap-5 px-6 py-[22px]">
         {selected && children(selected)}
       </view>
     </view>
@@ -223,15 +224,7 @@ const HEADER_ICON_SIZE = 20;
  *
  * Part of {@link ListDetail}.
  */
-export function ListDetailHeader({
-  icon,
-  title,
-  description,
-  actions,
-  className,
-  style,
-  id,
-}: ListDetailHeaderProps) {
+export function ListDetailHeader({ icon, title, description, actions, className, style, id }: ListDetailHeaderProps) {
   const theme = useHoronTheme();
   const dark = theme.scheme === "dark";
   const glyph =
@@ -314,7 +307,10 @@ export function ListDetailMeta({ items, className, style, id }: ListDetailMetaPr
             item.label
           )}
           {isPlainText(item.value) ? (
-            <text className="overflow-hidden text-ellipsis whitespace-nowrap text-label-md text-text-primary" text-maxline="1">
+            <text
+              className="overflow-hidden text-ellipsis whitespace-nowrap text-label-md text-text-primary"
+              text-maxline="1"
+            >
               {item.value}
             </text>
           ) : (
@@ -395,18 +391,10 @@ export function ListDetailInstructions({
   return (
     <view className={cn("flex flex-col gap-2", className)} style={style} {...(id === undefined ? {} : { id })}>
       <view className="flex flex-row flex-wrap items-center gap-2">
-        {isPlainText(title) ? (
-          <text className="text-label-md font-semibold text-text-primary">{title}</text>
-        ) : (
-          title
-        )}
+        {isPlainText(title) ? <text className="text-label-md font-semibold text-text-primary">{title}</text> : title}
         {tag ? (
           <view className="flex h-[22px] flex-row items-center rounded-full bg-overlay-ink-6 px-2">
-            {isPlainText(tag) ? (
-              <text className="text-label-sm text-text-secondary">{tag}</text>
-            ) : (
-              tag
-            )}
+            {isPlainText(tag) ? <text className="text-label-sm text-text-secondary">{tag}</text> : tag}
           </view>
         ) : null}
         <view className="flex-1" />
@@ -419,7 +407,12 @@ export function ListDetailInstructions({
           <text
             key={editing ? "done" : "edit"}
             className="text-trim text-label-md text-text-primary"
-            style={{ animationName: "fade-in", animationDuration: "160ms", animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)", animationFillMode: "both" }}
+            style={{
+              animationName: "fade-in",
+              animationDuration: "160ms",
+              animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+              animationFillMode: "both",
+            }}
           >
             {editing ? "Done" : "Edit"}
           </text>
@@ -460,11 +453,7 @@ export type ListDetailFilesProps = Omit<PortedElementProps["div"], "className"> 
 export function ListDetailFiles({ label = "Files", children, className, style, id }: ListDetailFilesProps) {
   return (
     <view className={cn("flex flex-col gap-2", className)} style={style} {...(id === undefined ? {} : { id })}>
-      {isPlainText(label) ? (
-        <text className="text-label-md font-semibold text-text-primary">{label}</text>
-      ) : (
-        label
-      )}
+      {isPlainText(label) ? <text className="text-label-md font-semibold text-text-primary">{label}</text> : label}
       <view className="flex flex-row flex-wrap gap-1.5">{children}</view>
     </view>
   );
@@ -475,7 +464,12 @@ export function ListDetailFiles({ label = "Files", children, className, style, i
  *
  * Part of {@link ListDetail}.
  */
-export function ListDetailFooter({ className, children, style, id }: Omit<PortedElementProps["div"], "className"> & { className?: string; children?: ReactNode }) {
+export function ListDetailFooter({
+  className,
+  children,
+  style,
+  id,
+}: Omit<PortedElementProps["div"], "className"> & { className?: string; children?: ReactNode }) {
   return (
     <view
       className={cn("flex flex-row flex-wrap items-center gap-2 border-t border-border-default pt-3.5", className)}

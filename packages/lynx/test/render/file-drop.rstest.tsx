@@ -12,7 +12,9 @@ const requireElement = (element: Element | null): Element => {
 };
 
 /** What the host's own picker returns; Lynx has no `File`, so these descriptors stand in for one. */
-const HOST_FILES: FileDropFile[] = [{ name: "report.pdf", size: 1024, type: "application/pdf", path: "/tmp/report.pdf" }];
+const HOST_FILES: FileDropFile[] = [
+  { name: "report.pdf", size: 1024, type: "application/pdf", path: "/tmp/report.pdf" },
+];
 
 /** The target, found through the label it announces. */
 const targetOf = (container: HTMLElement, label: string): Element =>
@@ -32,6 +34,19 @@ test("a tap asks the host to pick and reports the host's files", () => {
   expect(onPick).toHaveBeenCalledTimes(1);
   expect(onFiles).toHaveBeenCalledTimes(1);
   expect(onFiles).toHaveBeenCalledWith(HOST_FILES);
+});
+
+test("an idle target is announced as a button and not busy", () => {
+  const { container } = render(
+    <HoronProvider scheme="light">
+      <FileDrop label="Drop contracts here" files={HOST_FILES} />
+    </HoronProvider>,
+  );
+
+  const target = targetOf(container, "Drop contracts here");
+  expect(target.getAttribute("accessibility-traits")).toBe("button");
+  expect(target.getAttribute("accessibility-value")).toBeNull();
+  expect(target.getAttribute("class")).not.toContain("border-border-danger");
 });
 
 test("a disabled target ignores the tap", () => {

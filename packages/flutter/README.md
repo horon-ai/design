@@ -5,8 +5,9 @@ Horon 디자인 시스템의 Flutter 컴포넌트 라이브러리입니다. 웹�
 
 ## 쓰는 방법
 
-이 패키지는 pub.dev에 게시하지 않습니다(`publish_to: none`). 지금 소비하는 곳은 `mobile`
-앱 하나이고, 저장소 안에서 경로로 가져다 씁니다.
+이 패키지는 pub.dev에 게시하지 않습니다(`publish_to: none`). 이 패키지를 쓰던 곳은 옛 Flutter
+모바일 앱 하나였고, 그 앱은 `horon-ai/mobile-archive`로 보관했습니다. 새 `mobile` 앱은 Lynx로 바뀌어
+`@horon-ai/lynx`를 쓰므로 지금 이 패키지를 쓰는 앱은 없습니다. 쓸 때는 저장소 안에서 경로로 가져다 씁니다.
 
 ```yaml
 dependencies:
@@ -63,7 +64,7 @@ React `globals.css`의 `.veil-field`·`.veil-overlay`·`.veil-drop`을 위젯 �
 - 폭은 `HoronModalSize.sm` 400, `md` 560(기본), `lg` 720입니다. 화면이 좁으면 뷰포트에서
   32를 뺀 폭까지만 씁니다.
 - 표면은 `HoronModalSurfaceKind.solid`(기본, `bgSurface`와 0/24/64 그림자) 또는 `glass`
-  (`veil-overlay`)입니다. `HoronModalSurface`라는 이름은 `mobile` 앱이 쓰는 기존 패널
+  (`veil-overlay`)입니다. `HoronModalSurface`라는 이름은 옛 Flutter 모바일 앱이 쓰던 기존 패널
   위젯이 이미 차지하고 있어 enum에는 `Kind` 접미사를 붙였습니다.
 - 머리글은 좌우·위 24, 아래 16이고, 본문만 스크롤합니다. 푸터(`HoronModalFooter`)는 좌우 24,
   위 16, 아래 24에 동작을 오른쪽으로 모읍니다.

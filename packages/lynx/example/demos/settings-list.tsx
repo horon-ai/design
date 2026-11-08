@@ -1,7 +1,13 @@
 import { formatShortcut } from "../../src/lib/platform";
 import { usePlatform } from "../../src/hooks/use-platform";
 import { Radio, RadioGroup } from "../../src/components/radio-group";
-import { SettingsKey, SettingsKeys, SettingsList, SettingsRow, SettingsSwitch } from "../../src/components/settings-list";
+import {
+  SettingsKey,
+  SettingsKeys,
+  SettingsList,
+  SettingsRow,
+  SettingsSwitch,
+} from "../../src/components/settings-list";
 import { Backdrop } from "./backdrop";
 
 /** The same five rows for both surfaces: three toggles, a shortcut chord, a picker and a locked row. */

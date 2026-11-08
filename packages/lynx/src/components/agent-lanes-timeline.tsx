@@ -270,13 +270,13 @@ export function AgentLanesTimeline({
   return (
     <view
       className={cn(
-        "flex w-full max-w-[1010px] min-w-0 flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full min-w-0 max-w-[1010px] flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       style={style}
       {...(id === undefined ? {} : { id })}
     >
-      <view className="flex flex-row flex-wrap items-center gap-x-2.5 gap-y-2 px-5 pt-4 pb-3.5">
+      <view className="flex flex-row flex-wrap items-center gap-x-2.5 gap-y-2 px-5 pb-3.5 pt-4">
         <Icon name="Pulse" size={18} color="text-primary" />
         {isPlainText(title) ? (
           <text className="min-w-0 text-label-lg text-text-primary">{title}</text>
@@ -286,7 +286,10 @@ export function AgentLanesTimeline({
         {statuses.map((entry) => (
           <view key={entry.id} className="flex flex-row items-center gap-1.5">
             <view
-              className={cn("size-[7px] rounded-full", entry.tone === "live" ? "bg-status-live" : "bg-interactive-primary")}
+              className={cn(
+                "size-[7px] rounded-full",
+                entry.tone === "live" ? "bg-status-live" : "bg-interactive-primary",
+              )}
               accessibility-elements-hidden
             />
             {isPlainText(entry.label) ? (
@@ -299,25 +302,17 @@ export function AgentLanesTimeline({
         <view className="flex-1" />
         {onRangeClick ? (
           <view
-            className="flex h-[30px] flex-row items-center gap-1 rounded-full bg-overlay-ink-6 px-3 motion-press active:bg-overlay-ink-10"
+            className="motion-press flex h-[30px] flex-row items-center gap-1 rounded-full bg-overlay-ink-6 px-3 active:bg-overlay-ink-10"
             bindtap={onRangeClick}
             accessibility-element
             accessibility-traits="button"
           >
-            {isPlainText(range) ? (
-              <text className="text-label-sm text-text-primary">{range}</text>
-            ) : (
-              range
-            )}
+            {isPlainText(range) ? <text className="text-label-sm text-text-primary">{range}</text> : range}
             <Icon name="CaretDown" size={12} color="text-secondary" />
           </view>
         ) : (
           <view className="flex h-[30px] flex-row items-center gap-1 rounded-full bg-overlay-ink-6 px-3">
-            {isPlainText(range) ? (
-              <text className="text-label-sm text-text-primary">{range}</text>
-            ) : (
-              range
-            )}
+            {isPlainText(range) ? <text className="text-label-sm text-text-primary">{range}</text> : range}
             <Icon name="CaretDown" size={12} color="text-secondary" />
           </view>
         )}
@@ -331,10 +326,16 @@ export function AgentLanesTimeline({
             <view
               key={bot.id}
               className={cn(
-                "absolute flex flex-row items-center gap-3 pl-5 motion-rise motion-colors active:bg-overlay-ink-3",
+                "motion-rise motion-colors absolute flex flex-row items-center gap-3 pl-5 active:bg-overlay-ink-3",
                 lane < bots.length - 1 && "border-b border-overlay-ink-6",
               )}
-              style={{ top: `${TOP + lane * ROW}px`, left: 0, right: 0, height: `${ROW}px`, animationDelay: `${lane * 30}ms` }}
+              style={{
+                top: `${TOP + lane * ROW}px`,
+                left: 0,
+                right: 0,
+                height: `${ROW}px`,
+                animationDelay: `${lane * 30}ms`,
+              }}
             >
               <view
                 className={cn(
@@ -393,12 +394,9 @@ export function AgentLanesTimeline({
               const left = `${at(minutes) * 100}%`;
               return (
                 <view key={minutes} accessibility-elements-hidden>
-                  <view className="absolute top-9 bottom-0 w-px bg-overlay-ink-5" style={{ left }} />
-                  <view
-                    className="absolute top-2.5"
-                    style={{ left, transform: "translateX(-50%)" }}
-                  >
-                    <text className="text-caption whitespace-nowrap text-text-secondary">{`${minutes}m`}</text>
+                  <view className="absolute bottom-0 top-9 w-px bg-overlay-ink-5" style={{ left }} />
+                  <view className="absolute top-2.5" style={{ left, transform: "translateX(-50%)" }}>
+                    <text className="whitespace-nowrap text-caption text-text-secondary">{`${minutes}m`}</text>
                   </view>
                 </view>
               );
@@ -428,7 +426,7 @@ export function AgentLanesTimeline({
                 <view
                   key={task.id}
                   className={cn(
-                    "absolute flex h-9 flex-row items-center gap-1.5 overflow-hidden rounded-[10px] px-2.5 motion-rise",
+                    "motion-rise absolute flex h-9 flex-row items-center gap-1.5 overflow-hidden rounded-[10px] px-2.5",
                     barTone[task.tone],
                   )}
                   style={{
@@ -446,7 +444,7 @@ export function AgentLanesTimeline({
                     <view className="min-w-0 flex-1">{task.label}</view>
                   )}
                   {task.badge ? (
-                    <view className="flex flex-row items-center gap-1 rounded-full bg-interactive-primary py-0.5 pr-2 pl-1.5">
+                    <view className="flex flex-row items-center gap-1 rounded-full bg-interactive-primary py-0.5 pl-1.5 pr-2">
                       {isPlainText(task.badge) ? (
                         <text className="text-label-sm text-text-inverse">{task.badge}</text>
                       ) : (
@@ -468,7 +466,7 @@ export function AgentLanesTimeline({
               </view>
             </view>
             <view
-              className="absolute top-9 bottom-0 w-[1.5px] bg-accent-sky-500-60"
+              className="absolute bottom-0 top-9 w-[1.5px] bg-accent-sky-500-60"
               style={{ left: `${at(-cursor) * 100}%` }}
             />
           </view>
@@ -486,7 +484,7 @@ export function AgentLanesTimeline({
               <view className="min-w-0 flex-1">{approval.message}</view>
             )}
             <view
-              className="flex h-[30px] shrink-0 flex-row items-center rounded-full bg-overlay-ink-6 px-3 motion-press active:bg-overlay-ink-10"
+              className="motion-press flex h-[30px] shrink-0 flex-row items-center rounded-full bg-overlay-ink-6 px-3 active:bg-overlay-ink-10"
               bindtap={approval.onLater}
               accessibility-element
               accessibility-traits="button"
@@ -494,7 +492,7 @@ export function AgentLanesTimeline({
               <text className="text-label-sm text-text-primary">Later</text>
             </view>
             <view
-              className="flex h-[30px] shrink-0 flex-row items-center rounded-full bg-interactive-primary px-3 motion-press active:bg-interactive-primary-hover"
+              className="motion-press flex h-[30px] shrink-0 flex-row items-center rounded-full bg-interactive-primary px-3 active:bg-interactive-primary-hover"
               bindtap={approval.onApprove}
               accessibility-element
               accessibility-traits="button"

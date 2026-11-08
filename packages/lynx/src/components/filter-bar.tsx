@@ -80,7 +80,14 @@ export type FilterBarProps = Omit<PortedElementProps["div"], "onChange" | "defau
  * }
  * ```
  */
-export function FilterBar({ items, value, defaultValue, onValueChange, className, "aria-label": ariaLabel = "Filter" }: FilterBarProps) {
+export function FilterBar({
+  items,
+  value,
+  defaultValue,
+  onValueChange,
+  className,
+  "aria-label": ariaLabel = "Filter",
+}: FilterBarProps) {
   const [inner, setInner] = useState<string | undefined>(defaultValue ?? items[0]?.value);
   const selected = value ?? inner;
   const activeIndex = items.findIndex((item) => item.value === selected);
@@ -88,7 +95,10 @@ export function FilterBar({ items, value, defaultValue, onValueChange, className
 
   return (
     <view
-      className={cn("relative inline-flex max-w-full min-w-0 flex-row items-center rounded-full bg-overlay-ink-5 p-[3px]", className)}
+      className={cn(
+        "relative inline-flex min-w-0 max-w-full flex-row items-center rounded-full bg-overlay-ink-5 p-[3px]",
+        className,
+      )}
       accessibility-element
       accessibility-role-description="radiogroup"
       accessibility-label={ariaLabel}
@@ -108,7 +118,7 @@ export function FilterBar({ items, value, defaultValue, onValueChange, className
               <view
                 key={item.value}
                 className={cn(
-                  "relative flex h-[30px] shrink-0 flex-row items-center gap-1.5 whitespace-nowrap rounded-full px-4 motion-colors",
+                  "motion-colors relative flex h-[30px] shrink-0 flex-row items-center gap-1.5 whitespace-nowrap rounded-full px-4",
                   active ? "text-text-primary" : "text-text-secondary",
                   item.disabled && "opacity-40",
                 )}
@@ -124,8 +134,12 @@ export function FilterBar({ items, value, defaultValue, onValueChange, className
                 accessibility-value={active ? "checked" : "unchecked"}
                 {...bindItem(index)}
               >
-                <text className={cn("text-trim text-label-md", active ? "text-text-primary" : "text-text-secondary")}>{item.label}</text>
-                {item.count !== undefined ? <text className="text-trim text-caption text-text-secondary">{item.count}</text> : null}
+                <text className={cn("text-trim text-label-md", active ? "text-text-primary" : "text-text-secondary")}>
+                  {item.label}
+                </text>
+                {item.count !== undefined ? (
+                  <text className="text-trim text-caption text-text-secondary">{item.count}</text>
+                ) : null}
               </view>
             );
           })}

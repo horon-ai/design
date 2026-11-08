@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
@@ -32,6 +33,8 @@ export type SwitchProps = {
   label?: ReactNode;
   /** Extra classes, applied to the label row when `label` is set and to the switch itself otherwise; `"className"` is the React member, declared here instead of forwarded to a native element */
   className?: string;
+  /** Inline style, applied to the same root that takes `className`. */
+  style?: CSSProperties;
 };
 
 /**
@@ -125,6 +128,7 @@ export function Switch({
   disabled = false,
   readOnly = false,
   id,
+  style,
   "aria-label": ariaLabel,
 }: SwitchRootProps) {
   const [own, setOwn] = useState(defaultChecked);
@@ -149,12 +153,16 @@ export function Switch({
         thumbClass[size],
         isChecked ? travelClass[size] : "translate-x-0",
       )}
-      style={{ transitionProperty: "transform, background-color", transitionDuration: "220ms", transitionTimingFunction: SPRING }}
+      style={{
+        transitionProperty: "transform, background-color",
+        transitionDuration: "220ms",
+        transitionTimingFunction: SPRING,
+      }}
     />
   );
 
   const trackClassList = cn(
-    "relative inline-flex shrink-0 flex-row items-center rounded-full bg-border-strong motion-colors",
+    "motion-colors relative inline-flex shrink-0 flex-row items-center rounded-full bg-border-strong",
     isChecked ? "bg-interactive-primary active:bg-interactive-primary-hover" : "active:bg-interactive-secondary-hover",
     trackClass[size],
   );
@@ -171,6 +179,7 @@ export function Switch({
         accessibility-role-description="switch"
         accessibility-label={ariaLabel}
         accessibility-value={isChecked ? "checked" : "unchecked"}
+        style={style}
         {...(id === undefined ? {} : { id })}
       >
         {thumb}
@@ -180,13 +189,19 @@ export function Switch({
 
   return (
     <view
-      className={cn("inline-flex max-w-full min-w-0 flex-row items-center", labelClass[size], disabled && "opacity-40", className)}
+      className={cn(
+        "inline-flex min-w-0 max-w-full flex-row items-center",
+        labelClass[size],
+        disabled && "opacity-40",
+        className,
+      )}
       bindtap={toggle}
       accessibility-element
       accessibility-traits={disabled ? "disabled" : "button"}
       accessibility-role-description="switch"
       accessibility-label={ariaLabel}
       accessibility-value={isChecked ? "checked" : "unchecked"}
+      style={style}
       {...(id === undefined ? {} : { id })}
     >
       {typeof label === "string" || typeof label === "number" ? (
