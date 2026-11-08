@@ -88,7 +88,7 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 - 직전 실행이 `tokens`만 올리고 `react`에서 실패했다면 빠진 패키지만 같은 버전으로 채웁니다.
 - 게시 전에 lint·typecheck·test·build를 다시 돌리고, 게시한 커밋에 `v0.1.N` 태그를 남깁니다.
   provenance(실행한 워크플로와 커밋이 npm 패키지 페이지에 표시됨)가 붙습니다.
-- 게시가 끝나면 `web`, `admin`, `desktop` 저장소의 Renovate가 새 버전을 찾아 각 저장소의 `dev`로
+- 게시가 끝나면 `web`, `admin`, `desktop-archive` 저장소의 Renovate가 새 버전을 찾아 각 저장소의 `dev`로
   업데이트 PR을 엽니다(설정은 각 저장소의 `renovate.json`). 이 저장소에서 따로 보낼 신호는 없습니다.
 
 계산 규칙은 `.github/scripts/release-version.mjs`에 있고, 로컬에서 다음 버전을 미리 볼 수 있습니다.
@@ -119,7 +119,7 @@ npm view @horon-ai/tokens versions
 npm view @horon-ai/react versions
 ```
 
-게시한 뒤에는 `web/package.json`과 `desktop/package.json`의 `file:` 의존을
+게시한 뒤에는 `web/package.json`과 `desktop-archive/package.json`의 `file:` 의존을
 `"@horon-ai/react": "0.1.0"`, `"@horon-ai/tokens": "0.1.0"` 같은 정확한 버전으로 바꾸고
 `bun install`로 확인합니다. 범위(`^0.1.0`)는 쓰지 않습니다.
 
