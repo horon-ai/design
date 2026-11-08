@@ -542,7 +542,7 @@ const GAP = 2;
 /** Connector path of the Figma `Tree`: one 1.5px line with a 9px curve into the middle of each child row. */
 function branchesPath(count: number): string {
   const centers = Array.from({ length: count }, (_, index) => ROW / 2 + index * (ROW + GAP));
-  const last = centers.at(-1) ?? 0;
+  const last = centers[centers.length - 1] ?? 0;
   const trunk = `M0.75 0V${last - 9}`;
   const branches = centers.map((center) => {
     const start = center - 9;

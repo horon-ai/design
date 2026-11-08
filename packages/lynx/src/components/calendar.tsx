@@ -240,7 +240,11 @@ const weekdayNarrow = (locale: string | undefined, date: Date): string => {
 };
 
 const fullDayLabel = (locale: string | undefined, date: Date): string => {
-  if (hasIntl()) return new Intl.DateTimeFormat(locale, { dateStyle: "full" }).format(date);
+  // Spelled out instead of `dateStyle: "full"`, an ES2020 option an ES2019 Intl ignores.
+  if (hasIntl())
+    return new Intl.DateTimeFormat(locale, { weekday: "long", year: "numeric", month: "long", day: "numeric" }).format(
+      date,
+    );
   return `${WEEKDAYS[date.getDay()]}, ${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 };
 

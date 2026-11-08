@@ -553,7 +553,8 @@ export function useDataTable<TData>({
     const key = columns[index].accessorKey;
     if (key === undefined) return filtered;
     const direction = active.desc ? -1 : 1;
-    return filtered.toSorted((left, right) => direction * compareValues(left.row[key], right.row[key]));
+    // oxlint-disable-next-line unicorn/no-array-sort -- toSorted is ES2023, missing on Lynx's ES2019 main thread; this sorts a fresh copy
+    return filtered.slice().sort((left, right) => direction * compareValues(left.row[key], right.row[key]));
   }, [columns, filtered, sort]);
 
   const size = pageSize === undefined ? sorted.length : pageSize;
