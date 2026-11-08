@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 import type { NodesRef } from "@lynx-js/types/background";
 
 import { cn } from "../lib/cn";
@@ -61,8 +62,17 @@ export type InputProps = {
   className?: string;
   /** Classes for the native `<input>` itself. */
   inputClassName?: string;
+  /** Inline style, merged onto the box's own. */
+  style?: CSSProperties;
   /** Called with the new text after every edit; disabled and read-only inputs never call it. */
   onChange?: (value: string) => void;
+  /**
+   * Called with the new text after every edit, the same moment as `onChange`. React's Base UI input
+   * also reports why the value changed; a Lynx input only changes through its own `bindinput`, so the
+   * second argument is always `{ reason: "input" }` and stays optional. Disabled and read-only inputs
+   * never call it.
+   */
+  onValueChange?: (value: string, eventDetails?: { reason: "input" }) => void;
   /** Called when the input takes focus; the box draws its focus ring on this. */
   onFocus?: () => void;
   /** Called when the input loses focus. */
@@ -118,6 +128,9 @@ const PLACEHOLDER_CLASS = "[--placeholder-color:var(--color-text-placeholder)]";
 /** The only part of a Lynx input event a field reads. */
 type LynxTextEvent = { detail: { value: string } };
 
+/** The change-event details a Lynx input reports: every edit comes from the field's own `bindinput`. */
+const INPUT_CHANGE = { reason: "input" } as const;
+
 /** Writes a ref from inside an effect or handler, which the immutability lint reads as a post-render mutation. */
 function remember(ref: { current: string | null }, value: string) {
   ref.current = value;
@@ -129,7 +142,8 @@ function remember(ref: { current: string | null }, value: string) {
  * A bordered box around Lynx's own `<input>`: render the box, then the optional leading icon, then the input,
  * which takes the remaining width. Focus is drawn on the box, so the ring never detaches from the field.
  * `invalid` paints the box border danger-red. Lynx's `<input>` carries its own text and emits `bindinput`
- * instead of DOM change events, so `onChange` receives the new string rather than an event; a controlled
+ * instead of DOM change events, so `onChange` receives the new string rather than an event and
+ * `onValueChange` reports the same string with a change reason; a controlled
  * `value` is mirrored into the native editor with the element's `setValue` method, since the element has no
  * `value` attribute. The mirror writes only a value the editor does not already hold, so a parent echoing
  * the keystroke it was just handed leaves the caret and any in-progress composition untouched.
@@ -163,10 +177,12 @@ export function Input({
   size = "md",
   surface = "solid",
   icon,
-  invalid = false,
+  invalid,
   className,
   inputClassName,
+  style,
   onChange,
+  onValueChange,
   onFocus,
   onBlur,
   onConfirm,
@@ -204,6 +220,7 @@ export function Input({
     if (disabled || readOnly) return;
     remember(editorText, event.detail.value);
     onChange?.(event.detail.value);
+    onValueChange?.(event.detail.value, INPUT_CHANGE);
   };
 
   return (
@@ -214,7 +231,7 @@ export function Input({
         fieldSizeClass[size],
         className,
       )}
-      style={focused ? FOCUS_RING : undefined}
+      style={{ ...(focused ? FOCUS_RING : undefined), ...style }}
     >
       {icon && <view className="relative flex shrink-0 items-center">{icon}</view>}
       <input

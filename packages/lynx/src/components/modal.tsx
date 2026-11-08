@@ -9,6 +9,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
 import { cn } from "../lib/cn";
@@ -166,6 +167,8 @@ export type ModalContentProps = Omit<PortedPopupProps, "className" | "title"> & 
   footer?: ReactNode;
   /** Extra classes on the popup, merged after the built-in ones. */
   className?: string;
+  /** Inline style, merged onto the popup's own. */
+  style?: CSSProperties;
   /** The body between the header and the footer. */
   children?: ReactNode;
 };
@@ -217,6 +220,7 @@ export function ModalContent({
   closeLabel = "Close",
   footer,
   className,
+  style,
   children,
 }: ModalContentProps) {
   const { open, setOpen } = useContext(ModalContext);
@@ -238,6 +242,7 @@ export function ModalContent({
           surface === "solid" ? "bg-bg-surface shadow-[0_24px_64px_#0A142433]" : "veil-overlay",
           className,
         )}
+        style={style}
         catchtap={() => undefined}
       >
         <view className={cn("flex shrink-0 flex-row items-start px-6 pt-6 pb-4", leading ? "gap-3.5" : "gap-2")}>

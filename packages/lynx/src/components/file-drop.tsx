@@ -106,8 +106,8 @@ const isPlainText = (value: ReactNode): value is string | number => typeof value
  */
 export function FileDrop({
   label = "Drop files here or click to upload",
-  uploading = false,
-  rejected = false,
+  uploading,
+  rejected,
   onFiles,
   files,
   onPick,

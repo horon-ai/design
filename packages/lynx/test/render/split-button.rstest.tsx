@@ -76,3 +76,15 @@ test("a disabled pill runs neither half and never opens the menu", async () => {
   expect(onSchedule).not.toHaveBeenCalled();
   expect(queryByText("Schedule")).toBeNull();
 });
+
+test("a passed style reaches the pill container", () => {
+  const { container } = render(
+    <HoronProvider scheme="light">
+      <SplitButton aria-label="Publish" style={{ marginTop: "7px" }}>
+        Publish
+      </SplitButton>
+    </HoronProvider>,
+  );
+
+  expect(requireElement(container.querySelector('[accessibility-label="Publish"]')).parentElement).toHaveStyle({ marginTop: "7px" });
+});

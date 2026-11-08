@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
 import { cn } from "../lib/cn";
@@ -48,6 +49,8 @@ export type CheckboxProps = {
   size?: CheckboxSize;
   /** Extra classes merged onto the row; `"className"` is the one member the React root took from the native element and now receives as a plain prop */
   className?: string;
+  /** Inline style, merged onto the row's own. */
+  style?: CSSProperties;
 };
 
 /**
@@ -119,6 +122,7 @@ export function Checkbox({
   readOnly = false,
   indeterminate = false,
   id,
+  style,
   "aria-label": ariaLabel,
 }: CheckboxRootProps) {
   const [own, setOwn] = useState(defaultChecked);
@@ -142,6 +146,7 @@ export function Checkbox({
       accessibility-role-description="checkbox"
       accessibility-label={ariaLabel}
       accessibility-value={indeterminate ? "mixed" : isChecked ? "checked" : "unchecked"}
+      style={style}
       {...(id === undefined ? {} : { id })}
     >
       <view

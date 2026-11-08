@@ -75,3 +75,14 @@ test("a selected card turns its border brand and shows the core dot", async () =
   expect(container.querySelector(".border-border-brand")).not.toBeNull();
   expect(container.querySelector(".bg-interactive-on-primary")).not.toBeNull();
 });
+
+test("a passed style reaches the card root", async () => {
+  const { container, findByText } = render(
+    <HoronProvider>
+      <ChoiceCard value="styled" title="Styled" style={{ marginTop: "7px" }} />
+    </HoronProvider>,
+  );
+
+  await findByText("Styled");
+  expect(card(container)).toHaveStyle({ marginTop: "7px" });
+});

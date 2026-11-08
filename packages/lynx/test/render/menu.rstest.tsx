@@ -2,7 +2,7 @@ import "@testing-library/jest-dom";
 import { fireEvent, render } from "@lynx-js/react/testing-library";
 import { expect, rstest, test } from "@rstest/core";
 
-import { Menu, MenuContent, MenuItem, MenuLabel, MenuTrigger } from "../../src/components/menu";
+import { Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger } from "../../src/components/menu";
 import { HoronProvider } from "../../src/provider";
 
 /** Narrows a query result for `fireEvent`, which needs a real element. */
@@ -81,6 +81,76 @@ test("an outside tap dismisses the menu without picking an item", async () => {
 
   expect(queryByText("mina@horon.ai")).toBeNull();
   expect(onSelect).not.toHaveBeenCalled();
+});
+
+test("an inline-start side opens the popup on the anchor's left", async () => {
+  const { container, findByText } = render(
+    <HoronProvider scheme="light">
+      <Menu>
+        <MenuTrigger>
+          <text>Account</text>
+        </MenuTrigger>
+        <MenuContent side="inline-start">
+          <MenuItem>Profile</MenuItem>
+        </MenuContent>
+      </Menu>
+    </HoronProvider>,
+  );
+
+  const trigger = requireElement((await findByText("Account")).parentElement);
+  layoutTrigger(trigger);
+  fireEvent.tap(trigger);
+
+  // The inline start resolves to the physical left branch: the popup starts at the anchor's own top
+  // (40) instead of the 80 a bottom placement would use, and it never sets `left`.
+  const popup = requireElement(container.querySelector(".z-50"));
+  const style = popup.getAttribute("style") ?? "";
+  expect(style).toContain("top: 40px");
+  expect(style).not.toContain("top: 80px");
+  expect(style).not.toContain("left:");
+});
+
+test("a vertical separator draws a column rule instead of a row rule", () => {
+  const { container } = render(
+    <HoronProvider scheme="light">
+      <MenuSeparator orientation="vertical" />
+    </HoronProvider>,
+  );
+
+  const separator = requireElement(container.querySelector("[accessibility-role-description='separator']"));
+  const rule = requireElement(separator.firstElementChild);
+  expect(separator.getAttribute("class")).toContain("h-4");
+  expect(rule.getAttribute("class")).toContain("w-px");
+  expect(rule.getAttribute("class")).not.toContain("h-px");
+});
+
+test("caller styles, ids and the popup placement land on their own parts", async () => {
+  const { container, findByText } = render(
+    <HoronProvider scheme="light">
+      <Menu>
+        <MenuTrigger>
+          <text>Account</text>
+        </MenuTrigger>
+        <MenuContent id="account-menu" style={{ width: "200px" }}>
+          <MenuItem id="profile-row" style={{ opacity: "0.5" }}>
+            Profile
+          </MenuItem>
+          <MenuSeparator style={{ width: "120px" }} />
+        </MenuContent>
+      </Menu>
+    </HoronProvider>,
+  );
+
+  const trigger = requireElement((await findByText("Account")).parentElement);
+  layoutTrigger(trigger);
+  fireEvent.tap(trigger);
+
+  const popup = requireElement(container.querySelector("#account-menu"));
+  expect(popup.getAttribute("style")).toContain("width: 200px");
+  // The placement still applies: the popup keeps the anchor's top offset next to the caller's width.
+  expect(popup.getAttribute("style")).toContain("top: 80px");
+  expect(requireElement(container.querySelector("#profile-row")).getAttribute("style")).toContain("opacity: 0.5");
+  expect(requireElement(container.querySelector("[accessibility-role-description='separator']")).getAttribute("style")).toContain("width: 120px");
 });
 
 test("a closed menu renders no popup content", () => {

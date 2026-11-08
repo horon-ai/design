@@ -5,6 +5,7 @@ import {
   useContext,
   type ReactNode,
 } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
@@ -43,6 +44,8 @@ type FieldProps = {
   disabled?: boolean;
   /** Extra classes appended after the stack's own classes. */
   className?: string;
+  /** Inline style, merged onto the stack's own. */
+  style?: CSSProperties;
   /** The label, control and description or error the field stacks. */
   children?: ReactNode;
 };
@@ -72,7 +75,7 @@ type FieldProps = {
  * }
  * ```
  */
-export function Field({ size = "md", invalid = false, disabled = false, className, children }: FieldProps) {
+export function Field({ size = "md", invalid = false, disabled = false, className, style, children }: FieldProps) {
   /**
    * Hands the field state to the control: the parts of this field keep their own props, everything else placed
    * directly inside the field is a control and gets `invalid`/`disabled` so it can paint the right border.
@@ -91,7 +94,7 @@ export function Field({ size = "md", invalid = false, disabled = false, classNam
   return (
     <FieldSizeContext.Provider value={size}>
       <FieldInvalidContext.Provider value={invalid}>
-        <view className={cn("flex max-w-full min-w-0 flex-col items-start", gapClass[size], className)}>
+        <view className={cn("flex max-w-full min-w-0 flex-col items-start", gapClass[size], className)} style={style}>
           {Array.isArray(children) ? children.map((child) => withFieldState(child)) : withFieldState(children)}
         </view>
       </FieldInvalidContext.Provider>
@@ -105,6 +108,8 @@ type FieldLabelProps = {
   htmlFor?: string;
   /** Extra classes appended after the label's own classes. */
   className?: string;
+  /** Inline style, merged onto the label's own. */
+  style?: CSSProperties;
   /** The label text. */
   children?: ReactNode;
 };
@@ -115,11 +120,12 @@ type FieldLabelProps = {
  * matching the control's `id` and the field wires the two together, which is what makes clicking the text
  * focus the input on the web.
  */
-export function FieldLabel({ htmlFor, className, children }: FieldLabelProps) {
+export function FieldLabel({ htmlFor, className, style, children }: FieldLabelProps) {
   const size = useContext(FieldSizeContext);
   return (
     <text
       className={cn(labelClass[size], "text-text-primary", className)}
+      style={style}
       bindtap={() => {
         if (!htmlFor || typeof lynx === "undefined") return;
         try {
@@ -138,6 +144,8 @@ export function FieldLabel({ htmlFor, className, children }: FieldLabelProps) {
 type FieldDescriptionProps = {
   /** Extra classes appended after the description's own classes. */
   className?: string;
+  /** Inline style, merged onto the description's own. */
+  style?: CSSProperties;
   /** The help text. */
   children?: ReactNode;
 };
@@ -146,9 +154,13 @@ type FieldDescriptionProps = {
  * Part of {@link Field}. The help line under the control (`Field.Description`) in secondary text: `caption` at
  * sm and md, `body-sm` at lg. Always full width so the copy wraps inside the field.
  */
-export function FieldDescription({ className, children }: FieldDescriptionProps) {
+export function FieldDescription({ className, style, children }: FieldDescriptionProps) {
   const size = useContext(FieldSizeContext);
-  return <text className={cn(metaClass[size], "w-full text-text-secondary", className)}>{children}</text>;
+  return (
+    <text className={cn(metaClass[size], "w-full text-text-secondary", className)} style={style}>
+      {children}
+    </text>
+  );
 }
 
 /** Props of {@link FieldError}: the validation message and whether to show it. */
@@ -157,6 +169,8 @@ type FieldErrorProps = {
   match?: boolean;
   /** Extra classes appended after the message's own classes. */
   className?: string;
+  /** Inline style, merged onto the message row's own. */
+  style?: CSSProperties;
   /** The validation message. */
   children?: ReactNode;
 };
@@ -167,12 +181,12 @@ type FieldErrorProps = {
  * when the enclosing field is invalid or `match` is set. The parts below then move up with the field instead
  * of a jump, because the row was never laid out.
  */
-export function FieldError({ match = false, className, children }: FieldErrorProps) {
+export function FieldError({ match = false, className, style, children }: FieldErrorProps) {
   const size = useContext(FieldSizeContext);
   const invalid = useContext(FieldInvalidContext);
   if (!match && !invalid) return null;
   return (
-    <view className={cn("flex w-full items-start", className)}>
+    <view className={cn("flex w-full items-start", className)} style={style}>
       <text className={cn(metaClass[size], "text-text-danger")}>{children}</text>
     </view>
   );

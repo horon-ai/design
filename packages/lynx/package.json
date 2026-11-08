@@ -29,6 +29,8 @@
   },
   "scripts": {
     "lint": "oxlint --deny-warnings .",
+    "lint:fix": "oxlint --fix .",
+    "format": "prettier --write \"**/*.{ts,tsx}\" \"!src/icons/*.g.ts\"",
     "typecheck": "tsc --noEmit -p .",
     "test": "rstest run",
     "build": "rspeedy build",

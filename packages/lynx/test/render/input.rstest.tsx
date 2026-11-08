@@ -41,6 +41,26 @@ test("typing calls onChange with the new value", () => {
   expect(onChange).toHaveBeenCalledWith("hello");
 });
 
+test("onValueChange reports the text and the change reason alongside onChange", () => {
+  const onChange = rstest.fn();
+  const onValueChange = rstest.fn();
+  const { field } = renderField(<Input placeholder="Search" onChange={onChange} onValueChange={onValueChange} />);
+
+  typeInto(field, "hello");
+
+  expect(onChange).toHaveBeenCalledWith("hello");
+  expect(onValueChange).toHaveBeenCalledWith("hello", { reason: "input" });
+});
+
+test("a disabled input calls neither change handler", () => {
+  const onValueChange = rstest.fn();
+  const { field } = renderField(<Input disabled placeholder="Search" onValueChange={onValueChange} />);
+
+  typeInto(field, "nope");
+
+  expect(onValueChange).not.toHaveBeenCalled();
+});
+
 test("the uncontrolled default text is rendered on the field", () => {
   const { field } = renderField(<Input defaultValue="Inbox Manager" placeholder="Search" />);
 
@@ -56,6 +76,12 @@ test("a disabled input never emits", () => {
 
   expect(field).toHaveAttribute("disabled");
   expect(onChange).not.toHaveBeenCalled();
+});
+
+test("a caller style is merged onto the box", () => {
+  const { container } = renderField(<Input placeholder="Search" style={{ width: "240px" }} />);
+
+  expect(container.querySelector(".rounded-md")?.getAttribute("style")).toContain("width: 240px");
 });
 
 test("invalid paints the danger border and the class split lands on both parts", () => {

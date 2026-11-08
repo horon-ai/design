@@ -171,3 +171,39 @@ test("a vertical touch near the top of the column lands on the high end of the r
   expect(value(container)).toBe("97");
 });
 
+
+test("format speaks the thumb's value through Intl instead of the plain number", () => {
+  const { container } = render(
+    <HoronProvider>
+      <Slider aria-label="Progress" locale="en-US" min={0} max={1} step={0.01} defaultValue={0.5} format={{ style: "percent" }} />
+    </HoronProvider>,
+  );
+  expect(value(container)).toBe("50%");
+});
+
+test("locale decides how the formatted value is written", () => {
+  const { container } = render(
+    <HoronProvider>
+      <Slider
+        aria-label="Resolution"
+        locale="de-DE"
+        max={100}
+        defaultValue={50}
+        format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}
+      />
+    </HoronProvider>,
+  );
+  // A German decimal comma; an English formatter would write 50.00.
+  expect(value(container)).toBe("50,00");
+});
+
+test("a caller's inline style reaches the root around the control", () => {
+  const { container } = render(
+    <HoronProvider>
+      <Slider aria-label="Speed" style={{ width: "300px" }} />
+    </HoronProvider>,
+  );
+  const root = control(container).parentElement;
+  expect(root).not.toBeNull();
+  expect(root?.style.width).toBe("300px");
+});

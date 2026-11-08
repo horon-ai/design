@@ -93,3 +93,18 @@ test("a disabled action drops its tap handler", async () => {
   expect(action?.getAttribute("bindtap")).toBeNull();
   expect(taps).toBe(0);
 });
+
+test("a passed style reaches the sheet panel", async () => {
+  const { container, findByText } = render(
+    <HoronProvider>
+      <BottomSheet defaultOpen>
+        <BottomSheetContent title="Chief of staff" style={{ marginTop: "7px" }}>
+          <BottomSheetRow value="On">Notifications</BottomSheetRow>
+        </BottomSheetContent>
+      </BottomSheet>
+    </HoronProvider>,
+  );
+
+  await findByText("Chief of staff");
+  expect(container.querySelector(".motion-rise")).toHaveStyle({ marginTop: "7px" });
+});

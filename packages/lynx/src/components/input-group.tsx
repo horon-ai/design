@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 import type { NodesRef } from "@lynx-js/types/background";
 
 import { cn } from "../lib/cn";
@@ -34,6 +35,8 @@ export type InputGroupProps = {
    * `ComponentProps`, `"className"`, `"prefix"` and `"size"`, are explicit props here.
    */
   className?: string;
+  /** Inline style, merged onto the box's own. */
+  style?: CSSProperties;
   /** The text the caller owns; a change is written into the native editor with `setValue`. */
   value?: string;
   /** The text the field starts with when the caller does not own it. */
@@ -54,6 +57,13 @@ export type InputGroupProps = {
   id?: string;
   /** Called with the new text after every edit; a disabled or read-only group never calls it. */
   onChange?: (value: string) => void;
+  /**
+   * Called with the new text after every edit, the same moment as `onChange`. React's Base UI input
+   * also reports why the value changed; a Lynx group only changes through its own `bindinput`, so the
+   * second argument is always `{ reason: "input" }` and stays optional. A disabled or read-only group
+   * never calls it.
+   */
+  onValueChange?: (value: string, eventDetails?: { reason: "input" }) => void;
   /** Called when the input takes focus; the group draws its focus ring on this. */
   onFocus?: () => void;
   /** Called when the input loses focus. */
@@ -122,6 +132,9 @@ const PLACEHOLDER_CLASS = "[--placeholder-color:var(--color-text-placeholder)]";
 /** The only part of a Lynx input event a field reads. */
 type LynxTextEvent = { detail: { value: string } };
 
+/** The change-event details a Lynx input reports: every edit comes from the field's own `bindinput`. */
+const INPUT_CHANGE = { reason: "input" } as const;
+
 /** Whether a slot is a bare string, which has to be placed inside a `<text>` to paint on Lynx. */
 const isPlainText = (value: ReactNode): value is string | number =>
   typeof value === "string" || typeof value === "number";
@@ -131,7 +144,8 @@ const isPlainText = (value: ReactNode): value is string | number =>
  *
  * One box drawn from `fieldBoxClass` holds the optional `prefix`, the input and the optional `suffix`, with a
  * 1px hairline between them; the hairlines turn danger-red with `invalid` and dim with the group's `disabled`.
- * The group renders its own input, so pass `placeholder`/`value`/`onChange` as props rather than children. Size,
+ * The group renders its own input, so pass `placeholder`/`value`/`onChange` (and `onValueChange`, which
+ * reports the same string with a change reason) as props rather than children. Size,
  * disabled state and surface go to the segments through the group context, which is why a `Select` or
  * `Combobox` with `variant="segment"` matches without extra props.
  *
@@ -154,9 +168,10 @@ export function InputGroup({
   prefix,
   suffix,
   size = "md",
-  invalid = false,
+  invalid,
   surface = "solid",
   className,
+  style,
   value,
   defaultValue,
   placeholder,
@@ -167,6 +182,7 @@ export function InputGroup({
   readOnly = false,
   id,
   onChange,
+  onValueChange,
   onFocus,
   onBlur,
   onConfirm,
@@ -198,13 +214,14 @@ export function InputGroup({
   const handleInput = (event: LynxTextEvent) => {
     if (disabled || readOnly) return;
     onChange?.(event.detail.value);
+    onValueChange?.(event.detail.value, INPUT_CHANGE);
   };
 
   return (
     <InputGroupContext.Provider value={context}>
       <view
         className={cn(fieldBoxClass.base, sizeClass[size], boxSurface, className)}
-        style={focused ? FOCUS_RING : undefined}
+        style={{ ...(focused ? FOCUS_RING : undefined), ...style }}
       >
         {prefix ? (
           <>
@@ -255,7 +272,7 @@ type InputGroupSegmentProps = {
   /** Extra classes for the segment. */
   className?: string;
   /** Segment content: short text, or text plus an icon sized by the segment's rung. */
-  children?: ReactNode;
+  children: ReactNode;
 };
 
 /**

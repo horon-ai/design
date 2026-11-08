@@ -9,6 +9,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
 import { cn } from "../lib/cn";
@@ -154,6 +155,8 @@ export type BottomSheetContentProps = Omit<PortedPopupProps, "className" | "titl
   floating?: boolean;
   /** Extra classes merged onto the sheet popup. */
   className?: string;
+  /** Inline style, merged onto the sheet popup's own. */
+  style?: CSSProperties;
   /** The sheet body under the title. */
   children?: ReactNode;
 };
@@ -202,6 +205,7 @@ export function BottomSheetContent({
   backdrop = true,
   floating = false,
   className,
+  style,
   children,
 }: BottomSheetContentProps) {
   const { open, setOpen } = useContext(SheetContext);
@@ -242,6 +246,7 @@ export function BottomSheetContent({
             detail ? "gap-[18px]" : floating ? "gap-3" : "max-w-[374px] gap-1",
             className,
           )}
+          style={style}
           catchtap={() => undefined}
         >
           <view

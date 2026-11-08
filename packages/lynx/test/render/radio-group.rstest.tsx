@@ -50,6 +50,26 @@ test("a disabled radio inside an enabled group never becomes the selection", asy
   expect(selected(container)).toEqual(["Email"]);
 });
 
+test("a read-only radio refuses the pick without dimming", async () => {
+  const seen: string[] = [];
+  const { container } = render(
+    <HoronProvider>
+      <RadioGroup aria-label="Repeat" defaultValue="day" onValueChange={(next) => seen.push(next)}>
+        <Radio value="day" label="Every day" />
+        <Radio value="week" label="Every week" readOnly />
+      </RadioGroup>
+    </HoronProvider>,
+  );
+
+  fireEvent.tap(radios(container)[1]);
+  await Promise.resolve();
+
+  expect(seen).toEqual([]);
+  expect(selected(container)).toEqual(["Every day"]);
+  // Read-only refuses the pick but keeps the mark fully painted.
+  expect(radios(container)[1].getAttribute("class")).not.toContain("opacity-40");
+});
+
 test("a disabled group locks every radio it holds", async () => {
   const seen: string[] = [];
   const { container } = render(
@@ -67,6 +87,19 @@ test("a disabled group locks every radio it holds", async () => {
 
   expect(seen).toEqual([]);
   expect(selected(container)).toEqual([]);
+});
+
+test("a caller style lands on the group column and on the radio row", () => {
+  const { container } = render(
+    <HoronProvider>
+      <RadioGroup aria-label="Repeat" style={{ width: "280px" }}>
+        <Radio value="day" label="Every day" style={{ width: "200px" }} />
+      </RadioGroup>
+    </HoronProvider>,
+  );
+
+  expect(container.querySelector('[style*="width: 280px"]')).not.toBeNull();
+  expect(radios(container)[0].getAttribute("style")).toContain("width: 200px");
 });
 
 test("the group's rung decides the mark size unless a radio overrides it", () => {

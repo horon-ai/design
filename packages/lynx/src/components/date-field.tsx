@@ -145,8 +145,8 @@ export function DateField({
   size = "md",
   surface = "solid",
   placeholder = "Pick a date",
-  invalid = false,
-  disabled = false,
+  invalid,
+  disabled,
   format,
   triggerClassName,
   ...calendar

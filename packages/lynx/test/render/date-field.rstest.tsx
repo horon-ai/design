@@ -77,6 +77,19 @@ test("a chosen day is written into the trigger and the placeholder is gone", () 
   expect(queryByText("Pick a date")).toBeNull();
 });
 
+test("an enabled field announces the button trait and opens the calendar", async () => {
+  const { container, findByText } = render(
+    <HoronProvider scheme="light">
+      <DateField locale="en-US" defaultMonth={MONTH} today={TODAY} value={null} />
+    </HoronProvider>,
+  );
+
+  expect(triggerOf(container).getAttribute("accessibility-traits")).toBe("button");
+  openField(container);
+
+  expect(await findByText("November 2026")).toBeInTheDocument();
+});
+
 test("a disabled field never opens the calendar", () => {
   const onValueChange = rstest.fn();
   const { container, queryByText } = render(

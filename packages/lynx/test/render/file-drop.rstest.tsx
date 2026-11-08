@@ -34,6 +34,19 @@ test("a tap asks the host to pick and reports the host's files", () => {
   expect(onFiles).toHaveBeenCalledWith(HOST_FILES);
 });
 
+test("an idle target is announced as a button and not busy", () => {
+  const { container } = render(
+    <HoronProvider scheme="light">
+      <FileDrop label="Drop contracts here" files={HOST_FILES} />
+    </HoronProvider>,
+  );
+
+  const target = targetOf(container, "Drop contracts here");
+  expect(target.getAttribute("accessibility-traits")).toBe("button");
+  expect(target.getAttribute("accessibility-value")).toBeNull();
+  expect(target.getAttribute("class")).not.toContain("border-border-danger");
+});
+
 test("a disabled target ignores the tap", () => {
   const onFiles = rstest.fn();
   const onPick = rstest.fn();

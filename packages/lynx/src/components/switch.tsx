@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
@@ -32,6 +33,8 @@ export type SwitchProps = {
   label?: ReactNode;
   /** Extra classes, applied to the label row when `label` is set and to the switch itself otherwise; `"className"` is the React member, declared here instead of forwarded to a native element */
   className?: string;
+  /** Inline style, applied to the same root that takes `className`. */
+  style?: CSSProperties;
 };
 
 /**
@@ -125,6 +128,7 @@ export function Switch({
   disabled = false,
   readOnly = false,
   id,
+  style,
   "aria-label": ariaLabel,
 }: SwitchRootProps) {
   const [own, setOwn] = useState(defaultChecked);
@@ -171,6 +175,7 @@ export function Switch({
         accessibility-role-description="switch"
         accessibility-label={ariaLabel}
         accessibility-value={isChecked ? "checked" : "unchecked"}
+        style={style}
         {...(id === undefined ? {} : { id })}
       >
         {thumb}
@@ -187,6 +192,7 @@ export function Switch({
       accessibility-role-description="switch"
       accessibility-label={ariaLabel}
       accessibility-value={isChecked ? "checked" : "unchecked"}
+      style={style}
       {...(id === undefined ? {} : { id })}
     >
       {typeof label === "string" || typeof label === "number" ? (

@@ -1,4 +1,5 @@
 import { Children, createContext, isValidElement, useCallback, useContext, useMemo, useState, type ReactNode } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
@@ -13,13 +14,20 @@ export type TabsSize = ControlSize;
 type TabsSet = {
   /** Rung every tab inside reads so one list stays on one rung. */
   size: ControlSize;
+  /** Axis the set runs along: `horizontal` (the default) or the column of a vertical set. */
+  orientation: "horizontal" | "vertical";
   /** The selected value: the controlled prop, or the uncontrolled inner state. */
   value: string | undefined;
   /** Selects a value; the root does not own it while controlled. */
   select: (value: string) => void;
 };
 
-const TabsSetContext = createContext<TabsSet>({ size: "md", value: undefined, select: () => undefined });
+const TabsSetContext = createContext<TabsSet>({
+  size: "md",
+  orientation: "horizontal",
+  value: undefined,
+  select: () => undefined,
+});
 
 /**
  * Shape of a tab list: `pill` is the tray of rounded pill tabs, `underline` is a bare
@@ -40,8 +48,16 @@ export type TabsProps = {
   onValueChange?: (value: string) => void;
   /** Rung for this tab set: tab heights of 26px (`sm`), 30px (`md`) or 36px (`lg`). @default "md" */
   size?: TabsSize;
+  /**
+   * Axis of the set. `horizontal` (the default) lays the list out as a row with the panels under it;
+   * `vertical` lays the list out as a column, which is what a side navigation rail wants.
+   * @default "horizontal"
+   */
+  orientation?: "horizontal" | "vertical";
   /** Extra classes on the root column. */
   className?: string;
+  /** Inline style, merged onto the root column's own. */
+  style?: CSSProperties;
   /** The lists and panels of the set. */
   children?: ReactNode;
 };
@@ -76,7 +92,16 @@ export type TabsProps = {
  * }
  * ```
  */
-export function Tabs({ value, defaultValue, onValueChange, size = "md", className, children }: TabsProps) {
+export function Tabs({
+  value,
+  defaultValue,
+  onValueChange,
+  size = "md",
+  orientation = "horizontal",
+  className,
+  style,
+  children,
+}: TabsProps) {
   const [inner, setInner] = useState<string | undefined>(defaultValue);
   const selected = value ?? inner;
   const select = useCallback(
@@ -86,10 +111,12 @@ export function Tabs({ value, defaultValue, onValueChange, size = "md", classNam
     },
     [onValueChange],
   );
-  const set = useMemo(() => ({ size, value: selected, select }), [size, selected, select]);
+  const set = useMemo(() => ({ size, orientation, value: selected, select }), [size, orientation, selected, select]);
   return (
     <TabsSetContext.Provider value={set}>
-      <view className={cn("flex max-w-full min-w-0 flex-col gap-4", className)}>{children}</view>
+      <view className={cn("flex max-w-full min-w-0 flex-col gap-4", className)} style={style}>
+        {children}
+      </view>
     </TabsSetContext.Provider>
   );
 }
@@ -109,6 +136,8 @@ export type TabsListProps = {
   surface?: "solid" | "glass";
   /** Extra classes on the track. */
   className?: string;
+  /** Inline style, merged onto the track's own. */
+  style?: CSSProperties;
   /** The `TabsTab`s of this list, in display order. */
   children?: ReactNode;
 };
@@ -134,8 +163,9 @@ const tabValueOf = (child: unknown): string | undefined => {
  *
  * Part of {@link Tabs}; it also provides the variant every `TabsTab` inside reads.
  */
-export function TabsList({ variant = "pill", surface = "solid", className, children }: TabsListProps) {
-  const { size, value } = useContext(TabsSetContext);
+export function TabsList({ variant = "pill", surface = "solid", className, style, children }: TabsListProps) {
+  const { size, orientation, value } = useContext(TabsSetContext);
+  const vertical = orientation === "vertical";
   const theme = useHoronTheme();
   // The tabs of this list, with the value each one carries so the measured index and the React key
   // both come from data instead of array positions.
@@ -165,40 +195,52 @@ export function TabsList({ variant = "pill", surface = "solid", className, child
       </view>
     ) : null;
 
+  const track = (
+    <view
+      className={cn(
+        "relative flex w-full",
+        vertical ? "flex-col items-stretch" : "flex-row items-center",
+        variant === "underline" ? "gap-6" : "gap-0.5",
+      )}
+      bindlayoutchange={bindTrack}
+    >
+      {indicator}
+      {entries.map((entry, index) => (
+        <view key={entry.value ?? `tab-${index}`} className="shrink-0" {...bindItem(index)}>
+          {entry.node}
+        </view>
+      ))}
+      {rect && variant === "underline" ? (
+        vertical ? (
+          <view
+            className={cn("absolute left-0 w-0.5 bg-text-primary", animate && "motion-indicator")}
+            style={{ top: `${rect.top}px`, height: `${rect.height}px` }}
+          />
+        ) : (
+          <view
+            className={cn("absolute bottom-0 h-0.5 bg-text-primary", animate && "motion-indicator")}
+            style={{ left: `${rect.left}px`, width: `${rect.width}px` }}
+          />
+        )
+      ) : null}
+    </view>
+  );
+
   return (
     <TabsVariantContext.Provider value={variant}>
       <view
         className={cn(
+          "relative flex w-full max-w-full min-w-0 flex-col overflow-hidden",
           variant === "underline"
-            ? "relative flex w-full flex-col border-b border-border-default"
-            : cn(
-                "relative flex w-full max-w-full min-w-0 flex-col overflow-hidden rounded-full",
-                listClass[size],
-                surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
-              ),
+            ? cn("rounded-none", vertical ? "border-l border-border-default" : "border-b border-border-default")
+            : cn("rounded-full", listClass[size], surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface"),
           className,
         )}
+        style={style}
       >
         {variant === "pill" && surface === "glass" ? <LiquidGlass /> : null}
-        <scroll-view scroll-orientation="horizontal" className="w-full">
-          <view
-            className={cn("relative flex w-full flex-row items-center", variant === "underline" ? "gap-6" : "gap-0.5")}
-            bindlayoutchange={bindTrack}
-          >
-            {indicator}
-            {entries.map((entry, index) => (
-              <view key={entry.value ?? `tab-${index}`} className="shrink-0" {...bindItem(index)}>
-                {entry.node}
-              </view>
-            ))}
-            {rect && variant === "underline" ? (
-              <view
-                className={cn("absolute bottom-0 h-0.5 bg-text-primary", animate && "motion-indicator")}
-                style={{ left: `${rect.left}px`, width: `${rect.width}px` }}
-              />
-            ) : null}
-          </view>
-        </scroll-view>
+        {/* A vertical column keeps its natural height instead of scrolling inside a box that has none. */}
+        {vertical ? track : <scroll-view scroll-orientation="horizontal" className="w-full">{track}</scroll-view>}
       </view>
     </TabsVariantContext.Provider>
   );
@@ -238,6 +280,8 @@ export type TabsTabProps = {
   disabled?: boolean;
   /** Extra classes on the tab. */
   className?: string;
+  /** Inline style, merged onto the tab's own. */
+  style?: CSSProperties;
   /** The tab label. */
   children?: ReactNode;
 };
@@ -266,7 +310,7 @@ export type TabsTabProps = {
  * }
  * ```
  */
-export function TabsTab({ value, icon, count, disabled = false, className, children }: TabsTabProps) {
+export function TabsTab({ value, icon, count, disabled = false, className, style, children }: TabsTabProps) {
   const set = useContext(TabsSetContext);
   const underline = useContext(TabsVariantContext) === "underline";
   const active = set.value === value;
@@ -282,6 +326,7 @@ export function TabsTab({ value, icon, count, disabled = false, className, child
         disabled && "opacity-40",
         className,
       )}
+      style={style}
       bindtap={() => {
         if (!disabled) set.select(value);
       }}
@@ -319,6 +364,8 @@ export type TabsPanelProps = {
   keepMounted?: boolean;
   /** Extra classes on the panel. */
   className?: string;
+  /** Inline style, merged onto the panel's own animation. */
+  style?: CSSProperties;
   /** The panel content. */
   children?: ReactNode;
 };
@@ -332,18 +379,19 @@ export type TabsPanelProps = {
  *
  * Part of {@link Tabs}.
  */
-export function TabsPanel({ value, keepMounted = false, className, children }: TabsPanelProps) {
+export function TabsPanel({ value, keepMounted = false, className, style, children }: TabsPanelProps) {
   const set = useContext(TabsSetContext);
   const active = set.value === value;
   if (!active && !keepMounted) return null;
   return (
     <view
       className={cn("flex flex-col", !active && "hidden", className)}
-      style={
-        active
+      style={{
+        ...(active
           ? { animationName: "swap-move", animationDuration: "200ms", animationTimingFunction: EASE_OUT_QUINT, animationFillMode: "both" }
-          : undefined
-      }
+          : undefined),
+        ...style,
+      }}
       accessibility-element
       accessibility-role-description="tabpanel"
     >

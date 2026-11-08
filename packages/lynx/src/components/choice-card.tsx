@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { cn } from "../lib/cn";
 
@@ -9,10 +10,10 @@ import { cn } from "../lib/cn";
  */
 export type ChoiceCardProps = {
   /**
-   * The value this card reports when picked. Base UI kept it optional, so a card without one is
-   * still valid: it selects itself and reports nothing upward.
+   * The value this card reports when picked. React requires it on the Base UI radio root, so a
+   * card always carries one; Lynx keeps the member for the same call sites.
    */
-  value?: string;
+  value: string;
   /**
    * Selected state the caller owns. Passing it makes the card controlled: a tap reports the next
    * state through `onCheckedChange` but does not move the card by itself.
@@ -46,6 +47,8 @@ export type ChoiceCardProps = {
    * card slot; the Lynx type declares the same three members directly.
    */
   className?: string;
+  /** Inline style, merged onto the card root's own. */
+  style?: CSSProperties;
 };
 
 /** Whether a value can be dropped into a `<text>` as its child. */
@@ -99,6 +102,7 @@ export function ChoiceCard({
   badge,
   badgeTone = "brand",
   className,
+  style,
 }: ChoiceCardProps) {
   const [own, setOwn] = useState(defaultChecked);
   const isChecked = checked ?? own;
@@ -124,6 +128,7 @@ export function ChoiceCard({
       accessibility-traits={disabled ? "disabled" : "button"}
       accessibility-role-description="radio"
       accessibility-value={isChecked ? "selected" : "unselected"}
+      style={style}
       {...(id === undefined ? {} : { id })}
     >
       <view

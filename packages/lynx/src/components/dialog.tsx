@@ -9,6 +9,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
 import { cn } from "../lib/cn";
@@ -167,6 +168,8 @@ export type DialogContentProps = Omit<PortedPopupProps, "className" | "title"> &
   surface?: "glass" | "solid";
   /** Extra classes on the popup panel, merged after the surface, radius and motion classes. */
   className?: string;
+  /** Inline style, merged onto the popup panel's own. */
+  style?: CSSProperties;
   /** The body under the description. */
   children?: ReactNode;
 };
@@ -195,6 +198,7 @@ export function DialogContent({
   leading,
   surface = "solid",
   className,
+  style,
   children,
 }: DialogContentProps) {
   const { open, setOpen } = useContext(DialogContext);
@@ -217,6 +221,7 @@ export function DialogContent({
           solid ? "bg-bg-surface shadow-[0_24px_64px_#0A142433]" : "veil-overlay",
           className,
         )}
+        style={style}
         // The panel swallows the press so a tap inside never reaches the scrim behind it.
         catchtap={() => undefined}
       >

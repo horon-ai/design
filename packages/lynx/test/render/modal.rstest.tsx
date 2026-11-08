@@ -76,3 +76,16 @@ test("the glass surface paints the veil, the solid one the surface fill", async 
   expect(container.querySelector(".veil-overlay")).toBeNull();
   expect(container.querySelector(".bg-bg-surface")).not.toBeNull();
 });
+
+test("a passed style reaches the modal panel", async () => {
+  const { container, findByText } = render(
+    <HoronProvider>
+      <Modal defaultOpen>
+        <ModalContent title="Rename workspace" style={{ marginTop: "7px" }} />
+      </Modal>
+    </HoronProvider>,
+  );
+
+  await findByText("Rename workspace");
+  expect(container.querySelector(".motion-rise")).toHaveStyle({ marginTop: "7px" });
+});

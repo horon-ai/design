@@ -1,4 +1,5 @@
 import { Children, cloneElement, isValidElement, useState, type ReactNode } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon, type IconProps } from "../icons";
 import { cn } from "../lib/cn";
@@ -40,6 +41,8 @@ export type SplitButtonProps = Omit<PortedButtonAttributes, "className" | "child
   menuLabel?: string;
   /** Extra classes on the pill container, which owns the fill, the press scale and the disabled dim. */
   className?: string;
+  /** Inline style, merged onto the pill container's own. */
+  style?: CSSProperties;
 };
 
 /** The shared half classes: one hit area of the pill, its own rounding on the outer edge. */
@@ -90,6 +93,7 @@ export function SplitButton({
   menuLabel = "More actions",
   disabled = false,
   className,
+  style,
   onClick,
   type: _type,
   name: _name,
@@ -109,6 +113,7 @@ export function SplitButton({
         disabled ? "opacity-40" : "motion-press",
         className,
       )}
+      style={style}
     >
       <view
         className={cn(halfClass, "overflow-hidden", menu ? "gap-1.5 rounded-l-full pl-3 pr-2" : "gap-1.5 rounded-full px-3")}

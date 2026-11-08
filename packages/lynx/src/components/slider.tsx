@@ -1,4 +1,5 @@
 import { useState } from "@lynx-js/react";
+import type { CSSProperties } from "@lynx-js/types";
 
 import { cn } from "../lib/cn";
 
@@ -53,6 +54,17 @@ type SliderRangeProps = {
   max?: number;
   /** The granularity the value snaps to, measured from `min`. @default 1 */
   step?: number;
+  /**
+   * The locale `Intl.NumberFormat` uses when the thumb's spoken value is formatted.
+   * Defaults to the runtime locale, and is ignored on an engine without `Intl`.
+   */
+  locale?: Intl.LocalesArgument;
+  /**
+   * Options for `Intl.NumberFormat` applied to the thumb's spoken value, for example
+   * `{ style: "percent" }` or `{ maximumFractionDigits: 1 }`. Without it the thumb speaks the
+   * plain snapped number.
+   */
+  format?: Intl.NumberFormatOptions;
   /** Blocks interaction and dims the control. @default false */
   disabled?: boolean;
   /**
@@ -74,15 +86,32 @@ type SliderRangeProps = {
 
 /**
  * Props of {@link Slider}: every Base UI `Slider.Root` prop (`value`, `defaultValue`,
- * `onValueChange`, `min`, `max`, `step`, `disabled`, `orientation`) plus the two
- * overrides below. React dropped the root element members `"className"` and
+ * `onValueChange`, `min`, `max`, `step`, `locale`, `format`, `disabled`, `orientation`)
+ * plus the overrides below. React dropped the root element members `"className"` and
  * `"children"`; Lynx re-declares `className` and takes no children at all.
  */
 export type SliderProps = Omit<SliderRangeProps, "className" | "children"> & {
   /** Extra classes for the root, which is 220px wide (`w-[220px]`) and caps at its container by default. */
   className?: string;
+  /** Inline style, merged onto the slider's own. */
+  style?: CSSProperties;
   /** Accessible name of the thumb, the only focusable part of the control in React; here it names the whole row. */
   "aria-label"?: string;
+};
+
+/**
+ * A number through `Intl.NumberFormat`, or `fallback` when the engine has no `Intl` (Lynx's native
+ * JS engine often does not). The caller passes the plain number as the fallback so an unformatted
+ * thumb still reads as its value.
+ */
+const formatNumber = (
+  value: number,
+  locale: Intl.LocalesArgument | undefined,
+  options: Intl.NumberFormatOptions,
+  fallback: string,
+): string => {
+  if (typeof Intl === "undefined" || typeof Intl.NumberFormat !== "function") return fallback;
+  return new Intl.NumberFormat(locale, options).format(value);
 };
 
 /**
@@ -137,6 +166,7 @@ const snap = (raw: number, min: number, max: number, step: number): number => {
  */
 export function Slider({
   className,
+  style,
   "aria-label": ariaLabel,
   defaultValue,
   value,
@@ -145,6 +175,8 @@ export function Slider({
   min = 0,
   max = 100,
   step = 1,
+  locale,
+  format,
   disabled = false,
   orientation = "horizontal",
   thumbAlignment = "center",
@@ -235,6 +267,7 @@ export function Slider({
   return (
     <view
       className={cn("relative flex w-[220px] max-w-full flex-row", vertical && "h-[220px] w-auto flex-col", className)}
+      style={style}
       {...(id === undefined ? {} : { id })}
     >
       <view
@@ -256,7 +289,7 @@ export function Slider({
         accessibility-role-description="adjustable"
         accessibility-traits={disabled ? "disabled" : "adjustable"}
         accessibility-label={ariaLabel}
-        accessibility-value={String(current)}
+        accessibility-value={format ? formatNumber(current, locale, format, String(current)) : String(current)}
       >
         <view
           className={cn("relative rounded-full bg-overlay-ink-8", vertical ? "h-full w-1.5" : "h-1.5 w-full")}
