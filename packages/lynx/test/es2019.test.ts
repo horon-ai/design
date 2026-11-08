@@ -27,7 +27,10 @@ test("the package and its gallery use no library API newer than ES2019", () => {
     ts.sys,
     dirname(configPath),
   );
-  const program = ts.createProgram(parsed.fileNames, { ...parsed.options, noEmit: true, skipLibCheck: true });
+  const options = { ...parsed.options, noEmit: true, skipLibCheck: true };
+  // Resolve `types` from this package, not from the directory `bun test` started in (the repo root in CI).
+  const host = { ...ts.createCompilerHost(options), getCurrentDirectory: () => pkg };
+  const program = ts.createProgram({ rootNames: parsed.fileNames, options, host });
 
   const problems = ts
     .getPreEmitDiagnostics(program)
