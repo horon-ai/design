@@ -21,7 +21,7 @@ packages/
   flutter/      horon_ui           Flutter 컴포넌트 + example 갤러리 앱
 ```
 
-컴포넌트 레이어는 웹의 `@horon-ai/react`, 모바일의 Flutter `horon_ui`, Lynx 앱의 `@horon-ai/lynx` 셋이고, 셋은 같은 토큰 정본을 읽습니다. site가 `@horon-ai/react`를 소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. `packages/flutter`는 Dart 패키지라 `package.json`이 없어 bun 워크스페이스 밖에 있고, `dart`·`flutter` 명령으로 검사합니다. `packages/lynx`는 `@horon-ai/react`의 84개 컴포넌트를 ReactLynx로 옮긴 포트로, `test/parity.test.ts`가 두 패키지의 슬러그·export 이름·variant 리터럴을 대조합니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다.
+컴포넌트 레이어는 웹의 `@horon-ai/react`, Lynx 앱의 `@horon-ai/lynx`, Flutter `horon_ui` 셋이고, 셋은 같은 토큰 정본을 읽습니다. 새 `mobile` 앱은 Lynx로 바뀌어 `@horon-ai/lynx`를 쓰고, `horon_ui`를 쓰던 옛 Flutter 앱은 `horon-ai/mobile-archive`로 보관했습니다. site가 `@horon-ai/react`를 소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. `packages/flutter`는 Dart 패키지라 `package.json`이 없어 bun 워크스페이스 밖에 있고, `dart`·`flutter` 명령으로 검사합니다. `packages/lynx`는 `@horon-ai/react`의 84개 컴포넌트를 ReactLynx로 옮긴 포트로, `test/parity.test.ts`가 두 패키지의 슬러그·export 이름·variant 리터럴을 대조합니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다.
 
 ```tsx
 import { Button, Card, Input } from "@horon-ai/react";
@@ -88,8 +88,9 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 - 직전 실행이 `tokens`만 올리고 `react`에서 실패했다면 빠진 패키지만 같은 버전으로 채웁니다.
 - 게시 전에 lint·typecheck·test·build를 다시 돌리고, 게시한 커밋에 `v0.1.N` 태그를 남깁니다.
   provenance(실행한 워크플로와 커밋이 npm 패키지 페이지에 표시됨)가 붙습니다.
-- 게시가 끝나면 `web`, `admin`, `desktop-archive` 저장소의 Renovate가 새 버전을 찾아 각 저장소의 `dev`로
-  업데이트 PR을 엽니다(설정은 각 저장소의 `renovate.json`). 이 저장소에서 따로 보낼 신호는 없습니다.
+- 게시가 끝나면 `web`, `admin` 저장소의 Renovate가 새 버전을 찾아 각 저장소의 `dev`로
+  업데이트 PR을 엽니다(설정은 각 저장소의 `renovate.json`). 새 `desktop`(Electron) 저장소에도 같은
+  `renovate.json`이 있지만, 아직 GitHub 원격이 없어 동작하지 않습니다. 이 저장소에서 따로 보낼 신호는 없습니다.
 
 계산 규칙은 `.github/scripts/release-version.mjs`에 있고, 로컬에서 다음 버전을 미리 볼 수 있습니다.
 
@@ -119,7 +120,7 @@ npm view @horon-ai/tokens versions
 npm view @horon-ai/react versions
 ```
 
-게시한 뒤에는 `web/package.json`과 `desktop-archive/package.json`의 `file:` 의존을
+게시한 뒤에는 `web/package.json`의 `file:` 의존을
 `"@horon-ai/react": "0.1.0"`, `"@horon-ai/tokens": "0.1.0"` 같은 정확한 버전으로 바꾸고
 `bun install`로 확인합니다. 범위(`^0.1.0`)는 쓰지 않습니다.
 
