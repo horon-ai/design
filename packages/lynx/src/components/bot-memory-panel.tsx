@@ -147,12 +147,12 @@ export function BotMemoryPanel({
   return (
     <view
       className={cn(
-        "flex w-full max-w-[560px] min-w-0 flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full min-w-0 max-w-[560px] flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       {...(id === undefined ? {} : { id })}
     >
-      <view className="flex flex-row flex-wrap items-center gap-x-2.5 gap-y-2 px-5 pt-4 pb-3.5">
+      <view className="flex flex-row flex-wrap items-center gap-x-2.5 gap-y-2 px-5 pb-3.5 pt-4">
         <view className="flex min-w-0 flex-1 flex-col gap-0.5">
           {typeof title === "string" || typeof title === "number" ? (
             <text className="truncate text-label-lg text-text-primary">{title}</text>
@@ -208,7 +208,7 @@ export function BotMemoryPanel({
         </view>
       ))}
       <Divider />
-      <view className="flex flex-row items-center gap-2 px-5 pt-3 pb-1.5">
+      <view className="flex flex-row items-center gap-2 px-5 pb-1.5 pt-3">
         <PanelPillTabs
           aria-label="Memory filter"
           value={filter}
@@ -218,7 +218,7 @@ export function BotMemoryPanel({
         <view className="min-w-0 flex-1" />
         {onSearch ? (
           <view
-            className="flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 motion-press active:bg-overlay-ink-10"
+            className="motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 active:bg-overlay-ink-10"
             bindtap={onSearch}
             accessibility-element
             accessibility-traits="button"
@@ -238,7 +238,7 @@ export function BotMemoryPanel({
       {toast && !dismissed ? (
         <view className="px-5 py-1.5">
           <view
-            className="flex h-8 max-w-full min-w-0 flex-row items-center gap-2 self-start rounded-full bg-accent-sky-500-16 pr-3 pl-2.5"
+            className="flex h-8 min-w-0 max-w-full flex-row items-center gap-2 self-start rounded-full bg-accent-sky-500-16 pl-2.5 pr-3"
             style={{
               animationName: leaving ? "pop-out" : "pop-in",
               animationDuration: leaving ? "130ms" : "220ms",
@@ -260,7 +260,7 @@ export function BotMemoryPanel({
               <text className="min-w-0 truncate text-caption text-text-secondary">{toast.message}</text>
             ) : null}
             <view
-              className="flex size-3 shrink-0 flex-row items-center justify-center motion-colors active:text-text-primary"
+              className="motion-colors flex size-3 shrink-0 flex-row items-center justify-center active:text-text-primary"
               bindtap={() => setLeavingFor(toast)}
               accessibility-element
               accessibility-traits="button"
@@ -276,7 +276,7 @@ export function BotMemoryPanel({
           const items = memories.filter((memory) => memory.group === group);
           return (
             <view key={group} className="flex flex-col">
-              <view className="flex flex-row items-center gap-1.5 px-5 pt-3 pb-1">
+              <view className="flex flex-row items-center gap-1.5 px-5 pb-1 pt-3">
                 <text className="text-label-sm text-text-secondary">{group}</text>
                 <text className="text-caption text-text-secondary">{`${items.length}`}</text>
               </view>
@@ -284,13 +284,13 @@ export function BotMemoryPanel({
                 <view
                   key={memory.id}
                   className={cn(
-                    "flex motion-rise flex-col gap-0.5 px-5 py-2 motion-colors",
+                    "motion-rise motion-colors flex flex-col gap-0.5 px-5 py-2",
                     memory.fresh && "bg-accent-sky-500-10",
                   )}
                   style={{ animationDelay: `${rowIndex++ * 30}ms` }}
                 >
-                  <text className="text-body-sm break-all text-text-primary">{memory.text}</text>
-                  <text className="text-caption break-all text-text-secondary">{memory.source}</text>
+                  <text className="break-all text-body-sm text-text-primary">{memory.text}</text>
+                  <text className="break-all text-caption text-text-secondary">{memory.source}</text>
                 </view>
               ))}
             </view>
@@ -298,7 +298,7 @@ export function BotMemoryPanel({
         })}
       </view>
       <view
-        className="flex flex-row items-center gap-2 px-5 pt-3 pb-4 motion-colors active:text-text-primary"
+        className="motion-colors flex flex-row items-center gap-2 px-5 pb-4 pt-3 active:text-text-primary"
         bindtap={onAdd}
         accessibility-element
         accessibility-traits="button"

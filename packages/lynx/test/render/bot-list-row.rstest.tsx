@@ -8,8 +8,7 @@ import { HoronProvider } from "../../src/provider";
 /** The row whose whole text contains `name`; every row carries a button-ish trait. */
 const rowByName = (container: HTMLElement, name: string): Element => {
   const node = [...container.querySelectorAll("view")].find(
-    (element) =>
-      element.getAttribute("accessibility-traits") !== null && (element.textContent ?? "").includes(name),
+    (element) => element.getAttribute("accessibility-traits") !== null && (element.textContent ?? "").includes(name),
   );
   if (!node) throw new Error(`no row for ${name}`);
   return node;

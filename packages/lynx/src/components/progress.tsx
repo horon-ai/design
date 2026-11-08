@@ -162,7 +162,12 @@ export function Progress({
                   animationTimingFunction: EASE_OUT_QUINT,
                   animationIterationCount: "infinite",
                 }
-              : { width: `${percent}%`, transitionProperty: "width", transitionDuration: "400ms", transitionTimingFunction: EASE_OUT_QUINT }
+              : {
+                  width: `${percent}%`,
+                  transitionProperty: "width",
+                  transitionDuration: "400ms",
+                  transitionTimingFunction: EASE_OUT_QUINT,
+                }
           }
         />
       </view>

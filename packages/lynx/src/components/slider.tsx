@@ -291,11 +291,12 @@ export function Slider({
         accessibility-label={ariaLabel}
         accessibility-value={format ? formatNumber(current, locale, format, String(current)) : String(current)}
       >
-        <view
-          className={cn("relative rounded-full bg-overlay-ink-8", vertical ? "h-full w-1.5" : "h-1.5 w-full")}
-        >
+        <view className={cn("relative rounded-full bg-overlay-ink-8", vertical ? "h-full w-1.5" : "h-1.5 w-full")}>
           <view
-            className={cn("absolute rounded-full bg-interactive-primary", vertical ? "bottom-0 left-0 w-full" : "left-0 top-0 h-full")}
+            className={cn(
+              "absolute rounded-full bg-interactive-primary",
+              vertical ? "bottom-0 left-0 w-full" : "left-0 top-0 h-full",
+            )}
             style={vertical ? { height: `${fill}px` } : { width: `${fill}px` }}
           />
           <view

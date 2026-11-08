@@ -381,7 +381,7 @@ export function Combobox(props: ComboboxProps) {
                     <view
                       key={item.value}
                       className={cn(
-                        "relative flex flex-row items-center rounded-md motion-colors",
+                        "motion-colors relative flex flex-row items-center rounded-md",
                         itemClass[size],
                         item.disabled ? "opacity-40" : "active:bg-overlay-ink-6",
                         selected && "bg-overlay-ink-6",

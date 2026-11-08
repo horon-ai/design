@@ -31,7 +31,8 @@ function installViewport(width: number): void {
   const environment = Reflect.get(globalThis, "lynxTestingEnv");
   const background = isRecord(environment) ? environment.backgroundThread : undefined;
   const global = isRecord(background) ? background.globalThis : undefined;
-  if (!isRecord(global) || !isRecord(global.SystemInfo)) throw new Error("the Lynx testing environment is not installed");
+  if (!isRecord(global) || !isRecord(global.SystemInfo))
+    throw new Error("the Lynx testing environment is not installed");
   Object.assign(global.SystemInfo, { pixelHeight: 1600, pixelRatio: 2, pixelWidth: width * 2, platform: "web" });
 }
 
@@ -53,7 +54,12 @@ function Collapsible() {
           <SidebarItem>Inbox</SidebarItem>
         </Sidebar>
       ) : (
-        <view bindtap={() => setOpen(true)} accessibility-element accessibility-traits="button" accessibility-label="Expand sidebar">
+        <view
+          bindtap={() => setOpen(true)}
+          accessibility-element
+          accessibility-traits="button"
+          accessibility-label="Expand sidebar"
+        >
           <text className="text-label-md text-text-primary">expand sidebar</text>
         </view>
       )}

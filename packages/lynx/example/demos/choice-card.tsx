@@ -32,7 +32,13 @@ export default function ChoiceCardDemo() {
         />
       </view>
       <view className="mt-6 flex w-full flex-row flex-wrap items-center justify-center gap-4">
-        <ChoiceCard value="neutral" title="Neutral badge" description="A 6% ink pill." badge="Optional" badgeTone="neutral" />
+        <ChoiceCard
+          value="neutral"
+          title="Neutral badge"
+          description="A 6% ink pill."
+          badge="Optional"
+          badgeTone="neutral"
+        />
         <ChoiceCard value="dot" title="Uncontrolled" description="Keeps its own state." defaultChecked={false} />
       </view>
       <text className="mt-4 text-caption text-text-secondary">{`Picked: ${plan}`}</text>

@@ -16,7 +16,9 @@ test("renders the heading and the description copy", async () => {
   );
 
   expect(await findByText("Meet your first bot")).toBeInTheDocument();
-  expect(await findByText("Give it a role and a task. It keeps working after you close the laptop.")).toBeInTheDocument();
+  expect(
+    await findByText("Give it a role and a task. It keeps working after you close the laptop."),
+  ).toBeInTheDocument();
 });
 
 test("the action slot renders only when an action is given", async () => {

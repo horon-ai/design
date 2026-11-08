@@ -52,7 +52,8 @@ const withKeys = (values: string[] | undefined) => {
 };
 
 /** Text slots take a string so the token classes can sit on a `<text>`; a node keeps its own styling. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** Props for {@link McpServerRow}: the server identity, its tags and status, and the two actions. */
 export type McpServerRowProps = Omit<PortedElementProps["div"], "className"> & {
@@ -139,7 +140,7 @@ export function McpServerRow({
       </view>
       <view className="flex min-w-0 grow basis-40 flex-col gap-1">
         <view className="flex min-w-0 flex-row flex-wrap items-center gap-2">
-          <text className="max-w-full min-w-0 truncate text-label-md text-text-primary">{name}</text>
+          <text className="min-w-0 max-w-full truncate text-label-md text-text-primary">{name}</text>
           {withKeys(tags).map(({ value, key }) => (
             <view key={key} className={cn(pillClass, "bg-overlay-ink-6")}>
               <text className="text-label-sm text-text-secondary">{value}</text>
@@ -175,7 +176,11 @@ export function McpServerRow({
           <text
             className={cn(
               "text-label-sm",
-              statusTone === "warning" ? "text-text-danger" : statusTone === "neutral" ? "text-text-secondary" : "text-text-primary",
+              statusTone === "warning"
+                ? "text-text-danger"
+                : statusTone === "neutral"
+                  ? "text-text-secondary"
+                  : "text-text-primary",
             )}
           >
             {statusLabel}

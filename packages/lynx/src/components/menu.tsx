@@ -260,9 +260,11 @@ function popupPlacement(
 
   // Only the axis keys the placement actually sets are written: a key present with `undefined`
   // makes Lynx drop the whole style object, which would leave the popup unpositioned.
-  const startLeft = align === "center" ? anchor.left + anchor.width / 2 - panel.width / 2 + alignOffset : anchor.left + alignOffset;
+  const startLeft =
+    align === "center" ? anchor.left + anchor.width / 2 - panel.width / 2 + alignOffset : anchor.left + alignOffset;
   const endRight = viewport.width - anchor.left - anchor.width + alignOffset;
-  const startTop = align === "center" ? anchor.top + anchor.height / 2 - panel.height / 2 + alignOffset : anchor.top + alignOffset;
+  const startTop =
+    align === "center" ? anchor.top + anchor.height / 2 - panel.height / 2 + alignOffset : anchor.top + alignOffset;
   const endBottom = anchor.top + anchor.height - panel.height - alignOffset;
 
   // Lengths are written as px strings: Lynx applies an inline style object key by key, and a bare
@@ -343,7 +345,7 @@ export function MenuContent({
       />
       <view
         className={cn(
-          "fixed z-50 flex flex-col gap-0.5 overflow-hidden p-1.5 motion-popup",
+          "motion-popup fixed z-50 flex flex-col gap-0.5 overflow-hidden p-1.5",
           surface === "glass" ? "w-[220px]" : surface === "paper" ? "w-[304px]" : "w-[256px]",
           "max-w-[calc(100vw-2rem)]",
           menuPopupClass[surface],
@@ -354,7 +356,9 @@ export function MenuContent({
         bindlayoutchange={(event: LayoutChangeLike) => {
           const box = boxOf(event);
           setPanel((previous) =>
-            previous.width === box.width && previous.height === box.height ? previous : { width: box.width, height: box.height },
+            previous.width === box.width && previous.height === box.height
+              ? previous
+              : { width: box.width, height: box.height },
           );
         }}
       >
@@ -425,7 +429,7 @@ export function MenuItem({
   return (
     <view
       className={cn(
-        "relative flex w-full flex-row items-center gap-2.5 motion-colors active:bg-overlay-ink-6",
+        "motion-colors relative flex w-full flex-row items-center gap-2.5 active:bg-overlay-ink-6",
         surface === "glass" ? "rounded-md px-3" : "rounded-[10px] px-2.5",
         description ? "h-12" : surface === "glass" ? "h-10" : "h-9",
         selected && "bg-bg-brand active:bg-bg-brand",
@@ -444,7 +448,12 @@ export function MenuItem({
       accessibility-label={label}
     >
       {icon ? (
-        <view className={cn("flex shrink-0 flex-row items-center", danger ? "text-text-danger" : surface === "glass" ? "text-text-secondary" : "text-text-primary")}>
+        <view
+          className={cn(
+            "flex shrink-0 flex-row items-center",
+            danger ? "text-text-danger" : surface === "glass" ? "text-text-secondary" : "text-text-primary",
+          )}
+        >
           {icon}
         </view>
       ) : null}
@@ -511,7 +520,7 @@ type MenuLabelProps = {
 /** A caption heading for a group of items, such as "Workspaces" or the account email. */
 export function MenuLabel({ className, children }: MenuLabelProps) {
   return (
-    <view className={cn("relative px-2.5 pt-2 pb-1", className)}>
+    <view className={cn("relative px-2.5 pb-1 pt-2", className)}>
       <text className="text-caption text-text-secondary">{children}</text>
     </view>
   );
@@ -529,10 +538,7 @@ type MenuTileProps = {
 export function MenuTile({ className, children }: MenuTileProps) {
   return (
     <view
-      className={cn(
-        "flex size-7 shrink-0 items-center justify-center rounded-sm bg-interactive-primary",
-        className,
-      )}
+      className={cn("flex size-7 shrink-0 items-center justify-center rounded-sm bg-interactive-primary", className)}
     >
       <text className="text-label-sm text-text-inverse">{children}</text>
     </view>

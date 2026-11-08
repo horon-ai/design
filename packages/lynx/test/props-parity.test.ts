@@ -40,18 +40,33 @@ const PLATFORM_PROPS = new Map([
 
 /** Single props whose difference is forced, keyed `slug:Component.prop`. */
 const ALLOWED = new Map([
-  ["select:Select.itemToStringValue", "Only serializes the value Base UI writes into the hidden form input; Lynx has no form submission."],
+  [
+    "select:Select.itemToStringValue",
+    "Only serializes the value Base UI writes into the hidden form input; Lynx has no form submission.",
+  ],
   ["card:Card.render", "React's own `render` swaps the root element via useRender; Lynx has no element swapping."],
-  ["checkbox:Checkbox.parent", "Marks the parent checkbox of a CheckboxGroup; the React package has no CheckboxGroup to pair it with."],
-  ["select:Select.multiple", "React's Select renders a single `string | null` value, so `multiple` is not usable through it."],
+  [
+    "checkbox:Checkbox.parent",
+    "Marks the parent checkbox of a CheckboxGroup; the React package has no CheckboxGroup to pair it with.",
+  ],
+  [
+    "select:Select.multiple",
+    "React's Select renders a single `string | null` value, so `multiple` is not usable through it.",
+  ],
   ["slider:Slider.minStepsBetweenValues", "Multi-thumb only; React's Slider renders one thumb."],
   ["slider:Slider.thumbCollisionBehavior", "Multi-thumb only; React's Slider renders one thumb."],
-  ["slider:Slider.thumbAlignment", "`edge-client-only` defers measurement past server rendering; Lynx renders on the client only, so `edge` covers it."],
+  [
+    "slider:Slider.thumbAlignment",
+    "`edge-client-only` defers measurement past server rendering; Lynx renders on the client only, so `edge` covers it.",
+  ],
   [
     "menu:MenuContent.side",
     "The default `bottom` is Base UI's own default, which React leaves undocumented in its wrapper; Lynx states it with @default.",
   ],
-  ["menu:MenuContent.alignOffset", "The default 0 is Base UI's own default, which React leaves undocumented in its wrapper; Lynx states it with @default."],
+  [
+    "menu:MenuContent.alignOffset",
+    "The default 0 is Base UI's own default, which React leaves undocumented in its wrapper; Lynx states it with @default.",
+  ],
 ]);
 
 /** An allowed difference keeps only the kinds it explains; `side` is allowed its default, not its literals. */
@@ -64,20 +79,27 @@ const report = compareProps();
 
 describe("@horon-ai/lynx ↔ @horon-ai/react props parity", () => {
   test("every React component has a Lynx component", () => {
-    console.log(`components: react ${report.components.react}, lynx ${report.components.lynx}, matched ${report.components.matched}`);
+    console.log(
+      `components: react ${report.components.react}, lynx ${report.components.lynx}, matched ${report.components.matched}`,
+    );
     expect(report.components.matched).toBe(report.components.react);
   });
 
   test("every own and Base UI prop matches, apart from the documented platform differences", () => {
-    for (const [source, count] of Object.entries(report.props)) console.log(`${source} props: react ${count.react}, matched ${count.matched}`);
+    for (const [source, count] of Object.entries(report.props))
+      console.log(`${source} props: react ${count.react}, matched ${count.matched}`);
     const unexplained = report.differences.filter((difference) => {
       const prop = difference.key.split(".").at(-1) ?? "";
-      if (difference.source === "base-ui" && difference.kind === "missing-prop" && PLATFORM_PROPS.has(prop)) return false;
+      if (difference.source === "base-ui" && difference.kind === "missing-prop" && PLATFORM_PROPS.has(prop))
+        return false;
       const allowedKind = ALLOWED_KINDS[difference.key];
       return !ALLOWED.has(difference.key) || (allowedKind !== undefined && allowedKind !== difference.kind);
     });
     console.log(`allowed differences: ${report.differences.length - unexplained.length}`);
-    if (unexplained.length > 0) console.log(`  ${unexplained.map((difference) => `${difference.key} [${difference.kind}] ${difference.detail}`).join("\n  ")}`);
+    if (unexplained.length > 0)
+      console.log(
+        `  ${unexplained.map((difference) => `${difference.key} [${difference.kind}] ${difference.detail}`).join("\n  ")}`,
+      );
     expect(unexplained).toEqual([]);
   });
 

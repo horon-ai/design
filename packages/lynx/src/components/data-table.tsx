@@ -23,7 +23,8 @@ export type DataTableDevice = "desktop" | "tablet" | "mobile";
 const DataTableDeviceContext = createContext<DataTableDevice>("desktop");
 
 /** True for a slot the component can wrap in its own `<text>`; a node keeps its own styling. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** The Figma spring (`--ease-spring`), written out because an inline style cannot read a variable. */
 const EASE_OUT_QUINT = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -118,9 +119,7 @@ export function DataTableHeader({ icon, title, actions, className }: DataTableHe
       ) : (
         <view className="min-w-0 flex-1">{title}</view>
       )}
-      {actions ? (
-        <view className="flex shrink-0 flex-row items-center gap-3">{actions}</view>
-      ) : null}
+      {actions ? <view className="flex shrink-0 flex-row items-center gap-3">{actions}</view> : null}
     </view>
   );
 }
@@ -136,7 +135,7 @@ export function DataTableTable({ className, children }: WithClass<{ children?: R
   const device = useContext(DataTableDeviceContext);
 
   return (
-    <scroll-view scroll-orientation="horizontal" className="w-full max-w-full min-w-0">
+    <scroll-view scroll-orientation="horizontal" className="w-full min-w-0 max-w-full">
       <view className={cn("flex w-full flex-col", device === "mobile" ? "min-w-[420px]" : "min-w-[520px]", className)}>
         {children}
       </view>
@@ -168,10 +167,7 @@ type DataTableHeadProps = WithClass<{ children?: ReactNode }> & {
 export function DataTableHead({ icon, className, children, onTap, sorted }: DataTableHeadProps) {
   return (
     <view
-      className={cn(
-        "flex h-[52px] min-w-0 flex-row items-center border-y border-border-default pr-3",
-        className,
-      )}
+      className={cn("flex h-[52px] min-w-0 flex-row items-center border-y border-border-default pr-3", className)}
       bindtap={onTap}
       accessibility-element={onTap ? true : undefined}
       accessibility-role-description={onTap ? "columnheader" : undefined}
@@ -212,7 +208,11 @@ export function DataTableHead({ icon, className, children, onTap, sorted }: Data
 }
 
 /** Body row: one bottom hairline; `DataTableView` adds the selected wash and the staggered rise. */
-export function DataTableRow({ className, children, style }: WithClass<{ children?: ReactNode; style?: Record<string, string | number> }>) {
+export function DataTableRow({
+  className,
+  children,
+  style,
+}: WithClass<{ children?: ReactNode; style?: Record<string, string | number> }>) {
   return (
     <view className={cn("flex flex-row items-center border-b border-border-default", className)} style={style}>
       {children}
@@ -234,7 +234,10 @@ export function DataTableCell({ className, children }: WithClass<{ children?: Re
 /**
  * The 24px ink logo tile with a label-sm initial, beside a label-lg name. Part of {@link DataTable}.
  */
-export function DataTableItem({ logo, children }: {
+export function DataTableItem({
+  logo,
+  children,
+}: {
   /** Tile content: a letter, or an icon the caller sizes (the tile is 24px square). */
   logo: ReactNode;
   /** The row's name, `label-lg` primary text truncated to the cell. */
@@ -312,7 +315,7 @@ export function DataTableFooter({ onAdd, addLabel = "Add row", hint, className }
   return (
     <view
       className={cn(
-        "flex flex-row flex-wrap items-center gap-x-2 gap-y-1 pt-3.5 pb-4",
+        "flex flex-row flex-wrap items-center gap-x-2 gap-y-1 pb-4 pt-3.5",
         device === "mobile" ? "px-[18px]" : "px-6",
         className,
       )}
@@ -535,7 +538,9 @@ export function useDataTable<TData>({
       columns.some((column) => {
         if (column.accessorKey === undefined) return false;
         const value = row[column.accessorKey];
-        return String(value ?? "").toLowerCase().includes(query);
+        return String(value ?? "")
+          .toLowerCase()
+          .includes(query);
       }),
     );
   }, [columns, data, filter, getRowId]);
@@ -687,11 +692,7 @@ function renderCell<TData>(
  *
  * @typeParam TData - Shape of one row, matching the instance.
  */
-export function DataTableView<TData>({
-  table,
-  emptyMessage = "No results.",
-  className,
-}: DataTableViewProps<TData>) {
+export function DataTableView<TData>({ table, emptyMessage = "No results.", className }: DataTableViewProps<TData>) {
   const device = useContext(DataTableDeviceContext);
   const start = device === "mobile" ? "pl-[18px]" : "pl-6";
   const end = device === "mobile" ? "pr-[18px]" : "pr-6";
@@ -715,12 +716,7 @@ export function DataTableView<TData>({
               icon={meta?.icon}
               sorted={canSort ? sorted : undefined}
               onTap={canSort ? () => table.toggleSort(id) : undefined}
-              className={cn(
-                columnFlex(meta),
-                index === 0 && start,
-                index === lastIndex && end,
-                meta?.headClassName,
-              )}
+              className={cn(columnFlex(meta), index === 0 && start, index === lastIndex && end, meta?.headClassName)}
             >
               {header}
             </DataTableHead>
@@ -789,11 +785,7 @@ export type DataTableSearchProps<TData> = {
  *
  * @typeParam TData - Shape of one row.
  */
-export function DataTableSearch<TData>({
-  table,
-  placeholder = "Search",
-  className,
-}: DataTableSearchProps<TData>) {
+export function DataTableSearch<TData>({ table, placeholder = "Search", className }: DataTableSearchProps<TData>) {
   return (
     <Input
       surface="solid"
@@ -852,9 +844,7 @@ export function DataTablePagination<TData>({ table, className }: DataTablePagina
           onClick={() => table.previousPage()}
           disabled={!table.canPreviousPage}
         />
-        <text className="text-caption text-text-secondary">
-          {`Page ${table.pageIndex + 1} of ${pageCount}`}
-        </text>
+        <text className="text-caption text-text-secondary">{`Page ${table.pageIndex + 1} of ${pageCount}`}</text>
         <IconButton
           size="sm"
           icon={<Icon name="CaretRight" size={16} color="text-primary" />}

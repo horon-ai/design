@@ -108,7 +108,7 @@ export function Banner({
   return (
     <view
       className={cn(
-        "relative flex motion-rise flex-row items-center overflow-hidden rounded-md",
+        "motion-rise relative flex flex-row items-center overflow-hidden rounded-md",
         sizeClass[size],
         toneClass[tone],
         surface === "glass"

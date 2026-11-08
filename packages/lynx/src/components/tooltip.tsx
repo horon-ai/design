@@ -109,7 +109,11 @@ type PanelSize = { width: number; height: number };
  * reported back so the arrow turns with the bubble. A zero viewport (a plain
  * render test) keeps the requested side.
  */
-function resolveBubble(anchor: AnchorRect, panel: PanelSize, side: TooltipProps["side"]): { side: TooltipProps["side"]; style: CSSProperties } {
+function resolveBubble(
+  anchor: AnchorRect,
+  panel: PanelSize,
+  side: TooltipProps["side"],
+): { side: TooltipProps["side"]; style: CSSProperties } {
   const viewport = readViewport();
   const known = viewport.width > 0 && viewport.height > 0;
   const gap = 6;
@@ -128,9 +132,12 @@ function resolveBubble(anchor: AnchorRect, panel: PanelSize, side: TooltipProps[
   const centeredLeft = anchor.left + anchor.width / 2 - panel.width / 2;
   const centeredTop = anchor.top + anchor.height / 2 - panel.height / 2;
 
-  if (resolved === "bottom") return { side: resolved, style: { top: anchor.top + anchor.height + gap, left: centeredLeft } };
-  if (resolved === "left") return { side: resolved, style: { top: centeredTop, right: viewport.width - anchor.left + gap } };
-  if (resolved === "right") return { side: resolved, style: { top: centeredTop, left: anchor.left + anchor.width + gap } };
+  if (resolved === "bottom")
+    return { side: resolved, style: { top: anchor.top + anchor.height + gap, left: centeredLeft } };
+  if (resolved === "left")
+    return { side: resolved, style: { top: centeredTop, right: viewport.width - anchor.left + gap } };
+  if (resolved === "right")
+    return { side: resolved, style: { top: centeredTop, left: anchor.left + anchor.width + gap } };
   return { side: resolved, style: { bottom: viewport.height - anchor.top + gap, left: centeredLeft } };
 }
 
@@ -142,7 +149,8 @@ const arrowStyle = (side: TooltipProps["side"]): CSSProperties => {
   return { bottom: -6, left: "50%", marginLeft: -5 };
 };
 
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * Figma `Tooltip` (62:282): an ink bubble, 10/6px padding, 8px radius, with a 10x6 arrow.
@@ -227,12 +235,14 @@ export function Tooltip({ children, label, side = "top", delay }: TooltipProps) 
 
       {open && placement ? (
         <view
-          className="fixed z-50 flex max-w-[256px] flex-row motion-popup rounded-sm bg-interactive-primary px-2.5 py-1.5 duration-150"
+          className="motion-popup fixed z-50 flex max-w-[256px] flex-row rounded-sm bg-interactive-primary px-2.5 py-1.5 duration-150"
           style={placement.style}
           bindlayoutchange={(event: LayoutChangeLike) => {
             const box = boxOf(event);
             setPanel((previous) =>
-              previous.width === box.width && previous.height === box.height ? previous : { width: box.width, height: box.height },
+              previous.width === box.width && previous.height === box.height
+                ? previous
+                : { width: box.width, height: box.height },
             );
           }}
           accessibility-element

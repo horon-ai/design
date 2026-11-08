@@ -81,7 +81,13 @@ const ASPECT_RATIO = 48.7038 / 11.5;
  * }
  * ```
  */
-export function HoronWordmark({ title = "Horon", height = 11.5, width, color = "text-primary", className }: HoronWordmarkProps) {
+export function HoronWordmark({
+  title = "Horon",
+  height = 11.5,
+  width,
+  color = "text-primary",
+  className,
+}: HoronWordmarkProps) {
   const fill = useIconColor(color);
   const resolvedWidth = width ?? (typeof height === "number" ? height * ASPECT_RATIO : "auto");
 
@@ -94,7 +100,10 @@ export function HoronWordmark({ title = "Horon", height = 11.5, width, color = "
   return (
     <view
       className={cn("flex", className)}
-      style={{ width: typeof resolvedWidth === "number" ? `${resolvedWidth}px` : resolvedWidth, height: typeof height === "number" ? `${height}px` : height }}
+      style={{
+        width: typeof resolvedWidth === "number" ? `${resolvedWidth}px` : resolvedWidth,
+        height: typeof height === "number" ? `${height}px` : height,
+      }}
       accessibility-element
       accessibility-traits="image"
       accessibility-role-description="image"

@@ -86,7 +86,8 @@ await Promise.all(
     const wanted = [...(weights.get(name) ?? new Set<Weight>(["regular"]))].toSorted();
     const glyphs = await Promise.all(
       wanted.map(async (weight) => {
-        const file = weight === "regular" ? `${assets}/regular/${stem}.svg` : `${assets}/${weight}/${stem}-${weight}.svg`;
+        const file =
+          weight === "regular" ? `${assets}/regular/${stem}.svg` : `${assets}/${weight}/${stem}-${weight}.svg`;
         if (!existsSync(file)) return { weight, svg: undefined };
         const svg = (await Bun.file(file).text()).trim().replaceAll("currentColor", "__COLOR__");
         return { weight, svg };

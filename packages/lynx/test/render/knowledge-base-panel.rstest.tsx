@@ -8,8 +8,7 @@ import { HoronProvider } from "../../src/provider";
 /** The pressable node whose own text contains `label`; the tab pills carry a button trait. */
 const byText = (container: HTMLElement, label: string): Element => {
   const node = [...container.querySelectorAll("view")].find(
-    (element) =>
-      element.getAttribute("accessibility-traits") !== null && (element.textContent ?? "").trim() === label,
+    (element) => element.getAttribute("accessibility-traits") !== null && (element.textContent ?? "").trim() === label,
   );
   if (!node) throw new Error(`no control labelled ${label}`);
   return node;

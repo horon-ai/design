@@ -16,7 +16,8 @@ const read = (path: string) => Bun.file(`${pkg}/${path}`).text();
 const commitTokenCss = await read("src/styles/tokens.css");
 const committedPreset = await read("tailwind-preset.cjs");
 
-const variableValue = (css: string, name: string): string | undefined => new RegExp(`--${name}:\\s*([^;]+);`).exec(css)?.[1]?.trim();
+const variableValue = (css: string, name: string): string | undefined =>
+  new RegExp(`--${name}:\\s*([^;]+);`).exec(css)?.[1]?.trim();
 
 describe("generated token css", () => {
   test("committed tokens.css equals a fresh generation", () => {
@@ -36,7 +37,9 @@ describe("generated token css", () => {
     const declared = [...palette.matchAll(/^\s*--color-[a-z0-9-]+:/gm)].length;
     // Light and the primitives share one block, so the file declares each semantic
     // token once for light and once for dark, plus the primitives once: 91 + 38 + 91.
-    expect(declared).toBe(Object.keys(lightColors).length + Object.keys(primitives).length + Object.keys(darkColors).length);
+    expect(declared).toBe(
+      Object.keys(lightColors).length + Object.keys(primitives).length + Object.keys(darkColors).length,
+    );
   });
 
   test("the glass switch re-points exactly the three tiers", () => {
@@ -88,7 +91,8 @@ describe("generated tailwind preset", () => {
       boxShadow: Record<string, string>;
       fontSize: Record<string, [string, Record<string, string>]>;
     };
-    for (const name of [...Object.keys(lightColors), ...Object.keys(primitives)]) expect(colors[name]).toBe(`var(--color-${name})`);
+    for (const name of [...Object.keys(lightColors), ...Object.keys(primitives)])
+      expect(colors[name]).toBe(`var(--color-${name})`);
     for (const name of Object.keys(radius)) expect(borderRadius[name]).toBe(`var(--radius-${name})`);
     for (const name of Object.keys(shadow)) expect(boxShadow[name]).toBe(`var(--shadow-${name})`);
     for (const name of Object.keys(textStyles)) expect(fontSize[name]?.[0]).toBe(`var(--text-${name})`);

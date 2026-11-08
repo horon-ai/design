@@ -26,7 +26,12 @@ type RadioGroupContextValue = {
 };
 
 /** What a radio outside any group reads: nothing selected, nothing to select into. */
-const DEFAULT_GROUP: RadioGroupContextValue = { value: undefined, select: () => undefined, disabled: false, readOnly: false };
+const DEFAULT_GROUP: RadioGroupContextValue = {
+  value: undefined,
+  select: () => undefined,
+  disabled: false,
+  readOnly: false,
+};
 
 const RadioGroupContext = createContext<RadioGroupContextValue>(DEFAULT_GROUP);
 
@@ -231,7 +236,17 @@ type RadioRootProps = RadioProps & {
  * }
  * ```
  */
-export function Radio({ value, label, disabled = false, readOnly, id, size, className, style, "aria-label": ariaLabel }: RadioRootProps) {
+export function Radio({
+  value,
+  label,
+  disabled = false,
+  readOnly,
+  id,
+  size,
+  className,
+  style,
+  "aria-label": ariaLabel,
+}: RadioRootProps) {
   const groupSize = useContext(RadioSizeContext);
   const group = useContext(RadioGroupContext);
   const [own, setOwn] = useState(false);
@@ -250,7 +265,12 @@ export function Radio({ value, label, disabled = false, readOnly, id, size, clas
 
   return (
     <view
-      className={cn("inline-flex max-w-full min-w-0 flex-row items-center", labelClass[resolvedSize], dimmed && "opacity-40", className)}
+      className={cn(
+        "inline-flex min-w-0 max-w-full flex-row items-center",
+        labelClass[resolvedSize],
+        dimmed && "opacity-40",
+        className,
+      )}
       bindtap={pick}
       accessibility-element
       accessibility-traits={dimmed ? "disabled" : "button"}
@@ -262,7 +282,7 @@ export function Radio({ value, label, disabled = false, readOnly, id, size, clas
     >
       <view
         className={cn(
-          "flex shrink-0 flex-row items-center justify-center rounded-full border-[1.5px] bg-bg-surface motion-colors",
+          "motion-colors flex shrink-0 flex-row items-center justify-center rounded-full border-[1.5px] bg-bg-surface",
           circleClass[resolvedSize],
           isSelected
             ? "border-interactive-primary bg-interactive-primary active:border-interactive-primary-hover active:bg-interactive-primary-hover"
@@ -272,7 +292,12 @@ export function Radio({ value, label, disabled = false, readOnly, id, size, clas
         {isSelected ? (
           <view
             className={cn("rounded-full bg-interactive-on-primary", dotClass[resolvedSize])}
-            style={{ animationName: "pop-in", animationDuration: "220ms", animationTimingFunction: EASE_SPRING, animationFillMode: "both" }}
+            style={{
+              animationName: "pop-in",
+              animationDuration: "220ms",
+              animationTimingFunction: EASE_SPRING,
+              animationFillMode: "both",
+            }}
           />
         ) : null}
       </view>

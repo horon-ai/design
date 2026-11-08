@@ -133,9 +133,7 @@ export default function AgentLanesTimelineDemo() {
             accessibility-traits="button"
             accessibility-label={`${minute} minutes before now`}
           >
-            <text
-              className={minute === cursor ? "text-caption text-text-inverse" : "text-caption text-text-primary"}
-            >
+            <text className={minute === cursor ? "text-caption text-text-inverse" : "text-caption text-text-primary"}>
               {`-${minute}m`}
             </text>
           </view>

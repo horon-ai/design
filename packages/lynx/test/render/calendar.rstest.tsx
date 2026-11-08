@@ -25,7 +25,9 @@ const isRange = (value: unknown): value is { start: Date | null; end: Date | nul
 
 /** The rendered day whose spoken label starts with the given weekday-free date text. */
 const dayByName = (container: HTMLElement, label: string): Element => {
-  const node = [...container.querySelectorAll("view")].find((element) => element.getAttribute("accessibility-label") === label);
+  const node = [...container.querySelectorAll("view")].find(
+    (element) => element.getAttribute("accessibility-label") === label,
+  );
   if (!node) throw new Error(`no day labelled ${label}`);
   return node;
 };
@@ -84,7 +86,9 @@ test("the arrows move the month and report the first day of it", () => {
     </HoronProvider>,
   );
 
-  const next = [...container.querySelectorAll("view")].find((element) => element.getAttribute("accessibility-label") === "Next month");
+  const next = [...container.querySelectorAll("view")].find(
+    (element) => element.getAttribute("accessibility-label") === "Next month",
+  );
   if (!next) throw new Error("no next-month button");
   fireEvent.tap(next);
 
@@ -99,7 +103,14 @@ test("range mode stores the tapped endpoints and leaves the second end empty aft
   const onValueChange = rstest.fn();
   const { container } = render(
     <HoronProvider scheme="light">
-      <Calendar mode="range" locale="en-US" defaultMonth={MONTH} today={TODAY} value={{ start: null, end: null }} onValueChange={onValueChange} />
+      <Calendar
+        mode="range"
+        locale="en-US"
+        defaultMonth={MONTH}
+        today={TODAY}
+        value={{ start: null, end: null }}
+        onValueChange={onValueChange}
+      />
     </HoronProvider>,
   );
 

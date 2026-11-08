@@ -95,7 +95,8 @@ export type SettingsRowProps = Omit<PortedElementProps["div"], "className" | "ti
 };
 
 /** Text slots take a string so the row can put the type token on its own `<text>`; Lynx does not inherit type. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * One row: title and subtitle on the left, control on the right, 1px divider except on the last row.
@@ -105,15 +106,7 @@ const isPlainText = (value: ReactNode): value is string | number => typeof value
  *
  * Part of {@link SettingsList}.
  */
-export function SettingsRow({
-  title,
-  description,
-  leading,
-  control,
-  className,
-  style,
-  id,
-}: SettingsRowProps) {
+export function SettingsRow({ title, description, leading, control, className, style, id }: SettingsRowProps) {
   return (
     <view
       className={cn(
@@ -126,11 +119,7 @@ export function SettingsRow({
     >
       {leading}
       <view className="flex min-w-0 flex-1 flex-col gap-0.5">
-        {isPlainText(title) ? (
-          <text className="break-words text-label-md text-text-primary">{title}</text>
-        ) : (
-          title
-        )}
+        {isPlainText(title) ? <text className="break-words text-label-md text-text-primary">{title}</text> : title}
         {description ? (
           isPlainText(description) ? (
             <text className="break-words text-body-sm text-text-secondary">{description}</text>
@@ -153,9 +142,16 @@ const TILE_ICON_SIZE = 16;
  *
  * Part of {@link SettingsList}.
  */
-export function SettingsRowIcon({ className, children, style, id }: Omit<PortedElementProps["div"], "className"> & { className?: string; children?: ReactNode }) {
+export function SettingsRowIcon({
+  className,
+  children,
+  style,
+  id,
+}: Omit<PortedElementProps["div"], "className"> & { className?: string; children?: ReactNode }) {
   const glyph =
-    isValidElement<IconProps>(children) && children.type === Icon ? cloneElement(children, { size: TILE_ICON_SIZE }) : children;
+    isValidElement<IconProps>(children) && children.type === Icon
+      ? cloneElement(children, { size: TILE_ICON_SIZE })
+      : children;
 
   return (
     <view
@@ -185,7 +181,12 @@ export function SettingsSwitch(props: SwitchProps) {
  *
  * Part of {@link SettingsList}.
  */
-export function SettingsKey({ className, children, style, id }: Omit<PortedElementProps["div"], "className"> & { className?: string; children?: ReactNode }) {
+export function SettingsKey({
+  className,
+  children,
+  style,
+  id,
+}: Omit<PortedElementProps["div"], "className"> & { className?: string; children?: ReactNode }) {
   return (
     <view
       className={cn(
@@ -207,7 +208,12 @@ export function SettingsKey({ className, children, style, id }: Omit<PortedEleme
  *
  * Part of {@link SettingsList}.
  */
-export function SettingsKeys({ className, children, style, id }: Omit<PortedElementProps["div"], "className"> & { className?: string; children?: ReactNode }) {
+export function SettingsKeys({
+  className,
+  children,
+  style,
+  id,
+}: Omit<PortedElementProps["div"], "className"> & { className?: string; children?: ReactNode }) {
   return (
     <view
       className={cn("flex flex-row items-center gap-1", className)}

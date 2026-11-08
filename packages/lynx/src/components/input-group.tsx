@@ -232,7 +232,12 @@ export function InputGroup({
         <view className={cn("relative flex h-full min-w-0 flex-1 items-center", inputPaddingClass[size])}>
           <input
             id={id}
-            className={cn(fieldBoxClass.text, fieldTextClass[size], PLACEHOLDER_CLASS, disabled && "text-text-disabled")}
+            className={cn(
+              fieldBoxClass.text,
+              fieldTextClass[size],
+              PLACEHOLDER_CLASS,
+              disabled && "text-text-disabled",
+            )}
             default-value={defaultValue}
             placeholder={placeholder}
             type={type}
@@ -286,9 +291,7 @@ export function InputGroupSegment({ className, children }: InputGroupSegmentProp
   const group = useInputGroup();
   const size = group?.size ?? "md";
   return (
-    <view
-      className={cn(inputGroupSegmentClass[size], group?.disabled && "opacity-60", className)}
-    >
+    <view className={cn(inputGroupSegmentClass[size], group?.disabled && "opacity-60", className)}>
       {isPlainText(children) ? (
         <text className={cn(fieldTextClass[size], "text-text-primary")}>{children}</text>
       ) : (

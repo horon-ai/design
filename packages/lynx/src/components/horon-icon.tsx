@@ -70,7 +70,11 @@ export function HoronIcon({ size = "1em", color = "text-primary", className }: H
   );
 
   return (
-    <view className={cn("flex", className)} style={{ width: dimension, height: dimension }} accessibility-elements-hidden>
+    <view
+      className={cn("flex", className)}
+      style={{ width: dimension, height: dimension }}
+      accessibility-elements-hidden
+    >
       <svg content={content} style={{ width: "100%", height: "100%" }} />
     </view>
   );

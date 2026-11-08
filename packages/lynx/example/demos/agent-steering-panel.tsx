@@ -1,10 +1,6 @@
 import { useState } from "@lynx-js/react";
 
-import {
-  AgentSteeringPanel,
-  type SteeringNote,
-  type SteeringStep,
-} from "../../src/components/agent-steering-panel";
+import { AgentSteeringPanel, type SteeringNote, type SteeringStep } from "../../src/components/agent-steering-panel";
 
 const initialSteps: SteeringStep[] = [
   { id: "read", label: "Read 41 new emails", status: "done", time: "1.4s" },

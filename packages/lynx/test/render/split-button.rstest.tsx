@@ -86,5 +86,7 @@ test("a passed style reaches the pill container", () => {
     </HoronProvider>,
   );
 
-  expect(requireElement(container.querySelector('[accessibility-label="Publish"]')).parentElement).toHaveStyle({ marginTop: "7px" });
+  expect(requireElement(container.querySelector('[accessibility-label="Publish"]')).parentElement).toHaveStyle({
+    marginTop: "7px",
+  });
 });

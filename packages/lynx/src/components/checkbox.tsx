@@ -139,7 +139,12 @@ export function Checkbox({
 
   return (
     <view
-      className={cn("inline-flex max-w-full min-w-0 flex-row items-center", labelClass[size], disabled && "opacity-40", className)}
+      className={cn(
+        "inline-flex min-w-0 max-w-full flex-row items-center",
+        labelClass[size],
+        disabled && "opacity-40",
+        className,
+      )}
       bindtap={toggle}
       accessibility-element
       accessibility-traits={disabled ? "disabled" : "button"}
@@ -151,7 +156,7 @@ export function Checkbox({
     >
       <view
         className={cn(
-          "flex shrink-0 flex-row items-center justify-center border-[1.5px] bg-bg-surface motion-colors",
+          "motion-colors flex shrink-0 flex-row items-center justify-center border-[1.5px] bg-bg-surface",
           boxClass[size],
           filled
             ? "border-interactive-primary bg-interactive-primary active:border-interactive-primary-hover active:bg-interactive-primary-hover"
@@ -161,9 +166,19 @@ export function Checkbox({
         {filled ? (
           <view
             className="flex items-center justify-center"
-            style={{ animationName: "pop-in", animationDuration: "220ms", animationTimingFunction: EASE_SPRING, animationFillMode: "both" }}
+            style={{
+              animationName: "pop-in",
+              animationDuration: "220ms",
+              animationTimingFunction: EASE_SPRING,
+              animationFillMode: "both",
+            }}
           >
-            <Icon name={indeterminate ? "Minus" : "Check"} size={glyphSize[size]} color="interactive-on-primary" weight="bold" />
+            <Icon
+              name={indeterminate ? "Minus" : "Check"}
+              size={glyphSize[size]}
+              color="interactive-on-primary"
+              weight="bold"
+            />
           </view>
         ) : null}
       </view>

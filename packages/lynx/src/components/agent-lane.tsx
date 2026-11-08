@@ -75,7 +75,7 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
   return (
     <view
       className={cn(
-        "flex min-w-0 flex-col gap-1.5 rounded-2xl border bg-bg-surface px-4 py-3 motion-colors",
+        "motion-colors flex min-w-0 flex-col gap-1.5 rounded-2xl border bg-bg-surface px-4 py-3",
         status === "failed" ? "border-border-danger" : "border-border-default",
         className,
       )}
@@ -97,7 +97,7 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
         >
           <view
             className={cn(
-              "flex size-[18px] flex-row items-center justify-center rounded-[5px] motion-colors",
+              "motion-colors flex size-[18px] flex-row items-center justify-center rounded-[5px]",
               botTile[status],
             )}
           >
@@ -118,14 +118,14 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
         </view>
         {elapsed ? (
           isPlainText(elapsed) ? (
-            <text className="shrink-0 text-caption text-text-secondary tabular-nums">{elapsed}</text>
+            <text className="shrink-0 text-caption tabular-nums text-text-secondary">{elapsed}</text>
           ) : (
             <view className="shrink-0">{elapsed}</view>
           )
         ) : null}
       </view>
       {isPlainText(task) ? (
-        <text className="min-w-0 text-label-lg break-all text-text-primary">{task}</text>
+        <text className="min-w-0 break-all text-label-lg text-text-primary">{task}</text>
       ) : (
         <view className="min-w-0">{task}</view>
       )}
@@ -143,7 +143,7 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
         isPlainText(output) ? (
           <text
             className={cn(
-              "min-w-0 text-body-sm break-all",
+              "min-w-0 break-all text-body-sm",
               status === "failed" ? "text-text-danger" : "text-text-primary",
             )}
           >
@@ -153,13 +153,7 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
           <view className="min-w-0">{output}</view>
         )
       ) : null}
-      {usage ? (
-        isPlainText(usage) ? (
-          <text className="text-caption text-text-secondary">{usage}</text>
-        ) : (
-          usage
-        )
-      ) : null}
+      {usage ? isPlainText(usage) ? <text className="text-caption text-text-secondary">{usage}</text> : usage : null}
     </view>
   );
 }

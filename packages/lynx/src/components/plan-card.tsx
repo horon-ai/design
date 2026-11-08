@@ -65,7 +65,7 @@ export function PlanCard({ label, title, children, status, statusLabel, elapsed,
       accessibility-element
       accessibility-role-description="region"
     >
-      <view className="flex flex-col gap-2 px-6 pt-5 pb-3.5">
+      <view className="flex flex-col gap-2 px-6 pb-3.5 pt-5">
         {label ? (
           <view className="flex min-w-0 flex-row items-center gap-2">
             <Icon name="ListChecks" size={16} color="text-secondary" />
@@ -78,13 +78,13 @@ export function PlanCard({ label, title, children, status, statusLabel, elapsed,
           <text className="break-all text-label-lg font-semibold text-text-primary">{title}</text>
         </view>
       </view>
-      <view className="flex flex-col px-6 pt-1.5 pb-1">{children}</view>
+      <view className="flex flex-col px-6 pb-1 pt-1.5">{children}</view>
       {status !== undefined ? (
         <view className="flex flex-col">
           <view className="h-px bg-overlay-ink-8" accessibility-element={false} />
           <view
             className={cn(
-              "flex min-w-0 flex-row items-center gap-2 px-6 pt-3.5 pb-4 motion-colors",
+              "motion-colors flex min-w-0 flex-row items-center gap-2 px-6 pb-4 pt-3.5",
               status === "failed" ? "text-text-danger" : "text-text-primary",
             )}
           >
@@ -93,7 +93,10 @@ export function PlanCard({ label, title, children, status, statusLabel, elapsed,
             <view className="min-w-0 flex-1">
               <text
                 key={status}
-                className={cn("break-all", status === "failed" ? "text-label-md text-text-danger" : "text-label-md text-text-primary")}
+                className={cn(
+                  "break-all",
+                  status === "failed" ? "text-label-md text-text-danger" : "text-label-md text-text-primary",
+                )}
                 style={fadeIn}
               >
                 {statusLabel}

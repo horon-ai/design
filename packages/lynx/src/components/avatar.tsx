@@ -117,7 +117,7 @@ export function Avatar({
     <view className={cn("relative flex shrink-0", className)}>
       <view
         className={cn(
-          "flex items-center justify-center overflow-hidden rounded-full select-none",
+          "flex select-none items-center justify-center overflow-hidden rounded-full",
           circleClass[size],
           typeClass[type],
           skyInitials && "bg-sky-100",
@@ -132,7 +132,7 @@ export function Avatar({
               <image
                 src={src}
                 mode="aspectFill"
-                className={cn("absolute inset-0 size-full motion-fade", showFallback && "opacity-0")}
+                className={cn("motion-fade absolute inset-0 size-full", showFallback && "opacity-0")}
                 accessibility-element
                 accessibility-traits="image"
                 accessibility-label={alt === "" ? undefined : alt}
@@ -141,7 +141,9 @@ export function Avatar({
               />
             ) : null}
             {showFallback ? (
-              <text className={cn(textClass[size], skyInitials ? "text-sky-700" : typeTextClass[type])}>{children}</text>
+              <text className={cn(textClass[size], skyInitials ? "text-sky-700" : typeTextClass[type])}>
+                {children}
+              </text>
             ) : null}
           </>
         )}
@@ -150,10 +152,17 @@ export function Avatar({
         <view
           accessibility-elements-hidden
           className="absolute flex"
-          style={{ right: "-1px", bottom: "-1px", animationName: "pop-in", animationDuration: "220ms", animationTimingFunction: EASE_SPRING, animationFillMode: "both" }}
+          style={{
+            right: "-1px",
+            bottom: "-1px",
+            animationName: "pop-in",
+            animationDuration: "220ms",
+            animationTimingFunction: EASE_SPRING,
+            animationFillMode: "both",
+          }}
         >
           <view
-            className={cn("rounded-full border-2 bg-status-live border-solid", liveRingClassName)}
+            className={cn("rounded-full border-2 border-solid bg-status-live", liveRingClassName)}
             style={{
               width: liveSize[size],
               height: liveSize[size],

@@ -70,7 +70,10 @@ export function Icon({ name, size = 16, weight = "regular", color = "text-primar
   }, [name, weight, color, theme]);
 
   return (
-    <view className={cn("flex items-center justify-center", className)} style={{ width: `${size}px`, height: `${size}px` }}>
+    <view
+      className={cn("flex items-center justify-center", className)}
+      style={{ width: `${size}px`, height: `${size}px` }}
+    >
       <svg content={content} style={{ width: `${size}px`, height: `${size}px` }} />
     </view>
   );

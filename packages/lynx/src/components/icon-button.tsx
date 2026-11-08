@@ -131,7 +131,7 @@ export function IconButton({
   return (
     <view
       className={cn(
-        "relative flex shrink-0 flex-row items-center justify-center overflow-hidden motion-press select-none rounded-full",
+        "motion-press relative flex shrink-0 select-none flex-row items-center justify-center overflow-hidden rounded-full",
         disabled ? "opacity-40" : "cursor-pointer",
         sizeClass[size],
         variantClass[variant],

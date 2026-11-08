@@ -52,7 +52,8 @@ export type ChoiceCardProps = {
 };
 
 /** Whether a value can be dropped into a `<text>` as its child. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** The Figma spring (`--ease-spring`), written out because an inline animation cannot read a variable. */
 const EASE_SPRING = "cubic-bezier(0.34, 1.3, 0.64, 1)";
@@ -117,7 +118,7 @@ export function ChoiceCard({
   return (
     <view
       className={cn(
-        "relative flex w-full max-w-[252px] flex-row items-start gap-3 overflow-hidden rounded-2xl border bg-bg-surface p-3.5 motion-colors",
+        "motion-colors relative flex w-full max-w-[252px] flex-row items-start gap-3 overflow-hidden rounded-2xl border bg-bg-surface p-3.5",
         isChecked ? "border-border-brand" : "border-border-default",
         !blocked && !isChecked && "active:border-border-strong",
         disabled && "opacity-40",
@@ -133,7 +134,7 @@ export function ChoiceCard({
     >
       <view
         className={cn(
-          "relative mt-px flex size-[18px] shrink-0 flex-row items-center justify-center rounded-full border-[1.5px] motion-colors",
+          "motion-colors relative mt-px flex size-[18px] shrink-0 flex-row items-center justify-center rounded-full border-[1.5px]",
           isChecked ? "border-interactive-primary bg-interactive-primary" : "border-border-dashed",
         )}
       >
@@ -165,10 +166,7 @@ export function ChoiceCard({
             >
               {isPlainText(badge) ? (
                 <text
-                  className={cn(
-                    "text-label-sm",
-                    badgeTone === "brand" ? "text-text-brand" : "text-text-secondary",
-                  )}
+                  className={cn("text-label-sm", badgeTone === "brand" ? "text-text-brand" : "text-text-secondary")}
                 >
                   {badge}
                 </text>

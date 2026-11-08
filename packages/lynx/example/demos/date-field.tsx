@@ -15,13 +15,34 @@ function Examples({ surface }: { surface: "solid" | "glass" }) {
     <view className="flex flex-row flex-wrap items-start justify-center gap-6">
       {/* The three rungs stacked, so the height step reads down the column. */}
       <view className="flex flex-col items-start gap-3">
-        <DateField surface={surface} size="sm" value={date} onValueChange={setDate} defaultMonth={MONTH} today={TODAY} />
+        <DateField
+          surface={surface}
+          size="sm"
+          value={date}
+          onValueChange={setDate}
+          defaultMonth={MONTH}
+          today={TODAY}
+        />
         <DateField surface={surface} value={date} onValueChange={setDate} defaultMonth={MONTH} today={TODAY} />
-        <DateField surface={surface} size="lg" value={date} onValueChange={setDate} defaultMonth={MONTH} today={TODAY} />
+        <DateField
+          surface={surface}
+          size="lg"
+          value={date}
+          onValueChange={setDate}
+          defaultMonth={MONTH}
+          today={TODAY}
+        />
       </view>
       <view className="flex flex-col items-start gap-3">
         <DateField surface={surface} value={date} onValueChange={setDate} defaultMonth={MONTH} today={TODAY} />
-        <DateField surface={surface} mode="range" value={range} onValueChange={setRange} defaultMonth={MONTH} today={TODAY} />
+        <DateField
+          surface={surface}
+          mode="range"
+          value={range}
+          onValueChange={setRange}
+          defaultMonth={MONTH}
+          today={TODAY}
+        />
         <DateField surface={surface} disabled value={null} placeholder="Pick a date" />
         <DateField surface={surface} invalid placeholder="No date yet" />
       </view>

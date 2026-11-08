@@ -252,7 +252,7 @@ export function DocumentExtractPanel({
   return (
     <view
       className={cn(
-        "flex w-full max-w-[1120px] min-w-0 flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full min-w-0 max-w-[1120px] flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       {...(id === undefined ? {} : { id })}
@@ -292,7 +292,7 @@ export function DocumentExtractPanel({
                 <Icon name="Minus" size={14} color="text-primary" />
               </view>
               <view className="w-9 flex-row items-center justify-center">
-                <text className="text-label-sm text-text-primary tabular-nums">{`${zoom}%`}</text>
+                <text className="text-label-sm tabular-nums text-text-primary">{`${zoom}%`}</text>
               </view>
               <view
                 className={cn(STEP_CLASS, zoom >= ZOOM_MAX && "opacity-40")}
@@ -305,7 +305,7 @@ export function DocumentExtractPanel({
               </view>
             </view>
             <view
-              className="flex h-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 pr-3.5 pl-3 motion-press active:bg-overlay-ink-8"
+              className="motion-press flex h-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 pl-3 pr-3.5 active:bg-overlay-ink-8"
               bindtap={() => setZoom(ZOOM_FIT)}
               accessibility-element
               accessibility-traits="button"
@@ -316,7 +316,7 @@ export function DocumentExtractPanel({
           </view>
           <view className="flex min-h-[480px] flex-1 flex-row items-start justify-center overflow-hidden bg-overlay-ink-7 px-6 py-5">
             <view
-              className="flex w-full max-w-[470px] shrink-0 flex-col gap-3.5 border border-overlay-ink-8 bg-neutral-50 px-[26px] pt-[26px] pb-5"
+              className="flex w-full max-w-[470px] shrink-0 flex-col gap-3.5 border border-overlay-ink-8 bg-neutral-50 px-[26px] pb-5 pt-[26px]"
               style={{
                 boxShadow: "0 2px 4px #00000014",
                 transform: `scale(${zoom / ZOOM_FIT})`,
@@ -342,7 +342,7 @@ export function DocumentExtractPanel({
             />
             <view className="min-w-0 flex-1" />
             <view
-              className="flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 pr-3 pl-3.5 motion-press active:bg-overlay-ink-10"
+              className="motion-press flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 pl-3.5 pr-3 active:bg-overlay-ink-10"
               bindtap={() => {
                 setRun((value) => value + 1);
                 onExtract?.();
@@ -356,15 +356,13 @@ export function DocumentExtractPanel({
             </view>
           </view>
           <Divider />
-          <view key={`${view}-${run}`} className="flex flex-col gap-1.5 px-5 pt-3.5 pb-4">
+          <view key={`${view}-${run}`} className="flex flex-col gap-1.5 px-5 pb-4 pt-3.5">
             {view === "fields" ? (
               <>
-                <text className="text-body-sm text-text-secondary">
-                  {`${total} fields read from this document`}
-                </text>
+                <text className="text-body-sm text-text-secondary">{`${total} fields read from this document`}</text>
                 {groups.map((group) => (
                   <view key={group.id} className="flex flex-col gap-1.5">
-                    <view className="flex flex-row items-center gap-2 pt-3 pb-1">
+                    <view className="flex flex-row items-center gap-2 pb-1 pt-3">
                       <view className="size-[7px] rounded-full bg-sky-500" />
                       <text className="text-label-md text-text-primary">{group.label}</text>
                     </view>
@@ -372,7 +370,7 @@ export function DocumentExtractPanel({
                       const delay = { animationDelay: `${rowIndex++ * 30}ms` };
                       if (isTable(field)) {
                         return (
-                          <view key={field.id} className="flex motion-rise flex-col gap-1.5" style={delay}>
+                          <view key={field.id} className="motion-rise flex flex-col gap-1.5" style={delay}>
                             <view className="flex flex-row items-center gap-3">
                               <view className="w-[100px] shrink-0">
                                 <text className="text-body-sm text-text-secondary">{field.label}</text>
@@ -408,10 +406,7 @@ export function DocumentExtractPanel({
                                   ))}
                                 </view>
                                 {field.rows.map((row) => (
-                                  <view
-                                    key={row.join("|")}
-                                    className="flex flex-row items-center gap-2 py-2"
-                                  >
+                                  <view key={row.join("|")} className="flex flex-row items-center gap-2 py-2">
                                     {row.map((cell, index) => {
                                       const column = field.columns[index];
                                       return (
@@ -442,7 +437,7 @@ export function DocumentExtractPanel({
                       return (
                         <view
                           key={field.id}
-                          className="flex motion-rise flex-row flex-wrap items-center gap-3"
+                          className="motion-rise flex flex-row flex-wrap items-center gap-3"
                           style={delay}
                         >
                           <view className="w-[100px] shrink-0">
@@ -450,7 +445,7 @@ export function DocumentExtractPanel({
                           </view>
                           <view
                             className={cn(
-                              "flex h-9 min-w-0 flex-1 flex-row items-center gap-2 rounded-[10px] border px-3 motion-colors",
+                              "motion-colors flex h-9 min-w-0 flex-1 flex-row items-center gap-2 rounded-[10px] border px-3",
                               needsCheck
                                 ? "border-border-danger bg-overlay-ink-12 active:bg-overlay-ink-14"
                                 : "border-transparent bg-overlay-ink-4",
@@ -482,11 +477,8 @@ export function DocumentExtractPanel({
               </>
             ) : null}
             {view === "json" ? (
-              <scroll-view
-                scroll-orientation="horizontal"
-                className="rounded-[10px] bg-overlay-ink-4 p-3"
-              >
-                <text className="font-mono text-caption whitespace-pre text-text-primary">{json}</text>
+              <scroll-view scroll-orientation="horizontal" className="rounded-[10px] bg-overlay-ink-4 p-3">
+                <text className="whitespace-pre font-mono text-caption text-text-primary">{json}</text>
               </scroll-view>
             ) : null}
             {view === "schema" ? (
@@ -512,7 +504,7 @@ export function DocumentExtractPanel({
           {flat.map((field) => (
             <view
               key={field.id}
-              className={cn("size-2 rounded-full motion-colors", needs(field) ? "bg-red-500" : "bg-sky-500")}
+              className={cn("motion-colors size-2 rounded-full", needs(field) ? "bg-red-500" : "bg-sky-500")}
             />
           ))}
         </view>
@@ -529,7 +521,7 @@ export function DocumentExtractPanel({
           </view>
         ) : null}
         <view
-          className="flex h-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary pr-3 pl-3.5 motion-press active:bg-interactive-primary-hover"
+          className="motion-press flex h-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary pl-3.5 pr-3 active:bg-interactive-primary-hover"
           bindtap={acceptAll}
           accessibility-element
           accessibility-traits="button"

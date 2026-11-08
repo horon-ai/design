@@ -215,9 +215,9 @@ export function ResearchRunPanel({
         }}
       />
       {meta.length > 0 ? (
-        <text className="text-caption text-text-secondary tabular-nums">
+        <text className="text-caption tabular-nums text-text-secondary">
           {meta.map((entry, index) => (
-            <text key={entry.id} className="text-caption text-text-secondary tabular-nums">
+            <text key={entry.id} className="text-caption tabular-nums text-text-secondary">
               {index > 0 ? " · " : ""}
               {entry.value}
             </text>
@@ -230,16 +230,16 @@ export function ResearchRunPanel({
   return (
     <view
       className={cn(
-        "flex w-full max-w-[600px] min-w-0 flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full min-w-0 max-w-[600px] flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       {...(id === undefined ? {} : { id })}
     >
-      <view className="flex flex-row flex-wrap items-center gap-x-2 gap-y-2 px-5 pt-4 pb-3.5">
+      <view className="flex flex-row flex-wrap items-center gap-x-2 gap-y-2 px-5 pb-3.5 pt-4">
         <Icon name="MagnifyingGlass" size={16} color="text-primary" className="shrink-0" />
         <text className="min-w-0 flex-1 truncate text-label-lg text-text-primary">{title}</text>
         <view
-          className="flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-3 pl-3.5 motion-press active:bg-overlay-ink-10"
+          className="motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pl-3.5 pr-3 active:bg-overlay-ink-10"
           bindtap={() => onNewResearch?.()}
           accessibility-element
           accessibility-traits="button"
@@ -249,7 +249,7 @@ export function ResearchRunPanel({
         </view>
       </view>
       <view className="h-px bg-overlay-ink-8" accessibility-element={false} />
-      <view className="flex flex-col gap-3 px-5 pt-4 pb-4">
+      <view className="flex flex-col gap-3 px-5 pb-4 pt-4">
         <ChatBubble from="me" className="max-w-[85%] self-end">
           {question}
         </ChatBubble>
@@ -278,13 +278,13 @@ export function ResearchRunPanel({
         {queries && queries.length > 0 ? (
           <view className="relative flex flex-col gap-2.5 py-0.5 pl-3.5">
             <view
-              className="absolute top-0 bottom-0 left-0 w-[1.5px] rounded-full bg-overlay-ink-14"
+              className="absolute bottom-0 left-0 top-0 w-[1.5px] rounded-full bg-overlay-ink-14"
               accessibility-element={false}
             />
             {queries.map((query, index) => (
               <view
                 key={query.id}
-                className="flex flex-row items-center gap-2.5 motion-rise"
+                className="motion-rise flex flex-row items-center gap-2.5"
                 style={{ animationDelay: `${index * 30}ms` }}
               >
                 {query.state === "searching" ? (
@@ -319,28 +319,28 @@ export function ResearchRunPanel({
           >
             {onOpenSources ? (
               <view
-                className="flex h-9 w-fit flex-row items-center gap-2 rounded-full bg-overlay-ink-5 pr-3 pl-1 motion-press active:bg-overlay-ink-8"
+                className="motion-press flex h-9 w-fit flex-row items-center gap-2 rounded-full bg-overlay-ink-5 pl-1 pr-3 active:bg-overlay-ink-8"
                 bindtap={() => onOpenSources()}
                 accessibility-element
                 accessibility-traits="button"
               >
                 {avatarStack}
-                <text className="text-label-md text-text-primary tabular-nums">{sourcesLabel}</text>
+                <text className="text-label-md tabular-nums text-text-primary">{sourcesLabel}</text>
                 <Icon name="CaretDown" size={12} color="text-secondary" />
               </view>
             ) : (
-              <view className="flex h-9 w-fit flex-row items-center gap-2 rounded-full bg-overlay-ink-5 pr-3 pl-1">
+              <view className="flex h-9 w-fit flex-row items-center gap-2 rounded-full bg-overlay-ink-5 pl-1 pr-3">
                 {avatarStack}
-                <text className="text-label-md text-text-primary tabular-nums">{sourcesLabel}</text>
+                <text className="text-label-md tabular-nums text-text-primary">{sourcesLabel}</text>
               </view>
             )}
           </view>
         ) : null}
       </view>
-      <view className="px-5 pt-1 pb-4">
+      <view className="px-5 pb-4 pt-1">
         <view
           className={cn(
-            "flex h-11 flex-row items-center gap-2 rounded-full pr-1.5 pl-4 motion-colors",
+            "motion-colors flex h-11 flex-row items-center gap-2 rounded-full pl-4 pr-1.5",
             focused ? "bg-overlay-ink-8" : "bg-overlay-ink-5",
           )}
         >
@@ -359,7 +359,7 @@ export function ResearchRunPanel({
             }}
           />
           <view
-            className="flex size-8 shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary motion-press active:bg-interactive-primary-hover"
+            className="motion-press flex size-8 shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary active:bg-interactive-primary-hover"
             bindtap={() => {
               if (running) onStop?.();
               else submit();

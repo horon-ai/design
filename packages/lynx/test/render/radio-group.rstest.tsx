@@ -6,7 +6,9 @@ import { Radio, RadioGroup } from "../../src/components/radio-group";
 import { HoronProvider } from "../../src/provider";
 
 /** Every radio announces its own state, so a selection can be read straight off the rows. */
-const radios = (container: HTMLElement): Element[] => [...container.querySelectorAll("[accessibility-role-description='radio']")];
+const radios = (container: HTMLElement): Element[] => [
+  ...container.querySelectorAll("[accessibility-role-description='radio']"),
+];
 
 const selected = (container: HTMLElement): string[] =>
   radios(container)

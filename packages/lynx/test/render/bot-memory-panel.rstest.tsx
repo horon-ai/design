@@ -7,15 +7,20 @@ import { HoronProvider } from "../../src/provider";
 
 const memories = [
   { id: "1", group: "About you", text: "Runs Horon HQ", source: "From a chat · Oct 8" },
-  { id: "2", group: "Preferences", text: "Wants replies under 120 words", source: "From a chat · just now", fresh: true },
+  {
+    id: "2",
+    group: "Preferences",
+    text: "Wants replies under 120 words",
+    source: "From a chat · just now",
+    fresh: true,
+  },
   { id: "3", group: "People", text: "Lena handles invoices", source: "From a chat · Oct 14" },
 ];
 
 /** The pressable node whose own text is exactly `label`, so a tab and its tray are told apart. */
 const byText = (container: HTMLElement, label: string): Element => {
   const node = [...container.querySelectorAll("view")].find(
-    (element) =>
-      element.getAttribute("accessibility-traits") !== null && (element.textContent ?? "").trim() === label,
+    (element) => element.getAttribute("accessibility-traits") !== null && (element.textContent ?? "").trim() === label,
   );
   if (!node) throw new Error(`no control labelled ${label}`);
   return node;

@@ -10,8 +10,7 @@ const instructions = [["You write the brief for", { variable: "user_name" }, "be
 /** The pressable node whose own text is exactly `label`. */
 const byText = (container: HTMLElement, label: string): Element => {
   const node = [...container.querySelectorAll("view")].find(
-    (element) =>
-      element.getAttribute("accessibility-traits") !== null && (element.textContent ?? "").trim() === label,
+    (element) => element.getAttribute("accessibility-traits") !== null && (element.textContent ?? "").trim() === label,
   );
   if (!node) throw new Error(`no control labelled ${label}`);
   return node;

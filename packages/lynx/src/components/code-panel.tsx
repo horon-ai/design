@@ -63,13 +63,11 @@ export function CodePanel({ className, copyText, children, style }: CodePanelPro
         className={cn(
           "overflow-hidden rounded-[10px] border py-3.5 pl-4",
           showCopy ? "pr-20" : "pr-4",
-          theme.scheme === "dark"
-            ? "border-border-strong bg-neutral-800"
-            : "border-border-default bg-neutral-50",
+          theme.scheme === "dark" ? "border-border-strong bg-neutral-800" : "border-border-default bg-neutral-50",
         )}
         scroll-bar-enable={false}
       >
-        <text className="font-mono text-[12px]/[21px] whitespace-pre text-syntax-string">{children}</text>
+        <text className="whitespace-pre font-mono text-[12px]/[21px] text-syntax-string">{children}</text>
       </scroll-view>
       {showCopy ? (
         <view
@@ -92,7 +90,10 @@ export function CodePanel({ className, copyText, children, style }: CodePanelPro
  * Part of {@link CodePanel}. Renders an inline nested `<text>` in the key colour, so it only changes
  * the colour of the text it wraps; extra classes can override or add weight.
  */
-export function CodeKey({ className, children }: Omit<PortedElementProps["span"], "className"> & {
+export function CodeKey({
+  className,
+  children,
+}: Omit<PortedElementProps["span"], "className"> & {
   /** Extra classes on the token, merged after the key colour. */
   className?: string;
   /** The token text. */

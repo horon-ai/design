@@ -28,7 +28,14 @@ function FullCard({ surface }: { surface: "solid" | "glass" }) {
   return (
     <ScheduleCard surface={surface} title="Morning brief" nextRun="Next run: Tomorrow, 8:00 AM">
       <ScheduleSection label="Repeat">
-        <SegmentedControl aria-label="Repeat" size="sm" surface="inset" fill items={frequency} defaultValue="weekdays" />
+        <SegmentedControl
+          aria-label="Repeat"
+          size="sm"
+          surface="inset"
+          fill
+          items={frequency}
+          defaultValue="weekdays"
+        />
       </ScheduleSection>
       <ScheduleSection label="Days">
         <WeekdayPicker days={days} defaultValue={["mon", "tue", "wed", "thu", "fri"]} />

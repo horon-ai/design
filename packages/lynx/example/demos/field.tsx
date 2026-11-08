@@ -12,7 +12,13 @@ function LiveField({ surface }: { surface?: "glass" }) {
   return (
     <Field className="w-full" invalid={invalid}>
       <FieldLabel>Handle</FieldLabel>
-      <Input className="w-full" surface={surface} value={value} onChange={setValue} placeholder="Two letters is too short" />
+      <Input
+        className="w-full"
+        surface={surface}
+        value={value}
+        onChange={setValue}
+        placeholder="Two letters is too short"
+      />
       <FieldError match={invalid}>Use at least 3 characters.</FieldError>
     </Field>
   );
@@ -21,7 +27,7 @@ function LiveField({ surface }: { surface?: "glass" }) {
 function Fields({ surface }: { surface?: "glass" }) {
   return (
     <>
-      <view className="flex w-full max-w-64 min-w-0 flex-col gap-4">
+      <view className="flex w-full min-w-0 max-w-64 flex-col gap-4">
         <Field className="w-full" size="sm">
           <FieldLabel>Bot name</FieldLabel>
           <Input className="w-full" surface={surface} size="sm" defaultValue="Small" />
@@ -38,7 +44,7 @@ function Fields({ surface }: { surface?: "glass" }) {
           <FieldDescription>Large field.</FieldDescription>
         </Field>
       </view>
-      <view className="flex w-full max-w-64 min-w-0 flex-col gap-4">
+      <view className="flex w-full min-w-0 max-w-64 flex-col gap-4">
         <Field className="w-full">
           <FieldLabel>Bot name</FieldLabel>
           <Input className="w-full" surface={surface} defaultValue="Chief of staff" />

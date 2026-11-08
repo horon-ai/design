@@ -18,7 +18,8 @@ type PortedElementProps = {
 };
 
 /** Text slots take a string so the token classes can sit on a `<text>`; a node keeps its own styling. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** Props for {@link PluginRow}. The row's remaining `div` props reduce to `style` on Lynx, which has no DOM element to forward them to. */
 export type PluginRowProps = PortedElementProps["div"] & {
@@ -135,9 +136,7 @@ export function PluginRow({
       <view className="flex min-w-0 grow basis-40 flex-col gap-1.5">
         <view className="flex flex-row flex-wrap items-center gap-2">
           <text className="min-w-0 truncate text-label-md text-text-primary">{name}</text>
-          {version ? (
-            <text className="shrink-0 font-mono text-label-sm text-text-secondary">{version}</text>
-          ) : null}
+          {version ? <text className="shrink-0 font-mono text-label-sm text-text-secondary">{version}</text> : null}
           {updateBadge ? (
             <view className="flex h-[22px] shrink-0 flex-row items-center rounded-full bg-accent-sky-500-18 px-2">
               <text className="text-label-sm text-text-brand">{updateBadge}</text>
@@ -146,11 +145,7 @@ export function PluginRow({
         </view>
         {author ? (
           <view className="flex flex-row items-center gap-1">
-            {isPlainText(author) ? (
-              <text className="text-label-sm text-text-secondary">{author}</text>
-            ) : (
-              author
-            )}
+            {isPlainText(author) ? <text className="text-label-sm text-text-secondary">{author}</text> : author}
             {verified ? (
               <view
                 className="flex size-3.5 shrink-0 flex-row items-center justify-center rounded-full bg-sky-500"
@@ -191,7 +186,12 @@ export function PluginRow({
         {menu ? (
           <Menu>
             <MenuTrigger>
-              <IconButton label={overflowLabel} variant="ghost" size="sm" icon={<Icon name="DotsThree" weight="bold" />} />
+              <IconButton
+                label={overflowLabel}
+                variant="ghost"
+                size="sm"
+                icon={<Icon name="DotsThree" weight="bold" />}
+              />
             </MenuTrigger>
             <MenuContent align="end">{menu}</MenuContent>
           </Menu>

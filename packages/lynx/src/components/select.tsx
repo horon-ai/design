@@ -224,7 +224,8 @@ function popupPlacement(anchor: AnchorRect, panel: PanelSize): CSSProperties {
   return { top, left, minWidth: anchor.width };
 }
 
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** Lynx has no hover, so react's hover border becomes the pressed border. */
 const triggerFocusClass = "active:border-border-strong";
@@ -364,7 +365,10 @@ export function Select({
               )
             : segment
               ? cn(inputGroupSegmentClass[size], "flex-row text-left")
-              : cn("relative flex h-8 flex-row items-center gap-1 rounded-full bg-bg-subtle px-3", !disabled && "active:bg-overlay-ink-8"),
+              : cn(
+                  "relative flex h-8 flex-row items-center gap-1 rounded-full bg-bg-subtle px-3",
+                  !disabled && "active:bg-overlay-ink-8",
+                ),
           "motion-colors",
           className,
         )}
@@ -422,14 +426,16 @@ export function Select({
           ) : null}
           <view
             className={cn(
-              "fixed z-50 flex flex-col gap-0.5 overflow-hidden rounded-xl p-1.5 motion-popup max-w-[calc(100vw-2rem)]",
+              "motion-popup fixed z-50 flex max-w-[calc(100vw-2rem)] flex-col gap-0.5 overflow-hidden rounded-xl p-1.5",
               popupSurface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-popover",
             )}
             style={placement}
             bindlayoutchange={(event: LayoutChangeLike) => {
               const box = boxOf(event);
               setPanel((previous) =>
-                previous.width === box.width && previous.height === box.height ? previous : { width: box.width, height: box.height },
+                previous.width === box.width && previous.height === box.height
+                  ? previous
+                  : { width: box.width, height: box.height },
               );
             }}
             accessibility-element
@@ -452,7 +458,9 @@ export function Select({
                   accessibility-value={selected ? "selected" : undefined}
                 >
                   {isPlainText(item.label) ? (
-                    <text className={cn("min-w-0 flex-1 overflow-hidden text-text-primary", rowTextClass[size])}>{item.label}</text>
+                    <text className={cn("min-w-0 flex-1 overflow-hidden text-text-primary", rowTextClass[size])}>
+                      {item.label}
+                    </text>
                   ) : (
                     <view className="flex min-w-0 flex-1 flex-row items-center overflow-hidden">{item.label}</view>
                   )}

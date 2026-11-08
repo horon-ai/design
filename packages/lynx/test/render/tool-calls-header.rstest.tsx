@@ -9,22 +9,20 @@ import { HoronProvider } from "../../src/provider";
 const tool = { icon: null, name: "Web search" };
 
 /** The group trigger is the first pressable element; the `ToolCall` headers come after it. */
-const trigger = (container: HTMLElement): Element =>
-  container.querySelectorAll("[accessibility-traits='button']")[0];
+const trigger = (container: HTMLElement): Element => container.querySelectorAll("[accessibility-traits='button']")[0];
 
-function Group({ defaultOpen, open, onOpenChange }: {
+function Group({
+  defaultOpen,
+  open,
+  onOpenChange,
+}: {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (next: boolean) => void;
 }) {
   return (
     <HoronProvider>
-      <ToolCallsHeader
-        elapsed="4.0s"
-        defaultOpen={defaultOpen}
-        open={open}
-        onOpenChange={onOpenChange}
-      >
+      <ToolCallsHeader elapsed="4.0s" defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
         <ToolCall status="done" tool={tool} summary="First call" />
         <ToolCall status="running" tool={tool} summary="Second call" />
       </ToolCallsHeader>
@@ -86,10 +84,18 @@ test("only the first three icons are drawn as chips", async () => {
     <HoronProvider>
       <ToolCallsHeader
         icons={[
-          <text key="a" className="text-caption">A</text>,
-          <text key="b" className="text-caption">B</text>,
-          <text key="c" className="text-caption">C</text>,
-          <text key="d" className="text-caption">D</text>,
+          <text key="a" className="text-caption">
+            A
+          </text>,
+          <text key="b" className="text-caption">
+            B
+          </text>,
+          <text key="c" className="text-caption">
+            C
+          </text>,
+          <text key="d" className="text-caption">
+            D
+          </text>,
         ]}
       >
         <ToolCall status="done" tool={tool} summary="First call" />

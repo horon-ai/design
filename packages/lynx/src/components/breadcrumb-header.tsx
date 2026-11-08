@@ -105,10 +105,7 @@ export function BreadcrumbHeader({
             {crumbs.map((crumb, index) => {
               const current = index === crumbs.length - 1;
               return (
-                <view
-                  key={crumb.label}
-                  className={cn("flex flex-row items-center gap-1.5", current && "min-w-0")}
-                >
+                <view key={crumb.label} className={cn("flex flex-row items-center gap-1.5", current && "min-w-0")}>
                   {index > 0 ? (
                     <view className="flex shrink-0" accessibility-elements-hidden>
                       <Icon name="CaretRight" size={14} color="text-secondary" />

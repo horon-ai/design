@@ -37,8 +37,9 @@ const openSelect = (container: HTMLElement) => {
  * `z-50`, which is how the two are told apart.
  */
 const backdropOf = (container: HTMLElement): Element | null =>
-  [...container.querySelectorAll(".fixed")].find((element) => !(element.getAttribute("class") ?? "").includes("z-50")) ??
-  null;
+  [...container.querySelectorAll(".fixed")].find(
+    (element) => !(element.getAttribute("class") ?? "").includes("z-50"),
+  ) ?? null;
 
 test("a row tap reports its value, shows its label and closes the popup", async () => {
   const onValueChange = rstest.fn();
@@ -124,7 +125,14 @@ test("a controlled open popup paints and reports a pick without closing itself",
   const onValueChange = rstest.fn();
   const { container, findByText } = render(
     <HoronProvider scheme="light">
-      <Select aria-label="Bot" items={items} open value="chief" onOpenChange={onOpenChange} onValueChange={onValueChange} />
+      <Select
+        aria-label="Bot"
+        items={items}
+        open
+        value="chief"
+        onOpenChange={onOpenChange}
+        onValueChange={onValueChange}
+      />
     </HoronProvider>,
   );
 

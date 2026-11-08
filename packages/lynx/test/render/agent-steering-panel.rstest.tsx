@@ -90,11 +90,7 @@ test("a queued note applies now and leaves once its exit animation ends", async 
 test("an applied note shows the filled Now pill, not the actions", () => {
   const { container, getByText, queryByText } = render(
     <HoronProvider scheme="light">
-      <AgentSteeringPanel
-        title="Triage"
-        steps={steps}
-        notes={[{ id: "n2", text: "Hold the deck", applied: true }]}
-      />
+      <AgentSteeringPanel title="Triage" steps={steps} notes={[{ id: "n2", text: "Hold the deck", applied: true }]} />
     </HoronProvider>,
   );
 

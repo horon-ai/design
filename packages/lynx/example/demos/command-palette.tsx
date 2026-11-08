@@ -25,9 +25,7 @@ const groups: CommandGroup[] = [
   },
   {
     label: "Projects",
-    items: [
-      { value: "q4", label: "Q4 hiring", tile: <Icon name="Folder" size={16} color="text-primary" /> },
-    ],
+    items: [{ value: "q4", label: "Q4 hiring", tile: <Icon name="Folder" size={16} color="text-primary" /> }],
   },
   {
     label: "Actions",

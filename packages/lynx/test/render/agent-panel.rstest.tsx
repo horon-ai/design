@@ -70,7 +70,13 @@ test("the composer's confirm key also starts the task", async () => {
 test("the panel draws the filter slot above its children, and omits it when unset", () => {
   const withFilter = render(
     <HoronProvider scheme="light">
-      <AgentPanel filter={<view><text>All</text></view>}>
+      <AgentPanel
+        filter={
+          <view>
+            <text>All</text>
+          </view>
+        }
+      >
         <text>Task composer</text>
       </AgentPanel>
     </HoronProvider>,

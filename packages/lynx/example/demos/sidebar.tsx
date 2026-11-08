@@ -64,96 +64,96 @@ export default function SidebarDemo() {
       <Backdrop>
         {/* react's demo used a full-width row so the column hugs the left edge of the sky. */}
         <view className="flex w-full flex-row items-start">
-        {collapsed ? (
-          <view
-            className="flex flex-row items-center rounded-md border border-border-default bg-bg-surface px-3 py-2"
-            bindtap={() => setCollapsed(false)}
-            accessibility-element
-            accessibility-traits="button"
-            accessibility-label="Expand sidebar"
-          >
-            <text className="text-label-md text-text-primary">expand sidebar</text>
-          </view>
-        ) : (
-          <Sidebar resizable className="h-[900px]" onWidthChange={() => undefined}>
-            <SidebarHeader
-              initial={current.name.charAt(0)}
-              name={current.name}
-              onCollapse={() => setCollapsed(true)}
-              switchSlot={
-                <WorkspaceMenu
-                  workspaces={workspaces}
-                  value={workspace}
-                  onValueChange={setWorkspace}
-                  trigger={
-                    <view className="flex size-7 shrink-0 flex-row items-center justify-center rounded-sm bg-interactive-primary">
-                      <text className="text-label-md text-text-inverse">{current.name.charAt(0)}</text>
-                    </view>
-                  }
-                  triggerChildren={
-                    <view className="flex min-w-0 flex-1 flex-row items-center gap-1.5">
-                      <text className="min-w-0 flex-1 truncate text-label-lg text-text-primary">{current.name}</text>
-                      <Icon name="CaretUpDown" size={14} color="text-secondary" />
-                    </view>
-                  }
-                  triggerClassName="min-w-0 flex-1 gap-1.5 pr-1 pl-2"
-                />
-              }
-            />
-            <SidebarItem icon={<HoronIcon size={18} color="text-primary" />} current aria-label="Horon">
-              <HoronWordmark height={9.6} color="text-primary" />
-            </SidebarItem>
-            <SidebarItem
-              icon={<Icon name="Bell" size={18} color="text-secondary" />}
-              count={12}
-              onClick={() => undefined}
+          {collapsed ? (
+            <view
+              className="flex flex-row items-center rounded-md border border-border-default bg-bg-surface px-3 py-2"
+              bindtap={() => setCollapsed(false)}
+              accessibility-element
+              accessibility-traits="button"
+              accessibility-label="Expand sidebar"
             >
-              Inbox
-            </SidebarItem>
-            <SidebarItem icon={<Icon name="Files" size={18} color="text-secondary" />}>Artifacts</SidebarItem>
-            <SidebarItem icon={<Icon name="CalendarDots" size={18} color="text-secondary" />}>Schedule</SidebarItem>
-            <SidebarItem icon={<Icon name="Repeat" size={18} color="text-secondary" />}>Routines</SidebarItem>
-            <SidebarItem icon={<Icon name="TreeStructure" size={18} color="text-secondary" />}>Workflows</SidebarItem>
-            <SidebarItem icon={<Icon name="MagnifyingGlass" size={18} color="text-secondary" />}>Search</SidebarItem>
+              <text className="text-label-md text-text-primary">expand sidebar</text>
+            </view>
+          ) : (
+            <Sidebar resizable className="h-[900px]" onWidthChange={() => undefined}>
+              <SidebarHeader
+                initial={current.name.charAt(0)}
+                name={current.name}
+                onCollapse={() => setCollapsed(true)}
+                switchSlot={
+                  <WorkspaceMenu
+                    workspaces={workspaces}
+                    value={workspace}
+                    onValueChange={setWorkspace}
+                    trigger={
+                      <view className="flex size-7 shrink-0 flex-row items-center justify-center rounded-sm bg-interactive-primary">
+                        <text className="text-label-md text-text-inverse">{current.name.charAt(0)}</text>
+                      </view>
+                    }
+                    triggerChildren={
+                      <view className="flex min-w-0 flex-1 flex-row items-center gap-1.5">
+                        <text className="min-w-0 flex-1 truncate text-label-lg text-text-primary">{current.name}</text>
+                        <Icon name="CaretUpDown" size={14} color="text-secondary" />
+                      </view>
+                    }
+                    triggerClassName="min-w-0 flex-1 gap-1.5 pr-1 pl-2"
+                  />
+                }
+              />
+              <SidebarItem icon={<HoronIcon size={18} color="text-primary" />} current aria-label="Horon">
+                <HoronWordmark height={9.6} color="text-primary" />
+              </SidebarItem>
+              <SidebarItem
+                icon={<Icon name="Bell" size={18} color="text-secondary" />}
+                count={12}
+                onClick={() => undefined}
+              >
+                Inbox
+              </SidebarItem>
+              <SidebarItem icon={<Icon name="Files" size={18} color="text-secondary" />}>Artifacts</SidebarItem>
+              <SidebarItem icon={<Icon name="CalendarDots" size={18} color="text-secondary" />}>Schedule</SidebarItem>
+              <SidebarItem icon={<Icon name="Repeat" size={18} color="text-secondary" />}>Routines</SidebarItem>
+              <SidebarItem icon={<Icon name="TreeStructure" size={18} color="text-secondary" />}>Workflows</SidebarItem>
+              <SidebarItem icon={<Icon name="MagnifyingGlass" size={18} color="text-secondary" />}>Search</SidebarItem>
 
-            <SidebarGroup label="Projects">
-              {projects.map((project) => (
-                <SidebarProject
-                  key={project.name}
-                  icon={
-                    <SidebarProjectTile className={project.tile}>
-                      <Icon name={project.icon} size={14} color="interactive-on-primary" />
-                    </SidebarProjectTile>
-                  }
-                  label={project.name}
-                  open={open === project.name}
-                  onOpenChange={(next) => setOpen(next ? project.name : "")}
-                  actions={<SidebarProjectMore onClick={() => undefined} />}
-                >
-                  {(project.children ?? [{ icon: "ChatCircle", name: "Kickoff notes" }]).map((child) => (
-                    <SidebarItem key={child.name} icon={<Icon name={child.icon} size={16} color="text-secondary" />}>
-                      {child.name}
-                    </SidebarItem>
-                  ))}
-                </SidebarProject>
-              ))}
-            </SidebarGroup>
-            <SidebarAddButton onClick={() => undefined}>Add project</SidebarAddButton>
-            <SidebarSpacer />
-            <Menu>
-              <MenuTrigger>
-                <SidebarAccount initials="AL" name="Alpox" email="alpoxdev@gmail.com" />
-              </MenuTrigger>
-              <MenuContent surface="solid" side="top" className="w-64">
-                <MenuLabel>alpoxdev@gmail.com</MenuLabel>
-                <MenuItem icon={<Icon name="GearSix" size={18} color="text-primary" />}>Settings</MenuItem>
-                <MenuItem icon={<Icon name="Drop" size={18} color="text-primary" />}>Usage</MenuItem>
-                <MenuSeparator />
-                <MenuItem icon={<Icon name="SignOut" size={18} color="text-primary" />}>Log out</MenuItem>
-              </MenuContent>
-            </Menu>
-          </Sidebar>
-        )}
+              <SidebarGroup label="Projects">
+                {projects.map((project) => (
+                  <SidebarProject
+                    key={project.name}
+                    icon={
+                      <SidebarProjectTile className={project.tile}>
+                        <Icon name={project.icon} size={14} color="interactive-on-primary" />
+                      </SidebarProjectTile>
+                    }
+                    label={project.name}
+                    open={open === project.name}
+                    onOpenChange={(next) => setOpen(next ? project.name : "")}
+                    actions={<SidebarProjectMore onClick={() => undefined} />}
+                  >
+                    {(project.children ?? [{ icon: "ChatCircle", name: "Kickoff notes" }]).map((child) => (
+                      <SidebarItem key={child.name} icon={<Icon name={child.icon} size={16} color="text-secondary" />}>
+                        {child.name}
+                      </SidebarItem>
+                    ))}
+                  </SidebarProject>
+                ))}
+              </SidebarGroup>
+              <SidebarAddButton onClick={() => undefined}>Add project</SidebarAddButton>
+              <SidebarSpacer />
+              <Menu>
+                <MenuTrigger>
+                  <SidebarAccount initials="AL" name="Alpox" email="alpoxdev@gmail.com" />
+                </MenuTrigger>
+                <MenuContent surface="solid" side="top" className="w-64">
+                  <MenuLabel>alpoxdev@gmail.com</MenuLabel>
+                  <MenuItem icon={<Icon name="GearSix" size={18} color="text-primary" />}>Settings</MenuItem>
+                  <MenuItem icon={<Icon name="Drop" size={18} color="text-primary" />}>Usage</MenuItem>
+                  <MenuSeparator />
+                  <MenuItem icon={<Icon name="SignOut" size={18} color="text-primary" />}>Log out</MenuItem>
+                </MenuContent>
+              </Menu>
+            </Sidebar>
+          )}
         </view>
       </Backdrop>
       {/* The Paper surface: the Horon photo under a white veil, kept for the light scheme. */}

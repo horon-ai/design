@@ -15,7 +15,11 @@ function Trigger({ surface, children }: { surface: Surface; children: ReactNode 
           : "flex flex-row items-center rounded-full bg-interactive-primary px-4 py-2"
       }
     >
-      <text className={surface === "glass" ? "text-label-md text-text-primary" : "text-label-md text-interactive-on-primary"}>
+      <text
+        className={
+          surface === "glass" ? "text-label-md text-text-primary" : "text-label-md text-interactive-on-primary"
+        }
+      >
         {children}
       </text>
     </view>
@@ -29,13 +33,22 @@ function ActionsMenu({ surface }: { surface: Surface }) {
         <Trigger surface={surface}>Message actions</Trigger>
       </MenuTrigger>
       <MenuContent surface={surface}>
-        <MenuItem icon={<Icon name="Copy" size={18} color={surface === "glass" ? "text-secondary" : "text-primary"} />} trailing="⌘C">
+        <MenuItem
+          icon={<Icon name="Copy" size={18} color={surface === "glass" ? "text-secondary" : "text-primary"} />}
+          trailing="⌘C"
+        >
           Copy
         </MenuItem>
-        <MenuItem icon={<Icon name="ArrowClockwise" size={18} color={surface === "glass" ? "text-secondary" : "text-primary"} />}>
+        <MenuItem
+          icon={
+            <Icon name="ArrowClockwise" size={18} color={surface === "glass" ? "text-secondary" : "text-primary"} />
+          }
+        >
           Regenerate
         </MenuItem>
-        <MenuItem icon={<Icon name="Paperclip" size={18} color={surface === "glass" ? "text-secondary" : "text-primary"} />}>
+        <MenuItem
+          icon={<Icon name="Paperclip" size={18} color={surface === "glass" ? "text-secondary" : "text-primary"} />}
+        >
           Attach file
         </MenuItem>
         <MenuSeparator />
@@ -55,8 +68,12 @@ function AccountMenu({ surface }: { surface: Surface }) {
       </MenuTrigger>
       <MenuContent surface={surface}>
         <MenuLabel>mina@horon.ai</MenuLabel>
-        <MenuItem icon={<Icon name="User" size={18} color={surface === "glass" ? "text-secondary" : "text-primary"} />}>Profile</MenuItem>
-        <MenuItem icon={<Icon name="Gear" size={18} color={surface === "glass" ? "text-secondary" : "text-primary"} />}>Settings</MenuItem>
+        <MenuItem icon={<Icon name="User" size={18} color={surface === "glass" ? "text-secondary" : "text-primary"} />}>
+          Profile
+        </MenuItem>
+        <MenuItem icon={<Icon name="Gear" size={18} color={surface === "glass" ? "text-secondary" : "text-primary"} />}>
+          Settings
+        </MenuItem>
         <MenuSeparator />
         <MenuItem icon={<Icon name="SignOut" size={18} color="text-primary" />}>Sign out</MenuItem>
       </MenuContent>

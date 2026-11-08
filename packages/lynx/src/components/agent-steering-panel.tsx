@@ -140,7 +140,7 @@ function SteeringNoteRow({
   return (
     <view
       className={cn(
-        "flex flex-row items-center gap-2.5 rounded-[10px] bg-overlay-ink-4 py-2 pr-2.5 pl-3.5",
+        "flex flex-row items-center gap-2.5 rounded-[10px] bg-overlay-ink-4 py-2 pl-3.5 pr-2.5",
         leaving ? "" : "motion-rise",
       )}
       style={{
@@ -154,7 +154,7 @@ function SteeringNoteRow({
       }}
     >
       {isPlainText(note.text) ? (
-        <text className="min-w-0 flex-1 text-body-sm break-all text-text-primary">{note.text}</text>
+        <text className="min-w-0 flex-1 break-all text-body-sm text-text-primary">{note.text}</text>
       ) : (
         <view className="min-w-0 flex-1">{note.text}</view>
       )}
@@ -166,7 +166,7 @@ function SteeringNoteRow({
       ) : (
         <view className="flex shrink-0 flex-row items-center gap-1.5">
           <view
-            className="flex h-[26px] shrink-0 flex-row items-center gap-1 rounded-full bg-overlay-ink-6 px-2 motion-press active:bg-overlay-ink-10"
+            className="motion-press flex h-[26px] shrink-0 flex-row items-center gap-1 rounded-full bg-overlay-ink-6 px-2 active:bg-overlay-ink-10"
             bindtap={() => onApplyNow?.(note.id)}
             accessibility-element
             accessibility-traits="button"
@@ -175,7 +175,7 @@ function SteeringNoteRow({
             <text className="text-label-sm text-text-primary">Now</text>
           </view>
           <view
-            className="flex size-6 shrink-0 flex-row items-center justify-center rounded-full motion-press active:bg-overlay-ink-6"
+            className="motion-press flex size-6 shrink-0 flex-row items-center justify-center rounded-full active:bg-overlay-ink-6"
             bindtap={() => setLeaving(true)}
             accessibility-element
             accessibility-traits="button"
@@ -261,13 +261,13 @@ export function AgentSteeringPanel({
   return (
     <view
       className={cn(
-        "flex w-full max-w-[520px] min-w-0 flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full min-w-0 max-w-[520px] flex-col overflow-hidden rounded-[24px] border border-border-default bg-bg-surface",
         className,
       )}
       style={style}
       {...(id === undefined ? {} : { id })}
     >
-      <view className="flex flex-row flex-wrap items-center gap-x-2.5 gap-y-2 px-5 pt-4 pb-3.5">
+      <view className="flex flex-row flex-wrap items-center gap-x-2.5 gap-y-2 px-5 pb-3.5 pt-4">
         <Icon name="Path" size={18} color="text-primary" />
         <view className="flex min-w-0 flex-1 flex-col">
           {isPlainText(title) ? (
@@ -299,13 +299,13 @@ export function AgentSteeringPanel({
         />
         {status ? (
           isPlainText(status) ? (
-            <text className="min-w-0 truncate text-body-sm text-text-secondary tabular-nums">{status}</text>
+            <text className="min-w-0 truncate text-body-sm tabular-nums text-text-secondary">{status}</text>
           ) : (
             <view className="min-w-0">{status}</view>
           )
         ) : null}
         <view
-          className="flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 motion-press active:bg-overlay-ink-10"
+          className="motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 active:bg-overlay-ink-10"
           bindtap={() => onPausedChange?.(!paused)}
           accessibility-element
           accessibility-traits="button"
@@ -325,7 +325,7 @@ export function AgentSteeringPanel({
         {steps.map((step, index) => (
           <view
             key={step.id}
-            className="relative flex min-h-[26px] flex-row items-center gap-3 motion-rise"
+            className="motion-rise relative flex min-h-[26px] flex-row items-center gap-3"
             style={{ animationDelay: `${index * 30}ms` }}
           >
             <view className="flex h-[26px] w-5 shrink-0 flex-row items-center justify-center">
@@ -344,7 +344,7 @@ export function AgentSteeringPanel({
             {isPlainText(step.label) ? (
               <text
                 className={cn(
-                  "min-w-0 flex-1 text-body-sm motion-colors",
+                  "motion-colors min-w-0 flex-1 text-body-sm",
                   step.status === "todo" ? "text-text-secondary" : "text-text-primary",
                 )}
               >
@@ -355,7 +355,7 @@ export function AgentSteeringPanel({
             )}
             {step.time ? (
               isPlainText(step.time) ? (
-                <text className="shrink-0 text-caption text-text-secondary tabular-nums">{step.time}</text>
+                <text className="shrink-0 text-caption tabular-nums text-text-secondary">{step.time}</text>
               ) : (
                 <view className="shrink-0">{step.time}</view>
               )
@@ -380,7 +380,7 @@ export function AgentSteeringPanel({
           </view>
         ) : null}
 
-        <view className="flex h-11 flex-row items-center gap-2 rounded-full bg-overlay-ink-5 pr-1.5 pl-4">
+        <view className="flex h-11 flex-row items-center gap-2 rounded-full bg-overlay-ink-5 pl-4 pr-1.5">
           <input
             className={cn("min-w-0 flex-1 text-body-sm text-text-primary", PLACEHOLDER_CLASS)}
             ref={field}
@@ -392,7 +392,7 @@ export function AgentSteeringPanel({
             bindconfirm={() => submit(true)}
           />
           <view
-            className="flex size-8 shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary motion-press active:bg-interactive-primary-hover"
+            className="motion-press flex size-8 shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary active:bg-interactive-primary-hover"
             bindtap={() => submit(false)}
             accessibility-element
             accessibility-traits="button"

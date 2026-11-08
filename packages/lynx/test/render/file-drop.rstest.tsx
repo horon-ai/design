@@ -12,7 +12,9 @@ const requireElement = (element: Element | null): Element => {
 };
 
 /** What the host's own picker returns; Lynx has no `File`, so these descriptors stand in for one. */
-const HOST_FILES: FileDropFile[] = [{ name: "report.pdf", size: 1024, type: "application/pdf", path: "/tmp/report.pdf" }];
+const HOST_FILES: FileDropFile[] = [
+  { name: "report.pdf", size: 1024, type: "application/pdf", path: "/tmp/report.pdf" },
+];
 
 /** The target, found through the label it announces. */
 const targetOf = (container: HTMLElement, label: string): Element =>

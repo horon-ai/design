@@ -162,7 +162,8 @@ export type BottomSheetContentProps = Omit<PortedPopupProps, "className" | "titl
 };
 
 /** Text slots take a string so the component can put the token classes on a `<text>`. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** How far down the grabber must travel before the sheet dismisses, in px. */
 const DRAG_DISMISS_THRESHOLD = 72;
@@ -241,7 +242,7 @@ export function BottomSheetContent({
       <view className={cn("relative flex w-full flex-row justify-center", floating ? "px-4 pb-4" : "pb-0")}>
         <view
           className={cn(
-            "relative flex max-h-[calc(100vh-2rem)] w-full flex-col items-stretch overflow-hidden px-4 pt-2 motion-rise",
+            "motion-rise relative flex max-h-[calc(100vh-2rem)] w-full flex-col items-stretch overflow-hidden px-4 pt-2",
             solid ? "rounded-t-xl bg-bg-surface pb-6" : "veil-overlay rounded-t-[32px] pb-5",
             detail ? "gap-[18px]" : floating ? "gap-3" : "max-w-[374px] gap-1",
             className,
@@ -263,7 +264,7 @@ export function BottomSheetContent({
               scroll-bar-enable={false}
               style={{ flex: "1 1 0%", minHeight: "0px", width: "100%" }}
             >
-              <view className={cn("flex flex-row gap-2", detail ? "items-start" : "items-center pt-2.5 pb-2 pl-2")}>
+              <view className={cn("flex flex-row gap-2", detail ? "items-start" : "items-center pb-2 pl-2 pt-2.5")}>
                 <view className="min-w-0 flex-1">
                   {isPlainText(title) ? (
                     <text
@@ -303,7 +304,7 @@ export function BottomSheetRow({ icon, value, onClick, disabled = false, classNa
   return (
     <view
       className={cn(
-        "flex h-12 w-full flex-row items-center gap-3 rounded-lg px-2 motion-press active:bg-overlay-ink-4",
+        "motion-press flex h-12 w-full flex-row items-center gap-3 rounded-lg px-2 active:bg-overlay-ink-4",
         disabled && "opacity-50",
         className,
       )}
@@ -314,7 +315,7 @@ export function BottomSheetRow({ icon, value, onClick, disabled = false, classNa
       {icon ? <view className="flex shrink-0">{icon}</view> : null}
       <view className="min-w-0 flex-1">
         {isPlainText(children) ? (
-          <text className="text-label-md text-text-primary overflow-hidden">{children}</text>
+          <text className="overflow-hidden text-label-md text-text-primary">{children}</text>
         ) : (
           children
         )}
@@ -368,7 +369,7 @@ export function BottomSheetAction({
   return (
     <view
       className={cn(
-        "flex h-11 min-w-[100px] flex-row items-center justify-center rounded-full px-4 motion-press",
+        "motion-press flex h-11 min-w-[100px] flex-row items-center justify-center rounded-full px-4",
         variant === "primary" ? "bg-interactive-primary" : "bg-overlay-ink-6",
         disabled && "opacity-50",
         className,
@@ -377,9 +378,7 @@ export function BottomSheetAction({
       accessibility-element
       accessibility-traits="button"
     >
-      <text
-        className={cn("text-label-md", variant === "primary" ? "text-text-inverse" : "text-text-primary")}
-      >
+      <text className={cn("text-label-md", variant === "primary" ? "text-text-inverse" : "text-text-primary")}>
         {children}
       </text>
     </view>

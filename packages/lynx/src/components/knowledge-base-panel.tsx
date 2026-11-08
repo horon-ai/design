@@ -122,7 +122,7 @@ export function KnowledgeBasePanel({
   return (
     <view
       className={cn(
-        "flex w-full max-w-[800px] min-w-0 flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-5 py-4.5",
+        "py-4.5 flex w-full min-w-0 max-w-[800px] flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-5",
         className,
       )}
       {...(id === undefined ? {} : { id })}
@@ -143,7 +143,7 @@ export function KnowledgeBasePanel({
           ) : null}
         </view>
         <view
-          className="flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 motion-press active:bg-overlay-ink-10"
+          className="motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 active:bg-overlay-ink-10"
           bindtap={onSettings}
           accessibility-element
           accessibility-traits="button"
@@ -152,7 +152,7 @@ export function KnowledgeBasePanel({
           <Icon name="SlidersHorizontal" size={16} color="text-primary" />
         </view>
         <view
-          className="flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-3 motion-press active:bg-overlay-ink-10"
+          className="motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pl-3 pr-2.5 active:bg-overlay-ink-10"
           bindtap={onAddSource}
           accessibility-element
           accessibility-traits="button"
@@ -188,16 +188,13 @@ export function KnowledgeBasePanel({
         {indexing > 0 ? (
           <view className="flex shrink-0 flex-row items-center gap-2">
             <Spinner size={12} label="Indexing" />
-            <text className="text-caption text-text-secondary tabular-nums">{`${indexing} indexing`}</text>
+            <text className="text-caption tabular-nums text-text-secondary">{`${indexing} indexing`}</text>
           </view>
         ) : null}
       </view>
 
       {wide ? (
-        <view
-          className="flex flex-row items-center gap-3 px-2 pt-2 pb-1"
-          accessibility-elements-hidden
-        >
+        <view className="flex flex-row items-center gap-3 px-2 pb-1 pt-2" accessibility-elements-hidden>
           <view className="min-w-0 flex-1">
             <text className="text-caption text-text-secondary">Source</text>
           </view>
@@ -216,18 +213,18 @@ export function KnowledgeBasePanel({
 
       {onFiles ? (
         <view
-          className="flex flex-row items-center gap-3 rounded-2xl border border-dashed border-overlay-ink-18 px-4.5 py-4 motion-colors"
+          className="px-4.5 motion-colors flex flex-row items-center gap-3 rounded-2xl border border-dashed border-overlay-ink-18 py-4"
           accessibility-elements-hidden
         >
           <Icon name="UploadSimple" size={18} color="text-secondary" />
           <view className="flex min-w-0 flex-col gap-0.5">
             {typeof dropTitle === "string" || typeof dropTitle === "number" ? (
-              <text className="text-label-md break-all text-text-primary">{dropTitle}</text>
+              <text className="break-all text-label-md text-text-primary">{dropTitle}</text>
             ) : (
               dropTitle
             )}
             {typeof dropHint === "string" || typeof dropHint === "number" ? (
-              <text className="text-caption break-all text-text-secondary">{dropHint}</text>
+              <text className="break-all text-caption text-text-secondary">{dropHint}</text>
             ) : (
               dropHint
             )}

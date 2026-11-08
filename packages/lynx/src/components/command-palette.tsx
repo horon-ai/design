@@ -65,7 +65,8 @@ export type CommandPaletteProps = {
 /** Lynx's engine paints the placeholder from this variable; react's `placeholder:` utility cannot run. */
 const PLACEHOLDER_CLASS = "[--placeholder-color:var(--color-text-secondary)]";
 
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * Figma `Command palette` (110:676): a 560px palette, 24px radius, with a 48px search row,
@@ -167,7 +168,7 @@ export function CommandPalette({
           <view
             className={cn(
               // 560px where it fits; the viewport's 8px gutters cap `w-full` below that.
-              "relative flex w-full max-w-[560px] flex-col overflow-hidden rounded-[24px] p-1.5 motion-popup",
+              "motion-popup relative flex w-full max-w-[560px] flex-col overflow-hidden rounded-[24px] p-1.5",
               surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-palette",
               className,
             )}
@@ -183,7 +184,7 @@ export function CommandPalette({
               onSelect={() => setOpen(false)}
             />
             {keyboardHints && hints && hints.length > 0 ? (
-              <view className="relative flex flex-row flex-wrap items-center gap-x-4 gap-y-1 px-3 pt-2 pb-1">
+              <view className="relative flex flex-row flex-wrap items-center gap-x-4 gap-y-1 px-3 pb-1 pt-2">
                 {hints.map(([key, label]) => (
                   <view key={label} className="flex flex-row items-center gap-1.5">
                     <Kbd>{key}</Kbd>
@@ -258,10 +259,7 @@ export function CommandPaletteBody({
           <Icon name="MagnifyingGlass" size={20} color="text-secondary" />
         </view>
         <input
-          className={cn(
-            "min-w-0 flex-1 bg-transparent text-body-sm text-text-primary",
-            PLACEHOLDER_CLASS,
-          )}
+          className={cn("min-w-0 flex-1 bg-transparent text-body-sm text-text-primary", PLACEHOLDER_CLASS)}
           placeholder={placeholder}
           bindinput={(event: { detail: { value: string } }) => setQuery(event.detail.value)}
         />
@@ -290,13 +288,13 @@ export function CommandPaletteBody({
           <view className="relative flex flex-col">
             {visible.map((group) => (
               <view key={group.label} className="flex flex-col pt-1">
-                <view className="px-3 pt-1 pb-1">
+                <view className="px-3 pb-1 pt-1">
                   <text className="text-caption text-text-secondary">{group.label}</text>
                 </view>
                 {group.items.map((item) => (
                   <view
                     key={item.value}
-                    className="relative flex h-11 flex-row items-center gap-2.5 rounded-md px-3 motion-colors active:bg-overlay-ink-6"
+                    className="motion-colors relative flex h-11 flex-row items-center gap-2.5 rounded-md px-3 active:bg-overlay-ink-6"
                     bindtap={() => {
                       item.onSelect?.();
                       onSelect?.();

@@ -66,7 +66,8 @@ export type FileDropProps = Omit<
   disabled?: boolean;
 };
 
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * Paper `File drop` (1VWI-0): a 1.5px dashed r10 target, icon 16 and a 13/18 500 label centred with gap 8.
@@ -129,9 +130,11 @@ export function FileDrop({
   return (
     <view
       className={cn(
-        "relative flex w-full max-w-[550px] flex-row items-center justify-center gap-2 overflow-hidden rounded-[10px] border-[1.5px] border-dashed px-4 py-3 motion-colors",
+        "motion-colors relative flex w-full max-w-[550px] flex-row items-center justify-center gap-2 overflow-hidden rounded-[10px] border-[1.5px] border-dashed px-4 py-3",
         // The dashed edge stays put (border-style cannot transition) and the active state adds an inner rim.
-        pressed && !blocked ? "border-border-brand shadow-[inset_0_0_0_1px_var(--color-text-brand)]" : "border-border-dashed",
+        pressed && !blocked
+          ? "border-border-brand shadow-[inset_0_0_0_1px_var(--color-text-brand)]"
+          : "border-border-dashed",
         surface === "solid" ? cn("bg-bg-surface", pressed && !blocked && "bg-bg-subtle") : "veil-drop",
         rejected && "border-border-danger shadow-[inset_0_0_0_1px_var(--color-border-danger)]",
         blocked && "opacity-40",
@@ -154,11 +157,7 @@ export function FileDrop({
         )}
         {isPlainText(label) ? (
           <text
-            className={cn(
-              "text-label-md",
-              rejected ? "text-danger" : "text-text-secondary",
-              uploading && "opacity-60",
-            )}
+            className={cn("text-label-md", rejected ? "text-danger" : "text-text-secondary", uploading && "opacity-60")}
           >
             {label}
           </text>

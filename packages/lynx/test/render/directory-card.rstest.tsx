@@ -31,7 +31,12 @@ test("the add button reports the tap and the card keeps its copy", async () => {
 test("without onAdd the card draws no button at all", async () => {
   const { container, findByText, queryByText } = render(
     <HoronProvider scheme="light">
-      <DirectoryCard icon={<Icon name="Folder" />} name="Local files" description="Files on this device." surface="glass" />
+      <DirectoryCard
+        icon={<Icon name="Folder" />}
+        name="Local files"
+        description="Files on this device."
+        surface="glass"
+      />
     </HoronProvider>,
   );
 

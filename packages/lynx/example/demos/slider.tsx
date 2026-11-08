@@ -7,16 +7,8 @@ function VerticalSlider({ label, disabled = false }: { label: string; disabled?:
   const [level, setLevel] = useState(65);
   return (
     <view className="flex flex-col items-center gap-2">
-      <Slider
-        aria-label={label}
-        orientation="vertical"
-        value={level}
-        disabled={disabled}
-        onValueChange={setLevel}
-      />
-      <text className="text-caption tabular-nums text-text-secondary">
-        {`${level}%`}
-      </text>
+      <Slider aria-label={label} orientation="vertical" value={level} disabled={disabled} onValueChange={setLevel} />
+      <text className="text-caption tabular-nums text-text-secondary">{`${level}%`}</text>
     </view>
   );
 }

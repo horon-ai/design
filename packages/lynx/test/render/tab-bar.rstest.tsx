@@ -14,7 +14,9 @@ const items: TabBarItem[] = [
 
 /** The tab whose accessible name matches. */
 const tabByName = (container: HTMLElement, label: string): Element => {
-  const node = [...container.querySelectorAll("view")].find((element) => element.getAttribute("accessibility-label") === label);
+  const node = [...container.querySelectorAll("view")].find(
+    (element) => element.getAttribute("accessibility-label") === label,
+  );
   if (!node) throw new Error(`no tab named ${label}`);
   return node;
 };

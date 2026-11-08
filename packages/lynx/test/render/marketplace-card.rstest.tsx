@@ -35,7 +35,12 @@ test("the Install button reports the tap and the card shows its rating, installs
 test("without onInstall the footer draws no button, so tapping the card installs nothing", async () => {
   const { container, findByText, queryByText } = render(
     <HoronProvider scheme="light">
-      <MarketplaceCard initials="CR" name="Code review" description="Reads a diff and leaves comments." surface="glass" />
+      <MarketplaceCard
+        initials="CR"
+        name="Code review"
+        description="Reads a diff and leaves comments."
+        surface="glass"
+      />
     </HoronProvider>,
   );
 

@@ -141,7 +141,7 @@ export function Composer({
   return (
     <view
       className={cn(
-        "relative flex max-w-full min-w-0 flex-row items-center overflow-hidden rounded-full motion-colors",
+        "motion-colors relative flex min-w-0 max-w-full flex-row items-center overflow-hidden rounded-full",
         surface === "glass"
           ? "veil-field"
           : cn("border bg-bg-surface", focused ? "border-border-strong" : "border-border-default"),

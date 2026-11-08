@@ -1,4 +1,13 @@
-import { Children, createContext, isValidElement, useCallback, useContext, useMemo, useState, type ReactNode } from "@lynx-js/react";
+import {
+  Children,
+  createContext,
+  isValidElement,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
 import { cn } from "../lib/cn";
@@ -114,7 +123,7 @@ export function Tabs({
   const set = useMemo(() => ({ size, orientation, value: selected, select }), [size, orientation, selected, select]);
   return (
     <TabsSetContext.Provider value={set}>
-      <view className={cn("flex max-w-full min-w-0 flex-col gap-4", className)} style={style}>
+      <view className={cn("flex min-w-0 max-w-full flex-col gap-4", className)} style={style}>
         {children}
       </view>
     </TabsSetContext.Provider>
@@ -230,17 +239,27 @@ export function TabsList({ variant = "pill", surface = "solid", className, style
     <TabsVariantContext.Provider value={variant}>
       <view
         className={cn(
-          "relative flex w-full max-w-full min-w-0 flex-col overflow-hidden",
+          "relative flex w-full min-w-0 max-w-full flex-col overflow-hidden",
           variant === "underline"
             ? cn("rounded-none", vertical ? "border-l border-border-default" : "border-b border-border-default")
-            : cn("rounded-full", listClass[size], surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface"),
+            : cn(
+                "rounded-full",
+                listClass[size],
+                surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
+              ),
           className,
         )}
         style={style}
       >
         {variant === "pill" && surface === "glass" ? <LiquidGlass /> : null}
         {/* A vertical column keeps its natural height instead of scrolling inside a box that has none. */}
-        {vertical ? track : <scroll-view scroll-orientation="horizontal" className="w-full">{track}</scroll-view>}
+        {vertical ? (
+          track
+        ) : (
+          <scroll-view scroll-orientation="horizontal" className="w-full">
+            {track}
+          </scroll-view>
+        )}
       </view>
     </TabsVariantContext.Provider>
   );
@@ -337,16 +356,22 @@ export function TabsTab({ value, icon, count, disabled = false, className, style
       accessibility-value={active ? "selected" : undefined}
     >
       {icon}
-      <text className={cn("text-trim", tabTextClass[set.size], active ? "text-text-primary" : "text-text-secondary")}>{children}</text>
+      <text className={cn("text-trim", tabTextClass[set.size], active ? "text-text-primary" : "text-text-secondary")}>
+        {children}
+      </text>
       {count !== undefined ? (
         <view
           className={cn(
-            "flex flex-row items-center rounded-full motion-colors",
+            "motion-colors flex flex-row items-center rounded-full",
             active ? "bg-interactive-primary" : "bg-overlay-ink-6",
             countClass[set.size],
           )}
         >
-          <text className={cn("text-trim text-label-sm", active ? "text-interactive-on-primary" : "text-text-secondary")}>{count}</text>
+          <text
+            className={cn("text-trim text-label-sm", active ? "text-interactive-on-primary" : "text-text-secondary")}
+          >
+            {count}
+          </text>
         </view>
       ) : null}
     </view>
@@ -388,7 +413,12 @@ export function TabsPanel({ value, keepMounted = false, className, style, childr
       className={cn("flex flex-col", !active && "hidden", className)}
       style={{
         ...(active
-          ? { animationName: "swap-move", animationDuration: "200ms", animationTimingFunction: EASE_OUT_QUINT, animationFillMode: "both" }
+          ? {
+              animationName: "swap-move",
+              animationDuration: "200ms",
+              animationTimingFunction: EASE_OUT_QUINT,
+              animationFillMode: "both",
+            }
           : undefined),
         ...style,
       }}

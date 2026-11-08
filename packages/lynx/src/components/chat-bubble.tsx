@@ -76,13 +76,19 @@ export function ChatBubble({ from = "me", size = "md", className, children }: Ch
   return (
     <view
       className={cn(
-        "motion-rise w-fit max-w-[560px] flex-row rounded-xl break-all",
+        "motion-rise w-fit max-w-[560px] flex-row break-all rounded-xl",
         sizeClass[size],
         from === "me" ? "ml-auto bg-interactive-primary" : "bg-bg-subtle",
         className,
       )}
     >
-      <text className={cn("text-trim", textClass[size], from === "me" ? "text-interactive-on-primary" : "text-text-primary")}>
+      <text
+        className={cn(
+          "text-trim",
+          textClass[size],
+          from === "me" ? "text-interactive-on-primary" : "text-text-primary",
+        )}
+      >
         {children}
       </text>
     </view>

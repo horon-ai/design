@@ -62,7 +62,7 @@ export function PageHeader({
   return (
     <view
       className={cn(
-        "relative flex max-w-full min-w-0 flex-col gap-1.5 overflow-hidden rounded-[28px] p-2",
+        "relative flex min-w-0 max-w-full flex-col gap-1.5 overflow-hidden rounded-[28px] p-2",
         surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
         className,
       )}
@@ -70,14 +70,15 @@ export function PageHeader({
       {surface === "glass" ? <LiquidGlass /> : null}
       <view className="relative flex h-10 min-w-0 flex-row items-center gap-2">
         {onBack ? (
-          <IconButton icon={<Icon name="CaretLeft" size={20} color="text-primary" />} label={backLabel} onClick={onBack} />
+          <IconButton
+            icon={<Icon name="CaretLeft" size={20} color="text-primary" />}
+            label={backLabel}
+            onClick={onBack}
+          />
         ) : null}
         {typeof title === "string" || typeof title === "number" ? (
           <text
-            className={cn(
-              "min-w-0 flex-1 truncate text-label-lg text-text-primary",
-              !onBack && "pl-2",
-            )}
+            className={cn("min-w-0 flex-1 truncate text-label-lg text-text-primary", !onBack && "pl-2")}
             accessibility-traits="header"
           >
             {title}
@@ -87,9 +88,7 @@ export function PageHeader({
         )}
         {actions}
       </view>
-      {children ? (
-        <view className="relative motion-rise">{children}</view>
-      ) : null}
+      {children ? <view className="motion-rise relative">{children}</view> : null}
     </view>
   );
 }

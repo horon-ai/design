@@ -62,8 +62,7 @@ const botTileText: Record<TaskStatus, string> = {
   failed: "text-sky-50",
 };
 
-const pill =
-  "flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full px-3 motion-press";
+const pill = "flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full px-3 motion-press";
 
 /** The spring and quint curves the status glyphs enter on, written out for an inline animation. */
 const EASE_SPRING = "cubic-bezier(0.34, 1.3, 0.64, 1)";
@@ -83,7 +82,8 @@ const fadeIn = {
 } as const;
 
 /** Whether a value can be dropped into a `<text>` as its child. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * Figma `Task row` (Agent tasks 112:939): a flat subtle row, 16px radius, with Running / Review / Failed / Done.
@@ -163,7 +163,9 @@ export function TaskRow({
             bot.tileClassName ?? botTile[status],
           )}
         >
-          <text className={cn("text-label-sm text-trim", bot.tileClassName ? "text-text-inverse" : botTileText[status])}>
+          <text
+            className={cn("text-trim text-label-sm", bot.tileClassName ? "text-text-inverse" : botTileText[status])}
+          >
             {bot.initial}
           </text>
         </view>
@@ -207,8 +209,12 @@ export function TaskRow({
           <text
             key={status}
             className={cn(
-              "min-w-0 truncate text-label-md motion-colors",
-              status === "failed" ? "text-text-danger" : status === "done" ? "text-text-secondary" : "text-text-primary",
+              "motion-colors min-w-0 truncate text-label-md",
+              status === "failed"
+                ? "text-text-danger"
+                : status === "done"
+                  ? "text-text-secondary"
+                  : "text-text-primary",
             )}
             style={fadeIn}
           >
@@ -267,7 +273,7 @@ export function TaskRow({
         ) : null}
         {status === "review" || status === "done" ? (
           <view
-            className="flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full motion-press"
+            className="motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full"
             style={popIn}
             bindtap={onArchive}
             accessibility-element

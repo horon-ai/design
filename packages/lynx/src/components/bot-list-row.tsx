@@ -59,7 +59,7 @@ export function BotListRow({ name, time, preview, live, selected, className, onC
   return (
     <view
       className={cn(
-        "flex w-full min-w-0 flex-row items-center gap-3 rounded-lg p-3 motion-press",
+        "motion-press flex w-full min-w-0 flex-row items-center gap-3 rounded-lg p-3",
         selected ? "bg-overlay-ink-10" : "active:bg-overlay-ink-5",
         className,
       )}

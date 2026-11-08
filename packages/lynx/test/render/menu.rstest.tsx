@@ -150,7 +150,9 @@ test("caller styles, ids and the popup placement land on their own parts", async
   // The placement still applies: the popup keeps the anchor's top offset next to the caller's width.
   expect(popup.getAttribute("style")).toContain("top: 80px");
   expect(requireElement(container.querySelector("#profile-row")).getAttribute("style")).toContain("opacity: 0.5");
-  expect(requireElement(container.querySelector("[accessibility-role-description='separator']")).getAttribute("style")).toContain("width: 120px");
+  expect(
+    requireElement(container.querySelector("[accessibility-role-description='separator']")).getAttribute("style"),
+  ).toContain("width: 120px");
 });
 
 test("a closed menu renders no popup content", () => {

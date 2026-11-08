@@ -28,7 +28,9 @@ const isDate = (value: unknown): value is Date => value instanceof Date;
 
 /** The rendered day whose spoken label is the given date. */
 const dayByName = (container: HTMLElement, label: string): Element => {
-  const node = [...container.querySelectorAll("view")].find((element) => element.getAttribute("accessibility-label") === label);
+  const node = [...container.querySelectorAll("view")].find(
+    (element) => element.getAttribute("accessibility-label") === label,
+  );
   if (!node) throw new Error(`no day labelled ${label}`);
   return node;
 };
@@ -42,13 +44,7 @@ test("the trigger opens the calendar and a day tap reports that day", async () =
   const onValueChange = rstest.fn();
   const { container, findByText, getByText } = render(
     <HoronProvider scheme="light">
-      <DateField
-        locale="en-US"
-        defaultMonth={MONTH}
-        today={TODAY}
-        value={null}
-        onValueChange={onValueChange}
-      />
+      <DateField locale="en-US" defaultMonth={MONTH} today={TODAY} value={null} onValueChange={onValueChange} />
     </HoronProvider>,
   );
 

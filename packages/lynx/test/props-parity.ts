@@ -59,14 +59,22 @@ function loadProgram(pkg: string): ts.Program {
 }
 
 function isExported(node: ts.Node): boolean {
-  return ts.canHaveModifiers(node) && (ts.getModifiers(node) ?? []).some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword);
+  return (
+    ts.canHaveModifiers(node) &&
+    (ts.getModifiers(node) ?? []).some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)
+  );
 }
 
 /** Exported PascalCase components of a file, keyed by name, with the node whose first parameter carries the props. */
 function components(source: ts.SourceFile): Map<string, ts.SignatureDeclaration> {
   const found = new Map<string, ts.SignatureDeclaration>();
   for (const statement of source.statements) {
-    if (ts.isFunctionDeclaration(statement) && statement.name && isExported(statement) && /^[A-Z]/.test(statement.name.text)) {
+    if (
+      ts.isFunctionDeclaration(statement) &&
+      statement.name &&
+      isExported(statement) &&
+      /^[A-Z]/.test(statement.name.text)
+    ) {
       found.set(statement.name.text, statement);
       continue;
     }
@@ -155,7 +163,12 @@ export function compareProps(): PropParityReport {
       const reactProps = propsOf(react, reactSignature, "react");
       for (const info of reactProps.values()) report.props[info.source].react += 1;
       if (!lynxSignature) {
-        report.differences.push({ key: `${slug}:${name}`, source: "own", kind: "missing-component", detail: "no Lynx component" });
+        report.differences.push({
+          key: `${slug}:${name}`,
+          source: "own",
+          kind: "missing-component",
+          detail: "no Lynx component",
+        });
         continue;
       }
       report.components.matched += 1;
@@ -167,15 +180,21 @@ export function compareProps(): PropParityReport {
           continue;
         }
         const found: PropDifference[] = [];
-        const push = (kind: PropDifferenceKind, detail: string) => found.push({ key: `${slug}:${name}.${prop}`, source: info.source, kind, detail });
+        const push = (kind: PropDifferenceKind, detail: string) =>
+          found.push({ key: `${slug}:${name}.${prop}`, source: info.source, kind, detail });
         if (!other) {
           push("missing-prop", "absent on Lynx");
         } else {
-          if (info.optional !== other.optional) push("optional", `React ${info.optional ? "optional" : "required"}, Lynx ${other.optional ? "optional" : "required"}`);
+          if (info.optional !== other.optional)
+            push(
+              "optional",
+              `React ${info.optional ? "optional" : "required"}, Lynx ${other.optional ? "optional" : "required"}`,
+            );
           if (info.literals && info.literals.join("|") !== (other.literals ?? []).join("|")) {
             push("literals", `React [${info.literals.join(", ")}], Lynx [${(other.literals ?? []).join(", ")}]`);
           }
-          if (info.source === "own" && info.defaultValue !== other.defaultValue) push("default", `React ${info.defaultValue ?? "none"}, Lynx ${other.defaultValue ?? "none"}`);
+          if (info.source === "own" && info.defaultValue !== other.defaultValue)
+            push("default", `React ${info.defaultValue ?? "none"}, Lynx ${other.defaultValue ?? "none"}`);
         }
         if (found.length === 0) report.props[info.source].matched += 1;
         report.differences.push(...found);
@@ -188,5 +207,6 @@ export function compareProps(): PropParityReport {
 if (import.meta.main) {
   const report = compareProps();
   console.log(JSON.stringify({ components: report.components, props: report.props }));
-  for (const difference of report.differences) console.log(`${difference.key} [${difference.source} ${difference.kind}] ${difference.detail}`);
+  for (const difference of report.differences)
+    console.log(`${difference.key} [${difference.source} ${difference.kind}] ${difference.detail}`);
 }

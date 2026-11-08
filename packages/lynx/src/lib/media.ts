@@ -37,7 +37,12 @@ export type MediaSnapshot = {
 export function readViewport(): { width: number; height: number } {
   if (typeof SystemInfo === "undefined") return { width: 0, height: 0 };
   const { pixelWidth, pixelHeight, pixelRatio } = SystemInfo;
-  if (typeof pixelWidth !== "number" || typeof pixelHeight !== "number" || typeof pixelRatio !== "number" || pixelRatio <= 0) {
+  if (
+    typeof pixelWidth !== "number" ||
+    typeof pixelHeight !== "number" ||
+    typeof pixelRatio !== "number" ||
+    pixelRatio <= 0
+  ) {
     return { width: 0, height: 0 };
   }
   return { width: pixelWidth / pixelRatio, height: pixelHeight / pixelRatio };
@@ -72,7 +77,10 @@ function parse(query: string): Condition[] {
     const colon = body.indexOf(":");
     if (colon === -1) continue;
     const feature = body.slice(0, colon).trim().toLowerCase();
-    const value = body.slice(colon + 1).trim().toLowerCase();
+    const value = body
+      .slice(colon + 1)
+      .trim()
+      .toLowerCase();
     if (FEATURE.test(feature) && value !== "") conditions.push({ feature, value });
   }
   return conditions;
@@ -106,13 +114,21 @@ function matchesCondition(condition: Condition, snapshot: MediaSnapshot): boolea
     case "prefers-color-scheme":
       return condition.value === snapshot.scheme;
     case "prefers-reduced-motion":
-      return condition.value === "reduce" ? snapshot.reducedMotion : condition.value === "no-preference" && !snapshot.reducedMotion;
+      return condition.value === "reduce"
+        ? snapshot.reducedMotion
+        : condition.value === "no-preference" && !snapshot.reducedMotion;
     case "pointer":
-      return condition.value === "coarse" ? isTouchOs(snapshot.os) : condition.value === "fine" && !isTouchOs(snapshot.os);
+      return condition.value === "coarse"
+        ? isTouchOs(snapshot.os)
+        : condition.value === "fine" && !isTouchOs(snapshot.os);
     case "hover":
-      return condition.value === "none" ? isTouchOs(snapshot.os) : condition.value === "hover" && !isTouchOs(snapshot.os);
+      return condition.value === "none"
+        ? isTouchOs(snapshot.os)
+        : condition.value === "hover" && !isTouchOs(snapshot.os);
     case "orientation":
-      return condition.value === "portrait" ? snapshot.height >= snapshot.width : condition.value === "landscape" && snapshot.width > snapshot.height;
+      return condition.value === "portrait"
+        ? snapshot.height >= snapshot.width
+        : condition.value === "landscape" && snapshot.width > snapshot.height;
     default:
       return false;
   }

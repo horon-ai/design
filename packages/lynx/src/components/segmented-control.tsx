@@ -209,7 +209,7 @@ export function SegmentedControl({
         <view
           key={item.value}
           className={cn(
-            "relative flex min-w-0 flex-row items-center justify-center whitespace-nowrap rounded-full motion-colors",
+            "motion-colors relative flex min-w-0 flex-row items-center justify-center whitespace-nowrap rounded-full",
             item.disabled && "opacity-40",
             segmentClass[size],
             // Filled segments share the track; hugging segments keep the padding their rung gives them.
@@ -247,7 +247,7 @@ export function SegmentedControl({
     <view
       className={cn(
         // Segments keep the padding their rung gives them; a filled row shares the width instead.
-        "relative inline-flex max-w-full min-w-0 flex-row items-center overflow-hidden rounded-full",
+        "relative inline-flex min-w-0 max-w-full flex-row items-center overflow-hidden rounded-full",
         trackClass[size],
         surfaceClass[surface],
         className,
@@ -257,7 +257,9 @@ export function SegmentedControl({
       accessibility-label={ariaLabel}
     >
       {surface === "glass" ? <LiquidGlass /> : null}
-      {fill ? row : (
+      {fill ? (
+        row
+      ) : (
         <scroll-view scroll-orientation="horizontal" className="max-w-full">
           {row}
         </scroll-view>

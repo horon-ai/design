@@ -42,7 +42,8 @@ export type PlanStepProps = {
 };
 
 /** Whether a value can be dropped into a `<text>` as its child. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /** The Figma spring (`--ease-spring`), written out because an inline animation cannot read a variable. */
 const EASE_SPRING = "cubic-bezier(0.34, 1.3, 0.64, 1)";
@@ -99,7 +100,7 @@ export function PlanStep({
       <view className="flex shrink-0 flex-col items-center gap-1">
         <view
           className={cn(
-            "flex size-6 shrink-0 flex-row items-center justify-center rounded-md motion-colors",
+            "motion-colors flex size-6 shrink-0 flex-row items-center justify-center rounded-md",
             status === "done" && "bg-status-live",
             status === "failed" && "bg-bg-danger",
             status === "pending" && "border border-border-default",
@@ -116,18 +117,18 @@ export function PlanStep({
         {last ? null : (
           <view
             className={cn(
-              "w-0.5 grow rounded-[1px] motion-colors",
+              "motion-colors w-0.5 grow rounded-[1px]",
               status === "done" ? "bg-status-live" : "bg-border-default",
             )}
           />
         )}
       </view>
-      <view className="flex min-w-0 grow flex-col pt-0.5 pb-[18px]">
+      <view className="flex min-w-0 grow flex-col pb-[18px] pt-0.5">
         <view className="flex flex-row items-start gap-3">
           {isPlainText(title) ? (
             <text
               className={cn(
-                "min-w-0 grow text-label-lg break-all",
+                "min-w-0 grow break-all text-label-lg",
                 status === "pending" ? "text-text-secondary" : "text-text-primary",
               )}
             >
@@ -147,18 +148,14 @@ export function PlanStep({
         <view className="mt-1.5 flex min-w-0 flex-row flex-wrap items-center gap-x-2 gap-y-1.5">
           {description ? (
             isPlainText(description) ? (
-              <text className="min-w-0 text-body-sm break-all text-text-secondary">{description}</text>
+              <text className="min-w-0 break-all text-body-sm text-text-secondary">{description}</text>
             ) : (
               <view className="min-w-0">{description}</view>
             )
           ) : null}
           {tool ? (
             <view className="rounded-xs bg-bg-subtle px-2 py-0.5">
-              {isPlainText(tool) ? (
-                <text className="font-mono text-label-md text-text-secondary">{tool}</text>
-              ) : (
-                tool
-              )}
+              {isPlainText(tool) ? <text className="font-mono text-label-md text-text-secondary">{tool}</text> : tool}
             </view>
           ) : null}
         </view>
@@ -166,14 +163,14 @@ export function PlanStep({
           <view className="mt-1.5 flex flex-col gap-1.5">
             {error ? (
               isPlainText(error) ? (
-                <text className="text-body-sm break-all text-text-danger">{error}</text>
+                <text className="break-all text-body-sm text-text-danger">{error}</text>
               ) : (
                 error
               )
             ) : null}
             {onRetry ? (
               <view
-                className="flex h-[30px] w-fit flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 px-3 motion-press"
+                className="motion-press flex h-[30px] w-fit flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 px-3"
                 bindtap={onRetry}
                 accessibility-element
                 accessibility-traits="button"

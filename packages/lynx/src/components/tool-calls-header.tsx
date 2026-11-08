@@ -26,7 +26,8 @@ export type ToolCallsHeaderProps = {
 };
 
 /** One 28px tool chip: a subtle square with a 2px surface border that paints the overlap seam. */
-const CHIP = "flex size-7 shrink-0 flex-row items-center justify-center rounded-[10px] border-2 border-bg-surface bg-bg-subtle";
+const CHIP =
+  "flex size-7 shrink-0 flex-row items-center justify-center rounded-[10px] border-2 border-bg-surface bg-bg-subtle";
 
 /**
  * Figma `Tool-calls header` (Agents N11): overlapping tool chips, "Using tools…" and a caret that fold the ToolCall cards below.
@@ -71,9 +72,12 @@ export function ToolCallsHeader({
   const open = controlled ? openProp : innerOpen;
   // React's `Children.toArray` dropped null, undefined and boolean entries before slicing, so an
   // icon slot the caller leaves empty draws no chip here either.
-  const chips = (Array.isArray(icons) ? icons : [icons]).filter(
-    (icon): icon is Exclude<ReactNode, null | undefined | boolean> => icon !== null && icon !== undefined && typeof icon !== "boolean",
-  ).slice(0, 3);
+  const chips = (Array.isArray(icons) ? icons : [icons])
+    .filter(
+      (icon): icon is Exclude<ReactNode, null | undefined | boolean> =>
+        icon !== null && icon !== undefined && typeof icon !== "boolean",
+    )
+    .slice(0, 3);
 
   const toggle = () => {
     const next = !open;
@@ -121,7 +125,7 @@ export function ToolCallsHeader({
           typeof elapsed === "string" || typeof elapsed === "number" ? (
             <text className="shrink-0 text-label-md text-text-secondary">· {elapsed}</text>
           ) : (
-            <view className="shrink-0 flex flex-row items-center gap-1">
+            <view className="flex shrink-0 flex-row items-center gap-1">
               <text className="text-label-md text-text-secondary">·</text>
               {elapsed}
             </view>

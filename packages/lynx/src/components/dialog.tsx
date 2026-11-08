@@ -119,7 +119,11 @@ function DialogPress({ render, children, className, onTap }: DialogPressProps & 
  */
 export function DialogTrigger({ render, children, className }: DialogPressProps) {
   const { setOpen } = useContext(DialogContext);
-  return <DialogPress render={render} className={className} onTap={() => setOpen(true)}>{children}</DialogPress>;
+  return (
+    <DialogPress render={render} className={className} onTap={() => setOpen(true)}>
+      {children}
+    </DialogPress>
+  );
 }
 
 /**
@@ -128,7 +132,11 @@ export function DialogTrigger({ render, children, className }: DialogPressProps)
  */
 export function DialogClose({ render, children, className }: DialogPressProps) {
   const { setOpen } = useContext(DialogContext);
-  return <DialogPress render={render} className={className} onTap={() => setOpen(false)}>{children}</DialogPress>;
+  return (
+    <DialogPress render={render} className={className} onTap={() => setOpen(false)}>
+      {children}
+    </DialogPress>
+  );
 }
 
 /**
@@ -175,7 +183,8 @@ export type DialogContentProps = Omit<PortedPopupProps, "className" | "title"> &
 };
 
 /** Text slots take a string so the component can put the token classes on a `<text>`. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * Figma `Dialog on scrim` (63:329): the `bg-scrim` ink at 32% alpha and a 420px veil dialog,
@@ -217,7 +226,7 @@ export function DialogContent({
       <view
         className={cn(
           // 420px where it fits; the viewport's 16px gutters cap `w-full` below that.
-          "relative flex max-h-[calc(100vh-2rem)] w-full max-w-[420px] flex-col overflow-hidden rounded-xl motion-rise",
+          "motion-rise relative flex max-h-[calc(100vh-2rem)] w-full max-w-[420px] flex-col overflow-hidden rounded-xl",
           solid ? "bg-bg-surface shadow-[0_24px_64px_#0A142433]" : "veil-overlay",
           className,
         )}
@@ -248,7 +257,7 @@ export function DialogContent({
               </view>
               {closeLabel !== null && (
                 <view
-                  className="relative -mt-1 -mr-2 flex size-8 shrink-0 items-center justify-center rounded-full text-text-secondary motion-press motion-colors active:bg-overlay-ink-6"
+                  className="motion-press motion-colors relative -mr-2 -mt-1 flex size-8 shrink-0 items-center justify-center rounded-full text-text-secondary active:bg-overlay-ink-6"
                   bindtap={() => setOpen(false)}
                   hit-slop="6px"
                   accessibility-element

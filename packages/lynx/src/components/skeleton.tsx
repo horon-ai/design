@@ -33,7 +33,8 @@ export type SkeletonProps = Omit<PortedElementProps["div"], "className"> & {
  * The sweep highlight: a 200%-wide gradient whose 50% stop is the only moving part, as React's
  * `bg-[linear-gradient(…)]` class drew it.
  */
-const shimmerGradient = (highlight: string): string => `linear-gradient(90deg, transparent 30%, ${highlight} 50%, transparent 70%)`;
+const shimmerGradient = (highlight: string): string =>
+  `linear-gradient(90deg, transparent 30%, ${highlight} 50%, transparent 70%)`;
 
 /**
  * A 7% ink placeholder; size it with classes.

@@ -225,12 +225,7 @@ export function Input({
 
   return (
     <view
-      className={cn(
-        fieldBoxClass.base,
-        boxSurface,
-        fieldSizeClass[size],
-        className,
-      )}
+      className={cn(fieldBoxClass.base, boxSurface, fieldSizeClass[size], className)}
       style={{ ...(focused ? FOCUS_RING : undefined), ...style }}
     >
       {icon && <view className="relative flex shrink-0 items-center">{icon}</view>}

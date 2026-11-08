@@ -73,7 +73,7 @@ export function Kbd({ size = "md", keys, className, children, id, style }: KbdPr
   return (
     <view
       className={cn(
-        "flex shrink-0 flex-row items-center rounded-xs bg-overlay-ink-6 font-sans leading-none whitespace-nowrap",
+        "flex shrink-0 flex-row items-center whitespace-nowrap rounded-xs bg-overlay-ink-6 font-sans leading-none",
         sizeClass[size],
         className,
       )}

@@ -70,7 +70,8 @@ const options: {
 ];
 
 /** Whether a value can be dropped into a `<text>` as its child. */
-const isPlainText = (value: ReactNode): value is string | number => typeof value === "string" || typeof value === "number";
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
 
 /**
  * Paper `Tool permissions` (1VT5-0): one solid card, 16px radius with a default border. A subtle header
@@ -124,7 +125,7 @@ export function ToolPermissions({
   return (
     <view
       className={cn(
-        "flex w-full max-w-[520px] min-w-0 flex-col overflow-hidden rounded-2xl border border-border-default bg-bg-surface",
+        "flex w-full min-w-0 max-w-[520px] flex-col overflow-hidden rounded-2xl border border-border-default bg-bg-surface",
         className,
       )}
       style={style}
@@ -141,13 +142,13 @@ export function ToolPermissions({
         </view>
         <view className="min-w-0 flex-1" />
         <view
-          className="shrink-0 rounded-sm motion-colors active:opacity-70"
+          className="motion-colors shrink-0 rounded-sm active:opacity-70"
           bindtap={() => update(Object.fromEntries(tools.map((tool) => [tool.name, "allow" as const])))}
           accessibility-element
           accessibility-traits="button"
         >
           {isPlainText(allowAllLabel) ? (
-            <text className="text-label-sm whitespace-nowrap text-text-secondary">{allowAllLabel}</text>
+            <text className="whitespace-nowrap text-label-sm text-text-secondary">{allowAllLabel}</text>
           ) : (
             allowAllLabel
           )}

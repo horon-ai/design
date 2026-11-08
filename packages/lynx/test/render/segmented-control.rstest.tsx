@@ -11,7 +11,9 @@ const items = [
   { value: "call", label: "Call", disabled: true },
 ];
 
-const segments = (container: HTMLElement): Element[] => [...container.querySelectorAll("[accessibility-role-description='tab']")];
+const segments = (container: HTMLElement): Element[] => [
+  ...container.querySelectorAll("[accessibility-role-description='tab']"),
+];
 
 const selected = (container: HTMLElement): string[] =>
   segments(container)
@@ -26,12 +28,7 @@ test("tapping a segment moves the selection and reports the chosen value", async
   const seen: string[] = [];
   const { container } = render(
     <HoronProvider>
-      <SegmentedControl
-        aria-label="View"
-        defaultValue="chat"
-        onValueChange={(next) => seen.push(next)}
-        items={items}
-      />
+      <SegmentedControl aria-label="View" defaultValue="chat" onValueChange={(next) => seen.push(next)} items={items} />
     </HoronProvider>,
   );
   expect(selected(container)).toEqual(["Chat"]);

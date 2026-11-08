@@ -139,7 +139,12 @@ test("a vertical slider tracks page y, so a sideways-only drag keeps its value",
   const changed: number[] = [];
   const { container } = render(
     <HoronProvider>
-      <Slider aria-label="Pitch" orientation="vertical" defaultValue={40} onValueChange={(next) => changed.push(next)} />
+      <Slider
+        aria-label="Pitch"
+        orientation="vertical"
+        defaultValue={40}
+        onValueChange={(next) => changed.push(next)}
+      />
     </HoronProvider>,
   );
   layOutColumn(container, 0, 200);
@@ -171,11 +176,18 @@ test("a vertical touch near the top of the column lands on the high end of the r
   expect(value(container)).toBe("97");
 });
 
-
 test("format speaks the thumb's value through Intl instead of the plain number", () => {
   const { container } = render(
     <HoronProvider>
-      <Slider aria-label="Progress" locale="en-US" min={0} max={1} step={0.01} defaultValue={0.5} format={{ style: "percent" }} />
+      <Slider
+        aria-label="Progress"
+        locale="en-US"
+        min={0}
+        max={1}
+        step={0.01}
+        defaultValue={0.5}
+        format={{ style: "percent" }}
+      />
     </HoronProvider>,
   );
   expect(value(container)).toBe("50%");

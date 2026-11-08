@@ -13,7 +13,9 @@ const items: FilterBarItem[] = [
 
 /** The option chip whose accessible name matches. */
 const optionByName = (container: HTMLElement, label: string): Element => {
-  const node = [...container.querySelectorAll("view")].find((element) => element.getAttribute("accessibility-label") === label);
+  const node = [...container.querySelectorAll("view")].find(
+    (element) => element.getAttribute("accessibility-label") === label,
+  );
   if (!node) throw new Error(`no option named ${label}`);
   return node;
 };

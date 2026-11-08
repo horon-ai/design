@@ -1,10 +1,4 @@
-import {
-  cloneElement,
-  createContext,
-  isValidElement,
-  useContext,
-  type ReactNode,
-} from "@lynx-js/react";
+import { cloneElement, createContext, isValidElement, useContext, type ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
 import { cn } from "../lib/cn";
@@ -94,7 +88,7 @@ export function Field({ size = "md", invalid = false, disabled = false, classNam
   return (
     <FieldSizeContext.Provider value={size}>
       <FieldInvalidContext.Provider value={invalid}>
-        <view className={cn("flex max-w-full min-w-0 flex-col items-start", gapClass[size], className)} style={style}>
+        <view className={cn("flex min-w-0 max-w-full flex-col items-start", gapClass[size], className)} style={style}>
           {Array.isArray(children) ? children.map((child) => withFieldState(child)) : withFieldState(children)}
         </view>
       </FieldInvalidContext.Provider>

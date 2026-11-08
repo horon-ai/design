@@ -5,7 +5,9 @@ import { FileDrop, type FileDropFile, type FileDropSurface } from "../../src/com
 import { Backdrop } from "./backdrop";
 
 /** The host owns the files: this demo reports a descriptor as if its own picker had returned one. */
-const REPORT: FileDropFile[] = [{ name: "report.pdf", size: 248_320, type: "application/pdf", path: "/tmp/report.pdf" }];
+const REPORT: FileDropFile[] = [
+  { name: "report.pdf", size: 248_320, type: "application/pdf", path: "/tmp/report.pdf" },
+];
 
 function Examples({ surface }: { surface: FileDropSurface }) {
   const [files, setFiles] = useState<FileDropFile[]>([]);
