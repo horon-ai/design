@@ -100,12 +100,12 @@ if (prereleaseAt !== -1) {
 	if (!/^[a-z]+$/.test(id)) fail(`--prerelease 값 ${id || "(없음)"}은 rc 같은 영문 소문자여야 합니다.`);
 	// 빠진 PATCH를 채우는 중이어도 프리릴리스는 아직 게시되지 않은 다음 PATCH를 바탕으로 만듭니다.
 	const base = maxPatch < 0 ? `${line}.0` : `${line}.${maxPatch + 1}`;
-	const pattern = new RegExp(`^${base.replaceAll(".", "\\.")}-${id}\\.(\\d+)$`);
+	const prefix = `${base}-${id}.`;
 	let maxPre = -1;
 	for (const versions of allPublished.values()) {
 		for (const version of versions) {
-			const match = pattern.exec(version);
-			if (match) maxPre = Math.max(maxPre, Number(match[1]));
+			const tail = version.startsWith(prefix) ? version.slice(prefix.length) : "";
+			if (/^\d+$/.test(tail)) maxPre = Math.max(maxPre, Number(tail));
 		}
 	}
 	const latestPre = `${base}-${id}.${maxPre}`;
