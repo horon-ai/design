@@ -326,6 +326,28 @@ page,
   }
 }
 
+/* Flue's plume breathing. It stays near full height so the dense end keeps the column's lower part blue at
+   every moment, as the react shader does; `wave-level` dips to 35%, which a slow sidebar cycle (~82s) makes
+   read as the smoke draining away. */
+@keyframes flue-rise {
+  from {
+    transform: scaleY(0.86);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* Flue's bloom pulse, relative to the opacity its parent view sets, so the tuned `glow` stays the ceiling. */
+@keyframes flue-glow {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes slide-next {
   from {
     opacity: 0;

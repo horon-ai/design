@@ -295,11 +295,14 @@ export type FlueBackgroundProps = {
  * Flue: an animated smoke gradient drawn with token-colour gradients.
  *
  * React drew this with one fragment shader and a WebGL2 canvas; Lynx has neither, so the plume is a
- * composition of vertical gradient layers that breathe on the existing keyframes (`wave-level` for the
- * growth, `fade-in` for the bloom), scaled by the palette's `speed`. It fills its positioned parent
- * behind the content (the parent needs `relative`) and paints the flat `bgColor` first, so a missing
- * animation still leaves the palette's ground. Light mode paints the white-and-sky `FLUE_SKY`; dark mode
- * paints the black-and-blue `FLUE_NIGHT`; `reducedMotion` freezes every layer on its first frame.
+ * composition of vertical gradient layers that breathe on Flue's own keyframes (`flue-rise` holds each
+ * plume between 86% and 100% of its height, `flue-glow` pulses the bloom under its tuned opacity), scaled by
+ * the palette's `speed`. The general `wave-level` and `fade-in` keyframes are not used: `wave-level` drops
+ * to 35% and `fade-in` overrides the inline opacity up to 1, so a slow cycle read as the smoke draining and
+ * the bloom flooding the column. It fills its positioned parent behind the content (the parent needs
+ * `relative`) and paints the flat `bgColor` first, so a missing animation still leaves the palette's
+ * ground. Light mode paints the white-and-sky `FLUE_SKY`; dark mode paints the black-and-blue
+ * `FLUE_NIGHT`; `reducedMotion` holds every layer still at its full height.
  *
  * The wrapper is `absolute inset-0`, `pointer-events-none` and hidden from assistive tech, with a tint
  * view over the plumes, so it never intercepts input and the content above it stays readable. Settings
@@ -349,7 +352,7 @@ export function FlueBackground({ className, style, variant = "default", config, 
             ...(reducedMotion
               ? {}
               : {
-                  animationName: "wave-level",
+                  animationName: "flue-rise",
                   animationDuration: `${Math.round(layer.duration * cycle)}ms`,
                   animationDelay: `${layer.delay ?? 0}ms`,
                   animationTimingFunction: "ease-in-out",
@@ -359,23 +362,26 @@ export function FlueBackground({ className, style, variant = "default", config, 
           }}
         />
       ))}
-      <view
-        className="absolute inset-0"
-        style={{
-          backgroundImage: `linear-gradient(0deg, ${settings.colorD} 0%, transparent 62%)`,
-          opacity: shade(settings.glow / 2),
-          ...(reducedMotion
-            ? {}
-            : {
-                animationName: "fade-in",
-                animationDuration: `${Math.round(8000 * cycle)}ms`,
-                animationDelay: "-2600ms",
-                animationTimingFunction: "ease-in-out",
-                animationIterationCount: "infinite",
-                animationDirection: "alternate",
-              }),
-        }}
-      />
+      {/* The bloom's tuned opacity sits on this view; the child pulses under it, because an animated
+          `opacity` would replace the inline value instead of scaling it. */}
+      <view className="absolute inset-0" style={{ opacity: shade(settings.glow / 2) }}>
+        <view
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(0deg, ${settings.colorD} 0%, transparent 62%)`,
+            ...(reducedMotion
+              ? {}
+              : {
+                  animationName: "flue-glow",
+                  animationDuration: `${Math.round(8000 * cycle)}ms`,
+                  animationDelay: "-2600ms",
+                  animationTimingFunction: "ease-in-out",
+                  animationIterationCount: "infinite",
+                  animationDirection: "alternate",
+                }),
+          }}
+        />
+      </view>
       {settings.vignette > 0 ? (
         <view
           className="absolute inset-0"

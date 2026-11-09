@@ -7,8 +7,10 @@
 //   다르면(MAJOR·MINOR 변경) 게시하지 않고 실패합니다.
 // - 직전 실행이 일부 패키지만 올리고 도중에 실패했다면, 빠진 패키지만 같은 버전으로 채웁니다.
 //
-// 사용법: node .github/scripts/release-version.mjs [--write]
-//   --write  계산한 버전을 세 package.json에 적습니다(CI 작업 공간 안에서만, 커밋하지 않음).
+// 사용법: node .github/scripts/release-version.mjs [--write] [--prerelease <id>]
+//   --write             계산한 버전을 세 package.json에 적습니다(CI 작업 공간 안에서만, 커밋하지 않음).
+//   --prerelease <id>   다음 PATCH의 프리릴리스(`0.1.4-rc.0`, `0.1.4-rc.1` …)를 고릅니다. 정식 버전
+//                       계산에는 영향을 주지 않습니다. 빠진 패키지가 있으면 같은 번호로 채웁니다.
 // 결과 버전은 표준 출력 마지막 줄과, GITHUB_OUTPUT이 있으면 `version=` 줄로 남깁니다.
 
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
@@ -39,8 +41,7 @@ async function publishedVersions(name) {
 	if (response.status === 404) return [];
 	if (!response.ok) fail(`${name} 조회 실패: HTTP ${response.status}`);
 	const body = await response.json();
-	// 프리릴리스(0.1.0-beta 등)는 이 흐름이 만들지 않으므로 계산에서 뺍니다.
-	return Object.keys(body.versions ?? {}).filter((v) => STABLE.test(v));
+	return Object.keys(body.versions ?? {});
 }
 
 const manifests = PACKAGES.map((pkg) => {
@@ -59,8 +60,10 @@ for (const m of manifests) {
 const [major, minor] = parse(first.version, first.file);
 const line = `${major}.${minor}`;
 
-const published = new Map();
-for (const m of manifests) published.set(m.name, await publishedVersions(m.name));
+// 정식 버전 계산에는 X.Y.Z만 씁니다. 프리릴리스(0.1.4-rc.0, 0.0.0-stage 등)는 --prerelease 계산에만 씁니다.
+const allPublished = new Map();
+for (const m of manifests) allPublished.set(m.name, await publishedVersions(m.name));
+const published = new Map([...allPublished].map(([name, versions]) => [name, versions.filter((v) => STABLE.test(v))]));
 
 let maxPatch = -1;
 for (const [name, versions] of published) {
@@ -89,6 +92,26 @@ if (maxPatch < 0) {
 		next = `${line}.${maxPatch + 1}`;
 		console.log(`npm 최신 ${latest} → ${next}`);
 	}
+}
+
+const prereleaseAt = process.argv.indexOf("--prerelease");
+if (prereleaseAt !== -1) {
+	const id = process.argv[prereleaseAt + 1] ?? "";
+	if (!/^[a-z]+$/.test(id)) fail(`--prerelease 값 ${id || "(없음)"}은 rc 같은 영문 소문자여야 합니다.`);
+	// 빠진 PATCH를 채우는 중이어도 프리릴리스는 아직 게시되지 않은 다음 PATCH를 바탕으로 만듭니다.
+	const base = maxPatch < 0 ? `${line}.0` : `${line}.${maxPatch + 1}`;
+	const pattern = new RegExp(`^${base.replaceAll(".", "\\.")}-${id}\\.(\\d+)$`);
+	let maxPre = -1;
+	for (const versions of allPublished.values()) {
+		for (const version of versions) {
+			const match = pattern.exec(version);
+			if (match) maxPre = Math.max(maxPre, Number(match[1]));
+		}
+	}
+	const latestPre = `${base}-${id}.${maxPre}`;
+	const missingPre = maxPre < 0 ? [] : [...allPublished].filter(([, versions]) => !versions.includes(latestPre));
+	next = missingPre.length > 0 ? latestPre : `${base}-${id}.${maxPre + 1}`;
+	console.log(`프리릴리스 ${next}`);
 }
 
 if (process.argv.includes("--write")) {

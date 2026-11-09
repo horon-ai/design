@@ -113,19 +113,20 @@ node .github/scripts/release-version.mjs   # 마지막 줄이 다음 게시 버�
 cd packages/lynx && npm pack --dry-run   # 들어갈 파일 목록과 크기만 보여 주고 tarball은 만들지 않음
 ```
 
-### 처음 한 번 하는 설정
+### 게시 인증 (trusted publisher)
 
-1. npmjs.com에서 `horon-ai` 조직(organization)을 만듭니다. `@horon-ai/*` 이름은 이 조직이
-   있어야 게시됩니다.
-2. npm에서 Granular Access Token을 만듭니다. 권한은 Packages and scopes **Read and write**,
-   범위는 `@horon-ai` 조직, 2FA 우회(Bypass 2FA)를 켭니다.
-3. 저장소 Settings → Secrets and variables → Actions에 `NPM_TOKEN`으로 등록합니다.
-4. `main`에 병합하면 `0.1.0`이 게시됩니다. 패키지 변경 없이 게시하려면 Actions 탭의
-   Publish npm packages에서 수동 실행합니다(PATCH가 하나 오릅니다).
-5. 첫 게시 뒤 npmjs.com의 세 패키지 Settings → Trusted Publisher에 GitHub Actions,
-   `horon-ai/design`, 워크플로 `publish.yml`을 등록합니다. 그다음부터는 토큰 없이 OIDC로
-   게시되므로 `NPM_TOKEN` 시크릿과 npm 토큰을 지워도 됩니다(토큰은 만료일이 있습니다).
-   `@horon-ai/lynx`는 나중에 추가됐으므로 이 등록이 되어 있는지 따로 확인합니다.
+세 패키지(tokens, react, lynx)는 npmjs.com의 Settings → Trusted Publisher에 GitHub Actions,
+`horon-ai/design`, 워크플로 `publish.yml`이 등록돼 있습니다. `publish.yml`은 npm 토큰을 쓰지
+않고 GitHub OIDC로만 게시합니다. 등록은 워크플로 파일 이름만 보므로 어느 브랜치에서 실행해도
+됩니다. 새 패키지를 추가하면 첫 게시 뒤 그 패키지에도 같은 값으로 등록합니다.
+
+패키지 변경 없이 게시하려면 Actions 탭의 Publish npm packages에서 수동 실행합니다(PATCH가
+하나 오릅니다). `prerelease`에 `rc`를 넣고 실행하면 다음 PATCH의 프리릴리스(`0.1.4-rc.0` …)를
+`rc` dist-tag로만 게시하고 `latest`, 릴리스 태그, 사이트 배포는 건드리지 않습니다.
+
+```bash
+gh workflow run publish.yml --ref dev -f prerelease=rc   # 시험 게시
+```
 
 ```bash
 # 게시 확인

@@ -64,8 +64,25 @@ test("reduced motion freezes the plumes instead of animating them", () => {
     </HoronProvider>,
   );
 
-  expect(plumes(moving.container)[0].style.animationName).toBe("wave-level");
+  expect(plumes(moving.container)[0].style.animationName).toBe("flue-rise");
   expect(plumes(still.container)[0].style.animationName).toBe("");
+});
+
+test("the bloom pulses under its tuned opacity instead of replacing it", () => {
+  const { container } = render(
+    <HoronProvider scheme="light">
+      <view className="relative h-[200px] w-full">
+        <FlueBackground variant="sidebar" />
+      </view>
+    </HoronProvider>,
+  );
+
+  const bloom = plumes(container).find((element) => element.style.animationName === "flue-glow");
+  expect(bloom).toBeDefined();
+  // An animated opacity would override an inline one, so the tuned ceiling must live on the parent.
+  expect(bloom?.style.opacity).toBe("");
+  const ceiling = bloom?.parentElement;
+  expect(ceiling instanceof HTMLElement ? Number(ceiling.style.opacity) : Number.NaN).toBeCloseTo(0.15, 5);
 });
 
 test("a variant tint is laid over the smoke unless the caller replaces it", () => {
