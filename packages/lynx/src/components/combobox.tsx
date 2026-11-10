@@ -138,7 +138,7 @@ const popupSurfaceClass = (surface: InputSurface) =>
   surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-popover";
 
 /** Lynx's engine paints the placeholder from this variable, since `placeholder:` utilities cannot run. */
-const PLACEHOLDER_CLASS = "[--placeholder-color:var(--color-text-placeholder)]";
+const PLACEHOLDER_CLASS = "[-x-placeholder-color:var(--color-text-placeholder)]";
 
 const findItem = (items: readonly ComboboxItemData[], value: string | null | undefined) =>
   value == null ? null : (items.find((item) => item.value === value) ?? null);

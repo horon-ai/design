@@ -70,7 +70,7 @@ const FOCUS_RING = { boxShadow: "0 0 0 2px var(--color-text-brand)" };
  * Lynx's engine paints the placeholder from this variable; react's `placeholder:text-…` utility cannot run, so
  * the variable is set as a custom property through the class list, which Lynx inherits to the placeholder.
  */
-const PLACEHOLDER_CLASS = "[--placeholder-color:var(--color-text-placeholder)]";
+const PLACEHOLDER_CLASS = "[-x-placeholder-color:var(--color-text-placeholder)]";
 
 /** The only part of a Lynx textarea event a field reads. */
 type LynxTextEvent = { detail: { value: string } };
