@@ -174,7 +174,7 @@ export type TaskComposerProps = {
 };
 
 /** Lynx's engine paints the placeholder from this variable, which the class list sets on the field. */
-const PLACEHOLDER_CLASS = "[--placeholder-color:var(--color-text-secondary)]";
+const PLACEHOLDER_CLASS = "[-x-placeholder-color:var(--color-text-secondary)]";
 
 /** The ring Lynx draws where react drew its 2px offset outline on the composer box. */
 const FOCUS_RING = { boxShadow: "0 0 0 2px var(--color-text-brand)" };

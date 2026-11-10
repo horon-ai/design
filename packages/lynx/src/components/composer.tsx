@@ -56,7 +56,7 @@ const textClass: Record<ComposerSize, string> = {
  * Lynx's engine paints the placeholder from this variable, which the class list sets so the engine
  * inherits it into the field.
  */
-const PLACEHOLDER_CLASS = "[--placeholder-color:var(--color-text-placeholder)]";
+const PLACEHOLDER_CLASS = "[-x-placeholder-color:var(--color-text-placeholder)]";
 
 /** The only part of a Lynx textarea event the composer reads. */
 type LynxTextEvent = { detail: { value: string } };

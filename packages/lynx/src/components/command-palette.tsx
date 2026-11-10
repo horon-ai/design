@@ -63,7 +63,7 @@ export type CommandPaletteProps = {
 };
 
 /** Lynx's engine paints the placeholder from this variable; react's `placeholder:` utility cannot run. */
-const PLACEHOLDER_CLASS = "[--placeholder-color:var(--color-text-secondary)]";
+const PLACEHOLDER_CLASS = "[-x-placeholder-color:var(--color-text-secondary)]";
 
 const isPlainText = (value: ReactNode): value is string | number =>
   typeof value === "string" || typeof value === "number";
