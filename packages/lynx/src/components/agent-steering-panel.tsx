@@ -78,7 +78,7 @@ const EASE_SPRING = "cubic-bezier(0.34, 1.3, 0.64, 1)";
 const EASE_OUT_QUINT = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 /** Lynx's engine paints the placeholder from this variable, which the class list sets on the field. */
-const PLACEHOLDER_CLASS = "[--placeholder-color:var(--color-text-secondary)]";
+const PLACEHOLDER_CLASS = "[-x-placeholder-color:var(--color-text-secondary)]";
 
 /** The only part of a Lynx text event the panel reads. */
 type LynxTextEvent = { detail: { value: string } };
