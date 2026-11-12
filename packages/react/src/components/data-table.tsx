@@ -105,7 +105,7 @@ export function DataTableHeader({ icon, title, actions, className }: DataTableHe
   return (
     <div className={cn("flex items-center gap-3 px-6 py-4.5 group-data-[device=mobile]/dt:px-4.5", className)}>
       {icon && (
-        <span className="flex size-6.5 shrink-0 items-center justify-center rounded-[7px] bg-bg-brand text-text-brand [&>svg]:size-4">
+        <span className="flex size-6.5 shrink-0 items-center justify-center rounded-xs bg-bg-brand text-text-brand [&>svg]:size-4">
           {icon}
         </span>
       )}

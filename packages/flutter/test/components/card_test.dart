@@ -17,11 +17,12 @@ Future<void> pumpCard(WidgetTester tester, Widget child, {Brightness brightness 
 void main() {
   testWidgets('card: the glass surface is a 20px rounded thick glass card', (WidgetTester tester) async {
     await pumpCard(tester, const HoronCard(title: '제목', description: '설명', surface: HoronCardSurface.glass));
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronCard)));
     expect(find.byType(HoronLiquidGlass), findsOneWidget);
     final ClipRRect clip = tester.widget<ClipRRect>(
       find.descendant(of: find.byType(HoronCard), matching: find.byType(ClipRRect)).first,
     );
-    expect((clip.borderRadius as BorderRadius).topLeft.x, closeTo(20, 0.01));
+    expect((clip.borderRadius as BorderRadius).topLeft.x, closeTo(theme.radius.xl, 0.01));
     expect(find.text('제목'), findsOneWidget);
     expect(find.text('설명'), findsOneWidget);
   });

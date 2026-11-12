@@ -155,7 +155,7 @@ export function ResearchRunPanel({
   return (
     <section
       className={cn(
-        "flex w-full max-w-150 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full max-w-150 min-w-0 flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
@@ -188,7 +188,7 @@ export function ResearchRunPanel({
               >
                 <Spinner size={14} />
                 <span className="min-w-0 text-label-md text-text-primary">{statusLabel}</span>
-                <span aria-hidden className="h-3 w-0.5 shrink-0 animate-caret rounded-[1px] bg-interactive-primary" />
+                <span aria-hidden className="h-3 w-0.5 shrink-0 animate-caret rounded-full bg-interactive-primary" />
                 {meta.length > 0 && (
                   <span className="text-caption text-text-secondary tabular-nums">
                     {meta.map((entry, index) => (
@@ -205,7 +205,7 @@ export function ResearchRunPanel({
               <div aria-live="polite" className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
                 <Spinner size={14} />
                 <span className="min-w-0 text-label-md text-text-primary">{statusLabel}</span>
-                <span aria-hidden className="h-3 w-0.5 shrink-0 animate-caret rounded-[1px] bg-interactive-primary" />
+                <span aria-hidden className="h-3 w-0.5 shrink-0 animate-caret rounded-full bg-interactive-primary" />
                 {meta.length > 0 && (
                   <span className="text-caption text-text-secondary tabular-nums">
                     {meta.map((entry, index) => (

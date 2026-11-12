@@ -54,7 +54,7 @@ double? radiusOf(BoxDecoration decoration) =>
     decoration.borderRadius is BorderRadius ? (decoration.borderRadius! as BorderRadius).topLeft.x : null;
 
 void main() {
-  testWidgets('bot instructions panel: the surface is a 24px radius card on bg-surface', (WidgetTester tester) async {
+  testWidgets('bot instructions panel: the surface is the xl radius card on bg-surface', (WidgetTester tester) async {
     await pumpPanel(
       tester,
       HoronBotInstructionsPanel(
@@ -66,12 +66,14 @@ void main() {
     expect(tester.takeException(), isNull);
     final List<BoxDecoration> painted = decorations(tester);
     expect(
-      painted.where((BoxDecoration d) => d.color == theme.colors.bgSurface && radiusOf(d) == 24),
+      painted.where((BoxDecoration d) => d.color == theme.colors.bgSurface && radiusOf(d) == theme.radius.xl),
       isNotEmpty,
-      reason: 'rounded-[24px] bg-bg-surface',
+      reason: 'rounded-xl bg-bg-surface',
     );
     expect(
-      painted.where((BoxDecoration d) => d.border?.top.color == theme.colors.borderDefault && radiusOf(d) == 24),
+      painted.where(
+        (BoxDecoration d) => d.border?.top.color == theme.colors.borderDefault && radiusOf(d) == theme.radius.xl,
+      ),
       isNotEmpty,
       reason: 'border-border-default',
     );

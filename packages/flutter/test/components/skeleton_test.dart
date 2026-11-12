@@ -19,7 +19,7 @@ void main() {
     ClipRRect clip = tester.widget<ClipRRect>(
       find.descendant(of: find.byType(HoronSkeleton), matching: find.byType(ClipRRect)).first,
     );
-    expect((clip.borderRadius as BorderRadius).topLeft.x, closeTo(6, 0.01));
+    expect((clip.borderRadius as BorderRadius).topLeft.x, closeTo(theme.radius.xs, 0.01));
     expect(tester.getSize(find.byType(HoronSkeleton)), const Size(120, 12));
 
     await pumpSkeleton(tester, const HoronSkeleton(width: 36, height: 36, pill: true));

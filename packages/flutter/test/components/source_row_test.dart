@@ -21,7 +21,7 @@ int _barCount(WidgetTester tester) => tester
     .length;
 
 void main() {
-  testWidgets('source row: the tile is 32px at a 10px radius with a 16px icon', (WidgetTester tester) async {
+  testWidgets('source row: the tile is 32px at the md radius with a 16px icon', (WidgetTester tester) async {
     await pumpRow(
       tester,
       const HoronSourceRow(
@@ -35,7 +35,7 @@ void main() {
       final Decoration? decoration = box.decoration;
       return decoration is BoxDecoration &&
           decoration.borderRadius != null &&
-          (decoration.borderRadius! as BorderRadius).topLeft.x == 10;
+          (decoration.borderRadius! as BorderRadius).topLeft.x == HoronRadius.md;
     });
     expect(tester.getSize(find.byWidget(tile)), const Size(32, 32));
     expect(IconTheme.of(tester.element(find.byIcon(Icons.description_outlined))).size, 16);

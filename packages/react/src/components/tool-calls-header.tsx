@@ -75,7 +75,7 @@ export function ToolCallsHeader({
         {chips.length > 0 && (
           <span className="flex shrink-0 items-center">
             {Children.map(chips, (icon) => (
-              <span className="-ml-2 flex size-7 shrink-0 items-center justify-center rounded-[10px] bg-bg-subtle text-text-secondary ring-2 ring-bg-surface first:ml-0 [&>svg]:size-3.5">
+              <span className="-ml-2 flex size-7 shrink-0 items-center justify-center rounded-md bg-bg-subtle text-text-secondary ring-2 ring-bg-surface first:ml-0 [&>svg]:size-3.5">
                 {icon}
               </span>
             ))}

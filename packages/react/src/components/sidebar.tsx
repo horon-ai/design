@@ -265,7 +265,7 @@ export function SidebarWorkspaceSwitch({ initial, name, className, ...props }: S
     <button
       type="button"
       className={cn(
-        "flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-[10px] pr-1 pl-2 text-left motion-colors hover:bg-overlay-ink-6 data-popup-open:bg-overlay-ink-6",
+        "flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-md pr-1 pl-2 text-left motion-colors hover:bg-overlay-ink-6 data-popup-open:bg-overlay-ink-6",
         "focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}
@@ -532,7 +532,7 @@ export function SidebarAccount({ initials, name, email, className, ...props }: S
       )}
       {...props}
     >
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-sky-200 text-label-md text-surface-ink">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-sky-200 text-label-md text-surface-ink">
         {initials}
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
@@ -701,7 +701,7 @@ export function SidebarAddButton({ icon = addIcon, className, children, ...props
     <button
       type="button"
       className={cn(
-        "relative mt-2 flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-[10px] text-label-md text-text-secondary motion-colors hover:bg-overlay-ink-4",
+        "relative mt-2 flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-md text-label-md text-text-secondary motion-colors hover:bg-overlay-ink-4",
         "focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}

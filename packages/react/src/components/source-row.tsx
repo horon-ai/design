@@ -93,11 +93,11 @@ export function SourceRow({
         "flex flex-wrap items-center gap-x-3 gap-y-2 px-2 py-3",
         variant === "list"
           ? "relative after:absolute after:inset-x-2 after:bottom-0 after:h-px after:bg-overlay-ink-8 last:after:hidden"
-          : "rounded-[14px] border border-border-default bg-bg-surface px-3",
+          : "rounded-lg border border-border-default bg-bg-surface px-3",
         className,
       )}
     >
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-overlay-ink-5 text-text-primary [&>svg]:size-4">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-overlay-ink-5 text-text-primary [&>svg]:size-4">
         {icon}
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">

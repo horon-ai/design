@@ -19,8 +19,8 @@ enum HoronAgentLaneStatus {
 /// `agent-lane.tsx`의 `py-3`입니다.
 const double _lanePaddingY = 12;
 
-/// `agent-lane.tsx`의 `rounded-[5px]`입니다. 봇 타일의 반경입니다.
-const double _botTileRadius = 5;
+/// `rounded-xs` — 봇 타일의 반경입니다.
+const double _botTileRadius = HoronRadius.xs;
 
 /// `agent-lane.tsx`의 `size-4.5`입니다. 봇 타일입니다.
 const double _botTile = 18;

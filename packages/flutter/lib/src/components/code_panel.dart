@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
-/// `code-panel.tsx`의 `rounded-[10px]`입니다.
-const double _panelRadius = 10;
+/// `code-panel.tsx`의 `rounded-md`입니다.
+const double _panelRadius = HoronRadius.md;
 
 /// `code-panel.tsx`의 `px-4`입니다.
 const double _panelPaddingX = 16;

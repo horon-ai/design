@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../theme/horon_theme.dart';
+import '../tokens/horon_tokens.g.dart';
 import 'kbd.dart';
 
-/// `agent-panel.tsx`의 `rounded-[24px]`입니다.
-const double _panelRadius = 24;
+/// `agent-panel.tsx`의 `rounded-xl`입니다.
+const double _panelRadius = HoronRadius.xl;
 
 /// `agent-panel.tsx`의 `px-5`입니다.
 const double _panelPaddingX = 20;
 
-/// `agent-panel.tsx`의 `rounded-[5px]`입니다. 봇 타일의 반경입니다.
-const double _chipTileRadius = 5;
+/// `agent-panel.tsx`의 `rounded-xs` — 봇 타일의 반경입니다.
+const double _chipTileRadius = HoronRadius.xs;
 
 /// `agent-panel.tsx`의 `h-7.5`입니다. 칩 높이입니다.
 const double _chipHeight = 30;

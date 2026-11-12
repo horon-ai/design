@@ -17,7 +17,7 @@ const double _meterPadding = 16;
 const double _meterTrackHeight = 6;
 
 /// `usage-meter.tsx`의 `rounded-xl`입니다.
-const double _meterRadius = 20;
+const double _meterRadius = HoronRadius.xl;
 
 /// `usage-meter.tsx`의 `duration-400`입니다.
 const Duration _meterFillDuration = Duration(milliseconds: 400);

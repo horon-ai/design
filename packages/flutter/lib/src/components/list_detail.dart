@@ -309,7 +309,7 @@ class _ListRowState extends State<_ListRow> {
             padding: EdgeInsets.symmetric(horizontal: theme.space.s3, vertical: theme.space.s2_5), // px-3 py-2.5
             decoration: BoxDecoration(
               color: background,
-              borderRadius: BorderRadius.circular(theme.space.s2_5), // list-detail.tsx rounded-[10px]
+              borderRadius: BorderRadius.circular(theme.radius.md), // list-detail.tsx rounded-md
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -383,7 +383,7 @@ class HoronListDetailHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 // bg-sky-100 dark:bg-sky-900
                 color: dark ? HoronPalette.sky900 : HoronPalette.sky100,
-                borderRadius: BorderRadius.circular(theme.space.s2_5), // rounded-[10px]
+                borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md
               ),
               child: IconTheme.merge(
                 // [&_svg]:size-5, text-sky-700 dark:text-sky-300
@@ -658,7 +658,7 @@ class _HoronListDetailInstructionsState extends State<HoronListDetailInstruction
 /// 텍스트 영역의 1px 테두리입니다.
 OutlineInputBorder _fieldBorder(HoronThemeData theme, Color color, {double width = 1}) {
   return OutlineInputBorder(
-    borderRadius: BorderRadius.circular(theme.space.s2_5), // rounded-[10px]
+    borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md
     borderSide: BorderSide(color: color, width: width),
   );
 }

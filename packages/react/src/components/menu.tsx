@@ -64,8 +64,8 @@ export type MenuContentProps = WithClass<ComponentProps<typeof BaseMenu.Popup>> 
  */
 export const menuPopupClass = {
   glass: "rounded-xl veil-overlay",
-  solid: "rounded-[18px] bg-glass-fill-solid shadow-popover",
-  paper: "rounded-[14px] border border-border-default bg-bg-default shadow-[0_12px_32px_#0A142424]",
+  solid: "rounded-xl bg-glass-fill-solid shadow-popover",
+  paper: "rounded-lg border border-border-default bg-bg-default shadow-[0_12px_32px_#0A142424]",
 } as const;
 
 /**
@@ -168,7 +168,7 @@ export function MenuItem({
     <BaseMenu.Item
       className={cn(
         "relative flex w-full cursor-pointer items-center gap-2.5 motion-colors outline-none select-none data-disabled:cursor-not-allowed data-disabled:opacity-40 data-highlighted:bg-overlay-ink-6",
-        surface === "glass" ? "rounded-md px-3" : "rounded-[10px] px-2.5",
+        surface === "glass" ? "rounded-md px-3" : "rounded-md px-2.5",
         description ? "h-12" : surface === "glass" ? "h-10" : "h-9",
         selected && "bg-bg-brand data-highlighted:bg-bg-brand",
         className,

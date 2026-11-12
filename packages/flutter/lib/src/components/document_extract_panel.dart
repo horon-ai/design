@@ -18,11 +18,11 @@ enum HoronExtractFieldStatus {
   check,
 }
 
-/// `rounded-[24px]` — 패널 반경 24px입니다. 토큰 단계(16, 20)에 없는 값입니다.
-const double _panelRadius = 24;
+/// `rounded-xl` — 패널 반경입니다.
+const double _panelRadius = HoronRadius.xl;
 
-/// `rounded-[10px]` — 확인이 필요한 값 상자의 반경입니다.
-const double _fieldRadius = 10;
+/// `rounded-md` — 확인이 필요한 값 상자의 반경입니다.
+const double _fieldRadius = HoronRadius.md;
 
 /// `border-[1.2px]` — `ExtractHighlight` 상자의 테두리 두께입니다.
 const double _highlightBorder = 1.2;
@@ -36,8 +36,8 @@ const double _fileIconSize = 16;
 /// `h-px` — 구분선 두께 1px입니다.
 const double _hairline = 1;
 
-/// `rounded-[5px]` — 바닥줄 봇 머리글자 타일의 반경입니다. 토큰 단계에 없습니다.
-const double _botTileRadius = 5;
+/// `rounded-xs` — 바닥줄 봇 머리글자 타일의 반경입니다.
+const double _botTileRadius = HoronRadius.xs;
 
 /// `disabled:opacity-40`입니다.
 const double _disabledOpacity = 0.4;
@@ -371,7 +371,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: colors.overlayInk5, // bg-overlay-ink-5
-                      borderRadius: BorderRadius.circular(space.step(2.5)), // rounded-[10px]
+                      borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md
                     ),
                     child: Icon(Icons.picture_as_pdf, size: _fileIconSize, color: colors.textDanger), // FilePdf size-4
                   ),
@@ -803,7 +803,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: space.s3, vertical: space.s0_5), // px-3 py-0.5
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(space.step(2.5)), // rounded-[10px]
+            borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md
             border: Border.all(color: colors.overlayInk10), // border-overlay-ink-10
           ),
           child: Column(
@@ -882,7 +882,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
       padding: EdgeInsets.all(space.s3), // p-3 = 12
       decoration: BoxDecoration(
         color: colors.overlayInk4,
-        borderRadius: BorderRadius.circular(space.step(2.5)), // rounded-[10px]
+        borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md
       ),
       child: Text(
         _json(flat),
@@ -987,7 +987,7 @@ class _HoronDocumentExtractPanelState extends State<HoronDocumentExtractPanel> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: colors.interactivePrimary,
-                borderRadius: BorderRadius.circular(_botTileRadius), // rounded-[5px]
+                borderRadius: BorderRadius.circular(_botTileRadius), // rounded-xs
               ),
               child: Text(bot.initial, style: theme.text.labelSm.copyWith(color: colors.textInverse)),
             ),

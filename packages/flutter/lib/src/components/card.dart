@@ -17,7 +17,7 @@ const double _cardPadding = 20;
 const double _cardGap = 8;
 
 /// `card.tsx`의 `rounded-xl`입니다.
-const double _cardRadius = 20;
+const double _cardRadius = HoronRadius.xl;
 
 /// Figma `Card`(63:310): 320px 두꺼운 유리 카드입니다. 기본·상호작용·선택 상태가 있습니다.
 ///

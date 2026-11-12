@@ -120,7 +120,7 @@ class HoronIntegrationRow extends StatelessWidget {
     return HoronSurfaceLayer(
       surface: surface,
       tier: HoronGlassTier.thick,
-      borderRadius: BorderRadius.circular(theme.radius.xl2), // rounded-[16px]
+      borderRadius: BorderRadius.circular(theme.radius.xl2), // rounded-2xl
       borderColor: status == HoronIntegrationStatus.reconnect ? theme.colors.borderDanger : null,
       child: body,
     );
@@ -148,7 +148,7 @@ class HoronIntegrationRow extends StatelessWidget {
         curve: HoronMotion.colorsCurve,
         decoration: BoxDecoration(
           color: background,
-          borderRadius: BorderRadius.circular(theme.space.s2_5), // rounded-[10px]
+          borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md
         ),
         child: IconTheme.merge(
           // [&>svg]:size-5 — 색은 상태별 타일 글자색을 씁니다.

@@ -79,13 +79,13 @@ void main() {
     expect(title.data, 'October 2026');
   });
 
-  testWidgets('the popover variant swaps the 24 radius, the label-lg title and 32px arrows', (
+  testWidgets('the popover variant swaps the xl radius, the label-lg title and 32px arrows', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(_host(HoronCalendar(defaultMonth: _month, today: _today, popover: true)));
     final HoronThemeData theme = _theme(tester);
 
-    expect((_surfaceDecoration(tester).borderRadius! as BorderRadius).topLeft.x, 24, reason: 'rounded-[24px]');
+    expect((_surfaceDecoration(tester).borderRadius! as BorderRadius).topLeft.x, theme.radius.xl, reason: 'rounded-xl');
     expect(
       tester.widget<Padding>(find.descendant(of: _surface(), matching: find.byType(Padding)).first).padding,
       EdgeInsets.all(theme.space.s3_5),

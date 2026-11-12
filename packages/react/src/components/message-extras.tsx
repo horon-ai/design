@@ -116,11 +116,11 @@ export function Attachment({ name, detail, thumbnail, onRemove, removeLabel = "R
       {thumbnail ? (
         <span
           aria-hidden
-          className="size-10 shrink-0 rounded-[10px] bg-cover bg-center"
+          className="size-10 shrink-0 rounded-md bg-cover bg-center"
           style={{ backgroundImage: `url(${JSON.stringify(thumbnail)})` }}
         />
       ) : (
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-accent-sky-500-16 text-text-brand">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-accent-sky-500-16 text-text-brand">
           <FileText aria-hidden className="size-5" />
         </span>
       )}

@@ -23,11 +23,12 @@ void main() {
         children: <Widget>[HoronSettingsRow(title: '언어', last: true)],
       ),
     );
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronSettingsList)));
     expect(find.byType(HoronLiquidGlass), findsOneWidget);
     final ClipRRect clip = tester.widget<ClipRRect>(
       find.descendant(of: find.byType(HoronSettingsList), matching: find.byType(ClipRRect)).first,
     );
-    expect((clip.borderRadius as BorderRadius).topLeft.x, closeTo(16, 0.01));
+    expect((clip.borderRadius as BorderRadius).topLeft.x, closeTo(theme.radius.xl2, 0.01));
   });
 
   testWidgets('settings row: the title and description sit left, the control right', (WidgetTester tester) async {

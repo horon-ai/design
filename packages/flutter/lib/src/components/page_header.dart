@@ -8,10 +8,10 @@ import '../tokens/horon_tokens.g.dart';
 import 'icon_button.dart';
 import 'liquid_glass.dart';
 
-/// `page-header.tsx`의 `rounded-[28px]`입니다.
+/// `page-header.tsx`의 `rounded-xl`입니다.
 ///
 /// 토큰 반경 단계에 28이 없어(`radius.xl` = 20, `radius.xl2` = 16) 임의값을 그대로 씁니다.
-const double _headerRadius = 28;
+const double _headerRadius = HoronRadius.xl;
 
 /// Figma `Header with filter`(Segmented filters 88:723)입니다.
 ///
@@ -54,7 +54,7 @@ class HoronPageHeader extends StatelessWidget {
     final HoronColors colors = theme.colors;
     final HoronSpaceSpec space = theme.space;
 
-    // `flex flex-col gap-1.5 rounded-[28px] bg-glass-regular p-2`입니다.
+    // `flex flex-col gap-1.5 rounded-xl bg-glass-regular p-2`입니다.
     return HoronSurfaceLayer(
       surface: surface,
       tier: HoronGlassTier.regular,

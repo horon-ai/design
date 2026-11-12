@@ -34,7 +34,7 @@ export function AgentPanel({
   return (
     <section
       className={cn(
-        "flex min-w-0 flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-5 pt-4 pb-2",
+        "flex min-w-0 flex-col items-stretch gap-3 rounded-xl border border-border-default bg-bg-surface px-5 pt-4 pb-2",
         className,
       )}
       {...props}
@@ -70,7 +70,7 @@ export function ComposerChip({ leading, tileClassName, className, children, ...p
       {typeof leading === "string" ? (
         <span
           className={cn(
-            "flex size-4 items-center justify-center rounded-[5px] text-label-sm text-text-inverse",
+            "flex size-4 items-center justify-center rounded-xs text-label-sm text-text-inverse",
             tileClassName ?? "bg-interactive-primary",
           )}
         >

@@ -116,7 +116,7 @@ export function TaskRow({
       <div className="flex items-center gap-1.5 text-caption text-text-secondary">
         <span
           className={cn(
-            "flex size-4.5 shrink-0 items-center justify-center rounded-[5px] text-label-sm",
+            "flex size-4.5 shrink-0 items-center justify-center rounded-xs text-label-sm",
             bot.tileClassName ? cn("text-text-inverse", bot.tileClassName) : botTile[status],
           )}
         >

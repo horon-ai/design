@@ -120,7 +120,7 @@ export function KnowledgeBasePanel({
   return (
     <section
       className={cn(
-        "flex w-full max-w-200 min-w-0 flex-col items-stretch gap-3 rounded-[24px] border border-border-default bg-bg-surface px-5 py-4.5",
+        "flex w-full max-w-200 min-w-0 flex-col items-stretch gap-3 rounded-xl border border-border-default bg-bg-surface px-5 py-4.5",
         className,
       )}
       {...props}

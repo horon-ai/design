@@ -18,14 +18,14 @@ enum HoronInstructionVariableTone {
   neutral,
 }
 
-/// `rounded-[24px]` — 패널 반경 24px입니다. 토큰 단계(16, 20)에 없는 값입니다.
-const double _panelRadius = 24;
+/// `rounded-xl` — 패널 반경입니다.
+const double _panelRadius = HoronRadius.xl;
 
 /// `size-3` — 머리말 캐럿 12px입니다.
 const double _caretSize = 12;
 
-/// `rounded-[5px]` — 봇 알약 아바타의 반경입니다. 토큰 단계에 없는 값입니다.
-const double _botAvatarRadius = 5;
+/// `rounded-xs` — 봇 알약 아바타의 반경입니다.
+const double _botAvatarRadius = HoronRadius.xs;
 
 /// `size-3.5` — Run 아이콘 14px입니다.
 const double _runIconSize = 14;
@@ -521,7 +521,7 @@ class _HoronBotInstructionsPanelState extends State<HoronBotInstructionsPanel> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: colors.interactivePrimary, // bg-interactive-primary
-                borderRadius: BorderRadius.circular(_botAvatarRadius), // rounded-[5px]
+                borderRadius: BorderRadius.circular(_botAvatarRadius), // rounded-xs
               ),
               child: Text(widget.bot.initial, style: theme.text.labelSm.copyWith(color: colors.textInverse)),
             ),

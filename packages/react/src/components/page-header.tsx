@@ -54,7 +54,7 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        "relative flex max-w-full min-w-0 flex-col gap-1.5 overflow-clip rounded-[28px] p-2",
+        "relative flex max-w-full min-w-0 flex-col gap-1.5 overflow-clip rounded-xl p-2",
         surface === "glass" ? "bg-glass-regular" : "border border-border-default bg-bg-surface",
         className,
       )}
