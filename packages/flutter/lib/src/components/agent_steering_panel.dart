@@ -22,8 +22,8 @@ enum HoronSteeringStepStatus {
   todo,
 }
 
-/// `rounded-[24px]` — 패널 반경 24입니다. 토큰 단계에 같은 값이 없습니다.
-const double _panelRadius = 24;
+/// `rounded-xl` — 패널 반경입니다.
+const double _panelRadius = HoronRadius.xl;
 
 /// `max-w-130` — 패널이 더 넓어지지 않는 폭 520입니다.
 const double _panelMaxWidth = 520;
@@ -43,8 +43,8 @@ const double _pauseButtonSize = 30;
 /// `[&>svg]:size-4` — 일시정지·보내기 아이콘 16입니다.
 const double _iconButtonIconSize = 16;
 
-/// `rounded-[10px]` — 쪽지 줄의 반경 10입니다.
-const double _controlRadius = 10;
+/// `rounded-md` — 쪽지 줄의 반경입니다.
+const double _controlRadius = HoronRadius.md;
 
 /// `min-h-6.5` — 단계 한 줄의 최소 높이 26입니다.
 const double _stepRowHeight = 26;
@@ -556,7 +556,7 @@ class _StepMarker extends StatelessWidget {
   }
 }
 
-/// `rounded-[10px] bg-overlay-ink-4 py-2 pr-2.5 pl-3.5` 쪽지 한 장입니다.
+/// `rounded-md bg-overlay-ink-4 py-2 pr-2.5 pl-3.5` 쪽지 한 장입니다.
 ///
 /// 제거를 누르면 130ms `pop-out`으로 줄어든 뒤 콜백을 부르고, 적용되면
 /// `motion-swap`으로 Now/Remove 버튼과 적용 알약이 같은 자리에서 교차합니다.
@@ -833,7 +833,7 @@ class _RemoveButtonState extends State<_RemoveButton> {
   }
 }
 
-/// `size-8 rounded-[10px]` 일시정지·재개 버튼입니다.
+/// `size-8 rounded-md` 일시정지·재개 버튼입니다.
 class _PauseButton extends StatefulWidget {
   const _PauseButton({required this.paused, this.onPressed});
 

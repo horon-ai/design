@@ -17,11 +17,11 @@ const double _solidWidth = 256;
 /// `w-76` — Paper 메뉴의 304px 폭입니다.
 const double _paperWidth = 304;
 
-/// `rounded-[18px]` — 토큰 반경 단계에 없는 단색 메뉴의 반경입니다.
-const double _solidRadius = 18;
+/// `rounded-xl` — 단색 메뉴의 반경입니다.
+const double _solidRadius = HoronRadius.xl;
 
-/// `rounded-[10px]` — 토큰 반경 단계에 없는 단색 메뉴 항목의 반경입니다.
-const double _itemRadius = 10;
+/// `rounded-md` — 단색 메뉴 항목의 반경입니다.
+const double _itemRadius = HoronRadius.md;
 
 /// `[&>svg]:size-4.5` — 항목 앞 아이콘 18px입니다.
 const double _menuIconSize = 18;
@@ -246,8 +246,8 @@ class HoronMenuContent extends StatelessWidget {
     final HoronColors colors = theme.colors;
     final BorderRadius radius = BorderRadius.circular(switch (surface) {
       HoronMenuSurface.glass => theme.radius.xl, // rounded-xl = 20
-      HoronMenuSurface.solid => _solidRadius, // rounded-[18px]
-      HoronMenuSurface.paper => theme.radius.lg, // rounded-[14px] = radius.lg
+      HoronMenuSurface.solid => _solidRadius, // rounded-xl
+      HoronMenuSurface.paper => theme.radius.lg, // rounded-lg
     });
 
     // 팝업은 트리거에 매달린 떠 있는 요소라 크기 기준이 자기 상자가 아니라 화면입니다
@@ -281,13 +281,13 @@ class HoronMenuContent extends StatelessWidget {
     }
 
     final BoxDecoration decoration = switch (surface) {
-      // `rounded-[18px] bg-glass-fill-solid shadow-popover`.
+      // `rounded-xl bg-glass-fill-solid shadow-popover`.
       HoronMenuSurface.solid => BoxDecoration(
         borderRadius: radius,
         color: colors.glassFillSolid,
         boxShadow: theme.shadows.popover,
       ),
-      // `rounded-[14px] border border-border-default bg-bg-default shadow-[0_12px_32px_#0A142424]`.
+      // `rounded-lg border border-border-default bg-bg-default shadow-[0_12px_32px_#0A142424]`.
       HoronMenuSurface.paper => BoxDecoration(
         borderRadius: radius,
         color: colors.bgDefault,
@@ -379,7 +379,7 @@ class _HoronMenuItemState extends State<HoronMenuItem> {
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
     final bool hasDescription = widget.description != null;
 
-    // 유리는 `rounded-md px-3`, 단색·Paper는 `rounded-[10px] px-2.5`.
+    // 유리는 `rounded-md px-3`, 단색·Paper는 `rounded-md px-2.5`.
     final bool glass = surface == HoronMenuSurface.glass;
     final BorderRadius radius = BorderRadius.circular(glass ? theme.radius.md : _itemRadius);
     final double horizontal = glass ? space.s3 : space.s2_5;

@@ -37,9 +37,6 @@ const double _cellGap = 12;
 /// `size-6.5` — 머리 아이콘 타일 한 변입니다(26).
 const double _headerTileSize = 26;
 
-/// `rounded-[7px]` — 머리 아이콘 타일의 반경입니다. 토큰 단계에 없어 간격 단위로 계산합니다.
-const double _headerTileRadiusUnits = 1.75;
-
 /// `[&>svg]:size-4` — 머리 아이콘 크기입니다(16).
 const double _headerIconSize = 16;
 
@@ -394,7 +391,7 @@ class HoronDataTableHeader extends StatelessWidget {
             height: _headerTileSize,
             decoration: BoxDecoration(
               color: colors.bgBrand, // bg-bg-brand
-              borderRadius: BorderRadius.circular(space.step(_headerTileRadiusUnits)), // rounded-[7px]
+              borderRadius: BorderRadius.circular(HoronRadius.xs), // rounded-xs
             ),
             child: Center(
               child: IconTheme.merge(

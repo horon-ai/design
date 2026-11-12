@@ -17,8 +17,8 @@ const double _actionSide = 30;
 /// `message-extras.tsx`의 `size-10`입니다. 첨부 썸네일입니다.
 const double _attachmentThumb = 40;
 
-/// `message-extras.tsx`의 `rounded-[10px]`입니다.
-const double _attachmentRadius = 10;
+/// `message-extras.tsx`의 `rounded-md`입니다.
+const double _attachmentRadius = HoronRadius.md;
 
 /// `message-extras.tsx`의 `p-[3px]`입니다. 동작 알약의 안쪽 여백입니다.
 const double _actionsPadding = 3;
@@ -27,7 +27,7 @@ const double _actionsPadding = 3;
 const double _attachmentWidth = 280;
 
 /// `message-extras.tsx`의 `rounded-lg`입니다. 코드 블록의 14 반경입니다.
-const double _codeRadius = 14;
+const double _codeRadius = HoronRadius.lg;
 
 /// Figma `Date separator`(Message extras 109:667): 10% 잉크 선 사이의 캡션입니다.
 class HoronDateSeparator extends StatelessWidget {

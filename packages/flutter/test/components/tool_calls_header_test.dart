@@ -56,7 +56,7 @@ void main() {
     );
     final BoxDecoration chipDecoration = chip.decoration! as BoxDecoration;
     expect(chipDecoration.color, theme.colors.bgSubtle);
-    expect(chipDecoration.borderRadius, BorderRadius.circular(10));
+    expect(chipDecoration.borderRadius, BorderRadius.circular(theme.radius.md));
     expect((chipDecoration.border! as Border).top.color, theme.colors.bgSurface);
     expect((chipDecoration.border! as Border).top.width, 2);
   });

@@ -10,8 +10,8 @@ import '../tokens/horon_tokens.g.dart';
 import 'bot_instructions_panel.dart';
 import 'spinner.dart';
 
-/// `knowledge-base-panel.tsx`의 `rounded-[24px]`입니다. 토큰 반경 단계에 24가 없습니다.
-const double _panelRadius = 24;
+/// `knowledge-base-panel.tsx`의 `rounded-xl`입니다.
+const double _panelRadius = HoronRadius.xl;
 
 /// `max-w-200` — 800. 좁은 화면에서는 폭을 따라 줄어듭니다.
 const double _maxWidth = 800;
@@ -190,7 +190,7 @@ class _HoronKnowledgeBasePanelState extends State<HoronKnowledgeBasePanel> {
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               color: colors.bgSurface, // bg-bg-surface
-              borderRadius: BorderRadius.circular(_panelRadius), // rounded-[24px]
+              borderRadius: BorderRadius.circular(_panelRadius), // rounded-xl
               border: Border.all(color: colors.borderDefault), // border-border-default
             ),
             // px-5 py-4.5

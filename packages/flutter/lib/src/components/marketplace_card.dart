@@ -89,7 +89,7 @@ class HoronMarketplaceCard extends StatelessWidget {
     return HoronSurfaceLayer(
       surface: surface,
       tier: HoronGlassTier.thick,
-      borderRadius: BorderRadius.circular(theme.radius.xl), // rounded-[20px]
+      borderRadius: BorderRadius.circular(theme.radius.xl), // rounded-xl
       child: Padding(
         padding: EdgeInsets.all(theme.space.s4), // p-4
         child: Column(
@@ -156,7 +156,7 @@ class HoronMarketplaceCard extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: HoronPalette.neutral900, // bg-neutral-900 (양쪽 밝기에서 같은 값)
-          borderRadius: BorderRadius.circular(theme.space.s2_5), // rounded-[10px]
+          borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md
         ),
         child: Center(
           child: Text(

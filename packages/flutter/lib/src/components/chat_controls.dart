@@ -22,11 +22,11 @@ const double _voiceHeight = 52;
 /// `chat-controls.tsx`의 `w-60`입니다.
 const double _voiceWidth = 240;
 
-/// `chat-controls.tsx`의 `rounded-[3px]`입니다. 정지 사각형의 반경입니다.
-const double _stopSquareRadius = 3;
+/// 정지 사각형은 각진 글리프라 반경을 주지 않습니다.
+const double _stopSquareRadius = HoronRadius.none;
 
-/// `chat-controls.tsx`의 `rounded-[2px]`입니다. 파형 막대의 반경입니다.
-const double _waveBarRadius = 2;
+/// `rounded-full` — 파형 막대의 반경입니다.
+const double _waveBarRadius = HoronRadius.full;
 
 /// `chat-controls.tsx`의 `ChatControlSurface`입니다.
 enum HoronChatControlSurface {

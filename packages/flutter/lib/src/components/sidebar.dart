@@ -52,7 +52,7 @@ const double _minTapTarget = 44;
 /// 옮겨야 보이는 아이콘이 `right-2.5` 자리에 그대로 남습니다.
 const double _projectMoreHitInset = (_minTapTarget - 16) / 2;
 
-/// `rounded-[10px]` — 워크스페이스 스위치·계정 아바타·추가 버튼의 10px 반경입니다.
+/// `rounded-md` — 워크스페이스 스위치·계정 아바타·추가 버튼의 반경입니다.
 const double _radius10 = 10;
 
 /// `[&>svg]:size-4.5` — 사이드바 항목 아이콘 18px입니다.
@@ -86,7 +86,7 @@ const double _treeConnectorWidth = 16;
 const double _treeConnectorStroke = 1.5;
 
 /// 연결선이 행 가운데로 꺾이는 반경 9입니다.
-const double _treeCurveRadius = 9;
+const double _treeCurveRadius = HoronRadius.sm;
 
 /// `bg-sidebar-photo`의 55% 흰 막입니다.
 ///
@@ -502,7 +502,7 @@ class _HoronSidebarWorkspaceSwitchState extends State<HoronSidebarWorkspaceSwitc
         child: AnimatedContainer(
           duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
           curve: HoronMotion.colorsCurve,
-          // h-9, rounded-[10px], pr-1 pl-2
+          // h-9, rounded-md, pr-1 pl-2
           height: space.step(9),
           padding: EdgeInsets.only(right: space.s1, left: space.s2),
           decoration: BoxDecoration(color: fill, borderRadius: BorderRadius.circular(_radius10)),
@@ -1189,7 +1189,7 @@ class _HoronSidebarAccountState extends State<HoronSidebarAccount> {
             spacing: space.s2_5,
             children: <Widget>[
               Container(
-                // size-9 rounded-[10px] bg-sky-200 text-surface-ink
+                // size-9 rounded-md bg-sky-200 text-surface-ink
                 width: space.step(9),
                 height: space.step(9),
                 decoration: BoxDecoration(color: HoronPalette.sky200, borderRadius: BorderRadius.circular(_radius10)),
@@ -1578,7 +1578,7 @@ class _HoronSidebarAddButtonState extends State<HoronSidebarAddButton> {
           child: AnimatedContainer(
             duration: reduceMotion ? Duration.zero : HoronMotion.colorsDuration,
             curve: HoronMotion.colorsCurve,
-            // h-9 rounded-[10px] hover:bg-overlay-ink-4
+            // h-9 rounded-md hover:bg-overlay-ink-4
             height: space.step(9),
             decoration: BoxDecoration(
               color: _hovered ? colors.overlayInk4 : Colors.transparent,

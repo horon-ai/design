@@ -52,11 +52,11 @@ Future<void> pumpPanel(
   }
 }
 
-/// `overflow-clip rounded-[24px] border`인 패널 상자입니다.
+/// `overflow-clip rounded-xl border`인 패널 상자입니다.
 final Finder _panel = find.byWidgetPredicate((Widget widget) {
   if (widget is! Container || widget.clipBehavior != Clip.antiAlias) return false;
   final Decoration? decoration = widget.decoration;
-  return decoration is BoxDecoration && decoration.borderRadius == BorderRadius.circular(24);
+  return decoration is BoxDecoration && decoration.borderRadius == BorderRadius.circular(HoronRadius.xl);
 });
 
 void main() {
@@ -83,14 +83,14 @@ void main() {
     }
   });
 
-  testWidgets('panel: 24px radius surface on a bg-surface fill with a default border', (WidgetTester tester) async {
+  testWidgets('panel: xl radius surface on a bg-surface fill with a default border', (WidgetTester tester) async {
     await pumpPanel(tester, const HoronOrchestratorPanel(title: 'Research run', lead: _lead));
     final HoronThemeData theme = HoronTheme.of(tester.element(_panel));
     final BoxDecoration decoration = tester.widget<Container>(_panel).decoration! as BoxDecoration;
 
     expect(decoration.color, theme.colors.bgSurface);
     expect(decoration.border, Border.all(color: theme.colors.borderDefault));
-    expect(decoration.borderRadius, BorderRadius.circular(24)); // rounded-[24px]
+    expect(decoration.borderRadius, BorderRadius.circular(theme.radius.xl)); // rounded-xl
   });
 
   testWidgets('header: the parallel picker is the sm inset segmented control', (WidgetTester tester) async {

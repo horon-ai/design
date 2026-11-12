@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
+import '../tokens/horon_tokens.g.dart';
 import 'spinner.dart';
 
 /// `plan-step.tsx`의 `PlanStepStatus`입니다.
@@ -31,8 +32,8 @@ const double _railWidth = 2;
 /// `plan-step.tsx`의 `pb-4.5`입니다. 본문 아래 여백입니다.
 const double _bodyPaddingBottom = 18;
 
-/// `plan-step.tsx`의 `rounded-[1px]`입니다. 레일 끝의 반경입니다.
-const double _railRadius = 1;
+/// `plan-step.tsx`의 `rounded-full`입니다. 레일 끝의 반경입니다.
+const double _railRadius = HoronRadius.full;
 
 /// Figma `Plan step`(Agent plan 191:8296): 2px 레일 위 24px 표식으로 단계를 잇습니다.
 ///

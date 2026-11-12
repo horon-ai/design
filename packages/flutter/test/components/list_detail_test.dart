@@ -69,7 +69,7 @@ void main() {
       find.ancestor(of: find.text('beta'), matching: find.byType(AnimatedContainer)).first,
     );
     expect((unselected.decoration! as BoxDecoration).color, Colors.transparent);
-    expect((unselected.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(theme.space.s2_5));
+    expect((unselected.decoration! as BoxDecoration).borderRadius, BorderRadius.circular(theme.radius.md));
   });
 
   testWidgets('the shell clips at rounded-2xl and the solid list sits on the inset surface', (

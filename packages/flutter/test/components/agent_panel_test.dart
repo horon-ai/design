@@ -15,14 +15,14 @@ Future<void> pumpPanel(WidgetTester tester, Widget child, {Brightness brightness
 }
 
 void main() {
-  testWidgets('agent panel: a surface plate with the 24px radius and 20px padding', (WidgetTester tester) async {
+  testWidgets('agent panel: the panel radius and 20px padding', (WidgetTester tester) async {
     await pumpPanel(tester, const HoronAgentPanel(filter: Text('필터'), children: <Widget>[Text('블록')]));
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronAgentPanel)));
     final Container plate = tester.widget<Container>(find.byType(Container).first);
     final BoxDecoration decoration = plate.decoration! as BoxDecoration;
 
     expect(decoration.color, theme.colors.bgSurface);
-    expect((decoration.borderRadius! as BorderRadius).topLeft.x, 24);
+    expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.radius.xl);
     // `px-5` — 판은 좌우 20입니다.
     expect(plate.padding, const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 8));
     // React는 필터를 폭 채우는 `div`로 감쌉니다.

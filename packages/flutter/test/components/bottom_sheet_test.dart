@@ -49,7 +49,7 @@ void main() {
     expect(veil.kind, HoronVeilKind.overlay, reason: 'React veil-overlay');
     expect(find.byType(HoronLiquidGlass), findsNothing, reason: '유리 레이어를 겹치지 않습니다');
     final BorderRadius radius = _panelClip(tester).borderRadius as BorderRadius;
-    expect(radius.topLeft.x, 32, reason: 'rounded-t-[32px]');
+    expect(radius.topLeft.x, theme.radius.xl, reason: 'rounded-t-xl');
     expect(radius.bottomLeft.x, 0, reason: '위쪽 모서리만 둥급니다');
     expect(
       find.byWidgetPredicate(

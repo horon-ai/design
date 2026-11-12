@@ -99,22 +99,26 @@ double? radiusOf(BoxDecoration decoration) =>
 /// 확인이 필요한 값 상자는 `bg-overlay-ink-12`에 `border-border-danger`입니다.
 BoxDecoration checkedBox(WidgetTester tester, HoronThemeData theme) => decorations(tester).firstWhere(
   (BoxDecoration decoration) =>
-      decoration.color == theme.colors.overlayInk12 && radiusOf(decoration) == 10 && decoration.border != null,
+      decoration.color == theme.colors.overlayInk12 &&
+      radiusOf(decoration) == theme.radius.md &&
+      decoration.border != null,
 );
 
 void main() {
-  testWidgets('document extract panel: 24px surface with a default border on bg-surface', (WidgetTester tester) async {
+  testWidgets('document extract panel: xl surface with a default border on bg-surface', (WidgetTester tester) async {
     await pumpPanel(tester, panel());
     final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronDocumentExtractPanel)));
     expect(tester.takeException(), isNull);
     final List<BoxDecoration> painted = decorations(tester);
     expect(
-      painted.where((BoxDecoration d) => d.color == theme.colors.bgSurface && radiusOf(d) == 24),
+      painted.where((BoxDecoration d) => d.color == theme.colors.bgSurface && radiusOf(d) == theme.radius.xl),
       isNotEmpty,
-      reason: 'rounded-[24px] bg-bg-surface',
+      reason: 'rounded-xl bg-bg-surface',
     );
     expect(
-      painted.where((BoxDecoration d) => d.border?.top.color == theme.colors.borderDefault && radiusOf(d) == 24),
+      painted.where(
+        (BoxDecoration d) => d.border?.top.color == theme.colors.borderDefault && radiusOf(d) == theme.radius.xl,
+      ),
       isNotEmpty,
       reason: 'border-border-default',
     );
@@ -188,7 +192,9 @@ void main() {
     expect(find.text('Check'), findsOneWidget, reason: '누른 항목만 확인됩니다');
     expect(find.text('3 of 4 filled · 1 to check'), findsOneWidget);
     expect(
-      decorations(tester).where((BoxDecoration d) => d.color == theme.colors.overlayInk4 && radiusOf(d) == 10),
+      decorations(
+        tester,
+      ).where((BoxDecoration d) => d.color == theme.colors.overlayInk4 && radiusOf(d) == theme.radius.md),
       isNotEmpty,
       reason: '확인한 항목은 bg-overlay-ink-4로 돌아갑니다',
     );
@@ -213,7 +219,9 @@ void main() {
       final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronDocumentExtractPanel)));
       expect(tester.takeException(), isNull, reason: status.name);
       final List<BoxDecoration> rows = decorations(tester)
-          .where((BoxDecoration d) => radiusOf(d) == 10 && d.color != null && d.color != theme.colors.bgSurface)
+          .where(
+            (BoxDecoration d) => radiusOf(d) == theme.radius.md && d.color != null && d.color != theme.colors.bgSurface,
+          )
           .toList();
       switch (status) {
         case HoronExtractFieldStatus.check:
@@ -291,14 +299,16 @@ void main() {
     final List<BoxDecoration> painted = decorations(tester);
 
     expect(
-      painted.where((BoxDecoration d) => d.color == theme.colors.overlayInk5 && radiusOf(d) == 10),
+      painted.where((BoxDecoration d) => d.color == theme.colors.overlayInk5 && radiusOf(d) == theme.radius.md),
       isNotEmpty,
-      reason: '파일 타일 rounded-[10px]',
+      reason: '파일 타일 rounded-md',
     );
     expect(
-      painted.where((BoxDecoration d) => d.border?.top.color == theme.colors.overlayInk10 && radiusOf(d) == 10),
+      painted.where(
+        (BoxDecoration d) => d.border?.top.color == theme.colors.overlayInk10 && radiusOf(d) == theme.radius.md,
+      ),
       isNotEmpty,
-      reason: '표 상자 rounded-[10px]',
+      reason: '표 상자 rounded-md',
     );
 
     final AnimatedContainer extract = tester.widget<AnimatedContainer>(
@@ -313,9 +323,11 @@ void main() {
     await tester.tap(find.text('JSON'));
     await tester.pumpAndSettle();
     expect(
-      decorations(tester).where((BoxDecoration d) => d.color == theme.colors.overlayInk4 && radiusOf(d) == 10),
+      decorations(
+        tester,
+      ).where((BoxDecoration d) => d.color == theme.colors.overlayInk4 && radiusOf(d) == theme.radius.md),
       isNotEmpty,
-      reason: 'JSON pre rounded-[10px]',
+      reason: 'JSON pre rounded-md',
     );
 
     await tester.tap(find.text('Schema'));
@@ -378,8 +390,9 @@ void main() {
         'ink' => (theme.colors.interactivePrimary, theme.colors.overlayInk12),
         _ => (theme.colors.accentSky500_90, theme.colors.accentSky500_12),
       };
-      final BoxDecoration decoration = decorations(tester)
-          .firstWhere((BoxDecoration d) => d.color == fill && radiusOf(d) == theme.radius.sm);
+      final BoxDecoration decoration = decorations(
+        tester,
+      ).firstWhere((BoxDecoration d) => d.color == fill && radiusOf(d) == theme.radius.sm);
       expect(decoration.border!.top.color, border, reason: name);
       expect(decoration.border!.top.width, 1.2, reason: 'border-[1.2px]');
     }

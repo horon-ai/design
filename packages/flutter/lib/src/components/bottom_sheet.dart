@@ -7,8 +7,8 @@ import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
-/// `rounded-t-[32px]` — 유리 시트의 위쪽 모서리 반경입니다.
-const double _glassTopRadius = 32;
+/// `rounded-t-xl` — 유리 시트의 위쪽 모서리 반경입니다.
+const double _glassTopRadius = HoronRadius.xl;
 
 /// `max-w-93.5` — 패널 시트가 더 넓어지지 않는 폭 374입니다.
 const double _panelMaxWidth = 374;
@@ -19,8 +19,8 @@ const double _grabberHeight = 5;
 /// `w-9` — 그랩바 폭 36입니다.
 const double _grabberWidth = 36;
 
-/// `rounded-[3px]` — 그랩바 반경입니다.
-const double _grabberRadius = 3;
+/// `rounded-full` — 그랩바 반경입니다.
+const double _grabberRadius = HoronRadius.full;
 
 /// `bg-bg-scrim/32` — 스크림 불투명도입니다.
 const double _scrimOpacity = 0.32;
@@ -151,7 +151,7 @@ class HoronBottomSheet extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: gap,
             children: <Widget>[
-              // h-[5px] w-9 rounded-[3px] bg-overlay-ink-20 그랩바입니다.
+              // h-[5px] w-9 rounded-full bg-overlay-ink-20 그랩바입니다.
               // `cursor-grab touch-none active:cursor-grabbing` — 시트를 끌어 내리는
               // 자리임을 포인터로 알립니다.
               MouseRegion(

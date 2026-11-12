@@ -29,8 +29,8 @@ const double _rowPaddingY = 14;
 /// `task-row.tsx`의 `size-4.5`입니다. 봇 타일입니다.
 const double _botTile = 18;
 
-/// `task-row.tsx`의 `rounded-[5px]`입니다. 봇 타일의 반경입니다.
-const double _botTileRadius = 5;
+/// `task-row.tsx`의 `rounded-xs`입니다. 봇 타일의 반경입니다.
+const double _botTileRadius = HoronRadius.xs;
 
 /// `task-row.tsx`의 `h-7.5`입니다. 동작 알약 높이입니다.
 const double _pillHeight = 30;

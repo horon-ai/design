@@ -5,9 +5,10 @@ import '../glass/glass_geometry.dart';
 import '../glass/horon_surface.dart';
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
+import '../tokens/horon_tokens.g.dart';
 
 /// `skeleton.tsx`의 `rounded-xs`입니다. 블록 자리표시자의 반경입니다.
-const double _skeletonBlockRadius = 6;
+const double _skeletonBlockRadius = HoronRadius.xs;
 
 /// `skeleton.tsx`의 `p-4`입니다.
 const double _skeletonCardPadding = 16;

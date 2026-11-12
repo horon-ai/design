@@ -111,7 +111,7 @@ void main() {
 
       final double expectedRadius = switch (surface) {
         HoronMenuSurface.glass => theme.radius.xl,
-        HoronMenuSurface.solid => 18,
+        HoronMenuSurface.solid => theme.radius.xl,
         HoronMenuSurface.paper => theme.radius.lg,
       };
       expect(tester.widget<ClipRRect>(_clipInside()).borderRadius, BorderRadius.circular(expectedRadius));
@@ -183,8 +183,8 @@ void main() {
     expect(tester.getSize(_item('Plain')).height, 36, reason: 'solid h-9');
     expect(
       (tester.widget<AnimatedContainer>(_item('Plain')).decoration! as BoxDecoration).borderRadius,
-      BorderRadius.circular(10),
-      reason: 'rounded-[10px]',
+      BorderRadius.circular(theme.radius.md),
+      reason: 'rounded-md',
     );
   });
 

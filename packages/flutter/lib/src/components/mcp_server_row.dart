@@ -143,7 +143,7 @@ class HoronMcpServerRow extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: HoronPalette.sky500, // bg-sky-500
-          borderRadius: BorderRadius.circular(theme.space.s2_5), // rounded-[10px]
+          borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md
         ),
         child: Center(
           child: Text(

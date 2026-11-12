@@ -4,10 +4,11 @@ import '../contracts/surface.dart';
 import '../glass/glass_geometry.dart';
 import '../glass/horon_surface.dart';
 import '../theme/horon_theme.dart';
+import '../tokens/horon_tokens.g.dart';
 import 'switch.dart';
 
 /// `settings-list.tsx`의 `rounded-2xl`입니다.
-const double _listRadius = 16;
+const double _listRadius = HoronRadius.xl2;
 
 /// `settings-list.tsx`의 `px-5`입니다.
 const double _listPaddingX = 20;
@@ -24,8 +25,8 @@ const double _rowGap = 16;
 /// `settings-list.tsx`의 `gap-3`입니다. 아이콘이 있을 때의 간격입니다.
 const double _rowGapWithLeading = 12;
 
-/// `settings-list.tsx`의 `rounded-[9px]`입니다. 행 아이콘 타일의 반경입니다.
-const double _iconTileRadius = 9;
+/// `settings-list.tsx`의 `rounded-sm`입니다. 행 아이콘 타일의 반경입니다.
+const double _iconTileRadius = HoronRadius.sm;
 
 /// Paper `Settings list`(1VD8-0): 16px 라운드의 두꺼운 유리 카드에 구분선이 있는 행을 담습니다.
 class HoronSettingsList extends StatelessWidget {

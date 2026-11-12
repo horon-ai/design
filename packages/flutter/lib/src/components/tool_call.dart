@@ -31,8 +31,8 @@ const double _smallIconSize = 14;
 /// `tool-call.tsx`의 `py-[3px]`입니다. 도구 칩의 위아래 여백입니다.
 const double _chipPaddingY = 3;
 
-/// `tool-call.tsx`의 `rounded-[10px]`입니다. 오류 상자와 섹션 본문의 반경입니다.
-const double _boxRadius = 10;
+/// `tool-call.tsx`의 `rounded-md`입니다. 오류 상자와 섹션 본문의 반경입니다.
+const double _boxRadius = HoronRadius.md;
 
 /// `tool-call.tsx`의 `Failed`입니다.
 const String _failedLabel = 'Failed';
@@ -306,7 +306,7 @@ class _HoronToolCallState extends State<HoronToolCall> {
     final HoronSpaceSpec space = theme.space;
 
     return Container(
-      // rounded-[10px] bg-bg-danger px-3.5 py-3
+      // rounded-md bg-bg-danger px-3.5 py-3
       padding: EdgeInsets.fromLTRB(space.s3_5, space.s3, space.s3_5, space.s3),
       decoration: BoxDecoration(color: colors.bgDanger, borderRadius: BorderRadius.circular(_boxRadius)),
       child: Row(
@@ -413,7 +413,7 @@ class _SectionState extends State<_Section> {
           ],
         ),
         Container(
-          // rounded-[10px] bg-bg-subtle px-3.5 py-3
+          // rounded-md bg-bg-subtle px-3.5 py-3
           padding: EdgeInsets.fromLTRB(space.s3_5, space.s3, space.s3_5, space.s3),
           decoration: BoxDecoration(color: colors.bgSubtle, borderRadius: BorderRadius.circular(_boxRadius)),
           child: widget.child,

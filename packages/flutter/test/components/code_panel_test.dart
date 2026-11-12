@@ -26,7 +26,7 @@ void main() {
     final BoxDecoration decoration = _decoration(tester);
 
     expect(decoration.color, HoronPalette.neutral50);
-    expect((decoration.borderRadius! as BorderRadius).topLeft.x, closeTo(10, 0.01));
+    expect((decoration.borderRadius! as BorderRadius).topLeft.x, closeTo(theme.radius.md, 0.01));
     expect((decoration.border! as Border).top.color, theme.colors.borderDefault);
   });
 

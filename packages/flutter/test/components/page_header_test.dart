@@ -29,7 +29,7 @@ void main() {
 
     final HoronLiquidGlass glass = tester.widget<HoronLiquidGlass>(find.byType(HoronLiquidGlass));
     expect(glass.tier, HoronGlassTier.regular, reason: 'bg-glass-regular');
-    expect(glass.borderRadius, BorderRadius.circular(28), reason: 'rounded-[28px]');
+    expect(glass.borderRadius, BorderRadius.circular(theme.radius.xl), reason: 'rounded-xl');
 
     final Finder row = find.ancestor(of: find.text('에이전트 설정'), matching: find.byType(SizedBox)).first;
     expect(tester.getSize(row).height, theme.space.step(10), reason: 'h-10 = 40');

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
+import '../tokens/horon_tokens.g.dart';
 
 /// `source-row.tsx`의 `SourceStatus`입니다.
 enum HoronSourceStatus {
@@ -34,8 +35,8 @@ enum HoronSourceStage {
 /// `source-row.tsx`의 `size-8`입니다. 아이콘 타일입니다.
 const double _tileSide = 32;
 
-/// `source-row.tsx`의 `rounded-[14px]`입니다. card 변형의 반경입니다.
-const double _cardRadius = 14;
+/// `source-row.tsx`의 `rounded-lg`입니다. card 변형의 반경입니다.
+const double _cardRadius = HoronRadius.lg;
 
 /// `source-row.tsx`의 `h-[3px]`입니다. 단계 막대 높이입니다.
 const double _barHeight = 3;
@@ -145,7 +146,7 @@ class HoronSourceRow extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: theme.colors.overlayInk5,
-              borderRadius: BorderRadius.circular(theme.space.step(2.5)), // rounded-[10px]
+              borderRadius: BorderRadius.circular(theme.radius.md), // rounded-md
             ),
             child: IconTheme.merge(
               data: IconThemeData(size: 16, color: theme.colors.textPrimary),
