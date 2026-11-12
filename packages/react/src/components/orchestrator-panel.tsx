@@ -117,7 +117,7 @@ export function OrchestratorPanel({
   return (
     <section
       className={cn(
-        "flex w-full min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full min-w-0 flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
         className,
       )}
     >
@@ -151,7 +151,7 @@ export function OrchestratorPanel({
       <div role="separator" className="h-px bg-overlay-ink-8" />
       <div className="flex flex-col gap-2.5 px-5 pt-4 pb-5">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="flex size-5.5 shrink-0 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
+          <span className="flex size-5.5 shrink-0 items-center justify-center rounded-xs bg-interactive-primary text-label-sm text-text-inverse">
             {lead.initial}
           </span>
           <span className="min-w-0 truncate text-label-lg text-text-primary">{lead.name}</span>

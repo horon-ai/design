@@ -26,8 +26,8 @@ export const conceptsMessages = defineMessages({
     en: "Subpath: the file name is the path. @horon-ai/react/components/button maps to src/components/button.tsx.",
   },
   importsEntryBundleItem: {
-    ko: "하위 경로는 번들을 쓰는 컴포넌트로 좁힙니다. 여러 컴포넌트를 쓰는 화면은 진입점 목록이 읽기 쉽습니다.",
-    en: "A subpath keeps a bundle to the components it uses. A screen that uses several reads better as one entry-point list.",
+    ko: "진입점도 번들러가 쓰지 않는 컴포넌트를 떨어냅니다. 패키지의 sideEffects가 배럴·전역 CSS·커서 잔상 세 파일만 남기기 때문입니다. 하위 경로와의 차이는 커서 잔상 자동 마운트 3KB뿐이라, 여러 컴포넌트를 쓰는 화면은 진입점을 그대로 써도 됩니다.",
+    en: "The entry point tree-shakes too: the package's sideEffects keeps only the barrel, the global CSS and the cursor ghost, so unused components drop out. The only difference from a subpath is the 3 KB cursor-ghost auto-mount, so a screen that uses several components can stay on the entry point.",
   },
   importsPropsHeading: { ko: "Prop 타입", en: "Prop types" },
   importsPropsBody: {

@@ -110,7 +110,7 @@ export function SettingsRowIcon({ className, ...props }: WithClass<ComponentProp
     <span
       aria-hidden
       className={cn(
-        "flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-bg-subtle text-text-primary [&_svg]:size-4",
+        "flex size-8 shrink-0 items-center justify-center rounded-sm bg-bg-subtle text-text-primary [&_svg]:size-4",
         className,
       )}
       {...props}

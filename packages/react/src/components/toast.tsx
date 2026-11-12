@@ -92,6 +92,7 @@ function ToastList({ size, surface }: {
           aria-label="Close"
           className={cn(
             "relative flex shrink-0 motion-press cursor-pointer text-text-secondary motion-colors hover:text-text-primary",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
             "after:absolute after:-inset-2 after:content-['']",
             closeSizeClass[size],
           )}

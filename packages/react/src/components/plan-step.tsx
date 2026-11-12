@@ -97,7 +97,7 @@ export function PlanStep({
         {!last && (
           <span
             className={cn(
-              "w-0.5 flex-1 rounded-[1px] motion-colors",
+              "w-0.5 flex-1 rounded-full motion-colors",
               status === "done" ? "bg-status-live" : "bg-border-default",
             )}
           />

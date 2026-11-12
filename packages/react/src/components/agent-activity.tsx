@@ -138,7 +138,7 @@ export function StreamingText({ text, streaming = true, smooth = true, className
         <span
           aria-hidden
           className={cn(
-            "ml-px inline-block h-[1.15em] w-0.5 rounded-[1px] bg-interactive-primary align-[-0.2em]",
+            "ml-px inline-block h-[1.15em] w-0.5 rounded-full bg-interactive-primary align-[-0.2em]",
             !typing && "animate-caret",
           )}
         />
@@ -242,7 +242,7 @@ export function WorkLog({
     <details
       open
       className={cn(
-        "group flex w-full max-w-85 min-w-0 flex-col motion-details rounded-[16px] border border-border-default bg-bg-surface p-1.5",
+        "group flex w-full max-w-85 min-w-0 flex-col motion-details rounded-2xl border border-border-default bg-bg-surface p-1.5",
         className,
       )}
     >

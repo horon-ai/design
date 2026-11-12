@@ -196,8 +196,8 @@ class _HoronCalendarState extends State<HoronCalendar> {
   /// 좁은 폭에서도 칸이 글자를 담을 수 있는 최소 크기입니다.
   static const double _minCellSize = 28;
 
-  /// `rounded-[24px]` — 팝오버 변형의 반경입니다.
-  static const double _popoverRadius = 24;
+  /// `rounded-xl` — 팝오버 변형의 반경입니다.
+  static const double _popoverRadius = HoronRadius.xl;
 
   /// `size-1` — 오늘을 표시하는 점의 지름입니다.
   static const double _todayDotSize = 4;

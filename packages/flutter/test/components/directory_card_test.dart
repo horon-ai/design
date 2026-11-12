@@ -17,6 +17,7 @@ Future<void> pumpCard(WidgetTester tester, Widget child, {Brightness brightness 
 void main() {
   testWidgets('directory card: the tile is 40px ink at a 10px radius', (WidgetTester tester) async {
     await pumpCard(tester, const HoronDirectoryCard(icon: Icon(Icons.folder_outlined), name: 'Docs'));
+    final HoronThemeData theme = HoronTheme.of(tester.element(find.byType(HoronDirectoryCard)));
 
     final Container tile = tester.widget<Container>(
       find.descendant(of: find.byType(HoronDirectoryCard), matching: find.byType(Container)).first,
@@ -25,7 +26,7 @@ void main() {
 
     // Paper `1VJJ-0`: 타일 채움 #17181A, 글리프 #F9FAFB
     expect(decoration.color, HoronPalette.neutral900);
-    expect((decoration.borderRadius! as BorderRadius).topLeft.x, closeTo(10, 0.01));
+    expect((decoration.borderRadius! as BorderRadius).topLeft.x, closeTo(theme.radius.md, 0.01));
     expect(tester.getSize(find.byType(Container).first), const Size(40, 40));
     expect(find.byIcon(Icons.folder_outlined), findsOneWidget);
     // `text-neutral-50` — 반대색이 아니라 neutral-50입니다.

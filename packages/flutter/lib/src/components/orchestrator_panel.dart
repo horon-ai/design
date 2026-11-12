@@ -7,11 +7,11 @@ import '../tokens/horon_tokens.g.dart';
 import 'segmented_control.dart';
 import 'spinner.dart';
 
-/// `orchestrator-panel.tsx`의 `rounded-[24px]`입니다. 토큰 반경 단계에 24가 없습니다.
-const double _panelRadius = 24;
+/// `orchestrator-panel.tsx`의 `rounded-xl`입니다.
+const double _panelRadius = HoronRadius.xl;
 
-/// `rounded-[5px]` — 리드 타일의 반경입니다.
-const double _leadTileRadius = 5;
+/// `rounded-xs` — 리드 타일의 반경입니다.
+const double _leadTileRadius = HoronRadius.xs;
 
 /// `size-5.5` — 리드 타일 한 변 22입니다.
 const double _leadTileSize = 22;
@@ -32,7 +32,7 @@ const double _laneIndent = 30;
 const double _elbowHeight = 22;
 
 /// `rounded-bl-lg` — 팔꿈치 모서리의 반경 14입니다.
-const double _elbowRadius = 14;
+const double _elbowRadius = HoronRadius.lg;
 
 /// `border-[1.5px]` — 레인 연결선의 두께입니다.
 const double _connectorWidth = 1.5;
@@ -191,7 +191,7 @@ class _HoronOrchestratorPanelState extends State<HoronOrchestratorPanel> {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: colors.bgSurface, // bg-bg-surface
-        borderRadius: BorderRadius.circular(_panelRadius), // rounded-[24px]
+        borderRadius: BorderRadius.circular(_panelRadius), // rounded-xl
         border: Border.all(color: colors.borderDefault), // border-border-default
       ),
       child: Column(
@@ -489,7 +489,7 @@ class _LeadRow extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: colors.interactivePrimary, // bg-interactive-primary
-            borderRadius: BorderRadius.circular(_leadTileRadius), // rounded-[5px]
+            borderRadius: BorderRadius.circular(_leadTileRadius), // rounded-xs
           ),
           child: Text(lead.initial, style: theme.text.labelSm.copyWith(color: colors.textInverse)),
         ),

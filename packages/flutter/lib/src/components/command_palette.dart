@@ -10,8 +10,8 @@ import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 
-/// `rounded-[24px]` — 토큰 반경 단계에 없는 팔레트 전용 반경입니다.
-const double _popupRadius = 24;
+/// `rounded-xl` — 팔레트 반경입니다.
+const double _popupRadius = HoronRadius.xl;
 
 /// `w-140` — 560. 화면이 좁으면 이 값보다 작아집니다.
 const double _popupMaxWidth = 560;

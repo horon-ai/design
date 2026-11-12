@@ -59,11 +59,11 @@ const double _labelTop = 10;
 /// `size-8.5` — 봇 아바타 34입니다.
 const double _avatarSize = 34;
 
-/// `rounded-[10px]` — 아바타와 작업 막대의 반경 10입니다.
-const double _tileRadius = 10;
+/// `rounded-md` — 아바타와 작업 막대의 반경입니다.
+const double _tileRadius = HoronRadius.md;
 
-/// `rounded-[24px]` — 패널 반경 24입니다. 토큰 단계에 같은 값이 없습니다.
-const double _panelRadius = 24;
+/// `rounded-xl` — 패널 반경입니다.
+const double _panelRadius = HoronRadius.xl;
 
 /// `max-w-252.5` — 패널이 더 넓어지지 않는 폭 1010입니다.
 const double _panelMaxWidth = 1010;
@@ -738,7 +738,7 @@ class _LaneRowState extends State<_LaneRow> {
               child: Row(
                 children: <Widget>[
                   Container(
-                    // `size-8.5 rounded-[10px] text-label-md text-text-on-ink`.
+                    // `size-8.5 rounded-md text-label-md text-text-on-ink`.
                     width: _avatarSize,
                     height: _avatarSize,
                     alignment: Alignment.center,
@@ -817,7 +817,7 @@ class _BotBadge extends StatelessWidget {
   }
 }
 
-/// `absolute h-9 gap-1.5 rounded-[10px] px-2.5 text-label-sm` 작업 막대입니다.
+/// `absolute h-9 gap-1.5 rounded-md px-2.5 text-label-sm` 작업 막대입니다.
 class _TaskBar extends StatelessWidget {
   const _TaskBar({required this.task, required this.width});
 

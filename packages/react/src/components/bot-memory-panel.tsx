@@ -139,7 +139,7 @@ export function BotMemoryPanel({
   return (
     <section
       className={cn(
-        "flex w-full max-w-140 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full max-w-140 min-w-0 flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
         className,
       )}
       {...props}

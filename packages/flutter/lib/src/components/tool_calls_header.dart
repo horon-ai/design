@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
+import '../tokens/horon_tokens.g.dart';
 
 /// `tool-calls-header.tsx`의 `size-7`입니다. 도구 칩 한 개의 크기입니다.
 const double _chipSide = 28;
@@ -9,8 +10,8 @@ const double _chipSide = 28;
 /// `tool-calls-header.tsx`의 `-ml-2`입니다. 칩이 겹치는 폭입니다.
 const double _chipOverlap = 8;
 
-/// `tool-calls-header.tsx`의 `rounded-[10px]`입니다. 도구 칩의 반경입니다.
-const double _chipRadius = 10;
+/// `tool-calls-header.tsx`의 `rounded-md`입니다. 도구 칩의 반경입니다.
+const double _chipRadius = HoronRadius.md;
 
 /// `tool-calls-header.tsx`의 `ring-2`입니다. 칩을 표면색으로 두르는 두께입니다.
 const double _chipRing = 2;

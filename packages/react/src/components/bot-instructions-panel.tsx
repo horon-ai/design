@@ -259,7 +259,7 @@ export function BotInstructionsPanel({
   return (
     <section
       className={cn(
-        "flex w-full max-w-155 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full max-w-155 min-w-0 flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
@@ -307,7 +307,7 @@ export function BotInstructionsPanel({
             onClick={onBotClick}
             className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
           >
-            <span className="flex size-4.5 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
+            <span className="flex size-4.5 items-center justify-center rounded-xs bg-interactive-primary text-label-sm text-text-inverse">
               {bot.initial}
             </span>
             {bot.name}
@@ -315,7 +315,7 @@ export function BotInstructionsPanel({
           </button>
         ) : (
           <span className="flex h-7.5 shrink-0 items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5 text-label-sm text-text-primary">
-            <span className="flex size-4.5 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
+            <span className="flex size-4.5 items-center justify-center rounded-xs bg-interactive-primary text-label-sm text-text-inverse">
               {bot.initial}
             </span>
             {bot.name}

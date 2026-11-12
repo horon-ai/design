@@ -37,7 +37,7 @@ Container panelOf(WidgetTester tester) => tester.widget<Container>(
 );
 
 void main() {
-  testWidgets('research run panel: the shell is a 24px surface card with a header and a question', (
+  testWidgets('research run panel: the shell is an xl surface card with a header and a question', (
     WidgetTester tester,
   ) async {
     await pumpPanel(tester, const HoronResearchRunPanel(question: 'What changed in the rebuild?', running: false));
@@ -49,7 +49,7 @@ void main() {
     expect(find.text('What changed in the rebuild?'), findsOneWidget);
     expect(tester.getSize(find.byIcon(Icons.search)), const Size(16, 16));
     expect(decoration.color, theme.colors.bgSurface);
-    expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.space.s6);
+    expect((decoration.borderRadius! as BorderRadius).topLeft.x, theme.radius.xl);
     expect((decoration.border! as Border).top.color, theme.colors.borderDefault);
 
     // 질문은 `ChatBubble from="me"`입니다.

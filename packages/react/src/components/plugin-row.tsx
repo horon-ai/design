@@ -116,7 +116,7 @@ export function PluginRow({
     >
       <span
         aria-hidden
-        className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-500 text-label-md text-neutral-50"
+        className="flex size-10 shrink-0 items-center justify-center rounded-md bg-sky-500 text-label-md text-neutral-50"
       >
         {initials}
       </span>

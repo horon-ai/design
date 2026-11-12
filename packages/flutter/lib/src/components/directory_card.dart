@@ -10,8 +10,8 @@ import 'icon_button.dart';
 /// `directory-card.tsx`의 `size-10`입니다. 아이콘 타일입니다.
 const double _tileSide = 40;
 
-/// `directory-card.tsx`의 `rounded-[10px]`입니다.
-const double _tileRadius = 10;
+/// `directory-card.tsx`의 `rounded-md`입니다.
+const double _tileRadius = HoronRadius.md;
 
 /// `directory-card.tsx`의 `py-3`입니다.
 const double _cardPaddingY = 12;

@@ -95,7 +95,7 @@ export function IntegrationRow({
       {surface === "glass" && <LiquidGlass />}
       <span
         className={cn(
-          "relative flex size-10 shrink-0 items-center justify-center rounded-[10px] motion-colors [&>svg]:size-5",
+          "relative flex size-10 shrink-0 items-center justify-center rounded-md motion-colors [&>svg]:size-5",
           surface === "glass" && status === "not-connected"
             ? "bg-overlay-ink-6 text-text-secondary"
             : tileClass[status],

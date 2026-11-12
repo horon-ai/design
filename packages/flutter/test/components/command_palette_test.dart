@@ -63,13 +63,17 @@ void main() {
     expect(find.byType(HoronCommandPaletteBody), findsNothing);
   });
 
-  testWidgets('the popup is a 560px solid surface with the 24px palette radius', (WidgetTester tester) async {
+  testWidgets('the popup is a 560px solid surface with the xl palette radius', (WidgetTester tester) async {
     await tester.pumpWidget(_host(HoronCommandPalette(open: true, groups: _groups())));
     await tester.pumpAndSettle();
 
     final HoronThemeData theme = _theme(tester);
     expect(tester.getSize(_popup()).width, 560, reason: 'w-140 = 560');
-    expect(tester.widget<ClipRRect>(_popup()).borderRadius, BorderRadius.circular(24), reason: 'rounded-[24px]');
+    expect(
+      tester.widget<ClipRRect>(_popup()).borderRadius,
+      BorderRadius.circular(theme.radius.xl),
+      reason: 'rounded-xl',
+    );
 
     final Iterable<DecoratedBox> boxes = tester.widgetList<DecoratedBox>(
       find.ancestor(of: find.byType(HoronCommandPaletteBody), matching: find.byType(DecoratedBox)),
@@ -87,10 +91,11 @@ void main() {
   testWidgets('the glass popup is the veil overlay and drops the palette shadow', (WidgetTester tester) async {
     await tester.pumpWidget(_host(HoronCommandPalette(open: true, surface: HoronSurface.glass, groups: _groups())));
     await tester.pumpAndSettle();
+    final HoronThemeData theme = _theme(tester);
 
     final HoronVeil veil = tester.widget<HoronVeil>(find.byType(HoronVeil).first);
     expect(veil.kind, HoronVeilKind.overlay, reason: 'React veil-overlay');
-    expect(veil.borderRadius!.topLeft.x, 24, reason: 'rounded-[24px]');
+    expect(veil.borderRadius!.topLeft.x, theme.radius.xl, reason: 'rounded-xl');
     expect(find.byType(HoronLiquidGlass), findsNothing);
   });
 

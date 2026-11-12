@@ -120,7 +120,7 @@ export function CommandPalette({
             aria-label={placeholder}
             className={cn(
               // 560px where it fits; the viewport's 8px gutters cap `w-full` below that.
-              "relative flex w-full max-w-140 motion-popup flex-col overflow-clip rounded-[24px] p-1.5",
+              "relative flex w-full max-w-140 motion-popup flex-col overflow-clip rounded-xl p-1.5",
               surface === "glass" ? "veil-overlay" : "border border-border-default bg-bg-surface shadow-palette",
               "duration-240 data-starting-style:translate-y-2",
               className,

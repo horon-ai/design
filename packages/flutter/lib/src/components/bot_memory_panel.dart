@@ -8,8 +8,8 @@ import '../theme/horon_theme.dart';
 import '../tokens/horon_tokens.g.dart';
 import 'switch.dart';
 
-/// `bot-memory-panel.tsx`의 `rounded-[24px]`입니다. 토큰 반경 단계에 24가 없습니다.
-const double _panelRadius = 24;
+/// `bot-memory-panel.tsx`의 `rounded-xl`입니다.
+const double _panelRadius = HoronRadius.xl;
 
 /// `max-w-140` — 560. 좁은 화면에서는 폭을 따라 줄어듭니다.
 const double _maxWidth = 560;
@@ -225,7 +225,7 @@ class _HoronBotMemoryPanelState extends State<HoronBotMemoryPanel> {
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               color: colors.bgSurface, // bg-bg-surface
-              borderRadius: BorderRadius.circular(_panelRadius), // rounded-[24px]
+              borderRadius: BorderRadius.circular(_panelRadius), // rounded-xl
               border: Border.all(color: colors.borderDefault), // border-border-default
             ),
             child: Column(

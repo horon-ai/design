@@ -30,8 +30,8 @@ const double _caretBarWidth = 2;
 /// `research-run-panel.tsx`의 `h-3`입니다. 깜빡이는 캐럿 막대의 높이입니다.
 const double _caretBarHeight = 12;
 
-/// `research-run-panel.tsx`의 `rounded-[1px]`입니다. 캐럿 막대 끝의 반경입니다.
-const double _caretBarRadius = 1;
+/// `research-run-panel.tsx`의 `rounded-full`입니다. 캐럿 막대 끝의 반경입니다.
+const double _caretBarRadius = HoronRadius.full;
 
 /// `research-run-panel.tsx`의 `max-w-[85%]`입니다. 질문 말풍선의 최대 폭 비율입니다.
 const double _questionWidthFactor = 0.85;
@@ -195,7 +195,6 @@ class _HoronResearchRunPanelState extends State<HoronResearchRunPanel> with Sing
   Widget build(BuildContext context) {
     final HoronThemeData theme = HoronTheme.of(context);
     final HoronColors colors = theme.colors;
-    final HoronSpaceSpec space = theme.space;
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: _maxWidth),
@@ -204,7 +203,7 @@ class _HoronResearchRunPanelState extends State<HoronResearchRunPanel> with Sing
         child: Container(
           decoration: BoxDecoration(
             color: colors.bgSurface, // bg-bg-surface
-            borderRadius: BorderRadius.circular(space.s6), // rounded-[24px]
+            borderRadius: BorderRadius.circular(theme.radius.xl), // rounded-xl
             border: Border.all(color: colors.borderDefault), // border-border-default
           ),
           clipBehavior: Clip.antiAlias, // overflow-clip

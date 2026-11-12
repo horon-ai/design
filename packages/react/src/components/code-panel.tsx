@@ -27,7 +27,7 @@ export function CodePanel({ className, ...props }: CodePanelProps) {
   return (
     <pre
       className={cn(
-        "font-normal m-0 max-w-full overflow-x-auto rounded-[10px] border border-border-default bg-neutral-50 px-4 py-3.5 font-mono text-[12px]/[21px] whitespace-pre text-syntax-string dark:border-border-strong dark:bg-neutral-800",
+        "font-normal m-0 max-w-full overflow-x-auto rounded-md border border-border-default bg-neutral-50 px-4 py-3.5 font-mono text-[12px]/[21px] whitespace-pre text-syntax-string dark:border-border-strong dark:bg-neutral-800",
         className,
       )}
       {...props}

@@ -65,7 +65,7 @@ class HoronFileDrop extends StatefulWidget {
   /// `max-w-[550px]` — 영역이 더 넓어지지 않는 폭입니다.
   static const double _maxWidth = 550;
 
-  /// `rounded-[10px]`.
+  /// `rounded-md`.
   static const double _radius = 10;
 
   /// `border-[1.5px]`.

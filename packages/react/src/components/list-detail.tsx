@@ -121,7 +121,7 @@ export function ListDetail({
                 role="option"
                 aria-selected={item.id === selected?.id}
                 data-selected={item.id === selected?.id ? "" : undefined}
-                className="flex cursor-pointer flex-col gap-1 rounded-[10px] px-3 py-2.5 text-left motion-colors hover:bg-overlay-ink-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-selected:bg-overlay-ink-6 data-selected:hover:bg-overlay-ink-8"
+                className="flex cursor-pointer flex-col gap-1 rounded-md px-3 py-2.5 text-left motion-colors hover:bg-overlay-ink-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-selected:bg-overlay-ink-6 data-selected:hover:bg-overlay-ink-8"
                 onClick={() => {
                   setInner(item.id);
                   onValueChange?.(item.id);
@@ -165,7 +165,7 @@ export function ListDetailHeader({ icon, title, description, actions, className,
   return (
     <div className={cn("flex flex-wrap items-center gap-3", className)} {...props}>
       {icon && (
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 [&_svg]:size-5">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 [&_svg]:size-5">
           {icon}
         </span>
       )}
@@ -301,7 +301,7 @@ export function ListDetailInstructions({
             aria-label="Edit instructions"
             value={text}
             rows={6}
-            className="block w-full resize-y rounded-[10px] border border-border-default bg-bg-inset px-4 py-3.5 font-mono text-[12px]/[21px] text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+            className="block w-full resize-y rounded-md border border-border-default bg-bg-inset px-4 py-3.5 font-mono text-[12px]/[21px] text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
             onChange={(event) => {
               setInner(event.target.value);
               onValueChange?.(event.target.value);

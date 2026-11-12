@@ -102,7 +102,7 @@ function SteeringNoteRow({
   return (
     <li
       className={cn(
-        "flex items-center gap-2.5 rounded-[10px] bg-overlay-ink-4 py-2 pr-2.5 pl-3.5",
+        "flex items-center gap-2.5 rounded-md bg-overlay-ink-4 py-2 pr-2.5 pl-3.5",
         leaving ? "animate-pop-out" : "motion-rise",
       )}
       onAnimationEnd={(event) => {
@@ -201,7 +201,7 @@ export function AgentSteeringPanel({
   return (
     <section
       className={cn(
-        "flex w-full max-w-130 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full max-w-130 min-w-0 flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
         className,
       )}
       {...props}

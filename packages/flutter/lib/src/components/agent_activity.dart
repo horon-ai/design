@@ -5,6 +5,7 @@ import 'package:flutter/scheduler.dart';
 
 import '../theme/horon_motion.dart';
 import '../theme/horon_theme.dart';
+import '../tokens/horon_tokens.g.dart';
 import 'spinner.dart';
 
 /// `agent-activity.tsx`의 `ToolStepState`입니다.
@@ -28,14 +29,14 @@ const double _thinkingHeight = 31;
 /// `agent-activity.tsx`의 `w-17.25`입니다.
 const double _thinkingWidth = 69;
 
-/// `agent-activity.tsx`의 `rounded-[1px]`입니다. 스트리밍 캐럿의 반경입니다.
-const double _caretRadius = 1;
+/// `rounded-full` — 스트리밍 캐럿의 반경입니다.
+const double _caretRadius = HoronRadius.full;
 
 /// `agent-activity.tsx`의 `p-1.5`입니다. 작업 기록 카드의 안쪽 여백입니다.
 const double _workLogPadding = 6;
 
-/// `agent-activity.tsx`의 `rounded-[16px]`입니다. 작업 기록 카드의 반경입니다.
-const double _workLogRadius = 16;
+/// `rounded-2xl` — 작업 기록 카드의 반경입니다.
+const double _workLogRadius = HoronRadius.xl2;
 
 /// `agent-activity.tsx`의 `w-85`입니다. 작업 기록 카드 폭입니다.
 const double _workLogWidth = 340;
