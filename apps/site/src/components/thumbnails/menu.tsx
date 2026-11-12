@@ -14,9 +14,9 @@ export default function MenuThumbnail() {
       <Button variant="solid" size="sm">
         Message actions
       </Button>
-      <div className="flex w-56 flex-col gap-0.5 overflow-clip rounded-[18px] bg-glass-fill-solid p-1.5 shadow-popover">
+      <div className="flex w-56 flex-col gap-0.5 overflow-clip rounded-xl bg-glass-fill-solid p-1.5 shadow-popover">
         {items.map((item) => (
-          <div key={item.label} className="flex h-9 items-center gap-2.5 rounded-[10px] px-2.5">
+          <div key={item.label} className="flex h-9 items-center gap-2.5 rounded-md px-2.5">
             <span
               className={`flex shrink-0 [&>svg]:size-4.5 ${item.danger ? "text-text-danger" : "text-text-primary"}`}
             >

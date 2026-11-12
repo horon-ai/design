@@ -13,7 +13,7 @@ export default function ListDetailThumbnail() {
         <span className="px-2 pt-1 pb-1.5 text-label-sm font-semibold tracking-[0.04em] text-text-secondary">
           ACTIVE
         </span>
-        <div className="flex flex-col gap-0.5 rounded-[10px] bg-overlay-ink-6 px-2 py-1.5">
+        <div className="flex flex-col gap-0.5 rounded-md bg-overlay-ink-6 px-2 py-1.5">
           <span className="truncate font-mono text-label-sm text-text-primary">weekly</span>
           <span className="truncate text-caption text-text-secondary">Every Friday</span>
         </div>
@@ -24,7 +24,7 @@ export default function ListDetailThumbnail() {
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-3 px-3 py-3">
         <div className="flex items-center gap-2">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300">
             <HoronGlyph name="sparkles" size={16} />
           </span>
           <span className="flex min-w-0 flex-col">

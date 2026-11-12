@@ -5,7 +5,7 @@ import { CaretDown, Check, FileText, Globe, Plus, SlidersHorizontal } from "@pho
  * flat source rows are rebuilt here at tile size with the panel's own tokens. */
 export default function KnowledgeBasePanelThumbnail() {
   return (
-    <section className="flex w-[340px] flex-col gap-1.5 rounded-[24px] border border-border-default bg-bg-surface px-4 pt-2.5 pb-1.5">
+    <section className="flex w-[340px] flex-col gap-1.5 rounded-xl border border-border-default bg-bg-surface px-4 pt-2.5 pb-1.5">
       <div className="flex items-center gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate text-label-lg text-text-primary">Knowledge base</span>
@@ -29,7 +29,7 @@ export default function KnowledgeBasePanelThumbnail() {
       </div>
       <div className="flex flex-col">
         <div className="flex items-center gap-2.5 border-b border-overlay-ink-8 px-1 py-1">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-overlay-ink-5 text-text-primary">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-overlay-ink-5 text-text-primary">
             <FileText aria-hidden className="size-4" />
           </span>
           <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -39,7 +39,7 @@ export default function KnowledgeBasePanelThumbnail() {
           <Check aria-label="Ready" className="size-4 shrink-0 text-text-secondary" />
         </div>
         <div className="flex items-center gap-2.5 px-1 py-1">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-overlay-ink-5 text-text-primary">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-overlay-ink-5 text-text-primary">
             <Globe aria-hidden className="size-4" />
           </span>
           <span className="flex min-w-0 flex-1 flex-col gap-0.5">

@@ -6,9 +6,9 @@ import { CaretDown, FilePdf, Minus, Plus } from "@phosphor-icons/react";
  * rows and the accept footer are rebuilt here at tile size. */
 export default function DocumentExtractPanelThumbnail() {
   return (
-    <section className="flex w-[344px] flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface">
+    <section className="flex w-[344px] flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface">
       <div className="flex items-center gap-2 px-4 py-2">
-        <span className="flex size-6 shrink-0 items-center justify-center rounded-[8px] bg-overlay-ink-5 text-text-danger">
+        <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-overlay-ink-5 text-text-danger">
           <FilePdf aria-hidden className="size-3.5" />
         </span>
         <span className="flex min-w-0 items-center gap-1">
@@ -52,19 +52,19 @@ export default function DocumentExtractPanelThumbnail() {
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <div className="flex items-center gap-1.5">
             <span className="w-[54px] shrink-0 truncate text-caption text-text-secondary">Vendor</span>
-            <span className="flex h-6.5 min-w-0 flex-1 items-center rounded-[8px] bg-overlay-ink-4 px-2 text-caption text-text-primary">
+            <span className="flex h-6.5 min-w-0 flex-1 items-center rounded-md bg-overlay-ink-4 px-2 text-caption text-text-primary">
               <span className="truncate">Larkspur Studio</span>
             </span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-[54px] shrink-0 truncate text-caption text-text-secondary">Total</span>
-            <span className="flex h-6.5 min-w-0 flex-1 items-center rounded-[8px] bg-overlay-ink-4 px-2 text-caption text-text-primary">
+            <span className="flex h-6.5 min-w-0 flex-1 items-center rounded-md bg-overlay-ink-4 px-2 text-caption text-text-primary">
               <span className="truncate">$4,940.00</span>
             </span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-[54px] shrink-0 truncate text-caption text-text-secondary">Due date</span>
-            <span className="flex h-6.5 min-w-0 flex-1 items-center gap-1 rounded-[8px] bg-overlay-ink-12 px-2 ring-1 ring-border-danger">
+            <span className="flex h-6.5 min-w-0 flex-1 items-center gap-1 rounded-md bg-overlay-ink-12 px-2 ring-1 ring-border-danger">
               <span className="min-w-0 flex-1 truncate text-caption text-text-primary">Nov 30</span>
               <span className="shrink-0 text-caption text-text-danger">Check</span>
             </span>
