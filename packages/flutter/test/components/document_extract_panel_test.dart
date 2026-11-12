@@ -192,9 +192,8 @@ void main() {
     expect(find.text('Check'), findsOneWidget, reason: '누른 항목만 확인됩니다');
     expect(find.text('3 of 4 filled · 1 to check'), findsOneWidget);
     expect(
-      decorations(
-        tester,
-      ).where((BoxDecoration d) => d.color == theme.colors.overlayInk4 && radiusOf(d) == theme.radius.md),
+      decorations(tester)
+          .where((BoxDecoration d) => d.color == theme.colors.overlayInk4 && radiusOf(d) == theme.radius.md),
       isNotEmpty,
       reason: '확인한 항목은 bg-overlay-ink-4로 돌아갑니다',
     );
@@ -323,9 +322,8 @@ void main() {
     await tester.tap(find.text('JSON'));
     await tester.pumpAndSettle();
     expect(
-      decorations(
-        tester,
-      ).where((BoxDecoration d) => d.color == theme.colors.overlayInk4 && radiusOf(d) == theme.radius.md),
+      decorations(tester)
+          .where((BoxDecoration d) => d.color == theme.colors.overlayInk4 && radiusOf(d) == theme.radius.md),
       isNotEmpty,
       reason: 'JSON pre rounded-md',
     );
@@ -390,9 +388,8 @@ void main() {
         'ink' => (theme.colors.interactivePrimary, theme.colors.overlayInk12),
         _ => (theme.colors.accentSky500_90, theme.colors.accentSky500_12),
       };
-      final BoxDecoration decoration = decorations(
-        tester,
-      ).firstWhere((BoxDecoration d) => d.color == fill && radiusOf(d) == theme.radius.sm);
+      final BoxDecoration decoration = decorations(tester)
+          .firstWhere((BoxDecoration d) => d.color == fill && radiusOf(d) == theme.radius.sm);
       expect(decoration.border!.top.color, border, reason: name);
       expect(decoration.border!.top.width, 1.2, reason: 'border-[1.2px]');
     }
