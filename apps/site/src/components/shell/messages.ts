@@ -85,4 +85,8 @@ export const shellMessages = defineMessages({
     ko: "macOS에서 쓸 수 있습니다. Windows와 Linux는 곧 나옵니다.",
     en: "Available on macOS · Windows and Linux soon",
   },
+  footerLicense: {
+    ko: "라이선스",
+    en: "License",
+  },
 });
