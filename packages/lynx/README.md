@@ -109,3 +109,7 @@ Lynx에는 DOM이 없고, 일부 CSS·API도 없습니다. 컴포넌트의 이�
 - React가 Base UI에서 물려받은 prop은 같은 이름, 필수 여부, 리터럴 집합으로 있어야 합니다. 기본값은 Base UI d.ts가 정하므로 비교하지 않습니다.
 - React DOM 속성(`onKeyDown`, `tabIndex` 등)은 개수만 셉니다.
 - 플랫폼 때문에 다른 항목은 이유와 함께 허용 목록에 두고, 실제 차이와 맞지 않는 허용 항목이 남으면 실패합니다.
+
+## 라이선스
+
+[PolyForm Strict License 1.0.0](https://polyformproject.org/licenses/strict/1.0.0)입니다. 비상업적 목적의 사용만 허용하고 수정·재배포·상업적 이용은 금지합니다. 전문은 패키지에 동봉된 `LICENSE`에 있습니다. 서드파티 고지는 `THIRD_PARTY_NOTICES.md`에 있습니다.

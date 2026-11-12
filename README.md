@@ -183,7 +183,33 @@ CI(`.github/workflows/ci.yml`)도 같은 lint·typecheck·test·build를 돌립�
 
 수동 배포(`bun run deploy:site`)는 저장소 소스로 빌드하며 `wrangler` CLI가 설치·로그인돼 있어야 합니다(`wrangler login`).
 
+## 라이선스
+
+이 저장소와 여기서 배포하는 `@horon-ai/react`, `@horon-ai/lynx`, `@horon-ai/tokens`는
+[PolyForm Strict License 1.0.0](https://polyformproject.org/licenses/strict/1.0.0)으로
+배포합니다. 전문은 저장소 루트 `LICENSE`에 있고, 각 패키지 tarball에도 같은 파일이 들어갑니다.
+
+- 허용: 비상업적 목적의 사용. 소스는 공개되어 있어 읽고 평가할 수 있습니다.
+- 금지: 상업적 목적의 사용, 수정, 재배포, 2차 저작물 작성.
+
+PolyForm Strict 1.0.0은 SPDX 식별자가 없어 `package.json`의 `license` 필드가
+`SEE LICENSE IN LICENSE`입니다. 판단이 갈리는 사용은 저장소 이슈로 문의해 주세요.
+
+npm에 이미 게시된 0.1.6 이하 버전에는 라이선스 표기가 없었습니다. 저장소에 `LICENSE` 파일이
+없었고 `package.json`에도 `license` 필드가 없었기 때문입니다. 즉 그 버전들에 MIT 사용 허가가
+부여된 적이 없으므로, 이번 교체로 이미 배포된 버전의 권리가 바뀌는 것은 없습니다. 앞으로
+게시하는 버전부터 이 라이선스가 적용됩니다.
+
+포함된 서드파티 자산의 고지는 다음과 같습니다.
+
+| 자산                                            | 라이선스                               | 쓰이는 곳                                                               |
+| ----------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------- |
+| `@phosphor-icons/core`, `@phosphor-icons/react` | MIT, Copyright (c) 2023 Phosphor Icons | 아이콘 글리프(`packages/lynx/src/icons/phosphor.g.ts`)와 React 컴포넌트 |
+| Pretendard                                      | SIL Open Font License 1.1              | 문서 사이트·예제 서체                                                   |
+| Geist Mono                                      | SIL Open Font License 1.1              | 코드 서체                                                               |
+| Tabler Icons                                    | MIT                                    | Flutter 예제 아이콘                                                     |
+
 ## 알아 둘 점
 
 - 패키지는 소스(`.tsx`) 그대로 배포합니다(내부 패키지 방식). Vite와 Astro가 각각 변환합니다.
-- 앱 `@horon/site`와 저장소 루트는 `private: true`입니다. 라이브러리 두 패키지는 게시 설정이 `public`이고, 실제 게시는 위 npm 절차를 따릅니다.
+- 앱 `@horon/site`와 저장소 루트는 `private: true`입니다. 라이브러리 세 패키지는 게시 설정이 `public`이고, 실제 게시는 위 npm 절차를 따릅니다.

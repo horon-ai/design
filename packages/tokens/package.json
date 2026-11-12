@@ -7,11 +7,13 @@
 		"directory": "packages/tokens"
 	},
 	"type": "module",
+	"license": "SEE LICENSE IN LICENSE",
 	"sideEffects": false,
 	"files": [
 		"src",
 		"theme.css",
-		"README.md"
+		"README.md",
+		"LICENSE"
 	],
 	"publishConfig": {
 		"access": "public"

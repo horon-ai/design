@@ -8,6 +8,9 @@
  *
  * Every weight listed for an icon is one some React component actually draws it
  * with; `regular` is always present as the default.
+ *
+ * The artwork is `@phosphor-icons/core`, MIT, Copyright (c) 2023 Phosphor Icons
+ * (https://github.com/phosphor-icons/core).
  */
 export type IconWeight = "thin" | "light" | "regular" | "bold" | "fill" | "duotone";
 

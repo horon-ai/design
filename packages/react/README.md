@@ -167,3 +167,7 @@ web, desktop(Electron의 Chromium), iOS, Android가 같은 모습입니다.
 bun run lint && bun run typecheck   # 이 패키지에서
 bun test                            # 저장소 루트에서, 진입점 재수출 커버리지
 ```
+
+## 라이선스
+
+[PolyForm Strict License 1.0.0](https://polyformproject.org/licenses/strict/1.0.0)입니다. 비상업적 목적의 사용만 허용하고 수정·재배포·상업적 이용은 금지합니다. 전문은 패키지에 동봉된 `LICENSE`에 있습니다. 서드파티 고지는 `THIRD_PARTY_NOTICES.md`에 있습니다.

@@ -7,12 +7,15 @@
     "directory": "packages/lynx"
   },
   "type": "module",
+  "license": "SEE LICENSE IN LICENSE",
   "sideEffects": [
     "**/*.css"
   ],
   "files": [
     "src",
     "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
     "tailwind-preset.cjs",
     "tailwind-preset.d.cts"
   ],
