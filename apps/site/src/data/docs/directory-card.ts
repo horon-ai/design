@@ -33,7 +33,7 @@ export const doc: ComponentDoc = {
         name: "Tile",
         slot: "icon",
         description: {
-          ko: "아이콘을 담는 40px 타일입니다. 모서리 10px이고 안쪽 아이콘은 20px이며 하늘색 바탕에 흰 아이콘을 씁니다.",
+          ko: "아이콘을 담는 40px 타일입니다. 모서리 12px이고 안쪽 아이콘은 20px이며 하늘색 바탕에 흰 아이콘을 씁니다.",
           en: "A 40px tile holding the icon: 10px corners, a 20px icon, a sky fill and a light glyph.",
         },
       },

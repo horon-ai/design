@@ -137,8 +137,8 @@ export const doc: ComponentDoc = {
         {
           name: "glass",
           description: {
-            ko: "veil-overlay 유리 바탕에 위쪽 모서리 32px를 씁니다. 이미지나 유리 크롬 위에서 씁니다.",
-            en: "The veil-overlay glass with 32px top corners, for use over imagery or glass chrome.",
+            ko: "veil-overlay 유리 바탕에 위쪽 모서리 20px를 씁니다. 이미지나 유리 크롬 위에서 씁니다.",
+            en: "The veil-overlay glass with 20px top corners, for use over imagery or glass chrome.",
           },
         },
       ],

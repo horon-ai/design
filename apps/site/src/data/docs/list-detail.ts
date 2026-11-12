@@ -226,7 +226,7 @@ export const doc: ComponentDoc = {
         { state: "all", slot: "Detail pane", property: "gap", value: "20px" },
         { state: "selection change", slot: "Detail pane", property: "motion", value: "motion-rise" },
         { state: "all", slot: "Header", property: "tile", value: "40px" },
-        { state: "all", slot: "Header", property: "tile radius", value: "10px" },
+        { state: "all", slot: "Header", property: "tile radius", value: "rounded-md" },
         { state: "light", slot: "Header tile", property: "background", value: "bg-sky-100" },
         { state: "light", slot: "Header tile", property: "text color", value: "text-sky-700" },
         { state: "dark", slot: "Header tile", property: "background", value: "bg-sky-900" },
