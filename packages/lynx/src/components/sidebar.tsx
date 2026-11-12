@@ -1,7 +1,7 @@
 import { Children, useState, type ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
-import sidebarPhoto from "../assets/sidebar-photo.jpg";
+import sidebarGradient from "../assets/sidebar-gradient.png";
 import { Icon } from "../icons";
 import { useMediaQuery } from "../hooks";
 import { cn } from "../lib/cn";
@@ -72,9 +72,10 @@ export type SidebarProps = Omit<PortedElementProps["nav"], "className"> & {
   /** Classes merged onto the column. */
   className?: string;
   /**
-   * `glass` (default) is the thick-glass column. `photo` is the Paper app sidebar: the Horon photo
-   * on the sky ground under a 55% white veil, with the thick glass kept for dark mode. `plain` paints
-   * no fill or glass, so the column takes the color of the layout behind it, divided by a 1px border.
+   * `glass` (default) is the thick-glass column. `photo` is the Paper app sidebar: the Horon sky
+   * gradient on the sky ground under a 55% white veil, with the thick glass kept for dark mode; the
+   * name survives from the photograph this surface once used. `plain` paints no fill or glass, so
+   * the column takes the color of the layout behind it, divided by a 1px border.
    * @default "glass"
    */
   surface?: "glass" | "photo" | "plain";
@@ -125,7 +126,7 @@ type TouchLike = { detail?: { x?: number } };
  * Width is uncontrolled: the column keeps its own state, starts at `defaultWidth` and reports every
  * clamped change through `onWidthChange`. React made the handle keyboard operable and put it behind
  * `md`; Lynx has no keyboard on a touch engine, so the handle is touch-only and the breakpoint is
- * read through `useMediaQuery`. `surface="photo"` draws the Paper photo as a real `<image>` with the
+ * read through `useMediaQuery`. `surface="photo"` draws the Paper gradient as a real `<image>` with the
  * 55% veil above it, because Lynx cannot attach a background image to a class.
  *
  * @example
@@ -213,10 +214,12 @@ export function Sidebar({
       accessibility-role-description="navigation"
       accessibility-label={ariaLabel}
     >
-      {/* `surface="photo"`: the photo keeps its bottom-anchored cover, and the veil sits above it. */}
+      {/* `surface="photo"`: `aspectFill` scales the 280×760 gradient to the column and the veil
+       * sits above it. The ramp only moves from top to bottom, so any cropped band keeps the
+       * same direction and the same lightness range as the web utility's `50% 100%` anchor. */}
       {surface === "photo" && theme.scheme !== "dark" ? (
         <view className="absolute inset-0" accessibility-elements-hidden>
-          <image src={sidebarPhoto} mode="aspectFill" className="absolute inset-0 size-full" />
+          <image src={sidebarGradient} mode="aspectFill" className="absolute inset-0 size-full" />
           <view className="absolute inset-0 bg-[#ffffff8c]" />
         </view>
       ) : null}
