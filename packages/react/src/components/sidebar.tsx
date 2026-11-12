@@ -33,9 +33,10 @@ export type SidebarProps = Omit<ComponentProps<"nav">, "className"> & {
   /** Classes merged onto the column. */
   className?: string;
   /**
-   * `glass` (default) is the thick-glass column. `photo` is the Paper app sidebar: the Horon photo
-   * on #EEF3F8 under a 55% white veil, with the thick glass kept for dark mode. `plain` paints no
-   * fill or glass, so the column takes the color of the layout behind it, divided by a 1px border.
+   * `glass` (default) is the thick-glass column. `photo` is the Paper app sidebar: the Horon sky
+   * gradient on #EEF3F8 under a 55% white veil, with the thick glass kept for dark mode; the name
+   * survives from the photograph this surface once used. `plain` paints no fill or glass, so the
+   * column takes the color of the layout behind it, divided by a 1px border.
    * @default "glass"
    */
   surface?: "glass" | "photo" | "plain";

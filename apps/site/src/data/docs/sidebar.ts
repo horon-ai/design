@@ -124,8 +124,8 @@ export const doc: ComponentDoc = {
       id: "surface",
       title: { ko: "surface", en: "surface" },
       description: {
-        ko: "열의 바탕입니다. glass는 두꺼운 유리, photo는 Horon 사진 위에 55% 흰 베일, plain은 바탕 없이 1px 오른쪽 테두리만 씁니다.",
-        en: "The column's ground. Glass is the thick glass, photo puts the Horon photo under a 55% white veil, and plain paints no fill and only a 1px right border.",
+        ko: "열의 바탕입니다. glass는 두꺼운 유리, photo는 하늘색 그라디언트 위에 55% 흰 베일, plain은 바탕 없이 1px 오른쪽 테두리만 씁니다.",
+        en: "The column's ground. Glass is the thick glass, photo puts the Horon sky gradient under a 55% white veil, and plain paints no fill and only a 1px right border.",
       },
       values: [
         {
@@ -138,8 +138,8 @@ export const doc: ComponentDoc = {
         {
           name: "photo",
           description: {
-            ko: "Paper 앱의 사이드바처럼 Horon 사진 위에 흰 베일을 얹습니다. 다크 테마에서는 두꺼운 유리로 돌아갑니다.",
-            en: "Lays the Horon photo under a white veil, as the Paper app sidebar does. In dark mode it falls back to the thick glass.",
+            ko: "Paper 앱의 사이드바처럼 하늘색 그라디언트 위에 흰 베일을 얹습니다. 다크 테마에서는 두꺼운 유리로 돌아갑니다. 이름은 사진을 쓰던 시절의 것이라 사진이 아니라 그라디언트를 가리킵니다.",
+            en: "Lays the Horon sky gradient under a white veil, as the Paper app sidebar does. In dark mode it falls back to the thick glass. The name is historical and now refers to a gradient rather than a photograph.",
           },
         },
         {
@@ -238,8 +238,8 @@ export const doc: ComponentDoc = {
       id: "glass-not-photo",
       title: { ko: "photo는 앱 셸에만", en: "Photo belongs to the app shell" },
       body: {
-        ko: "photo 표면은 사진과 베일을 깔아 열이 무거워집니다. 앱 전체를 감싸는 셸의 사이드바에만 쓰고, 패널이나 설정 화면 안쪽에서는 glass나 plain을 씁니다.",
-        en: "The photo surface layers a photograph and a veil, which makes the column heavy. Keep it for the app shell's own sidebar and use glass or plain inside panels and settings screens.",
+        ko: "photo 표면은 그라디언트와 베일을 깔아 열이 무거워집니다. 앱 전체를 감싸는 셸의 사이드바에만 쓰고, 패널이나 설정 화면 안쪽에서는 glass나 plain을 씁니다.",
+        en: "The photo surface layers a gradient and a veil, which makes the column heavy. Keep it for the app shell's own sidebar and use glass or plain inside panels and settings screens.",
       },
       example: "surfaces",
     },
@@ -351,8 +351,8 @@ export const doc: ComponentDoc = {
       id: "surfaces",
       title: { ko: "표면", en: "Surfaces" },
       description: {
-        ko: "glass, photo, plain 세 표면을 같은 내용으로 놓았습니다. photo는 사진 위에 베일이 깔립니다.",
-        en: "The same content on the glass, photo and plain surfaces. Photo puts a veil over the photograph.",
+        ko: "glass, photo, plain 세 표면을 같은 내용으로 놓았습니다. photo는 하늘색 그라디언트 위에 베일이 깔립니다.",
+        en: "The same content on the glass, photo and plain surfaces. Photo puts a veil over the sky gradient.",
       },
     },
     {

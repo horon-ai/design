@@ -62,6 +62,8 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 
 `theme.css`를 손으로 고치거나 생성기를 낡게 두면 드리프트 가드 테스트가 실패합니다.
 
+사이드바 그라디언트(`packages/{react,lynx}/src/assets/sidebar-gradient.png`)도 같은 방식의 생성물입니다. `packages/tokens/src/color.ts`의 `primitives`에서 하늘색 램프를 읽어 만들므로, 색을 바꾸면 `bun run assets`로 다시 만들고 `bun run assets:check`나 `bun test`로 커밋된 파일과 맞는지 확인합니다. 검사는 압축 바이트가 아니라 디코드한 픽셀을 비교하므로 zlib 구현이 다른 CI에서도 같은 결과가 나옵니다.
+
 ## 컴포넌트 추가
 
 새 컴포넌트는 Figma Components 보드의 실제 노드 값을 읽어 `packages/react/src/components/<이름>.tsx`에 Base UI로 만듭니다. `packages/react/src/index.ts`에 넣고, `apps/site/src/data/components.ts`에 항목을 추가하고, `apps/site/src/components/demos/<slug>.tsx`에 라이브 프리뷰를 만듭니다. `bun test`가 배럴 재수출과 사이트 목록·프리뷰가 서로 맞는지 확인합니다.

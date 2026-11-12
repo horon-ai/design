@@ -495,7 +495,7 @@ void main() {
       expect(tester.takeException(), isNull, reason: 'photo $brightness');
       expect(_rightBorder(colors), findsNothing, reason: 'photo도 테두리가 없습니다');
       if (brightness == Brightness.light) {
-        // 라이트는 사진 바탕(#EEF3F8 근사)과 흰 막이고 유리 겹이 없습니다.
+        // 라이트는 그라디언트를 대신하는 평평한 바탕(#EEF3F8 근사)과 흰 막이고 유리 겹이 없습니다.
         expect(find.byType(HoronLiquidGlass), findsNothing);
         expect(
           find.descendant(
