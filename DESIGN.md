@@ -156,7 +156,7 @@ Core v2 anchors: `experience`, `foundations`, `typography-assets`, `components-s
 - **워드마크.** `HoronWordmark`는 `currentColor` 벡터이고 기본 높이 11.5px입니다. 워드마크 자리에 글자로 "Horon"을 다시 조판하지 않습니다.
 - **마스코트.** 둥근 매 한 캐릭터입니다. `assets/horon-mascot-*.png` 26컷, 1254×1254 RGBA 투명 배경. 팔레트는 `--color-mascot-ink`(#1c1a17), `--color-mascot-cream`(#fbf7f0), `--color-mascot-gold`(#e0921f)입니다. 문서 사이트는 `apps/site/public/mascots/*.webp`로 변환한 파일을 씁니다. 몸이 잉크색이라 밝은 바탕에만 두고, 다크 모드에서는 `--color-sky-100` 판(`dark:bg-sky-100`) 위에 둡니다.
 - **메타 이미지.** `og.png`(1200×630, Paper Cover 구성: 워드마크, 슬로건 세 줄, 하늘색 원 위의 main 컷), `icon.png`(256), `icon-512.png`, `apple-icon.png`(180), `favicon.ico`.
-- **라이선스.** Pretendard는 SIL Open Font License 1.1, Geist Mono는 SIL Open Font License 1.1입니다. 마스코트는 저장소가 소유한 브랜드 자산이며 `assets/README.md`에 제작 경위가 있습니다. 저장소 밖 재배포 조건은 별도 라이선스 파일로 선언되어 있지 않습니다.
+- **라이선스.** Pretendard는 SIL Open Font License 1.1, Geist Mono는 SIL Open Font License 1.1입니다. 마스코트는 저장소가 소유한 브랜드 자산이며 `assets/README.md`에 제작 경위가 있습니다. 저장소 밖 사용 조건은 루트 `LICENSE`의 PolyForm Strict License 1.0.0이 정합니다. 비상업적 사용만 허용하고 수정·재배포·상업적 이용은 금지합니다. 아이콘 글리프는 `@phosphor-icons/core`(MIT, Copyright (c) 2023 Phosphor Icons)에서 생성하며 생성 파일 머리말에 그 고지를 둡니다.
 
 ## 4. Components & States
 
