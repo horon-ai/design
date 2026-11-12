@@ -290,7 +290,7 @@ export function Combobox(props: ComboboxProps) {
                     {shortLabel(item)}
                     <BaseCombobox.ChipRemove
                       aria-label={`Remove ${item.label}`}
-                      className="flex cursor-pointer rounded-full p-0.5 text-text-secondary hover:bg-overlay-ink-10 hover:text-text-primary"
+                      className="flex cursor-pointer rounded-full p-0.5 text-text-secondary hover:bg-overlay-ink-10 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
                     >
                       <X />
                     </BaseCombobox.ChipRemove>

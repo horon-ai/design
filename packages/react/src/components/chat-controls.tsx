@@ -152,13 +152,13 @@ export function VoiceInput({
         onClick={onStop}
         className="relative flex size-9 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
       >
-        <span className="size-3 rounded-[3px] bg-interactive-on-danger" />
+        <span className="size-3 bg-interactive-on-danger" />
       </button>
       <div aria-hidden className="relative flex min-w-0 flex-1 items-center gap-[3px] overflow-hidden">
         {bars.map((bar, position) => (
           <span
             key={bar.id}
-            className={cn("w-[3px] shrink-0 rounded-[2px] bg-interactive-primary-75", recording && "animate-wave")}
+            className={cn("w-[3px] shrink-0 rounded-full bg-interactive-primary-75", recording && "animate-wave")}
             style={{ height: bar.height, animationDelay: recording ? `${position * 120}ms` : undefined }}
           />
         ))}

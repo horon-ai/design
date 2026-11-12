@@ -119,7 +119,7 @@ export function McpServerRow({
       )}
       {...props}
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sky-500 text-label-md text-neutral-50">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-sky-500 text-label-md text-neutral-50">
         {initials ?? name.slice(0, 2).toUpperCase()}
       </span>
       <div className="flex min-w-0 grow basis-40 flex-col gap-1">

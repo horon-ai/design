@@ -85,7 +85,7 @@ export function MarketplaceCard({
       <div className="relative flex items-center gap-3">
         <span
           aria-hidden
-          className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-neutral-900 text-label-md text-neutral-50"
+          className="flex size-10 shrink-0 items-center justify-center rounded-md bg-neutral-900 text-label-md text-neutral-50"
         >
           {initials}
         </span>

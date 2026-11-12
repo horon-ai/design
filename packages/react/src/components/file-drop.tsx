@@ -94,7 +94,7 @@ export function FileDrop({
       onDragLeave={() => setDragging(false)}
       onDrop={onDrop}
       className={cn(
-        "relative flex w-full max-w-[550px] cursor-pointer items-center justify-center gap-2 overflow-clip rounded-[10px] border-[1.5px] border-dashed border-border-dashed px-4 py-3 text-label-md text-text-secondary motion-colors",
+        "relative flex w-full max-w-[550px] cursor-pointer items-center justify-center gap-2 overflow-clip rounded-md border-[1.5px] border-dashed border-border-dashed px-4 py-3 text-label-md text-text-secondary motion-colors",
         "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-text-brand",
         // The dashed edge stays put (border-style cannot transition) and the active state adds an inner rim.
         "data-dragging:border-border-brand data-dragging:shadow-[inset_0_0_0_1px_var(--color-text-brand)]",

@@ -324,7 +324,7 @@ export function Calendar(props: CalendarProps) {
             ? "veil-overlay"
             : "bg-glass-thick",
         variant === "popover"
-          ? cn("rounded-[24px]", containerSizeClass[size].popover)
+          ? cn("rounded-xl", containerSizeClass[size].popover)
           : cn("rounded-xl", containerSizeClass[size].default),
         // Paper renders every popover day on the label scale; the default calendar mixes body and label.
         variant === "popover" && popoverDayTextClass[size],

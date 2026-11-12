@@ -98,6 +98,7 @@ export function Composer({
       onSubmit={submit}
       className={cn(
         "relative flex max-w-full min-w-0 items-center overflow-clip rounded-full motion-colors has-[input:focus-visible]:border-border-strong",
+        "has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-text-brand",
         surface === "glass" ? "veil-field" : "border border-border-default bg-bg-surface",
         sizeClass[size],
         className,

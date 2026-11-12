@@ -68,10 +68,10 @@ export function AgentLane({ status, bot, elapsed, task, tool, output, usage, cla
     >
       <div className="flex items-center gap-2 text-caption text-text-secondary">
         {/* live-pulse draws its ring in currentColor, so the running wrapper carries the tile's sky tone. */}
-        <span className={cn("shrink-0 rounded-[5px]", status === "running" && "animate-live-pulse text-sky-400")}>
+        <span className={cn("shrink-0 rounded-xs", status === "running" && "animate-live-pulse text-sky-400")}>
           <span
             className={cn(
-              "flex size-4.5 items-center justify-center rounded-[5px] text-label-sm text-text-inverse motion-colors",
+              "flex size-4.5 items-center justify-center rounded-xs text-label-sm text-text-inverse motion-colors",
               botTile[status],
             )}
           >

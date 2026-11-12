@@ -217,7 +217,7 @@ export function DocumentExtractPanel({
   return (
     <section
       className={cn(
-        "@container flex w-full max-w-280 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "@container flex w-full max-w-280 min-w-0 flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
@@ -225,7 +225,7 @@ export function DocumentExtractPanel({
       <div className="flex flex-col @4xl:flex-row">
         <div className="flex min-w-0 flex-col @4xl:w-135 @4xl:shrink-0">
           <div className="flex flex-wrap items-center gap-2 px-5 py-3">
-            <span className="flex size-7 shrink-0 items-center justify-center rounded-[10px] bg-overlay-ink-5 text-text-danger">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-overlay-ink-5 text-text-danger">
               <FilePdf aria-hidden className="size-4" />
             </span>
             {onOpenFile ? (
@@ -331,7 +331,7 @@ export function DocumentExtractPanel({
                                 </span>
                               ) : null}
                             </div>
-                            <div className="flex flex-col overflow-x-auto rounded-[10px] border border-overlay-ink-10 px-3 py-0.5">
+                            <div className="flex flex-col overflow-x-auto rounded-md border border-overlay-ink-10 px-3 py-0.5">
                               <div className="flex min-w-52 flex-col">
                                 <div className="flex items-center gap-2 py-2 text-caption text-text-secondary">
                                   {field.columns.map((column) => (
@@ -384,7 +384,7 @@ export function DocumentExtractPanel({
                             onClick={() => resolve(field.id)}
                             aria-label={needsCheck ? `Confirm ${field.label}` : undefined}
                             className={cn(
-                              "flex h-9 min-w-0 flex-1 items-center gap-2 rounded-[10px] border px-3 text-start motion-colors",
+                              "flex h-9 min-w-0 flex-1 items-center gap-2 rounded-md border px-3 text-start motion-colors",
                               needsCheck
                                 ? "cursor-pointer border-border-danger bg-overlay-ink-12 hover:bg-overlay-ink-14 focus-visible:outline-2 focus-visible:outline-text-brand"
                                 : "cursor-default border-transparent bg-overlay-ink-4",
@@ -416,7 +416,7 @@ export function DocumentExtractPanel({
               </>
             ) : null}
             {view === "json" ? (
-              <pre className="animate-slide-shift-next overflow-x-auto rounded-[10px] bg-overlay-ink-4 p-3 font-mono text-caption whitespace-pre text-text-primary">
+              <pre className="animate-slide-shift-next overflow-x-auto rounded-md bg-overlay-ink-4 p-3 font-mono text-caption whitespace-pre text-text-primary">
                 {json}
               </pre>
             ) : null}
@@ -454,7 +454,7 @@ export function DocumentExtractPanel({
         <span className="min-w-0 flex-1" />
         {bot ? (
           <>
-            <span className="flex size-5 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
+            <span className="flex size-5 items-center justify-center rounded-xs bg-interactive-primary text-label-sm text-text-inverse">
               {bot.initial}
             </span>
             <span className="text-caption text-text-secondary">

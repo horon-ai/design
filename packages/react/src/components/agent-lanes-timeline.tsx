@@ -193,7 +193,7 @@ export function AgentLanesTimeline({
   return (
     <section
       className={cn(
-        "flex w-full max-w-252.5 min-w-0 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface",
+        "flex w-full max-w-252.5 min-w-0 flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface",
         className,
       )}
       {...props}
@@ -261,7 +261,7 @@ export function AgentLanesTimeline({
             >
               <span
                 className={cn(
-                  "flex size-8.5 shrink-0 items-center justify-center rounded-[10px] text-label-md text-text-on-ink",
+                  "flex size-8.5 shrink-0 items-center justify-center rounded-md text-label-md text-text-on-ink",
                   avatarTone[bot.tone],
                 )}
               >
@@ -327,7 +327,7 @@ export function AgentLanesTimeline({
               <div
                 key={task.id}
                 className={cn(
-                  "absolute flex h-9 motion-rise items-center gap-1.5 overflow-clip rounded-[10px] px-2.5 text-label-sm transition-[left,width,background-color,color,border-color] duration-280 ease-emphasized [&>svg]:size-3.5",
+                  "absolute flex h-9 motion-rise items-center gap-1.5 overflow-clip rounded-md px-2.5 text-label-sm transition-[left,width,background-color,color,border-color] duration-280 ease-emphasized [&>svg]:size-3.5",
                   barTone[task.tone],
                 )}
                 style={{

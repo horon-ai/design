@@ -94,7 +94,7 @@ export function BottomSheetContent({
         <Drawer.Popup
           className={cn(
             "relative flex max-h-[calc(100dvh-2rem)] w-full flex-col items-stretch overflow-clip px-4 pt-2 outline-none",
-            solid ? "rounded-t-xl bg-bg-surface pb-6" : "veil-overlay rounded-t-[32px] pb-5",
+            solid ? "rounded-t-xl bg-bg-surface pb-6" : "veil-overlay rounded-t-xl pb-5",
             "transition-[translate] duration-320 ease-out-quint data-ending-style:translate-y-full data-ending-style:duration-220 data-ending-style:ease-in data-starting-style:translate-y-full",
             detail ? "gap-4.5" : floating ? "gap-3" : "max-w-93.5 gap-1",
             className,
@@ -103,7 +103,7 @@ export function BottomSheetContent({
         >
           <span
             aria-hidden
-            className="relative mx-auto h-[5px] w-9 cursor-grab touch-none rounded-[3px] bg-overlay-ink-20 active:cursor-grabbing"
+            className="relative mx-auto h-[5px] w-9 cursor-grab touch-none rounded-full bg-overlay-ink-20 active:cursor-grabbing"
           />
           <Drawer.Content
             className={cn(
