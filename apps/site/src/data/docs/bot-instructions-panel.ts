@@ -17,8 +17,8 @@ export const doc: ComponentDoc = {
         name: "Panel",
         slot: "section",
         description: {
-          ko: "패널 전체를 감싸는 section입니다. 24px 모서리와 표면 색을 쓰고 최대 너비가 620px입니다.",
-          en: "The section wrapping the panel. It has a 24px radius, the surface fill and a 620px maximum width.",
+          ko: "패널 전체를 감싸는 section입니다. 20px 모서리와 표면 색을 쓰고 최대 너비가 620px입니다.",
+          en: "The section wrapping the panel. It has a 20px radius, the surface fill and a 620px maximum width.",
         },
       },
       {
@@ -283,7 +283,7 @@ export const doc: ComponentDoc = {
         en: "Values are the source classes as written.",
       },
       rows: [
-        { state: "default", slot: "Panel", property: "radius", value: "rounded-[24px]" },
+        { state: "default", slot: "Panel", property: "radius", value: "rounded-xl" },
         { state: "default", slot: "Panel", property: "border", value: "1px border-border-default" },
         { state: "default", slot: "Panel", property: "background", value: "bg-bg-surface" },
         { state: "default", slot: "Panel", property: "max width", value: "max-w-155" },
@@ -301,7 +301,7 @@ export const doc: ComponentDoc = {
         { state: "default", slot: "Bot pill", property: "background", value: "bg-overlay-ink-6" },
         { state: "Bot · hover", slot: "Bot pill", property: "background", value: "bg-overlay-ink-10" },
         { state: "default", slot: "Bot avatar", property: "size", value: "size-4.5" },
-        { state: "default", slot: "Bot avatar", property: "radius", value: "rounded-[5px]" },
+        { state: "default", slot: "Bot avatar", property: "radius", value: "rounded-xs" },
         { state: "default", slot: "Bot avatar", property: "background", value: "bg-interactive-primary text-text-inverse" },
         { state: "default", slot: "Header divider", property: "background", value: "h-px bg-overlay-ink-8" },
         { state: "focus-visible", slot: "Pill", property: "outline", value: "2px outline-text-brand" },

@@ -234,7 +234,7 @@ export const doc: ComponentDoc = {
         { state: "lg", slot: "Header", property: "icon size", value: "size-5" },
         { state: "lg", slot: "Next run", property: "font", value: "text-label-lg" },
         { state: "lg", slot: "Next run", property: "padding", value: "px-3.5 py-3" },
-        { state: "all", slot: "Card", property: "radius", value: "rounded-xl (20px)" },
+        { state: "all", slot: "Card", property: "radius", value: "rounded-xl" },
       ],
     },
     {
@@ -248,7 +248,7 @@ export const doc: ComponentDoc = {
         { state: "all", slot: "Header", property: "text color", value: "text-text-primary" },
         { state: "all", slot: "Section caption", property: "text color", value: "text-text-secondary" },
         { state: "all", slot: "Next run", property: "background", value: "bg-accent-sky-500-16" },
-        { state: "all", slot: "Next run", property: "radius", value: "rounded-md (12px)" },
+        { state: "all", slot: "Next run", property: "radius", value: "rounded-md" },
       ],
     },
     {

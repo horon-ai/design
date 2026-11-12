@@ -137,8 +137,8 @@ export const doc: ComponentDoc = {
         {
           name: "glass",
           description: {
-            ko: "veil-overlay 유리 바탕에 위쪽 모서리 32px를 씁니다. 이미지나 유리 크롬 위에서 씁니다.",
-            en: "The veil-overlay glass with 32px top corners, for use over imagery or glass chrome.",
+            ko: "veil-overlay 유리 바탕에 위쪽 모서리 20px를 씁니다. 이미지나 유리 크롬 위에서 씁니다.",
+            en: "The veil-overlay glass with 20px top corners, for use over imagery or glass chrome.",
           },
         },
       ],
@@ -230,7 +230,7 @@ export const doc: ComponentDoc = {
         { state: "solid", slot: "Popup", property: "radius", value: "rounded-t-xl" },
         { state: "solid", slot: "Popup", property: "padding", value: "px-4 pt-2 pb-6" },
         { state: "glass", slot: "Popup", property: "background", value: "veil-overlay" },
-        { state: "glass", slot: "Popup", property: "radius", value: "rounded-t-[32px]" },
+        { state: "glass", slot: "Popup", property: "radius", value: "rounded-t-xl" },
         { state: "glass", slot: "Popup", property: "padding", value: "px-4 pt-2 pb-5" },
         { state: "backdrop", slot: "Backdrop", property: "background", value: "bg-bg-scrim/32" },
         { state: "backdrop", slot: "Backdrop", property: "blur", value: "backdrop-blur-[6px]" },
@@ -301,8 +301,8 @@ export const doc: ComponentDoc = {
           property: "size",
           value: "h-[5px] w-9",
           note: {
-            ko: "radius 3px, 20% 잉크 바탕입니다.",
-            en: "3px radius on a 20% ink fill.",
+            ko: "완전히 둥근 모서리, 20% 잉크 바탕입니다.",
+            en: "A fully rounded bar on a 20% ink fill.",
           },
         },
         {

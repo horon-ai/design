@@ -155,7 +155,7 @@ export const doc: ComponentDoc = {
         { state: "lg", slot: "Radio", property: "gap", value: "12px" },
         { state: "lg", slot: "Radio", property: "font", value: "text-body-lg" },
         { state: "all", slot: "Group", property: "gap", value: "12px" },
-        { state: "all", slot: "Mark", property: "radius", value: "9999px" },
+        { state: "all", slot: "Mark", property: "radius", value: "rounded-full" },
         { state: "all", slot: "Mark", property: "border", value: "1.5px border-border-strong" },
       ],
     },

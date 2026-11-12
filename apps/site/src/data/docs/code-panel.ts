@@ -9,8 +9,8 @@ export const doc: ComponentDoc = {
   slug: "code-panel",
   anatomy: {
     description: {
-      ko: "CodePanel은 설정 화면에 놓는 밝은 코드 상자입니다. 모서리 10px의 패널 하나에 코드 문자열이 들어가고, 헤더 바나 복사 버튼은 없습니다.",
-      en: "A light code box for settings screens. One 10px-radius panel holds the code string, and there is no header bar or copy button.",
+      ko: "CodePanel은 설정 화면에 놓는 밝은 코드 상자입니다. 모서리 12px의 패널 하나에 코드 문자열이 들어가고, 헤더 바나 복사 버튼은 없습니다.",
+      en: "A light code box for settings screens. One 12px-radius panel holds the code string, and there is no header bar or copy button.",
     },
     parts: [
       {
@@ -115,7 +115,7 @@ export const doc: ComponentDoc = {
       rows: [
         { state: "default", slot: "Panel", property: "background", value: "bg-neutral-50" },
         { state: "default", slot: "Panel", property: "border", value: "1px border-border-default" },
-        { state: "default", slot: "Panel", property: "radius", value: "rounded-[10px]" },
+        { state: "default", slot: "Panel", property: "radius", value: "rounded-md" },
         { state: "default", slot: "Panel", property: "padding", value: "px-4 py-3.5" },
         { state: "default", slot: "Code", property: "font", value: "font-mono text-[12px]/[21px]" },
         { state: "default", slot: "Code", property: "text color", value: "text-syntax-string" },

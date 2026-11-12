@@ -230,7 +230,7 @@ export const doc: ComponentDoc = {
         { state: "default", slot: "Header", property: "font", value: "text-caption" },
         { state: "default", slot: "Header", property: "text color", value: "text-text-secondary" },
         { state: "default", slot: "Bot tile", property: "size", value: "18px" },
-        { state: "default", slot: "Bot tile", property: "radius", value: "5px" },
+        { state: "default", slot: "Bot tile", property: "radius", value: "rounded-xs" },
         { state: "default", slot: "Bot tile", property: "font", value: "text-label-sm" },
         { state: "default", slot: "Bot tile", property: "text color", value: "text-text-inverse" },
         { state: "default", slot: "Elapsed", property: "font", value: "text-caption" },

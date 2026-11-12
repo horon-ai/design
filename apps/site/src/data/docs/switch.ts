@@ -173,7 +173,7 @@ export const doc: ComponentDoc = {
         { state: "compact", slot: "Thumb", property: "travel", value: "16px" },
         { state: "compact", slot: "Label row", property: "gap", value: "12px" },
         { state: "compact", slot: "Label row", property: "font", value: "text-body-sm" },
-        { state: "all", slot: "Track", property: "radius", value: "9999px" },
+        { state: "all", slot: "Track", property: "radius", value: "rounded-full" },
         { state: "all", slot: "Track", property: "padding", value: "2px" },
       ],
     },

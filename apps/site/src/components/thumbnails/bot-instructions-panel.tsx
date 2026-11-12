@@ -5,7 +5,7 @@ import { Play } from "@phosphor-icons/react";
  * prompt with `{{variable}}` chips and the tab pair are rebuilt at tile size. */
 export default function BotInstructionsPanelThumbnail() {
   return (
-    <section className="flex w-[340px] flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface">
+    <section className="flex w-[340px] flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface">
       <header className="flex items-center gap-2 px-4 pt-2 pb-1.5">
         <span className="text-label-lg text-text-primary">Morning brief</span>
         <span className="flex h-6 shrink-0 items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 text-label-sm text-text-primary">
@@ -15,7 +15,7 @@ export default function BotInstructionsPanelThumbnail() {
         </span>
         <span className="min-w-0 flex-1" />
         <span className="flex h-6 shrink-0 items-center gap-1.5 rounded-full bg-overlay-ink-5 pr-2 pl-1 text-label-sm text-text-primary">
-          <span className="flex size-4 items-center justify-center rounded-[5px] bg-interactive-primary text-label-sm text-text-inverse">
+          <span className="flex size-4 items-center justify-center rounded-xs bg-interactive-primary text-label-sm text-text-inverse">
             C
           </span>
           Chief of staff

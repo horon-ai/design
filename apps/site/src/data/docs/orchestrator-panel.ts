@@ -17,8 +17,8 @@ export const doc: ComponentDoc = {
         name: "Panel",
         slot: "OrchestratorPanel",
         description: {
-          ko: "24px 라운드의 surface 판입니다. 모든 조각이 선택 사항이라 title과 lead만으로도 리드 뷰 하나로 동작합니다.",
-          en: "A 24px-radius surface panel. Every part is optional, so title and lead alone make a working lead view.",
+          ko: "20px 모서리의 surface 판입니다. 모든 조각이 선택 사항이라 title과 lead만으로도 리드 뷰 하나로 동작합니다.",
+          en: "A 20px-radius surface panel. Every part is optional, so title and lead alone make a working lead view.",
         },
       },
       {
@@ -216,7 +216,7 @@ export const doc: ComponentDoc = {
         en: "Values are the token utility names in the component classes, or the literal the class sets.",
       },
       rows: [
-        { state: "default", slot: "OrchestratorPanel", property: "radius", value: "24px" },
+        { state: "default", slot: "OrchestratorPanel", property: "radius", value: "rounded-xl" },
         { state: "default", slot: "OrchestratorPanel", property: "border", value: "1px border-border-default" },
         { state: "default", slot: "OrchestratorPanel", property: "background", value: "bg-bg-surface" },
         { state: "default", slot: "Header", property: "padding", value: "px-5 pt-4 pb-3.5" },
@@ -244,7 +244,7 @@ export const doc: ComponentDoc = {
       rows: [
         { state: "default", slot: "Lead row", property: "gap", value: "8px" },
         { state: "default", slot: "Lead tile", property: "size", value: "22px" },
-        { state: "default", slot: "Lead tile", property: "radius", value: "5px" },
+        { state: "default", slot: "Lead tile", property: "radius", value: "rounded-xs" },
         { state: "default", slot: "Lead tile", property: "background", value: "bg-interactive-primary" },
         { state: "default", slot: "Lead tile", property: "text color", value: "text-text-inverse" },
         { state: "default", slot: "Lead name", property: "font", value: "text-label-lg" },

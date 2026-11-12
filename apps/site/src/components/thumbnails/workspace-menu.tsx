@@ -8,12 +8,12 @@ const workspaces = [
 /** Static facsimile of the open workspace switcher: tiles, the current check and the create row. */
 export default function WorkspaceMenuThumbnail() {
   return (
-    <div className="flex w-64 flex-col gap-0.5 overflow-clip rounded-[18px] bg-glass-fill-solid p-1.5 shadow-popover">
+    <div className="flex w-64 flex-col gap-0.5 overflow-clip rounded-xl bg-glass-fill-solid p-1.5 shadow-popover">
       <span className="px-2.5 pt-2 pb-1 text-caption text-text-secondary">Workspaces</span>
       {workspaces.map((workspace) => (
         <div
           key={workspace.name}
-          className={`flex h-12 w-full items-center gap-2.5 rounded-[10px] px-2.5 ${workspace.current ? "bg-bg-brand" : ""}`}
+          className={`flex h-12 w-full items-center gap-2.5 rounded-md px-2.5 ${workspace.current ? "bg-bg-brand" : ""}`}
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-sm bg-interactive-primary text-label-sm text-text-inverse">
             {workspace.initial}
@@ -30,7 +30,7 @@ export default function WorkspaceMenuThumbnail() {
       <div className="flex px-2.5 py-1">
         <span className="h-px flex-1 bg-overlay-ink-8" />
       </div>
-      <div className="flex h-9 w-full items-center gap-2.5 rounded-[10px] px-2.5">
+      <div className="flex h-9 w-full items-center gap-2.5 rounded-md px-2.5">
         <span className="flex shrink-0 text-text-primary [&>svg]:size-4.5">
           <PlusCircle />
         </span>

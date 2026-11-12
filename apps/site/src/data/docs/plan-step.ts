@@ -240,7 +240,7 @@ export const doc: ComponentDoc = {
         { state: "pending", slot: "Marker", property: "border", value: "1px border-border-default" },
         { state: "pending", slot: "Marker", property: "text color", value: "text-text-secondary" },
         { state: "default", slot: "Rail", property: "width", value: "2px" },
-        { state: "default", slot: "Rail", property: "radius", value: "1px" },
+        { state: "default", slot: "Rail", property: "radius", value: "rounded-full" },
         { state: "done", slot: "Rail", property: "background", value: "bg-status-live" },
         { state: "running, failed, pending", slot: "Rail", property: "background", value: "bg-border-default" },
         {

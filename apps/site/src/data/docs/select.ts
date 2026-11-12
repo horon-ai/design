@@ -247,7 +247,7 @@ export const doc: ComponentDoc = {
         { state: "Chip", slot: "Trigger", property: "background", value: "bg-bg-subtle" },
         { state: "Chip", slot: "Trigger", property: "height", value: "32px" },
         { state: "Chip", slot: "Trigger", property: "padding-x", value: "12px" },
-        { state: "Chip", slot: "Trigger", property: "radius", value: "9999px" },
+        { state: "Chip", slot: "Trigger", property: "radius", value: "rounded-full" },
         { state: "Chip", slot: "Trigger", property: "gap", value: "4px" },
         { state: "Chip", slot: "Trigger", property: "font", value: "text-label-md" },
         { state: "Chip · hover", slot: "Trigger", property: "background", value: "bg-overlay-ink-8" },

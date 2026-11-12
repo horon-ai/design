@@ -165,7 +165,7 @@ export const doc: ComponentDoc = {
       },
       rows: [
         { state: "all", slot: "Target", property: "width", value: "w-full max-w-[550px]" },
-        { state: "all", slot: "Target", property: "radius", value: "rounded-[10px]" },
+        { state: "all", slot: "Target", property: "radius", value: "rounded-md" },
         { state: "all", slot: "Target", property: "border", value: "1.5px dashed border-border-dashed" },
         { state: "all", slot: "Target", property: "padding", value: "px-4 py-3" },
         { state: "all", slot: "Target", property: "gap", value: "gap-2" },

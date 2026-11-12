@@ -33,7 +33,7 @@ export const doc: ComponentDoc = {
         name: "Tile",
         slot: "icon",
         description: {
-          ko: "아이콘을 담는 40px 타일입니다. 모서리 10px이고 안쪽 아이콘은 20px이며 하늘색 바탕에 흰 아이콘을 씁니다.",
+          ko: "아이콘을 담는 40px 타일입니다. 모서리 12px이고 안쪽 아이콘은 20px이며 하늘색 바탕에 흰 아이콘을 씁니다.",
           en: "A 40px tile holding the icon: 10px corners, a 20px icon, a sky fill and a light glyph.",
         },
       },
@@ -176,7 +176,7 @@ export const doc: ComponentDoc = {
       id: "card",
       title: { ko: "카드", en: "Card" },
       rows: [
-        { state: "solid", slot: "Card", property: "radius", value: "16px" },
+        { state: "solid", slot: "Card", property: "radius", value: "rounded-2xl" },
         { state: "solid", slot: "Card", property: "padding", value: "12px" },
         { state: "solid", slot: "Card", property: "gap", value: "12px" },
         { state: "solid", slot: "Card", property: "background", value: "bg-bg-surface" },
@@ -191,7 +191,7 @@ export const doc: ComponentDoc = {
       title: { ko: "내용", en: "Content" },
       rows: [
         { state: "all", slot: "Tile", property: "size", value: "40px" },
-        { state: "all", slot: "Tile", property: "radius", value: "10px" },
+        { state: "all", slot: "Tile", property: "radius", value: "rounded-md" },
         { state: "all", slot: "Tile", property: "background", value: "bg-sky-500" },
         { state: "all", slot: "Tile", property: "text color", value: "text-neutral-50" },
         { state: "all", slot: "Tile", property: "icon size", value: "20px" },

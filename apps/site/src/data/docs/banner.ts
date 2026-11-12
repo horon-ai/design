@@ -273,7 +273,7 @@ export const doc: ComponentDoc = {
       title: { ko: "배치와 동작", en: "Layout and motion" },
       rows: [
         { state: "default", slot: "Strip", property: "display", value: "flex items-center" },
-        { state: "default", slot: "Strip", property: "radius", value: "12px" },
+        { state: "default", slot: "Strip", property: "radius", value: "rounded-md" },
         { state: "default", slot: "Strip", property: "overflow", value: "overflow-clip" },
         { state: "default", slot: "Message", property: "width", value: "min-w-0 flex-1" },
         {

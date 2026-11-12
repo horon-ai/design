@@ -258,7 +258,7 @@ export const doc: ComponentDoc = {
         { state: "all", slot: "Input", property: "text color", value: "text-text-primary" },
         { state: "all", slot: "Input", property: "placeholder", value: "text-text-placeholder" },
         { state: "all", slot: "Chip", property: "background", value: "bg-overlay-ink-6" },
-        { state: "all", slot: "Chip", property: "radius", value: "9999px" },
+        { state: "all", slot: "Chip", property: "radius", value: "rounded-full" },
         { state: "all", slot: "Chip", property: "font", value: "text-label-sm" },
         { state: "chip · highlighted", slot: "Chip", property: "background", value: "bg-overlay-ink-12" },
         {

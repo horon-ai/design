@@ -5,7 +5,7 @@ import { CaretDown, Envelope, FileText, Folder, Pulse, Warning } from "@phosphor
  * size against the same token classes and task tones. */
 export default function AgentLanesTimelineThumbnail() {
   return (
-    <section className="flex w-[344px] flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface">
+    <section className="flex w-[344px] flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface">
       <div className="flex items-center gap-2.5 px-4 pt-2.5 pb-2">
         <Pulse aria-hidden className="size-4 shrink-0 text-text-primary" />
         <span className="text-label-lg text-text-primary">Bots</span>
@@ -30,7 +30,7 @@ export default function AgentLanesTimelineThumbnail() {
         </div>
         <div className="flex h-9 items-center gap-2 border-b border-overlay-ink-6">
           <span className="flex w-[110px] shrink-0 items-center gap-2">
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-[7px] bg-sky-500 text-label-sm text-text-on-ink">
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-sky-500 text-label-sm text-text-on-ink">
               R
             </span>
             <span className="flex min-w-0 flex-col">
@@ -39,11 +39,11 @@ export default function AgentLanesTimelineThumbnail() {
             </span>
           </span>
           <span className="relative min-w-0 flex-1 self-stretch">
-            <span className="absolute top-1/2 left-0 flex h-6 w-[42%] -translate-y-1/2 items-center gap-1 overflow-clip rounded-[6px] bg-overlay-ink-6 px-1.5 text-caption text-text-secondary">
+            <span className="absolute top-1/2 left-0 flex h-6 w-[42%] -translate-y-1/2 items-center gap-1 overflow-clip rounded-md bg-overlay-ink-6 px-1.5 text-caption text-text-secondary">
               <Folder aria-hidden className="size-2.5 shrink-0" />
               <span className="min-w-0 truncate">Portfolio</span>
             </span>
-            <span className="absolute top-1/2 left-[45%] flex h-6 w-[55%] -translate-y-1/2 items-center gap-1 overflow-clip rounded-[6px] bg-status-live/20 px-1.5 text-caption text-text-primary">
+            <span className="absolute top-1/2 left-[45%] flex h-6 w-[55%] -translate-y-1/2 items-center gap-1 overflow-clip rounded-md bg-status-live/20 px-1.5 text-caption text-text-primary">
               <Envelope aria-hidden className="size-2.5 shrink-0" />
               <span className="min-w-0 truncate">Investor Q&amp;A</span>
             </span>
@@ -51,7 +51,7 @@ export default function AgentLanesTimelineThumbnail() {
         </div>
         <div className="flex h-9 items-center gap-2 border-b border-overlay-ink-6">
           <span className="flex w-[110px] shrink-0 items-center gap-2">
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-[7px] bg-sky-700 text-label-sm text-text-on-ink">
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-sky-700 text-label-sm text-text-on-ink">
               W
             </span>
             <span className="flex min-w-0 flex-col">
@@ -60,7 +60,7 @@ export default function AgentLanesTimelineThumbnail() {
             </span>
           </span>
           <span className="relative min-w-0 flex-1 self-stretch">
-            <span className="absolute top-1/2 left-[24%] flex h-6 w-[76%] -translate-y-1/2 items-center gap-1 overflow-clip rounded-[6px] bg-status-live/20 px-1.5 text-caption text-text-primary">
+            <span className="absolute top-1/2 left-[24%] flex h-6 w-[76%] -translate-y-1/2 items-center gap-1 overflow-clip rounded-md bg-status-live/20 px-1.5 text-caption text-text-primary">
               <FileText aria-hidden className="size-2.5 shrink-0" />
               <span className="min-w-0 truncate">Draft update</span>
             </span>
@@ -68,7 +68,7 @@ export default function AgentLanesTimelineThumbnail() {
         </div>
         <div className="flex h-9 items-center gap-2">
           <span className="flex w-[110px] shrink-0 items-center gap-2">
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-[7px] bg-interactive-primary text-label-sm text-text-inverse">
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-interactive-primary text-label-sm text-text-inverse">
               C
             </span>
             <span className="flex min-w-0 flex-col">
@@ -77,7 +77,7 @@ export default function AgentLanesTimelineThumbnail() {
             </span>
           </span>
           <span className="relative min-w-0 flex-1 self-stretch">
-            <span className="absolute top-1/2 left-[34%] flex h-6 w-[66%] -translate-y-1/2 items-center gap-1 overflow-clip rounded-[6px] border border-interactive-primary bg-bg-surface-90 px-1.5 text-caption text-text-primary">
+            <span className="absolute top-1/2 left-[34%] flex h-6 w-[66%] -translate-y-1/2 items-center gap-1 overflow-clip rounded-md border border-interactive-primary bg-bg-surface-90 px-1.5 text-caption text-text-primary">
               <Warning aria-hidden className="size-2.5 shrink-0" />
               <span className="min-w-0 truncate">Needs your yes</span>
             </span>
