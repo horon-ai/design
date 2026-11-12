@@ -9,8 +9,8 @@ export const doc: ComponentDoc = {
   slug: "page-header",
   anatomy: {
     description: {
-      ko: "PageHeader는 화면 맨 위에서 뒤로 가기, 제목, 동작을 한 줄에 담고 그 아래에 필터 줄을 붙일 수 있는 머리말입니다. 모서리 28px의 표면 하나가 전체를 감쌉니다.",
-      en: "A PageHeader holds back, title and actions in one row at the top of a screen, with an optional filter row underneath. One 28px-radius surface wraps the whole thing.",
+      ko: "PageHeader는 화면 맨 위에서 뒤로 가기, 제목, 동작을 한 줄에 담고 그 아래에 필터 줄을 붙일 수 있는 머리말입니다. 20px 모서리의 표면 하나가 전체를 감쌉니다.",
+      en: "A PageHeader holds back, title and actions in one row at the top of a screen, with an optional filter row underneath. One 20px-radius surface wraps the whole thing.",
     },
     parts: [
       {
@@ -68,8 +68,8 @@ export const doc: ComponentDoc = {
       id: "surface",
       title: { ko: "surface", en: "surface" },
       description: {
-        ko: "머리말의 바탕입니다. 두 값 모두 모서리 28px과 8px 안쪽 여백을 공유합니다.",
-        en: "The header's ground. Both values share the 28px radius and 8px padding.",
+        ko: "머리말의 바탕입니다. 두 값 모두 20px 모서리와 8px 안쪽 여백을 공유합니다.",
+        en: "The header's ground. Both values share the 20px radius and 8px padding.",
       },
       values: [
         {
@@ -180,7 +180,7 @@ export const doc: ComponentDoc = {
         en: "The title row is 40px, and the title and action icons share that height.",
       },
       rows: [
-        { state: "any", slot: "Header", property: "radius", value: "rounded-[28px]" },
+        { state: "any", slot: "Header", property: "radius", value: "rounded-xl" },
         { state: "any", slot: "Header", property: "padding", value: "p-2" },
         { state: "any", slot: "Header", property: "gap", value: "gap-1.5" },
         { state: "solid", slot: "Header", property: "background", value: "bg-bg-surface" },

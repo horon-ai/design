@@ -15,7 +15,7 @@ export default function BottomSheetThumbnail() {
         <span aria-hidden className="absolute inset-0 bg-bg-scrim/16" />
       </div>
       <div className="flex flex-col items-stretch rounded-t-xl bg-bg-surface px-4 pt-1.5 pb-3">
-        <span aria-hidden className="mx-auto h-[5px] w-9 rounded-[3px] bg-overlay-ink-20" />
+        <span aria-hidden className="mx-auto h-[5px] w-9 rounded-full bg-overlay-ink-20" />
         <div className="flex items-center pt-2 pb-1.5 pl-2">
           <p className="min-w-0 flex-1 text-label-lg text-text-primary">Chief of staff</p>
         </div>

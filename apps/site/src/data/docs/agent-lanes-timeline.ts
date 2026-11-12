@@ -17,8 +17,8 @@ export const doc: ComponentDoc = {
         name: "Panel",
         slot: "section",
         description: {
-          ko: "패널 전체를 감싸는 section입니다. 24px 모서리에 테두리와 표면 색을 씁니다.",
-          en: "The section that wraps the panel, with a 24px radius, a border and the surface fill.",
+          ko: "패널 전체를 감싸는 section입니다. 20px 모서리에 테두리와 표면 색을 씁니다.",
+          en: "The section that wraps the panel, with a 20px radius, a border and the surface fill.",
         },
       },
       {
@@ -260,7 +260,7 @@ export const doc: ComponentDoc = {
         en: "Values are the source classes as written.",
       },
       rows: [
-        { state: "default", slot: "Panel", property: "radius", value: "rounded-[24px]" },
+        { state: "default", slot: "Panel", property: "radius", value: "rounded-xl" },
         { state: "default", slot: "Panel", property: "border", value: "1px border-border-default" },
         { state: "default", slot: "Panel", property: "background", value: "bg-bg-surface" },
         { state: "default", slot: "Panel", property: "max width", value: "max-w-252.5" },
@@ -300,7 +300,7 @@ export const doc: ComponentDoc = {
         { state: "default", slot: "Lane row", property: "separator", value: "border-b border-overlay-ink-6" },
         { state: "Lane · hover", slot: "Lane row", property: "background", value: "bg-overlay-ink-3" },
         { state: "default", slot: "Avatar", property: "size", value: "size-8.5" },
-        { state: "default", slot: "Avatar", property: "radius", value: "rounded-[10px]" },
+        { state: "default", slot: "Avatar", property: "radius", value: "rounded-md" },
         { state: "Avatar · sky", slot: "Avatar", property: "background", value: "bg-sky-500" },
         { state: "Avatar · steel", slot: "Avatar", property: "background", value: "bg-sky-700" },
         { state: "Avatar · neutral", slot: "Avatar", property: "background", value: "bg-neutral-500" },
@@ -310,7 +310,7 @@ export const doc: ComponentDoc = {
         { state: "default", slot: "Bot badge", property: "background", value: "bg-overlay-ink-6" },
         { state: "Bot badge · ink", slot: "Bot badge", property: "background", value: "bg-interactive-primary text-text-inverse" },
         { state: "default", slot: "Task bar", property: "height", value: "h-9" },
-        { state: "default", slot: "Task bar", property: "radius", value: "rounded-[10px]" },
+        { state: "default", slot: "Task bar", property: "radius", value: "rounded-md" },
         { state: "default", slot: "Task bar", property: "padding", value: "px-2.5" },
         { state: "default", slot: "Task bar", property: "gap", value: "gap-1.5" },
         { state: "default", slot: "Task bar", property: "font", value: "text-label-sm" },

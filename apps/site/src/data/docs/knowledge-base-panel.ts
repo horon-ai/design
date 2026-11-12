@@ -17,8 +17,8 @@ export const doc: ComponentDoc = {
         name: "Panel",
         slot: "KnowledgeBasePanel",
         description: {
-          ko: "24px 라운드의 surface 판입니다. 최대 폭이 800px이라 넓은 화면에서도 소스 줄이 한 줄로 읽힙니다.",
-          en: "A 24px-radius surface panel capped at 800px, so source rows stay readable on a wide screen.",
+          ko: "20px 모서리의 surface 판입니다. 최대 폭이 800px이라 넓은 화면에서도 소스 줄이 한 줄로 읽힙니다.",
+          en: "A 20px-radius surface panel capped at 800px, so source rows stay readable on a wide screen.",
         },
       },
       {
@@ -234,7 +234,7 @@ export const doc: ComponentDoc = {
         en: "Values are the token utility names in the component classes, or the literal the class sets.",
       },
       rows: [
-        { state: "default", slot: "KnowledgeBasePanel", property: "radius", value: "24px" },
+        { state: "default", slot: "KnowledgeBasePanel", property: "radius", value: "rounded-xl" },
         { state: "default", slot: "KnowledgeBasePanel", property: "border", value: "1px border-border-default" },
         { state: "default", slot: "KnowledgeBasePanel", property: "background", value: "bg-bg-surface" },
         { state: "default", slot: "KnowledgeBasePanel", property: "padding", value: "px-5 py-4.5" },

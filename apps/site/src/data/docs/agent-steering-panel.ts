@@ -232,7 +232,7 @@ export const doc: ComponentDoc = {
         en: "Values are the token utility names in the component classes, or the literal the class sets.",
       },
       rows: [
-        { state: "default", slot: "AgentSteeringPanel", property: "radius", value: "24px" },
+        { state: "default", slot: "AgentSteeringPanel", property: "radius", value: "rounded-xl" },
         { state: "default", slot: "AgentSteeringPanel", property: "border", value: "1px border-border-default" },
         { state: "default", slot: "AgentSteeringPanel", property: "background", value: "bg-bg-surface" },
         { state: "default", slot: "AgentSteeringPanel", property: "max width", value: "520px" },
@@ -329,7 +329,7 @@ export const doc: ComponentDoc = {
         },
         { state: "default", slot: "Notes heading", property: "font", value: "text-caption" },
         { state: "default", slot: "Notes heading", property: "text color", value: "text-text-secondary" },
-        { state: "default", slot: "Note row", property: "radius", value: "10px" },
+        { state: "default", slot: "Note row", property: "radius", value: "rounded-md" },
         { state: "default", slot: "Note row", property: "background", value: "bg-overlay-ink-4" },
         { state: "default", slot: "Note row", property: "padding", value: "py-2 pr-2.5 pl-3.5" },
         { state: "default", slot: "Note text", property: "font", value: "text-body-sm" },

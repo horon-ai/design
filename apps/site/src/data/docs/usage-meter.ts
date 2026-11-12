@@ -203,11 +203,11 @@ export const doc: ComponentDoc = {
         { state: "default", slot: "Root", property: "max width", value: "300px" },
         { state: "default", slot: "Root", property: "padding", value: "16px" },
         { state: "default", slot: "Root", property: "gap", value: "8px" },
-        { state: "default", slot: "Root", property: "radius", value: "20px" },
+        { state: "default", slot: "Root", property: "radius", value: "rounded-xl" },
         { state: "default", slot: "Header", property: "font", value: "text-label-md" },
         { state: "default", slot: "Value", property: "numerals", value: "tabular-nums" },
         { state: "default", slot: "Track", property: "height", value: "6px" },
-        { state: "default", slot: "Track", property: "radius", value: "9999px" },
+        { state: "default", slot: "Track", property: "radius", value: "rounded-full" },
         { state: "default", slot: "Captions", property: "font", value: "text-caption" },
         { state: "default", slot: "Note", property: "wrap", value: "whitespace-nowrap" },
         {

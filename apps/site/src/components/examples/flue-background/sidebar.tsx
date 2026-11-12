@@ -15,7 +15,7 @@ export default function FlueBackgroundSidebar() {
       <span className="relative text-label-md font-semibold">Horon</span>
       <nav className="relative flex flex-col gap-1">
         {items.map((item) => (
-          <span key={item.id} className="flex items-center gap-2.5 rounded-[10px] px-2.5 py-2 text-label-md">
+          <span key={item.id} className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-label-md">
             <HoronGlyph name={item.icon} size={20} />
             {item.label}
           </span>

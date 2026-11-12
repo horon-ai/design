@@ -195,7 +195,7 @@ export const doc: ComponentDoc = {
       id: "card",
       title: { ko: "카드", en: "Card" },
       rows: [
-        { state: "solid", slot: "Card", property: "radius", value: "20px" },
+        { state: "solid", slot: "Card", property: "radius", value: "rounded-xl" },
         { state: "solid", slot: "Card", property: "padding", value: "16px" },
         { state: "solid", slot: "Card", property: "gap", value: "12px" },
         { state: "solid", slot: "Card", property: "background", value: "bg-bg-surface" },
@@ -211,7 +211,7 @@ export const doc: ComponentDoc = {
       rows: [
         { state: "all", slot: "Header", property: "gap", value: "12px" },
         { state: "all", slot: "Tile", property: "size", value: "40px" },
-        { state: "all", slot: "Tile", property: "radius", value: "10px" },
+        { state: "all", slot: "Tile", property: "radius", value: "rounded-md" },
         { state: "all", slot: "Tile", property: "background", value: "bg-neutral-900" },
         { state: "all", slot: "Tile", property: "text color", value: "text-neutral-50" },
         { state: "all", slot: "Tile", property: "font", value: "text-label-md" },

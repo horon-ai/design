@@ -5,7 +5,7 @@ import { MagnifyingGlass } from "@phosphor-icons/react";
  * grouped memories are rebuilt here at tile size. */
 export default function BotMemoryPanelThumbnail() {
   return (
-    <section className="flex w-[340px] flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface">
+    <section className="flex w-[340px] flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface">
       <header className="flex items-center gap-2.5 px-4 pt-2 pb-1.5">
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <span className="text-label-lg text-text-primary">Memory</span>
@@ -35,7 +35,7 @@ export default function BotMemoryPanelThumbnail() {
           <span className="text-label-sm text-text-secondary">Preferences</span>
           <span className="text-caption text-text-secondary">2</span>
         </div>
-        <div className="flex flex-col gap-0.5 rounded-[10px] bg-accent-sky-500-10 px-2 py-0">
+        <div className="flex flex-col gap-0.5 rounded-full bg-accent-sky-500-10 px-2 py-0">
           <span className="text-body-sm text-text-primary">Wants replies under 120 words</span>
           <span className="text-caption text-text-secondary">From a chat · just now</span>
         </div>

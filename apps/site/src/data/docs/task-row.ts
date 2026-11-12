@@ -267,7 +267,7 @@ export const doc: ComponentDoc = {
         { state: "default", slot: "Elapsed", property: "font", value: "text-caption" },
         { state: "default", slot: "Bot line", property: "font", value: "text-caption" },
         { state: "default", slot: "Bot tile", property: "size", value: "18px" },
-        { state: "default", slot: "Bot tile", property: "radius", value: "5px" },
+        { state: "default", slot: "Bot tile", property: "radius", value: "rounded-xs" },
         { state: "default", slot: "Bot tile", property: "font", value: "text-label-sm" },
       ],
     },

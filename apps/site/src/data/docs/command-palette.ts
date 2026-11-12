@@ -168,7 +168,7 @@ export const doc: ComponentDoc = {
         { state: "backdrop", slot: "Backdrop", property: "background", value: "bg-bg-scrim/32" },
         { state: "backdrop", slot: "Backdrop", property: "blur", value: "backdrop-blur-[6px]" },
         { state: "all", slot: "Popup", property: "width", value: "w-full max-w-140" },
-        { state: "all", slot: "Popup", property: "radius", value: "rounded-[24px]" },
+        { state: "all", slot: "Popup", property: "radius", value: "rounded-xl" },
         { state: "all", slot: "Popup", property: "padding", value: "p-1.5" },
         { state: "all", slot: "Popup", property: "motion", value: "motion-popup duration-240" },
         { state: "enter", slot: "Popup", property: "offset", value: "translate-y-2" },

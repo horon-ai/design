@@ -6,7 +6,7 @@ import { ArrowUp, Check, Path, Pause } from "@phosphor-icons/react";
  * here at tile size with two steps and the steer box. */
 export default function AgentSteeringPanelThumbnail() {
   return (
-    <section className="flex w-[340px] flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface">
+    <section className="flex w-[340px] flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface">
       <div className="flex items-center gap-2.5 px-4 pt-2.5 pb-2">
         <Path aria-hidden className="size-4 shrink-0 text-text-primary" />
         <div className="flex min-w-0 flex-1 flex-col">

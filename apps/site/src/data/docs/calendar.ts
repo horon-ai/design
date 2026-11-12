@@ -17,8 +17,8 @@ export const doc: ComponentDoc = {
         name: "Frame",
         slot: "container",
         description: {
-          ko: "달력 전체를 감싸는 상자입니다. default는 모서리 20px, popover는 24px이고, surface가 바탕과 테두리를 정합니다.",
-          en: "The box around the whole calendar. Its corners are 20px in default and 24px in popover, and the surface decides the fill and border.",
+          ko: "달력 전체를 감싸는 상자입니다. 두 변형 모두 모서리 20px이고, surface가 바탕과 테두리를 정합니다.",
+          en: "The box around the whole calendar. Both variants use 20px corners, and the surface decides the fill and border.",
         },
       },
       {
@@ -99,8 +99,8 @@ export const doc: ComponentDoc = {
         {
           name: "popover",
           description: {
-            ko: "왼쪽 제목과 오른쪽의 둥근 화살표 두 개, 24px 모서리를 쓰고 요일 글자를 label 눈금으로 그립니다. DateField 팝업 안의 달력이 이 모양입니다.",
-            en: "A left title with two round arrows on the right, 24px corners and weekday text on the label scale. This is the calendar inside a DateField popup.",
+            ko: "왼쪽 제목과 오른쪽의 둥근 화살표 두 개, 20px 모서리를 쓰고 요일 글자를 label 눈금으로 그립니다. DateField 팝업 안의 달력이 이 모양입니다.",
+            en: "A left title with two round arrows on the right, 20px corners and weekday text on the label scale. This is the calendar inside a DateField popup.",
           },
         },
       ],
@@ -277,11 +277,11 @@ export const doc: ComponentDoc = {
         { state: "default · lg", slot: "Frame", property: "width", value: "w-full max-w-93.5 (374px)" },
         { state: "default · lg", slot: "Frame", property: "padding", value: "p-4.5" },
         { state: "default · lg", slot: "Frame", property: "gap", value: "gap-3.5" },
-        { state: "default", slot: "Frame", property: "radius", value: "rounded-xl (20px)" },
+        { state: "default", slot: "Frame", property: "radius", value: "rounded-xl" },
         { state: "popover · sm", slot: "Frame", property: "width", value: "w-62 max-w-[calc(100vw-2rem)]" },
         { state: "popover · md", slot: "Frame", property: "width", value: "w-77 max-w-[calc(100vw-2rem)]" },
         { state: "popover · lg", slot: "Frame", property: "width", value: "w-92 max-w-[calc(100vw-2rem)]" },
-        { state: "popover", slot: "Frame", property: "radius", value: "rounded-[24px]" },
+        { state: "popover", slot: "Frame", property: "radius", value: "rounded-xl" },
         {
           state: "default · narrow",
           slot: "Frame",

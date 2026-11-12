@@ -155,8 +155,8 @@ export const doc: ComponentDoc = {
         {
           name: "popover",
           description: {
-            ko: "왼쪽에 붙인 제목과 오른쪽의 둥근 화살표 두 개를 쓰고, 모서리를 24px로 키웁니다.",
-            en: "A title on the left with two round arrows on the right, and 24px corners.",
+            ko: "왼쪽에 붙인 제목과 오른쪽의 둥근 화살표 두 개를 씁니다. 모서리는 20px입니다.",
+            en: "A title on the left with two round arrows on the right, and 20px corners.",
           },
         },
       ],

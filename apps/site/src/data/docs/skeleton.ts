@@ -215,8 +215,8 @@ export const doc: ComponentDoc = {
             en: "The highlight travels on a 1.6s cycle.",
           },
         },
-        { state: "block", slot: "Block", property: "radius", value: "6px" },
-        { state: "pill", slot: "Block", property: "radius", value: "9999px" },
+        { state: "block", slot: "Block", property: "radius", value: "rounded-xs" },
+        { state: "pill", slot: "Block", property: "radius", value: "rounded-full" },
         {
           state: "default",
           slot: "Block",
@@ -272,7 +272,7 @@ export const doc: ComponentDoc = {
       rows: [
         { state: "default", slot: "Card", property: "padding", value: "16px" },
         { state: "default", slot: "Card", property: "gap", value: "12px" },
-        { state: "default", slot: "Card", property: "radius", value: "20px" },
+        { state: "default", slot: "Card", property: "radius", value: "rounded-xl" },
         { state: "solid", slot: "Card", property: "background", value: "bg-bg-surface" },
         { state: "solid", slot: "Card", property: "border", value: "1px border-border-default" },
         { state: "glass", slot: "Card", property: "background", value: "bg-glass-thick" },

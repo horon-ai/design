@@ -6,7 +6,7 @@ import { CaretDown, Check, MagnifyingGlass, Plus } from "@phosphor-icons/react";
  * read so far and the sources pill are rebuilt here at tile size. */
 export default function ResearchRunPanelThumbnail() {
   return (
-    <section className="flex w-[340px] flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface">
+    <section className="flex w-[340px] flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface">
       <header className="flex items-center gap-2 px-4 pt-2 pb-1.5">
         <MagnifyingGlass aria-hidden className="size-4 shrink-0 text-text-primary" />
         <span className="min-w-0 flex-1 truncate text-label-lg text-text-primary">Research</span>
@@ -23,7 +23,7 @@ export default function ResearchRunPanelThumbnail() {
         <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
           <Spinner size={12} label="Researching" />
           <span className="text-label-md text-text-primary">Researching</span>
-          <span aria-hidden className="h-3 w-0.5 rounded-[1px] bg-interactive-primary" />
+          <span aria-hidden className="h-3 w-0.5 rounded-full bg-interactive-primary" />
           <span className="text-caption text-text-secondary tabular-nums">12s · 3 of 5 read</span>
         </div>
         <div className="relative flex flex-col gap-1 pl-3">

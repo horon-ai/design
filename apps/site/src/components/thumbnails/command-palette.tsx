@@ -21,7 +21,7 @@ const items = [
 /** Static facsimile of the open palette: search row, one group of results and the hint footer. */
 export default function CommandPaletteThumbnail() {
   return (
-    <div className="flex w-80 flex-col overflow-clip rounded-[24px] border border-border-default bg-bg-surface p-1 shadow-palette">
+    <div className="flex w-80 flex-col overflow-clip rounded-xl border border-border-default bg-bg-surface p-1 shadow-palette">
       <div className="flex h-11 items-center gap-2.5 px-3">
         <span className="flex size-7 shrink-0 items-center justify-center">
           <MagnifyingGlass aria-hidden className="size-5 text-text-secondary" />

@@ -141,7 +141,7 @@ export const doc: ComponentDoc = {
       rows: [
         { state: "all", slot: "Popup", property: "surface", value: "solid" },
         { state: "all", slot: "Popup", property: "background", value: "bg-glass-fill-solid" },
-        { state: "all", slot: "Popup", property: "radius", value: "rounded-[18px]" },
+        { state: "all", slot: "Popup", property: "radius", value: "rounded-xl" },
         { state: "all", slot: "Popup", property: "shadow", value: "shadow-popover" },
         { state: "all", slot: "Popup", property: "width", value: "w-64" },
         { state: "all", slot: "Popup", property: "padding", value: "p-1.5" },
@@ -160,7 +160,7 @@ export const doc: ComponentDoc = {
         { state: "default", slot: "Item", property: "height", value: "h-9" },
         { state: "with meta", slot: "Item", property: "height", value: "h-12" },
         { state: "default", slot: "Item", property: "padding", value: "px-2.5" },
-        { state: "default", slot: "Item", property: "radius", value: "rounded-[10px]" },
+        { state: "default", slot: "Item", property: "radius", value: "rounded-md" },
         { state: "selected", slot: "Item", property: "background", value: "bg-bg-brand" },
         { state: "hover", slot: "Item", property: "background", value: "bg-overlay-ink-6" },
         { state: "all", slot: "Tile", property: "size", value: "size-7" },
