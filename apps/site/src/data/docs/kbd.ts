@@ -165,7 +165,7 @@ export const doc: ComponentDoc = {
       rows: [
         { state: "default", slot: "Chip", property: "background", value: "bg-overlay-ink-6" },
         { state: "default", slot: "Chip", property: "text color", value: "text-text-secondary" },
-        { state: "default", slot: "Chip", property: "radius", value: "6px" },
+        { state: "default", slot: "Chip", property: "radius", value: "rounded-xs" },
         { state: "default", slot: "Chip", property: "font family", value: "font-sans" },
         { state: "default", slot: "Chip", property: "display", value: "inline-flex items-center shrink-0" },
         { state: "default", slot: "Chip", property: "line height", value: "leading-none" },

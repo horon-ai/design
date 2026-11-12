@@ -17,8 +17,8 @@ export const doc: ComponentDoc = {
         name: "Panel",
         slot: "section",
         description: {
-          ko: "패널 전체를 감싸는 section입니다. 24px 모서리에 최대 너비가 600px입니다.",
-          en: "The section wrapping the panel, with a 24px radius and a 600px maximum width.",
+          ko: "패널 전체를 감싸는 section입니다. 20px 모서리에 최대 너비가 600px입니다.",
+          en: "The section wrapping the panel, with a 20px radius and a 600px maximum width.",
         },
       },
       {
@@ -268,7 +268,7 @@ export const doc: ComponentDoc = {
         en: "Values are the source classes as written.",
       },
       rows: [
-        { state: "default", slot: "Panel", property: "radius", value: "rounded-[24px]" },
+        { state: "default", slot: "Panel", property: "radius", value: "rounded-xl" },
         { state: "default", slot: "Panel", property: "border", value: "1px border-border-default" },
         { state: "default", slot: "Panel", property: "background", value: "bg-bg-surface" },
         { state: "default", slot: "Panel", property: "max width", value: "max-w-150" },

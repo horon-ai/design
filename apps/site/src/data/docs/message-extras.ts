@@ -179,7 +179,7 @@ export const doc: ComponentDoc = {
         { state: "all", slot: "Attachment", property: "background", value: "bg-bg-subtle" },
         { state: "all", slot: "Attachment", property: "motion", value: "motion-rise" },
         { state: "thumbnail", slot: "Thumb", property: "size", value: "size-10" },
-        { state: "thumbnail", slot: "Thumb", property: "radius", value: "rounded-[10px]" },
+        { state: "thumbnail", slot: "Thumb", property: "radius", value: "rounded-md" },
         { state: "file", slot: "Thumb", property: "background", value: "bg-accent-sky-500-16" },
         { state: "file", slot: "Thumb", property: "text color", value: "text-text-brand" },
         { state: "file", slot: "Thumb icon", property: "size", value: "size-5" },

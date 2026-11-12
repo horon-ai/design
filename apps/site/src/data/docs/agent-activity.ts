@@ -287,7 +287,7 @@ export const doc: ComponentDoc = {
       id: "log-card",
       title: { ko: "기록 카드", en: "Log card" },
       rows: [
-        { state: "default", slot: "WorkLog", property: "radius", value: "16px" },
+        { state: "default", slot: "WorkLog", property: "radius", value: "rounded-2xl" },
         { state: "default", slot: "WorkLog", property: "border", value: "1px border-border-default" },
         { state: "default", slot: "WorkLog", property: "background", value: "bg-bg-surface" },
         { state: "default", slot: "WorkLog", property: "padding", value: "6px" },

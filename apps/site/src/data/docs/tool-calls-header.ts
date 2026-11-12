@@ -17,8 +17,8 @@ export const doc: ComponentDoc = {
         name: "Card",
         slot: "section",
         description: {
-          ko: "제목 줄과 카드를 감싸는 카드입니다. 12px 모서리에 테두리와 표면 색을 씁니다.",
-          en: "The card that wraps the header and the calls, with a 12px radius, a border and the surface fill.",
+          ko: "제목 줄과 카드를 감싸는 카드입니다. 20px 모서리에 테두리와 표면 색을 씁니다.",
+          en: "The card that wraps the header and the calls, with a 20px radius, a border and the surface fill.",
         },
       },
       {
@@ -183,7 +183,7 @@ export const doc: ComponentDoc = {
         { state: "focus-visible", slot: "Trigger", property: "outline", value: "2px outline-text-brand" },
         { state: "focus-visible", slot: "Trigger", property: "outline offset", value: "2px" },
         { state: "default", slot: "Chip", property: "size", value: "size-7" },
-        { state: "default", slot: "Chip", property: "radius", value: "rounded-[10px]" },
+        { state: "default", slot: "Chip", property: "radius", value: "rounded-md" },
         { state: "default", slot: "Chip", property: "background", value: "bg-bg-subtle text-text-secondary" },
         { state: "default", slot: "Chip", property: "ring", value: "ring-2 ring-bg-surface" },
         { state: "default", slot: "Chip", property: "overlap", value: "-ml-2" },

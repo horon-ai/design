@@ -297,7 +297,7 @@ export const doc: ComponentDoc = {
       id: "shape-and-live",
       title: { ko: "모양과 상태 점", en: "Shape and live dot" },
       rows: [
-        { state: "default", slot: "Root", property: "radius", value: "9999px" },
+        { state: "default", slot: "Root", property: "radius", value: "rounded-full" },
         { state: "default", slot: "Root", property: "ring", value: "inset-ring-1 inset-ring-overlay-ink-6" },
         { state: "default", slot: "Image", property: "fit", value: "size-full object-cover" },
         {

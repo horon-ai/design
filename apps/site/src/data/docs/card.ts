@@ -286,7 +286,7 @@ export const doc: ComponentDoc = {
       title: { ko: "치수", en: "Metrics" },
       rows: [
         { state: "default", slot: "Root", property: "padding", value: "20px" },
-        { state: "default", slot: "Root", property: "radius", value: "20px" },
+        { state: "default", slot: "Root", property: "radius", value: "rounded-xl" },
         { state: "default", slot: "Root", property: "gap", value: "8px" },
         { state: "default", slot: "Root", property: "width", value: "min-w-0" },
         { state: "default", slot: "Title", property: "font", value: "text-title-sm" },

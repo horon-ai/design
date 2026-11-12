@@ -17,8 +17,8 @@ export const doc: ComponentDoc = {
         name: "Panel",
         slot: "AgentPanel",
         description: {
-          ko: "입력창과 목록을 담는 section입니다. 24px 라운드와 surface 바탕을 쓰고, filter를 넘기면 제목 없이 맨 위에 필터 줄만 놓습니다.",
-          en: "The section that holds the composer and the list. It uses a 24px radius and the surface fill; passing filter puts a filter row at the top and nothing else above it.",
+          ko: "입력창과 목록을 담는 section입니다. 20px 모서리와 surface 바탕을 쓰고, filter를 넘기면 제목 없이 맨 위에 필터 줄만 놓습니다.",
+          en: "The section that holds the composer and the list. It uses a 20px radius and the surface fill; passing filter puts a filter row at the top and nothing else above it.",
         },
       },
       {
@@ -199,7 +199,7 @@ export const doc: ComponentDoc = {
         en: "Values are the token utility names in the component classes, or the literal the class sets.",
       },
       rows: [
-        { state: "default", slot: "AgentPanel", property: "radius", value: "24px" },
+        { state: "default", slot: "AgentPanel", property: "radius", value: "rounded-xl" },
         { state: "default", slot: "AgentPanel", property: "border", value: "1px border-border-default" },
         { state: "default", slot: "AgentPanel", property: "background", value: "bg-bg-surface" },
         { state: "default", slot: "AgentPanel", property: "padding", value: "px-5 pt-4 pb-2" },
@@ -268,7 +268,7 @@ export const doc: ComponentDoc = {
         { state: "default", slot: "ComposerChip", property: "gap", value: "6px" },
         { state: "default", slot: "ComposerChip", property: "font", value: "text-label-sm" },
         { state: "default", slot: "Tile", property: "size", value: "16px" },
-        { state: "default", slot: "Tile", property: "radius", value: "5px" },
+        { state: "default", slot: "Tile", property: "radius", value: "rounded-xs" },
         { state: "default", slot: "Tile", property: "background", value: "bg-interactive-primary" },
         { state: "default", slot: "Tile", property: "text color", value: "text-text-inverse" },
         { state: "icon leading", slot: "Icon", property: "size", value: "14px" },

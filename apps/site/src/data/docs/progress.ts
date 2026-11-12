@@ -125,11 +125,11 @@ export const doc: ComponentDoc = {
       rows: [
         { state: "default", slot: "Track", property: "height", value: "6px" },
         { state: "default", slot: "Track", property: "background", value: "bg-overlay-ink-8" },
-        { state: "default", slot: "Track", property: "radius", value: "9999px" },
+        { state: "default", slot: "Track", property: "radius", value: "rounded-full" },
         { state: "default", slot: "Track", property: "overflow", value: "overflow-clip" },
         { state: "determinate", slot: "Indicator", property: "background", value: "bg-interactive-primary" },
         { state: "determinate", slot: "Indicator", property: "height", value: "100%" },
-        { state: "determinate", slot: "Indicator", property: "radius", value: "9999px" },
+        { state: "determinate", slot: "Indicator", property: "radius", value: "rounded-full" },
         { state: "indeterminate", slot: "Indicator", property: "width", value: "33.333%" },
         { state: "indeterminate", slot: "Indicator", property: "background", value: "bg-interactive-primary" },
         { state: "responsive", slot: "Root", property: "width", value: "w-60" },

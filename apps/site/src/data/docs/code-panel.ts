@@ -115,7 +115,7 @@ export const doc: ComponentDoc = {
       rows: [
         { state: "default", slot: "Panel", property: "background", value: "bg-neutral-50" },
         { state: "default", slot: "Panel", property: "border", value: "1px border-border-default" },
-        { state: "default", slot: "Panel", property: "radius", value: "rounded-[10px]" },
+        { state: "default", slot: "Panel", property: "radius", value: "rounded-md" },
         { state: "default", slot: "Panel", property: "padding", value: "px-4 py-3.5" },
         { state: "default", slot: "Code", property: "font", value: "font-mono text-[12px]/[21px]" },
         { state: "default", slot: "Code", property: "text color", value: "text-syntax-string" },

@@ -208,7 +208,7 @@ export const doc: ComponentDoc = {
         { state: "default", slot: "Row", property: "padding", value: "16px 0" },
         { state: "default", slot: "Row", property: "gap", value: "14px / 12px" },
         { state: "default", slot: "Tile", property: "size", value: "40px" },
-        { state: "default", slot: "Tile", property: "radius", value: "10px" },
+        { state: "default", slot: "Tile", property: "radius", value: "rounded-md" },
         { state: "default", slot: "Tile", property: "background", value: "bg-sky-500" },
         { state: "default", slot: "Tile", property: "text color", value: "text-neutral-50" },
         { state: "default", slot: "Tile", property: "font", value: "text-label-md" },
@@ -226,7 +226,7 @@ export const doc: ComponentDoc = {
       title: { ko: "알약과 배지", en: "Pills and badges" },
       rows: [
         { state: "update", slot: "Update pill", property: "height", value: "22px" },
-        { state: "update", slot: "Update pill", property: "radius", value: "9999px" },
+        { state: "update", slot: "Update pill", property: "radius", value: "rounded-full" },
         { state: "update", slot: "Update pill", property: "padding", value: "0 8px" },
         { state: "update", slot: "Update pill", property: "background", value: "bg-accent-sky-500-18" },
         { state: "update", slot: "Update pill", property: "text color", value: "text-text-brand" },

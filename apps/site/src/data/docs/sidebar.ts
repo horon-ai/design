@@ -284,7 +284,7 @@ export const doc: ComponentDoc = {
       rows: [
         { state: "any", slot: "Header", property: "height", value: "h-9" },
         { state: "any", slot: "Header", property: "gap", value: "gap-1.5" },
-        { state: "any", slot: "WorkspaceSwitch", property: "radius", value: "rounded-[10px]" },
+        { state: "any", slot: "WorkspaceSwitch", property: "radius", value: "rounded-md" },
         { state: "any", slot: "WorkspaceSwitch", property: "padding", value: "pr-1 pl-2" },
         { state: "any", slot: "WorkspaceSwitch tile", property: "size", value: "size-7" },
         { state: "any", slot: "WorkspaceSwitch name", property: "font", value: "text-label-lg" },
