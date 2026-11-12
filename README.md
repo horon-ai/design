@@ -195,9 +195,10 @@ CI(`.github/workflows/ci.yml`)도 같은 lint·typecheck·test·build를 돌립�
 PolyForm Strict 1.0.0은 SPDX 식별자가 없어 `package.json`의 `license` 필드가
 `SEE LICENSE IN LICENSE`입니다. 판단이 갈리는 사용은 저장소 이슈로 문의해 주세요.
 
-npm에 이미 게시된 `@horon-ai/react`·`@horon-ai/lynx`·`@horon-ai/tokens` 0.1.6 이하 버전은
-MIT로 게시되었고, 그 버전에 대해 이미 부여된 MIT 사용 권리는 그대로 유지됩니다. 이 저장소의
-라이선스 교체는 앞으로 게시하는 버전에만 적용됩니다.
+npm에 이미 게시된 0.1.6 이하 버전에는 라이선스 표기가 없었습니다. 저장소에 `LICENSE` 파일이
+없었고 `package.json`에도 `license` 필드가 없었기 때문입니다. 즉 그 버전들에 MIT 사용 허가가
+부여된 적이 없으므로, 이번 교체로 이미 배포된 버전의 권리가 바뀌는 것은 없습니다. 앞으로
+게시하는 버전부터 이 라이선스가 적용됩니다.
 
 포함된 서드파티 자산의 고지는 다음과 같습니다.
 
