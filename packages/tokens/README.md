@@ -23,3 +23,7 @@ CSS 변수 이름은 Figma 변수의 WEB 코드 문법과 같습니다. Figma De
 bun run build                   # packages/tokens 안에서
 bun test packages/tokens        # 저장소 루트에서, 생성기 출력과 커밋된 파일이 같은지 확인
 ```
+
+## 라이선스
+
+[PolyForm Strict License 1.0.0](https://polyformproject.org/licenses/strict/1.0.0)입니다. 비상업적 목적의 사용만 허용하고 수정·재배포·상업적 이용은 금지합니다. 전문은 패키지에 동봉된 `LICENSE`에 있습니다.

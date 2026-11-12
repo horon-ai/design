@@ -13,6 +13,10 @@
  * demo uses, because the gallery demos are ports of those same demos. The
  * `weight="..."` props on their JSX usages decide which weights are needed for
  * each icon (default `regular`). Run `bun scripts/generate-icons.ts`.
+ *
+ * The artwork is `@phosphor-icons/core`, MIT, Copyright (c) 2023 Phosphor Icons
+ * (https://github.com/phosphor-icons/core). The generated file carries that
+ * notice; keep it when the icons are regenerated.
  */
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -125,6 +129,9 @@ const content = `${HEADER}
  *
  * Every weight listed for an icon is one some React component actually draws it
  * with; \`regular\` is always present as the default.
+ *
+ * The artwork is \`@phosphor-icons/core\`, MIT, Copyright (c) 2023 Phosphor Icons
+ * (https://github.com/phosphor-icons/core).
  */
 export type IconWeight = ${WEIGHTS.map((weight) => `"${weight}"`).join(" | ")};
 

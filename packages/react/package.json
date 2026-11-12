@@ -7,6 +7,7 @@
 		"directory": "packages/react"
 	},
 	"type": "module",
+	"license": "SEE LICENSE IN LICENSE",
 	"sideEffects": [
 		"./src/index.ts",
 		"./src/styles/globals.css",
@@ -14,7 +15,9 @@
 	],
 	"files": [
 		"src",
-		"README.md"
+		"README.md",
+		"LICENSE",
+		"THIRD_PARTY_NOTICES.md"
 	],
 	"publishConfig": {
 		"access": "public"
