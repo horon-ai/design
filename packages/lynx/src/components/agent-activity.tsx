@@ -3,6 +3,7 @@ import type { CSSProperties } from "@lynx-js/types";
 
 import { useReducedMotion } from "../hooks/use-reduced-motion";
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { Spinner } from "./spinner";
 
@@ -247,10 +248,13 @@ const isPlainText = (value: ReactNode): value is string | number =>
  * ```
  */
 export function ToolStep({ state = "running", title, detail, className, onClick, disabled, id, style }: ToolStepProps) {
+  const touch = useTouch();
   return (
     <view
       className={cn(
         "motion-press flex w-full min-w-0 flex-row items-center gap-2.5 rounded-md border border-border-default bg-bg-surface px-2.5 py-2",
+        // The row's padding sets its height, which sits under 44px until a detail line is present.
+        touch && "min-h-11",
         disabled ? "opacity-40" : "active:bg-overlay-ink-3",
         className,
       )}
@@ -328,6 +332,7 @@ export function WorkLog({
   /** Extra classes merged onto the card, for margins or a width override. */
   className?: string;
 }) {
+  const touch = useTouch();
   const [open, setOpen] = useState(true);
   const toggle = useCallback(() => setOpen((value) => !value), []);
 
@@ -339,7 +344,10 @@ export function WorkLog({
       )}
     >
       <view
-        className="motion-press flex min-w-0 flex-row items-center gap-2 px-2.5 py-1.5 active:bg-overlay-ink-3"
+        className={cn(
+          "motion-press flex min-w-0 flex-row items-center gap-2 px-2.5 py-1.5 active:bg-overlay-ink-3",
+          touch && "min-h-11",
+        )}
         bindtap={toggle}
         accessibility-element
         accessibility-traits="button"

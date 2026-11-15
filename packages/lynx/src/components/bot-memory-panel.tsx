@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "@lynx-js/react";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { PanelPillTabs } from "./bot-instructions-panel";
 import { Switch } from "./switch";
@@ -132,6 +133,7 @@ export function BotMemoryPanel({
   className,
   id,
 }: BotMemoryPanelProps) {
+  const touch = useTouch();
   const [filter, setFilter] = useState("all");
   // Both marks are tied to the toast object, so a new toast event revives the pill without an effect.
   const [leavingFor, setLeavingFor] = useState<BotMemoryToast | undefined>();
@@ -218,7 +220,10 @@ export function BotMemoryPanel({
         <view className="min-w-0 flex-1" />
         {onSearch ? (
           <view
-            className="motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 active:bg-overlay-ink-10"
+            className={cn(
+              "motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 active:bg-overlay-ink-10",
+              touch && "size-11",
+            )}
             bindtap={onSearch}
             accessibility-element
             accessibility-traits="button"
@@ -238,7 +243,12 @@ export function BotMemoryPanel({
       {toast && !dismissed ? (
         <view className="px-5 py-1.5">
           <view
-            className="flex h-8 min-w-0 max-w-full flex-row items-center gap-2 self-start rounded-full bg-accent-sky-500-16 pl-2.5 pr-3"
+            className={cn(
+              "flex h-8 min-w-0 max-w-full flex-row items-center gap-2 self-start rounded-full bg-accent-sky-500-16 pl-2.5 pr-3",
+              // The dismiss inside grows to 44px under the rung, so the pill grows with it;
+              // without this the taller box would spill outside the rounded fill.
+              touch && "h-11",
+            )}
             style={{
               animationName: leaving ? "pop-out" : "pop-in",
               animationDuration: leaving ? "130ms" : "220ms",
@@ -260,7 +270,11 @@ export function BotMemoryPanel({
               <text className="min-w-0 truncate text-caption text-text-secondary">{toast.message}</text>
             ) : null}
             <view
-              className="motion-colors flex size-3 shrink-0 flex-row items-center justify-center active:text-text-primary"
+              className={cn(
+                "motion-colors flex size-3 shrink-0 flex-row items-center justify-center active:text-text-primary",
+                // The dismiss hugs its 12px glyph, so the tap box is set outright under the rung.
+                touch && "size-11",
+              )}
               bindtap={() => setLeavingFor(toast)}
               accessibility-element
               accessibility-traits="button"

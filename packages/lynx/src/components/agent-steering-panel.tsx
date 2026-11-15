@@ -4,6 +4,7 @@ import type { CSSProperties } from "@lynx-js/types";
 
 import { useDevice } from "../hooks/use-device";
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { Kbd } from "./kbd";
 import { Spinner } from "./spinner";
@@ -135,6 +136,7 @@ function SteeringNoteRow({
   /** Called with the note id when the pop-out animation finishes, so the parent can drop it. */
   onRemoveNote?: (id: string) => void;
 }) {
+  const touch = useTouch();
   const [leaving, setLeaving] = useState(false);
 
   return (
@@ -166,7 +168,11 @@ function SteeringNoteRow({
       ) : (
         <view className="flex shrink-0 flex-row items-center gap-1.5">
           <view
-            className="motion-press flex h-[26px] shrink-0 flex-row items-center gap-1 rounded-full bg-overlay-ink-6 px-2 active:bg-overlay-ink-10"
+            className={cn(
+              "motion-press flex h-[26px] shrink-0 flex-row items-center gap-1 rounded-full bg-overlay-ink-6 px-2 active:bg-overlay-ink-10",
+              // Both note actions sit well under 44px; only their boxes grow, the glyphs and padding stay.
+              touch && "h-11",
+            )}
             bindtap={() => onApplyNow?.(note.id)}
             accessibility-element
             accessibility-traits="button"
@@ -175,7 +181,10 @@ function SteeringNoteRow({
             <text className="text-label-sm text-text-primary">Now</text>
           </view>
           <view
-            className="motion-press flex size-6 shrink-0 flex-row items-center justify-center rounded-full active:bg-overlay-ink-6"
+            className={cn(
+              "motion-press flex size-6 shrink-0 flex-row items-center justify-center rounded-full active:bg-overlay-ink-6",
+              touch && "size-11",
+            )}
             bindtap={() => setLeaving(true)}
             accessibility-element
             accessibility-traits="button"
@@ -234,6 +243,7 @@ export function AgentSteeringPanel({
   id,
   style,
 }: AgentSteeringPanelProps) {
+  const touch = useTouch();
   const [draft, setDraft] = useState("");
   const { keyboardHints } = useDevice();
   const queued = notes.filter((note) => !note.applied);
@@ -305,7 +315,10 @@ export function AgentSteeringPanel({
           )
         ) : null}
         <view
-          className="motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 active:bg-overlay-ink-10"
+          className={cn(
+            "motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 active:bg-overlay-ink-10",
+            touch && "size-11",
+          )}
           bindtap={() => onPausedChange?.(!paused)}
           accessibility-element
           accessibility-traits="button"
@@ -392,7 +405,10 @@ export function AgentSteeringPanel({
             bindconfirm={() => submit(true)}
           />
           <view
-            className="motion-press flex size-8 shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary active:bg-interactive-primary-hover"
+            className={cn(
+              "motion-press flex size-8 shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary active:bg-interactive-primary-hover",
+              touch && "size-11",
+            )}
             bindtap={() => submit(false)}
             accessibility-element
             accessibility-traits="button"

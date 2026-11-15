@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from "@lynx-js/react";
 
 import { useCopyToClipboard } from "../hooks/use-copy-to-clipboard";
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { Button } from "./button";
 import { Spinner } from "./spinner";
@@ -195,6 +196,7 @@ function Section({
   footer?: ReactNode;
 }) {
   const { copied, copy, supported } = useCopyToClipboard(1500);
+  const touch = useTouch();
   return (
     <view className="flex min-w-0 flex-col gap-1.5">
       <view className="flex flex-row items-center gap-2">
@@ -203,7 +205,11 @@ function Section({
         </view>
         {copyText !== undefined && supported ? (
           <view
-            className="motion-press flex flex-row items-center justify-center rounded-sm active:opacity-70"
+            className={cn(
+              "motion-press flex flex-row items-center justify-center rounded-sm active:opacity-70",
+              // The copy button hugged its 14px glyph, so the rung sets the box outright.
+              touch && "size-11",
+            )}
             bindtap={() => copy(copyText)}
             accessibility-element
             accessibility-traits="button"
@@ -266,6 +272,7 @@ export function ToolCall({
   defaultOpen,
   className,
 }: ToolCallProps) {
+  const touch = useTouch();
   const [open, setOpen] = useState(Boolean(defaultOpen));
 
   return (
@@ -316,7 +323,10 @@ export function ToolCall({
               <text className="min-w-0 flex-1 text-body-sm text-text-danger">{error}</text>
               {onRetry ? (
                 <view
-                  className="motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full border border-border-default bg-bg-surface px-2.5"
+                  className={cn(
+                    "motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full border border-border-default bg-bg-surface px-2.5",
+                    touch && "h-11",
+                  )}
                   bindtap={onRetry}
                   accessibility-element
                   accessibility-traits="button"

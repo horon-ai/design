@@ -4,6 +4,7 @@ import type { CSSProperties } from "@lynx-js/types";
 import { Icon, type IconProps } from "../icons";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
+import { useTouch } from "../hooks/use-touch";
 import { LiquidGlass } from "./liquid-glass";
 
 /**
@@ -59,6 +60,17 @@ export type IconButtonProps = Omit<PortedIconButtonAttributes, "className" | "ch
 const sizeClass: Record<IconButtonSize, string> = {
   sm: "size-8",
   md: "size-10",
+  lg: "size-12",
+};
+
+/**
+ * The disc a finger lands on: `sm` and `md` grow to 44px, `lg` keeps its 48px.
+ * The glyph inside is untouched — it is what reads as the control's size — so the
+ * button looks the same and only its box changes.
+ */
+const touchSizeClass: Record<IconButtonSize, string> = {
+  sm: "size-11",
+  md: "size-11",
   lg: "size-12",
 };
 
@@ -128,20 +140,24 @@ export function IconButton({
   id,
   style,
 }: IconButtonProps) {
+  const touch = useTouch();
   return (
     <view
       className={cn(
         "motion-press relative flex shrink-0 select-none flex-row items-center justify-center overflow-hidden rounded-full",
         disabled ? "opacity-40" : "cursor-pointer",
         sizeClass[size],
+        touch && touchSizeClass[size],
         variantClass[variant],
         className,
       )}
       style={style}
       // React painted a 44px reach with an invisible `::after`; Lynx has no
       // pseudo-element, so the same reach is `hit-slop`: sm 32px needs 6px a
-      // side, md 40px needs 2px, lg 48px already exceeds it.
-      hit-slop={size === "sm" ? "6px" : size === "md" ? "2px" : undefined}
+      // side, md 40px needs 2px, lg 48px already exceeds it. The touch rung
+      // makes the disc itself 44px, so no skirt is needed — and Lynx's web
+      // renderer does not apply `hit-slop` to hit testing regardless.
+      hit-slop={touch ? undefined : size === "sm" ? "6px" : size === "md" ? "2px" : undefined}
       bindtap={disabled ? undefined : onClick}
       accessibility-element
       accessibility-traits={disabled ? "disabled" : "button"}

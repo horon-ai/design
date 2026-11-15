@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "@lynx-js/react";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
@@ -288,6 +289,7 @@ export function Calendar(props: CalendarProps) {
     highlight,
     size = "md",
   } = props;
+  const touch = useTouch();
   const [now] = useState(() => new Date());
   const today = startOfDay(props.today ?? now);
   const single = props.mode === "range" ? null : (props.value ?? null);
@@ -363,7 +365,12 @@ export function Calendar(props: CalendarProps) {
   /** One round arrow button; Lynx has no `<button>`, so the view reports itself as one. */
   const arrow = (label: string, step: number, icon: ReactNode, boxClass: string) => (
     <view
-      className={cn("motion-press flex flex-row items-center justify-center rounded-full", boxClass)}
+      className={cn(
+        "motion-press flex flex-row items-center justify-center rounded-full",
+        boxClass,
+        // The round arrow is the only control in the frame that can grow: the glyph inside keeps its size.
+        touch && "size-11",
+      )}
       bindtap={() => setMonth(addMonths(month, step))}
       accessibility-element
       accessibility-traits="button"
@@ -474,6 +481,9 @@ export function Calendar(props: CalendarProps) {
                       cellFluidClass,
                       dayShapeClass,
                       daySizeClass[size],
+                      // The cell takes an equal share of the row, so its size is the grid's, not a
+                      // rung's; the floor is what makes a phone grid 44 and keeps it square.
+                      touch && "min-h-11 min-w-11",
                       between
                         ? "bg-overlay-ink-8"
                         : selected

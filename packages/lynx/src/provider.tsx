@@ -20,6 +20,8 @@ export type HoronTheme = {
   platform: ThemePlatform;
   /** True while the root draws without motion. */
   reducedMotion: boolean;
+  /** True while controls paint at the 44px touch rung instead of their desktop rung. */
+  touch: boolean;
   /** Resolves a token name to the hex of the active scheme. */
   color: (token: ColorToken) => string;
 };
@@ -43,6 +45,21 @@ export type HoronProviderProps = {
    * @default false
    */
   reducedMotion?: boolean;
+  /**
+   * Grow every pressable control to the 44px touch target. Desktop draws 28–40px
+   * rungs, so a finger misses a control the eye can see; a host that runs on a
+   * phone — or any surface where a fingertip is the pointer — sets this once and
+   * every `Button`, `IconButton`, `MenuItem`, `Chip`, `TabsTab`, `SegmentedControl`,
+   * `Switch`, `Select`, `FilterBar`, `TabBar` and sidebar row grows in place.
+   *
+   * The paint keeps its own proportions: a control's face stays the size the
+   * design draws and the box around it reaches 44px, so a 32px disc still reads
+   * as 32px while the target a finger hits is 44. Lynx evaluates no media
+   * queries, so a `pointer: coarse`-style switch cannot exist; the host states
+   * the input kind instead of the engine guessing it.
+   * @default false
+   */
+  touch?: boolean;
   /** The tree to paint inside the theme root. */
   children?: ReactNode;
 };
@@ -51,6 +68,7 @@ const DEFAULT_THEME: HoronTheme = {
   scheme: "light",
   platform: "web",
   reducedMotion: false,
+  touch: false,
   color: (token) => lightColors[token],
 };
 
@@ -99,6 +117,7 @@ export function HoronProvider({
   scheme = "light",
   platform = "web",
   reducedMotion = false,
+  touch = false,
   children,
 }: HoronProviderProps) {
   // `system` is resolved while building the first state, not in an effect, so a
@@ -114,9 +133,10 @@ export function HoronProvider({
       scheme: resolved,
       platform,
       reducedMotion,
+      touch,
       color: (token) => (resolved === "dark" ? darkColors[token] : lightColors[token]),
     }),
-    [resolved, platform, reducedMotion],
+    [resolved, platform, reducedMotion, touch],
   );
 
   const rootClass = [
@@ -134,6 +154,11 @@ export function HoronProvider({
     resolved === "dark" ? "dark" : "horon-light",
     `horon-platform-${platform}`,
     reducedMotion ? "horon-reduced-motion" : "",
+    // No rule hangs off this class in the package styles: the 44px rungs are
+    // picked per component from `useTouch()`, which is the only reliable signal
+    // on the native engine. The class exists so a host's own pressable rows —
+    // the ones the library does not own — can key off the same switch.
+    touch ? "horon-touch" : "",
   ]
     .filter(Boolean)
     .join(" ");

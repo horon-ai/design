@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "@lynx-js/react";
 
 import { useMediaQuery } from "../hooks/use-media-query";
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { PanelPillTabs } from "./bot-instructions-panel";
 import { Spinner } from "./spinner";
@@ -110,6 +111,7 @@ export function KnowledgeBasePanel({
   className,
   id,
 }: KnowledgeBasePanelProps) {
+  const touch = useTouch();
   const [inner, setInner] = useState(defaultValue ?? tabs[0]?.id);
   const selectedId = value ?? inner;
   const wide = useMediaQuery(WIDE_QUERY, true);
@@ -143,7 +145,10 @@ export function KnowledgeBasePanel({
           ) : null}
         </view>
         <view
-          className="motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 active:bg-overlay-ink-10"
+          className={cn(
+            "motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 active:bg-overlay-ink-10",
+            touch && "size-11",
+          )}
           bindtap={onSettings}
           accessibility-element
           accessibility-traits="button"
@@ -152,7 +157,10 @@ export function KnowledgeBasePanel({
           <Icon name="SlidersHorizontal" size={16} color="text-primary" />
         </view>
         <view
-          className="motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pl-3 pr-2.5 active:bg-overlay-ink-10"
+          className={cn(
+            "motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pl-3 pr-2.5 active:bg-overlay-ink-10",
+            touch && "h-11",
+          )}
           bindtap={onAddSource}
           accessibility-element
           accessibility-traits="button"

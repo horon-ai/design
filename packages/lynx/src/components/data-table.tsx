@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "@lynx-js/react";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { Checkbox } from "./checkbox";
 import { IconButton } from "./icon-button";
@@ -310,6 +311,7 @@ export type DataTableFooterProps = {
  * Part of {@link DataTable}. The add action takes the free width, so the hint stays pinned right; both wrap onto a second line when narrow.
  */
 export function DataTableFooter({ onAdd, addLabel = "Add row", hint, className }: DataTableFooterProps) {
+  const touch = useTouch();
   const device = useContext(DataTableDeviceContext);
 
   return (
@@ -321,7 +323,11 @@ export function DataTableFooter({ onAdd, addLabel = "Add row", hint, className }
       )}
     >
       <view
-        className="flex min-w-0 flex-1 flex-row items-center gap-2"
+        className={cn(
+          "flex min-w-0 flex-1 flex-row items-center gap-2",
+          // The add row's height comes from its label, so the touch rung sets a floor instead of a height.
+          touch && "min-h-11",
+        )}
         bindtap={onAdd}
         accessibility-element={onAdd ? true : undefined}
         accessibility-traits={onAdd ? "button" : undefined}

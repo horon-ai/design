@@ -13,6 +13,7 @@ import type { CSSProperties } from "@lynx-js/types";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { useActiveIndicator } from "../hooks/use-active-indicator";
+import { useTouch } from "../hooks/use-touch";
 import { useHoronTheme } from "../provider";
 import { LiquidGlass } from "./liquid-glass";
 
@@ -330,6 +331,7 @@ export type TabsTabProps = {
  * ```
  */
 export function TabsTab({ value, icon, count, disabled = false, className, style, children }: TabsTabProps) {
+  const touch = useTouch();
   const set = useContext(TabsSetContext);
   const underline = useContext(TabsVariantContext) === "underline";
   const active = set.value === value;
@@ -339,6 +341,10 @@ export function TabsTab({ value, icon, count, disabled = false, className, style
         "relative flex flex-row items-center justify-center whitespace-nowrap",
         underline ? "rounded-xs" : "rounded-full",
         tabClass[set.size],
+        // A pill tab is the control a thumb taps; 26/30/36px all grow to 44. The
+        // underline variant is a text row in a column, not a pill, so its padding
+        // already carries the reach and the height stays with the label.
+        !underline && touch && "h-11",
         underline && "px-0",
         "motion-colors",
         active ? "text-text-primary" : "text-text-secondary",

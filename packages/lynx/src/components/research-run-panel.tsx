@@ -2,6 +2,7 @@ import { useRef, useState, type ReactNode } from "@lynx-js/react";
 import type { NodesRef } from "@lynx-js/types/background";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { useHoronTheme } from "../provider";
 import { ChatBubble } from "./chat-bubble";
@@ -154,6 +155,7 @@ export function ResearchRunPanel({
   onFollowUp,
   className,
 }: ResearchRunPanelProps) {
+  const touch = useTouch();
   const theme = useHoronTheme();
   const field = useRef<NodesRef | null>(null);
   const [draft, setDraft] = useState("");
@@ -239,7 +241,10 @@ export function ResearchRunPanel({
         <Icon name="MagnifyingGlass" size={16} color="text-primary" className="shrink-0" />
         <text className="min-w-0 flex-1 truncate text-label-lg text-text-primary">{title}</text>
         <view
-          className="motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pl-3.5 pr-3 active:bg-overlay-ink-10"
+          className={cn(
+            "motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pl-3.5 pr-3 active:bg-overlay-ink-10",
+            touch && "h-11",
+          )}
           bindtap={() => onNewResearch?.()}
           accessibility-element
           accessibility-traits="button"
@@ -256,7 +261,11 @@ export function ResearchRunPanel({
         {running ? (
           onToggleStatus ? (
             <view
-              className="flex w-full flex-row flex-wrap items-center gap-x-1.5 gap-y-1 rounded-md"
+              className={cn(
+                "flex w-full flex-row flex-wrap items-center gap-x-1.5 gap-y-1 rounded-md",
+                // The status line is sized by its text, so only a minimum keeps the tap box at 44px.
+                touch && "min-h-11",
+              )}
               bindtap={() => onToggleStatus()}
               accessibility-element
               accessibility-traits="button"
@@ -319,7 +328,10 @@ export function ResearchRunPanel({
           >
             {onOpenSources ? (
               <view
-                className="motion-press flex h-9 w-fit flex-row items-center gap-2 rounded-full bg-overlay-ink-5 pl-1 pr-3 active:bg-overlay-ink-8"
+                className={cn(
+                  "motion-press flex h-9 w-fit flex-row items-center gap-2 rounded-full bg-overlay-ink-5 pl-1 pr-3 active:bg-overlay-ink-8",
+                  touch && "h-11",
+                )}
                 bindtap={() => onOpenSources()}
                 accessibility-element
                 accessibility-traits="button"
@@ -359,7 +371,10 @@ export function ResearchRunPanel({
             }}
           />
           <view
-            className="motion-press flex size-8 shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary active:bg-interactive-primary-hover"
+            className={cn(
+              "motion-press flex size-8 shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary active:bg-interactive-primary-hover",
+              touch && "size-11",
+            )}
             bindtap={() => {
               if (running) onStop?.();
               else submit();

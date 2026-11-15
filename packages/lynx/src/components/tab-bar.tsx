@@ -3,6 +3,7 @@ import type { ReactNode } from "@lynx-js/react";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { useActiveIndicator } from "../hooks/use-active-indicator";
+import { useTouch } from "../hooks/use-touch";
 import { LiquidGlass } from "./liquid-glass";
 
 /** One destination in a {@link TabBar}: its stable value, the accessible name, and the icon shown in the tab. */
@@ -49,6 +50,13 @@ const tabClass: Record<TabBarSize, string> = {
 };
 
 /**
+ * `md` (64x48) and `lg` (72x56) already clear 44px; `sm` is 56x40 and only its
+ * height is short, so it grows and keeps its width. The other rungs are left as
+ * `tabClass` paints them rather than restated, so the two cannot drift.
+ */
+const touchSmTabClass = "h-11 w-14";
+
+/**
  * Figma `Tab bar` (63:441): the mobile bottom navigation, a regular-glass pill
  * with icon-only 64x48 tabs and 22px icons; the current tab is a 10% ink pill
  * that slides to the tab you pick.
@@ -91,6 +99,7 @@ export function TabBar({
   className,
   "aria-label": ariaLabel = "Main",
 }: TabBarProps) {
+  const touch = useTouch();
   const activeIndex = items.findIndex((item) => item.value === value);
   const { rect, animate, bindTrack, bindItem } = useActiveIndicator(activeIndex);
 
@@ -127,6 +136,7 @@ export function TabBar({
                 className={cn(
                   "motion-press relative flex shrink-0 flex-row items-center justify-center rounded-full",
                   tabClass[size],
+                  touch && size === "sm" && touchSmTabClass,
                   current ? "text-text-primary" : "text-text-secondary",
                 )}
                 bindtap={() => onValueChange?.(item.value)}

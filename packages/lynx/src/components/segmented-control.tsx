@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "@lynx-js/react";
 
 import { useActiveIndicator } from "../hooks/use-active-indicator";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 import { useHoronTheme } from "../provider";
@@ -81,6 +82,29 @@ const segmentClass: Record<SegmentedControlSize, string> = {
 };
 
 /**
+ * The segment a finger lands on. Every rung is under 44px, so all of them grow; the
+ * tag `tab` rung included, since a page tab is picked the same way.
+ */
+const touchSegmentClass: Record<SegmentedControlSize, string> = {
+  sm: "h-11",
+  md: "h-11",
+  lg: "h-11",
+  tab: "h-11",
+};
+
+/**
+ * The track around those segments. `sm` and `tab` set no height and hug their
+ * content, so they follow for free; `md` and `lg` are fixed pills and must grow by
+ * their own padding or the 44px segment is clipped by the track's `overflow-hidden`.
+ */
+const touchTrackClass: Record<SegmentedControlSize, string | undefined> = {
+  sm: undefined,
+  md: "h-[50px]",
+  lg: "h-[52px]",
+  tab: undefined,
+};
+
+/**
  * The rung's type weight and size. Lynx does not inherit `font-size`/`color` into a `<text>`, so
  * these live on the label itself while `segmentClass` keeps the segment's box.
  */
@@ -148,6 +172,7 @@ export function SegmentedControl({
   className,
   "aria-label": ariaLabel,
 }: SegmentedControlProps) {
+  const touch = useTouch();
   const { scheme } = useHoronTheme();
   const [own, setOwn] = useState<string | undefined>(defaultValue);
   const selected = value === undefined ? own : value;
@@ -212,6 +237,7 @@ export function SegmentedControl({
             "motion-colors relative flex min-w-0 flex-row items-center justify-center whitespace-nowrap rounded-full",
             item.disabled && "opacity-40",
             segmentClass[size],
+            touch && touchSegmentClass[size],
             // Filled segments share the track; hugging segments keep the padding their rung gives them.
             fill ? "flex-1" : "shrink-0",
           )}
@@ -249,6 +275,7 @@ export function SegmentedControl({
         // Segments keep the padding their rung gives them; a filled row shares the width instead.
         "relative inline-flex min-w-0 max-w-full flex-row items-center overflow-hidden rounded-full",
         trackClass[size],
+        touch && touchTrackClass[size],
         surfaceClass[surface],
         className,
       )}

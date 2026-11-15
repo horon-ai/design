@@ -3,6 +3,7 @@ import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
 import type { LayoutChangeLike } from "../hooks";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { readViewport } from "../lib/media";
 import type { ControlSize } from "../lib/size";
@@ -58,6 +59,20 @@ const triggerSizeClass: Record<PickerFieldSize, string> = {
   sm: "flex h-8 w-[144px] max-w-full flex-row items-center gap-1.5 px-3",
   md: "flex h-10 w-[160px] max-w-full flex-row items-center gap-2 px-3.5",
   lg: "flex h-12 w-[176px] max-w-full flex-row items-center gap-2.5 px-5",
+};
+
+/** The trigger is a press target: `sm` and `md` grow to 44px, `lg` is already 48. Width and padding stay put. */
+const touchTriggerClass: Record<PickerFieldSize, string> = {
+  sm: "h-11",
+  md: "h-11",
+  lg: "h-12",
+};
+
+/** A popup row is picked by thumb, so it takes the same 44px floor as the trigger. */
+const touchRowClass: Record<PickerFieldSize, string> = {
+  sm: "h-11",
+  md: "h-11",
+  lg: "h-12",
 };
 
 /** React sized the glyph through `[&>svg]`; `<Icon>` takes the px number instead. */
@@ -161,6 +176,7 @@ export function PickerField({
   defaultValue,
   onValueChange,
 }: PickerFieldProps) {
+  const touch = useTouch();
   const [internalValue, setInternalValue] = useState<string | undefined>(defaultValue);
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState<AnchorRect | null>(null);
@@ -182,6 +198,7 @@ export function PickerField({
         className={cn(
           "motion-colors relative min-w-0 max-w-full rounded-md",
           triggerSizeClass[size],
+          touch && touchTriggerClass[size],
           surface === "glass"
             ? "veil-field"
             : surface === "inset"
@@ -260,6 +277,7 @@ export function PickerField({
                       className={cn(
                         "motion-colors flex flex-row items-center rounded-md active:bg-overlay-ink-6",
                         size === "sm" ? "h-8 gap-2 px-2.5" : size === "lg" ? "h-12 gap-3 px-4" : "h-10 gap-2.5 px-3",
+                        touch && touchRowClass[size],
                         selected && "bg-overlay-ink-6",
                       )}
                       bindtap={() => choose(item.value)}
@@ -390,6 +408,7 @@ export function WeekdayPicker({
   className,
   ...props
 }: WeekdayPickerProps) {
+  const touch = useTouch();
   const [internalValue, setInternalValue] = useState<string[]>(defaultValue ?? []);
   const selected = controlledValue === undefined ? internalValue : controlledValue;
 
@@ -414,6 +433,8 @@ export function WeekdayPicker({
             className={cn(
               "motion-press flex shrink-0 flex-row items-center justify-center rounded-full",
               weekdayToggleSizeClass[size],
+              // Every day circle takes the 44px tap target; the group wraps, so they take a second line instead.
+              touch && "size-11",
               on ? "bg-interactive-primary" : "bg-overlay-ink-6",
             )}
             bindtap={() => toggle(day.value)}
