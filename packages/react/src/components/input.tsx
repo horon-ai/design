@@ -34,8 +34,10 @@ export type InputProps = Omit<ComponentProps<typeof BaseInput>, "className" | "s
 
 /** Height, horizontal padding and icon size shared by every field-style control. */
 export const fieldSizeClass: Record<ControlSize, string> = {
-  sm: "h-8 gap-1.5 px-3 [&_svg]:size-4",
-  md: "h-10 gap-2 px-3.5 [&_svg]:size-4",
+  // Every rung under 44px grows on a coarse pointer: 32px `sm` and 40px `md` both miss the touch floor,
+  // so a desktop form keeps its compact rows while a touch screen gets a full-height target.
+  sm: "h-8 pointer-coarse:h-11 gap-1.5 px-3 [&_svg]:size-4",
+  md: "h-10 pointer-coarse:h-11 gap-2 px-3.5 [&_svg]:size-4",
   lg: "h-12 gap-2.5 px-5 [&_svg]:size-5",
 };
 
@@ -61,8 +63,12 @@ export const fieldBoxClass = {
   /** The solid fill on the page background instead of a raised surface; the same disabled and invalid states. */
   "solid-on-page":
     "border-border-default bg-bg-default has-[[data-disabled]]:border-border-default has-[:disabled]:border-border-default has-[[data-disabled]]:bg-bg-subtle has-[:disabled]:bg-bg-subtle has-[[data-invalid]]:border-border-danger data-invalid:border-border-danger",
-  /** The inner control: transparent, fills the remaining width, primary text, placeholder and disabled colours. */
-  text: "min-w-0 flex-1 bg-transparent text-text-primary outline-none placeholder:text-text-placeholder disabled:cursor-not-allowed disabled:text-text-disabled",
+  /**
+   * The inner control: transparent, fills the remaining width, primary text, placeholder and disabled colours.
+   * On a coarse pointer it also fills the box height, so tapping anywhere in the 44px field focuses the input
+   * instead of aiming at a 22px line box in its middle.
+   */
+  text: "min-w-0 flex-1 bg-transparent text-text-primary outline-none pointer-coarse:h-full placeholder:text-text-placeholder disabled:cursor-not-allowed disabled:text-text-disabled",
 } as const;
 
 /**

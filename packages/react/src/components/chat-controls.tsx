@@ -70,7 +70,7 @@ export function NewMessagesPill({ surface = "solid", className, children, ...pro
   return (
     <button
       type="button"
-      className={cn(controlBase, surfaceClass[surface], "h-10 gap-1.5 pr-4 pl-3.5 text-label-md", className)}
+      className={cn(controlBase, surfaceClass[surface], "h-10 pointer-coarse:h-11 gap-1.5 pr-4 pl-3.5 text-label-md", className)}
       {...props}
     >
       {surface === "glass" && <LiquidGlass />}
@@ -150,7 +150,7 @@ export function VoiceInput({
         type="button"
         aria-label={stopLabel}
         onClick={onStop}
-        className="relative flex size-9 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+        className="relative flex size-9 pointer-coarse:size-11 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
       >
         <span className="size-3 bg-interactive-on-danger" />
       </button>

@@ -129,7 +129,7 @@ export function IntegrationRow({
           aria-hidden={status === "connected" || undefined}
           tabIndex={status === "connected" ? -1 : undefined}
           className={cn(
-            "flex h-7.5 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full px-3 text-label-sm whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
+            "flex h-7.5 pointer-coarse:h-11 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full px-3 text-label-sm whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
             status === "reconnect"
               ? "bg-accent-red-500-14 text-text-danger"
               : "bg-interactive-primary text-text-inverse",

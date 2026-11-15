@@ -121,7 +121,7 @@ export function ListDetail({
                 role="option"
                 aria-selected={item.id === selected?.id}
                 data-selected={item.id === selected?.id ? "" : undefined}
-                className="flex cursor-pointer flex-col gap-1 rounded-md px-3 py-2.5 text-left motion-colors hover:bg-overlay-ink-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-selected:bg-overlay-ink-6 data-selected:hover:bg-overlay-ink-8"
+                className="flex cursor-pointer flex-col gap-1 rounded-md px-3 py-2.5 text-left pointer-coarse:min-h-11 motion-colors hover:bg-overlay-ink-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand data-selected:bg-overlay-ink-6 data-selected:hover:bg-overlay-ink-8"
                 onClick={() => {
                   setInner(item.id);
                   onValueChange?.(item.id);

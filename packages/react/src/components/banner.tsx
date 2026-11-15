@@ -45,9 +45,11 @@ const textSizeClass: Record<BannerSize, string> = {
 };
 
 const actionSizeClass: Record<BannerSize, string> = {
-  sm: "text-label-md",
-  md: "text-label-lg",
-  lg: "text-label-lg",
+  // An underlined link has a 22px line box, so on a coarse pointer the link itself takes the 44px touch
+  // row and centres its text in it; a mouse keeps the strip at its drawn height.
+  sm: "text-label-md pointer-coarse:[&_a]:flex pointer-coarse:[&_a]:min-h-11 pointer-coarse:[&_a]:items-center pointer-coarse:[&_button]:flex pointer-coarse:[&_button]:min-h-11 pointer-coarse:[&_button]:items-center",
+  md: "text-label-lg pointer-coarse:[&_a]:flex pointer-coarse:[&_a]:min-h-11 pointer-coarse:[&_a]:items-center pointer-coarse:[&_button]:flex pointer-coarse:[&_button]:min-h-11 pointer-coarse:[&_button]:items-center",
+  lg: "text-label-lg pointer-coarse:[&_a]:flex pointer-coarse:[&_a]:min-h-11 pointer-coarse:[&_a]:items-center pointer-coarse:[&_button]:flex pointer-coarse:[&_button]:min-h-11 pointer-coarse:[&_button]:items-center",
 };
 
 const toneClass: Record<BannerTone, string> = {

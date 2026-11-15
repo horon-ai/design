@@ -169,7 +169,7 @@ export function MenuItem({
       className={cn(
         "relative flex w-full cursor-pointer items-center gap-2.5 motion-colors outline-none select-none data-disabled:cursor-not-allowed data-disabled:opacity-40 data-highlighted:bg-overlay-ink-6",
         surface === "glass" ? "rounded-md px-3" : "rounded-md px-2.5",
-        description ? "h-12" : surface === "glass" ? "h-10" : "h-9",
+        description ? "h-12" : surface === "glass" ? "h-10 pointer-coarse:h-11" : "h-9 pointer-coarse:h-11",
         selected && "bg-bg-brand data-highlighted:bg-bg-brand",
         className,
       )}

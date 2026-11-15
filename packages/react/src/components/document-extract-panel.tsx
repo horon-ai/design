@@ -141,9 +141,8 @@ function Divider({ vertical }: {
   );
 }
 
-function stepClass() {
-  return "flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-text-primary motion-press hover:bg-overlay-ink-8 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-text-brand";
-}
+const STEP_CLASS =
+  "flex size-6 pointer-coarse:size-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-text-primary motion-press hover:bg-overlay-ink-8 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-text-brand";
 
 /**
  * Document extract panel (Paper `YUT-1` / `GWP-0`): a viewer with zoom controls on the left and the extracted
@@ -232,7 +231,7 @@ export function DocumentExtractPanel({
               <button
                 type="button"
                 onClick={onOpenFile}
-                className="flex min-w-0 cursor-pointer items-center gap-1 rounded-md text-left focus-visible:outline-2 focus-visible:outline-text-brand"
+                className="flex min-w-0 cursor-pointer items-center gap-1 rounded-md text-left pointer-coarse:min-h-11 focus-visible:outline-2 focus-visible:outline-text-brand"
               >
                 <span className="min-w-0 truncate text-label-md text-text-primary">{fileName}</span>
                 <CaretDown aria-hidden className="size-3.5 shrink-0 text-text-secondary" />
@@ -242,13 +241,13 @@ export function DocumentExtractPanel({
             )}
             <span className="min-w-0 flex-1" />
             <span className="shrink-0 text-caption text-text-secondary">{pageLabel}</span>
-            <div className="flex h-7.5 shrink-0 items-center gap-0.5 rounded-full bg-overlay-ink-5 p-[3px]">
+            <div className="flex h-7.5 pointer-coarse:h-auto shrink-0 items-center gap-0.5 rounded-full bg-overlay-ink-5 p-[3px]">
               <button
                 type="button"
                 aria-label="Zoom out"
                 disabled={zoom <= ZOOM_MIN}
                 onClick={() => setZoom((value) => Math.max(ZOOM_MIN, value - ZOOM_STEP))}
-                className={stepClass()}
+                className={STEP_CLASS}
               >
                 <Minus aria-hidden className="size-3.5" />
               </button>
@@ -258,7 +257,7 @@ export function DocumentExtractPanel({
                 aria-label="Zoom in"
                 disabled={zoom >= ZOOM_MAX}
                 onClick={() => setZoom((value) => Math.min(ZOOM_MAX, value + ZOOM_STEP))}
-                className={stepClass()}
+                className={STEP_CLASS}
               >
                 <Plus aria-hidden className="size-3.5" />
               </button>
@@ -266,7 +265,7 @@ export function DocumentExtractPanel({
             <button
               type="button"
               onClick={() => setZoom(ZOOM_FIT)}
-              className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 pr-3.5 pl-3 text-label-sm text-text-primary hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
+              className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 pr-3.5 pl-3 text-label-sm text-text-primary hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
             >
               Fit
             </button>
@@ -300,7 +299,7 @@ export function DocumentExtractPanel({
                 setRun((value) => value + 1);
                 onExtract?.();
               }}
-              className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 pr-3 pl-3.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+              className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 pr-3 pl-3.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
             >
               <Scan aria-hidden className="size-3.5" />
               Extract
@@ -384,7 +383,7 @@ export function DocumentExtractPanel({
                             onClick={() => resolve(field.id)}
                             aria-label={needsCheck ? `Confirm ${field.label}` : undefined}
                             className={cn(
-                              "flex h-9 min-w-0 flex-1 items-center gap-2 rounded-md border px-3 text-start motion-colors",
+                              "flex h-9 pointer-coarse:h-11 min-w-0 flex-1 items-center gap-2 rounded-md border px-3 text-start motion-colors",
                               needsCheck
                                 ? "cursor-pointer border-border-danger bg-overlay-ink-12 hover:bg-overlay-ink-14 focus-visible:outline-2 focus-visible:outline-text-brand"
                                 : "cursor-default border-transparent bg-overlay-ink-4",
@@ -466,7 +465,7 @@ export function DocumentExtractPanel({
         <button
           type="button"
           onClick={acceptAll}
-          className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-primary pr-3 pl-3.5 text-label-sm text-text-inverse hover:bg-interactive-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+          className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-primary pr-3 pl-3.5 text-label-sm text-text-inverse hover:bg-interactive-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
         >
           Accept all
         </button>

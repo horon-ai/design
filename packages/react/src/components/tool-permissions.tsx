@@ -116,7 +116,7 @@ export function ToolPermissions({
         <span className="min-w-0 flex-1" />
         <button
           type="button"
-          className="shrink-0 cursor-pointer rounded-sm text-label-sm whitespace-nowrap text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+          className="shrink-0 cursor-pointer rounded-sm text-label-sm whitespace-nowrap text-text-secondary pointer-coarse:min-h-11 motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
           onClick={() => update(Object.fromEntries(tools.map((tool) => [tool.name, "allow" as const])))}
         >
           {allowAllLabel}

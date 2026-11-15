@@ -137,8 +137,10 @@ const weekdayHeaderSizeClass: Record<CalendarSize, string> = {
  * flex item shrink it at all; `aspect-square` keeps each target square below the cap.
  */
 const daySizeClass: Record<CalendarSize, string> = {
-  sm: "max-w-8",
-  md: "max-w-10",
+  // A day is its own target: on a coarse pointer the 32/40px ceilings rise to the 44px floor, and the
+  // grid still fits seven columns because each cell stays a fluid seventh of the row.
+  sm: "max-w-8 pointer-coarse:max-w-11",
+  md: "max-w-10 pointer-coarse:max-w-11",
   lg: "max-w-12",
 };
 
@@ -147,7 +149,9 @@ const daySizeClass: Record<CalendarSize, string> = {
  * while a desktop grid keeps the Figma size from `daySizeClass` as its ceiling.
  */
 const cellFluidClass = "min-w-7 flex-1";
-const dayShapeClass = "aspect-square";
+// Square on a mouse; on a coarse pointer the square is released and the cell takes the 44px height
+// floor, because seven 44px squares do not fit a narrow card and a scrollable grid would be worse.
+const dayShapeClass = "aspect-square pointer-coarse:aspect-auto pointer-coarse:min-h-11";
 
 const dayTextClass: Record<CalendarSize, string> = {
   sm: "text-body-sm",
@@ -349,7 +353,7 @@ export function Calendar(props: CalendarProps) {
               type="button"
               aria-label={label}
               className={cn(
-                "flex motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6",
+                "relative flex touch-slop motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6",
                 "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
                 popoverArrowSizeClass[size],
               )}
@@ -365,7 +369,7 @@ export function Calendar(props: CalendarProps) {
             type="button"
             aria-label="Previous month"
             className={cn(
-              "flex motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary",
+              "relative flex touch-slop motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
               arrowSizeClass[size],
             )}
@@ -382,7 +386,7 @@ export function Calendar(props: CalendarProps) {
             type="button"
             aria-label="Next month"
             className={cn(
-              "flex motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary",
+              "relative flex touch-slop motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",
               arrowSizeClass[size],
             )}

@@ -140,7 +140,7 @@ export function SourceRow({
           <button
             type="button"
             onClick={onRetry}
-            className="flex h-7.5 motion-press cursor-pointer items-center rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex h-7.5 pointer-coarse:h-11 motion-press cursor-pointer items-center rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             Retry
           </button>

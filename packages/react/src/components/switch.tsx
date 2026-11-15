@@ -73,7 +73,7 @@ export function Switch({ size = "md", label, className, ...props }: SwitchProps)
   const control = (
     <BaseSwitch.Root
       className={cn(
-        "relative inline-flex shrink-0 cursor-pointer items-center rounded-full bg-border-strong motion-colors",
+        "relative inline-flex shrink-0 touch-slop cursor-pointer items-center rounded-full bg-border-strong motion-colors",
         "hover:not-data-disabled:bg-interactive-secondary-hover data-checked:bg-interactive-primary hover:not-data-disabled:data-checked:bg-interactive-primary-hover",
         "data-disabled:cursor-not-allowed data-disabled:opacity-40",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand",

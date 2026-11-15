@@ -69,7 +69,7 @@ const variantClass: Record<ButtonVariant, string> = {
     "border border-border-default bg-bg-surface text-text-primary hover:not-data-disabled:bg-bg-subtle active:not-data-disabled:bg-interactive-secondary-hover",
   danger:
     "bg-interactive-danger text-interactive-on-danger hover:not-data-disabled:bg-interactive-danger-hover active:not-data-disabled:bg-interactive-danger",
-  link: "h-auto gap-1.5 rounded-sm px-1 text-label-sm text-text-secondary motion-colors hover:not-data-disabled:text-text-primary aria-[current=page]:text-text-primary aria-[current=true]:text-text-primary [&_svg]:size-3.5",
+  link: "h-auto gap-1.5 rounded-sm px-1 text-label-sm text-text-secondary motion-colors pointer-coarse:min-h-11 pointer-coarse:items-center hover:not-data-disabled:text-text-primary aria-[current=page]:text-text-primary aria-[current=true]:text-text-primary [&_svg]:size-3.5",
 };
 
 /**

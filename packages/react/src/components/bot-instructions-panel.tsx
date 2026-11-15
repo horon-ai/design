@@ -99,7 +99,7 @@ export function PanelPillTabs({ items, value, defaultValue, onValueChange, class
             tabIndex={active ? 0 : -1}
             onClick={() => select(item.value)}
             className={cn(
-              "relative flex h-7.5 cursor-pointer items-center rounded-full px-3 text-label-md whitespace-nowrap motion-colors",
+              "relative flex h-7.5 pointer-coarse:h-11 cursor-pointer items-center rounded-full px-3 text-label-md whitespace-nowrap motion-colors",
               "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-text-brand",
               active ? "text-text-primary" : "text-text-secondary hover:text-text-primary",
             )}
@@ -271,7 +271,7 @@ export function BotInstructionsPanel({
             <button
               type="button"
               onClick={onVersionClick}
-              className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+              className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
             >
               {version}
               {versionStatus ? (
@@ -305,7 +305,7 @@ export function BotInstructionsPanel({
           <button
             type="button"
             onClick={onBotClick}
-            className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-1.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             <span className="flex size-4.5 items-center justify-center rounded-xs bg-interactive-primary text-label-sm text-text-inverse">
               {bot.initial}
@@ -419,7 +419,7 @@ export function BotInstructionsPanel({
                   setRunCount((count) => count + 1);
                   onRun?.(scenario);
                 }}
-                className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full bg-interactive-primary pr-3 pl-3.5 text-label-sm text-text-inverse hover:bg-interactive-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+                className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full bg-interactive-primary pr-3 pl-3.5 text-label-sm text-text-inverse hover:bg-interactive-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
               >
                 <Play aria-hidden className="size-3.5" />
                 Run

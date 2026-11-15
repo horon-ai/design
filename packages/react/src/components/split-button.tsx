@@ -66,7 +66,7 @@ export function SplitButton({
   return (
     <div
       className={cn(
-        "inline-flex h-8 shrink-0 items-center rounded-full bg-interactive-primary text-label-md text-interactive-on-primary",
+        "inline-flex h-8 pointer-coarse:h-11 shrink-0 items-center rounded-full bg-interactive-primary text-label-md text-interactive-on-primary",
         // The press and the disabled dim belong to the pill, not to one half: the fill is the container's,
         // so shrinking a half alone moves the label inside a fixed pill.
         "transition-[scale,background-color,opacity] duration-150 ease-out-quint",

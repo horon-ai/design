@@ -90,8 +90,8 @@ export type ComboboxMultipleProps = ComboboxBaseProps & {
 export type ComboboxProps = ComboboxSingleProps | ComboboxMultipleProps;
 
 const itemClass: Record<ComboboxSize, string> = {
-  sm: "h-8 gap-2 px-2.5 text-label-sm [&_svg]:size-4",
-  md: "h-10 gap-2.5 px-3 text-label-md [&_svg]:size-4",
+  sm: "h-8 pointer-coarse:h-11 gap-2 px-2.5 text-label-sm [&_svg]:size-4",
+  md: "h-10 pointer-coarse:h-11 gap-2.5 px-3 text-label-md [&_svg]:size-4",
   lg: "h-12 gap-3 px-4 text-label-lg [&_svg]:size-5",
 };
 
@@ -103,8 +103,8 @@ const chipClass: Record<ComboboxSize, string> = {
 
 /** Multiple chips wrap, so the field grows from its rung height instead of fixing it. */
 const multiFieldClass: Record<ComboboxSize, string> = {
-  sm: "min-h-8 flex-wrap gap-1 px-2 py-1",
-  md: "min-h-10 flex-wrap gap-1.5 px-2.5 py-1.5",
+  sm: "min-h-8 pointer-coarse:min-h-11 flex-wrap gap-1 px-2 py-1",
+  md: "min-h-10 pointer-coarse:min-h-11 flex-wrap gap-1.5 px-2.5 py-1.5",
   lg: "min-h-12 flex-wrap gap-2 px-3 py-2",
 };
 
@@ -290,7 +290,7 @@ export function Combobox(props: ComboboxProps) {
                     {shortLabel(item)}
                     <BaseCombobox.ChipRemove
                       aria-label={`Remove ${item.label}`}
-                      className="flex cursor-pointer rounded-full p-0.5 text-text-secondary hover:bg-overlay-ink-10 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+                      className="relative flex touch-slop cursor-pointer rounded-full p-0.5 text-text-secondary hover:bg-overlay-ink-10 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
                     >
                       <X />
                     </BaseCombobox.ChipRemove>
@@ -321,7 +321,7 @@ export function Combobox(props: ComboboxProps) {
           />
           <BaseCombobox.Trigger
             aria-label="Show options"
-            className="group relative flex shrink-0 cursor-pointer text-text-secondary outline-none"
+            className="group relative flex shrink-0 pointer-coarse:size-11 cursor-pointer items-center justify-center text-text-secondary outline-none"
           >
             <CaretDown
               aria-hidden
