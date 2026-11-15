@@ -139,11 +139,16 @@ export function TabsList({
   );
 }
 
-/** One tab per rung: the `SegmentedControl` segment heights and padding (26/30/36px, 10/16/16px). */
+/**
+ * One tab per rung: the `SegmentedControl` segment heights and padding (26/30/36px, 10/16/16px).
+ * On a coarse pointer every rung grows to the 44px touch floor. The pill tray scrolls with
+ * `overflow-y-clip`, so a widened pseudo-element would be cut off at its edge and the height has to
+ * be real; the tray has no fixed height, so it grows with the tabs.
+ */
 const tabClass: Record<TabsSize, string> = {
-  sm: "h-6.5 gap-1 px-2.5 text-label-sm [&_svg]:size-3.5",
-  md: "h-7.5 gap-1.5 px-4 text-label-md [&_svg]:size-4",
-  lg: "h-9 gap-2 px-4 text-label-lg [&_svg]:size-5",
+  sm: "h-6.5 pointer-coarse:h-11 gap-1 px-2.5 text-label-sm [&_svg]:size-3.5",
+  md: "h-7.5 pointer-coarse:h-11 gap-1.5 px-4 text-label-md [&_svg]:size-4",
+  lg: "h-9 pointer-coarse:h-11 gap-2 px-4 text-label-lg [&_svg]:size-5",
 };
 
 const countClass: Record<TabsSize, string> = {

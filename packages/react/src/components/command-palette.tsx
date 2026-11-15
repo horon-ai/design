@@ -7,9 +7,9 @@ import { useDevice } from "../hooks/use-device";
 import { cn } from "../lib/cn";
 import { Kbd } from "./kbd";
 
-/** Close control shape for pointers that never reach a key: a 28px icon tile instead of the esc chip. */
+/** Close control shape for pointers that never reach a key: a 44px icon tile instead of the esc chip. */
 const touchCloseClass =
-  "flex size-7 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand [&_svg]:size-4";
+  "flex size-11 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:bg-overlay-ink-6 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand [&_svg]:size-4";
 
 /** One selectable row of the palette. */
 export type CommandItem = {

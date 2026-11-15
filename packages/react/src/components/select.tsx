@@ -70,8 +70,8 @@ export type SelectProps = Omit<ComponentProps<typeof BaseSelect.Root>, "items" |
 };
 
 const itemClass: Record<SelectSize, string> = {
-  sm: "h-8 gap-2 px-2.5 text-label-sm",
-  md: "h-10 gap-2.5 px-3 text-label-md",
+  sm: "h-8 pointer-coarse:h-11 gap-2 px-2.5 text-label-sm",
+  md: "h-10 pointer-coarse:h-11 gap-2.5 px-3 text-label-md",
   lg: "h-12 gap-3 px-4 text-label-lg",
 };
 
@@ -150,7 +150,7 @@ export function Select({
             : segment
               ? cn(inputGroupSegmentClass[size], "text-left data-disabled:text-text-disabled", triggerFocusClass)
               : cn(
-                  "relative inline-flex h-8 items-center gap-1 rounded-full bg-bg-subtle px-3 text-label-md hover:not-data-disabled:bg-overlay-ink-8",
+                  "relative inline-flex h-8 pointer-coarse:h-11 items-center gap-1 rounded-full bg-bg-subtle px-3 text-label-md hover:not-data-disabled:bg-overlay-ink-8",
                   triggerFocusClass,
                 ),
           "group cursor-pointer text-left motion-colors data-disabled:cursor-not-allowed",

@@ -136,7 +136,7 @@ export function PlanStep({
                   type="button"
                   onClick={onRetry}
                   inert={status !== "failed"}
-                  className="flex h-7.5 w-fit motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+                  className="flex h-7.5 pointer-coarse:h-11 w-fit motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
                 >
                   <ArrowClockwise aria-hidden className="size-3.5" />
                   Retry from here

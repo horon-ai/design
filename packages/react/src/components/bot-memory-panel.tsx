@@ -199,7 +199,7 @@ export function BotMemoryPanel({
             type="button"
             aria-label="Search memories"
             onClick={onSearch}
-            className="flex size-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-secondary hover:bg-overlay-ink-10 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex size-7.5 pointer-coarse:size-11 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-secondary hover:bg-overlay-ink-10 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             <MagnifyingGlass aria-hidden className="size-4" />
           </button>
@@ -237,7 +237,7 @@ export function BotMemoryPanel({
                 type="button"
                 aria-label="Dismiss"
                 onClick={() => setLeavingFor(toast)}
-                className="flex size-3 shrink-0 cursor-pointer items-center justify-center text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+                className="flex size-3 shrink-0 touch-slop cursor-pointer items-center justify-center text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
               >
                 <X aria-hidden className="size-3" />
               </button>
@@ -274,7 +274,7 @@ export function BotMemoryPanel({
       <button
         type="button"
         onClick={onAdd}
-        className="flex cursor-pointer items-center gap-2 px-5 pt-3 pb-4 text-label-md text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+        className="flex cursor-pointer items-center gap-2 px-5 pt-3 pb-4 text-label-md text-text-secondary pointer-coarse:min-h-11 motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
       >
         <Plus aria-hidden className="size-3.5" />
         Add memory

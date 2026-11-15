@@ -120,7 +120,7 @@ function SteeringNoteRow({
             type="button"
             tabIndex={note.applied ? -1 : undefined}
             onClick={() => onApplyNow?.(note.id)}
-            className="flex h-6.5 shrink-0 motion-press cursor-pointer items-center gap-1 rounded-full bg-overlay-ink-6 px-2 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex h-6.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center gap-1 rounded-full bg-overlay-ink-6 px-2 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             <Lightning aria-hidden className="size-3" />
             Now
@@ -130,7 +130,7 @@ function SteeringNoteRow({
             aria-label="Remove note"
             tabIndex={note.applied ? -1 : undefined}
             onClick={() => setLeaving(true)}
-            className="flex size-6 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex size-6 pointer-coarse:size-11 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             <X aria-hidden className="size-3.5" />
           </button>
@@ -225,7 +225,7 @@ export function AgentSteeringPanel({
           aria-label={paused ? "Resume" : "Pause"}
           aria-pressed={paused}
           onClick={() => onPausedChange?.(!paused)}
-          className="flex size-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="flex size-7.5 pointer-coarse:size-11 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
         >
           <span className="motion-swap size-4">
             <Play aria-hidden weight="fill" data-hidden={!paused || undefined} className="size-4" />
@@ -296,13 +296,13 @@ export function AgentSteeringPanel({
             }}
             placeholder={placeholder}
             aria-label={placeholder}
-            className="min-w-0 flex-1 bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
+            className="min-w-0 flex-1 bg-transparent text-body-sm text-text-primary outline-none pointer-coarse:h-full placeholder:text-text-secondary"
           />
           <button
             type="button"
             aria-label="Send"
             onClick={() => submit(false)}
-            className="flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-primary text-text-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+            className="flex size-8 pointer-coarse:size-11 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-primary text-text-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
           >
             <ArrowUp aria-hidden className="size-4" />
           </button>

@@ -168,6 +168,33 @@
       background-color: var(--color-glass-fill-frost);
     }
   }
+
+  /* The 44px touch target of a control whose drawn size must not change: a switch track, a checkbox
+   * box, a radio circle, a calendar arrow. On a coarse pointer the reach grows to 44px around the
+   * control's centre while the control paints exactly as before, which is the DESIGN.md policy ("the
+   * reach is widened by a pseudo-element, never the visual size"). A control that already owns
+   * `::after` (a toast close, a source-row underline) must not take this class; give it its own rule.
+   * The element must be the positioning context, so never put this on an `absolute` or `fixed` node.
+   *
+   * Deliberately a components-layer class, not an `@utility`: the Lynx package has no pseudo-elements
+   * and its parity test requires every React `@utility` name to exist in its own globals, so a
+   * touch-only pseudo-element utility would either fail that test or force a change in another
+   * package's contract. */
+  .touch-slop {
+    @media (pointer: coarse) {
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        min-width: 44px;
+        min-height: 44px;
+        translate: -50% -50%;
+      }
+    }
+  }
 }
 
 /* Motion. The Figma file defines no motion variables, so the library's motion

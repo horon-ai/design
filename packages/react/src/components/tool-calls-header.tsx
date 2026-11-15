@@ -71,7 +71,7 @@ export function ToolCallsHeader({
         className,
       )}
     >
-      <Collapsible.Trigger className="group flex w-full min-w-0 cursor-pointer items-center gap-2.5 pb-1 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand">
+      <Collapsible.Trigger className="group flex w-full min-w-0 pointer-coarse:min-h-11 cursor-pointer items-center gap-2.5 pb-1 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand">
         {chips.length > 0 && (
           <span className="flex shrink-0 items-center">
             {Children.map(chips, (icon) => (

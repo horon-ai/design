@@ -116,7 +116,7 @@ export function Radio({ label, size, className, ...props }: RadioProps) {
     >
       <BaseRadio.Root
         className={cn(
-          "flex shrink-0 items-center justify-center rounded-full border-[1.5px] border-border-strong bg-bg-surface motion-colors",
+          "flex shrink-0 touch-slop items-center justify-center rounded-full border-[1.5px] border-border-strong bg-bg-surface motion-colors",
           circleClass[resolvedSize],
           "hover:not-data-disabled:border-text-secondary",
           "data-checked:border-interactive-primary data-checked:bg-interactive-primary hover:not-data-disabled:data-checked:border-interactive-primary-hover hover:not-data-disabled:data-checked:bg-interactive-primary-hover",
