@@ -2,6 +2,7 @@ import { Children, isValidElement, type ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { SegmentedControl } from "./segmented-control";
 import { Spinner } from "./spinner";
@@ -132,6 +133,7 @@ export function OrchestratorPanel({
   summary,
   className,
 }: OrchestratorPanelProps) {
+  const touch = useTouch();
   const lanes = Children.map(children, (child) => child as ReactNode) ?? [];
 
   return (
@@ -168,7 +170,10 @@ export function OrchestratorPanel({
           <view className="min-w-0 flex-1" />
           {onStop ? (
             <view
-              className="motion-press flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 px-3 active:bg-overlay-ink-10"
+              className={cn(
+                "motion-press flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 px-3 active:bg-overlay-ink-10",
+                touch && "h-11",
+              )}
               bindtap={onStop}
               accessibility-element
               accessibility-traits="button"

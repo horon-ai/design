@@ -2,6 +2,7 @@ import { useState } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
 import type { LayoutChangeLike } from "../hooks";
+import { useTouch } from "../hooks/use-touch";
 import { Icon } from "../icons";
 import { cn } from "../lib/cn";
 import { readViewport } from "../lib/media";
@@ -77,6 +78,16 @@ const popupCalendarWidthClass: Record<DateFieldSize, string> = {
 /** React sized the trigger's calendar glyph through the text rung; `<Icon>` takes px. */
 const iconSize: Record<DateFieldSize, number> = { sm: 16, md: 16, lg: 20 };
 
+/**
+ * The trigger's height on a touch surface: `sm` and `md` grow to the 44px target, `lg` is already 48.
+ * `fieldSizeClass` is shared with `Input`, which is not a press target, so the rung lives here.
+ */
+const touchTriggerClass: Record<DateFieldSize, string> = {
+  sm: "h-11",
+  md: "h-11",
+  lg: "h-12",
+};
+
 /** The trigger's box on the page, measured by `bindlayoutchange`; all values in CSS px. */
 type AnchorRect = {
   left: number;
@@ -151,6 +162,7 @@ export function DateField({
   triggerClassName,
   ...calendar
 }: DateFieldProps) {
+  const touch = useTouch();
   const value = calendar.value ?? null;
   const text = value ? (format ? format(value) : defaultFormat(value, calendar.locale)) : "";
   const [open, setOpen] = useState(false);
@@ -166,6 +178,8 @@ export function DateField({
           fieldBoxClass.base,
           fieldBoxClass[surface],
           fieldSizeClass[size],
+          // The trigger is the press target, so the 44px rung is applied here rather than to the shared field rung.
+          touch && touchTriggerClass[size],
           "w-full max-w-[280px]",
           surface !== "glass" && !disabled && "active:border-border-strong",
           // React's field box repainted its fill and border for `data-disabled`; Lynx has no such

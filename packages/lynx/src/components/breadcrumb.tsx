@@ -2,6 +2,7 @@ import { Children, type ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
@@ -137,12 +138,16 @@ export type BreadcrumbItemProps = Omit<PortedElementProps["a"], "className"> & {
  * ```
  */
 export function BreadcrumbItem({ current, tile, href, onTap, className, children }: BreadcrumbItemProps) {
+  const touch = useTouch();
   const tappable = Boolean(href) && !current;
 
   return (
     <view
       className={cn(
         "motion-colors flex flex-row items-center gap-1.5 whitespace-nowrap rounded-sm py-1 pl-1.5 pr-1.5",
+        // A crumb is a word in a row, so its height comes from padding; only a tappable one
+        // becomes a target, and only that one grows.
+        touch && tappable && "min-h-11",
         current ? "text-text-primary" : "text-text-secondary",
         tappable && "active:opacity-70",
         className,

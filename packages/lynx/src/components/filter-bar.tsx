@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "@lynx-js/react";
 
 import { cn } from "../lib/cn";
 import { useActiveIndicator } from "../hooks/use-active-indicator";
+import { useTouch } from "../hooks/use-touch";
 
 /** One option in a `FilterBar`. */
 export type FilterBarItem = {
@@ -88,6 +89,7 @@ export function FilterBar({
   className,
   "aria-label": ariaLabel = "Filter",
 }: FilterBarProps) {
+  const touch = useTouch();
   const [inner, setInner] = useState<string | undefined>(defaultValue ?? items[0]?.value);
   const selected = value ?? inner;
   const activeIndex = items.findIndex((item) => item.value === selected);
@@ -119,6 +121,9 @@ export function FilterBar({
                 key={item.value}
                 className={cn(
                   "motion-colors relative flex h-[30px] shrink-0 flex-row items-center gap-1.5 whitespace-nowrap rounded-full px-4",
+                  // The 30px option is what a thumb has to land on, and the track's
+                  // 3px padding grows with it, so the tray stays a 50px pill.
+                  touch && "h-11",
                   active ? "text-text-primary" : "text-text-secondary",
                   item.disabled && "opacity-40",
                 )}

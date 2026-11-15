@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
@@ -125,6 +126,7 @@ export function Checkbox({
   style,
   "aria-label": ariaLabel,
 }: CheckboxRootProps) {
+  const touch = useTouch();
   const [own, setOwn] = useState(defaultChecked);
   const isChecked = checked ?? own;
   const blocked = disabled || readOnly;
@@ -142,6 +144,9 @@ export function Checkbox({
       className={cn(
         "inline-flex min-w-0 max-w-full flex-row items-center",
         labelClass[size],
+        // The row is the target, so only its height moves: the 18-24px box is the check
+        // mark's painted size and a 44px box would read as a different control.
+        touch && "min-h-11",
         disabled && "opacity-40",
         className,
       )}

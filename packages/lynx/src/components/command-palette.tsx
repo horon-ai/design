@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "@lynx-js/react";
 
 import { useDevice } from "../hooks/use-device";
+import { useTouch } from "../hooks/use-touch";
 import { Icon } from "../icons";
 import { cn } from "../lib/cn";
 import { Kbd } from "./kbd";
@@ -8,6 +9,9 @@ import { Kbd } from "./kbd";
 /** Close control shape for pointers that never reach a key: a 28px icon tile instead of the esc chip. */
 const touchCloseClass =
   "flex size-7 shrink-0 flex-row items-center justify-center rounded-full text-text-secondary active:bg-overlay-ink-6";
+
+/** The touch rung grows that tile to a 44px square; the 16px glyph inside keeps its size. */
+const closeTouchRungClass = "size-11";
 
 /** One selectable row of the palette. */
 export type CommandItem = {
@@ -123,6 +127,7 @@ export function CommandPalette({
   surface = "solid",
   className,
 }: CommandPaletteProps) {
+  const touch = useTouch();
   const { keyboardHints } = useDevice();
   const [innerOpen, setInnerOpen] = useState(false);
   const open = openProp ?? innerOpen;
@@ -145,7 +150,7 @@ export function CommandPalette({
 
   const closeControl = (
     <view
-      className={keyboardHints ? "motion-press" : touchCloseClass}
+      className={keyboardHints ? "motion-press" : cn(touchCloseClass, touch && closeTouchRungClass)}
       bindtap={() => setOpen(false)}
       accessibility-element
       accessibility-traits="button"
@@ -235,6 +240,7 @@ export function CommandPaletteBody({
   onClose,
   onSelect,
 }: CommandPaletteBodyProps) {
+  const touch = useTouch();
   const { keyboardHints } = useDevice();
   const [query, setQuery] = useState("");
   const needle = query.trim().toLowerCase();
@@ -266,7 +272,7 @@ export function CommandPaletteBody({
         {closeControl ??
           (onClose === undefined ? null : (
             <view
-              className={keyboardHints ? "motion-press" : touchCloseClass}
+              className={keyboardHints ? "motion-press" : cn(touchCloseClass, touch && closeTouchRungClass)}
               bindtap={onClose}
               accessibility-element
               accessibility-traits="button"

@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "@lynx-js/react";
 
 import { useMediaQuery } from "../hooks/use-media-query";
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { PanelPillTabs } from "./bot-instructions-panel";
 
@@ -214,6 +215,7 @@ export function DocumentExtractPanel({
   className,
   id,
 }: DocumentExtractPanelProps) {
+  const touch = useTouch();
   const [zoom, setZoom] = useState(defaultZoom);
   const [view, setView] = useState("fields");
   const [resolved, setResolved] = useState<Set<string>>(() => new Set());
@@ -265,7 +267,11 @@ export function DocumentExtractPanel({
             </view>
             {onOpenFile ? (
               <view
-                className="flex min-w-0 flex-row items-center gap-1 rounded-md"
+                className={cn(
+                  "flex min-w-0 flex-row items-center gap-1 rounded-md",
+                  // A text row carries no padding, so the rung sets the reach outright.
+                  touch && "min-h-11",
+                )}
                 bindtap={onOpenFile}
                 accessibility-element
                 accessibility-traits="button"
@@ -281,9 +287,16 @@ export function DocumentExtractPanel({
             )}
             <view className="min-w-0 flex-1" />
             <text className="shrink-0 text-caption text-text-secondary">{pageLabel}</text>
-            <view className="flex h-[30px] shrink-0 flex-row items-center gap-0.5 rounded-full bg-overlay-ink-5 p-[3px]">
+            <view
+              className={cn(
+                "flex h-[30px] shrink-0 flex-row items-center gap-0.5 rounded-full bg-overlay-ink-5 p-[3px]",
+                // The tray paints the steps' background, so it grows by its own 3px padding
+                // with them or the 44px step would hang out of the pill.
+                touch && "h-[50px]",
+              )}
+            >
               <view
-                className={cn(STEP_CLASS, zoom <= ZOOM_MIN && "opacity-40")}
+                className={cn(STEP_CLASS, touch && "size-11", zoom <= ZOOM_MIN && "opacity-40")}
                 bindtap={() => setZoom((value) => Math.max(ZOOM_MIN, value - ZOOM_STEP))}
                 accessibility-element
                 accessibility-traits={zoom <= ZOOM_MIN ? "disabled" : "button"}
@@ -295,7 +308,7 @@ export function DocumentExtractPanel({
                 <text className="text-label-sm tabular-nums text-text-primary">{`${zoom}%`}</text>
               </view>
               <view
-                className={cn(STEP_CLASS, zoom >= ZOOM_MAX && "opacity-40")}
+                className={cn(STEP_CLASS, touch && "size-11", zoom >= ZOOM_MAX && "opacity-40")}
                 bindtap={() => setZoom((value) => Math.min(ZOOM_MAX, value + ZOOM_STEP))}
                 accessibility-element
                 accessibility-traits={zoom >= ZOOM_MAX ? "disabled" : "button"}
@@ -305,7 +318,10 @@ export function DocumentExtractPanel({
               </view>
             </view>
             <view
-              className="motion-press flex h-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 pl-3 pr-3.5 active:bg-overlay-ink-8"
+              className={cn(
+                "motion-press flex h-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-overlay-ink-6 pl-3 pr-3.5 active:bg-overlay-ink-8",
+                touch && "h-11",
+              )}
               bindtap={() => setZoom(ZOOM_FIT)}
               accessibility-element
               accessibility-traits="button"
@@ -342,7 +358,10 @@ export function DocumentExtractPanel({
             />
             <view className="min-w-0 flex-1" />
             <view
-              className="motion-press flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 pl-3.5 pr-3 active:bg-overlay-ink-10"
+              className={cn(
+                "motion-press flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 pl-3.5 pr-3 active:bg-overlay-ink-10",
+                touch && "h-11",
+              )}
               bindtap={() => {
                 setRun((value) => value + 1);
                 onExtract?.();
@@ -446,6 +465,9 @@ export function DocumentExtractPanel({
                           <view
                             className={cn(
                               "motion-colors flex h-9 min-w-0 flex-1 flex-row items-center gap-2 rounded-[10px] border px-3",
+                              // Only a row waiting for confirmation is pressable, so only that row
+                              // grows; a plain read keeps the 36px the design draws.
+                              touch && needsCheck && "h-11",
                               needsCheck
                                 ? "border-border-danger bg-overlay-ink-12 active:bg-overlay-ink-14"
                                 : "border-transparent bg-overlay-ink-4",
@@ -521,7 +543,10 @@ export function DocumentExtractPanel({
           </view>
         ) : null}
         <view
-          className="motion-press flex h-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary pl-3.5 pr-3 active:bg-interactive-primary-hover"
+          className={cn(
+            "motion-press flex h-[30px] shrink-0 flex-row items-center justify-center rounded-full bg-interactive-primary pl-3.5 pr-3 active:bg-interactive-primary-hover",
+            touch && "h-11",
+          )}
           bindtap={acceptAll}
           accessibility-element
           accessibility-traits="button"

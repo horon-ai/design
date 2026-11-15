@@ -2,6 +2,7 @@ import { useMemo, type ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { useHoronTheme } from "../provider";
 import { Spinner } from "./spinner";
@@ -242,6 +243,7 @@ export function AgentLanesTimeline({
   id,
   style,
 }: AgentLanesTimelineProps) {
+  const touch = useTouch();
   const theme = useHoronTheme();
   const ticks = Array.from({ length: windowMinutes / 5 - 1 }, (_, i) => -(windowMinutes - 5 * (i + 1)));
   const taskAt = useMemo(() => {
@@ -302,7 +304,11 @@ export function AgentLanesTimeline({
         <view className="flex-1" />
         {onRangeClick ? (
           <view
-            className="motion-press flex h-[30px] flex-row items-center gap-1 rounded-full bg-overlay-ink-6 px-3 active:bg-overlay-ink-10"
+            className={cn(
+              "motion-press flex h-[30px] flex-row items-center gap-1 rounded-full bg-overlay-ink-6 px-3 active:bg-overlay-ink-10",
+              // The range pill is the picker for the window; the label step and padding stay.
+              touch && "h-11",
+            )}
             bindtap={onRangeClick}
             accessibility-element
             accessibility-traits="button"
@@ -484,7 +490,10 @@ export function AgentLanesTimeline({
               <view className="min-w-0 flex-1">{approval.message}</view>
             )}
             <view
-              className="motion-press flex h-[30px] shrink-0 flex-row items-center rounded-full bg-overlay-ink-6 px-3 active:bg-overlay-ink-10"
+              className={cn(
+                "motion-press flex h-[30px] shrink-0 flex-row items-center rounded-full bg-overlay-ink-6 px-3 active:bg-overlay-ink-10",
+                touch && "h-11",
+              )}
               bindtap={approval.onLater}
               accessibility-element
               accessibility-traits="button"
@@ -492,7 +501,10 @@ export function AgentLanesTimeline({
               <text className="text-label-sm text-text-primary">Later</text>
             </view>
             <view
-              className="motion-press flex h-[30px] shrink-0 flex-row items-center rounded-full bg-interactive-primary px-3 active:bg-interactive-primary-hover"
+              className={cn(
+                "motion-press flex h-[30px] shrink-0 flex-row items-center rounded-full bg-interactive-primary px-3 active:bg-interactive-primary-hover",
+                touch && "h-11",
+              )}
               bindtap={approval.onApprove}
               accessibility-element
               accessibility-traits="button"

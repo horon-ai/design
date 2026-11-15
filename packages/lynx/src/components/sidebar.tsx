@@ -4,6 +4,7 @@ import type { CSSProperties } from "@lynx-js/types";
 import sidebarPhoto from "../assets/sidebar-photo.jpg";
 import { Icon } from "../icons";
 import { useMediaQuery } from "../hooks";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { useHoronTheme } from "../provider";
 import { LiquidGlass } from "./liquid-glass";
@@ -292,12 +293,16 @@ const isPlainText = (value: ReactNode): value is string | number =>
  * Part of {@link Sidebar}.
  */
 export function SidebarWorkspaceSwitch({ initial, name, className, onClick, ...props }: SidebarWorkspaceSwitchProps) {
+  const touch = useTouch();
   const active = props["aria-current"] === "page" || props["aria-current"] === "true";
   return (
     <view
       className={cn(
         "motion-colors flex h-9 min-w-0 flex-1 flex-row items-center gap-1.5 rounded-[10px] pl-2 pr-1 active:bg-overlay-ink-6",
         active && "bg-overlay-ink-6",
+        // The switch shares the header's 36px line; the rung raises the press box while the
+        // 28px tile inside keeps its painted size.
+        touch && "h-11",
         className,
       )}
       style={props.style}
@@ -341,14 +346,28 @@ export function SidebarHeader({
   collapseLabel = "Collapse sidebar",
   className,
 }: SidebarHeaderProps) {
+  const touch = useTouch();
   return (
-    <view className={cn("relative mb-2.5 flex h-9 shrink-0 flex-row items-center gap-1.5", className)}>
+    <view
+      className={cn(
+        "relative mb-2.5 flex h-9 shrink-0 flex-row items-center gap-1.5",
+        // The header line holds the switch and the collapse button; both grow to 44 under the
+        // rung, so the line grows with them instead of clipping them.
+        touch && "h-11",
+        className,
+      )}
+    >
       {switchSlot ?? <SidebarWorkspaceSwitch {...switchProps} name={name} initial={initial} />}
       {onCollapse ? (
         <view
-          className="motion-colors relative flex size-7 shrink-0 flex-row items-center justify-center rounded-sm text-text-secondary active:bg-overlay-ink-10"
+          className={cn(
+            "motion-colors relative flex size-7 shrink-0 flex-row items-center justify-center rounded-sm text-text-secondary active:bg-overlay-ink-10",
+            // Lynx's web renderer ignores `hit-slop` in hit testing, so under the rung the box
+            // itself is the target and the slop is dropped rather than doubled.
+            touch && "size-11",
+          )}
           bindtap={onCollapse}
-          hit-slop="8px"
+          hit-slop={touch ? undefined : "8px"}
           accessibility-element
           accessibility-traits="button"
           accessibility-label={collapseLabel}
@@ -399,6 +418,7 @@ export type SidebarItemProps =
  * Part of {@link Sidebar}.
  */
 export function SidebarItem({ icon, count, attention, current, className, children, ...props }: SidebarItemProps) {
+  const touch = useTouch();
   const link = props.href !== undefined;
   const { style, onClick, "aria-label": ariaLabel, "aria-current": _ariaCurrent, id } = props;
 
@@ -407,6 +427,9 @@ export function SidebarItem({ icon, count, attention, current, className, childr
       className={cn(
         "motion-colors relative flex h-8 w-full shrink-0 flex-row items-center gap-2.5 rounded-md px-2.5",
         current ? "bg-overlay-ink-6" : "active:bg-overlay-ink-4",
+        // A 32px row is half a thumb. The rung grows only the height, so the row keeps
+        // its inset and the tree connector (drawn against the same value) lines up.
+        touch && "h-11",
         className,
       )}
       style={style}
@@ -503,11 +526,16 @@ export type SidebarGroupProps = {
  * drawn only while open and fades in through the shared motion utility.
  */
 export function SidebarGroup({ label, defaultOpen = true, children, className }: SidebarGroupProps) {
+  const touch = useTouch();
   const [open, setOpen] = useState(defaultOpen);
   return (
     <view className={cn("relative mt-3.5 flex shrink-0 flex-col gap-0.5", className)}>
       <view
-        className="motion-colors flex h-7 flex-row items-center gap-1 self-start rounded-sm px-2.5 active:bg-overlay-ink-4"
+        className={cn(
+          "motion-colors flex h-7 flex-row items-center gap-1 self-start rounded-sm px-2.5 active:bg-overlay-ink-4",
+          // A label that opens a section is a full control, not decoration; 28px becomes 44.
+          touch && "h-11",
+        )}
         bindtap={() => setOpen(!open)}
         accessibility-element
         accessibility-traits="button"
@@ -536,12 +564,17 @@ export function SidebarGroup({ label, defaultOpen = true, children, className }:
   );
 }
 
+/**
+ * Fixed 32px row step and 2px gap the Figma `Tree` connector is drawn against. The touch rung
+ * replaces the row height (see `TOUCH_ROW`), so the path and the rows it joins stay in step.
+ */
 const ROW = 32;
+const TOUCH_ROW = 44;
 const GAP = 2;
 
 /** Connector path of the Figma `Tree`: one 1.5px line with a 9px curve into the middle of each child row. */
-function branchesPath(count: number): string {
-  const centers = Array.from({ length: count }, (_, index) => ROW / 2 + index * (ROW + GAP));
+function branchesPath(count: number, row: number): string {
+  const centers = Array.from({ length: count }, (_, index) => row / 2 + index * (row + GAP));
   const last = centers[centers.length - 1] ?? 0;
   const trunk = `M0.75 0V${last - 9}`;
   const branches = centers.map((center) => {
@@ -565,9 +598,12 @@ export function SidebarTree({ children, className }: {
   className?: string;
 }) {
   const theme = useHoronTheme();
+  const touch = useTouch();
   const count = Children.count(children);
-  const height = ROW / 2 + Math.max(0, count - 1) * (ROW + GAP) + 0.75;
-  const content = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="${height}" viewBox="0 0 16 ${height}" fill="none"><path d="${branchesPath(count)}" stroke="${theme.color("overlay-ink-16")}" stroke-width="1.5"/></svg>`;
+  // The connector is one SVG path, so it must be drawn against the row height actually in use.
+  const row = touch ? TOUCH_ROW : ROW;
+  const height = row / 2 + Math.max(0, count - 1) * (row + GAP) + 0.75;
+  const content = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="${height}" viewBox="0 0 16 ${height}" fill="none"><path d="${branchesPath(count, row)}" stroke="${theme.color("overlay-ink-16")}" stroke-width="1.5"/></svg>`;
 
   return (
     // A plain flex row: the connector column, then the rows. React's `pl-5` indent lives on the wrapper.
@@ -701,6 +737,7 @@ export function SidebarProject({
   children,
   className,
 }: SidebarProjectProps) {
+  const touch = useTouch();
   const hasChildren = Children.count(children) > 0;
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const isOpen = open ?? uncontrolledOpen;
@@ -715,10 +752,16 @@ export function SidebarProject({
         className={cn(
           "motion-colors relative flex h-8 shrink-0 flex-row items-center rounded-md",
           current ? "bg-overlay-ink-6" : "active:bg-overlay-ink-4",
+          // The row and its pressable label grow together; the "More" slot is absolutely
+          // positioned against the right edge, so it stays centred in the taller row.
+          touch && "h-11",
         )}
       >
         <view
-          className="flex h-8 min-w-0 flex-1 flex-row items-center gap-2.5 rounded-md px-2.5"
+          className={cn(
+            "flex h-8 min-w-0 flex-1 flex-row items-center gap-2.5 rounded-md px-2.5",
+            touch && "h-11",
+          )}
           bindtap={() => handleOpenChange(!isOpen)}
           accessibility-element
           accessibility-traits="button"
@@ -783,15 +826,19 @@ export function SidebarProjectMore({
   onClick,
   ...props
 }: SidebarProjectMoreProps) {
+  const touch = useTouch();
   return (
     <view
       className={cn(
         "motion-colors relative flex size-4 flex-row items-center justify-center rounded-xs active:bg-overlay-ink-6",
+        // 16px is the smallest target in the library and the one place `hit-slop` provably
+        // does nothing on the Lynx web renderer, so the rung grows the box itself.
+        touch && "size-11",
         className,
       )}
       style={props.style}
       bindtap={onClick}
-      hit-slop="14px"
+      hit-slop={touch ? undefined : "14px"}
       accessibility-element
       accessibility-traits="button"
       accessibility-label={label}
@@ -819,12 +866,14 @@ export type SidebarAddButtonProps = ButtonProps & {
  */
 export function SidebarAddButton({ icon, className, children, onClick, ...props }: SidebarAddButtonProps) {
   const theme = useHoronTheme();
+  const touch = useTouch();
   const content = `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none"><rect width="100%" height="100%" rx="10" stroke="${theme.color("overlay-ink-20")}" stroke-width="2" stroke-dasharray="4 3"/></svg>`;
 
   return (
     <view
       className={cn(
         "motion-colors relative mt-2 flex h-9 w-full shrink-0 flex-row items-center justify-center gap-1.5 rounded-[10px] active:bg-overlay-ink-4",
+        touch && "h-11",
         className,
       )}
       style={props.style}

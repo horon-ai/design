@@ -12,6 +12,7 @@ import {
 import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 
 /** The open state {@link Dialog} publishes to the parts below it. */
@@ -210,6 +211,7 @@ export function DialogContent({
   style,
   children,
 }: DialogContentProps) {
+  const touch = useTouch();
   const { open, setOpen } = useContext(DialogContext);
   if (!open) return null;
 
@@ -257,9 +259,14 @@ export function DialogContent({
               </view>
               {closeLabel !== null && (
                 <view
-                  className="motion-press motion-colors relative -mr-2 -mt-1 flex size-8 shrink-0 items-center justify-center rounded-full text-text-secondary active:bg-overlay-ink-6"
+                  className={cn(
+                    "motion-press motion-colors relative -mr-2 -mt-1 flex size-8 shrink-0 items-center justify-center rounded-full text-text-secondary active:bg-overlay-ink-6",
+                    // The dismiss control is the one way out on a touch device; its 32px box
+                    // grows to 44 and the slop is dropped, since the box now does that work.
+                    touch && "size-11",
+                  )}
                   bindtap={() => setOpen(false)}
-                  hit-slop="6px"
+                  hit-slop={touch ? undefined : "6px"}
                   accessibility-element
                   accessibility-traits="button"
                   accessibility-label={closeLabel}
