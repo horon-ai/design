@@ -17,7 +17,8 @@ export type Device = {
 };
 
 const MOBILE_QUERY = "(max-width: 767px)";
-const COARSE_QUERY = "(pointer: coarse)";
+/** The `pointer: coarse` query that `useDevice` reports as `touch`; exported so a component can match the same breakpoint. */
+export const COARSE_QUERY = "(pointer: coarse)";
 const HINTS_QUERY = "(hover: hover) and (pointer: fine)";
 
 /**

@@ -262,7 +262,7 @@ export function DataTableFooter({ onAdd, addLabel = "Add row", hint, className }
       <button
         type="button"
         onClick={onAdd}
-        className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-label-md text-text-secondary motion-colors focus-visible:outline-2 focus-visible:outline-text-brand"
+        className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-label-md text-text-secondary pointer-coarse:min-h-11 motion-colors focus-visible:outline-2 focus-visible:outline-text-brand"
       >
         <Plus aria-hidden className="size-4" />
         {addLabel}
@@ -459,7 +459,7 @@ export function DataTableView<TData extends RowData>({
                     <button
                       type="button"
                       onClick={header.column.getToggleSortingHandler()}
-                      className="-mx-1 flex cursor-pointer items-center gap-2 rounded-xs px-1 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
+                      className="-mx-1 flex cursor-pointer items-center gap-2 rounded-xs px-1 pointer-coarse:min-h-11 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand"
                     >
                       {meta?.icon}
                       <table.FlexRender header={header} />

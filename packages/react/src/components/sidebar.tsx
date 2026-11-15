@@ -13,6 +13,8 @@ import {
 } from "react";
 
 import { cn } from "../lib/cn";
+import { COARSE_QUERY } from "../hooks/use-device";
+import { useMediaQuery } from "../hooks/use-media-query";
 import { LiquidGlass } from "./liquid-glass";
 
 /** A `div` prop set with an optional `className`, used by the parts that render a plain `div`. */
@@ -265,7 +267,7 @@ export function SidebarWorkspaceSwitch({ initial, name, className, ...props }: S
     <button
       type="button"
       className={cn(
-        "flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-md pr-1 pl-2 text-left motion-colors hover:bg-overlay-ink-6 data-popup-open:bg-overlay-ink-6",
+        "flex h-9 pointer-coarse:h-11 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-md pr-1 pl-2 text-left motion-colors hover:bg-overlay-ink-6 data-popup-open:bg-overlay-ink-6",
         "focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}
@@ -350,7 +352,7 @@ export type SidebarItemProps =
  */
 export function SidebarItem({ icon, count, attention, current, className, children, ...props }: SidebarItemProps) {
   const classes = cn(
-    "relative flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-label-md text-text-primary",
+    "relative flex h-8 pointer-coarse:h-11 w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-label-md text-text-primary",
     "motion-colors",
     current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-4",
     "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
@@ -435,7 +437,7 @@ export type SidebarGroupProps = {
 export function SidebarGroup({ label, defaultOpen = true, children, className }: SidebarGroupProps) {
   return (
     <Collapsible.Root defaultOpen={defaultOpen} className={cn("relative mt-3.5 flex flex-col gap-0.5", className)}>
-      <Collapsible.Trigger className="group flex h-7 w-fit cursor-pointer items-center gap-1 px-2.5 text-label-md text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand">
+      <Collapsible.Trigger className="group flex h-7 pointer-coarse:h-11 w-fit cursor-pointer items-center gap-1 px-2.5 text-label-md text-text-secondary motion-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand">
         {label}
         <CaretDown
           aria-hidden
@@ -449,10 +451,12 @@ export function SidebarGroup({ label, defaultOpen = true, children, className }:
 
 const ROW = 32;
 const GAP = 2;
+/** Row height when a coarse pointer forces every row to the 44px touch floor, matching `SidebarItem`. */
+const TOUCH_ROW = 44;
 
 /** Connector path of the Figma `Tree`: one 1.5px line with a 9px curve into the middle of each child row. */
-function branchesPath(count: number): string {
-  const centers = Array.from({ length: count }, (_, index) => ROW / 2 + index * (ROW + GAP));
+function branchesPath(count: number, row: number): string {
+  const centers = Array.from({ length: count }, (_, index) => row / 2 + index * (row + GAP));
   const last = centers.at(-1) ?? 0;
   const trunk = `M0.75 0V${last - 9}`;
   const branches = centers.map((center) => {
@@ -467,6 +471,8 @@ function branchesPath(count: number): string {
  *
  * Part of {@link Sidebar}. The connector is one SVG path computed from the child count, so it
  * assumes 32px rows with a 2px gap; pass the child rows directly rather than wrapping them.
+ * A coarse pointer grows the rows to 44px, and the path is recomputed at the same row height
+ * so the branches keep landing in the middle of each row.
  */
 // prettier-ignore
 export function SidebarTree({ children, className }: {
@@ -475,8 +481,10 @@ export function SidebarTree({ children, className }: {
   /** Classes merged onto the tree wrapper. */
   className?: string;
 }) {
+  const coarse = useMediaQuery(COARSE_QUERY);
   const count = Children.count(children);
-  const height = ROW / 2 + (count - 1) * (ROW + GAP) + 0.75;
+  const row = coarse ? TOUCH_ROW : ROW;
+  const height = row / 2 + (count - 1) * (row + GAP) + 0.75;
   return (
     <div className={cn("relative flex items-start pl-5 [&_[data-slot=icon]>svg]:size-4", className)}>
       <svg
@@ -487,7 +495,7 @@ export function SidebarTree({ children, className }: {
         fill="none"
         className="shrink-0 overflow-visible"
       >
-        <path d={branchesPath(count)} strokeWidth="1.5" className="stroke-overlay-ink-16" />
+        <path d={branchesPath(count, row)} strokeWidth="1.5" className="stroke-overlay-ink-16" />
       </svg>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">{children}</div>
     </div>
@@ -605,7 +613,7 @@ export function SidebarProject({
     <Collapsible.Root open={isOpen} onOpenChange={handleOpenChange} className={cn("flex flex-col gap-0.5", className)}>
       <div
         className={cn(
-          "group/project relative flex h-8 items-center rounded-md has-data-popup-open:bg-overlay-ink-6",
+          "group/project relative flex h-8 pointer-coarse:h-11 items-center rounded-md has-data-popup-open:bg-overlay-ink-6",
           "motion-colors",
           current ? "bg-overlay-ink-6" : "hover:bg-overlay-ink-4",
         )}
@@ -613,7 +621,7 @@ export function SidebarProject({
         <Collapsible.Trigger
           aria-current={current ? "page" : undefined}
           className={cn(
-            "group/trigger flex h-8 min-w-0 flex-1 cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-label-md text-text-primary",
+            "group/trigger flex h-8 pointer-coarse:h-11 min-w-0 flex-1 cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-left text-label-md text-text-primary",
             "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand",
           )}
         >
@@ -701,7 +709,7 @@ export function SidebarAddButton({ icon = addIcon, className, children, ...props
     <button
       type="button"
       className={cn(
-        "relative mt-2 flex h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-md text-label-md text-text-secondary motion-colors hover:bg-overlay-ink-4",
+        "relative mt-2 flex h-9 pointer-coarse:h-11 w-full cursor-pointer items-center justify-center gap-1.5 rounded-md text-label-md text-text-secondary motion-colors hover:bg-overlay-ink-4",
         "focus-visible:outline-2 focus-visible:outline-text-brand",
         className,
       )}

@@ -69,16 +69,18 @@ export type SegmentedControlProps = {
 
 const trackClass: Record<SegmentedControlSize, string> = {
   sm: "p-[3px]",
-  md: "h-9 p-[3px]",
-  lg: "h-11 p-1",
+  // The tray keeps its rung height on a fine pointer and hugs the grown segments on a coarse one;
+  // a fixed 36px box would clip them at the `overflow-y-clip` edge.
+  md: "h-9 pointer-coarse:h-auto p-[3px]",
+  lg: "h-11 pointer-coarse:h-auto p-1",
   tab: "gap-1 p-1",
 };
 
 const segmentClass: Record<SegmentedControlSize, string> = {
-  sm: "h-6.5 px-2.5 text-label-sm",
-  md: "h-7.5 px-4 text-label-md",
-  lg: "h-9 px-4 text-label-lg",
-  tab: "h-8 px-3.5 text-label-md",
+  sm: "h-6.5 pointer-coarse:h-11 px-2.5 text-label-sm",
+  md: "h-7.5 pointer-coarse:h-11 px-4 text-label-md",
+  lg: "h-9 pointer-coarse:h-11 px-4 text-label-lg",
+  tab: "h-8 pointer-coarse:h-11 px-3.5 text-label-md",
 };
 
 const surfaceClass: Record<SegmentedControlSurface, string> = {

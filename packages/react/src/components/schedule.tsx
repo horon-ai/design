@@ -53,8 +53,9 @@ export type PickerFieldProps = {
 
 /** The Figma widths (144/160/176px) are the maximum: the field shrinks with a narrow card instead of pushing past it. */
 const triggerSizeClass: Record<PickerFieldSize, string> = {
-  sm: "h-8 w-36 max-w-full gap-1.5 px-3",
-  md: "h-10 w-40 max-w-full gap-2 px-3.5",
+  // Every rung under 44px grows on a coarse pointer: 32px `sm` and 40px `md` both miss the touch floor.
+  sm: "h-8 pointer-coarse:h-11 w-36 max-w-full gap-1.5 px-3",
+  md: "h-10 pointer-coarse:h-11 w-40 max-w-full gap-2 px-3.5",
   lg: "h-12 w-44 max-w-full gap-2.5 px-5",
 };
 
@@ -85,8 +86,8 @@ const popupSizeClass: Record<PickerFieldSize, string> = {
 
 /** The same popup rows as `Select`, so the two pickers share one list style. */
 const itemSizeClass: Record<PickerFieldSize, string> = {
-  sm: "h-8 gap-2 px-2.5 text-label-sm",
-  md: "h-10 gap-2.5 px-3 text-label-md",
+  sm: "h-8 pointer-coarse:h-11 gap-2 px-2.5 text-label-sm",
+  md: "h-10 pointer-coarse:h-11 gap-2.5 px-3 text-label-md",
   lg: "h-12 gap-3 px-4 text-label-lg",
 };
 
@@ -239,8 +240,9 @@ const weekdayGroupSizeClass: Record<WeekdayPickerSize, string> = {
 
 /** The Figma day circle (32/36/44px) never shrinks; the group wraps instead, so the targets keep their size. */
 const weekdayToggleSizeClass: Record<WeekdayPickerSize, string> = {
-  sm: "size-8 text-label-sm",
-  md: "size-9 text-label-md",
+  // A circle is its own target, so on a coarse pointer the smaller two rungs take the 44px floor.
+  sm: "size-8 pointer-coarse:size-11 text-label-sm",
+  md: "size-9 pointer-coarse:size-11 text-label-md",
   lg: "size-11 text-label-lg",
 };
 

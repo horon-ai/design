@@ -69,7 +69,7 @@ export function Checkbox({ label, size = "md", className, ...props }: CheckboxPr
     >
       <BaseCheckbox.Root
         className={cn(
-          "flex shrink-0 items-center justify-center border-[1.5px] border-border-strong bg-bg-surface motion-colors",
+          "flex shrink-0 touch-slop items-center justify-center border-[1.5px] border-border-strong bg-bg-surface motion-colors",
           boxClass[size],
           "hover:not-data-disabled:border-text-secondary",
           "data-checked:border-interactive-primary data-checked:bg-interactive-primary data-indeterminate:border-interactive-primary data-indeterminate:bg-interactive-primary",

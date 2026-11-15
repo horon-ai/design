@@ -148,7 +148,7 @@ export function ModalContent({
             {closeLabel !== null && (
               <BaseDialog.Close
                 aria-label={closeLabel}
-                className="-mt-1 -mr-2 flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary motion-colors hover:bg-overlay-ink-6 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand [&_svg]:size-4"
+                className="-mt-1 -mr-2 flex size-8 pointer-coarse:size-11 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full text-text-secondary motion-colors hover:bg-overlay-ink-6 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-text-brand [&_svg]:size-4"
               >
                 <X />
               </BaseDialog.Close>

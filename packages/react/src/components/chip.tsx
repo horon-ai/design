@@ -72,6 +72,9 @@ export function Chip({ size = "md", className, children, onPressedChange, ...pro
     <Toggle
       className={cn(
         "group relative inline-flex shrink-0 motion-press cursor-pointer items-center justify-center rounded-full border whitespace-nowrap",
+        // Text-bearing, so on a coarse pointer the pill itself grows to the touch floor rather than
+        // hiding the reach in a pseudo-element a measurement cannot see.
+        "pointer-coarse:h-11",
         sizeClass[size],
         "border-border-default bg-bg-surface text-text-primary hover:not-data-disabled:bg-bg-subtle",
         "data-pressed:border-border-brand data-pressed:text-text-brand",

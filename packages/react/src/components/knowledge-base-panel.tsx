@@ -134,14 +134,14 @@ export function KnowledgeBasePanel({
           type="button"
           aria-label="Knowledge base settings"
           onClick={onSettings}
-          className="flex size-7.5 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
+          className="flex size-7.5 pointer-coarse:size-11 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-overlay-ink-6 text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand [&>svg]:size-4"
         >
           <SlidersHorizontal aria-hidden />
         </button>
         <button
           type="button"
           onClick={onAddSource}
-          className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-2.5 pl-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
         >
           <Plus aria-hidden className="size-3.5" />
           Add source

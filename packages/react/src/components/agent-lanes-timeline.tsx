@@ -218,7 +218,7 @@ export function AgentLanesTimeline({
           <button
             type="button"
             onClick={onRangeClick}
-            className="flex h-7.5 motion-press cursor-pointer items-center gap-1 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex h-7.5 pointer-coarse:h-11 motion-press cursor-pointer items-center gap-1 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
           >
             {range}
             <CaretDown aria-hidden className="size-3 text-text-secondary" />
@@ -371,14 +371,14 @@ export function AgentLanesTimeline({
             <button
               type="button"
               onClick={approval.onLater}
-              className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+              className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
             >
               Later
             </button>
             <button
               type="button"
               onClick={approval.onApprove}
-              className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center rounded-full bg-interactive-primary px-3 text-label-sm text-text-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+              className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center rounded-full bg-interactive-primary px-3 text-label-sm text-text-inverse focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
             >
               Approve
             </button>

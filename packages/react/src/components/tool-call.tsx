@@ -158,7 +158,7 @@ function Section({
             type="button"
             aria-label={copied ? "Copied" : `Copy ${label.toLowerCase()}`}
             onClick={() => copy(copyText)}
-            className="flex motion-press cursor-pointer items-center justify-center rounded-sm hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+            className="flex pointer-coarse:size-11 motion-press cursor-pointer items-center justify-center rounded-sm hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
           >
             {copied ? (
               <Check key="copied" aria-hidden className="size-3.5 animate-pop-in text-status-live" />
@@ -225,7 +225,7 @@ export function ToolCall({
         className,
       )}
     >
-      <Collapsible.Trigger className="group flex w-full cursor-pointer items-center gap-2.5 px-4 py-3.5 text-left motion-colors hover:bg-overlay-ink-3 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand">
+      <Collapsible.Trigger className="group flex w-full cursor-pointer items-center gap-2.5 px-4 py-3.5 text-left pointer-coarse:min-h-11 motion-colors hover:bg-overlay-ink-3 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-text-brand">
         <span className="flex max-w-full min-w-0 shrink items-center gap-1.5 rounded-full bg-overlay-ink-6 py-[3px] pr-2.5 pl-2 text-label-md text-text-primary [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-text-secondary">
           {tool.icon}
           <span className="min-w-0 truncate">{tool.name}</span>
@@ -257,7 +257,7 @@ export function ToolCall({
                 <button
                   type="button"
                   onClick={onRetry}
-                  className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full border border-border-default bg-bg-surface px-2.5 text-label-sm text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
+                  className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full border border-border-default bg-bg-surface px-2.5 text-label-sm text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-brand"
                 >
                   <ArrowClockwise aria-hidden className="size-3.5" />
                   Retry

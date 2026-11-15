@@ -166,7 +166,7 @@ export function ResearchRunPanel({
         <button
           type="button"
           onClick={onNewResearch}
-          className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-3 pl-3.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+          className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center gap-1.5 rounded-full bg-overlay-ink-6 pr-3 pl-3.5 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
         >
           {newLabel}
           <Plus aria-hidden className="size-3.5" />
@@ -184,7 +184,7 @@ export function ResearchRunPanel({
                 type="button"
                 onClick={onToggleStatus}
                 aria-live="polite"
-                className="flex w-full cursor-pointer flex-wrap items-center gap-x-1.5 gap-y-1 rounded-md text-left focus-visible:outline-2 focus-visible:outline-text-brand"
+                className="flex w-full cursor-pointer flex-wrap items-center gap-x-1.5 gap-y-1 rounded-md text-left pointer-coarse:min-h-11 focus-visible:outline-2 focus-visible:outline-text-brand"
               >
                 <Spinner size={14} />
                 <span className="min-w-0 text-label-md text-text-primary">{statusLabel}</span>
@@ -251,7 +251,7 @@ export function ResearchRunPanel({
               <button
                 type="button"
                 onClick={onOpenSources}
-                className="flex h-9 w-fit motion-press cursor-pointer items-center gap-2 rounded-full bg-overlay-ink-5 pr-3 pl-1 hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
+                className="flex h-9 pointer-coarse:h-11 w-fit motion-press cursor-pointer items-center gap-2 rounded-full bg-overlay-ink-5 pr-3 pl-1 hover:bg-overlay-ink-8 focus-visible:outline-2 focus-visible:outline-text-brand"
               >
                 {avatarStack}
                 <span className="text-label-md text-text-primary tabular-nums">{sourcesLabel}</span>
@@ -282,15 +282,15 @@ export function ResearchRunPanel({
             name="follow-up"
             aria-label={followUpPlaceholder}
             placeholder={followUpPlaceholder}
-            className="min-w-0 flex-1 bg-transparent text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
+            className="min-w-0 flex-1 bg-transparent text-body-sm text-text-primary outline-none pointer-coarse:h-full placeholder:text-text-secondary"
           />
           <button
             type={running ? "button" : "submit"}
             onClick={running ? onStop : undefined}
             aria-label={running ? "Stop" : "Send"}
-            className="flex size-8 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-primary text-text-inverse focus-visible:outline-2 focus-visible:outline-text-brand"
+            className="flex size-8 pointer-coarse:size-11 shrink-0 motion-press cursor-pointer items-center justify-center rounded-full bg-interactive-primary text-text-inverse focus-visible:outline-2 focus-visible:outline-text-brand"
           >
-            <span className="motion-swap size-8 place-items-center">
+            <span className="motion-swap size-8 pointer-coarse:size-11 place-items-center">
               <Stop aria-hidden weight="fill" data-hidden={!running || undefined} className="size-3.5" />
               <ArrowUp aria-hidden data-hidden={running || undefined} className="size-4" />
             </span>

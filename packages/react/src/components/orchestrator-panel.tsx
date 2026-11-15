@@ -140,7 +140,7 @@ export function OrchestratorPanel({
             <button
               type="button"
               onClick={onStop}
-              className="flex h-7.5 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
+              className="flex h-7.5 pointer-coarse:h-11 shrink-0 motion-press cursor-pointer items-center justify-center gap-1.5 rounded-full bg-overlay-ink-6 px-3 text-label-sm text-text-primary hover:bg-overlay-ink-10 focus-visible:outline-2 focus-visible:outline-text-brand"
             >
               <Stop aria-hidden className="size-3.5" />
               {stopLabel}

@@ -51,8 +51,8 @@ export function useInputGroup() {
 }
 
 const sizeClass: Record<InputGroupSize, string> = {
-  sm: "h-8",
-  md: "h-10",
+  sm: "h-8 pointer-coarse:h-11",
+  md: "h-10 pointer-coarse:h-11",
   lg: "h-12",
 };
 
