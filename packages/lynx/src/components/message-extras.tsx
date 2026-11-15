@@ -3,6 +3,7 @@ import type { CSSProperties } from "@lynx-js/types";
 
 import { useCopyToClipboard } from "../hooks/use-copy-to-clipboard";
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { IconButton } from "./icon-button";
 import { LiquidGlass } from "./liquid-glass";
@@ -86,6 +87,7 @@ export function MessageActions({
   /** Extra classes on the pill, merged after the built-in ones. */
   className?: string;
 }) {
+  const touch = useTouch();
   return (
     <view
       className={cn(
@@ -100,7 +102,10 @@ export function MessageActions({
       {actions.map((action) => (
         <view
           key={action.label}
-          className="motion-press motion-colors relative flex size-[30px] shrink-0 cursor-pointer flex-row items-center justify-center rounded-full text-text-secondary active:bg-overlay-ink-6"
+          className={cn(
+            "motion-press motion-colors relative flex size-[30px] shrink-0 cursor-pointer flex-row items-center justify-center rounded-full text-text-secondary active:bg-overlay-ink-6",
+            touch && "size-11",
+          )}
           bindtap={action.onClick}
           accessibility-element
           accessibility-traits="button"
@@ -222,6 +227,7 @@ export function CodeBlock({
   style,
 }: CodeBlockProps) {
   const { copied, copy } = useCopyToClipboard(1500);
+  const touch = useTouch();
   return (
     <view
       className={cn("flex flex-col overflow-hidden rounded-lg bg-surface-ink", className)}
@@ -233,7 +239,11 @@ export function CodeBlock({
           <text className="text-caption text-text-on-ink opacity-70">{language}</text>
         </view>
         <view
-          className="motion-press flex shrink-0 cursor-pointer flex-row items-center gap-1"
+          className={cn(
+            "motion-press flex shrink-0 cursor-pointer flex-row items-center gap-1",
+            // The control hugs a 14px glyph and a caption line, so the rung sets a height floor.
+            touch && "min-h-11",
+          )}
           bindtap={() => copy(code)}
           accessibility-element
           accessibility-traits="button"

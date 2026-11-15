@@ -1,6 +1,7 @@
 import type { ReactNode } from "@lynx-js/react";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { Spinner } from "./spinner";
 
@@ -95,6 +96,7 @@ export function PlanStep({
   last,
   className,
 }: PlanStepProps) {
+  const touch = useTouch();
   return (
     <view className={cn("flex min-w-0 flex-row items-stretch gap-3.5", className)}>
       <view className="flex shrink-0 flex-col items-center gap-1">
@@ -170,7 +172,10 @@ export function PlanStep({
             ) : null}
             {onRetry ? (
               <view
-                className="motion-press flex h-[30px] w-fit flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 px-3"
+                className={cn(
+                  "motion-press flex h-[30px] w-fit flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 px-3",
+                  touch && "h-11",
+                )}
                 bindtap={onRetry}
                 accessibility-element
                 accessibility-traits="button"

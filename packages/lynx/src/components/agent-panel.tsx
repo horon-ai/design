@@ -4,6 +4,7 @@ import type { CSSProperties } from "@lynx-js/types";
 
 import { useDevice } from "../hooks/use-device";
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { Kbd } from "./kbd";
 
@@ -119,10 +120,13 @@ export function ComposerChip({
   style,
   "aria-label": ariaLabel,
 }: ComposerChipProps) {
+  const touch = useTouch();
   return (
     <view
       className={cn(
         "motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-5 pl-2 pr-2.5",
+        // The composer chip is a 30px picker; only the box grows so the tile and label keep their size.
+        touch && "h-11",
         disabled ? "opacity-40" : "active:bg-overlay-ink-10",
         className,
       )}
@@ -214,6 +218,7 @@ export function TaskComposer({
   startLabel = "Start",
   className,
 }: TaskComposerProps) {
+  const touch = useTouch();
   const [valueState, setValueState] = useState("");
   const [focused, setFocused] = useState(false);
   const { keyboardHints } = useDevice();
@@ -267,7 +272,10 @@ export function TaskComposer({
         <view className="min-w-0 flex-1" />
         {keyboardHints ? <Kbd keys="Mod+Enter" /> : null}
         <view
-          className="motion-press flex h-[30px] shrink-0 flex-row items-center rounded-full bg-interactive-primary px-3.5 active:bg-interactive-primary-hover"
+          className={cn(
+            "motion-press flex h-[30px] shrink-0 flex-row items-center rounded-full bg-interactive-primary px-3.5 active:bg-interactive-primary-hover",
+            touch && "h-11",
+          )}
           bindtap={onStart}
           accessibility-element
           accessibility-traits="button"

@@ -1,6 +1,7 @@
 import { cloneElement, isValidElement, type ReactNode } from "@lynx-js/react";
 
 import { Icon, type IconProps } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { useMediaQuery } from "../hooks/use-media-query";
 
@@ -103,6 +104,7 @@ export function SourceRow({
   stages = defaultStages[status],
   className,
 }: SourceRowProps) {
+  const touch = useTouch();
   const wide = useMediaQuery("(min-width: 640px)");
 
   return (
@@ -179,7 +181,12 @@ export function SourceRow({
         ) : null}
         {status === "failed" ? (
           <view
-            className="motion-press flex h-[30px] flex-row items-center rounded-full bg-overlay-ink-6 px-3"
+            className={cn(
+              "motion-press flex h-[30px] flex-row items-center rounded-full bg-overlay-ink-6 px-3",
+              // The 30px trailing slot is left as it is, so the grown pill overhangs it into the
+              // row's padding instead of resizing the row.
+              touch && "h-11",
+            )}
             bindtap={onRetry}
             accessibility-element
             accessibility-traits="button"

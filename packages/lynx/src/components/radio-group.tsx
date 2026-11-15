@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
@@ -247,6 +248,7 @@ export function Radio({
   style,
   "aria-label": ariaLabel,
 }: RadioRootProps) {
+  const touch = useTouch();
   const groupSize = useContext(RadioSizeContext);
   const group = useContext(RadioGroupContext);
   const [own, setOwn] = useState(false);
@@ -268,6 +270,8 @@ export function Radio({
       className={cn(
         "inline-flex min-w-0 max-w-full flex-row items-center",
         labelClass[resolvedSize],
+        // As with `Checkbox`, the row is the target and the 16-24px mark keeps its paint.
+        touch && "min-h-11",
         dimmed && "opacity-40",
         className,
       )}

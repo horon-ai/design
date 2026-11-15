@@ -3,6 +3,7 @@ import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon, type IconProps } from "../icons";
 import { cn } from "../lib/cn";
+import { useTouch } from "../hooks/use-touch";
 import { LiquidGlass } from "./liquid-glass";
 
 /**
@@ -100,6 +101,18 @@ const sizeClass: Record<ButtonSize, string> = {
   lg: "h-12 gap-2 px-5 text-label-lg",
 };
 
+/**
+ * The height a control takes on a touch surface, keyed by its desktop rung. `lg` is
+ * already 48px and stays; everything shorter grows to the 44px minimum. The padding
+ * and label step of the desktop rung stay, so the control keeps its proportion and
+ * only its box grows.
+ */
+const touchHeight: Record<ButtonSize, string> = {
+  sm: "h-11",
+  md: "h-11",
+  lg: "h-12",
+};
+
 /** Lynx has no hover, so React's hover fill is dropped and only the pressed fill stays. */
 const variantClass: Record<ButtonVariant, string> = {
   primary: "bg-interactive-primary active:bg-interactive-primary-pressed",
@@ -181,6 +194,7 @@ export function Button({
   "aria-label": ariaLabel,
   "aria-current": ariaCurrent,
 }: ButtonProps) {
+  const touch = useTouch();
   const current = variant === "link" && (ariaCurrent === "page" || ariaCurrent === "true");
   const isPlain = typeof children === "string" || typeof children === "number";
   const hasElementChild = Children.toArray(children).some(
@@ -191,6 +205,9 @@ export function Button({
     "relative flex shrink-0 select-none flex-row items-center justify-center overflow-hidden whitespace-nowrap",
     variant === "link" ? "" : "motion-press rounded-full",
     variant === "link" ? "" : sizeClass[size],
+    // The touch rung replaces the height outright rather than adding a `min-h`:
+    // `cn` collapses the two, so the painted box is the one a finger lands on.
+    variant === "link" ? "" : touch && touchHeight[size],
     disabled ? "opacity-40" : "cursor-pointer",
     variantClass[variant],
     current && "text-text-primary",
@@ -200,7 +217,9 @@ export function Button({
   // React painted a 44px reach with an invisible `::after`; Lynx has no
   // pseudo-element, so the same reach is `hit-slop` and the box stays put:
   // sm 32px needs 6px a side, md 40px needs 2px, lg 48px already exceeds it.
-  const hitSlop = variant === "link" ? undefined : size === "sm" ? "6px" : size === "md" ? "2px" : undefined;
+  // The touch rung drops the skirt because the box itself is 44px, and Lynx's
+  // web renderer does not honour `hit-slop` in hit testing anyway.
+  const hitSlop = touch || variant === "link" ? undefined : size === "sm" ? "6px" : size === "md" ? "2px" : undefined;
 
   return (
     <view

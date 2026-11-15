@@ -6,3 +6,4 @@ export * from "./use-hotkey";
 export * from "./use-media-query";
 export * from "./use-platform";
 export * from "./use-reduced-motion";
+export * from "./use-touch";

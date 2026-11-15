@@ -2,6 +2,7 @@ import type { ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
 import { useCopyToClipboard } from "../hooks/use-copy-to-clipboard";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { useHoronTheme } from "../provider";
 
@@ -52,6 +53,7 @@ export type CodePanelProps = Omit<PortedElementProps["pre"], "className"> & {
  * ```
  */
 export function CodePanel({ className, copyText, children, style }: CodePanelProps) {
+  const touch = useTouch();
   const theme = useHoronTheme();
   const { copied, copy, supported } = useCopyToClipboard(1500);
   const showCopy = copyText !== undefined && supported;
@@ -71,7 +73,12 @@ export function CodePanel({ className, copyText, children, style }: CodePanelPro
       </scroll-view>
       {showCopy ? (
         <view
-          className="absolute right-2 top-2 flex flex-row rounded-sm bg-bg-surface px-2 py-1 active:opacity-70"
+          className={cn(
+            "absolute right-2 top-2 flex flex-row items-center rounded-sm bg-bg-surface px-2 py-1 active:opacity-70",
+            // The copy control sits inside the panel's top-right corner and hugs its word; the
+            // rung makes it a real target without moving the corner it is anchored to.
+            touch && "h-11 min-w-11 justify-center",
+          )}
           bindtap={() => copy(copyText)}
           accessibility-element
           accessibility-traits="button"

@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { SegmentedControl } from "./segmented-control";
 
@@ -113,6 +114,7 @@ export function ToolPermissions({
   id,
   style,
 }: ToolPermissionsProps) {
+  const touch = useTouch();
   const [inner, setInner] = useState<Record<string, ToolPermission>>(() =>
     Object.fromEntries(tools.map((tool) => [tool.name, tool.defaultValue ?? "ask"])),
   );
@@ -142,7 +144,11 @@ export function ToolPermissions({
         </view>
         <view className="min-w-0 flex-1" />
         <view
-          className="motion-colors shrink-0 rounded-sm active:opacity-70"
+          className={cn(
+            "motion-colors flex shrink-0 flex-row items-center rounded-sm active:opacity-70",
+            // The bulk action is a bare word; the rung gives it a box without moving its row.
+            touch && "min-h-11",
+          )}
           bindtap={() => update(Object.fromEntries(tools.map((tool) => [tool.name, "allow" as const])))}
           accessibility-element
           accessibility-traits="button"

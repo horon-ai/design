@@ -145,10 +145,16 @@ export const lynxThemingMessages = defineMessages({
     en: "reducedMotion defaults to false. Lynx cannot read prefers-reduced-motion, so the host decides and passes it. When true, .horon-reduced-motion lands on the root and every duration collapses to almost zero.",
   },
 
+  touchHeading: { ko: "touch", en: "touch" },
+  touchBody: {
+    ko: "touch의 기본값은 false입니다. 데스크톱 rung은 32/40/48px이라 눈으로는 보여도 손끝에는 좁습니다. true이면 눌리는 컨트롤의 상자가 44px 타깃으로 자라고 그려지는 모양은 그대로입니다. Lynx는 미디어 쿼리를 평가하지 않으므로 pointer: coarse 같은 자동 판별이 없고, 호스트가 입력 종류를 한 번 선언합니다. size·platform과 독립이라 platform=\"mobile\"이 타깃을 키우지는 않습니다.",
+    en: "touch defaults to false. The desktop rungs are 32/40/48px, visible but narrow for a fingertip. When true, a pressable control's box grows to a 44px target while the paint keeps its own size. Lynx evaluates no media queries, so there is no pointer: coarse switch; the host states the input kind once. It is independent of size and platform, so platform=\"mobile\" does not grow a target.",
+  },
+
   hookHeading: { ko: "useHoronTheme", en: "useHoronTheme" },
   hookBody: {
-    ko: "트리 아래 어디서든 useHoronTheme()이 지금 값을 돌려줍니다. scheme, platform, reducedMotion과 color(token) 네 가지입니다. color는 토큰 이름을 활성 스킴의 hex로 바꾸므로, CSS 클래스로 표현할 수 없는 Icon의 SVG fill이나 계산된 그라디언트에 씁니다.",
-    en: "Anywhere below the root, useHoronTheme() returns the current values: scheme, platform, reducedMotion and color(token). color resolves a token name to the hex of the active scheme, which serves what a CSS class cannot express, such as an Icon's SVG fill or a computed gradient.",
+    ko: "트리 아래 어디서든 useHoronTheme()이 지금 값을 돌려줍니다. scheme, platform, reducedMotion, touch와 color(token) 다섯 가지입니다. color는 토큰 이름을 활성 스킴의 hex로 바꾸므로, CSS 클래스로 표현할 수 없는 Icon의 SVG fill이나 계산된 그라디언트에 씁니다. 입력 종류만 필요하면 useTouch()가 touch 값 하나를 돌려줍니다.",
+    en: "Anywhere below the root, useHoronTheme() returns the current values: scheme, platform, reducedMotion, touch and color(token). color resolves a token name to the hex of the active scheme, which serves what a CSS class cannot express, such as an Icon's SVG fill or a computed gradient. When only the input kind matters, useTouch() returns that one flag.",
   },
   exampleHeading: { ko: "예", en: "Example" },
 });
@@ -371,7 +377,7 @@ export function App() {
 export function Check() {
   return <Button>Installed</Button>;
 }`,
-  provider: `<HoronProvider scheme="system" platform="mobile" reducedMotion={false}>
+  provider: `<HoronProvider scheme="system" platform="mobile" reducedMotion={false} touch>
   <Button onClick={() => console.log("tap")}>Continue</Button>
 </HoronProvider>`,
   themeHook: `import { HoronProvider, useHoronTheme } from "@horon-ai/lynx";

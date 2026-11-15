@@ -1,6 +1,7 @@
 import { cloneElement, isValidElement, type ReactNode } from "@lynx-js/react";
 
 import { Icon, type IconProps } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { LiquidGlass } from "./liquid-glass";
 
@@ -92,6 +93,7 @@ export function IntegrationRow({
   surface = "solid",
   className,
 }: IntegrationRowProps) {
+  const touch = useTouch();
   const isConnected = status === "connected";
 
   return (
@@ -134,6 +136,8 @@ export function IntegrationRow({
           <view
             className={cn(
               "motion-press flex h-[30px] flex-row items-center justify-center gap-1.5 rounded-full px-3",
+              // Only the pressable action grows; the connected label keeps the pill the design draws.
+              touch && "h-11",
               status === "reconnect" ? "bg-accent-red-500-14" : "bg-interactive-primary",
             )}
             bindtap={onAction}
