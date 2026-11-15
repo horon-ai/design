@@ -3,6 +3,7 @@ import { useState, type ReactNode } from "@lynx-js/react";
 import { useActiveIndicator } from "../hooks/use-active-indicator";
 import { useDevice } from "../hooks/use-device";
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { Kbd } from "./kbd";
 
@@ -64,6 +65,7 @@ type LynxKeyEvent = {
  * ```
  */
 export function PanelPillTabs({ items, value, defaultValue, onValueChange, className, ...props }: PanelPillTabsProps) {
+  const touch = useTouch();
   const [inner, setInner] = useState(defaultValue ?? items[0]?.value ?? "");
   const selected = value ?? inner;
   const activeIndex = items.findIndex((item) => item.value === selected);
@@ -111,6 +113,8 @@ export function PanelPillTabs({ items, value, defaultValue, onValueChange, class
             <view
               className={cn(
                 "motion-colors flex h-[30px] flex-row items-center whitespace-nowrap rounded-full px-3",
+                // The tray is padding-only, so growing the tab also grows the tray around it.
+                touch && "h-11",
                 active ? "text-text-primary" : "text-text-secondary active:text-text-primary",
               )}
               bindtap={() => select(item.value)}
@@ -307,6 +311,7 @@ export function BotInstructionsPanel({
   className,
   id,
 }: BotInstructionsPanelProps) {
+  const touch = useTouch();
   const [tab, setTab] = useState("instructions");
   const [scenario, setScenario] = useState(defaultScenario ?? scenarios?.[0]);
   const [runCount, setRunCount] = useState(0);
@@ -339,7 +344,10 @@ export function BotInstructionsPanel({
         {version ? (
           onVersionClick ? (
             <view
-              className="motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 active:bg-overlay-ink-10"
+              className={cn(
+                "motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 px-2.5 active:bg-overlay-ink-10",
+                touch && "h-11",
+              )}
               bindtap={onVersionClick}
               accessibility-element
               accessibility-traits="button"
@@ -359,7 +367,10 @@ export function BotInstructionsPanel({
         <view className="min-w-0 flex-1" />
         {onBotClick ? (
           <view
-            className="motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pl-1.5 pr-2.5 active:bg-overlay-ink-10"
+            className={cn(
+              "motion-press flex h-[30px] shrink-0 flex-row items-center gap-1.5 rounded-full bg-overlay-ink-6 pl-1.5 pr-2.5 active:bg-overlay-ink-10",
+              touch && "h-11",
+            )}
             bindtap={onBotClick}
             accessibility-element
             accessibility-traits="button"
@@ -485,7 +496,10 @@ export function BotInstructionsPanel({
               ) : null}
               <view className="min-w-0 flex-1" />
               <view
-                className="motion-press flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-interactive-primary pl-3.5 pr-3 active:bg-interactive-primary-hover"
+                className={cn(
+                  "motion-press flex h-[30px] shrink-0 flex-row items-center justify-center gap-1.5 rounded-full bg-interactive-primary pl-3.5 pr-3 active:bg-interactive-primary-hover",
+                  touch && "h-11",
+                )}
                 bindtap={() => {
                   setRunCount((count) => count + 1);
                   onRun?.(scenario);

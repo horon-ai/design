@@ -1,6 +1,7 @@
 import type { ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { Icon } from "../icons";
 import { LiquidGlass } from "./liquid-glass";
@@ -122,17 +123,19 @@ export function NewMessagesPill({
   style,
   children,
 }: ButtonProps & { children?: ReactNode }) {
+  const touch = useTouch();
   return (
     <view
       className={cn(
         controlBase,
         surfaceClass[surface],
         "h-10 shrink-0 gap-1.5 pl-3.5 pr-4",
+        touch && "h-11",
         disabled ? "opacity-40" : "",
         className,
       )}
       style={style}
-      hit-slop="2px"
+      hit-slop={touch ? undefined : "2px"}
       bindtap={disabled ? undefined : onClick}
       accessibility-element
       accessibility-traits={disabled ? "disabled" : "button"}
@@ -204,6 +207,7 @@ export function VoiceInput({
   surface = "solid",
   className,
 }: VoiceInputProps) {
+  const touch = useTouch();
   const heights = levels ? levels.map((level) => Math.max(4, Math.round(level * 28))) : WAVEFORM;
   const bars = heights.map((height, position) => ({ height, id: `bar-${position}` }));
   return (
@@ -216,8 +220,11 @@ export function VoiceInput({
     >
       {surface === "glass" && <LiquidGlass />}
       <view
-        className="motion-press relative flex size-9 shrink-0 cursor-pointer flex-row items-center justify-center rounded-full bg-interactive-danger"
-        hit-slop="2px"
+        className={cn(
+          "motion-press relative flex size-9 shrink-0 cursor-pointer flex-row items-center justify-center rounded-full bg-interactive-danger",
+          touch && "size-11",
+        )}
+        hit-slop={touch ? undefined : "2px"}
         bindtap={onStop}
         accessibility-element
         accessibility-traits="button"

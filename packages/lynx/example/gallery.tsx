@@ -55,13 +55,16 @@ export function Gallery() {
   const host = useMemo(readHostProps, []);
   const [scheme, setScheme] = useState<ColorScheme>(host.scheme === "dark" ? "dark" : "light");
   const [platform, setPlatform] = useState<ThemePlatform>(isPlatform(host.platform) ? host.platform : nativeBoard());
+  // Off by default so the gallery shows the desktop rungs the design draws; the pill
+  // below flips the same flag a phone host passes once.
+  const [touch, setTouch] = useState(false);
   const [selected, setSelected] = useState(host.demo);
 
   const entry = registry.find((item) => item.slug === selected);
   const Demo = entry?.Demo;
 
   return (
-    <HoronProvider scheme={scheme} platform={platform}>
+    <HoronProvider scheme={scheme} platform={platform} touch={touch}>
       <view className="flex h-full w-full flex-col">
         <view className="flex flex-row items-center justify-between border-b border-border-default px-4 py-3">
           <text className="text-title-sm text-text-primary">Horon Lynx</text>
@@ -71,6 +74,7 @@ export function Gallery() {
               onTap={() => setScheme(scheme === "dark" ? "light" : "dark")}
             />
             <Pill label={platform} onTap={() => setPlatform(platform === "mobile" ? "desktop" : "mobile")} />
+            <Pill label={touch ? "touch 44" : "touch off"} onTap={() => setTouch(!touch)} />
           </view>
         </view>
 

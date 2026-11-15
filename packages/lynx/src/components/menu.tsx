@@ -5,6 +5,7 @@ import type { CSSProperties } from "@lynx-js/types";
 import type { LayoutChangeLike } from "../hooks";
 import { readViewport } from "../lib/media";
 import { cn } from "../lib/cn";
+import { useTouch } from "../hooks/use-touch";
 
 /** Props of {@link Menu}: the open state Base UI's `Menu.Root` owns. */
 type MenuProps = {
@@ -423,6 +424,7 @@ export function MenuItem({
   id,
   children,
 }: MenuItemProps) {
+  const touch = useTouch();
   const surface = useContext(SurfaceContext);
   const { setOpen } = useMenuContext("MenuItem");
 
@@ -432,6 +434,9 @@ export function MenuItem({
         "motion-colors relative flex w-full flex-row items-center gap-2.5 active:bg-overlay-ink-6",
         surface === "glass" ? "rounded-md px-3" : "rounded-[10px] px-2.5",
         description ? "h-12" : surface === "glass" ? "h-10" : "h-9",
+        // A menu row is the one control a thumb picks blind, so the touch rung
+        // grows every row to 44px; `lg`'s 48px description row already clears it.
+        touch && (description ? "h-12" : "h-11"),
         selected && "bg-bg-brand active:bg-bg-brand",
         disabled && "opacity-40",
         className,

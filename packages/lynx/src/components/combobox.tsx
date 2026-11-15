@@ -3,6 +3,7 @@ import type { CSSProperties } from "@lynx-js/types";
 import type { NodesRef } from "@lynx-js/types/background";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { readViewport } from "../lib/media";
 import type { ControlSize } from "../lib/size";
@@ -97,6 +98,16 @@ const itemClass: Record<ComboboxSize, string> = {
   lg: "h-12 gap-3 px-4",
 };
 
+/**
+ * A popup row is picked by thumb: `sm` and `md` grow to 44px, `lg` keeps its 48px.
+ * The row's padding and gap are unchanged, so only the height moves.
+ */
+const touchRowClass: Record<ComboboxSize, string> = {
+  sm: "h-11",
+  md: "h-11",
+  lg: "h-12",
+};
+
 const itemTextClass: Record<ComboboxSize, string> = {
   sm: "text-label-sm",
   md: "text-label-md",
@@ -129,6 +140,24 @@ const multiFieldClass: Record<ComboboxSize, string> = {
   sm: "min-h-8 flex-wrap gap-1 px-2 py-1",
   md: "min-h-10 flex-wrap gap-1.5 px-2.5 py-1.5",
   lg: "min-h-12 flex-wrap gap-2 px-3 py-2",
+};
+
+/**
+ * The trigger's height on a touch surface. `sm` and `md` grow to 44px; `lg` is
+ * already 48. The field rung also drives `Input`, which is not a press target, so
+ * this stays beside `Combobox` and is not written into `fieldSizeClass`.
+ */
+const touchTriggerClass: Record<ComboboxSize, string> = {
+  sm: "h-11",
+  md: "h-11",
+  lg: "h-12",
+};
+
+/** A multi-select field wraps its chips, so its minimum grows instead of a fixed height that would clip them. */
+const touchMultiFieldClass: Record<ComboboxSize, string> = {
+  sm: "min-h-11",
+  md: "min-h-11",
+  lg: "min-h-12",
 };
 
 /** The popup follows the field's surface (a segment takes its group's): glass is the veil, every solid kind is solid. */
@@ -241,6 +270,7 @@ export function Combobox(props: ComboboxProps) {
     className,
     "aria-label": ariaLabel,
   } = props;
+  const touch = useTouch();
   const group = useInputGroup();
   const segment = variant === "segment";
   const size = segment && group ? group.size : ownSize;
@@ -383,6 +413,7 @@ export function Combobox(props: ComboboxProps) {
                       className={cn(
                         "motion-colors relative flex flex-row items-center rounded-md",
                         itemClass[size],
+                        touch && touchRowClass[size],
                         item.disabled ? "opacity-40" : "active:bg-overlay-ink-6",
                         selected && "bg-overlay-ink-6",
                       )}
@@ -466,6 +497,8 @@ export function Combobox(props: ComboboxProps) {
         fieldBoxClass.base,
         fieldBoxClass[surface],
         props.multiple ? multiFieldClass[size] : fieldSizeClass[size],
+        // The field is the press target itself, so the touch rung is the only thing that can grow it.
+        touch && (props.multiple ? touchMultiFieldClass[size] : touchTriggerClass[size]),
         "w-60 max-w-full",
         props.multiple && "cursor-text",
         invalid && "border-border-danger",

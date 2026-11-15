@@ -4,6 +4,7 @@ import type { CSSProperties } from "@lynx-js/types";
 import { Icon } from "../icons";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
+import { useTouch } from "../hooks/use-touch";
 
 /** Height and label rung of {@link Chip}; identical to {@link ControlSize} (`sm` 28px, `md` 32px, `lg` 36px). */
 export type ChipSize = ControlSize;
@@ -100,6 +101,7 @@ export function Chip({
   id,
   style,
 }: ChipProps) {
+  const touch = useTouch();
   // The exit animation only plays after the first toggle, so a chip that mounts unpressed never flashes the check.
   const [toggled, setToggled] = useState(false);
   const [own, setOwn] = useState(defaultPressed);
@@ -125,6 +127,9 @@ export function Chip({
       className={cn(
         "motion-press relative flex shrink-0 flex-row items-center justify-center whitespace-nowrap rounded-full border",
         sizeClass[size],
+        // Every chip rung is under 44px, so the touch surface grows them all; the
+        // label step and padding stay, so the chip keeps its shape.
+        touch && "h-11",
         disabled ? "opacity-40" : "cursor-pointer",
         "border-border-default bg-bg-surface",
         isPressed ? "border-border-brand" : "",

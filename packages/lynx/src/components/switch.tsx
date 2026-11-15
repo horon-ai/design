@@ -3,6 +3,7 @@ import type { CSSProperties } from "@lynx-js/types";
 
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
+import { useTouch } from "../hooks/use-touch";
 
 /** Shared control rungs plus `compact`, the 40x24 Paper bot-memory switch that keeps its own rung. */
 export type SwitchSize = ControlSize | "compact";
@@ -131,6 +132,7 @@ export function Switch({
   style,
   "aria-label": ariaLabel,
 }: SwitchRootProps) {
+  const touch = useTouch();
   const [own, setOwn] = useState(defaultChecked);
   const isChecked = checked ?? own;
   const blocked = disabled || readOnly;
@@ -170,9 +172,16 @@ export function Switch({
   // Without a label the switch is the whole control; with one, the row takes the tap and
   // carries the dim and the accessibility state so the text is a target too.
   if (!label) {
+    // A thumb hits a box, not a pill: the touch rung makes the press surface 44 square
+    // and lets the track keep the 32-52 x 20-30 pill it paints. Without the rung the
+    // track itself stays the control, exactly as before, so desktop is unchanged.
     return (
       <view
-        className={cn(trackClassList, disabled && "opacity-40", className)}
+        className={cn(
+          touch ? "flex h-11 min-w-11 flex-row items-center justify-center" : trackClassList,
+          disabled && "opacity-40",
+          className,
+        )}
         bindtap={toggle}
         accessibility-element
         accessibility-traits={disabled ? "disabled" : "button"}
@@ -182,7 +191,7 @@ export function Switch({
         style={style}
         {...(id === undefined ? {} : { id })}
       >
-        {thumb}
+        {touch ? <view className={trackClassList}>{thumb}</view> : thumb}
       </view>
     );
   }
@@ -192,6 +201,9 @@ export function Switch({
       className={cn(
         "inline-flex min-w-0 max-w-full flex-row items-center",
         labelClass[size],
+        // The labelled row already owns the tap; the rung only raises its height so
+        // the text beside the track is a 44px-high target as well.
+        touch && "min-h-11",
         disabled && "opacity-40",
         className,
       )}

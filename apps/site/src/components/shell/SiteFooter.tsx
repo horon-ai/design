@@ -53,6 +53,9 @@ export interface SiteFooterProps {
   year: number;
 }
 
+/** Public terms live with the code, so the footer points at the repository copy. */
+const LICENSE_HREF = "https://github.com/horon-ai/design/blob/main/LICENSE";
+
 /**
  * Site footer: the website's footer band. The band paints `bg-bg-subtle` with a
  * top border, the wordmark is set at `h-8`, the brand line is the brand link,
@@ -122,6 +125,15 @@ export function SiteFooter({ year }: SiteFooterProps) {
           <p className="font-mono text-caption tracking-[0.04em] text-text-secondary">
             <LocalizedText entry={m.footerAvailability} />
           </p>
+          <Button
+            variant="link"
+            href={LICENSE_HREF}
+            target="_blank"
+            rel="noreferrer"
+            className="w-fit px-0 font-mono text-caption tracking-[0.04em] text-text-secondary hover:text-text-primary"
+          >
+            <LocalizedText entry={m.footerLicense} />
+          </Button>
         </div>
       </div>
     </footer>

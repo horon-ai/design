@@ -12,6 +12,7 @@ import {
 import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 
 /**
@@ -224,6 +225,7 @@ export function ModalContent({
   style,
   children,
 }: ModalContentProps) {
+  const touch = useTouch();
   const { open, setOpen } = useContext(ModalContext);
   if (!open) return null;
 
@@ -266,9 +268,14 @@ export function ModalContent({
           </view>
           {closeLabel !== null && (
             <view
-              className="motion-press motion-colors -mr-2 -mt-1 flex size-8 shrink-0 items-center justify-center rounded-full text-text-secondary active:bg-overlay-ink-6"
+              className={cn(
+                "motion-press motion-colors -mr-2 -mt-1 flex size-8 shrink-0 items-center justify-center rounded-full text-text-secondary active:bg-overlay-ink-6",
+                // Same dismiss control as `DialogContent`: 32px becomes a 44px box on touch
+                // and the slop, which Lynx's web renderer ignores anyway, is dropped.
+                touch && "size-11",
+              )}
               bindtap={() => setOpen(false)}
-              hit-slop="6px"
+              hit-slop={touch ? undefined : "6px"}
               accessibility-element
               accessibility-traits="button"
               accessibility-label={closeLabel}

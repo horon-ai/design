@@ -12,6 +12,9 @@ const read = (path: string) => Bun.file(`${repo}/${path}`).text();
 
 const PUBLISHED = ["packages/react", "packages/lynx", "packages/tokens"];
 
+/** Unpublished (path-only) packages still carry the terms next to their code. */
+const UNPUBLISHED = ["packages/flutter"];
+
 /** Packages that vendor or bundle third-party artwork, so they ship its notice. */
 const WITH_NOTICES = ["packages/react", "packages/lynx"];
 
@@ -37,6 +40,12 @@ describe("license", () => {
 
       expect(manifest.license).toBe("SEE LICENSE IN LICENSE");
       expect(manifest.files).toContain("LICENSE");
+    });
+  }
+
+  for (const dir of UNPUBLISHED) {
+    test(`${dir} ships the same LICENSE`, async () => {
+      expect(await read(`${dir}/LICENSE`)).toBe(rootLicense);
     });
   }
 

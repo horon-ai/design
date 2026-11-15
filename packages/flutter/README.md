@@ -292,3 +292,7 @@ flutter test
 bun test scripts/generate-tokens.test.mjs
 node scripts/integrate.mjs --check
 ```
+
+## 라이선스
+
+[PolyForm Strict License 1.0.0](https://polyformproject.org/licenses/strict/1.0.0)입니다. 비상업적 목적의 사용만 허용하고 수정·재배포·상업적 이용은 금지합니다. 전문은 패키지에 동봉된 `LICENSE`에 있습니다. 이 패키지는 `publish_to: none`이라 pub.dev에 올라가지 않으며, 저장소 안에서 경로로 가져다 쓸 때도 같은 조건이 적용됩니다.

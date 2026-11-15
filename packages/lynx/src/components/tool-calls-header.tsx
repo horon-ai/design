@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "@lynx-js/react";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 
 /**
@@ -67,6 +68,7 @@ export function ToolCallsHeader({
   onOpenChange,
   className,
 }: ToolCallsHeaderProps) {
+  const touch = useTouch();
   const [innerOpen, setInnerOpen] = useState(defaultOpen);
   const controlled = openProp !== undefined;
   const open = controlled ? openProp : innerOpen;
@@ -93,7 +95,12 @@ export function ToolCallsHeader({
       )}
     >
       <view
-        className="flex w-full min-w-0 flex-row items-center gap-2.5 pb-1"
+        className={cn(
+          "flex w-full min-w-0 flex-row items-center gap-2.5 pb-1",
+          // The row's height is its 28px chips plus padding, so the rung sets a floor rather
+          // than a height and the chips keep their size.
+          touch && "min-h-11",
+        )}
         bindtap={toggle}
         accessibility-element
         accessibility-traits="button"

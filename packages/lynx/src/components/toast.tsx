@@ -1,6 +1,7 @@
 import { useCallback, useSyncExternalStore, type ReactNode } from "@lynx-js/react";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import type { ControlSize } from "../lib/size";
 
@@ -154,6 +155,7 @@ const toneIcon = (tone: ToastTone, size: number) => {
 
 /** Renders the live toast queue; each card stacks upward in the viewport. */
 function ToastList({ size, surface }: { size: ToastSize; surface: "solid" | "glass" }) {
+  const touch = useTouch();
   const queue = useSyncExternalStore(subscribe, getSnapshot, getSnapshot).slice(-MAX_VISIBLE);
 
   return (
@@ -177,9 +179,14 @@ function ToastList({ size, surface }: { size: ToastSize; surface: "solid" | "gla
               ) : null}
             </view>
             <view
-              className="motion-press motion-colors relative flex shrink-0 items-center justify-center active:opacity-70"
+              className={cn(
+                "motion-press motion-colors relative flex shrink-0 items-center justify-center active:opacity-70",
+                // The close control hugged its 16px glyph, so the box is set outright under the
+                // rung rather than grown from a size it never had.
+                touch && "size-11",
+              )}
               bindtap={() => closeToast(toast.id)}
-              hit-slop="6px"
+              hit-slop={touch ? undefined : "6px"}
               accessibility-element
               accessibility-traits="button"
               accessibility-label="Close"

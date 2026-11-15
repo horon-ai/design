@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "@lynx-js/react";
 import type { CSSProperties } from "@lynx-js/types";
 
 import type { LayoutChangeLike } from "../hooks";
+import { useTouch } from "../hooks/use-touch";
 import { Icon } from "../icons";
 import { cn } from "../lib/cn";
 import { readViewport } from "../lib/media";
@@ -165,6 +166,27 @@ const rowClass: Record<SelectSize, string> = {
   lg: "flex h-12 flex-row items-center gap-3 rounded-md px-4",
 };
 
+/**
+ * The trigger's height on a touch surface. `sm` and `md` grow to 44px; `lg` is
+ * already 48. The field rung also drives `Input`, which is not a press target, so
+ * this stays beside `Select` and is not written into `fieldSizeClass`.
+ */
+const touchTriggerClass: Record<SelectSize, string> = {
+  sm: "h-11",
+  md: "h-11",
+  lg: "h-12",
+};
+
+/**
+ * A popup row is a menu row picked by thumb: `sm` and `md` grow to 44px, `lg`
+ * keeps its 48px. Rows carry no fixed padding dependence, so the height alone moves.
+ */
+const touchRowClass: Record<SelectSize, string> = {
+  sm: "h-11",
+  md: "h-11",
+  lg: "h-12",
+};
+
 /** The row label's own text rung; Lynx text does not inherit the row's. */
 const rowTextClass: Record<SelectSize, string> = {
   sm: "text-label-sm",
@@ -295,6 +317,7 @@ export function Select({
   required: _required,
   id,
 }: SelectProps) {
+  const touch = useTouch();
   const group = useInputGroup();
   const segment = variant === "segment";
   const field = variant === "field";
@@ -356,6 +379,7 @@ export function Select({
                 fieldBoxClass.base,
                 fieldBoxClass[surface],
                 fieldSizeClass[size],
+                touch && touchTriggerClass[size],
                 "w-60 max-w-full",
                 surface !== "glass" && triggerFocusClass,
                 // React's field box repainted its fill and border for `data-disabled`; Lynx has no such
@@ -367,6 +391,9 @@ export function Select({
               ? cn(inputGroupSegmentClass[size], "flex-row text-left")
               : cn(
                   "relative flex h-8 flex-row items-center gap-1 rounded-full bg-bg-subtle px-3",
+                  // The bare trigger is a fixed 32px pill and is its own tap target, so
+                  // the touch rung is the only thing that can grow it.
+                  touch && touchTriggerClass[size],
                   !disabled && "active:bg-overlay-ink-8",
                 ),
           "motion-colors",
@@ -448,6 +475,7 @@ export function Select({
                   key={item.value}
                   className={cn(
                     rowClass[size],
+                    touch && touchRowClass[size],
                     "motion-colors",
                     item.disabled ? "opacity-40" : "active:bg-overlay-ink-6",
                     selected && !item.disabled && "bg-overlay-ink-6",

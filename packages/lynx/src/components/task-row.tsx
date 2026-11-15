@@ -1,6 +1,7 @@
 import type { ReactNode } from "@lynx-js/react";
 
 import { Icon } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { Spinner } from "./spinner";
 
@@ -131,6 +132,7 @@ export function TaskRow({
   variant = "card",
   className,
 }: TaskRowProps) {
+  const touch = useTouch();
   return (
     <view
       className={cn(
@@ -238,7 +240,7 @@ export function TaskRow({
         <view className="min-w-0 grow" />
         {status === "running" ? (
           <view
-            className={cn(pill, "bg-overlay-ink-6")}
+            className={cn(pill, touch && "h-11", "bg-overlay-ink-6")}
             style={popIn}
             bindtap={onCancel}
             accessibility-element
@@ -250,7 +252,7 @@ export function TaskRow({
         ) : null}
         {status === "failed" ? (
           <view
-            className={cn(pill, "bg-overlay-ink-6")}
+            className={cn(pill, touch && "h-11", "bg-overlay-ink-6")}
             style={popIn}
             bindtap={onRetry}
             accessibility-element
@@ -262,7 +264,7 @@ export function TaskRow({
         ) : null}
         {status === "review" ? (
           <view
-            className={cn(pill, "bg-interactive-primary")}
+            className={cn(pill, touch && "h-11", "bg-interactive-primary")}
             style={popIn}
             bindtap={onReview}
             accessibility-element
@@ -273,7 +275,10 @@ export function TaskRow({
         ) : null}
         {status === "review" || status === "done" ? (
           <view
-            className="motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full"
+            className={cn(
+              "motion-press flex size-[30px] shrink-0 flex-row items-center justify-center rounded-full",
+              touch && "size-11",
+            )}
             style={popIn}
             bindtap={onArchive}
             accessibility-element

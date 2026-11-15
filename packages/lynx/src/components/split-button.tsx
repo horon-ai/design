@@ -2,6 +2,7 @@ import { Children, cloneElement, isValidElement, useState, type ReactNode } from
 import type { CSSProperties } from "@lynx-js/types";
 
 import { Icon, type IconProps } from "../icons";
+import { useTouch } from "../hooks/use-touch";
 import { cn } from "../lib/cn";
 import { Menu, MenuContent, MenuTrigger } from "./menu";
 
@@ -102,6 +103,7 @@ export function SplitButton({
   id,
   "aria-label": ariaLabel,
 }: SplitButtonProps) {
+  const touch = useTouch();
   const [open, setOpen] = useState(false);
   const isPlain = typeof children === "string" || typeof children === "number";
   const hasElementChild = Children.toArray(children).some(
@@ -112,6 +114,9 @@ export function SplitButton({
     <view
       className={cn(
         "relative flex h-8 shrink-0 flex-row items-center rounded-full bg-interactive-primary text-interactive-on-primary",
+        // Both halves are `h-full` of this pill, so the pill itself is what has to grow; the fill and
+        // the rounding belong to the container, not to a half.
+        touch && "h-11",
         // The press and the disabled dim belong to the pill, not to one half: the fill is the container's,
         // so shrinking a half alone moves the label inside a fixed pill.
         disabled ? "opacity-40" : "motion-press",

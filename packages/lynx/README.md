@@ -38,7 +38,7 @@ import { HoronProvider, Button, Card } from "@horon-ai/lynx";
 
 function App() {
   return (
-    <HoronProvider scheme="dark" platform="mobile">
+    <HoronProvider scheme="dark" platform="mobile" touch>
       <Card>
         <Button onClick={() => console.log("tap")}>Continue</Button>
       </Card>
@@ -49,6 +49,16 @@ function App() {
 root.render(<App />);
 ```
 
+### `touch`: 손가락용 44px 타깃
+
+데스크톱 rung은 `sm` 32px, `md` 40px, `lg` 48px입니다. 눈으로는 보이지만 손끝으로는 좁습니다. `touch`를 켜면 눌리는 컨트롤이 44px 타깃으로 자라고, 그려지는 모양은 그대로입니다(32px 원반은 32px로 보이고, 그 둘레의 상자만 44px이 됩니다).
+
+```tsx
+<HoronProvider touch>{/* 폰·태블릿 화면 */}</HoronProvider>
+```
+
+Lynx는 미디어 쿼리를 평가하지 않으므로 `pointer: coarse` 같은 자동 판별이 없습니다. 호스트가 입력 종류를 한 번 선언하면 `useTouch()`가 그 값을 읽어 `Button`, `IconButton`, `MenuItem`, `Chip`, `TabsTab`, `SegmentedControl`, `Switch`, `Select`, `FilterBar`, `TabBar`, 사이드바 행 등이 같은 rung으로 자랍니다. `touch`는 `size`·`platform`과 독립입니다. `platform="mobile"`은 모바일 웹 타이포그래피를 고르는 값이고 타깃 크기와는 무관합니다.
+
 ## 구성
 
 | 경로 | 내용 |
@@ -56,7 +66,7 @@ root.render(<App />);
 | `src/components/<slug>.tsx` | 컴포넌트 84개. `@horon-ai/react`와 같은 슬러그·이름 |
 | `src/index.ts` | 배럴. `scripts/integrate.ts`가 생성 |
 | `src/provider.tsx` | `HoronProvider`, `useHoronTheme`, 테마 값 |
-| `src/hooks` | react 훅의 Lynx 대체 8종 |
+| `src/hooks` | react 훅의 Lynx 대체 9종 (`useTouch` 포함) |
 | `src/icons` | phosphor 아이콘을 `<svg content>` 문자열로 생성한 글리프 |
 | `src/styles/tokens.css` | 토큰 CSS 변수. `scripts/generate-tokens.ts`가 생성 |
 | `tailwind-preset.cjs` | 토큰 클래스 프리셋. 같은 스크립트가 생성 |
