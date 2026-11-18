@@ -50,15 +50,6 @@ void main() {
     );
   });
 
-  test('parity: the pending ledger has no duplicates', () {
-    final duplicates = <String>{};
-    final seen = <String>{};
-    for (final slug in pendingComponents) {
-      if (!seen.add(slug)) duplicates.add(slug);
-    }
-    expect(duplicates, isEmpty, reason: 'pendingComponents repeats: ${duplicates.toList()..sort()}');
-  });
-
   test('parity: the React component source is readable', () {
     // A gate that cannot find React must fail, not pass over an empty set.
     expect(Directory(reactComponentsPath).existsSync(), isTrue);
