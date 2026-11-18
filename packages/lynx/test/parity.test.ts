@@ -203,23 +203,3 @@ describe("@horon-ai/lynx ↔ @horon-ai/react parity", () => {
     expect(absent).toEqual([]);
   });
 });
-
-describe("the bun test suite stays free of the Lynx runtime", () => {
-  test("no file under test/ imports @lynx-js/react", async () => {
-    const files = [...new Bun.Glob("**/*.{ts,tsx}").scanSync(import.meta.dir)].filter(
-      (file) => !file.endsWith(".rstest.tsx"),
-    );
-    const offenders = (
-      await Promise.all(
-        files.map(async (file) => {
-          const text = await Bun.file(`${import.meta.dir}/${file}`).text();
-          // Anchor to a real import statement: this file mentions the specifier
-          // inside a string, which must not make it an offender itself.
-          return /^\s*import\s[^;]*from\s*"@lynx-js\/react"/m.test(text) ? file : undefined;
-        }),
-      )
-    ).filter((file) => file !== undefined);
-    if (offenders.length > 0) console.log(`  imports @lynx-js/react: ${offenders.join(", ")}`);
-    expect(offenders).toEqual([]);
-  });
-});

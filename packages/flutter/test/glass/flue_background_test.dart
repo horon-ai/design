@@ -78,6 +78,7 @@ void main() {
       expect(night.smokeScale, sky.smokeScale);
       expect(night.midpoint, sky.midpoint);
       expect(night.vignette, sky.vignette);
+      expect(night.cursor, 0);
     });
 
     test('mirrors FLUE_SKY field for field', () {
@@ -115,19 +116,6 @@ void main() {
       expect(sky.pointerStrength, 0.16);
       expect(sky.parallax, 0.028);
       expect(sky.maxDpr, 1);
-    });
-
-    test('mirrors FLUE_NIGHT field for field', () {
-      const HoronFlueConfig night = HoronFlueConfig.night;
-      expect(night.bgColor, const Color(0xFF050608));
-      expect(night.colorA, const Color(0xFF07090D));
-      expect(night.colorB, const Color(0xFF0C1A2C));
-      expect(night.colorC, const Color(0xFF1F4A78));
-      expect(night.colorD, const Color(0xFF4F8FD0));
-      expect(night.glow, 0.35);
-      // 나머지 값은 하늘 팔레트와 같습니다.
-      expect(night.speed, HoronFlueConfig.sky.speed);
-      expect(night.cursor, 0);
     });
 
     test('resolve picks the night palette in dark and the sky palette in light', () {

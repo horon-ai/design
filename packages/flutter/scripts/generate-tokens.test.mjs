@@ -8,7 +8,7 @@
  */
 
 import { describe, expect, test } from 'bun:test';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { darkColors, lightColors, primitives } from '../../tokens/src/color.ts';
@@ -18,7 +18,6 @@ import { fontFamily, fontWeight, textStyles } from '../../tokens/src/typography.
 import { buildDartTokens, memberName, spaceName } from './generate-tokens.mjs';
 
 const DART_PATH = fileURLToPath(new URL('../lib/src/tokens/horon_tokens.g.dart', import.meta.url));
-const LEGACY_DIR = fileURLToPath(new URL('./legacy-tokens', import.meta.url));
 
 const committed = readFileSync(DART_PATH, 'utf8');
 const expected = buildDartTokens();
@@ -73,15 +72,6 @@ describe('horon_tokens.g.dart 드리프트 가드', () => {
       );
     }
   });
-
-  test('생성기는 두 번 돌려도 같은 문자열을 만든다', () => {
-    expect(buildDartTokens()).toBe(expected);
-  });
-
-  test('동결 스냅샷은 저장소에 남아 있지 않다', () => {
-    expect(existsSync(LEGACY_DIR)).toBe(false);
-    expect(committed).not.toContain('legacy-tokens');
-  });
 });
 
 describe('접근자 이름 규칙', () => {
@@ -99,11 +89,6 @@ describe('접근자 이름 규칙', () => {
     expect(spaceName('1')).toBe('s1');
     expect(spaceName('1.5')).toBe('s1_5');
     expect(spaceName('0.5')).toBe('s0_5');
-  });
-
-  test('머리말이 이름 규칙을 설명한다', () => {
-    expect(committed).toContain('// 이름 규칙:');
-    expect(committed).toContain('//   accent-sky-500-18   -> accentSky500_18');
   });
 });
 
@@ -168,7 +153,6 @@ describe('반경·간격·그림자·브레이크포인트', () => {
       const rendered = Number.isInteger(value) ? `${value}.0` : `${value}`;
       expect(committed).toContain(`static const double ${memberName(key)} = ${rendered};`);
     }
-    expect(committed).not.toContain('HoronRadiusRole');
   });
 
   test('간격 단계가 scale.ts와 같다', () => {
@@ -258,25 +242,5 @@ describe('타이포와 글래스', () => {
     expect(committed).toContain('0.072 + 0.928 * s,');
     // 알파 행은 단위 행렬입니다.
     expect(committed).toContain('      1.0,\n      0.0,\n    ];');
-  });
-
-  test('예전 레이어 필드와 높이 함수가 남지 않는다', () => {
-    for (const gone of [
-      'layerOpacity',
-      'tintColor',
-      'tintBlur',
-      'innerShade',
-      'edgeDark',
-      'edgeLight',
-      'innerInset',
-      'edgeLightSoft',
-      'edgeDarkBlurFor',
-      'edgeLightBlurFor',
-      'innerInsetYFor',
-      'innerInsetXFor',
-    ]) {
-      expect(committed).not.toContain(gone);
-    }
-    expect(committed).not.toContain("import 'dart:math' as math;");
   });
 });

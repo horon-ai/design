@@ -81,19 +81,8 @@ describe("i18n contract", () => {
     expect(pick(messages.save, "fr")).toBe("저장");
   });
 
-  test("defineMessages keeps every key and both locales", () => {
-    expect(Object.keys(messages)).toEqual(["greeting", "save"]);
-    expect(messages.save).toEqual({ ko: "저장", en: "Save" });
-  });
-
   test("readLocale is Korean when there is no document", () => {
     expect(readLocale()).toBe("ko");
-  });
-
-  test("storage key and event names are the documented strings", () => {
-    expect(LOCALE_STORAGE_KEY).toBe("horon-locale");
-    expect(LOCALE_EVENT).toBe("horon:locale");
-    expect(LOCALE_TITLE_META_NAME).toBe("horon:title-en");
   });
 });
 

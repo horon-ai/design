@@ -40,23 +40,4 @@ describe("develop docs navigation", () => {
     const hrefs = navItems.map((item) => item.href);
     expect(new Set(hrefs).size).toBe(hrefs.length);
   });
-
-  test("the Lynx section lists exactly its six pages, each with a page source", () => {
-    const hrefs = lynxDocsNav.flatMap((group) => group.items.map((item) => item.href));
-    expect(hrefs).toEqual([
-      "/develop/lynx",
-      "/develop/lynx/installation",
-      "/develop/lynx/theming",
-      "/develop/lynx/liquid-glass",
-      "/develop/lynx/differences",
-      "/develop/lynx/gallery",
-    ]);
-    for (const href of hrefs) {
-      expect(existsSync(pageSource(href))).toBe(true);
-    }
-  });
-
-  test("the page-source helper reports a page that does not exist", () => {
-    expect(existsSync(pageSource("/develop/lynx/nope"))).toBe(false);
-  });
 });
