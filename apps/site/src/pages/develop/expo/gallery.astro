@@ -1,0 +1,35 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { expoBreadcrumb } from "@/data/nav";
+import { expoGalleryMessages as m, expoSnippets as s } from "@/i18n/messages/develop-expo";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={expoBreadcrumb(m.title, "/develop/expo/gallery")}
+>
+  <h2><T m={m.runHeading} /></h2>
+  <p><T m={m.runBody} /></p>
+  <CodeBlock code={s.galleryRun} lang="bash" title="terminal" />
+
+  <h2><T m={m.switchHeading} /></h2>
+  <p><T m={m.switchBody} /></p>
+
+  <h2><T m={m.linkHeading} /></h2>
+  <p><T m={m.linkBody} /></p>
+  <CodeBlock code={s.galleryLink} lang="bash" title="deep link" />
+
+  <h2><T m={m.testHeading} /></h2>
+  <p><T m={m.testBody} /></p>
+  <CodeBlock code={s.galleryCommands} lang="bash" title="terminal" />
+
+  <h2><T m={m.parityHeading} /></h2>
+  <p><T m={m.parityBody} /></p>
+
+  <h2><T m={m.generatedHeading} /></h2>
+  <p><T m={m.generatedBody} /></p>
+</DocsLayout>

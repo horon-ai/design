@@ -113,7 +113,7 @@ Lynx에는 DOM이 없고, 일부 CSS·API도 없습니다. 컴포넌트의 이�
 - 파일마다 값 export 이름과 `export type` 이름이 같아야 합니다.
 - `export type X = "a" | "b"` 형태의 문자열 유니언은 리터럴 집합이 같아야 합니다.
 
-`bun test packages/lynx/test/props-parity.test.ts`는 TypeScript 검사기로 컴포넌트마다 prop을 비교합니다(`bun packages/lynx/test/props-parity.ts`로 실행하면 차이 목록만 출력합니다).
+`bun test packages/lynx/test/props-parity.test.ts`는 TypeScript 검사기로 컴포넌트마다 prop을 비교합니다. 비교 코드는 Expo 포트와 함께 쓰는 저장소 루트의 `test/props-parity.ts`이고, `bun test/props-parity.ts lynx`로 실행하면 차이 목록만 출력합니다.
 
 - React가 직접 선언한 prop은 Lynx에도 같은 이름, 같은 필수 여부, 같은 문자열 리터럴 집합, 같은 기본값(`@default` 태그나 구조 분해 기본값)으로 있어야 합니다.
 - React가 Base UI에서 물려받은 prop은 같은 이름, 필수 여부, 리터럴 집합으로 있어야 합니다. 기본값은 Base UI d.ts가 정하므로 비교하지 않습니다.

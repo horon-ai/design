@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Progress`, written against
- * `packages/react/src/components/progress.tsx` and
- * `packages/flutter/lib/src/components/progress.dart`.
+ * `packages/react/src/components/progress.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

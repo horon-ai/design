@@ -1,0 +1,87 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { expoBreadcrumb } from "@/data/nav";
+import { expoThemingMessages as m, expoSnippets as snippets } from "@/i18n/messages/develop-expo";
+import type { Localized } from "@/i18n";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+
+/* One row per provider prop, in the order the provider declares them. A
+ * literal default is set in code type; a default that reads as prose is not. */
+const props: { name: string; fallback: string | Localized; meaning: Localized }[] = [
+  { name: "scheme", fallback: '"system"', meaning: m.rowSchemeMeaning },
+  { name: "platform", fallback: '"mobile"', meaning: m.rowPlatformMeaning },
+  { name: "reducedMotion", fallback: m.rowMotionDefault, meaning: m.rowMotionMeaning },
+  { name: "touch", fallback: "true", meaning: m.rowTouchMeaning },
+  { name: "glass", fallback: '"auto"', meaning: m.rowGlassMeaning },
+  { name: "haptics", fallback: "true", meaning: m.rowHapticsMeaning },
+  { name: "fonts", fallback: m.rowFontsDefault, meaning: m.rowFontsMeaning },
+];
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={expoBreadcrumb(m.title, "/develop/expo/theming")}
+>
+  <h2><T m={m.providerHeading} /></h2>
+  <p><T m={m.providerBody} /></p>
+  <CodeBlock code={snippets.provider} lang="tsx" title="app.tsx" />
+
+  <h2><T m={m.propsHeading} /></h2>
+  <div class="not-prose overflow-x-auto">
+    <table class="w-full border-collapse text-left text-body-sm">
+      <thead>
+        <tr class="border-b border-border-default text-text-primary">
+          <th class="py-2 pr-4 font-medium whitespace-nowrap"><T m={m.columnProp} /></th>
+          <th class="py-2 pr-4 font-medium whitespace-nowrap"><T m={m.columnDefault} /></th>
+          <th class="py-2 font-medium"><T m={m.columnMeaning} /></th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          props.map((prop) => (
+            <tr class="border-b border-border-default align-top last:border-b-0">
+              <td class="py-3 pr-4 whitespace-nowrap text-text-primary">
+                <code>{prop.name}</code>
+              </td>
+              <td class="py-3 pr-4 whitespace-nowrap">
+                {typeof prop.fallback === "string" ? <code>{prop.fallback}</code> : <T m={prop.fallback} />}
+              </td>
+              <td class="py-3">
+                <T m={prop.meaning} />
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2><T m={m.schemeHeading} /></h2>
+  <p><T m={m.schemeBody} /></p>
+
+  <h2><T m={m.platformHeading} /></h2>
+  <p><T m={m.platformBody} /></p>
+
+  <h2><T m={m.motionHeading} /></h2>
+  <p><T m={m.motionBody} /></p>
+
+  <h2><T m={m.touchHeading} /></h2>
+  <p><T m={m.touchBody} /></p>
+
+  <h2><T m={m.glassHeading} /></h2>
+  <p><T m={m.glassBody} /></p>
+
+  <h2><T m={m.fontsHeading} /></h2>
+  <p><T m={m.fontsBody} /></p>
+
+  <h2><T m={m.hapticsHeading} /></h2>
+  <p><T m={m.hapticsBody} /></p>
+
+  <h2><T m={m.hookHeading} /></h2>
+  <p><T m={m.hookBody} /></p>
+  <h3><T m={m.exampleHeading} /></h3>
+  <CodeBlock code={snippets.themeHook} lang="tsx" title="status.tsx" />
+</DocsLayout>

@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Textarea`, written against
- * `packages/react/src/components/textarea.tsx` and
- * `packages/flutter/lib/src/components/textarea.dart`.
+ * `packages/react/src/components/textarea.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

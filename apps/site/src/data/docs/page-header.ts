@@ -1,7 +1,6 @@
 /**
  * Reference doc for `PageHeader`, written against
- * `packages/react/src/components/page-header.tsx` and
- * `packages/flutter/lib/src/components/page_header.dart`.
+ * `packages/react/src/components/page-header.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

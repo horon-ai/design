@@ -1,8 +1,7 @@
 /**
  * Reference doc for the four pieces exported from `schedule`: `ScheduleCard`,
  * `ScheduleSection`, `PickerField` and `WeekdayPicker`. Written against
- * `packages/react/src/components/schedule.tsx` and
- * `packages/flutter/lib/src/components/schedule.dart`.
+ * `packages/react/src/components/schedule.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

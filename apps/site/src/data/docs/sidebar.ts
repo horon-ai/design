@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Sidebar`, written against
- * `packages/react/src/components/sidebar.tsx` and
- * `packages/flutter/lib/src/components/sidebar.dart`.
+ * `packages/react/src/components/sidebar.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -1,7 +1,6 @@
 /**
  * Reference doc for `FilterBar`, written against
- * `packages/react/src/components/filter-bar.tsx` and
- * `packages/flutter/lib/src/components/filter_bar.dart`.
+ * `packages/react/src/components/filter-bar.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

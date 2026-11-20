@@ -1,7 +1,6 @@
 /**
  * Reference doc for `SegmentedControl`, written against
- * `packages/react/src/components/segmented-control.tsx` and
- * `packages/flutter/lib/src/components/segmented_control.dart`.
+ * `packages/react/src/components/segmented-control.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

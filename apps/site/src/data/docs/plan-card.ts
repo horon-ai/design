@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Plan Card`, written against
- * `packages/react/src/components/plan-card.tsx` and
- * `packages/flutter/lib/src/components/plan_card.dart`.
+ * `packages/react/src/components/plan-card.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

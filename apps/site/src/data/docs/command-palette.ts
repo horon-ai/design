@@ -1,7 +1,6 @@
 /**
  * Reference doc for `CommandPalette`, written against
- * `packages/react/src/components/command-palette.tsx` and
- * `packages/flutter/lib/src/components/command_palette.dart`.
+ * `packages/react/src/components/command-palette.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

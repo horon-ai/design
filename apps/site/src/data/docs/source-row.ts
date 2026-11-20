@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Source Row`, written against
- * `packages/react/src/components/source-row.tsx` and
- * `packages/flutter/lib/src/components/source_row.dart`.
+ * `packages/react/src/components/source-row.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

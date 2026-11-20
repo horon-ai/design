@@ -1,0 +1,67 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { expoBreadcrumb } from "@/data/nav";
+import { expoSafeAreaMessages as m, expoSnippets as s } from "@/i18n/messages/develop-expo";
+import type { Localized } from "@/i18n";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+
+/* API names read the same in both locales; the two overlay rows differ. */
+const both = (name: string): Localized => ({ ko: name, en: name });
+
+/* One row per edge-owning component; a component lists the edges it pads. */
+const edges: { name: Localized; edge: Localized }[] = [
+  { name: both("TopBar"), edge: m.rowTopBar },
+  { name: both("TabBar"), edge: m.rowTabBar },
+  { name: both("BottomSheet"), edge: m.rowBottomSheet },
+  { name: both("Toaster"), edge: m.rowToaster },
+  { name: both("Sidebar"), edge: m.rowSidebar },
+  { name: m.rowOverlaysComponent, edge: m.rowOverlays },
+];
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={expoBreadcrumb(m.title, "/develop/expo/safe-areas")}
+>
+  <h2><T m={m.insetsHeading} /></h2>
+  <p><T m={m.insetsBody} /></p>
+
+  <h2><T m={m.edgesHeading} /></h2>
+  <div class="not-prose overflow-x-auto">
+    <table class="w-full border-collapse text-left text-body-sm">
+      <thead>
+        <tr class="border-b border-border-default text-text-primary">
+          <th class="py-2 pr-4 font-medium whitespace-nowrap"><T m={m.columnComponent} /></th>
+          <th class="py-2 font-medium"><T m={m.columnEdge} /></th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          edges.map((row) => (
+            <tr class="border-b border-border-default align-top last:border-b-0">
+              <td class="py-3 pr-4 whitespace-nowrap text-text-primary">
+                <T m={row.name} />
+              </td>
+              <td class="py-3">
+                <T m={row.edge} />
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2><T m={m.providerHeading} /></h2>
+  <p><T m={m.providerBody} /></p>
+
+  <h2><T m={m.fallbackHeading} /></h2>
+  <p><T m={m.fallbackBody} /></p>
+
+  <h2><T m={m.ownHeading} /></h2>
+  <p><T m={m.ownBody} /></p>
+  <CodeBlock code={s.insets} lang="tsx" title="screen.tsx" />
+</DocsLayout>

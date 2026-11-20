@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Checkbox`, written against
- * `packages/react/src/components/checkbox.tsx` and
- * `packages/flutter/lib/src/components/checkbox.dart`.
+ * `packages/react/src/components/checkbox.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

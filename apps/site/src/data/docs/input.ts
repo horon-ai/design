@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Input`, written against
- * `packages/react/src/components/input.tsx` and
- * `packages/flutter/lib/src/components/input.dart`.
+ * `packages/react/src/components/input.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

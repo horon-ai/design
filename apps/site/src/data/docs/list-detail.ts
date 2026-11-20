@@ -1,7 +1,6 @@
 /**
  * Reference doc for `ListDetail` and its parts, written against
- * `packages/react/src/components/list-detail.tsx` and
- * `packages/flutter/lib/src/components/list_detail.dart`.
+ * `packages/react/src/components/list-detail.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

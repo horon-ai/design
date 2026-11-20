@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Task Row`, written against
- * `packages/react/src/components/task-row.tsx` and
- * `packages/flutter/lib/src/components/task_row.dart`.
+ * `packages/react/src/components/task-row.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

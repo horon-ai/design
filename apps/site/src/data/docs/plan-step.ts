@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Plan Step`, written against
- * `packages/react/src/components/plan-step.tsx` and
- * `packages/flutter/lib/src/components/plan_step.dart`.
+ * `packages/react/src/components/plan-step.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

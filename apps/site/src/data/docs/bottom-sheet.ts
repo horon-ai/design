@@ -1,7 +1,6 @@
 /**
  * Reference doc for `BottomSheet`, written against
- * `packages/react/src/components/bottom-sheet.tsx` and
- * `packages/flutter/lib/src/components/bottom_sheet.dart`.
+ * `packages/react/src/components/bottom-sheet.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

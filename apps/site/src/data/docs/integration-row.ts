@@ -1,7 +1,6 @@
 /**
  * Reference doc for `IntegrationRow`, written against
- * `packages/react/src/components/integration-row.tsx` and
- * `packages/flutter/lib/src/components/integration_row.dart`.
+ * `packages/react/src/components/integration-row.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

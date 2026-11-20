@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Tooltip`, written against
- * `packages/react/src/components/tooltip.tsx` and
- * `packages/flutter/lib/src/components/tooltip.dart`.
+ * `packages/react/src/components/tooltip.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

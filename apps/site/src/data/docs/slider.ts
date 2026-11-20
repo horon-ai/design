@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Slider`, written against
- * `packages/react/src/components/slider.tsx` and
- * `packages/flutter/lib/src/components/slider.dart`.
+ * `packages/react/src/components/slider.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

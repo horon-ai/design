@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Spinner`, written against
- * `packages/react/src/components/spinner.tsx` and
- * `packages/flutter/lib/src/components/spinner.dart`.
+ * `packages/react/src/components/spinner.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -1,7 +1,6 @@
 /**
  * Reference doc for `RadioGroup` and `Radio`, written against
- * `packages/react/src/components/radio-group.tsx` and
- * `packages/flutter/lib/src/components/radio_group.dart`.
+ * `packages/react/src/components/radio-group.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

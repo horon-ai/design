@@ -2,26 +2,29 @@
 
 horon의 디자인 시스템입니다. 색·간격·글자·모션·표면 값을 토큰 한 곳에서 정의하고, 웹 컴포넌트와 문서 사이트가 그 값을 그대로 소비합니다. 그래서 컴포넌트와 문서의 색·간격·타이포가 어긋나지 않습니다.
 
-토큰 정본은 `@horon-ai/tokens` 하나이고, 값은 Figma `Horon` 파일(Components `54:81`, Typography `26:2`)에서 읽었습니다. 색(잉크·종이·하늘), 유리 표면, 글자, 반경, 그림자가 여기서 나옵니다. 컴포넌트는 `@horon-ai/react` 하나이고, Base UI(`@base-ui/react`)와 Tailwind CSS v4 위에 올라갑니다. shadcn/ui는 쓰지 않습니다.
+토큰 정본은 `@horon-ai/tokens` 하나이고, 값은 Figma `Horon` 파일(Components `54:81`, Typography `26:2`)에서 읽었습니다. 색(잉크·종이·하늘), 유리 표면, 글자, 반경, 그림자가 여기서 나옵니다. 웹 컴포넌트는 `@horon-ai/react`이고, Base UI(`@base-ui/react`)와 Tailwind CSS v4 위에 올라갑니다. shadcn/ui는 쓰지 않습니다. 같은 84개 컴포넌트를 ReactLynx로 옮긴 `@horon-ai/lynx`와 React Native(Expo)로 옮긴 `@horon-ai/expo`가 함께 있습니다.
 
 ## 무엇을 제공하나
 
 - **토큰**: 라이트·다크 시맨틱 색, 유리 레이어, 13개 글자 스타일(Web·Desktop·Mobile), 반경·그림자, 생성된 `theme.css`
 - **웹 컴포넌트**: import하면 바로 쓰는 React 컴포넌트. 단일 진입점과 하위 경로 진입점을 함께 제공
+- **앱 컴포넌트**: 같은 이름·variant·토큰의 Lynx(`@horon-ai/lynx`)와 Expo(`@horon-ai/expo`) 포트
 - **문서 사이트**: design.horon.ai. 컴포넌트 목록과 라이브 프리뷰
 
 ## 구조
 
 ```
 apps/
-  site/         @horon/site        문서 사이트 — design.horon.ai (Astro + React)
+  site/          @horon/site          문서 사이트 — design.horon.ai (Astro + React)
+  expo-gallery/  @horon/expo-gallery  Expo 갤러리 앱 (Expo Go·iOS 시뮬레이터에서 실행)
 packages/
-  tokens/       @horon-ai/tokens   디자인 토큰 단일 소스 (+ 생성된 theme.css)
-  react/        @horon-ai/react    웹 컴포넌트 — Base UI + Tailwind v4
-  flutter/      horon_ui           Flutter 컴포넌트 + example 갤러리 앱
+  tokens/        @horon-ai/tokens     디자인 토큰 단일 소스 (+ 생성된 theme.css)
+  react/         @horon-ai/react      웹 컴포넌트 — Base UI + Tailwind v4
+  lynx/          @horon-ai/lynx       ReactLynx 컴포넌트 + example 갤러리
+  expo/          @horon-ai/expo       React Native(Expo SDK 58) 컴포넌트
 ```
 
-컴포넌트 레이어는 웹의 `@horon-ai/react`, Lynx 앱의 `@horon-ai/lynx`, Flutter `horon_ui` 셋이고, 셋은 같은 토큰 정본을 읽습니다. 새 `mobile` 앱은 Lynx로 바뀌어 `@horon-ai/lynx`를 쓰고, `horon_ui`를 쓰던 옛 Flutter 앱은 `horon-ai/mobile-archive`로 보관했습니다. site가 `@horon-ai/react`를 소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. `packages/flutter`는 Dart 패키지라 `package.json`이 없어 bun 워크스페이스 밖에 있고, `dart`·`flutter` 명령으로 검사합니다. `packages/lynx`는 `@horon-ai/react`의 84개 컴포넌트를 ReactLynx로 옮긴 포트로, `test/parity.test.ts`가 두 패키지의 슬러그·export 이름·variant 리터럴을 대조합니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다.
+컴포넌트 레이어는 웹의 `@horon-ai/react`, Lynx 앱의 `@horon-ai/lynx`, Expo 앱의 `@horon-ai/expo` 셋이고, 셋은 같은 토큰 정본을 읽습니다. 새 `mobile` 앱은 Lynx로 바뀌어 `@horon-ai/lynx`를 씁니다. site가 `@horon-ai/react`를 소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. `packages/lynx`와 `packages/expo`는 `@horon-ai/react`의 84개 컴포넌트를 옮긴 포트이고, 각 패키지의 `test/parity.test.ts`와 `test/props-parity.test.ts`가 react와 슬러그·export 이름·variant 리터럴·prop을 대조합니다. Expo 포트는 유리 표면을 `expo-glass-effect`로, 안전 영역을 `react-native-safe-area-context`로 그립니다(`packages/expo/README.md`). 예전 Flutter 패키지(`horon_ui`)는 삭제했습니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다.
 
 ```tsx
 import { Button, Card, Input } from "@horon-ai/react";
@@ -74,21 +77,23 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 
 ## 패키지 게시 (npm)
 
-라이브러리 세 패키지(`@horon-ai/tokens`, `@horon-ai/react`, `@horon-ai/lynx`)는 `publishConfig.access`가
-`public`입니다. 앱(`@horon/site`)과 저장소 루트는 `private: true`라 게시 대상이 아닙니다.
+라이브러리 네 패키지(`@horon-ai/tokens`, `@horon-ai/react`, `@horon-ai/lynx`, `@horon-ai/expo`)는
+`publishConfig.access`가 `public`입니다. 앱(`@horon/site`, `@horon/expo-gallery`)과 저장소 루트는
+`private: true`라 게시 대상이 아닙니다.
 
-세 패키지는 같은 버전으로 움직이고, 버전은 npm 레지스트리가 정본입니다. `main`에 세 패키지의
-변경(`packages/tokens/**`, `packages/react/**`, `packages/lynx/**`, `bun.lock`)이 올라오면
-`.github/workflows/publish.yml`이 PATCH만 하나 올려 `tokens` → `react` → `lynx` 순서로 게시합니다.
-`react`와 `lynx`가 같은 버전의 `@horon-ai/tokens`를 의존하기 때문에 `tokens`가 먼저입니다.
+네 패키지는 같은 버전으로 움직이고, 버전은 npm 레지스트리가 정본입니다. `main`에 네 패키지의
+변경(`packages/tokens/**`, `packages/react/**`, `packages/lynx/**`, `packages/expo/**`, `bun.lock`)이
+올라오면 `.github/workflows/publish.yml`이 PATCH만 하나 올려 `tokens` → `react` → `lynx` → `expo`
+순서로 게시합니다. 나머지 셋이 같은 버전의 `@horon-ai/tokens`를 의존하기 때문에 `tokens`가 먼저입니다.
 
 - 첫 게시는 `0.1.0`, 그 뒤로 `0.1.1`, `0.1.2` … 순서입니다.
 - `package.json`의 `version`(`0.1.0`)은 MAJOR·MINOR 라인만 정합니다. CI가 작업 공간에서만
   버전을 바꿔 게시하고 저장소에 다시 커밋하지 않으므로 손으로 올리지 않습니다.
 - npm의 라인과 `package.json`의 라인이 다르면(MAJOR·MINOR 변경) 게시하지 않고 실패합니다.
 - 직전 실행이 일부 패키지만 올리고 실패했다면(예: `tokens`만 올리고 `react`에서 실패) 빠진 패키지만
-  같은 버전으로 채웁니다. `@horon-ai/lynx`는 `0.1.2`부터 게시돼 그 앞 버전이 없지만, 다음 게시는
-  세 패키지 모두 같은 다음 PATCH로 올라갑니다.
+  같은 버전으로 채웁니다. 정식 버전이 아직 없는 새 패키지는 빠진 패키지로 세지 않고, 다음 게시에서
+  다른 패키지와 같은 다음 PATCH로 처음 올라갑니다(`@horon-ai/lynx`는 `0.1.2`, `@horon-ai/expo`는
+  추가된 뒤 첫 게시 버전부터 있습니다).
 - 게시 전에 lint·typecheck·test·build를 다시 돌리고, 게시한 커밋에 `v0.1.N` 태그를 남깁니다.
   provenance(실행한 워크플로와 커밋이 npm 패키지 페이지에 표시됨)가 붙습니다.
 - 게시가 끝나면 `web`, `admin` 저장소의 Renovate가 새 버전을 찾아 각 저장소의 `dev`로
@@ -101,24 +106,41 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 node .github/scripts/release-version.mjs   # 마지막 줄이 다음 게시 버전, 파일은 바꾸지 않음
 ```
 
-`@horon-ai/react`와 `@horon-ai/lynx`의 `@horon-ai/tokens` 의존은 저장소에서 `workspace:*`로 두고,
-게시할 때 버전 스크립트가 같은 버전으로 고정합니다. 그래서 이 줄을 손으로 고치지 않습니다.
+`@horon-ai/react`, `@horon-ai/lynx`, `@horon-ai/expo`의 `@horon-ai/tokens` 의존은 저장소에서 `workspace:*`로
+두고, 게시할 때 버전 스크립트가 같은 버전으로 고정합니다. 그래서 이 줄을 손으로 고치지 않습니다.
 
-`@horon-ai/lynx`는 빌드 산출물 없이 TypeScript 소스를 그대로 게시합니다. 패키지에는 `files`의
-`src`, `README.md`, `tailwind-preset.cjs`, `tailwind-preset.d.cts`만 들어가고, `exports`는
-`.`(`src/index.ts`), `./components/*`, `./tokens.css`, `./globals.css`, `./tailwind-preset`을 엽니다.
+`@horon-ai/lynx`와 `@horon-ai/expo`는 빌드 산출물 없이 TypeScript 소스를 그대로 게시합니다. lynx
+패키지에는 `files`의 `src`, `README.md`, `tailwind-preset.cjs`, `tailwind-preset.d.cts`만 들어가고,
+`exports`는 `.`(`src/index.ts`), `./components/*`, `./tokens.css`, `./globals.css`, `./tailwind-preset`을
+엽니다. expo 패키지에는 `src`, `README.md`, `LICENSE`, `THIRD_PARTY_NOTICES.md`만 들어가고, `exports`는
+`.`(`src/index.ts`)와 `./components/*`를 엽니다. 테스트(`test/`), jest 설정, 갤러리 앱은 들어가지 않습니다.
 게시 전에 내용을 보려면 다음을 실행합니다.
 
 ```bash
 cd packages/lynx && npm pack --dry-run   # 들어갈 파일 목록과 크기만 보여 주고 tarball은 만들지 않음
+cd packages/expo && npm pack --dry-run
 ```
 
 ### 게시 인증 (trusted publisher)
 
-세 패키지(tokens, react, lynx)는 npmjs.com의 Settings → Trusted Publisher에 GitHub Actions,
+네 패키지(tokens, react, lynx, expo)는 npmjs.com의 Settings → Trusted Publisher에 GitHub Actions,
 `horon-ai/design`, 워크플로 `publish.yml`이 등록돼 있습니다. `publish.yml`은 npm 토큰을 쓰지
 않고 GitHub OIDC로만 게시합니다. 등록은 워크플로 파일 이름만 보므로 어느 브랜치에서 실행해도
-됩니다. 새 패키지를 추가하면 첫 게시 뒤 그 패키지에도 같은 값으로 등록합니다.
+됩니다.
+
+새 패키지를 추가할 때는 Trusted Publisher가 npm에 이미 있는 패키지에만 등록되므로 다음 순서를 따릅니다.
+`publish.yml`은 게시 전에 네 패키지가 모두 npm에 있는지 확인하고, 하나라도 없으면 아무것도 올리지
+않고 멈춥니다.
+
+1. npm 계정으로 로그인한 상태에서 `npm stage publish --tag placeholder`로 자리 표시 패키지를 단계 게시합니다.
+   버전은 `0.0.0-placeholder.0`처럼 프리릴리스로 둡니다. 실수로 승인돼도 0.1 라인 검사를 깨지 않게
+   하려는 것이고, `0.0.0` 같은 정식 버전은 게시를 멈추게 합니다. npm이 공개 자리 표시 버전
+   `0.0.0-stage`를 만들어 패키지가 생깁니다. 단계 게시본은 **거절하지 않고** 그대로 둡니다. 거절하면
+   패키지 예약도 함께 사라집니다(`@horon-ai/expo` 등록 때 확인). 승인하지도 않습니다.
+2. 패키지 Settings → Trusted Publisher에 GitHub Actions, 조직 `horon-ai`, 저장소 `design`,
+   워크플로 `publish.yml`, 환경 이름 없음으로 등록하고, 허용 동작에서 `npm publish`를 켭니다
+   (2026-09-03 이후 만든 설정은 기본으로 `npm stage publish`만 허용합니다).
+3. 등록한 설정은 2일 안에 첫 게시가 성공해야 유효하므로, 등록 뒤 바로 `main`에 병합해 게시합니다.
 
 패키지 변경 없이 게시하려면 Actions 탭의 Publish npm packages에서 수동 실행합니다(PATCH가
 하나 오릅니다). `prerelease`에 `rc`를 넣고 실행하면 다음 PATCH의 프리릴리스(`0.1.4-rc.0` …)를
@@ -133,6 +155,7 @@ gh workflow run publish.yml --ref dev -f prerelease=rc   # 시험 게시
 npm view @horon-ai/tokens versions
 npm view @horon-ai/react versions
 npm view @horon-ai/lynx versions
+npm view @horon-ai/expo versions
 ```
 
 게시한 뒤에는 `web/package.json`의 `file:` 의존을
@@ -149,9 +172,9 @@ bun run build                     # 토큰 + 문서 사이트 빌드
 bun run build:site                # 문서 사이트 정적 빌드
 ```
 
-CI(`.github/workflows/ci.yml`)도 같은 lint·typecheck·test·build를 돌립니다. Flutter 패키지는
-별도 잡이 `flutter analyze --fatal-infos`, `dart format --set-exit-if-changed lib test example`,
-`flutter test`, 갤러리 테스트로 검사합니다.
+CI(`.github/workflows/ci.yml`)도 같은 lint·typecheck·test·build를 돌립니다. 컴포넌트 렌더 테스트는
+별도 잡에서 돌립니다. Lynx는 `bun run --cwd packages/lynx test`(rstest), Expo는
+`bun packages/expo/scripts/integrate.ts --check`로 생성 파일을 확인한 뒤 `bun run --cwd packages/expo test`(jest-expo)입니다.
 
 ## 배포
 
@@ -185,7 +208,7 @@ CI(`.github/workflows/ci.yml`)도 같은 lint·typecheck·test·build를 돌립�
 
 ## 라이선스
 
-이 저장소와 여기서 배포하는 `@horon-ai/react`, `@horon-ai/lynx`, `@horon-ai/tokens`는
+이 저장소와 여기서 배포하는 `@horon-ai/react`, `@horon-ai/lynx`, `@horon-ai/expo`, `@horon-ai/tokens`는
 [PolyForm Strict License 1.0.0](https://polyformproject.org/licenses/strict/1.0.0)으로
 배포합니다. 전문은 저장소 루트 `LICENSE`에 있고, 각 패키지 tarball에도 같은 파일이 들어갑니다.
 
@@ -204,12 +227,11 @@ npm에 이미 게시된 0.1.6 이하 버전에는 라이선스 표기가 없었�
 
 | 자산                                            | 라이선스                               | 쓰이는 곳                                                               |
 | ----------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------- |
-| `@phosphor-icons/core`, `@phosphor-icons/react` | MIT, Copyright (c) 2023 Phosphor Icons | 아이콘 글리프(`packages/lynx/src/icons/phosphor.g.ts`)와 React 컴포넌트 |
-| Pretendard                                      | SIL Open Font License 1.1              | 문서 사이트·예제 서체                                                   |
+| `@phosphor-icons/core`, `@phosphor-icons/react`, `phosphor-react-native` | MIT, Copyright (c) 2023 Phosphor Icons | 아이콘 글리프(`packages/lynx/src/icons/phosphor.g.ts`), React·Expo 컴포넌트 |
+| Pretendard                                      | SIL Open Font License 1.1              | 문서 사이트·Expo 갤러리 서체                                            |
 | Geist Mono                                      | SIL Open Font License 1.1              | 코드 서체                                                               |
-| Tabler Icons                                    | MIT                                    | Flutter 예제 아이콘                                                     |
 
 ## 알아 둘 점
 
-- 패키지는 소스(`.tsx`) 그대로 배포합니다(내부 패키지 방식). Vite와 Astro가 각각 변환합니다.
-- 앱 `@horon/site`와 저장소 루트는 `private: true`입니다. 라이브러리 세 패키지는 게시 설정이 `public`이고, 실제 게시는 위 npm 절차를 따릅니다.
+- 패키지는 소스(`.tsx`) 그대로 배포합니다(내부 패키지 방식). Vite·Astro·rspeedy·Metro가 각각 변환합니다.
+- 앱 `@horon/site`, `@horon/expo-gallery`와 저장소 루트는 `private: true`입니다. 라이브러리 네 패키지는 게시 설정이 `public`이고, 실제 게시는 위 npm 절차를 따릅니다.

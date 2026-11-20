@@ -42,6 +42,11 @@ export const getStartedMessages = defineMessages({
     ko: "Lynx 앱에 @horon-ai/lynx를 설치하고 Tailwind 프리셋과 테마를 연결합니다.",
     en: "Install @horon-ai/lynx in a Lynx app and wire up the Tailwind presets and theme.",
   },
+  expoTitle: { ko: "Expo", en: "Expo" },
+  expoBody: {
+    ko: "Expo 앱에 @horon-ai/expo를 설치하고 글꼴과 테마 루트를 연결합니다.",
+    en: "Install @horon-ai/expo in an Expo app and wire up the fonts and the theme root.",
+  },
   aiTitle: { ko: "AI 도구", en: "AI tools" },
   aiBody: {
     ko: "에이전트가 읽을 문서 요약(llms.txt)을 받습니다.",

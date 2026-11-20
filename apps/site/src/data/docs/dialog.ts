@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Dialog`, written against
- * `packages/react/src/components/dialog.tsx` and
- * `packages/flutter/lib/src/components/dialog.dart`.
+ * `packages/react/src/components/dialog.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Button`, written against
- * `packages/react/src/components/button.tsx` and
- * `packages/flutter/lib/src/components/button.dart`.
+ * `packages/react/src/components/button.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

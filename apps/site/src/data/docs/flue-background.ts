@@ -1,7 +1,6 @@
 /**
  * Reference doc for `FlueBackground`, written against
- * `packages/react/src/components/flue-background.tsx` and
- * `packages/flutter/lib/src/glass/flue_background.dart`.
+ * `packages/react/src/components/flue-background.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -1,7 +1,7 @@
 /**
- * The glass material from `@horon-ai/tokens` `glass.ts`, the same one Flutter's
- * `HoronLiquidGlass` draws: the backdrop blurred and saturated, then a 1px rim
- * that is bright at the top and faint down the sides.
+ * The glass material from `@horon-ai/tokens` `glass.ts`, the same one
+ * `@horon-ai/lynx` and `@horon-ai/expo` draw: the backdrop blurred and
+ * saturated, then a 1px rim that is bright at the top and faint down the sides.
  *
  * Render it as the first child of a `relative isolate` host with a border radius
  * and no border of its own; the rim is the edge. `isolate` keeps the layer's
@@ -9,7 +9,7 @@
  * host's own fill. A host that cannot isolate keeps its body `relative` instead.
  *
  * The host keeps its fill (`glass-clear`, `glass-regular`, `glass-thick`), which
- * is equivalent to Flutter painting the fill over the filtered backdrop because
+ * is equivalent to painting the fill over the filtered backdrop because
  * saturation is linear and keeps white. There is deliberately no `tier` prop:
  * the fill is the host's, and a fill on the layer would have to override the
  * `glass-fill-frost` swap that `globals.css` applies for reduced transparency

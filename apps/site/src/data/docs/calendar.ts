@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Calendar`, written against
- * `packages/react/src/components/calendar.tsx` and
- * `packages/flutter/lib/src/components/calendar.dart`.
+ * `packages/react/src/components/calendar.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

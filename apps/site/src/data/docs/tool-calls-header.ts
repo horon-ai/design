@@ -1,7 +1,6 @@
 /**
  * Reference doc for `ToolCallsHeader`, written against
- * `packages/react/src/components/tool-calls-header.tsx` and
- * `packages/flutter/lib/src/components/tool_calls_header.dart`.
+ * `packages/react/src/components/tool-calls-header.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

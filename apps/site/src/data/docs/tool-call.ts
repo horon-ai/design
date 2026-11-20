@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Tool Call`, written against
- * `packages/react/src/components/tool-call.tsx` and
- * `packages/flutter/lib/src/components/tool_call.dart`.
+ * `packages/react/src/components/tool-call.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

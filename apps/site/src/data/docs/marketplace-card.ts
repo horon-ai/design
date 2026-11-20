@@ -1,7 +1,6 @@
 /**
  * Reference doc for `MarketplaceCard`, written against
- * `packages/react/src/components/marketplace-card.tsx` and
- * `packages/flutter/lib/src/components/marketplace_card.dart`.
+ * `packages/react/src/components/marketplace-card.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -6,7 +6,8 @@ the PolyForm Strict license in `LICENSE` covers only the Horon code.
 ## Phosphor Icons
 
 `packages/lynx/src/icons/phosphor.g.ts` is generated from `@phosphor-icons/core`,
-and the React components draw `@phosphor-icons/react`. Both are MIT.
+the React components draw `@phosphor-icons/react`, and the Expo components draw
+`phosphor-react-native`. All three are MIT.
 
 ```
 MIT License
@@ -35,23 +36,17 @@ SOFTWARE.
 ## Pretendard
 
 `packages/react/src/styles/globals.css` imports the Pretendard variable font
-CSS, and the Flutter example bundles the font file. SIL Open Font License 1.1,
+CSS, and the Expo gallery bundles the font file. SIL Open Font License 1.1,
 Copyright (c) 2021, Kil Hyung-jin, with Reserved Font Name Pretendard. The full
-license text is in `packages/flutter/example/assets/fonts/Pretendard-LICENSE.txt`
+license text is in `apps/expo-gallery/assets/fonts/Pretendard-LICENSE.txt`
 and at <https://openfontlicense.org>.
 
 ## Geist Mono
 
 Code typeface, loaded from `@fontsource-variable/geist-mono`, and bundled in the
-Flutter example. SIL Open Font License 1.1, Copyright 2024 The Geist Project
+Expo gallery. SIL Open Font License 1.1, Copyright 2024 The Geist Project
 Authors. The full license text is in
-`packages/flutter/example/assets/fonts/Geist-LICENSE.txt`.
-
-## Tabler Icons
-
-Flutter example icons, `packages/flutter/example/assets/fonts/TablerIcons.ttf`.
-MIT, Copyright (c) 2020-2026 Paweł Kuna. The full license text is in
-`packages/flutter/example/assets/fonts/TablerIcons-LICENSE.txt`.
+`apps/expo-gallery/assets/fonts/Geist-LICENSE.txt`.
 
 ## Sidebar photo
 
@@ -71,5 +66,7 @@ and its terms are confirmed.
 Everything else the packages import arrives as npm dependencies rather than
 vendored source, and each carries its own license in its published package:
 `@base-ui/react` (MIT), `@tanstack/react-table` (MIT), `tailwind-merge` (MIT),
-`shiki` (MIT), `@lynx-js/react` (Apache-2.0), and the React, Astro and Lynx
-toolchain. No copyleft-licensed code is vendored into this repository.
+`shiki` (MIT), `@lynx-js/react` (Apache-2.0), `expo`, `expo-glass-effect`,
+`expo-clipboard` (MIT), `react-native` (MIT), `react-native-safe-area-context`
+(MIT), `react-native-svg` (MIT), and the React, Astro, Lynx and Expo toolchain.
+No copyleft-licensed code is vendored into this repository.

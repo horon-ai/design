@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Tabs`, written against
- * `packages/react/src/components/tabs.tsx` and
- * `packages/flutter/lib/src/components/tabs.dart`.
+ * `packages/react/src/components/tabs.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

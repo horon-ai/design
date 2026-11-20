@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Orchestrator Panel`, written against
- * `packages/react/src/components/orchestrator-panel.tsx` and
- * `packages/flutter/lib/src/components/orchestrator_panel.dart`.
+ * `packages/react/src/components/orchestrator-panel.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Avatar`, written against
- * `packages/react/src/components/avatar.tsx` and
- * `packages/flutter/lib/src/components/avatar.dart`.
+ * `packages/react/src/components/avatar.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

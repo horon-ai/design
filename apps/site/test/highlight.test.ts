@@ -15,7 +15,7 @@ import { Button } from "@horon-ai/react";
 const s = "flex px-4"; // note`,
   ],
   ["bash", "bun add @horon-ai/react --exact"],
-  ["yaml", "dependencies:\n  horon_ui: ^0.1.0"],
+  ["yaml", "dependencies:\n  expo_router: ^0.1.0"],
   ["dart", "class Foo extends StatelessWidget { final String name; }"],
   ["html", `<div class="flex px-4" data-x="a"></div>`],
 ];
@@ -60,7 +60,7 @@ describe("code roles", () => {
   test("yaml keys are properties", async () => {
     const tokens = await flat(SAMPLES[2][1], "yaml");
     expect(contents(tokens, "property").join("")).toContain("dependencies");
-    expect(contents(tokens, "property").join("")).toContain("horon_ui");
+    expect(contents(tokens, "property").join("")).toContain("expo_router");
   });
 
   test("dart class names are types", async () => {

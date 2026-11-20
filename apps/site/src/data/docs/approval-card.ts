@@ -1,7 +1,6 @@
 /**
  * Reference doc for `ApprovalCard`, written against
- * `packages/react/src/components/approval-card.tsx` and
- * `packages/flutter/lib/src/components/approval_card.dart`.
+ * `packages/react/src/components/approval-card.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 
