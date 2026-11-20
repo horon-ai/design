@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Modal`, written against
- * `packages/react/src/components/modal.tsx` and
- * `packages/flutter/lib/src/components/modal.dart`.
+ * `packages/react/src/components/modal.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

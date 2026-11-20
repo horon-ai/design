@@ -1,7 +1,6 @@
 /**
  * Reference doc for `DocumentExtractPanel`, written against
- * `packages/react/src/components/document-extract-panel.tsx` and
- * `packages/flutter/lib/src/components/document_extract_panel.dart`.
+ * `packages/react/src/components/document-extract-panel.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

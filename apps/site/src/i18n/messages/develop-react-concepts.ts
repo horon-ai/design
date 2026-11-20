@@ -420,8 +420,8 @@ export const conceptsMessages = defineMessages({
     en: "Run bun install once at the repository root. It is a workspace, so the dependencies of packages and apps install together.",
   },
   contributingSetupTokensItem: {
-    ko: "bun run tokens: @horon-ai/tokens를 빌드해 theme.css를 만들고 Flutter 토큰을 생성합니다.",
-    en: "bun run tokens: builds @horon-ai/tokens into theme.css and generates the Flutter tokens.",
+    ko: "bun run tokens: @horon-ai/tokens를 빌드해 theme.css를 만듭니다.",
+    en: "bun run tokens: builds @horon-ai/tokens into theme.css.",
   },
   contributingSetupSiteItem: {
     ko: "bun run site: 문서 사이트를 띄웁니다. 주소는 http://localhost:4321입니다.",
@@ -594,10 +594,10 @@ function bindPaletteKey(os: Os, open: () => void) {
 const unmount = mountCursorGhost({ ghosts: 2, size: 20, headFollow: 0.2, smear: 10 });`,
   repoSetup: {
     ko: `bun install        # 워크스페이스 의존성 설치
-bun run tokens     # theme.css와 Flutter 토큰 생성
+bun run tokens     # theme.css 생성
 bun run site       # 문서 사이트 → http://localhost:4321`,
     en: `bun install        # install the workspace dependencies
-bun run tokens     # writes theme.css and the Flutter tokens
+bun run tokens     # writes theme.css
 bun run site       # docs site → http://localhost:4321`,
   },
 };

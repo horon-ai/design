@@ -1,7 +1,6 @@
 /**
  * Reference doc for `FileDrop`, written against
- * `packages/react/src/components/file-drop.tsx` and
- * `packages/flutter/lib/src/components/file_drop.dart`.
+ * `packages/react/src/components/file-drop.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

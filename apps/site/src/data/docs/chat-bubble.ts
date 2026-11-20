@@ -1,7 +1,6 @@
 /**
  * Reference doc for `ChatBubble`, written against
- * `packages/react/src/components/chat-bubble.tsx` and
- * `packages/flutter/lib/src/components/chat_bubble.dart`.
+ * `packages/react/src/components/chat-bubble.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -1,7 +1,6 @@
 /**
  * Reference doc for `IconButton`, written against
- * `packages/react/src/components/icon-button.tsx` and
- * `packages/flutter/lib/src/components/icon_button.dart`.
+ * `packages/react/src/components/icon-button.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

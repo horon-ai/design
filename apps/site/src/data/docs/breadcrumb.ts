@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Breadcrumb`, written against
- * `packages/react/src/components/breadcrumb.tsx` and
- * `packages/flutter/lib/src/components/breadcrumb.dart`.
+ * `packages/react/src/components/breadcrumb.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

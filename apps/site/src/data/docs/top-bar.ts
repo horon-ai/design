@@ -1,7 +1,6 @@
 /**
  * Reference doc for `TopBar`, written against
- * `packages/react/src/components/top-bar.tsx` and
- * `packages/flutter/lib/src/components/top_bar.dart`.
+ * `packages/react/src/components/top-bar.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

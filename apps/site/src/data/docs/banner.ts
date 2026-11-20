@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Banner`, written against
- * `packages/react/src/components/banner.tsx` and
- * `packages/flutter/lib/src/components/banner.dart`.
+ * `packages/react/src/components/banner.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -2,26 +2,29 @@
 
 horon의 디자인 시스템입니다. 색·간격·글자·모션·표면 값을 토큰 한 곳에서 정의하고, 웹 컴포넌트와 문서 사이트가 그 값을 그대로 소비합니다. 그래서 컴포넌트와 문서의 색·간격·타이포가 어긋나지 않습니다.
 
-토큰 정본은 `@horon-ai/tokens` 하나이고, 값은 Figma `Horon` 파일(Components `54:81`, Typography `26:2`)에서 읽었습니다. 색(잉크·종이·하늘), 유리 표면, 글자, 반경, 그림자가 여기서 나옵니다. 컴포넌트는 `@horon-ai/react` 하나이고, Base UI(`@base-ui/react`)와 Tailwind CSS v4 위에 올라갑니다. shadcn/ui는 쓰지 않습니다.
+토큰 정본은 `@horon-ai/tokens` 하나이고, 값은 Figma `Horon` 파일(Components `54:81`, Typography `26:2`)에서 읽었습니다. 색(잉크·종이·하늘), 유리 표면, 글자, 반경, 그림자가 여기서 나옵니다. 웹 컴포넌트는 `@horon-ai/react`이고, Base UI(`@base-ui/react`)와 Tailwind CSS v4 위에 올라갑니다. shadcn/ui는 쓰지 않습니다. 같은 84개 컴포넌트를 ReactLynx로 옮긴 `@horon-ai/lynx`와 React Native(Expo)로 옮긴 `@horon-ai/expo`가 함께 있습니다.
 
 ## 무엇을 제공하나
 
 - **토큰**: 라이트·다크 시맨틱 색, 유리 레이어, 13개 글자 스타일(Web·Desktop·Mobile), 반경·그림자, 생성된 `theme.css`
 - **웹 컴포넌트**: import하면 바로 쓰는 React 컴포넌트. 단일 진입점과 하위 경로 진입점을 함께 제공
+- **앱 컴포넌트**: 같은 이름·variant·토큰의 Lynx(`@horon-ai/lynx`)와 Expo(`@horon-ai/expo`) 포트
 - **문서 사이트**: design.horon.ai. 컴포넌트 목록과 라이브 프리뷰
 
 ## 구조
 
 ```
 apps/
-  site/         @horon/site        문서 사이트 — design.horon.ai (Astro + React)
+  site/          @horon/site          문서 사이트 — design.horon.ai (Astro + React)
+  expo-gallery/  @horon/expo-gallery  Expo 갤러리 앱 (Expo Go·iOS 시뮬레이터에서 실행)
 packages/
-  tokens/       @horon-ai/tokens   디자인 토큰 단일 소스 (+ 생성된 theme.css)
-  react/        @horon-ai/react    웹 컴포넌트 — Base UI + Tailwind v4
-  flutter/      horon_ui           Flutter 컴포넌트 + example 갤러리 앱
+  tokens/        @horon-ai/tokens     디자인 토큰 단일 소스 (+ 생성된 theme.css)
+  react/         @horon-ai/react      웹 컴포넌트 — Base UI + Tailwind v4
+  lynx/          @horon-ai/lynx       ReactLynx 컴포넌트 + example 갤러리
+  expo/          @horon-ai/expo       React Native(Expo SDK 58) 컴포넌트
 ```
 
-컴포넌트 레이어는 웹의 `@horon-ai/react`, Lynx 앱의 `@horon-ai/lynx`, Flutter `horon_ui` 셋이고, 셋은 같은 토큰 정본을 읽습니다. 새 `mobile` 앱은 Lynx로 바뀌어 `@horon-ai/lynx`를 쓰고, `horon_ui`를 쓰던 옛 Flutter 앱은 `horon-ai/mobile-archive`로 보관했습니다. site가 `@horon-ai/react`를 소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. `packages/flutter`는 Dart 패키지라 `package.json`이 없어 bun 워크스페이스 밖에 있고, `dart`·`flutter` 명령으로 검사합니다. `packages/lynx`는 `@horon-ai/react`의 84개 컴포넌트를 ReactLynx로 옮긴 포트로, `test/parity.test.ts`가 두 패키지의 슬러그·export 이름·variant 리터럴을 대조합니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다.
+컴포넌트 레이어는 웹의 `@horon-ai/react`, Lynx 앱의 `@horon-ai/lynx`, Expo 앱의 `@horon-ai/expo` 셋이고, 셋은 같은 토큰 정본을 읽습니다. 새 `mobile` 앱은 Lynx로 바뀌어 `@horon-ai/lynx`를 씁니다. site가 `@horon-ai/react`를 소비하고, 스타일은 `@horon-ai/tokens`의 `theme.css`에서 읽습니다. `packages/lynx`와 `packages/expo`는 `@horon-ai/react`의 84개 컴포넌트를 옮긴 포트이고, 각 패키지의 `test/parity.test.ts`와 `test/props-parity.test.ts`가 react와 슬러그·export 이름·variant 리터럴·prop을 대조합니다. Expo 포트는 유리 표면을 `expo-glass-effect`로, 안전 영역을 `react-native-safe-area-context`로 그립니다(`packages/expo/README.md`). 예전 Flutter 패키지(`horon_ui`)는 삭제했습니다. 정적 검사는 각 패키지·앱의 `.oxlintrc.json`을 읽는 oxlint가 맡고, `bun run lint`가 이를 실행합니다.
 
 ```tsx
 import { Button, Card, Input } from "@horon-ai/react";
@@ -75,7 +78,9 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 ## 패키지 게시 (npm)
 
 라이브러리 세 패키지(`@horon-ai/tokens`, `@horon-ai/react`, `@horon-ai/lynx`)는 `publishConfig.access`가
-`public`입니다. 앱(`@horon/site`)과 저장소 루트는 `private: true`라 게시 대상이 아닙니다.
+`public`입니다. 앱(`@horon/site`, `@horon/expo-gallery`)과 저장소 루트는 `private: true`라 게시 대상이 아닙니다.
+`@horon-ai/expo`도 게시 설정은 `public`이지만 아직 `publish.yml`의 게시 순서와 npm trusted publisher에
+등록하지 않았습니다. 첫 게시는 별도 승인 뒤에 두 곳을 함께 추가해서 합니다.
 
 세 패키지는 같은 버전으로 움직이고, 버전은 npm 레지스트리가 정본입니다. `main`에 세 패키지의
 변경(`packages/tokens/**`, `packages/react/**`, `packages/lynx/**`, `bun.lock`)이 올라오면
@@ -149,9 +154,9 @@ bun run build                     # 토큰 + 문서 사이트 빌드
 bun run build:site                # 문서 사이트 정적 빌드
 ```
 
-CI(`.github/workflows/ci.yml`)도 같은 lint·typecheck·test·build를 돌립니다. Flutter 패키지는
-별도 잡이 `flutter analyze --fatal-infos`, `dart format --set-exit-if-changed lib test example`,
-`flutter test`, 갤러리 테스트로 검사합니다.
+CI(`.github/workflows/ci.yml`)도 같은 lint·typecheck·test·build를 돌립니다. 컴포넌트 렌더 테스트는
+별도 잡에서 돌립니다. Lynx는 `bun run --cwd packages/lynx test`(rstest), Expo는
+`bun packages/expo/scripts/integrate.ts --check`로 생성 파일을 확인한 뒤 `bun run --cwd packages/expo test`(jest-expo)입니다.
 
 ## 배포
 
@@ -204,12 +209,11 @@ npm에 이미 게시된 0.1.6 이하 버전에는 라이선스 표기가 없었�
 
 | 자산                                            | 라이선스                               | 쓰이는 곳                                                               |
 | ----------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------- |
-| `@phosphor-icons/core`, `@phosphor-icons/react` | MIT, Copyright (c) 2023 Phosphor Icons | 아이콘 글리프(`packages/lynx/src/icons/phosphor.g.ts`)와 React 컴포넌트 |
-| Pretendard                                      | SIL Open Font License 1.1              | 문서 사이트·예제 서체                                                   |
+| `@phosphor-icons/core`, `@phosphor-icons/react`, `phosphor-react-native` | MIT, Copyright (c) 2023 Phosphor Icons | 아이콘 글리프(`packages/lynx/src/icons/phosphor.g.ts`), React·Expo 컴포넌트 |
+| Pretendard                                      | SIL Open Font License 1.1              | 문서 사이트·Expo 갤러리 서체                                            |
 | Geist Mono                                      | SIL Open Font License 1.1              | 코드 서체                                                               |
-| Tabler Icons                                    | MIT                                    | Flutter 예제 아이콘                                                     |
 
 ## 알아 둘 점
 
-- 패키지는 소스(`.tsx`) 그대로 배포합니다(내부 패키지 방식). Vite와 Astro가 각각 변환합니다.
+- 패키지는 소스(`.tsx`) 그대로 배포합니다(내부 패키지 방식). Vite·Astro·rspeedy·Metro가 각각 변환합니다.
 - 앱 `@horon/site`와 저장소 루트는 `private: true`입니다. 라이브러리 세 패키지는 게시 설정이 `public`이고, 실제 게시는 위 npm 절차를 따릅니다.

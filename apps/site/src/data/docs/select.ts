@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Select`, written against
- * `packages/react/src/components/select.tsx` and
- * `packages/flutter/lib/src/components/select.dart`.
+ * `packages/react/src/components/select.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

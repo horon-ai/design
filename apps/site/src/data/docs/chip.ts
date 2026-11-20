@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Chip`, written against
- * `packages/react/src/components/chip.tsx` and
- * `packages/flutter/lib/src/components/chip.dart`.
+ * `packages/react/src/components/chip.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -1,7 +1,6 @@
 /**
  * Reference doc for `TextareaField`, written against
- * `packages/react/src/components/textarea-field.tsx` and
- * `packages/flutter/lib/src/components/textarea_field.dart`.
+ * `packages/react/src/components/textarea-field.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

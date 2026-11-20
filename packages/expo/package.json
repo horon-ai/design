@@ -1,0 +1,71 @@
+{
+  "name": "@horon-ai/expo",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/horon-ai/design.git",
+    "directory": "packages/expo"
+  },
+  "type": "module",
+  "license": "SEE LICENSE IN LICENSE",
+  "sideEffects": false,
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./components/*": "./src/components/*.tsx",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "lint": "oxlint --deny-warnings .",
+    "lint:fix": "oxlint --fix .",
+    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "jest --config jest.config.cjs",
+    "integrate": "bun scripts/integrate.ts"
+  },
+  "dependencies": {
+    "@horon-ai/tokens": "workspace:*",
+    "phosphor-react-native": "^3.0.6"
+  },
+  "peerDependencies": {
+    "expo": ">=58",
+    "expo-clipboard": ">=58",
+    "expo-document-picker": ">=58",
+    "expo-glass-effect": ">=58",
+    "expo-haptics": ">=58",
+    "react": ">=19.3",
+    "react-native": ">=0.88",
+    "react-native-safe-area-context": ">=5.11",
+    "react-native-svg": ">=15.16"
+  },
+  "devDependencies": {
+    "@babel/runtime": "^7.28.4",
+    "@jest/globals": "^30.2.0",
+    "@react-native/jest-preset": "^0.88.1",
+    "@testing-library/react-native": "^14.1.0",
+    "@types/bun": "^1.4.3",
+    "@types/jest": "^30.0.0",
+    "@types/react": "~19.3.0",
+    "expo": "~58.0.26",
+    "expo-clipboard": "~58.0.4",
+    "expo-document-picker": "~58.0.5",
+    "expo-glass-effect": "~58.0.5",
+    "expo-haptics": "~58.0.8",
+    "jest": "^30.5.2",
+    "jest-expo": "~58.0.15",
+    "react": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-safe-area-context": "~5.11.1",
+    "react-native-svg": "15.16.0",
+    "test-renderer": "1.3.0",
+    "typescript": "~6.0.3"
+  }
+}

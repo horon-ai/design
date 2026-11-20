@@ -39,8 +39,8 @@
   }
 }
 
-/* Glass, the material in @horon-ai/tokens glass.ts that Flutter's
- * HoronLiquidGlass draws with the same values: the backdrop blurred and
+/* Glass, the material in @horon-ai/tokens glass.ts that @horon-ai/lynx and
+ * @horon-ai/expo draw with the same values: the backdrop blurred and
  * saturated, under the host's own fill, and a rim ring on the edge. Only
  * backdrop-filter, gradients and masks, so Chromium, Safari and Firefox match. */
 @layer components {

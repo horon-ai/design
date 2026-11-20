@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Agent Activity`, written against
- * `packages/react/src/components/agent-activity.tsx` and
- * `packages/flutter/lib/src/components/agent_activity.dart`.
+ * `packages/react/src/components/agent-activity.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

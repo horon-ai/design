@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Agent Steering Panel`, written against
- * `packages/react/src/components/agent-steering-panel.tsx` and
- * `packages/flutter/lib/src/components/agent_steering_panel.dart`.
+ * `packages/react/src/components/agent-steering-panel.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

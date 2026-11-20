@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Field`, written against
- * `packages/react/src/components/field.tsx` and
- * `packages/flutter/lib/src/components/field.dart`.
+ * `packages/react/src/components/field.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

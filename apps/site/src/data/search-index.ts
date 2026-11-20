@@ -6,7 +6,7 @@
  */
 import type { Localized } from "@/i18n";
 import { componentGroups, components } from "@/data/components";
-import { foundationsNav, lynxDocsNav, primaryNav, reactDocsNav } from "@/data/nav";
+import { expoDocsNav, foundationsNav, lynxDocsNav, primaryNav, reactDocsNav } from "@/data/nav";
 import { siteHref } from "@/lib/urls";
 
 export interface SearchEntry {
@@ -30,7 +30,7 @@ export const searchIndex: SearchEntry[] = [
     href: siteHref(item.href),
     group: { ko: "Foundations", en: "Foundations" },
   })),
-  ...[...reactDocsNav, ...lynxDocsNav].flatMap((group) =>
+  ...[...reactDocsNav, ...lynxDocsNav, ...expoDocsNav].flatMap((group) =>
     group.items.map((item) => ({
       title: item.label,
       href: siteHref(item.href),

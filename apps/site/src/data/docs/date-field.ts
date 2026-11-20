@@ -1,7 +1,6 @@
 /**
  * Reference doc for `DateField`, written against
- * `packages/react/src/components/date-field.tsx` and
- * `packages/flutter/lib/src/components/date_field.dart`.
+ * `packages/react/src/components/date-field.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

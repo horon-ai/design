@@ -1,7 +1,6 @@
 /**
  * Reference doc for `SplitButton`, written against
- * `packages/react/src/components/split-button.tsx` and
- * `packages/flutter/lib/src/components/split_button.dart`.
+ * `packages/react/src/components/split-button.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

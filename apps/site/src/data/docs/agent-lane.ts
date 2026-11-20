@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Agent Lane`, written against
- * `packages/react/src/components/agent-lane.tsx` and
- * `packages/flutter/lib/src/components/agent_lane.dart`.
+ * `packages/react/src/components/agent-lane.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

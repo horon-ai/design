@@ -1,7 +1,6 @@
 /**
  * Reference doc for `ToolPermissions`, written against
- * `packages/react/src/components/tool-permissions.tsx` and
- * `packages/flutter/lib/src/components/tool_permissions.dart`.
+ * `packages/react/src/components/tool-permissions.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -1,7 +1,6 @@
 /**
  * Reference doc for `AgentLanesTimeline`, written against
- * `packages/react/src/components/agent-lanes-timeline.tsx` and
- * `packages/flutter/lib/src/components/agent_lanes_timeline.dart`.
+ * `packages/react/src/components/agent-lanes-timeline.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

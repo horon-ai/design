@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Switch`, written against
- * `packages/react/src/components/switch.tsx` and
- * `packages/flutter/lib/src/components/switch.dart`.
+ * `packages/react/src/components/switch.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

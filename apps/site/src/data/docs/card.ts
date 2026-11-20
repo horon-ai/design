@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Card`, written against
- * `packages/react/src/components/card.tsx` and
- * `packages/flutter/lib/src/components/card.dart`.
+ * `packages/react/src/components/card.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

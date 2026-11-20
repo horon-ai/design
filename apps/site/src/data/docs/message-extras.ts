@@ -1,7 +1,6 @@
 /**
  * Reference doc for `MessageExtras`, written against
- * `packages/react/src/components/message-extras.tsx` and
- * `packages/flutter/lib/src/components/message_extras.dart`.
+ * `packages/react/src/components/message-extras.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

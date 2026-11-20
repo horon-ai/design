@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Knowledge Base Panel`, written against
- * `packages/react/src/components/knowledge-base-panel.tsx` and
- * `packages/flutter/lib/src/components/knowledge_base_panel.dart`.
+ * `packages/react/src/components/knowledge-base-panel.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -3,8 +3,8 @@ import { glass } from "@horon-ai/tokens";
 import { supportsBackdropBlur } from "../lib/glass";
 
 /**
- * The glass material from `@horon-ai/tokens` `glass.ts`, the same one Flutter's
- * `HoronLiquidGlass` draws.
+ * The glass material from `@horon-ai/tokens` `glass.ts`, the same one
+ * `@horon-ai/react` and `@horon-ai/expo` draw.
  *
  * Lynx 4.0 ships `<blur-view>`, so this is the real material on every engine
  * that can filter a backdrop: iOS renders Liquid Glass through

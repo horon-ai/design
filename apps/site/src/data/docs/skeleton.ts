@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Skeleton` and `SkeletonCard`, written against
- * `packages/react/src/components/skeleton.tsx` and
- * `packages/flutter/lib/src/components/skeleton.dart`.
+ * `packages/react/src/components/skeleton.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

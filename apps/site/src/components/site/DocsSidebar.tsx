@@ -15,7 +15,15 @@ import { Fragment, useLayoutEffect, useRef } from "react";
 import { Sidebar, SidebarGroup, SidebarItem } from "@horon-ai/react";
 
 import { componentGroups, componentsInGroup } from "@/data/components";
-import { foundationsNav, isActive, lynxDocsNav, primaryNav, reactDocsNav, type NavGroup } from "@/data/nav";
+import {
+  expoDocsNav,
+  foundationsNav,
+  isActive,
+  lynxDocsNav,
+  primaryNav,
+  reactDocsNav,
+  type NavGroup,
+} from "@/data/nav";
 import { siteHref } from "@/lib/urls";
 import { pick, type Locale, type Localized } from "@/i18n";
 import { docsMessages } from "@/i18n/messages/docs";
@@ -82,7 +90,7 @@ export function docsSidebarBlocks(section: string, currentPath: string): DocsSid
         key: "overview",
         entries: [{ label: docsMessages.overview, href: "/develop", current: currentPath === "/develop" }],
       },
-      ...[...reactDocsNav, ...lynxDocsNav].map((group) => sidebarBlock(group, currentPath)),
+      ...[...reactDocsNav, ...lynxDocsNav, ...expoDocsNav].map((group) => sidebarBlock(group, currentPath)),
     ];
   }
 

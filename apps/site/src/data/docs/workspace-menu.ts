@@ -1,7 +1,6 @@
 /**
  * Reference doc for `WorkspaceMenu`, written against
- * `packages/react/src/components/workspace-menu.tsx` and
- * `packages/flutter/lib/src/components/workspace_menu.dart`.
+ * `packages/react/src/components/workspace-menu.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

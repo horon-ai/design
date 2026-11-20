@@ -1,7 +1,6 @@
 /**
  * Reference doc for `PluginRow`, written against
- * `packages/react/src/components/plugin-row.tsx` and
- * `packages/flutter/lib/src/components/plugin_row.dart`.
+ * `packages/react/src/components/plugin-row.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

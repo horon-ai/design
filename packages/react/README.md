@@ -53,8 +53,8 @@ import { Plus } from "@phosphor-icons/react";
 
 ## 유리 표면
 
-`LiquidGlass`가 `@horon-ai/tokens`의 `glass.ts` 재질을 그립니다. Flutter의 `HoronLiquidGlass`와 `@horon-ai/lynx`도 같은 값을 읽으므로
-web, desktop(Electron의 Chromium), iOS, Android가 같은 모습입니다.
+`LiquidGlass`가 `@horon-ai/tokens`의 `glass.ts` 재질을 그립니다. `@horon-ai/lynx`와 `@horon-ai/expo`도 같은 값을 읽으므로
+web, desktop(Electron의 Chromium), iOS, Android가 같은 모습입니다. Expo는 iOS 26 이상에서 `expo-glass-effect`의 Liquid Glass를 쓰고, 그 밖의 환경에서는 `glass-fill-frost` 채움으로 대체합니다.
 
 - 배경: 뒤 내용을 흐리게(20px) 하고 채도를 180%로 올립니다.
 - 채움: 호스트가 `glass-clear` / `glass-regular` / `glass-thick`으로 칠합니다.

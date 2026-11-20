@@ -1,0 +1,58 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { expoBreadcrumb } from "@/data/nav";
+import { expoGlassMessages as m, expoSnippets as s } from "@/i18n/messages/develop-expo";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={expoBreadcrumb(m.title, "/develop/expo/liquid-glass")}
+>
+  <h2><T m={m.surfaceHeading} /></h2>
+  <p><T m={m.surfaceBody} /></p>
+
+  <h2><T m={m.environmentHeading} /></h2>
+  <div class="not-prose overflow-x-auto">
+    <table class="w-full border-collapse text-left text-body-sm">
+      <thead>
+        <tr class="border-b border-border-default text-text-primary">
+          <th class="py-2 pr-4 font-medium"><T m={m.columnEnvironment} /></th>
+          <th class="py-2 font-medium"><T m={m.columnDraws} /></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-border-default align-top">
+          <td class="py-3 pr-4 text-text-primary"><T m={m.rowNativeEnvironment} /></td>
+          <td class="py-3"><T m={m.rowNativeDraws} /></td>
+        </tr>
+        <tr class="align-top">
+          <td class="py-3 pr-4 text-text-primary"><T m={m.rowFrostEnvironment} /></td>
+          <td class="py-3"><T m={m.rowFrostDraws} /></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2><T m={m.tierHeading} /></h2>
+  <p><T m={m.tierBody} /></p>
+
+  <h2><T m={m.pressedHeading} /></h2>
+  <p><T m={m.pressedBody} /></p>
+  <h3><T m={m.pressExampleHeading} /></h3>
+  <CodeBlock code={s.glassPress} lang="tsx" title="glass-button.tsx" />
+
+  <h2><T m={m.veilHeading} /></h2>
+  <p><T m={m.veilBody} /></p>
+
+  <h2><T m={m.opacityHeading} /></h2>
+  <p><T m={m.opacityBody} /></p>
+
+  <h2><T m={m.hostHeading} /></h2>
+  <p><T m={m.hostBody} /></p>
+  <h3><T m={m.exampleHeading} /></h3>
+  <CodeBlock code={s.glassSurface} lang="tsx" title="floating-bar.tsx" />
+</DocsLayout>

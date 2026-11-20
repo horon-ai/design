@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Agent Panel`, written against
- * `packages/react/src/components/agent-panel.tsx` and
- * `packages/flutter/lib/src/components/agent_panel.dart`.
+ * `packages/react/src/components/agent-panel.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 
