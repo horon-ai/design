@@ -1,17 +1,16 @@
 /**
  * Reads the library's own source to document an API instead of duplicating it.
  *
- * The page renders a props table and the import lines a reader copies, and each
- * of those has exactly one source of truth: `packages/react/src/components/
- * <slug>.tsx` for the table and the React line, `packages/lynx/src/components/
- * <slug>.tsx` for the Lynx line. A TypeScript program over the package entry
+ * The page renders a props table and the import line a reader copies, and one
+ * source of truth backs them: `packages/react/src/components/<slug>.tsx` carries
+ * both the table and the import line. A TypeScript program over the package entry
  * point resolves default values, JSDoc and inherited prop groups, so a renamed
  * prop breaks the docs build rather than silently shipping a stale table.
  *
  * The program is built once per process and cached; each page asks for one
  * component out of it.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
@@ -34,7 +33,6 @@ export interface ComponentApi {
 }
 
 const ENTRY = join("packages", "react", "src", "index.ts");
-const LYNX_DIR = join("packages", "lynx", "src", "components");
 /** Long type strings are replaced by their alias so the table stays one line per row. */
 const MAX_TYPE_LENGTH = 120;
 /** An import line longer than this wraps one name per line. */
@@ -189,10 +187,7 @@ function displayType(checker: ts.TypeChecker, prop: ts.Symbol, declaration: ts.D
   const type = checker.getTypeOfSymbolAtLocation(prop, declaration);
   const optional = (prop.flags & ts.SymbolFlags.Optional) !== 0;
   const shown = optional ? checker.getNonNullableType(type) : type;
-  const text = checker
-    .typeToString(shown, declaration, ts.TypeFormatFlags.NoTruncation)
-    .replace(/\s+/g, " ")
-    .trim();
+  const text = checker.typeToString(shown, declaration, ts.TypeFormatFlags.NoTruncation).replace(/\s+/g, " ").trim();
   if (text.length <= MAX_TYPE_LENGTH) return text;
 
   // An expansion of a named type is noise in a table cell; the written name is not.
@@ -335,9 +330,7 @@ function componentSource(slug: string): ts.SourceFile | undefined {
   const suffix = `/packages/react/src/components/${slug}.tsx`;
   // The program is built lazily by `getChecker`; build it here too so callers need no order.
   getChecker();
-  return program
-    ?.getSourceFiles()
-    .find((file) => file.fileName.replace(/\\/g, "/").endsWith(suffix));
+  return program?.getSourceFiles().find((file) => file.fileName.replace(/\\/g, "/").endsWith(suffix));
 }
 
 /** Every exported component of `packages/react/src/components/<slug>.tsx`. */
@@ -375,19 +368,4 @@ export function reactImport(slug: string): string {
 
   if (names.length === 0) return 'import * as horon from "@horon-ai/react";';
   return importLine(names, "@horon-ai/react");
-}
-
-/**
- * The Lynx import line for the same component, read from
- * `packages/lynx/src/components/<slug>.tsx`. Empty when the port does not exist
- * or the file exports nothing a caller can render.
- */
-export function lynxImport(slug: string): string {
-  const path = join(findRoot(), LYNX_DIR, `${slug}.tsx`);
-  if (!existsSync(path)) return "";
-
-  const source = ts.createSourceFile(path, readFileSync(path, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-  const names = exportedComponentNames(source);
-  if (names.length === 0) return "";
-  return importLine(names, "@horon-ai/lynx");
 }

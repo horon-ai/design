@@ -5,9 +5,8 @@ the PolyForm Strict license in `LICENSE` covers only the Horon code.
 
 ## Phosphor Icons
 
-`packages/lynx/src/icons/phosphor.g.ts` is generated from `@phosphor-icons/core`,
-the React components draw `@phosphor-icons/react`, and the Expo components draw
-`phosphor-react-native`. All three are MIT.
+The React components draw `@phosphor-icons/react` and the Expo components draw
+`phosphor-react-native`. Both are MIT.
 
 ```
 MIT License
@@ -50,8 +49,8 @@ Authors. The full license text is in
 
 ## Sidebar photo
 
-`packages/react/src/assets/sidebar-photo.jpg` (also copied into
-`packages/lynx/src/assets/`) is the sidebar photograph of the Paper "Horon"
+`packages/react/src/assets/sidebar-photo.jpg` is the sidebar photograph of the
+Paper "Horon"
 design, extracted from that screen with the interface elements removed and
 shipped as the `bg-sidebar-photo` ground. The repository carries no record of
 its original author or license: the file's EXIF holds no artist or copyright
@@ -66,7 +65,7 @@ and its terms are confirmed.
 Everything else the packages import arrives as npm dependencies rather than
 vendored source, and each carries its own license in its published package:
 `@base-ui/react` (MIT), `@tanstack/react-table` (MIT), `tailwind-merge` (MIT),
-`shiki` (MIT), `@lynx-js/react` (Apache-2.0), `expo`, `expo-glass-effect`,
-`expo-clipboard` (MIT), `react-native` (MIT), `react-native-safe-area-context`
-(MIT), `react-native-svg` (MIT), and the React, Astro, Lynx and Expo toolchain.
+`shiki` (MIT), `expo`, `expo-glass-effect`, `expo-clipboard` (MIT),
+`react-native` (MIT), `react-native-safe-area-context` (MIT), `react-native-svg`
+(MIT), and the React, Astro and Expo toolchain.
 No copyleft-licensed code is vendored into this repository.

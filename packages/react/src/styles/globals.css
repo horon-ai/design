@@ -39,8 +39,8 @@
   }
 }
 
-/* Glass, the material in @horon-ai/tokens glass.ts that @horon-ai/lynx and
- * @horon-ai/expo draw with the same values: the backdrop blurred and
+/* Glass, the material in @horon-ai/tokens glass.ts that @horon-ai/expo
+ * draws with the same values: the backdrop blurred and
  * saturated, under the host's own fill, and a rim ring on the edge. Only
  * backdrop-filter, gradients and masks, so Chromium, Safari and Firefox match. */
 @layer components {
@@ -176,10 +176,8 @@
    * `::after` (a toast close, a source-row underline) must not take this class; give it its own rule.
    * The element must be the positioning context, so never put this on an `absolute` or `fixed` node.
    *
-   * Deliberately a components-layer class, not an `@utility`: the Lynx package has no pseudo-elements
-   * and its parity test requires every React `@utility` name to exist in its own globals, so a
-   * touch-only pseudo-element utility would either fail that test or force a change in another
-   * package's contract. */
+   * Deliberately a components-layer class, not an `@utility`: React Native has no pseudo-elements, so a
+   * touch-only utility would be a web-only API name with no counterpart in the app packages. */
   .touch-slop {
     @media (pointer: coarse) {
       position: relative;

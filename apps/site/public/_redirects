@@ -1,2 +1,8 @@
-/develop/flutter /develop/lynx 301
-/develop/flutter/ /develop/lynx/ 301
+# `/develop/flutter` and `/develop/lynx` were the removed Flutter and ReactLynx
+# sections. Both point at the Expo section (the remaining app port), keeping the
+# sub-page a reader landed on when the page exists there.
+/develop/flutter /develop/expo 301
+/develop/flutter/ /develop/expo 301
+/develop/lynx /develop/expo 301
+/develop/lynx/ /develop/expo 301
+/develop/lynx/* /develop/expo/:splat 301

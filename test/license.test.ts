@@ -10,10 +10,10 @@ import { describe, expect, test } from "bun:test";
 const repo = `${import.meta.dir}/..`;
 const read = (path: string) => Bun.file(`${repo}/${path}`).text();
 
-const PUBLISHED = ["packages/react", "packages/lynx", "packages/expo", "packages/tokens"];
+const PUBLISHED = ["packages/react", "packages/expo", "packages/tokens"];
 
 /** Packages that vendor or bundle third-party artwork, so they ship its notice. */
-const WITH_NOTICES = ["packages/react", "packages/lynx", "packages/expo"];
+const WITH_NOTICES = ["packages/react", "packages/expo"];
 
 const rootLicense = await read("LICENSE");
 const rootNotices = await read("THIRD_PARTY_NOTICES.md");

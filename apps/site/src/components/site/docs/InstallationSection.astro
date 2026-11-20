@@ -1,15 +1,14 @@
 ---
-/** The `installation` section: the package command and the React and Lynx import lines. */
+/** The `installation` section: the package command and the React import line. */
 import CodeBlock from "@/components/site/CodeBlock.astro";
 import T from "@/components/i18n/T.astro";
 import { componentPageMessages as m } from "@/i18n/messages/components-page";
 
 interface Props {
   reactImport: string;
-  lynxImport: string;
 }
 
-const { reactImport, lynxImport } = Astro.props;
+const { reactImport } = Astro.props;
 ---
 
 <section>
@@ -19,16 +18,5 @@ const { reactImport, lynxImport } = Astro.props;
     <CodeBlock code="bun add @horon-ai/react" lang="bash" />
     <p><T m={m.installImport} /></p>
     <CodeBlock code={reactImport} lang="tsx" />
-    {
-      lynxImport && (
-        <>
-          <p>
-            <T m={m.installLynx} />
-          </p>
-          <CodeBlock code="bun add @horon-ai/lynx @lynx-js/react" lang="bash" />
-          <CodeBlock code={lynxImport} lang="tsx" />
-        </>
-      )
-    }
   </div>
 </section>

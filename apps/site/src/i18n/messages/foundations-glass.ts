@@ -9,16 +9,16 @@ export const foundationsGlassMessages = defineMessages({
   },
   layersHeading: { ko: "레이어", en: "Layers" },
   layersBody: {
-    ko: "아래에서 위로 세 겹입니다. React의 LiquidGlass와 Lynx의 LiquidGlass가 @horon-ai/tokens의 같은 값을 읽습니다. Lynx는 <blur-view>로 배경을 거르고, 이 요소가 채도 값을 받지 않아 흐림만 겁니다. 지원하지 않는 엔진은 glass-fill-frost 채움으로 떨어집니다.",
-    en: "Three layers, bottom to top. React's LiquidGlass and Lynx's LiquidGlass read the same values from @horon-ai/tokens. Lynx filters the backdrop with <blur-view>, which takes no saturation value, so it blurs only. Engines without it fall back to the glass-fill-frost fill.",
+    ko: "아래에서 위로 세 겹입니다. React의 LiquidGlass와 Expo의 GlassSurface가 @horon-ai/tokens의 같은 값을 읽습니다. Expo는 iOS 26 이상에서 expo-glass-effect의 GlassView로 그리고, GlassView를 쓸 수 없는 환경은 glass-fill-frost 채움으로 떨어집니다.",
+    en: "Three layers, bottom to top. React's LiquidGlass and Expo's GlassSurface read the same values from @horon-ai/tokens. Expo draws them with expo-glass-effect's GlassView on iOS 26 and later, and falls back to the glass-fill-frost fill where GlassView is unavailable.",
   },
   backdropItem: {
-    ko: "배경: 뒤 내용을 {blur}px 흐리게 하고 채도를 {saturate}%로 올립니다. Lynx의 <blur-view>는 흐림만 겁니다.",
-    en: "Backdrop: blurs what is behind by {blur}px and raises saturation to {saturate}%. Lynx's <blur-view> blurs only.",
+    ko: "배경: 뒤 내용을 {blur}px 흐리게 하고 채도를 {saturate}%로 올립니다. 네이티브 Liquid Glass를 그리는 GlassView는 같은 효과를 호스트가 맡습니다.",
+    en: "Backdrop: blurs what is behind by {blur}px and raises saturation to {saturate}%. On GlassView the native Liquid Glass draws it instead.",
   },
   fillItem: {
-    ko: "채움: glass-clear, glass-regular, glass-thick 중 하나입니다. React와 Lynx 모두 호스트가 칠합니다. Lynx의 HoronProvider는 <blur-view>를 쓸 수 있는 엔진에서 반투명 값으로 바꾸고, 쓸 수 없으면 glass-fill-frost를 유지합니다.",
-    en: "Fill: one of glass-clear, glass-regular, or glass-thick. In both React and Lynx the host paints it. Lynx's HoronProvider swaps in the translucent value on engines that can use <blur-view> and keeps glass-fill-frost where it cannot.",
+    ko: "채움: glass-clear, glass-regular, glass-thick 중 하나입니다. React는 호스트가 칠하고, Expo의 GlassSurface가 같은 단계를 GlassView의 효과와 glass-thick 색조로 옮깁니다. GlassView를 쓸 수 없으면 glass-fill-frost를 유지합니다.",
+    en: "Fill: one of glass-clear, glass-regular, or glass-thick. React lets the host paint it; Expo's GlassSurface maps the same tiers to GlassView's effect and the glass-thick tint, and keeps glass-fill-frost where GlassView is unavailable.",
   },
   borderItem: {
     ko: "테두리: 가장자리 안쪽 {width}px 링입니다. 위가 가장 밝고({top}), 가운데에서 옅어졌다가({mid}) 아래에서 조금 다시 밝아집니다({bottom}). 다크 모드는 더 옅습니다.",
