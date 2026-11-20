@@ -73,8 +73,8 @@ export const expoInstallationMessages = defineMessages({
 
   packagesHeading: { ko: "패키지 추가", en: "Add the packages" },
   packagesBody: {
-    ko: "컴포넌트 패키지와 네이티브 의존성을 넣습니다. 유리는 expo-glass-effect, 클립보드는 expo-clipboard, 눌림 진동은 expo-haptics, 안전 영역은 react-native-safe-area-context, 아이콘은 react-native-svg가 맡습니다. expo install을 쓰면 앱의 SDK에 맞는 빌드가 들어갑니다.",
-    en: "Add the component package and its native dependencies: expo-glass-effect for glass, expo-clipboard for copy actions, expo-haptics for press feedback, react-native-safe-area-context for insets and react-native-svg for icons. expo install picks the build that matches the app's SDK.",
+    ko: "컴포넌트 패키지와 네이티브 의존성을 넣습니다. 유리는 expo-glass-effect, 클립보드는 expo-clipboard, 눌림 진동은 expo-haptics, 파일 선택은 expo-document-picker, 안전 영역은 react-native-safe-area-context, 아이콘은 react-native-svg가 맡습니다. expo install을 쓰면 앱의 SDK에 맞는 빌드가 들어갑니다.",
+    en: "Add the component package and its native dependencies: expo-glass-effect for glass, expo-clipboard for copy actions, expo-haptics for press feedback, expo-document-picker for file picking, react-native-safe-area-context for insets and react-native-svg for icons. expo install picks the build that matches the app's SDK.",
   },
 
   fontsHeading: { ko: "글꼴", en: "Fonts" },

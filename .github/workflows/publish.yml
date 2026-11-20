@@ -2,7 +2,7 @@ name: Publish npm packages and deploy the site
 
 # main에 커밋이 올라올 때마다 실행합니다.
 #
-# 1. publish: 세 라이브러리(packages/tokens, packages/react, packages/lynx)가 바뀌었으면 PATCH
+# 1. publish: 네 라이브러리(packages/tokens, packages/react, packages/lynx, packages/expo)가 바뀌었으면 PATCH
 #    버전을 하나 올려 npm에 게시합니다. 버전은 npm 레지스트리가 정본입니다. 처음에는 0.1.0, 그 뒤로
 #    0.1.1, 0.1.2 … 로 올라가고 package.json의 version(0.1.0)은 MAJOR·MINOR 라인만 정하며
 #    저장소에 다시 커밋하지 않습니다. 계산 규칙은 .github/scripts/release-version.mjs에 있습니다.
@@ -63,7 +63,7 @@ jobs:
             exit 0
           fi
           changed=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" -- \
-            packages/tokens packages/react packages/lynx bun.lock)
+            packages/tokens packages/react packages/lynx packages/expo bun.lock)
           if [ -n "$changed" ]; then
             echo "$changed"
             echo "packages=true" >> "$GITHUB_OUTPUT"
@@ -73,7 +73,7 @@ jobs:
           fi
 
   publish:
-    name: publish @horon-ai/tokens, @horon-ai/react, @horon-ai/lynx
+    name: publish @horon-ai/tokens, @horon-ai/react, @horon-ai/lynx, @horon-ai/expo
     needs: changes
     if: needs.changes.outputs.packages == 'true'
     runs-on: ubuntu-latest
@@ -119,6 +119,19 @@ jobs:
             exit 1
           fi
 
+      # trusted publisher는 npm에 이미 있는 패키지에만 등록할 수 있습니다. 새 패키지를 추가하고
+      # 자리 표시 버전(`npm stage publish`가 만드는 0.0.0-stage)을 올리지 않았다면, tokens부터
+      # 일부만 게시되기 전에 여기서 멈춥니다.
+      - name: Check every package exists on npm
+        run: |
+          set -euo pipefail
+          for name in tokens react lynx expo; do
+            if ! npm view "@horon-ai/$name" name >/dev/null 2>&1; then
+              echo "::error::@horon-ai/$name 이 npm에 없습니다. 패키지를 만들고(npm stage publish) Trusted Publisher에 publish.yml을 등록한 뒤 다시 실행하세요."
+              exit 1
+            fi
+          done
+
       # 게시 전에 CI와 같은 검사를 다시 돌립니다. 깨진 패키지는 npm에 올라가지 않습니다.
       - name: Verify
         run: |
@@ -150,9 +163,9 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/npm-pack"
 
-          # tokens를 먼저 올립니다. react와 lynx가 @horon-ai/tokens의 같은 버전을 의존하기
+          # tokens를 먼저 올립니다. react, lynx, expo가 @horon-ai/tokens의 같은 버전을 의존하기
           # 때문입니다.
-          for name in tokens react lynx; do
+          for name in tokens react lynx expo; do
             package="@horon-ai/$name"
 
             if npm view "$package@$VERSION" version >/dev/null 2>&1; then
@@ -177,7 +190,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
-          for name in tokens react lynx; do
+          for name in tokens react lynx expo; do
             package="@horon-ai/$name"
             for attempt in $(seq 1 40); do
               if published=$(npm view "$package@$VERSION" version 2>/dev/null) && [ -n "$published" ]; then
@@ -195,6 +208,7 @@ jobs:
           done
           npm view "@horon-ai/react@$VERSION" dependencies
           npm view "@horon-ai/lynx@$VERSION" dependencies
+          npm view "@horon-ai/expo@$VERSION" dependencies
 
       # 체크아웃이 자격 증명을 남기지 않으므로 태그는 GitHub API로 만듭니다.
       - name: Tag the release

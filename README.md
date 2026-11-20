@@ -77,23 +77,23 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 
 ## 패키지 게시 (npm)
 
-라이브러리 세 패키지(`@horon-ai/tokens`, `@horon-ai/react`, `@horon-ai/lynx`)는 `publishConfig.access`가
-`public`입니다. 앱(`@horon/site`, `@horon/expo-gallery`)과 저장소 루트는 `private: true`라 게시 대상이 아닙니다.
-`@horon-ai/expo`도 게시 설정은 `public`이지만 아직 `publish.yml`의 게시 순서와 npm trusted publisher에
-등록하지 않았습니다. 첫 게시는 별도 승인 뒤에 두 곳을 함께 추가해서 합니다.
+라이브러리 네 패키지(`@horon-ai/tokens`, `@horon-ai/react`, `@horon-ai/lynx`, `@horon-ai/expo`)는
+`publishConfig.access`가 `public`입니다. 앱(`@horon/site`, `@horon/expo-gallery`)과 저장소 루트는
+`private: true`라 게시 대상이 아닙니다.
 
-세 패키지는 같은 버전으로 움직이고, 버전은 npm 레지스트리가 정본입니다. `main`에 세 패키지의
-변경(`packages/tokens/**`, `packages/react/**`, `packages/lynx/**`, `bun.lock`)이 올라오면
-`.github/workflows/publish.yml`이 PATCH만 하나 올려 `tokens` → `react` → `lynx` 순서로 게시합니다.
-`react`와 `lynx`가 같은 버전의 `@horon-ai/tokens`를 의존하기 때문에 `tokens`가 먼저입니다.
+네 패키지는 같은 버전으로 움직이고, 버전은 npm 레지스트리가 정본입니다. `main`에 네 패키지의
+변경(`packages/tokens/**`, `packages/react/**`, `packages/lynx/**`, `packages/expo/**`, `bun.lock`)이
+올라오면 `.github/workflows/publish.yml`이 PATCH만 하나 올려 `tokens` → `react` → `lynx` → `expo`
+순서로 게시합니다. 나머지 셋이 같은 버전의 `@horon-ai/tokens`를 의존하기 때문에 `tokens`가 먼저입니다.
 
 - 첫 게시는 `0.1.0`, 그 뒤로 `0.1.1`, `0.1.2` … 순서입니다.
 - `package.json`의 `version`(`0.1.0`)은 MAJOR·MINOR 라인만 정합니다. CI가 작업 공간에서만
   버전을 바꿔 게시하고 저장소에 다시 커밋하지 않으므로 손으로 올리지 않습니다.
 - npm의 라인과 `package.json`의 라인이 다르면(MAJOR·MINOR 변경) 게시하지 않고 실패합니다.
 - 직전 실행이 일부 패키지만 올리고 실패했다면(예: `tokens`만 올리고 `react`에서 실패) 빠진 패키지만
-  같은 버전으로 채웁니다. `@horon-ai/lynx`는 `0.1.2`부터 게시돼 그 앞 버전이 없지만, 다음 게시는
-  세 패키지 모두 같은 다음 PATCH로 올라갑니다.
+  같은 버전으로 채웁니다. 정식 버전이 아직 없는 새 패키지는 빠진 패키지로 세지 않고, 다음 게시에서
+  다른 패키지와 같은 다음 PATCH로 처음 올라갑니다(`@horon-ai/lynx`는 `0.1.2`, `@horon-ai/expo`는
+  추가된 뒤 첫 게시 버전부터 있습니다).
 - 게시 전에 lint·typecheck·test·build를 다시 돌리고, 게시한 커밋에 `v0.1.N` 태그를 남깁니다.
   provenance(실행한 워크플로와 커밋이 npm 패키지 페이지에 표시됨)가 붙습니다.
 - 게시가 끝나면 `web`, `admin` 저장소의 Renovate가 새 버전을 찾아 각 저장소의 `dev`로
@@ -106,24 +106,39 @@ import "@horon-ai/react/globals.css"; // 엔트리에서 한 번
 node .github/scripts/release-version.mjs   # 마지막 줄이 다음 게시 버전, 파일은 바꾸지 않음
 ```
 
-`@horon-ai/react`와 `@horon-ai/lynx`의 `@horon-ai/tokens` 의존은 저장소에서 `workspace:*`로 두고,
-게시할 때 버전 스크립트가 같은 버전으로 고정합니다. 그래서 이 줄을 손으로 고치지 않습니다.
+`@horon-ai/react`, `@horon-ai/lynx`, `@horon-ai/expo`의 `@horon-ai/tokens` 의존은 저장소에서 `workspace:*`로
+두고, 게시할 때 버전 스크립트가 같은 버전으로 고정합니다. 그래서 이 줄을 손으로 고치지 않습니다.
 
-`@horon-ai/lynx`는 빌드 산출물 없이 TypeScript 소스를 그대로 게시합니다. 패키지에는 `files`의
-`src`, `README.md`, `tailwind-preset.cjs`, `tailwind-preset.d.cts`만 들어가고, `exports`는
-`.`(`src/index.ts`), `./components/*`, `./tokens.css`, `./globals.css`, `./tailwind-preset`을 엽니다.
+`@horon-ai/lynx`와 `@horon-ai/expo`는 빌드 산출물 없이 TypeScript 소스를 그대로 게시합니다. lynx
+패키지에는 `files`의 `src`, `README.md`, `tailwind-preset.cjs`, `tailwind-preset.d.cts`만 들어가고,
+`exports`는 `.`(`src/index.ts`), `./components/*`, `./tokens.css`, `./globals.css`, `./tailwind-preset`을
+엽니다. expo 패키지에는 `src`, `README.md`, `LICENSE`, `THIRD_PARTY_NOTICES.md`만 들어가고, `exports`는
+`.`(`src/index.ts`)와 `./components/*`를 엽니다. 테스트(`test/`), jest 설정, 갤러리 앱은 들어가지 않습니다.
 게시 전에 내용을 보려면 다음을 실행합니다.
 
 ```bash
 cd packages/lynx && npm pack --dry-run   # 들어갈 파일 목록과 크기만 보여 주고 tarball은 만들지 않음
+cd packages/expo && npm pack --dry-run
 ```
 
 ### 게시 인증 (trusted publisher)
 
-세 패키지(tokens, react, lynx)는 npmjs.com의 Settings → Trusted Publisher에 GitHub Actions,
+네 패키지(tokens, react, lynx, expo)는 npmjs.com의 Settings → Trusted Publisher에 GitHub Actions,
 `horon-ai/design`, 워크플로 `publish.yml`이 등록돼 있습니다. `publish.yml`은 npm 토큰을 쓰지
 않고 GitHub OIDC로만 게시합니다. 등록은 워크플로 파일 이름만 보므로 어느 브랜치에서 실행해도
-됩니다. 새 패키지를 추가하면 첫 게시 뒤 그 패키지에도 같은 값으로 등록합니다.
+됩니다.
+
+새 패키지를 추가할 때는 Trusted Publisher가 npm에 이미 있는 패키지에만 등록되므로 다음 순서를 따릅니다.
+`publish.yml`은 게시 전에 네 패키지가 모두 npm에 있는지 확인하고, 하나라도 없으면 아무것도 올리지
+않고 멈춥니다.
+
+1. npm 계정으로 로그인한 상태에서 패키지 폴더에서 `npm stage publish`를 실행합니다. npm이
+   공개 자리 표시 버전 `0.0.0-stage`를 만들어 패키지가 생깁니다. 함께 대기열에 올라간 단계 게시본은
+   npmjs.com의 Staged Packages에서 거절합니다(정식 버전은 CI가 올립니다).
+2. 패키지 Settings → Trusted Publisher에 GitHub Actions, 조직 `horon-ai`, 저장소 `design`,
+   워크플로 `publish.yml`, 환경 이름 없음으로 등록하고, 허용 동작에서 `npm publish`를 켭니다
+   (2026-09-03 이후 만든 설정은 기본으로 `npm stage publish`만 허용합니다).
+3. 등록한 설정은 2일 안에 첫 게시가 성공해야 유효하므로, 등록 뒤 바로 `main`에 병합해 게시합니다.
 
 패키지 변경 없이 게시하려면 Actions 탭의 Publish npm packages에서 수동 실행합니다(PATCH가
 하나 오릅니다). `prerelease`에 `rc`를 넣고 실행하면 다음 PATCH의 프리릴리스(`0.1.4-rc.0` …)를
@@ -138,6 +153,7 @@ gh workflow run publish.yml --ref dev -f prerelease=rc   # 시험 게시
 npm view @horon-ai/tokens versions
 npm view @horon-ai/react versions
 npm view @horon-ai/lynx versions
+npm view @horon-ai/expo versions
 ```
 
 게시한 뒤에는 `web/package.json`의 `file:` 의존을
@@ -190,7 +206,7 @@ CI(`.github/workflows/ci.yml`)도 같은 lint·typecheck·test·build를 돌립�
 
 ## 라이선스
 
-이 저장소와 여기서 배포하는 `@horon-ai/react`, `@horon-ai/lynx`, `@horon-ai/tokens`는
+이 저장소와 여기서 배포하는 `@horon-ai/react`, `@horon-ai/lynx`, `@horon-ai/expo`, `@horon-ai/tokens`는
 [PolyForm Strict License 1.0.0](https://polyformproject.org/licenses/strict/1.0.0)으로
 배포합니다. 전문은 저장소 루트 `LICENSE`에 있고, 각 패키지 tarball에도 같은 파일이 들어갑니다.
 
@@ -216,4 +232,4 @@ npm에 이미 게시된 0.1.6 이하 버전에는 라이선스 표기가 없었�
 ## 알아 둘 점
 
 - 패키지는 소스(`.tsx`) 그대로 배포합니다(내부 패키지 방식). Vite·Astro·rspeedy·Metro가 각각 변환합니다.
-- 앱 `@horon/site`와 저장소 루트는 `private: true`입니다. 라이브러리 세 패키지는 게시 설정이 `public`이고, 실제 게시는 위 npm 절차를 따릅니다.
+- 앱 `@horon/site`, `@horon/expo-gallery`와 저장소 루트는 `private: true`입니다. 라이브러리 네 패키지는 게시 설정이 `public`이고, 실제 게시는 위 npm 절차를 따릅니다.
