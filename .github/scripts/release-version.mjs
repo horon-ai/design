@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 // main에 올라온 커밋으로 게시할 버전을 정합니다. publish.yml이 실행합니다.
 //
-// - 버전 라인(major.minor)은 packages/{tokens,react,lynx}/package.json이 정합니다. 세 값은 같아야 합니다.
+// - 버전 라인(major.minor)은 packages/{tokens,react,lynx,expo}/package.json이 정합니다. 네 값은 같아야 합니다.
 // - npm에 아직 아무것도 없으면 `<라인>.0`(지금은 0.1.0)으로 시작합니다.
 // - 이미 게시된 버전이 있으면 PATCH만 하나 올립니다. npm의 라인과 package.json의 라인이
 //   다르면(MAJOR·MINOR 변경) 게시하지 않고 실패합니다.
 // - 직전 실행이 일부 패키지만 올리고 도중에 실패했다면, 빠진 패키지만 같은 버전으로 채웁니다.
+// - 정식 버전이 하나도 없는 새 패키지(자리 표시 `0.0.0-stage`만 있는 경우 포함)는 "빠진 패키지"로
+//   세지 않고, 다른 패키지와 함께 다음 PATCH로 처음 게시됩니다.
 //
 // 사용법: node .github/scripts/release-version.mjs [--write] [--prerelease <id>]
-//   --write             계산한 버전을 세 package.json에 적습니다(CI 작업 공간 안에서만, 커밋하지 않음).
+//   --write             계산한 버전을 네 package.json에 적습니다(CI 작업 공간 안에서만, 커밋하지 않음).
 //   --prerelease <id>   다음 PATCH의 프리릴리스(`0.1.4-rc.0`, `0.1.4-rc.1` …)를 고릅니다. 정식 버전
 //                       계산에는 영향을 주지 않습니다. 빠진 패키지가 있으면 같은 번호로 채웁니다.
 // 결과 버전은 표준 출력 마지막 줄과, GITHUB_OUTPUT이 있으면 `version=` 줄로 남깁니다.
@@ -19,6 +21,7 @@ const PACKAGES = [
 	{ name: "@horon-ai/tokens", file: "packages/tokens/package.json" },
 	{ name: "@horon-ai/react", file: "packages/react/package.json" },
 	{ name: "@horon-ai/lynx", file: "packages/lynx/package.json" },
+	{ name: "@horon-ai/expo", file: "packages/expo/package.json" },
 ];
 const REGISTRY = process.env.NPM_REGISTRY_URL ?? "https://registry.npmjs.org";
 const STABLE = /^(\d+)\.(\d+)\.(\d+)$/;
@@ -53,7 +56,7 @@ const [first] = manifests;
 for (const m of manifests) {
 	if (m.version !== first.version) {
 		fail(
-			`${first.name}(${first.version})와 ${m.name}(${m.version})의 package.json 버전이 다릅니다. 세 패키지는 같은 버전으로 게시합니다.`,
+			`${first.name}(${first.version})와 ${m.name}(${m.version})의 package.json 버전이 다릅니다. 모든 패키지는 같은 버전으로 게시합니다.`,
 		);
 	}
 }
@@ -84,7 +87,11 @@ if (maxPatch < 0) {
 	console.log(`npm에 게시된 버전이 없습니다. ${next}으로 시작합니다.`);
 } else {
 	const latest = `${line}.${maxPatch}`;
-	const missing = [...published].filter(([, versions]) => !versions.includes(latest)).map(([name]) => name);
+	// 새 패키지는 latest를 가진 적이 없으므로 빠졌다고 보지 않습니다. 빠졌다고 보면 이미 끝난 릴리스를
+	// 다시 "채우는" 것으로 계산해, 새 패키지만 옛 버전으로 올라가고 나머지는 새 PATCH를 받지 못합니다.
+	const missing = [...published]
+		.filter(([, versions]) => versions.length > 0 && !versions.includes(latest))
+		.map(([name]) => name);
 	if (missing.length > 0) {
 		next = latest;
 		console.log(`${missing.join(", ")}에 ${latest}이 빠져 있습니다. 같은 버전으로 채웁니다.`);
