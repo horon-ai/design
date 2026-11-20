@@ -132,9 +132,11 @@ cd packages/expo && npm pack --dry-run
 `publish.yml`은 게시 전에 네 패키지가 모두 npm에 있는지 확인하고, 하나라도 없으면 아무것도 올리지
 않고 멈춥니다.
 
-1. npm 계정으로 로그인한 상태에서 패키지 폴더에서 `npm stage publish`를 실행합니다. npm이
-   공개 자리 표시 버전 `0.0.0-stage`를 만들어 패키지가 생깁니다. 함께 대기열에 올라간 단계 게시본은
-   npmjs.com의 Staged Packages에서 거절합니다(정식 버전은 CI가 올립니다).
+1. npm 계정으로 로그인한 상태에서 `npm stage publish --tag placeholder`로 자리 표시 패키지를 단계 게시합니다.
+   버전은 `0.0.0-placeholder.0`처럼 프리릴리스로 둡니다. 실수로 승인돼도 0.1 라인 검사를 깨지 않게
+   하려는 것이고, `0.0.0` 같은 정식 버전은 게시를 멈추게 합니다. npm이 공개 자리 표시 버전
+   `0.0.0-stage`를 만들어 패키지가 생깁니다. 단계 게시본은 **거절하지 않고** 그대로 둡니다. 거절하면
+   패키지 예약도 함께 사라집니다(`@horon-ai/expo` 등록 때 확인). 승인하지도 않습니다.
 2. 패키지 Settings → Trusted Publisher에 GitHub Actions, 조직 `horon-ai`, 저장소 `design`,
    워크플로 `publish.yml`, 환경 이름 없음으로 등록하고, 허용 동작에서 `npm publish`를 켭니다
    (2026-09-03 이후 만든 설정은 기본으로 `npm stage publish`만 허용합니다).
