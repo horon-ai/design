@@ -90,10 +90,10 @@ const double _treeCurveRadius = HoronRadius.sm;
 
 /// `bg-sidebar-photo`의 55% 흰 막입니다.
 ///
-/// React의 유틸리티는 `#EEF3F8` 바탕 위에 사진 한 장과 `#ffffff8c` 막을 얹습니다
-/// (`globals.css`). 토큰 패키지에 `--color-sidebar-photo`가 없고 Flutter 패키지에
-/// 그 사진 자산도 없으므로, 이 포트는 가장 가까운 바탕 토큰([HoronPalette.sky50])과
-/// 같은 알파의 흰 막으로 평평하게 그립니다.
+/// React의 유틸리티는 `#EEF3F8` 바탕 위에 하늘색 그라디언트(`sidebar-gradient.png`)와
+/// `#ffffff8c` 막을 얹습니다(`globals.css`). Flutter 패키지는 그 이미지를 싣지 않으므로,
+/// 이 포트는 가장 가까운 바탕 토큰([HoronPalette.sky50])과 같은 알파의 흰 막으로
+/// 평평하게 그립니다.
 const double _photoVeil = 0.55;
 
 /// `strokeDasharray="4 3"` — 추가 버튼 점선의 4px 선, 3px 틈입니다.
@@ -117,7 +117,7 @@ enum _SidebarSurface {
   /// `surface="glass"`, 기본값입니다. 두꺼운 유리 한 겹입니다.
   glass,
 
-  /// `surface="photo"` — 라이트에서는 Paper 사진 바탕, 다크에서는 두꺼운 유리입니다.
+  /// `surface="photo"` — 라이트에서는 Paper 그라디언트 바탕, 다크에서는 두꺼운 유리입니다.
   photo,
 
   /// `surface="plain"` — 채움도 유리도 없이 뒤 레이아웃의 색을 그대로 쓰고, 오른쪽
@@ -154,7 +154,7 @@ class HoronSidebar extends StatefulWidget {
     this.resizeLabel = 'Resize sidebar',
   }) : _surface = _SidebarSurface.glass;
 
-  /// `surface="photo"` — 라이트에서는 Paper의 사진 바탕, 다크에서는 두꺼운 유리입니다.
+  /// `surface="photo"` — 라이트에서는 Paper의 그라디언트 바탕, 다크에서는 두꺼운 유리입니다.
   const HoronSidebar.photo({
     super.key,
     required this.children,
@@ -300,7 +300,7 @@ class _HoronSidebarState extends State<HoronSidebar> {
               SizedBox(width: animatedWidth, child: child),
           child: DecoratedBox(
             // `surface="plain"`만 `border-r border-border-default`를 얻습니다. glass와
-            // photo는 테두리 없이 유리나 사진 바탕이 경계를 만듭니다.
+            // photo는 테두리 없이 유리나 그라디언트 바탕이 경계를 만듭니다.
             decoration: BoxDecoration(
               border: widget._surface == _SidebarSurface.plain
                   ? Border(
@@ -341,7 +341,7 @@ class _HoronSidebarState extends State<HoronSidebar> {
       case _SidebarSurface.glass:
         return <Widget>[_glass(theme, HoronGlassTier.thick)];
       case _SidebarSurface.photo:
-        // `bg-sidebar-photo dark:bg-glass-thick dark:bg-none` — 다크에서는 사진이 빠지고
+        // `bg-sidebar-photo dark:bg-glass-thick dark:bg-none` — 다크에서는 그라디언트가 빠지고
         // 두꺼운 유리 **색**만 남습니다. React도 이 자리에 LiquidGlass 레이어를 두지 않습니다.
         if (dark) {
           return <Widget>[Positioned.fill(child: ColoredBox(color: colors.glassThick))];

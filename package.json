@@ -18,6 +18,8 @@
 		"format": "turbo format",
 		"tokens": "turbo build --filter=@horon-ai/tokens && bun run tokens:flutter",
 		"tokens:flutter": "bun packages/flutter/scripts/generate-tokens.mjs",
+		"assets": "bun scripts/generate-sidebar-gradient.mjs",
+		"assets:check": "bun scripts/generate-sidebar-gradient.mjs --check",
 		"site": "turbo dev --filter=@horon/site...",
 		"build:site": "turbo build --filter=@horon/site",
 		"deploy:site": "turbo build --filter=@horon/site && wrangler pages deploy apps/site/dist --project-name=horon-design --branch=main"

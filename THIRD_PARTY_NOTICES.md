@@ -53,19 +53,6 @@ Flutter example icons, `packages/flutter/example/assets/fonts/TablerIcons.ttf`.
 MIT, Copyright (c) 2020-2026 Paweł Kuna. The full license text is in
 `packages/flutter/example/assets/fonts/TablerIcons-LICENSE.txt`.
 
-## Sidebar photo
-
-`packages/react/src/assets/sidebar-photo.jpg` (also copied into
-`packages/lynx/src/assets/`) is the sidebar photograph of the Paper "Horon"
-design, extracted from that screen with the interface elements removed and
-shipped as the `bg-sidebar-photo` ground. The repository carries no record of
-its original author or license: the file's EXIF holds no artist or copyright
-field, no commit message names a source, and no image bank (Unsplash, Pexels,
-Pixabay) is cited anywhere. Its origin stays unconfirmed, and it may be
-third-party stock photography. If it is, the PolyForm Strict license in
-`LICENSE` does not apply to that file; the question stays open until the source
-and its terms are confirmed.
-
 ## Runtime dependencies
 
 Everything else the packages import arrives as npm dependencies rather than
