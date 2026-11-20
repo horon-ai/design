@@ -1,0 +1,32 @@
+---
+import T from "@/components/i18n/T.astro";
+import CodeBlock from "@/components/site/CodeBlock.astro";
+import { expoBreadcrumb } from "@/data/nav";
+import { expoInstallationMessages as m, expoSnippets as snippets } from "@/i18n/messages/develop-expo";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={expoBreadcrumb(m.title, "/develop/expo/installation")}
+>
+  <h2><T m={m.packagesHeading} /></h2>
+  <p><T m={m.packagesBody} /></p>
+  <CodeBlock code={snippets.install} lang="bash" title="terminal" />
+
+  <h2><T m={m.fontsHeading} /></h2>
+  <p><T m={m.fontsBody} /></p>
+
+  <h2><T m={m.providerHeading} /></h2>
+  <p><T m={m.providerBody} /></p>
+  <CodeBlock code={snippets.entry} lang="tsx" title="app.tsx" />
+
+  <h2><T m={m.sourceHeading} /></h2>
+  <p><T m={m.sourceBody} /></p>
+
+  <h2><T m={m.checkHeading} /></h2>
+  <p><T m={m.checkBody} /></p>
+  <CodeBlock code={snippets.check} lang="tsx" title="check.tsx" />
+</DocsLayout>

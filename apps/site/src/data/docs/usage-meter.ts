@@ -1,6 +1,6 @@
 /**
  * Reference doc for `UsageMeter`, written against
- * `packages/react/src/components/usage-meter.tsx` and the current Flutter loading set.
+ * `packages/react/src/components/usage-meter.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

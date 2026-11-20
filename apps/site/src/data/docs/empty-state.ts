@@ -1,6 +1,6 @@
 /**
  * Reference doc for `EmptyState`, written against
- * `packages/react/src/components/empty-state.tsx` and the current Flutter empty set.
+ * `packages/react/src/components/empty-state.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

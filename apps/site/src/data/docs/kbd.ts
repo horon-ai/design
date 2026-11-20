@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Kbd`, written against
- * `packages/react/src/components/kbd.tsx` and
- * `packages/flutter/lib/src/components/kbd.dart`.
+ * `packages/react/src/components/kbd.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

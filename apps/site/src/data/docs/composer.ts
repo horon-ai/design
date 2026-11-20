@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Composer`, written against
- * `packages/react/src/components/composer.tsx` and
- * `packages/flutter/lib/src/components/composer.dart`.
+ * `packages/react/src/components/composer.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -1,7 +1,6 @@
 /**
  * Reference doc for `TabBar`, written against
- * `packages/react/src/components/tab-bar.tsx` and
- * `packages/flutter/lib/src/components/tab_bar.dart`.
+ * `packages/react/src/components/tab-bar.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

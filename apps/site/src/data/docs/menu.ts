@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Menu`, written against
- * `packages/react/src/components/menu.tsx` and
- * `packages/flutter/lib/src/components/menu.dart`.
+ * `packages/react/src/components/menu.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

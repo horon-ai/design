@@ -1,7 +1,6 @@
 /**
  * Reference doc for `SettingsList` and its rows, written against
- * `packages/react/src/components/settings-list.tsx` and
- * `packages/flutter/lib/src/components/settings_list.dart`.
+ * `packages/react/src/components/settings-list.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

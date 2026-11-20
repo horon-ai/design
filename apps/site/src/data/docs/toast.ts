@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Toaster`, written against
- * `packages/react/src/components/toast.tsx` and
- * `packages/flutter/lib/src/components/toast.dart`.
+ * `packages/react/src/components/toast.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

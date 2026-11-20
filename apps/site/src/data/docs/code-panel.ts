@@ -1,7 +1,6 @@
 /**
  * Reference doc for `CodePanel`, written against
- * `packages/react/src/components/code-panel.tsx` and
- * `packages/flutter/lib/src/components/code_panel.dart`.
+ * `packages/react/src/components/code-panel.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

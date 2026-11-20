@@ -1,7 +1,6 @@
 /**
  * Reference doc for `HoronIcon` and `HoronGlyph`, written against
- * `packages/react/src/components/horon-icon.tsx` and
- * `packages/flutter/lib/src/components/horon_icon.dart`.
+ * `packages/react/src/components/horon-icon.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

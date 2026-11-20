@@ -1,7 +1,6 @@
 /**
  * Reference doc for `ChatControls`, written against
- * `packages/react/src/components/chat-controls.tsx` and
- * `packages/flutter/lib/src/components/chat_controls.dart`.
+ * `packages/react/src/components/chat-controls.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

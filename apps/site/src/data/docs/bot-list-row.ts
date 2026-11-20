@@ -1,7 +1,6 @@
 /**
  * Reference doc for `BotListRow`, written against
- * `packages/react/src/components/bot-list-row.tsx` and
- * `packages/flutter/lib/src/components/bot_list_row.dart`.
+ * `packages/react/src/components/bot-list-row.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -1,7 +1,6 @@
 /**
  * Reference doc for `BotMemoryPanel`, written against
- * `packages/react/src/components/bot-memory-panel.tsx` and
- * `packages/flutter/lib/src/components/bot_memory_panel.dart`.
+ * `packages/react/src/components/bot-memory-panel.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

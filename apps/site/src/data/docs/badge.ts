@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Badge`, written against
- * `packages/react/src/components/badge.tsx` and
- * `packages/flutter/lib/src/components/badge.dart`.
+ * `packages/react/src/components/badge.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

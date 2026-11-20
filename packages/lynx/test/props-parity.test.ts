@@ -1,14 +1,14 @@
 /**
  * The props parity gate: every prop a React component declares itself or takes
  * from Base UI must exist on its Lynx counterpart with the same optionality,
- * literal set and (for React's own props) default. `props-parity.ts` does the
- * reading; this file holds the differences the Lynx platform forces, each with
- * its reason, and fails on anything else, including an allowance that no longer
- * matches a real difference.
+ * literal set and (for React's own props) default. The repository's
+ * `test/props-parity.ts` does the reading; this file holds the differences the
+ * Lynx platform forces, each with its reason, and fails on anything else,
+ * including an allowance that no longer matches a real difference.
  */
 import { describe, expect, test } from "bun:test";
 
-import { compareProps } from "./props-parity";
+import { compareProps } from "../../../test/props-parity";
 
 /** Base UI props no Lynx component can have, whatever the component. */
 const PLATFORM_PROPS = new Map([
@@ -75,12 +75,12 @@ const ALLOWED_KINDS: Record<string, string> = {
   "menu:MenuContent.alignOffset": "default",
 };
 
-const report = compareProps();
+const report = compareProps("lynx");
 
 describe("@horon-ai/lynx ↔ @horon-ai/react props parity", () => {
   test("every React component has a Lynx component", () => {
     console.log(
-      `components: react ${report.components.react}, lynx ${report.components.lynx}, matched ${report.components.matched}`,
+      `components: react ${report.components.react}, lynx ${report.components.port}, matched ${report.components.matched}`,
     );
     expect(report.components.matched).toBe(report.components.react);
   });

@@ -1,7 +1,6 @@
 /**
  * Reference doc for `ResearchRunPanel`, written against
- * `packages/react/src/components/research-run-panel.tsx` and
- * `packages/flutter/lib/src/components/research_run_panel.dart`.
+ * `packages/react/src/components/research-run-panel.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

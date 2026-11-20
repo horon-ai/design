@@ -1,7 +1,6 @@
 /**
  * Reference doc for `InputGroup`, written against
- * `packages/react/src/components/input-group.tsx` and
- * `packages/flutter/lib/src/components/input_group.dart`.
+ * `packages/react/src/components/input-group.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

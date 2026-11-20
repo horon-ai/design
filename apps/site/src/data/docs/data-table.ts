@@ -1,6 +1,6 @@
 /**
  * Reference doc for the `DataTable` set, written against
- * `packages/react/src/components/data-table.tsx` and the current Flutter table set.
+ * `packages/react/src/components/data-table.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

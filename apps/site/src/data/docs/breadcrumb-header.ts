@@ -1,7 +1,6 @@
 /**
  * Reference doc for `BreadcrumbHeader`, written against
- * `packages/react/src/components/breadcrumb-header.tsx` and
- * `packages/flutter/lib/src/components/breadcrumb_header.dart`.
+ * `packages/react/src/components/breadcrumb-header.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 

@@ -1,0 +1,40 @@
+---
+import T from "@/components/i18n/T.astro";
+import { expoBreadcrumb } from "@/data/nav";
+import { expoDifferencesMessages as m } from "@/i18n/messages/develop-expo";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title={m.title}
+  description={m.description}
+  section="develop"
+  breadcrumb={expoBreadcrumb(m.title, "/develop/expo/differences")}
+>
+  <h2><T m={m.introHeading} /></h2>
+  <p><T m={m.introBody} /></p>
+
+  <h3><T m={m.eventsLabel} /></h3>
+  <p><T m={m.eventsBody} /></p>
+
+  <h3><T m={m.styleLabel} /></h3>
+  <p><T m={m.styleBody} /></p>
+
+  <h3><T m={m.propsLabel} /></h3>
+  <p><T m={m.propsBody} /></p>
+
+  <h3><T m={m.hooksLabel} /></h3>
+  <p><T m={m.hooksBody} /></p>
+
+  <h3><T m={m.pressLabel} /></h3>
+  <p><T m={m.pressBody} /></p>
+
+  <h3><T m={m.a11yLabel} /></h3>
+  <p><T m={m.a11yBody} /></p>
+
+  <h3><T m={m.domLabel} /></h3>
+  <p><T m={m.domBody} /></p>
+
+  <h2><T m={m.sameHeading} /></h2>
+  <p><T m={m.sameBody} /></p>
+</DocsLayout>

@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Horon Gallery",
+    "slug": "horon-expo-gallery",
+    "version": "0.0.0",
+    "orientation": "default",
+    "userInterfaceStyle": "automatic",
+    "ios": { "bundleIdentifier": "ai.horon.expo.gallery", "supportsTablet": true },
+    "android": { "package": "ai.horon.expo.gallery" },
+    "plugins": [
+      ["expo-font", { "fonts": ["./assets/fonts/PretendardVariable.ttf", "./assets/fonts/GeistMono-Variable.ttf"] }]
+    ]
+  }
+}

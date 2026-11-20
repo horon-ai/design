@@ -1,7 +1,6 @@
 /**
  * Reference doc for `Combobox`, written against
- * `packages/react/src/components/combobox.tsx` and
- * `packages/flutter/lib/src/components/combobox.dart`.
+ * `packages/react/src/components/combobox.tsx`.
  */
 import type { ComponentDoc } from "@/lib/component-docs";
 
