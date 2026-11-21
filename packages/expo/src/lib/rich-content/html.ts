@@ -195,7 +195,10 @@ function blocks(nodes: DomNode[]): RichBlock[] {
  * their content. While `streaming`, a tag that is still arriving at the end is cut off first.
  */
 export function parseHtml(source: string, streaming = false): RichBlock[] {
-  const complete = streaming ? source.replace(/<[^>]*$/, "") : source;
+  // The last `<` with no `>` after it is a tag still arriving; one lookup, not a regex that would
+  // rescan from every `<` in a long reply.
+  const last = source.lastIndexOf("<");
+  const complete = streaming && last !== -1 && !source.includes(">", last) ? source.slice(0, last) : source;
   const document = parseDocument(complete, { decodeEntities: true, lowerCaseTags: true, lowerCaseAttributeNames: true });
   // htmlparser2's node classes carry more than DomNode names; this file reads only those fields.
   const nodes: DomNode[] = document.children;

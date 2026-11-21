@@ -15,9 +15,15 @@ const underline: TokenizerAndRendererExtension = {
     return index === -1 ? undefined : index;
   },
   tokenizer(src) {
-    const match = /^\+\+(?=\S)([\s\S]*?\S)\+\+(?!\+)/.exec(src);
-    if (!match) return undefined;
-    return { type: "underline", raw: match[0], text: match[1], tokens: this.lexer.inlineTokens(match[1] ?? "") };
+    // A scan instead of a lazy regex: marked calls this at every `++`, and `[\s\S]*?\S` backtracks
+    // over the rest of the text each time, which grows with the square of a long reply.
+    if (!src.startsWith("++") || /\s/.test(src[2] ?? " ")) return undefined;
+    for (let end = src.indexOf("++", 3); end !== -1; end = src.indexOf("++", end + 1)) {
+      if (src[end + 2] === "+" || /\s/.test(src[end - 1] ?? " ")) continue;
+      const text = src.slice(2, end);
+      return { type: "underline", raw: src.slice(0, end + 2), text, tokens: this.lexer.inlineTokens(text) };
+    }
+    return undefined;
   },
   renderer: () => "",
 };
@@ -141,10 +147,13 @@ export function parseMarkdown(source: string, profile: Profile): RichBlock[] {
 
 const FENCE = /^ {0,3}(`{3,}|~{3,})/;
 const TABLE_ROW = /^\s*\|/;
-const TABLE_DELIMITER = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
 
 /** How many cells a table row has, ignoring the optional outer pipes. */
-const columns = (line: string) => line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").length;
+const cells = (line: string) => line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|");
+const columns = (line: string) => cells(line).length;
+
+/** A GFM delimiter row (`|:--|--:|`), checked cell by cell so the test stays linear in the line. */
+const isDelimiterRow = (line: string) => line.includes("-") && cells(line).every((cell) => /^:?-+:?$/.test(cell.trim()));
 
 /**
  * Makes a markdown reply that is still arriving render as it will once complete, without the
@@ -172,7 +181,7 @@ export function settleMarkdown(source: string): string {
   const tail = lines.slice(end);
   // A table renders once its delimiter row has as many columns as its header; until then the
   // rows would parse as a paragraph of pipes, so they wait.
-  const delimiter = tail.findIndex((line) => TABLE_DELIMITER.test(line) && line.includes("-"));
+  const delimiter = tail.findIndex(isDelimiterRow);
   const header = tail[delimiter - 1];
   if (tail.length > 0 && (delimiter < 1 || header === undefined || columns(tail[delimiter] ?? "") !== columns(header)))
     lines.length = end;
@@ -183,14 +192,14 @@ export function settleMarkdown(source: string): string {
 }
 
 function settleInline(paragraph: string): string {
-  let out = paragraph.replace(/\[([^\]\n]*)\]\([^)\s]*$/, "$1").replace(/\[([^\]\n]*)$/, "$1");
+  let out = settleLink(paragraph);
   if ((out.match(/`/g)?.length ?? 0) % 2 === 1) out = closeOrDrop(out, "`");
   const prose = out.replace(/`[^`]*`/g, "");
   const open: { marker: string; at: number }[] = [];
   for (const marker of ["**", "~~", "++"]) {
     if ((prose.split(marker).length - 1) % 2 === 1) open.push({ marker, at: prose.lastIndexOf(marker) });
   }
-  const singles = prose.replace(/\*\*/g, "  ").replace(/^\s*\*\s/gm, "  ");
+  const singles = prose.replace(/\*\*/g, "  ").replace(/^[ \t]*\*[ \t]/gm, "  ");
   if ((singles.match(/\*/g)?.length ?? 0) % 2 === 1) open.push({ marker: "*", at: singles.lastIndexOf("*") });
   // Close from the innermost (latest) opener outwards. An opener with nothing after it yet is
   // dropped instead, so a bare `**` never renders as a thematic break or as literal stars.
@@ -201,6 +210,21 @@ function settleInline(paragraph: string): string {
     else closers.push(marker);
   }
   return out + closers.join("");
+}
+
+/**
+ * The last link of a paragraph while it is still arriving shows its text only: `[text](https://ho`
+ * becomes `text`, and an unclosed `[text` loses its bracket. Found by position rather than by a
+ * regex, so a reply full of brackets costs one pass.
+ */
+function settleLink(paragraph: string): string {
+  const open = paragraph.lastIndexOf("[");
+  if (open === -1) return paragraph;
+  const close = paragraph.indexOf("]", open);
+  if (close === -1) return paragraph.includes("\n", open) ? paragraph : paragraph.slice(0, open) + paragraph.slice(open + 1);
+  const target = paragraph.slice(close + 2);
+  if (paragraph[close + 1] !== "(" || target.includes(")") || /\s/.test(target)) return paragraph;
+  return paragraph.slice(0, open) + paragraph.slice(open + 1, close);
 }
 
 /** Closes the last opener of `marker`, or removes it when nothing has arrived after it yet. */

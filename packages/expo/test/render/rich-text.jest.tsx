@@ -172,3 +172,29 @@ test("plain text keeps its characters and line breaks", async () => {
   await show("**그대로**\n<b>둘째 줄</b>", "text");
   expect(screen.getByText("**그대로**\n<b>둘째 줄</b>")).toBeTruthy();
 });
+
+test("a long hostile stream renders without stalling", async () => {
+  const hostile = [
+    "[\\".repeat(20000),
+    "[](".repeat(20000),
+    `|${" ".repeat(20000)}-`,
+    "++a +".repeat(5000),
+    "\n".repeat(20000),
+  ];
+  const started = Date.now();
+  await render(
+    <HoronProvider scheme="light">
+      {hostile.map((source) => (
+        <RichText key={source.slice(0, 8)} format="markdown" streaming>
+          {source}
+        </RichText>
+      ))}
+      <RichText format="html" streaming>
+        {"<".repeat(40000)}
+      </RichText>
+    </HoronProvider>,
+  );
+  // Each pathological input used to cost time growing with the square of its length; a linear
+  // settle finishes all of them in well under this bound even on a slow CI runner.
+  expect(Date.now() - started).toBeLessThan(5000);
+});
