@@ -16,7 +16,6 @@ export interface NavItem {
 
 export const developNav: NavItem[] = [
   { label: { ko: "React", en: "React" }, href: "/develop/react" },
-  { label: { ko: "Lynx", en: "Lynx" }, href: "/develop/lynx" },
   { label: { ko: "Expo", en: "Expo" }, href: "/develop/expo" },
 ];
 
@@ -85,28 +84,6 @@ export const reactDocsNav: NavGroup[] = [
   },
 ];
 
-/** Sidebar of the Lynx docs section, in reading order. */
-export const lynxDocsNav: NavGroup[] = [
-  {
-    key: "lynx-start",
-    label: { ko: "Lynx · 시작하기", en: "Lynx · Getting started" },
-    items: [
-      { label: { ko: "소개", en: "Introduction" }, href: "/develop/lynx" },
-      { label: { ko: "설치", en: "Installation" }, href: "/develop/lynx/installation" },
-      { label: { ko: "테마와 플랫폼", en: "Theme and platform" }, href: "/develop/lynx/theming" },
-    ],
-  },
-  {
-    key: "lynx-concepts",
-    label: { ko: "Lynx · 개념", en: "Lynx · Concepts" },
-    items: [
-      { label: { ko: "유리 표면", en: "Liquid glass" }, href: "/develop/lynx/liquid-glass" },
-      { label: { ko: "React와 다른 점", en: "Differences from React" }, href: "/develop/lynx/differences" },
-      { label: { ko: "갤러리 실행", en: "Running the gallery" }, href: "/develop/lynx/gallery" },
-    ],
-  },
-];
-
 /** Sidebar of the Expo docs section, in reading order. */
 export const expoDocsNav: NavGroup[] = [
   {
@@ -135,15 +112,6 @@ export function reactBreadcrumb(title: Localized, href: string): { label: Locali
   return [
     { label: { ko: "Develop", en: "Develop" }, href: "/develop" },
     { label: { ko: "React", en: "React" }, href: "/develop/react" },
-    { label: title, href },
-  ];
-}
-
-/** Breadcrumb shared by every page under `/develop/lynx`. */
-export function lynxBreadcrumb(title: Localized, href: string): { label: Localized; href: string }[] {
-  return [
-    { label: { ko: "Develop", en: "Develop" }, href: "/develop" },
-    { label: { ko: "Lynx", en: "Lynx" }, href: "/develop/lynx" },
     { label: title, href },
   ];
 }

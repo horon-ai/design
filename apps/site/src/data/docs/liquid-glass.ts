@@ -99,8 +99,8 @@ export const doc: ComponentDoc = {
       id: "material",
       title: { ko: "재질 값", en: "Material values" },
       note: {
-        ko: "값은 glass.ts에서 오고 theme.css가 CSS 변수로 내보냅니다. React와 Lynx의 LiquidGlass가 같은 값을 읽고, Lynx는 <blur-view>가 채도를 받지 않아 흐림만 겁니다.",
-        en: "The values come from glass.ts and theme.css publishes them as CSS variables. React's and Lynx's LiquidGlass read the same numbers, and Lynx blurs only because <blur-view> takes no saturation value.",
+        ko: "값은 glass.ts에서 오고 theme.css가 CSS 변수로 내보냅니다. React의 LiquidGlass와 Expo의 GlassSurface가 같은 값을 읽습니다.",
+        en: "The values come from glass.ts and theme.css publishes them as CSS variables. React's LiquidGlass and Expo's GlassSurface read the same numbers.",
       },
       rows: [
         { state: "layer", slot: "LiquidGlass", property: "position", value: "absolute inset-0" },

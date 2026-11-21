@@ -194,7 +194,7 @@ export type StreamingTextProps = {
  * reveal restarts from the shared prefix when `text` is rewritten rather than extended.
  *
  * React Native cannot place a view inline inside a wrapped `<Text>`, so the caret is a sibling laid out at
- * the bubble's end, the way the Lynx port places it.
+ * the bubble's end.
  *
  * @example
  * ```tsx

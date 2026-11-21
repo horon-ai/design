@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
 
-import { expoDocsNav, lynxDocsNav, reactDocsNav } from "../src/data/nav";
+import { expoDocsNav, reactDocsNav } from "../src/data/nav";
 import { reactHooks } from "../src/data/react-hooks";
 
 const pagesDir = `${import.meta.dir}/../src/pages`;
 const hooksDir = `${import.meta.dir}/../../../packages/react/src/hooks`;
 
-const navItems = [...reactDocsNav, ...lynxDocsNav, ...expoDocsNav].flatMap((group) => group.items);
+const navItems = [...reactDocsNav, ...expoDocsNav].flatMap((group) => group.items);
 const hookSlugs = reactHooks.map((hook) => hook.slug);
 const hookSources = [...new Bun.Glob("*.ts").scanSync(hooksDir)]
   .filter((file) => file !== "index.ts")
@@ -17,7 +17,6 @@ const hookSources = [...new Bun.Glob("*.ts").scanSync(hooksDir)]
 /** The page source a sidebar href renders, with hooks and section roots sharing their own routes. */
 const pageSource = (href: string) => {
   if (href === "/develop/react") return `${pagesDir}/develop/react.astro`;
-  if (href === "/develop/lynx") return `${pagesDir}/develop/lynx.astro`;
   if (href === "/develop/expo") return `${pagesDir}/develop/expo.astro`;
   if (href.startsWith("/develop/react/hooks/")) return `${pagesDir}/develop/react/hooks/[slug].astro`;
   return `${pagesDir}${href}.astro`;

@@ -1,7 +1,7 @@
 /**
- * Text scans of a component source tree, shared by the React parity gates of
- * `@horon-ai/lynx` and `@horon-ai/expo`. They read files instead of importing
- * them, because the ports need their own runtimes and a plain `bun test` has none.
+ * Text scans of a component source tree, used by the `@horon-ai/expo` React
+ * parity gates. It reads files instead of importing them, because the port needs
+ * Metro or jest-expo and a plain `bun test` has neither.
  */
 
 export const listTsx = (dir: string): string[] =>

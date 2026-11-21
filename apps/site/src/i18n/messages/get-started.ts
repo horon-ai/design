@@ -10,8 +10,8 @@ export const getStartedMessages = defineMessages({
 
   whatTitle: { ko: "Horon 디자인 시스템이란?", en: "What is the Horon Design System?" },
   whatBody: {
-    ko: "색, 글자, 간격 같은 값부터 버튼과 패널 같은 컴포넌트까지 하나의 체계로 정리했습니다. 값은 Figma Horon 파일에서 읽어 @horon-ai/tokens에 한 번만 적고, 웹(React)과 앱(Lynx)이 같은 값을 씁니다.",
-    en: "Values like color, type and spacing, and components like buttons and panels, live in one system. Values are read from the Figma Horon file and written once in @horon-ai/tokens, so web (React) and app (Lynx) share them.",
+    ko: "색, 글자, 간격 같은 값부터 버튼과 패널 같은 컴포넌트까지 하나의 체계로 정리했습니다. 값은 Figma Horon 파일에서 읽어 @horon-ai/tokens에 한 번만 적고, 웹(React)과 앱(Expo)이 같은 값을 씁니다.",
+    en: "Values like color, type and spacing, and components like buttons and panels, live in one system. Values are read from the Figma Horon file and written once in @horon-ai/tokens, so web (React) and app (Expo) share them.",
   },
 
   systemTitle: { ko: "시스템 이해하기", en: "Understand the system" },
@@ -36,11 +36,6 @@ export const getStartedMessages = defineMessages({
   reactBody: {
     ko: "웹 앱에 @horon-ai/react를 설치하고 컴포넌트를 불러옵니다.",
     en: "Install @horon-ai/react in a web app and import components.",
-  },
-  lynxTitle: { ko: "Lynx", en: "Lynx" },
-  lynxBody: {
-    ko: "Lynx 앱에 @horon-ai/lynx를 설치하고 Tailwind 프리셋과 테마를 연결합니다.",
-    en: "Install @horon-ai/lynx in a Lynx app and wire up the Tailwind presets and theme.",
   },
   expoTitle: { ko: "Expo", en: "Expo" },
   expoBody: {
