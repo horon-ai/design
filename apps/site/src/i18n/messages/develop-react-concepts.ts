@@ -78,8 +78,8 @@ export const conceptsMessages = defineMessages({
   },
   glassMaterialHeading: { ko: "재질", en: "The material" },
   glassMaterialBody: {
-    ko: "LiquidGlass는 @horon-ai/tokens의 glass.ts 값을 그대로 씁니다. Lynx의 LiquidGlass도 같은 값을 읽고, 배경은 <blur-view>로 겁니다. iOS는 Liquid Glass, web은 CSS backdrop-filter, Android와 HarmonyOS는 캡처 블러를 쓰고, 지원하지 않는 엔진은 glass-fill-frost로 떨어집니다. <blur-view>가 채도 값을 받지 않아 Lynx에서는 saturate(1.8)가 빠집니다.",
-    en: "LiquidGlass reads the values in glass.ts from @horon-ai/tokens. Lynx's LiquidGlass reads the same values and filters the backdrop with <blur-view>: iOS renders Liquid Glass, the web engine turns it into a CSS backdrop-filter, and Android and HarmonyOS blur the captured backdrop. Engines without it fall back to glass-fill-frost. <blur-view> takes no saturation value, so saturate(1.8) is dropped in Lynx.",
+    ko: "LiquidGlass는 @horon-ai/tokens의 glass.ts 값을 그대로 씁니다. Expo의 GlassSurface도 같은 값을 읽고, iOS 26 이상에서는 expo-glass-effect의 GlassView로 그립니다. web은 CSS backdrop-filter를 쓰고, GlassView를 쓸 수 없는 환경(Android, 이전 iOS, 투명도 줄이기)은 glass-fill-frost 채움으로 떨어집니다.",
+    en: "LiquidGlass reads the values in glass.ts from @horon-ai/tokens. Expo's GlassSurface reads the same values and draws them with expo-glass-effect's GlassView on iOS 26 and later. The web turns them into a CSS backdrop-filter, and environments without GlassView (Android, older iOS, Reduce Transparency) fall back to the glass-fill-frost fill.",
   },
   glassMaterialBackdropItem: {
     ko: "배경: 뒤 내용을 20px 흐리게 하고 채도를 180%로 올립니다.",

@@ -1,7 +1,6 @@
 /**
  * The one glass material every platform draws: web (Chromium, Safari, Firefox),
- * desktop (WebView2, WKWebView), Lynx (iOS, Android, HarmonyOS) and Expo
- * (iOS, Android).
+ * desktop (WebView2, WKWebView) and Expo (iOS, Android).
  *
  * It is limited to what all of them render the same way, so there is no
  * refraction, no blend mode and no height-dependent blur. Bottom to top:
@@ -9,8 +8,8 @@
  * 1. Backdrop: the content behind is blurred by `blur` and saturated by
  *    `saturate`. CSS `blur(r)` takes the Gaussian standard deviation and
  *    applies the Filter Effects saturate matrix. Native hosts with a system
- *    material (iOS Liquid Glass through `<blur-view>` or `expo-glass-effect`)
- *    let the system filter the backdrop instead.
+ *    material (iOS Liquid Glass through `expo-glass-effect`)
+ *    lets the system filter the backdrop instead.
  * 2. Fill: the tier colour `glass-clear` / `glass-regular` / `glass-thick` from
  *    `color.ts`. Saturation is linear and keeps white, so filling over the
  *    saturated backdrop equals saturating backdrop plus fill (CSS).

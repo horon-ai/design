@@ -1,8 +1,7 @@
 /**
- * Compares every component's public props between `@horon-ai/react` and one
- * port (`@horon-ai/lynx` or `@horon-ai/expo`) with the TypeScript checker, so
- * the parity gates cover what a caller writes at the call site and not only the
- * exported names.
+ * Compares every component's public props between `@horon-ai/react` and a port
+ * (`@horon-ai/expo`) with the TypeScript checker, so the parity gate covers what
+ * a caller writes at the call site and not only the exported names.
  *
  * For each slug and each exported PascalCase component, every React prop is
  * sorted by where it is declared:
@@ -17,10 +16,10 @@
  * - `dom`: inherited from `@types/react` (`onKeyDown`, `tabIndex`, `aria-*`).
  *   These describe a DOM element the ports do not have, so they are only counted.
  *
- * Each port's test file lists the differences its platform forces, each with a
+ * The port's test file lists the differences its platform forces, each with a
  * reason, and fails on any other difference.
  *
- *   bun test/props-parity.ts lynx   # print the differences of one port
+ *   bun test/props-parity.ts   # print the props differences against each port
  */
 import { dirname, join, resolve } from "node:path";
 
@@ -54,7 +53,7 @@ interface PropInfo {
 const packagesDir = resolve(import.meta.dir, "../packages");
 
 /** The ports compared against `@horon-ai/react`, by package directory. */
-export type Port = "lynx" | "expo";
+export type Port = "expo";
 
 function loadProgram(pkg: string): ts.Program {
   const configPath = join(packagesDir, pkg, "tsconfig.json");
@@ -211,8 +210,7 @@ export function compareProps(port: Port): PropParityReport {
 }
 
 if (import.meta.main) {
-  const port = process.argv[2] === "expo" ? "expo" : "lynx";
-  const report = compareProps(port);
+  const report = compareProps("expo");
   console.log(JSON.stringify({ components: report.components, props: report.props }));
   for (const difference of report.differences)
     console.log(`${difference.key} [${difference.source} ${difference.kind}] ${difference.detail}`);

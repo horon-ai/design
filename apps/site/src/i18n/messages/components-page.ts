@@ -27,10 +27,6 @@ export const componentPageMessages = defineMessages({
 
   installPackage: { ko: "패키지를 설치합니다.", en: "Install the package." },
   installImport: { ko: "컴포넌트를 가져옵니다.", en: "Import the component." },
-  installLynx: {
-    ko: "Lynx 앱에서는 @horon-ai/lynx를 설치하고 같은 이름으로 가져옵니다.",
-    en: "In a Lynx app, install @horon-ai/lynx and import the same names.",
-  },
 
   /** Table headers and paired-card labels. */
   stateHeader: { ko: "상태", en: "State" },

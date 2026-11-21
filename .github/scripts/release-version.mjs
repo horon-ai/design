@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // main에 올라온 커밋으로 게시할 버전을 정합니다. publish.yml이 실행합니다.
 //
-// - 버전 라인(major.minor)은 packages/{tokens,react,lynx,expo}/package.json이 정합니다. 네 값은 같아야 합니다.
+// - 버전 라인(major.minor)은 packages/{tokens,react,expo}/package.json이 정합니다. 세 값은 같아야 합니다.
 // - npm에 아직 아무것도 없으면 `<라인>.0`(지금은 0.1.0)으로 시작합니다.
 // - 이미 게시된 버전이 있으면 PATCH만 하나 올립니다. npm의 라인과 package.json의 라인이
 //   다르면(MAJOR·MINOR 변경) 게시하지 않고 실패합니다.
@@ -20,7 +20,6 @@ import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 const PACKAGES = [
 	{ name: "@horon-ai/tokens", file: "packages/tokens/package.json" },
 	{ name: "@horon-ai/react", file: "packages/react/package.json" },
-	{ name: "@horon-ai/lynx", file: "packages/lynx/package.json" },
 	{ name: "@horon-ai/expo", file: "packages/expo/package.json" },
 ];
 const REGISTRY = process.env.NPM_REGISTRY_URL ?? "https://registry.npmjs.org";

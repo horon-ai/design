@@ -11,7 +11,7 @@ import { describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
 
 import { components } from "../src/data/components";
-import { componentApi, lynxImport, reactImport } from "../src/lib/api";
+import { componentApi, reactImport } from "../src/lib/api";
 import { validateDoc, type ComponentDoc } from "../src/lib/component-docs";
 
 const siteDir = `${import.meta.dir}/..`;
@@ -32,18 +32,8 @@ const exampleIds = (slug: string): string[] => files(`${examplesDir}/${slug}`, "
 /** Own props whose type the extractor spelled as a string-literal union. */
 const ownUnionProps = (slug: string): string[] =>
   componentApi(slug).flatMap((entry) =>
-    entry.props
-      .filter((row) => /^"(?:[^"\\]|\\.)*"(?: \| "(?:[^"\\]|\\.)*")+$/.test(row.type))
-      .map((row) => row.name),
+    entry.props.filter((row) => /^"(?:[^"\\]|\\.)*"(?: \| "(?:[^"\\]|\\.)*")+$/.test(row.type)).map((row) => row.name),
   );
-
-/** The names inside an `import { … } from "…"` line, single-line or wrapped. */
-const importedNames = (line: string): string[] =>
-  line
-    .slice(line.indexOf("{") + 1, line.indexOf("}"))
-    .split(",")
-    .map((name) => name.trim().replace(/,$/, ""))
-    .filter(Boolean);
 
 /** Narrows an imported module's `doc` export before the validator looks at it. */
 function isComponentDoc(value: unknown): value is ComponentDoc {
@@ -111,18 +101,6 @@ describe("extractor", () => {
       .flatMap((entry) => entry.props)
       .find((row) => row.name === "size");
     expect(size?.type).toBe('"sm" | "md" | "lg" | "compact"');
-  });
-
-  test("lynxImport", { timeout: TIMEOUT }, () => {
-    const button = lynxImport("button");
-    expect(button).toContain("Button");
-    expect(button).toContain('from "@horon-ai/lynx"');
-    expect(lynxImport("not-a-real-component")).toBe("");
-    // The same wrap rule as reactImport: past the limit, one name per line.
-    expect(lynxImport("dialog")).toContain("\n  DialogTrigger,");
-    // packages/lynx/test/parity.test.ts keeps the Lynx value exports equal to
-    // React's, so the two import lines name the same components.
-    expect(importedNames(lynxImport("button"))).toEqual(importedNames(reactImport("button")));
   });
 });
 

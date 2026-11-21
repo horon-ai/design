@@ -1,5 +1,0 @@
-# Build output of the gallery bundles.
-example/dist/
-
-# Bun and Turbo caches.
-.turbo/

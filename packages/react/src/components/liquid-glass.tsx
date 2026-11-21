@@ -1,6 +1,6 @@
 /**
  * The glass material from `@horon-ai/tokens` `glass.ts`, the same one
- * `@horon-ai/lynx` and `@horon-ai/expo` draw: the backdrop blurred and
+ * `@horon-ai/expo` draws: the backdrop blurred and
  * saturated, then a 1px rim that is bright at the top and faint down the sides.
  *
  * Render it as the first child of a `relative isolate` host with a border radius
