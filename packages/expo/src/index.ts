@@ -75,6 +75,7 @@ export * from "./components/plugin-row";
 export * from "./components/progress";
 export * from "./components/radio-group";
 export * from "./components/research-run-panel";
+export * from "./components/rich-text";
 export * from "./components/schedule";
 export * from "./components/segmented-control";
 export * from "./components/select";

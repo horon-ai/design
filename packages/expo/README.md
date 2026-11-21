@@ -114,6 +114,43 @@ function ChatInput({ placeholder }: { placeholder: string }) {
 - 입력창이 직접 테두리와 배경을 그리면 세로 안쪽 여백을 `padding` 옵션으로 넘깁니다. 보정이 테두리 밖으로 나가지 않고 여백 안에서 이뤄집니다.
 - 한계: iOS는 큰 글자 설정에서 입력창 폭보다 긴 placeholder를 줄여 넣고, 이때 최대 3pt 아래로 처집니다. 큰 글자에서도 한 줄에 들어가는 짧은 placeholder를 씁니다.
 
+## 텍스트 콘텐츠 렌더링 (RichText)
+
+`RichText`는 채팅 응답, 공지, 도움말처럼 서식이 있는 글을 키트 토큰으로 그립니다. WebView 없이 React Native `Text`와 `View`로 그려서 Expo Go, 개발 빌드, 웹에서 똑같이 동작합니다. `@horon-ai/react`에는 아직 없는 Expo 전용 컴포넌트입니다.
+
+```tsx
+import { RichText } from "@horon-ai/expo";
+
+<RichText format="markdown" streaming={!done} selectable confirmLinks>
+  {reply}
+</RichText>
+```
+
+| `format` | 읽는 방식 |
+|---|---|
+| `text`(기본) | 글자 그대로. 줄바꿈만 유지하고 기호와 태그를 해석하지 않습니다. |
+| `basic` | 굵게(`**`), 기울임(`*`), 취소선(`~~`), 밑줄(`++`), 순서 없는/있는 목록(`-`, `1.`), 링크, 표, 인라인 코드와 코드 블록만 서식을 적용합니다. 제목, 인용, 구분선, 이미지, 체크리스트, HTML은 쓴 글자 그대로 보입니다. |
+| `markdown` | GFM 전체(제목, 인용, 목록과 체크리스트, 표, 코드, 구분선, 이미지)와 `++밑줄++`. 한 줄 바꿈도 줄을 바꿉니다(채팅 응답 방식). |
+| `html` | 허용 목록에 있는 태그만 markdown과 같은 블록으로 옮깁니다. |
+
+- 네 형식은 하나의 문서 모델로 해석되므로 같은 내용은 형식이 달라도 같은 모양으로 그려집니다. `basic`은 markdown과 같은 해석기를 쓰고, 허용하지 않는 요소만 원래 글자로 되돌립니다.
+- **밑줄 표기**: CommonMark에는 밑줄이 없고 `__글자__`는 굵게입니다. 그래서 markdown-it-ins 확장의 관례인 `++글자++`를 씁니다. HTML에서는 `<u>`, `<ins>`입니다.
+- **스트리밍**: `streaming`을 켜면 덜 도착한 문법을 정리한 뒤 그립니다. 열린 코드 블록은 바로 닫고, 구분 줄이 아직 없는 표 행은 기다리게 하고, 닫히지 않은 `` ` ``, `**`, `~~`, `++`, `*`는 닫거나(뒤에 글자가 없으면 지움) 주소가 덜 온 링크는 글자만 보여 줍니다. HTML은 덜 온 태그를 잘라 냅니다. 기호가 잠깐 보였다가 사라지는 깜박임이 없습니다.
+- **글꼴과 크기**: 본문은 `size`(`sm`·`md`·`lg`)에 따라 `body-*`, 제목은 `title-*`·`label-lg`, 코드는 `code`(Geist Mono) 토큰입니다. 색은 현재 화면 모드의 토큰이고, 시스템 글자 크기를 최대 2배까지 따릅니다. 한계: Pretendard에는 이탤릭 글꼴이 없어서 iOS는 기울임을 똑바로 그리고, Android는 기울여 흉내 냅니다.
+- **선택과 복사**: `selectable`을 켜면 블록 단위로 글을 선택해 복사할 수 있습니다. 코드 블록에는 복사 버튼이 있고(`copyCode={false}`로 숨김) `expo-clipboard`로 복사합니다.
+- **긴 내용**: 긴 링크와 단어는 줄을 바꿉니다. 긴 코드 줄은 코드 블록 안에서 가로로 스크롤되고, `wrapCode`를 켜면 줄을 바꿉니다. 코드 블록의 언어 표기(` ```ts `)는 무시합니다.
+- **표(모바일 컴팩트)**: 작은 글자(`md` 기준 `body-sm`, 머리 `label-md`), 좁은 칸 여백(6×8pt), 배경으로 구분한 머리 행, 행 구분선 없음. 화면보다 넓은 표는 표 안에서만 가로로 스크롤되고 페이지는 움직이지 않습니다. 열 폭은 칸 내용으로 정하되 48pt에서 240pt 사이이고(글자 배율만큼 함께 커짐), 그보다 긴 칸은 말줄임 없이 여러 줄로 바뀝니다. 정렬(`:--`, `:-:`, `--:` 또는 `align`)을 따릅니다.
+
+### 보안 정책
+
+- **HTML 정화**: `p`, `br`, `h1`∼`h6`, `strong`·`b`, `em`·`i`, `s`·`del`·`strike`, `u`·`ins`, `code`·`kbd`·`samp`, `pre`, `blockquote`, `ul`·`ol`·`li`, 체크박스 `input`, `table`·`tr`·`th`·`td`, `hr`, `a`, `img`만 해석합니다. 읽는 속성은 `href`, `src`, `alt`, `start`, `align`, `type`, `checked`뿐이라 `on*` 이벤트, `style`, `class`는 아예 읽지 않습니다. `script`, `style`, `iframe`, `object`, `embed`, `svg`, `form` 같은 요소는 내용까지 지웁니다. 모르는 태그는 벗기고 안의 글자만 남깁니다. markdown 안의 HTML은 해석하지 않고 글자로 보여 줍니다.
+- **링크**: `https`, `http`, `mailto`, `tel`만 링크가 됩니다. `javascript:`, `data:`, 상대 주소, 엔티티나 공백·제어 문자로 숨긴 주소는 일반 글자로 보입니다. `confirmLinks`를 켜면 전체 주소를 보여 주고 확인을 받은 뒤 엽니다. `onLinkPress`를 넘기면 앱이 직접 처리합니다(허용된 주소만 전달).
+- **이미지**: 기본값 `images="block"`은 원격 이미지를 받지 않고 대체 텍스트를 칩으로 보여 줍니다. `images="load"`일 때만 `https` 이미지를 받고, `data:`, `file:`, `http:`는 계속 막습니다.
+
+### 접근성
+
+제목은 header, 링크는 문장 안의 link, 체크리스트 표시는 checkbox(완료 여부 상태), 이미지는 대체 텍스트로 읽힙니다. 읽는 순서는 원문 순서입니다. 키트가 직접 넣는 글자(`Copy`, `Image`, 링크 확인 문구 등)는 `labels`로 바꿉니다.
+
 ## React 패키지와 다른 점
 
 - **이벤트 이름**: DOM에서 물려받은 `onClick` 대신 React Native 관례인 `onPress`를 씁니다. react가 직접 선언한 콜백 이름은 그대로입니다.
@@ -213,7 +250,7 @@ function ChatInput({ placeholder }: { placeholder: string }) {
 | usage-meter | 구현 | Base UI Meter를 `Animated` 채움과 `progressbar` 값으로 |
 | workspace-menu | 구현 | `render` 트리거를 측정 래퍼 안에서 복제 |
 
-배럴에서 빠진 이름은 `mountCursorGhost`·`CursorGhostOptions`(DOM 전용 데스크톱 커서 꼬리)와 `cn`·`ClassValue`(클래스 이름 병합 도구)입니다. 대신 `GlassSurface`, `HoronPressable`, `useHaptic`, `HoronText`, `useFieldText`, `useInsets`, `HoronProvider`, `useHoronTheme`을 더 내보냅니다.
+배럴에서 빠진 이름은 `mountCursorGhost`·`CursorGhostOptions`(DOM 전용 데스크톱 커서 꼬리)와 `cn`·`ClassValue`(클래스 이름 병합 도구)입니다. 대신 `GlassSurface`, `HoronPressable`, `useHaptic`, `HoronText`, `useFieldText`, `useInsets`, `HoronProvider`, `useHoronTheme`과 Expo 전용 컴포넌트 `RichText`를 더 내보냅니다.
 
 ## 명령
 

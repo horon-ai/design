@@ -67,5 +67,7 @@ vendored source, and each carries its own license in its published package:
 `@base-ui/react` (MIT), `@tanstack/react-table` (MIT), `tailwind-merge` (MIT),
 `shiki` (MIT), `expo`, `expo-glass-effect`, `expo-clipboard` (MIT),
 `react-native` (MIT), `react-native-safe-area-context` (MIT), `react-native-svg`
-(MIT), and the React, Astro and Expo toolchain.
+(MIT), `marked` (MIT), `htmlparser2` (MIT) with `entities`, `domhandler`,
+`domutils` and `domelementtype` (BSD-2-Clause), and the React, Astro and Expo
+toolchain.
 No copyleft-licensed code is vendored into this repository.
