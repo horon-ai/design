@@ -3,6 +3,7 @@ import { StyleSheet, TextInput, View, type StyleProp, type ViewStyle } from "rea
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme, type ColorToken, type TextStyleName } from "../provider";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { GlassSurface } from "../lib/glass-surface";
 import { HoronText } from "../lib/text";
 import type { ControlSize } from "../lib/size";
@@ -139,6 +140,7 @@ export function TextareaField({
   // A controlled value can change without an input event (a form reset, a parent rewriting it), so
   // the counter follows the value whenever the caller owns it.
   const length = value === undefined ? count : value.length;
+  const fieldText = useFieldText(fieldTextClass[size], { multiline: true, empty: length === 0 });
   const invalid = !!error;
   const glass = surface === "glass";
   const painted = glass ? null : fieldBoxClass[surface];
@@ -180,6 +182,7 @@ export function TextareaField({
         {glass ? <GlassSurface material="veil" radius={radius.md} style={StyleSheet.absoluteFill} /> : null}
         <TextInput
           testID={testID}
+          maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
           value={value}
           defaultValue={defaultValue}
           placeholder={placeholder}
@@ -206,7 +209,7 @@ export function TextareaField({
           }}
           style={[
             fieldBoxClass.text,
-            theme.text(fieldTextClass[size]),
+            fieldText,
             { color: theme.color(disabled ? "text-disabled" : "text-primary") },
           ]}
         />

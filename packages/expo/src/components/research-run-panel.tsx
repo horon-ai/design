@@ -5,6 +5,7 @@ import { primitives, radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme, type ColorToken } from "../provider";
 import { duration, easing } from "../lib/motion";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { HoronPressable } from "../lib/press";
 import { TOUCH_TARGET } from "../lib/size";
 import { HoronText } from "../lib/text";
@@ -227,6 +228,7 @@ export function ResearchRunPanel({
   ...props
 }: ResearchRunPanelProps) {
   const theme = useHoronTheme();
+  const fieldText = useFieldText("body-sm");
   const [draft, setDraft] = useState("");
   const [focused, setFocused] = useState(false);
   const count = read !== undefined && total !== undefined ? `${read} of ${total} read` : undefined;
@@ -396,7 +398,8 @@ export function ResearchRunPanel({
             onSubmitEditing={submit}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            style={[theme.text("body-sm"), styles.input, { color: theme.color("text-primary") }]}
+            maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
+            style={[styles.input, fieldText, { color: theme.color("text-primary") }]}
           />
           <HoronPressable
             pressScale

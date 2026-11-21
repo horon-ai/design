@@ -15,6 +15,7 @@ import { CaretDown, Check, MagnifyingGlass, X } from "phosphor-react-native";
 import { radius, shadow, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme, type ColorToken, type TextStyleName } from "../provider";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { GlassSurface } from "../lib/glass-surface";
 import { useInsets } from "../lib/insets";
 import { duration, easing } from "../lib/motion";
@@ -320,7 +321,7 @@ export function Combobox(props: ComboboxProps) {
     ? Math.max(spacing["2"], Math.min(anchor.x, window.width - popupWidth - spacing["2"]))
     : spacing["4"];
 
-  const fieldTextStyle = theme.text(fieldTextClass[size]);
+  const fieldTextStyle = useFieldText(fieldTextClass[size]);
   const rowHeight = theme.touch ? TOUCH_TARGET : controlHeight[size];
 
   const fieldTrigger = ({ pressed }: PressableStateCallbackType) =>
@@ -439,6 +440,7 @@ export function Combobox(props: ComboboxProps) {
               value={query}
               onChangeText={setQuery}
               onFocus={openPopup}
+              maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
               style={[fieldBoxClass.text, fieldTextStyle, { minWidth: 64, color: theme.color("text-primary") }]}
             />
           </HoronPressable>
@@ -471,6 +473,7 @@ export function Combobox(props: ComboboxProps) {
                     if (!open) openPopup();
                   }}
                   onFocus={openPopup}
+                  maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
                   style={[fieldBoxClass.text, fieldTextStyle, { color: theme.color("text-primary") }]}
                 />
                 <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
@@ -550,6 +553,7 @@ export function Combobox(props: ComboboxProps) {
                   placeholderTextColor={theme.color("text-placeholder")}
                   value={query}
                   onChangeText={setQuery}
+                  maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
                   style={[fieldBoxClass.text, fieldTextStyle, { color: theme.color("text-primary") }]}
                 />
               </View>
