@@ -20,6 +20,14 @@ const transpiled = [
   "expo-[a-z-]+",
   "jest-expo",
   "@testing-library",
+  // RichText's parsers ship as ES modules only.
+  "marked",
+  "htmlparser2",
+  "entities",
+  "domhandler",
+  "domutils",
+  "domelementtype",
+  "dom-serializer",
 ].join("|");
 
 module.exports = {
