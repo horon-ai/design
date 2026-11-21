@@ -5,6 +5,7 @@ import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
 import { fillFromClass } from "../lib/class-color";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { HoronPressable } from "../lib/press";
 import { useDevice } from "../hooks/use-device";
 import { DISABLED_OPACITY, TOUCH_TARGET } from "../lib/size";
@@ -176,6 +177,7 @@ export function TaskComposer({
   const [draft, setDraft] = useState("");
   const [focused, setFocused] = useState(false);
   const text = value ?? draft;
+  const fieldText = useFieldText("body-sm", { multiline: true, empty: text === "" });
 
   return (
     <View
@@ -198,8 +200,8 @@ export function TaskComposer({
         placeholder={placeholder}
         placeholderTextColor={theme.color("text-secondary")}
         accessibilityLabel={placeholder}
-        maxFontSizeMultiplier={2}
-        style={[styles.input, theme.text("body-sm"), { color: theme.color("text-primary") }]}
+        maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
+        style={[styles.input, fieldText, { color: theme.color("text-primary") }]}
       />
       <View style={styles.footer}>
         {pickers ? <View style={styles.pickers}>{pickers}</View> : null}

@@ -4,6 +4,7 @@ import { ArrowUp, Check, Lightning, PathIcon, Pause, Play, X } from "phosphor-re
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { HoronPressable } from "../lib/press";
 import { useDevice } from "../hooks/use-device";
 import { duration, easing } from "../lib/motion";
@@ -312,6 +313,7 @@ export function AgentSteeringPanel({
   style,
 }: AgentSteeringPanelProps) {
   const theme = useHoronTheme();
+  const fieldText = useFieldText("body-sm");
   const { keyboardHints } = useDevice();
   const [draft, setDraft] = useState("");
   const queued = notes.filter((note) => !note.applied);
@@ -462,8 +464,8 @@ export function AgentSteeringPanel({
             placeholder={placeholder}
             placeholderTextColor={theme.color("text-secondary")}
             accessibilityLabel={placeholder}
-            maxFontSizeMultiplier={2}
-            style={[styles.steerInput, theme.text("body-sm"), { color: theme.color("text-primary") }]}
+            maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
+            style={[styles.steerInput, fieldText, { color: theme.color("text-primary") }]}
           />
           <HoronPressable
             role="button"

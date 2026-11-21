@@ -61,6 +61,7 @@ import demo_plugin_row from "./demos/plugin-row";
 import demo_progress from "./demos/progress";
 import demo_radio_group from "./demos/radio-group";
 import demo_research_run_panel from "./demos/research-run-panel";
+import demo_rich_text from "./demos/rich-text";
 import demo_schedule from "./demos/schedule";
 import demo_segmented_control from "./demos/segmented-control";
 import demo_select from "./demos/select";
@@ -156,6 +157,7 @@ export const registry: GalleryEntry[] = [
   { slug: "progress", Demo: demo_progress },
   { slug: "radio-group", Demo: demo_radio_group },
   { slug: "research-run-panel", Demo: demo_research_run_panel },
+  { slug: "rich-text", Demo: demo_rich_text },
   { slug: "schedule", Demo: demo_schedule },
   { slug: "segmented-control", Demo: demo_segmented_control },
   { slug: "select", Demo: demo_select },

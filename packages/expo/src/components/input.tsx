@@ -13,6 +13,7 @@ import { IconContext } from "phosphor-react-native";
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme, type ColorToken, type TextStyleName } from "../provider";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { GlassSurface } from "../lib/glass-surface";
 import { controlHeight, type ControlSize } from "../lib/size";
 
@@ -234,6 +235,7 @@ export function Input({
   testID,
 }: InputProps) {
   const theme = useHoronTheme();
+  const fieldText = useFieldText(fieldTextClass[size]);
   const [focused, setFocused] = useState(false);
   const glass = surface === "glass";
   const iconColour = theme.color("text-secondary");
@@ -271,6 +273,7 @@ export function Input({
       ) : null}
       <TextInput
         testID={testID}
+        maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
         value={value}
         defaultValue={defaultValue}
         placeholder={placeholder}
@@ -299,7 +302,7 @@ export function Input({
           if (disabled || readOnly) return;
           onConfirm?.(event.nativeEvent.text);
         }}
-        style={[fieldBoxClass.text, theme.text(fieldTextClass[size]), { color: theme.color(disabled ? "text-disabled" : "text-primary") }]}
+        style={[fieldBoxClass.text, fieldText, { color: theme.color(disabled ? "text-disabled" : "text-primary") }]}
       />
     </View>
   );

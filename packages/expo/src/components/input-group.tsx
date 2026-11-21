@@ -12,6 +12,7 @@ import { IconContext } from "phosphor-react-native";
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme, type ColorToken, type TextStyleName } from "../provider";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { GlassSurface } from "../lib/glass-surface";
 import { controlHeight, type ControlSize } from "../lib/size";
 import { HoronText } from "../lib/text";
@@ -232,6 +233,7 @@ export function InputGroup({
   testID,
 }: InputGroupProps) {
   const theme = useHoronTheme();
+  const fieldText = useFieldText(fieldTextClass[size]);
   const [focused, setFocused] = useState(false);
   const context = useMemo(() => ({ size, disabled, surface }), [size, disabled, surface]);
   const glass = surface === "glass";
@@ -272,6 +274,7 @@ export function InputGroup({
         <View style={[styles.inputSlot, inputPadding[size]]}>
           <TextInput
             testID={testID}
+            maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
             value={value}
             defaultValue={defaultValue}
             placeholder={placeholder}
@@ -302,7 +305,7 @@ export function InputGroup({
             }}
             style={[
               fieldBoxClass.text,
-              theme.text(fieldTextClass[size]),
+              fieldText,
               { color: theme.color(disabled ? "text-disabled" : "text-primary") },
             ]}
           />

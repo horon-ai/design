@@ -25,6 +25,7 @@ import { fillFromClass } from "../lib/class-color";
 import { GlassSurface } from "../lib/glass-surface";
 import { useInsets } from "../lib/insets";
 import { duration, easing } from "../lib/motion";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { HoronPressable } from "../lib/press";
 import { TOUCH_TARGET } from "../lib/size";
 import { HoronText } from "../lib/text";
@@ -293,6 +294,7 @@ export function CommandPaletteBody({
   onSelect,
 }: CommandPaletteBodyProps) {
   const theme = useHoronTheme();
+  const fieldText = useFieldText("body-sm");
   const [query, setQuery] = useState("");
   const needle = query.trim().toLowerCase();
 
@@ -321,7 +323,8 @@ export function CommandPaletteBody({
           accessibilityLabel={placeholder}
           autoCorrect={false}
           autoCapitalize="none"
-          style={[styles.input, theme.text("body-sm"), { color: theme.color("text-primary") }]}
+          maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
+          style={[styles.input, fieldText, { color: theme.color("text-primary") }]}
         />
         {closeControl ??
           (onClose === undefined ? null : (
