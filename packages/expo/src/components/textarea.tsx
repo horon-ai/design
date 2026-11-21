@@ -3,6 +3,7 @@ import { StyleSheet, TextInput, View, type StyleProp, type ViewStyle } from "rea
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme, type ColorToken } from "../provider";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { GlassSurface } from "../lib/glass-surface";
 import type { ControlSize } from "../lib/size";
 import { fieldBoxClass, fieldTextClass, type InputSurface } from "./input";
@@ -112,6 +113,9 @@ export function Textarea({
   testID,
 }: TextareaProps) {
   const theme = useHoronTheme();
+  // The field may keep its own text (`defaultValue`), so the placeholder state is tracked here too.
+  const [ownText, setOwnText] = useState(defaultValue ?? "");
+  const fieldText = useFieldText(fieldTextClass[size], { multiline: true, empty: (value ?? ownText) === "" });
   const [focused, setFocused] = useState(false);
   const glass = surface === "glass";
   const painted = glass ? null : fieldBoxClass[surface];
@@ -143,6 +147,7 @@ export function Textarea({
       {glass ? <GlassSurface material="veil" radius={radius.md} style={StyleSheet.absoluteFill} /> : null}
       <TextInput
         testID={testID}
+        maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
         value={value}
         defaultValue={defaultValue}
         placeholder={placeholder}
@@ -163,11 +168,12 @@ export function Textarea({
         }}
         onChangeText={(text) => {
           if (disabled || readOnly) return;
+          setOwnText(text);
           onChange?.(text);
         }}
         style={[
           fieldBoxClass.text,
-          theme.text(fieldTextClass[size]),
+          fieldText,
           { color: theme.color(disabled ? "text-disabled" : "text-primary") },
         ]}
       />

@@ -115,6 +115,7 @@ export {
   type RuntimeWindow,
   type ShortcutEvent,
 } from "./lib/platform";
+export { FIELD_MAX_FONT_SCALE, useFieldText } from "./lib/field-text";
 export { HoronPressable, useHaptic, type HoronPressableProps, type PressHaptic } from "./lib/press";
 export { controlHeight, touchSlop, TOUCH_TARGET, DISABLED_OPACITY, type ControlSize } from "./lib/size";
 export { HoronText, type HoronTextProps } from "./lib/text";

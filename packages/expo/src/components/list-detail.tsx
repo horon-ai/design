@@ -6,6 +6,7 @@ import { useHoronTheme } from "../provider";
 import { useMediaQuery } from "../hooks/use-media-query";
 import { GlassSurface } from "../lib/glass-surface";
 import { duration, easing } from "../lib/motion";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { HoronPressable } from "../lib/press";
 import { HoronText } from "../lib/text";
 import { Button } from "./button";
@@ -407,6 +408,7 @@ export function ListDetailInstructions({
   style,
 }: ListDetailInstructionsProps) {
   const theme = useHoronTheme();
+  const fieldText = useFieldText("code", { multiline: true, padding: spacing["3.5"] });
   const [inner, setInner] = useState(defaultValue);
   const [editing, setEditing] = useState(false);
   const [height, setHeight] = useState(0);
@@ -466,14 +468,15 @@ export function ListDetailInstructions({
             setInner(next);
             onValueChange?.(next);
           }}
+          maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
           style={[
             styles.input,
+            fieldText,
             {
               borderRadius: radius.md,
               borderColor: theme.color("border-default"),
               backgroundColor: theme.color("bg-inset"),
               color: theme.color("text-primary"),
-              ...theme.text("code"),
             },
           ]}
         />
@@ -604,9 +607,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderWidth: 1,
     paddingHorizontal: spacing["4"],
-    paddingVertical: spacing["3.5"],
     minHeight: 126,
-    textAlignVertical: "top",
   },
   files: { flexDirection: "column", gap: spacing["2"] },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing["1.5"] },

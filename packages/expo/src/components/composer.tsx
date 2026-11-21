@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, useWindowDimensions, View } from "react-native";
 import { ArrowUp, Microphone, Plus } from "phosphor-react-native";
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { GlassSurface } from "../lib/glass-surface";
 import { controlHeight, type ControlSize } from "../lib/size";
 import { IconButton } from "./icon-button";
@@ -79,9 +80,11 @@ export function Composer({
   disabled,
 }: ComposerProps) {
   const theme = useHoronTheme();
+  const { fontScale } = useWindowDimensions();
   const [valueState, setValueState] = useState(defaultValue);
   const [focused, setFocused] = useState(false);
   const value = valueProp ?? valueState;
+  const fieldText = useFieldText(TEXT[size], { multiline: true, empty: value === "" });
   const setValue = (next: string) => {
     if (valueProp === undefined) setValueState(next);
     onValueChange?.(next);
@@ -103,33 +106,35 @@ export function Composer({
         onPress={onAttach}
         disabled={disabled}
       />
-      <TextInput
-        value={value}
-        onChangeText={(next) => {
-          if (disabled) return;
-          setValue(next);
-        }}
-        placeholder={placeholder}
-        placeholderTextColor={theme.color("text-placeholder")}
-        accessibilityLabel={placeholder}
-        editable={!disabled}
-        multiline
-        submitBehavior="submit"
-        returnKeyType="send"
-        onSubmitEditing={submit}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        textAlignVertical="center"
-        style={[
-          theme.text(TEXT[size]),
-          styles.field,
-          {
-            color: theme.color(disabled ? "text-disabled" : "text-primary"),
-            minHeight: height,
-            maxHeight: theme.text(TEXT[size]).lineHeight * 4,
-          },
-        ]}
-      />
+      {/* The field box keeps the control height and centres the input, which grows line by line up
+          to four lines; the input itself only spans its text, so one line sits in the middle. */}
+      <View style={[styles.field, { minHeight: height }]}>
+        <TextInput
+          value={value}
+          onChangeText={(next) => {
+            if (disabled) return;
+            setValue(next);
+          }}
+          placeholder={placeholder}
+          placeholderTextColor={theme.color("text-placeholder")}
+          accessibilityLabel={placeholder}
+          editable={!disabled}
+          multiline
+          submitBehavior="submit"
+          returnKeyType="send"
+          onSubmitEditing={submit}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE}
+          style={[
+            fieldText,
+            {
+              color: theme.color(disabled ? "text-disabled" : "text-primary"),
+              maxHeight: theme.text(TEXT[size]).lineHeight * 4 * Math.min(fontScale, FIELD_MAX_FONT_SCALE),
+            },
+          ]}
+        />
+      </View>
       <View style={{ width: height, height }}>
         <View
           style={[StyleSheet.absoluteFill, { opacity: canSubmit ? 1 : 0 }]}
@@ -215,5 +220,5 @@ const styles = StyleSheet.create({
   },
   border: { borderWidth: 1 },
   ring: { borderWidth: 2, margin: -2 },
-  field: { flex: 1, minWidth: 0, paddingTop: 0, paddingBottom: 0, paddingHorizontal: 0, margin: 0 },
+  field: { flex: 1, minWidth: 0, justifyContent: "center" },
 });

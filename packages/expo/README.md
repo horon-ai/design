@@ -89,6 +89,31 @@ Expo Router를 쓰면 `SafeAreaProvider`는 라우터가 이미 넣으므로 `Ho
 - 글자는 모두 `HoronText`로 그려 시스템 글자 크기(Dynamic Type)를 따르고, 최대 2배에서 멈춰 한 줄 컨트롤이 깨지지 않게 합니다.
 - 오버레이는 RN `Modal`이라 Android 뒤로 가기로 닫히고, 내용은 `accessibilityViewIsModal`입니다.
 
+## 입력창 글자 정렬
+
+`TextInput`은 `Text`와 달리 lineHeight 안에서 글자를 가운데에 두지 않습니다. iOS 한 줄 입력은 토큰 lineHeight를 주면 placeholder가 약 3pt, 입력 글자가 약 7pt 아래로 처지고, Android 여러 줄 입력은 placeholder만 줄 맨 위에 붙습니다. 키트의 입력 컴포넌트(`Input`, `InputGroup`, `Textarea`, `TextareaField`, `Combobox`, `Composer`, `CommandPalette` 등)는 모두 `useFieldText`로 이 차이를 보정합니다.
+
+앱에서 `TextInput`을 직접 쓸 때도 같은 훅을 씁니다. `useHoronTheme().text()`를 입력창에 그대로 넣지 않습니다.
+
+```tsx
+import { TextInput, View } from "react-native";
+import { FIELD_MAX_FONT_SCALE, useFieldText } from "@horon-ai/expo";
+
+function ChatInput({ placeholder }: { placeholder: string }) {
+  const fieldText = useFieldText("body-md");
+  return (
+    <View style={{ minHeight: 44, justifyContent: "center" }}>
+      <TextInput placeholder={placeholder} maxFontSizeMultiplier={FIELD_MAX_FONT_SCALE} style={[{ paddingHorizontal: 16 }, fieldText]} />
+    </View>
+  );
+}
+```
+
+- 한 줄 입력은 상자(`minHeight`)가 높이를 갖고 가운데 정렬하며, 입력창 자체에는 높이를 주지 않습니다.
+- 여러 줄 입력은 `useFieldText(name, { multiline: true, empty })`를 씁니다. `empty`는 지금 placeholder가 보이는지(값이 빈 문자열인지)입니다.
+- 입력창이 직접 테두리와 배경을 그리면 세로 안쪽 여백을 `padding` 옵션으로 넘깁니다. 보정이 테두리 밖으로 나가지 않고 여백 안에서 이뤄집니다.
+- 한계: iOS는 큰 글자 설정에서 입력창 폭보다 긴 placeholder를 줄여 넣고, 이때 최대 3pt 아래로 처집니다. 큰 글자에서도 한 줄에 들어가는 짧은 placeholder를 씁니다.
+
 ## React 패키지와 다른 점
 
 - **이벤트 이름**: DOM에서 물려받은 `onClick` 대신 React Native 관례인 `onPress`를 씁니다. react가 직접 선언한 콜백 이름은 그대로입니다.
@@ -188,7 +213,7 @@ Expo Router를 쓰면 `SafeAreaProvider`는 라우터가 이미 넣으므로 `Ho
 | usage-meter | 구현 | Base UI Meter를 `Animated` 채움과 `progressbar` 값으로 |
 | workspace-menu | 구현 | `render` 트리거를 측정 래퍼 안에서 복제 |
 
-배럴에서 빠진 이름은 `mountCursorGhost`·`CursorGhostOptions`(DOM 전용 데스크톱 커서 꼬리)와 `cn`·`ClassValue`(클래스 이름 병합 도구)입니다. 대신 `GlassSurface`, `HoronPressable`, `useHaptic`, `HoronText`, `useInsets`, `HoronProvider`, `useHoronTheme`을 더 내보냅니다.
+배럴에서 빠진 이름은 `mountCursorGhost`·`CursorGhostOptions`(DOM 전용 데스크톱 커서 꼬리)와 `cn`·`ClassValue`(클래스 이름 병합 도구)입니다. 대신 `GlassSurface`, `HoronPressable`, `useHaptic`, `HoronText`, `useFieldText`, `useInsets`, `HoronProvider`, `useHoronTheme`을 더 내보냅니다.
 
 ## 명령
 
