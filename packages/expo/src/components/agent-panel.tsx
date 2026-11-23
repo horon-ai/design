@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { StyleSheet, TextInput, View, type StyleProp, type ViewStyle } from "react-native";
 import { CaretDown, IconContext } from "phosphor-react-native";
 import { radius, spacing } from "@horon-ai/tokens";
@@ -6,6 +6,7 @@ import { radius, spacing } from "@horon-ai/tokens";
 import { useHoronTheme } from "../provider";
 import { fillFromClass } from "../lib/class-color";
 import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
+import { useIconContext } from "../lib/icon";
 import { HoronPressable } from "../lib/press";
 import { useDevice } from "../hooks/use-device";
 import { DISABLED_OPACITY, TOUCH_TARGET } from "../lib/size";
@@ -85,7 +86,7 @@ export function ComposerChip({
   style,
 }: ComposerChipProps) {
   const theme = useHoronTheme();
-  const iconDefaults = useMemo(() => ({ color: theme.color("text-secondary"), size: 14 }), [theme]);
+  const iconDefaults = useIconContext({ color: theme.color("text-secondary"), size: 14 });
   return (
     <HoronPressable
       role="button"

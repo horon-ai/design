@@ -4,6 +4,7 @@ import { Robot } from "phosphor-react-native";
 import { lightColors, primitives, radius } from "@horon-ai/tokens";
 
 import { useHoronTheme, type ColorToken, type TextStyleName } from "../provider";
+import { DEFAULT_ICON_WEIGHT } from "../lib/icon";
 import { duration, easing } from "../lib/motion";
 import { HoronText } from "../lib/text";
 
@@ -192,7 +193,7 @@ export function Avatar({
         ]}
       >
         {type === "bot" ? (
-          <Robot size={botSize[size]} weight="regular" color={theme.color("text-brand")} />
+          <Robot size={botSize[size]} weight={DEFAULT_ICON_WEIGHT} color={theme.color("text-brand")} />
         ) : (
           <>
             {hasImage ? (

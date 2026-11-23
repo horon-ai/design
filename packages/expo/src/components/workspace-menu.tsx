@@ -2,6 +2,7 @@ import type { ReactElement, ReactNode } from "react";
 import { Check, GearSix, PlusCircle } from "phosphor-react-native";
 
 import { useHoronTheme } from "../provider";
+import { ACTIVE_ICON_WEIGHT } from "../lib/icon";
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTile, MenuTrigger } from "./menu";
 
 /**
@@ -93,7 +94,7 @@ export function WorkspaceMenu({
             trailing={
               <Check
                 size={16}
-                weight="bold"
+                weight={ACTIVE_ICON_WEIGHT}
                 color={workspace.id === value ? theme.color("text-primary") : "transparent"}
               />
             }

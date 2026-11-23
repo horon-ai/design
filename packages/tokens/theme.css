@@ -228,6 +228,8 @@
   --veil-field-shadow: rgba(23, 24, 26, 0.06);
   --veil-overlay: rgba(255, 255, 255, 0.74);
   --veil-overlay-shadow: rgba(23, 24, 26, 0.1);
+  --icon-stroke-width: 1.3;
+  --icon-stroke-width-active: 1.8;
   --paragraph-body-lg: 0.75em;
   --paragraph-body-md: 0.75em;
   --paragraph-body-sm: 0.75em;

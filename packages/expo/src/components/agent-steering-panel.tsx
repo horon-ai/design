@@ -5,6 +5,7 @@ import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
 import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
+import { ACTIVE_ICON_WEIGHT } from "../lib/icon";
 import { HoronPressable } from "../lib/press";
 import { useDevice } from "../hooks/use-device";
 import { duration, easing } from "../lib/motion";
@@ -121,7 +122,7 @@ function Marker({ status }: { status: SteeringStepStatus }) {
         accessibilityLabel={statusWord.done}
         style={[styles.markerDone, { backgroundColor: theme.color("status-live") }]}
       >
-        <Check size={12} weight="bold" color={theme.color("text-on-ink")} />
+        <Check size={12} weight={ACTIVE_ICON_WEIGHT} color={theme.color("text-on-ink")} />
       </View>
     );
   }

@@ -86,6 +86,7 @@ import {
 } from "phosphor-react-native";
 
 import { useHoronTheme } from "../provider";
+import { DEFAULT_ICON_WEIGHT } from "../lib/icon";
 
 /** Props for the Horon mark: the size like a Phosphor icon, the tint and the accessible name. */
 export type HoronIconProps = {
@@ -340,7 +341,7 @@ export type HoronGlyphProps = {
   size?: number | string;
   /** Colour of the glyph; defaults to the icon colour the provider publishes. */
   color?: string;
-  /** Phosphor stroke weight, `regular` unless the caller asks for another. */
+  /** Phosphor stroke weight, inheriting ambient `IconContext` (default `light`) unless the caller asks for another. */
   weight?: IconWeight;
   /** Layout of the glyph (margins, opacity). */
   style?: StyleProp<ViewStyle>;
@@ -375,7 +376,7 @@ export function HoronGlyph({ name, size = 20, color, weight, style, accessibilit
     return <HoronIcon size={size} color={paint} style={style} accessibilityLabel={accessibilityLabel} />;
   }
   const Glyph = phosphorGlyphs[name];
-  const glyph = <Glyph size={size} color={paint} weight={weight} style={style} />;
+  const glyph = <Glyph size={size} color={paint} weight={weight ?? icons.weight ?? DEFAULT_ICON_WEIGHT} style={style} />;
   // A Phosphor icon takes no accessibility props; the label rides on a wrapper when the caller names it.
   return accessibilityLabel === undefined ? (
     glyph

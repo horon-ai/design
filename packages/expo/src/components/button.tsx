@@ -1,10 +1,11 @@
-import { useMemo, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { StyleSheet, View, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
 import { IconContext } from "phosphor-react-native";
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme, type ColorToken } from "../provider";
 import { GlassSurface } from "../lib/glass-surface";
+import { useIconContext } from "../lib/icon";
 import { controlHeight, DISABLED_OPACITY, TOUCH_TARGET, touchSlop } from "../lib/size";
 import { HoronPressable } from "../lib/press";
 import { wrapTextChildren } from "../lib/text";
@@ -103,7 +104,7 @@ export function Button({
       : PAINT[variant].label;
   const labelColor = theme.color(label);
   const iconSize = isLink ? 14 : ICON[size];
-  const iconDefaults = useMemo(() => ({ color: labelColor, size: iconSize }), [labelColor, iconSize]);
+  const iconDefaults = useIconContext({ color: labelColor, size: iconSize });
 
   const content = (
     <IconContext.Provider value={iconDefaults}>

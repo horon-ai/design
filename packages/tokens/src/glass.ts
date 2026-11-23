@@ -21,10 +21,14 @@
  * backdrop-filter support, reduced transparency, Android and iOS before 26 in
  * Expo), the fill becomes `glass-fill-frost` and the rim stays.
  *
- * `nativeFillOpacity` is the opacity of the system material layer where a
- * native host draws it (iOS Liquid Glass): 0.75 lets the content behind show
- * through while icons over the moving content keep 3:1 non-text contrast in
- * light and dark. It fades only the material, never the content on it.
+ * `nativeFillOpacity` is the light-mode opacity of the system material layer
+ * where a native host draws it (iOS Liquid Glass): 0.75 lets the content behind
+ * show through while icons over moving content keep 3:1 non-text contrast.
+ * `native` holds the per-scheme iOS Liquid Glass material tuning: both light
+ * and dark draw the `regular` effect (so moving text behind floating chrome
+ * diffuses softly instead of colliding with icons), at 0.75 opacity in light
+ * and 0.92 opacity in dark so dark specular curved refraction matches light
+ * without turning milky grey. Neither fades the content on the glass.
  */
 
 export const glass = {
@@ -33,6 +37,10 @@ export const glass = {
   rimWidth: 1,
   rimMidStop: 0.5,
   nativeFillOpacity: 0.75,
+  native: {
+    light: { effect: "regular", fillOpacity: 0.75 },
+    dark: { effect: "regular", fillOpacity: 0.92 },
+  },
   rim: {
     light: { top: "rgba(255, 255, 255, 0.7)", mid: "rgba(255, 255, 255, 0.12)", bottom: "rgba(255, 255, 255, 0.3)" },
     dark: { top: "rgba(255, 255, 255, 0.22)", mid: "rgba(255, 255, 255, 0.04)", bottom: "rgba(255, 255, 255, 0.1)" },

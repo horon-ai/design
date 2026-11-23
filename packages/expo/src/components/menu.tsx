@@ -38,6 +38,7 @@ import { radius, shadow, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
 import { GlassSurface } from "../lib/glass-surface";
+import { useIconContext } from "../lib/icon";
 import { duration, easing } from "../lib/motion";
 import { HoronPressable } from "../lib/press";
 import { DISABLED_OPACITY } from "../lib/size";
@@ -482,7 +483,7 @@ export function MenuItem({
   const { setOpen } = useContext(MenuContext);
   const labelTone = danger ? "text-danger" : "text-primary";
   const iconTone = danger ? "text-danger" : surface === "glass" ? "text-secondary" : "text-primary";
-  const iconContext = useMemo(() => ({ color: theme.color(iconTone) }), [theme, iconTone]);
+  const iconContext = useIconContext({ color: theme.color(iconTone) });
 
   return (
     <HoronPressable

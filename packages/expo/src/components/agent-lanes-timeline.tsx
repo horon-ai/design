@@ -5,6 +5,7 @@ import Svg, { Path } from "react-native-svg";
 import { primitives, radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme, type ColorToken } from "../provider";
+import { DEFAULT_ICON_STROKE_WIDTH, useIconWeight } from "../lib/icon";
 import { HoronPressable } from "../lib/press";
 import { duration, easing } from "../lib/motion";
 import { TOUCH_TARGET } from "../lib/size";
@@ -274,14 +275,15 @@ export function AgentLanesTimeline({
   style,
 }: AgentLanesTimelineProps) {
   const theme = useHoronTheme();
+  const iconWeight = useIconWeight();
   const barIconDefaults = useMemo(
     () => ({
-      done: { color: theme.color("text-secondary"), size: 14 },
-      running: { color: theme.color("text-primary"), size: 14 },
-      failed: { color: theme.color("text-danger"), size: 14 },
-      waiting: { color: theme.color("text-primary"), size: 14 },
+      done: { color: theme.color("text-secondary"), size: 14, weight: iconWeight },
+      running: { color: theme.color("text-primary"), size: 14, weight: iconWeight },
+      failed: { color: theme.color("text-danger"), size: 14, weight: iconWeight },
+      waiting: { color: theme.color("text-primary"), size: 14, weight: iconWeight },
     }),
-    [theme],
+    [theme, iconWeight],
   );
   const ticks = Array.from({ length: windowMinutes / 5 - 1 }, (_, index) => -(windowMinutes - 5 * (index + 1)));
   const at = (minutes: number) => (windowMinutes + minutes) / windowMinutes;
@@ -490,7 +492,7 @@ export function AgentLanesTimeline({
                       d={curve.path}
                       fill="none"
                       stroke={theme.color("status-live")}
-                      strokeWidth={1.5}
+                      strokeWidth={DEFAULT_ICON_STROKE_WIDTH}
                       strokeDasharray={[3, 3]}
                       vectorEffect="non-scaling-stroke"
                     />

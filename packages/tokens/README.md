@@ -9,6 +9,7 @@ Horon 디자인 토큰입니다. 모든 값은 Figma `Horon` 파일(fileKey `Jin
 | `src/typography.ts` | 글꼴, 네 가지 굵기, 13개 글자 스타일의 Web / Desktop / Mobile 크기 | Typography `26:2` |
 | `src/scale.ts` | 반경, 간격, 그림자 | Scale 컬렉션, Menus `88:495`, Command palette `110:676` |
 | `src/glass.ts` | 유리 레이어 값과 높이 비례 규칙 | Button `55:339` 외 유리 컴포넌트 |
+| `src/icon.ts` | 아이콘 선 굵기·Phosphor 무게 토큰(기본 1.3 / 활성 1.8) | 24px 아이콘 그리드 기준 |
 | `src/css.ts` | `theme.css` 생성기 | |
 
 CSS 변수 이름은 Figma 변수의 WEB 코드 문법과 같습니다. Figma Dev Mode에서
