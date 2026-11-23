@@ -24,11 +24,11 @@
  * `nativeFillOpacity` is the light-mode opacity of the system material layer
  * where a native host draws it (iOS Liquid Glass): 0.75 lets the content behind
  * show through while icons over moving content keep 3:1 non-text contrast.
- * `native` holds the per-scheme iOS Liquid Glass material tuning: light draws
- * the `regular` effect at 0.75 opacity, while dark draws the `clear` effect at
- * 0.85 opacity so curved edge refraction and translucency match light without
- * turning milky grey. Dense tiers (`thick`) and overlays (`veil`) keep the
- * `regular` effect for readability. Neither fades the content on the glass.
+ * `native` holds the per-scheme iOS Liquid Glass material tuning: both light
+ * and dark draw the `regular` effect (so moving text behind floating chrome
+ * diffuses softly instead of colliding with icons), at 0.75 opacity in light
+ * and 0.92 opacity in dark so dark specular curved refraction matches light
+ * without turning milky grey. Neither fades the content on the glass.
  */
 
 export const glass = {
@@ -39,7 +39,7 @@ export const glass = {
   nativeFillOpacity: 0.75,
   native: {
     light: { effect: "regular", fillOpacity: 0.75 },
-    dark: { effect: "clear", fillOpacity: 0.85 },
+    dark: { effect: "regular", fillOpacity: 0.92 },
   },
   rim: {
     light: { top: "rgba(255, 255, 255, 0.7)", mid: "rgba(255, 255, 255, 0.12)", bottom: "rgba(255, 255, 255, 0.3)" },

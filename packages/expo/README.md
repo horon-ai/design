@@ -57,7 +57,7 @@ Expo Router를 쓰면 `SafeAreaProvider`는 라우터가 이미 넣으므로 `Ho
 
 | 환경 | 그리는 것 |
 |---|---|
-| iOS 26 이상, 투명도 줄이기 꺼짐 | `GlassView`. 떠 있는 크롬(`material="glass"`, `clear`·`regular` 단계)은 `glass.native[scheme]`을 따릅니다. 라이트는 `regular` 효과에 불투명도 `0.75`, 다크는 `clear` 효과에 불투명도 `0.85`로 곡면 굴절과 투명도를 맞춥니다. `thick`과 `veil`은 가독성을 위해 `regular` 효과를 유지하고 `thick`에는 `glass-thick`(다크는 `glass-fill-strong`) 색조를 더합니다. `glass` 재료는 가장자리를 잘라 내지 않아 시스템 굴절 테두리가 그대로 보이고, `veil`은 모서리에서 잘라 냅니다. 앱 화면 모드를 `colorScheme`으로 넘깁니다. |
+| iOS 26 이상, 투명도 줄이기 꺼짐 | `GlassView`. 모든 단계가 `regular` 효과이고 유리 층 불투명도는 `glass.native[scheme].fillOpacity`(라이트 `0.75`, 다크 `0.92`)를 따릅니다. `thick`에는 `glass-thick`(다크는 `glass-fill-strong`) 색조를 더합니다. `glass` 재료는 가장자리를 잘라 내지 않아 시스템 굴절 테두리가 그대로 보이고, `veil`은 모서리에서 잘라 냅니다. 앱 화면 모드를 `colorScheme`으로 넘깁니다. |
 | Android, iOS 26 미만, 투명도 줄이기 켜짐, `glass="frost"` | 뒤 배경을 흐리게 할 수 없으므로 `glass-fill-frost` 채움에 토큰 테두리(위 밝음, 옆 옅음, 아래 중간)를 둡니다. `@horon-ai/tokens` `glass.ts`가 정한 대체 규칙과 같습니다. |
 
 - 판정은 `isLiquidGlassAvailable()`과 `isGlassEffectAPIAvailable()`(일부 iOS 26 베타의 API 누락 대비)이 모두 참이고 `AccessibilityInfo`의 투명도 줄이기가 꺼져 있을 때만 네이티브입니다. 함수가 예외를 던지면 대체 모양으로 갑니다.

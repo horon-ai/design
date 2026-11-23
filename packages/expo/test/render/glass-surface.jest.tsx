@@ -55,7 +55,7 @@ function findParentOf(node: unknown, target: JsonNode | undefined): JsonNode | n
 }
 
 describe("GlassSurface native Liquid Glass and frost fallback", () => {
-  test("dark floating chrome uses clear effect at dark fill opacity while light uses regular at light opacity, both unclipped", async () => {
+  test("dark floating chrome uses regular effect at 0.92 opacity while light uses regular at 0.75 opacity, both unclipped", async () => {
     const { rerender } = await render(
       <HoronProvider scheme="dark">
         <GlassSurface testID="surface" tier="clear" radius={24}>
@@ -68,11 +68,11 @@ describe("GlassSurface native Liquid Glass and frost fallback", () => {
     const darkSurface = screen.getByTestId("surface");
     const darkViews = findAll(darkTree, (n) => n.type === "ExpoGlassView");
     expect(darkViews).toHaveLength(1);
-    expect(darkViews[0]?.props.glassEffectStyle).toBe("clear");
+    expect(darkViews[0]?.props.glassEffectStyle).toBe("regular");
     expect(darkViews[0]?.props.colorScheme).toBe("dark");
     expect(darkViews[0]?.props.tintColor).toBeUndefined();
     const darkWrapper = findParentOf(darkTree, darkViews[0]);
-    expect(StyleSheet.flatten(darkWrapper?.props.style)?.opacity).toBe(0.85);
+    expect(StyleSheet.flatten(darkWrapper?.props.style)?.opacity).toBe(0.92);
     expect(StyleSheet.flatten(darkSurface.props.style)?.overflow).not.toBe("hidden");
 
     await rerender(
