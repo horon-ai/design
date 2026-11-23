@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import type { StyleProp, ViewStyle } from "react-native";
+import { Platform, type StyleProp, type ViewStyle } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { IconContext } from "phosphor-react-native";
 
@@ -64,12 +64,21 @@ export function HoronWordmark({ title = "Horon", height = 11.5, width, color, st
   const icons = useContext(IconContext);
   const paint = color ?? icons.color ?? theme.color("text-primary");
   const measured = width ?? (height / VIEWBOX.height) * VIEWBOX.width;
+  // react-native-svg forwards `accessible` to DOM <svg> on web, triggering a React warning.
+  const accessibilityProps =
+    Platform.OS === "web"
+      ? title
+        ? ({ role: "img", "aria-label": title } as const)
+        : ({ "aria-hidden": true } as const)
+      : ({
+          accessible: true,
+          accessibilityRole: "image",
+          accessibilityLabel: title,
+        } as const);
 
   return (
     <Svg
-      accessible
-      accessibilityRole="image"
-      accessibilityLabel={title}
+      {...accessibilityProps}
       width={measured}
       height={height}
       viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`}
