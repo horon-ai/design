@@ -34,7 +34,7 @@ export type GlassSurfaceProps = Omit<ViewProps, "style"> & {
   pressed?: boolean;
   /**
    * Layout of the surface. Keep `opacity` at 1: the native material is already
-   * faded to `glass.nativeFillOpacity`, and a faded parent fades it again.
+   * faded to `glass.native[scheme].fillOpacity`, and a faded parent fades it again.
    */
   style?: StyleProp<ViewStyle>;
   children?: ReactNode;
@@ -44,15 +44,18 @@ export type GlassSurfaceProps = Omit<ViewProps, "style"> & {
  * The one glass material of `@horon-ai/tokens` `glass.ts`, drawn by
  * `expo-glass-effect`.
  *
- * - **native** (iOS 26+, Reduce Transparency off): a `GlassView` in the
- *   `regular` effect for every tier, laid behind the children at
- *   `glass.nativeFillOpacity` so the content behind shows through while the
- *   children stay opaque. `thick` adds the `glass-thick` tint (`glass-fill-strong`
- *   in dark) so the denser tier still reads denser. The `glass` material is not
- *   clipped, so the system refraction rim at the edge stays visible; `veil`
- *   clips its children to the corner. The view follows the theme scheme
- *   through `colorScheme`, so an in-app dark toggle wins over the system
- *   appearance.
+ * - **native** (iOS 26+, Reduce Transparency off): a `GlassView` laid behind
+ *   the children at `glass.native[scheme].fillOpacity` (0.75 in light, 0.85 in
+ *   dark) so the content behind shows through while the children stay opaque.
+ *   Floating chrome (`material="glass"`, `clear` and `regular` tiers) uses
+ *   `glass.native[scheme].effect` — `regular` in light and `clear` in dark —
+ *   so dark curved refraction and transparency match light without a milky grey
+ *   veil. `thick` keeps the `regular` effect and adds the `glass-thick` tint
+ *   (`glass-fill-strong` in dark) so the denser tier still reads denser; `veil`
+ *   overlays also keep `regular` and clip their children to the corner, while
+ *   `glass` stays unclipped so the system refraction rim at the edge stays
+ *   visible. The view follows the theme scheme through `colorScheme`, so an
+ *   in-app dark toggle wins over the system appearance.
  * - **frost** (Android, iOS before 26, Reduce Transparency, or
  *   `HoronProvider glass="frost"`): the backdrop cannot be filtered, so the
  *   fill becomes `glass-fill-frost` and the rim stays — a `rimWidth` ring
@@ -80,11 +83,13 @@ export function GlassSurface({
 
   if (theme.glass === "native") {
     const corners = cornerStyle(style);
+    const nativeGlass = glass.native[theme.scheme];
+    const effect = material === "veil" || tier === "thick" ? "regular" : nativeGlass.effect;
     return (
       <View {...rest} style={[shape, material === "veil" && styles.clip, style]}>
-        <View pointerEvents="box-none" style={[StyleSheet.absoluteFill, styles.nativeFill]}>
+        <View pointerEvents="box-none" style={[StyleSheet.absoluteFill, { opacity: nativeGlass.fillOpacity }]}>
           <GlassView
-            glassEffectStyle="regular"
+            glassEffectStyle={effect}
             tintColor={
               tier === "thick"
                 ? theme.color(theme.scheme === "dark" ? "glass-fill-strong" : "glass-thick")
@@ -158,5 +163,4 @@ function cornerStyle(style: StyleProp<ViewStyle>): ViewStyle | undefined {
 
 const styles = StyleSheet.create({
   clip: { overflow: "hidden" },
-  nativeFill: { opacity: glass.nativeFillOpacity },
 });

@@ -1,9 +1,10 @@
-import { Children, useEffect, useMemo, useState, type ReactNode } from "react";
+import { Children, useEffect, useState, type ReactNode } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { CaretDown, IconContext } from "phosphor-react-native";
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
+import { useIconContext } from "../lib/icon";
 import { duration, easing } from "../lib/motion";
 import { HoronPressable } from "../lib/press";
 import { TOUCH_TARGET } from "../lib/size";
@@ -69,7 +70,7 @@ export function ToolCallsHeader({
   const [innerOpen, setInnerOpen] = useState(defaultOpen);
   const open = openProp ?? innerOpen;
   const [rotation] = useState(() => new Animated.Value(defaultOpen ? 1 : 0));
-  const icon = useMemo(() => ({ size: 14, color: theme.color("text-secondary") }), [theme]);
+  const icon = useIconContext({ size: 14, color: theme.color("text-secondary") });
 
   useEffect(() => {
     if (theme.reducedMotion) {

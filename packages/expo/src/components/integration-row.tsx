@@ -1,9 +1,10 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { StyleSheet, View, type LayoutChangeEvent, type StyleProp, type ViewProps, type ViewStyle } from "react-native";
 import { IconContext, Plug } from "phosphor-react-native";
 import { primitives, radius, spacing } from "@horon-ai/tokens";
 
 import { GlassSurface } from "../lib/glass-surface";
+import { useIconContext } from "../lib/icon";
 import { HoronPressable } from "../lib/press";
 import { TOUCH_TARGET } from "../lib/size";
 import { HoronText } from "../lib/text";
@@ -105,7 +106,7 @@ export function IntegrationRow({
   const theme = useHoronTheme();
   const { fill, glyph } = tilePaint(status, surface === "glass", theme.color);
   const glass = surface === "glass";
-  const glyphContext = useMemo(() => ({ color: glyph, size: 20 }), [glyph]);
+  const glyphContext = useIconContext({ color: glyph, size: 20 });
   const [width, setWidth] = useState(0);
   // React wraps the action at this width; React Native cannot rely on Yoga wrapping, so stack it.
   const stacked = width > 0 && width < STACK_AT;

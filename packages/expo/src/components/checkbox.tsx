@@ -4,6 +4,7 @@ import { Check, Minus } from "phosphor-react-native";
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
+import { ACTIVE_ICON_WEIGHT } from "../lib/icon";
 import { HoronPressable } from "../lib/press";
 import { duration, easing } from "../lib/motion";
 import { DISABLED_OPACITY, type ControlSize, touchSlop } from "../lib/size";
@@ -170,9 +171,9 @@ export function Checkbox({
               }}
             >
               {indeterminate ? (
-                <Minus size={rung.glyph} weight="bold" color={theme.color("interactive-on-primary")} />
+                <Minus size={rung.glyph} weight={ACTIVE_ICON_WEIGHT} color={theme.color("interactive-on-primary")} />
               ) : (
-                <Check size={rung.glyph} weight="bold" color={theme.color("interactive-on-primary")} />
+                <Check size={rung.glyph} weight={ACTIVE_ICON_WEIGHT} color={theme.color("interactive-on-primary")} />
               )}
             </Animated.View>
           </View>

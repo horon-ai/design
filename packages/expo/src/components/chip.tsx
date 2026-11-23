@@ -4,6 +4,7 @@ import { Check } from "phosphor-react-native";
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
+import { ACTIVE_ICON_WEIGHT } from "../lib/icon";
 import { HoronPressable } from "../lib/press";
 import { easing } from "../lib/motion";
 import { DISABLED_OPACITY, type ControlSize, touchSlop } from "../lib/size";
@@ -154,7 +155,7 @@ export function Chip({
           opacity: open,
         }}
       >
-        <Check size={rung.glyph} weight="bold" color={theme.color("text-brand")} />
+        <Check size={rung.glyph} weight={ACTIVE_ICON_WEIGHT} color={theme.color("text-brand")} />
       </Animated.View>
       <View style={hasElementChild ? { flexDirection: "row", alignItems: "center", gap: LABEL_GAP } : null}>
         {wrapTextChildren(children, {

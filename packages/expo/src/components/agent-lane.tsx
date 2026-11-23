@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Animated, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { CheckCircle, IconContext, WarningCircle } from "phosphor-react-native";
 import { primitives, radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
+import { useIconContext } from "../lib/icon";
 import { duration, easing } from "../lib/motion";
 import { HoronText } from "../lib/text";
 import { Spinner } from "./spinner";
@@ -122,7 +123,7 @@ function Tile({ status, initial }: { status: AgentLaneStatus; initial: string })
  */
 export function AgentLane({ status, bot, elapsed, task, tool, output, usage, style }: AgentLaneProps) {
   const theme = useHoronTheme();
-  const toolIcon = useMemo(() => ({ color: theme.color("text-secondary"), size: 14 }), [theme]);
+  const toolIcon = useIconContext({ color: theme.color("text-secondary"), size: 14 });
   return (
     <View
       style={[

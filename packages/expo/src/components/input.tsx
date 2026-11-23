@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   StyleSheet,
   TextInput,
@@ -15,6 +15,7 @@ import { radius, spacing } from "@horon-ai/tokens";
 import { useHoronTheme, type ColorToken, type TextStyleName } from "../provider";
 import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { GlassSurface } from "../lib/glass-surface";
+import { useIconContext } from "../lib/icon";
 import { controlHeight, type ControlSize } from "../lib/size";
 
 /** Height rung shared with every sized control: `sm` 32pt, `md` 40pt, `lg` 48pt. */
@@ -239,7 +240,7 @@ export function Input({
   const [focused, setFocused] = useState(false);
   const glass = surface === "glass";
   const iconColour = theme.color("text-secondary");
-  const iconContext = useMemo(() => ({ size: ICON[size], color: iconColour }), [size, iconColour]);
+  const iconContext = useIconContext({ size: ICON[size], color: iconColour });
   const painted = glass ? null : fieldBoxClass[surface];
   const borderToken: ColorToken = invalid
     ? (painted?.invalidBorder ?? "border-danger")

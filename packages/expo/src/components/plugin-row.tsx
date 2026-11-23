@@ -3,6 +3,7 @@ import { StyleSheet, View, type LayoutChangeEvent, type StyleProp, type ViewProp
 import { ArrowUp, Check, DotsThree } from "phosphor-react-native";
 import { primitives, radius, spacing } from "@horon-ai/tokens";
 
+import { ACTIVE_ICON_WEIGHT } from "../lib/icon";
 import { HoronText } from "../lib/text";
 import { useHoronTheme } from "../provider";
 import { Button } from "./button";
@@ -186,7 +187,7 @@ export function PluginRow({
             )}
             {verified ? (
               <View role="img" accessibilityLabel="Verified" style={styles.verified}>
-                <Check size={8} weight="bold" color={primitives["neutral-50"]} />
+                <Check size={8} weight={ACTIVE_ICON_WEIGHT} color={primitives["neutral-50"]} />
               </View>
             ) : null}
           </View>
@@ -223,7 +224,7 @@ export function PluginRow({
                 label={overflowLabel}
                 variant="ghost"
                 size="sm"
-                icon={<DotsThree size={16} weight="bold" />}
+                icon={<DotsThree size={16} weight={ACTIVE_ICON_WEIGHT} />}
               />
             </MenuTrigger>
             <MenuContent align="end">{menu}</MenuContent>

@@ -5,6 +5,7 @@ import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme, type ColorToken, type TextStyleName } from "../provider";
 import { GlassSurface } from "../lib/glass-surface";
+import { DEFAULT_ICON_WEIGHT } from "../lib/icon";
 import { duration, easing } from "../lib/motion";
 import { HoronPressable } from "../lib/press";
 import { TOUCH_TARGET, touchSlop, type ControlSize } from "../lib/size";
@@ -291,9 +292,9 @@ export function Calendar(props: CalendarProps) {
         ]}
       >
         {step < 0 ? (
-          <CaretLeft size={ARROW_ICON[size]} color={theme.color("text-secondary")} weight="bold" />
+          <CaretLeft size={ARROW_ICON[size]} color={theme.color("text-secondary")} weight={DEFAULT_ICON_WEIGHT} />
         ) : (
-          <CaretRight size={ARROW_ICON[size]} color={theme.color("text-secondary")} weight="bold" />
+          <CaretRight size={ARROW_ICON[size]} color={theme.color("text-secondary")} weight={DEFAULT_ICON_WEIGHT} />
         )}
       </HoronPressable>
     );

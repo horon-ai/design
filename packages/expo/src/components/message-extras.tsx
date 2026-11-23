@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Animated, Image, ScrollView, StyleSheet, View, type ViewProps } from "react-native";
 import { Copy, FileText, IconContext, X } from "phosphor-react-native";
 import { radius, spacing } from "@horon-ai/tokens";
@@ -6,6 +6,7 @@ import { radius, spacing } from "@horon-ai/tokens";
 import { useHoronTheme } from "../provider";
 import { useCopyToClipboard } from "../hooks/use-copy-to-clipboard";
 import { GlassSurface } from "../lib/glass-surface";
+import { useIconContext } from "../lib/icon";
 import { duration, easing } from "../lib/motion";
 import { HoronPressable } from "../lib/press";
 import { touchSlop } from "../lib/size";
@@ -74,7 +75,7 @@ export function MessageActions({
 }) {
   const theme = useHoronTheme();
   const layout = [styles.actions, { padding: 3, gap: spacing["0.5"] }];
-  const icon = useMemo(() => ({ size: 16, color: theme.color("text-secondary") }), [theme]);
+  const icon = useIconContext({ size: 16, color: theme.color("text-secondary") });
   const buttons = (
     <IconContext.Provider value={icon}>
       {actions.map((action) => (
