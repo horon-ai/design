@@ -8,8 +8,8 @@ export const doc: ComponentDoc = {
   slug: "bottom-sheet",
   anatomy: {
     description: {
-      ko: "BottomSheet은 화면 아래에서 올라오는 시트입니다. 손잡이, 제목, 설정 행과 동작 행이 한 컬럼으로 쌓이고, 열려 있는 동안에만 마운트됩니다.",
-      en: "A BottomSheet rises from the bottom of the screen. A grabber, a title, settings rows and an action row stack in one column, and the sheet is mounted only while open.",
+      ko: "BottomSheet은 화면 바닥에 밀착해 올라오는 시트입니다. 좁은 화면에서는 좌·우·아래 가장자리에 빈틈없이 붙고, 넓은 화면에서는 maxWidth(기본 560px)로 가로 중앙에 정렬되며 위쪽 모서리만 둥글고 하단 콘텐츠에는 안전 영역 패딩이 들어갑니다.",
+      en: "A BottomSheet rises docked to the bottom edge. On narrow screens it sits flush to the left, right and bottom edges; on wider screens it centres horizontally at maxWidth (560px by default), with rounded top corners only and safe-area padding under the content.",
     },
     parts: [
       {
@@ -32,8 +32,8 @@ export const doc: ComponentDoc = {
         name: "BottomSheetContent",
         slot: "BottomSheetContent",
         description: {
-          ko: "시트 본체입니다. 포털에 마운트되는 팝업으로, 최대 높이는 100dvh에서 2rem을 뺀 값입니다.",
-          en: "The sheet itself: a portalled popup capped at 100dvh minus 2rem.",
+          ko: "화면 아래에 밀착해 포털로 마운트되는 시트 본체입니다. 배경은 바닥 끝까지 이어지고 본문 하단에 안전 영역 패딩을 두며, 넓은 화면에서는 maxWidth로 가로 중앙 정렬됩니다.",
+          en: "The docked sheet body mounted in a portal. Its surface extends to the bottom edge while the scrollable body pads for the bottom safe-area inset and centres at maxWidth on wide viewports.",
         },
       },
       {
@@ -83,22 +83,22 @@ export const doc: ComponentDoc = {
       id: "variant",
       title: { ko: "variant", en: "variant" },
       description: {
-        ko: "BottomSheetContent의 variant는 시트의 구성 방식을, BottomSheetAction의 variant는 버튼의 채움을 정합니다.",
-        en: "variant on BottomSheetContent picks the sheet layout; variant on BottomSheetAction picks the button fill.",
+        ko: "BottomSheetContent의 variant는 시트의 내부 리듬과 제목 구성을, BottomSheetAction의 variant는 버튼의 채움을 정합니다.",
+        en: "variant on BottomSheetContent picks the sheet rhythm and title slot; variant on BottomSheetAction picks the button fill.",
       },
       values: [
         {
           name: "panel",
           description: {
-            ko: "Figma 패널 시트입니다. 폭이 374px로 제한되고 제목이 label-lg로 들어갑니다. 기본값입니다.",
-            en: "The Figma panel sheet: capped at 374px wide with a label-lg title. The default.",
+            ko: "기본 도킹 패널 시트입니다. 4px 리듬과 label-lg 제목을 씁니다.",
+            en: "The default docked panel sheet with a 4px rhythm and a label-lg title.",
           },
         },
         {
           name: "detail",
           description: {
-            ko: "Paper 상세 시트입니다. 폭을 꽉 채우고 18px 리듬을 쓰며, 타일과 제목, 설명으로 된 머리말을 호출자가 만듭니다.",
-            en: "The Paper detail sheet: full width, an 18px rhythm, and a header of tile, title and description that the caller builds.",
+            ko: "상세 시트입니다. 18px 리듬을 쓰며, 타일과 제목, 설명으로 된 머리말을 호출자가 왼쪽 정렬로 넣습니다.",
+            en: "The detail sheet with an 18px rhythm and a flush-left header of tile, title and description that the caller builds.",
           },
         },
         {
@@ -122,15 +122,15 @@ export const doc: ComponentDoc = {
       id: "surface",
       title: { ko: "surface", en: "surface" },
       description: {
-        ko: "시트의 바탕 재질입니다. glass는 veil 시트로, 뒤가 비치는 유리 위에 놓습니다.",
-        en: "The sheet material. glass turns it into the veil sheet for placing over see-through surfaces.",
+        ko: "시트의 바탕 재질입니다. 두 재질 모두 화면 바닥까지 이어지고 위쪽 모서리만 20px로 둥급니다.",
+        en: "The sheet material. Both materials extend to the bottom edge with 20px top corners.",
       },
       values: [
         {
           name: "solid",
           description: {
-            ko: "불투명한 표면 바탕에 위쪽 모서리 20px를 씁니다. 본문 위에 놓는 기본 시트입니다.",
-            en: "An opaque surface fill with 20px top corners, for the default sheet over content.",
+            ko: "불투명한 표면 바탕에 1px border-default 링과 상향 그림자, 위쪽 모서리 20px를 씁니다. 본문 위에 놓는 기본 시트입니다.",
+            en: "An opaque surface fill with a 1px border-default ring, upward shadow and 20px top corners, for the default sheet over content.",
           },
         },
         {
@@ -144,22 +144,22 @@ export const doc: ComponentDoc = {
       example: "glass-sheet",
     },
     {
+      id: "maxWidth",
+      title: { ko: "maxWidth", en: "maxWidth" },
+      description: {
+        ko: "태블릿·가로 화면·데스크톱 웹처럼 넓은 화면에서 시트의 최대 너비를 제한하고 가로 중앙에 배치합니다. 기본값은 Modal 기본 읽기 폭과 같은 560(px/pt)이며, 이보다 좁은 모바일 화면에서는 좌우 가장자리에 빈틈없이 붙습니다. \"none\"을 넘기면 너비 제한을 해제합니다.",
+        en: "Caps the sheet width on wider screens (tablets, landscape phones, desktop) and keeps it horizontally centred while docked to the bottom edge. Defaults to 560 (matching Modal's reading width) so portrait phones remain full width edge-to-edge; pass \"none\" to span full width at every size.",
+      },
+      example: "max-width-sheet",
+    },
+    {
       id: "backdrop",
       title: { ko: "backdrop", en: "backdrop" },
       description: {
-        ko: "참이면 시트 뒤에 32% 스크림과 6px 흐림을 깝니다. Paper의 떠 있는 패널 시트처럼 페이지를 계속 보여 주려면 끕니다.",
-        en: "When true a 32% scrim with a 6px blur sits behind the sheet. Turn it off to keep the page visible, as Paper's floating panel sheet does.",
+        ko: "참이면 시트 뒤에 32% 스크림과 6px 흐림을 깝니다. 페이지를 그대로 보면서 시트를 쓰려면 끕니다.",
+        en: "When true a 32% scrim with a 6px blur sits behind the sheet. Turn it off to keep the page visible behind the docked sheet.",
       },
-      example: "floating-sheet",
-    },
-    {
-      id: "floating",
-      title: { ko: "floating", en: "floating" },
-      description: {
-        ko: "참이면 시트를 좌우와 아래에서 16px 띄우고 폭을 꽉 채웁니다. 화면에 붙는 도킹 대신 떠 있는 패널이 됩니다.",
-        en: "When true the sheet sits 16px off the sides and bottom edge at full width, becoming a floating panel instead of a docked sheet.",
-      },
-      example: "floating-sheet",
+      example: "no-backdrop-sheet",
     },
   ],
   guidelines: [
@@ -193,12 +193,12 @@ export const doc: ComponentDoc = {
       id: "glass-over-imagery",
       title: { ko: "glass는 배경 위에서만", en: "Glass goes over a backdrop" },
       body: {
-        ko: "glass 시트는 이미지나 유리 크롬처럼 뒤가 비치는 면 위에만 놓습니다. 불투명한 본문 위에서는 유리 바탕이 드러나지 않아 시트의 경계가 사라집니다.",
-        en: "Place a glass sheet only over imagery or glass chrome. Over an opaque page its fill disappears and so does the sheet edge.",
+        ko: "glass 시트는 이미지나 유리 크롬처럼 뒤가 비치는 면 위에만 놓습니다. 불투명한 본문 위에서는 유리 바탕이 드러나지 않아 시트의 경계가 사라지며, 반투명 바탕 위 본문 글자는 대비 확보를 위해 text-primary를 권장합니다.",
+        en: "Place a glass sheet only over imagery or glass chrome. Over an opaque page its fill disappears and so does the sheet edge; use text-primary for body copy on glass so contrast holds over vivid backdrops.",
       },
       do: {
-        ko: "배경 이미지 위에서 메시지 옵션 시트를 glass로 띄웁니다.",
-        en: "Open a message options sheet in glass over a background image.",
+        ko: "배경 이미지 위에서 메시지 옵션 시트를 glass로 띄우고 본문은 text-primary로 씁니다.",
+        en: "Open a message options sheet in glass over a background image with text-primary copy.",
       },
       dont: {
         ko: "일반 설정 화면 한가운데에서 glass 시트를 쓰지 않습니다.",
@@ -208,12 +208,12 @@ export const doc: ComponentDoc = {
     },
     {
       id: "keep-context",
-      title: { ko: "맥락을 남길 때는 floating", en: "Keep context with floating" },
+      title: { ko: "맥락을 남길 때는 backdrop 끄기", en: "Keep context without a backdrop" },
       body: {
-        ko: "페이지를 계속 보면서 값을 고쳐야 한다면 floating과 backdrop을 끈 조합을 씁니다. 확인이 필요한 흐름이라면 도킹 시트에 스크림을 남깁니다.",
-        en: "If the page must stay readable while a value changes, combine floating with backdrop off. For a flow that needs confirmation, keep the docked sheet and its scrim.",
+        ko: "시트는 항상 화면 바닥에 붙어 있습니다. 페이지를 계속 보면서 값을 고쳐야 한다면 backdrop을 끄고, 확인이 필요한 흐름이라면 스크림을 남깁니다.",
+        en: "The sheet always docks to the bottom edge. Turn backdrop off when the page behind must stay readable, and keep the scrim for flows that need confirmation.",
       },
-      example: "floating-sheet",
+      example: "no-backdrop-sheet",
     },
   ],
   specification: [
@@ -221,28 +221,28 @@ export const doc: ComponentDoc = {
       id: "sheet-surfaces",
       title: { ko: "바탕과 배치", en: "Surfaces and placement" },
       note: {
-        ko: "값은 소스 클래스에 쓰인 그대로입니다.",
-        en: "Values are written as they appear in the source classes.",
+        ko: "값은 소스 클래스와 기본 prop 값 그대로입니다.",
+        en: "Values are written as they appear in the source classes and default props.",
       },
       rows: [
+        { state: "all", slot: "Viewport", property: "inset", value: "inset-x-0 bottom-0" },
+        { state: "all", slot: "Popup", property: "max width", value: '560px (default, or number / "none")' },
+        { state: "all", slot: "Popup", property: "alignment", value: "w-full mx-auto" },
         { state: "solid", slot: "Popup", property: "background", value: "bg-bg-surface" },
         { state: "solid", slot: "Popup", property: "radius", value: "rounded-t-xl" },
-        { state: "solid", slot: "Popup", property: "padding", value: "px-4 pt-2 pb-6" },
+        { state: "solid", slot: "Popup", property: "ring & shadow", value: "1px border-default + upward veil shadow" },
+        { state: "solid", slot: "Content", property: "bottom padding", value: "pb-[calc(1.5rem+env(safe-area-inset-bottom))]" },
         { state: "glass", slot: "Popup", property: "background", value: "veil-overlay" },
         { state: "glass", slot: "Popup", property: "radius", value: "rounded-t-xl" },
-        { state: "glass", slot: "Popup", property: "padding", value: "px-4 pt-2 pb-5" },
+        { state: "glass", slot: "Content", property: "bottom padding", value: "pb-[calc(1.25rem+env(safe-area-inset-bottom))]" },
         { state: "backdrop", slot: "Backdrop", property: "background", value: "bg-bg-scrim/32" },
         { state: "backdrop", slot: "Backdrop", property: "blur", value: "backdrop-blur-[6px]" },
-        { state: "all", slot: "Popup", property: "max height", value: "max-h-[calc(100dvh-2rem)]" },
+        { state: "all", slot: "Popup", property: "max height", value: "max-h-[calc(100dvh-max(2rem,env(safe-area-inset-top)+1rem))]" },
         { state: "all", slot: "Popup", property: "overflow", value: "overflow-clip" },
-        { state: "panel", slot: "Popup", property: "max width", value: "max-w-93.5" },
         { state: "panel", slot: "Popup", property: "gap", value: "gap-1" },
         { state: "panel", slot: "Title", property: "font", value: "text-label-lg" },
         { state: "detail", slot: "Popup", property: "gap", value: "gap-4.5" },
         { state: "detail", slot: "Title", property: "layout", value: "flex" },
-        { state: "floating", slot: "Viewport", property: "inset", value: "inset-x-4 bottom-4" },
-        { state: "floating", slot: "Popup", property: "gap", value: "gap-3" },
-        { state: "docked", slot: "Viewport", property: "inset", value: "inset-x-0 bottom-0" },
       ],
     },
     {
@@ -252,8 +252,9 @@ export const doc: ComponentDoc = {
         { state: "default", slot: "Row", property: "height", value: "h-12" },
         { state: "default", slot: "Row", property: "padding", value: "px-2" },
         { state: "default", slot: "Row", property: "gap", value: "gap-3" },
-        { state: "default", slot: "Row", property: "radius", value: "rounded-lg" },
+        { state: "default", slot: "Row", property: "radius", value: "rounded-sm" },
         { state: "hover", slot: "Row", property: "background", value: "bg-overlay-ink-4" },
+        { state: "disabled", slot: "Row", property: "opacity", value: "opacity-40" },
         { state: "focus-visible", slot: "Row", property: "outline", value: "outline-2 outline-text-brand" },
         { state: "focus-visible", slot: "Row", property: "outline offset", value: "-outline-offset-2" },
         { state: "all", slot: "Icon", property: "size", value: "size-5" },
@@ -280,7 +281,8 @@ export const doc: ComponentDoc = {
         { state: "secondary", slot: "Action", property: "background", value: "bg-overlay-ink-6" },
         { state: "secondary", slot: "Action", property: "text color", value: "text-text-primary" },
         { state: "primary", slot: "Action", property: "background", value: "bg-interactive-primary" },
-        { state: "primary", slot: "Action", property: "text color", value: "text-text-inverse" },
+        { state: "primary", slot: "Action", property: "text color", value: "text-interactive-on-primary" },
+        { state: "disabled", slot: "Action", property: "opacity", value: "opacity-40" },
         { state: "focus-visible", slot: "Action", property: "outline", value: "outline-2 outline-offset-2" },
       ],
     },
@@ -288,10 +290,10 @@ export const doc: ComponentDoc = {
       id: "motion",
       title: { ko: "모션", en: "Motion" },
       rows: [
-        { state: "open", slot: "Popup", property: "motion", value: "transition-[translate]" },
-        { state: "open", slot: "Popup", property: "duration", value: "duration-320" },
+        { state: "open", slot: "Popup", property: "motion", value: "transition-transform" },
+        { state: "open", slot: "Popup", property: "duration", value: "duration-240" },
         { state: "open", slot: "Popup", property: "easing", value: "ease-out-quint" },
-        { state: "closed", slot: "Popup", property: "duration", value: "duration-220" },
+        { state: "closed", slot: "Popup", property: "duration", value: "duration-200" },
         { state: "closed", slot: "Popup", property: "easing", value: "ease-in" },
         { state: "closed", slot: "Popup", property: "translate", value: "translate-y-full" },
         {
@@ -327,19 +329,27 @@ export const doc: ComponentDoc = {
       },
     },
     {
-      id: "floating-sheet",
-      title: { ko: "떠 있는 시트", en: "Floating sheet" },
+      id: "max-width-sheet",
+      title: { ko: "넓은 화면 최대 너비", en: "Maximum width on wide screens" },
       description: {
-        ko: "floating과 backdrop을 끈 조합입니다. 시트가 좌우와 아래에서 떨어져 페이지가 계속 보입니다.",
-        en: "floating with the backdrop off: the sheet stands off the sides and bottom, so the page stays visible.",
+        ko: "기본 560px, 400px 축소, \"none\" 전체 폭 세 가지 설정을 비교합니다. 좁은 화면에서는 모두 좌우에 밀착합니다.",
+        en: "Compares the 560px default, a compact 400px cap and maxWidth=\"none\" full width. All three dock edge-to-edge on narrow screens.",
+      },
+    },
+    {
+      id: "no-backdrop-sheet",
+      title: { ko: "배경 막 없는 시트", en: "Sheet without backdrop" },
+      description: {
+        ko: "backdrop을 끈 도킹 시트입니다. 화면 아래에 붙은 채 뒤쪽 페이지가 그대로 보입니다.",
+        en: "A docked sheet with backdrop off: it stays anchored to the bottom edge while the page behind remains visible.",
       },
     },
     {
       id: "detail-sheet",
       title: { ko: "상세 시트", en: "Detail sheet" },
       description: {
-        ko: "detail 변형은 폭을 꽉 채우고 제목 자리에 타일과 설명을 넣습니다.",
-        en: "The detail variant fills the width and takes a tile and description in the title slot.",
+        ko: "detail 변형은 18px 리듬을 쓰고 제목 자리에 타일과 설명을 넣습니다.",
+        en: "The detail variant uses an 18px rhythm and takes a tile and description in the title slot.",
       },
     },
     {
