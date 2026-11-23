@@ -1,7 +1,8 @@
-import { Alert, Linking } from "react-native";
+import { Alert, Linking, StyleSheet } from "react-native";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import { beforeEach, expect, jest, test } from "@jest/globals";
 import { setStringAsync } from "expo-clipboard";
+import { lightColors } from "@horon-ai/tokens";
 
 import { RichText, type RichTextFormat } from "../../src/components/rich-text";
 import { HoronProvider } from "../../src/provider";
@@ -197,4 +198,18 @@ test("a long hostile stream renders without stalling", async () => {
   // Each pathological input used to cost time growing with the square of its length; a linear
   // settle finishes all of them in well under this bound even on a slow CI runner.
   expect(Date.now() - started).toBeLessThan(5000);
+});
+
+const colorOf = (text: string) => StyleSheet.flatten(screen.getByText(text, { exact: false }).props.style)?.color;
+
+test("links and inline code stay readable inside an ink bubble", async () => {
+  await show("[docs](https://example.com) and `npm test`", "markdown", { tone: "interactive-on-primary" });
+  // The link follows the light text of the bubble; the code chip keeps dark text on its light fill.
+  expect(colorOf("docs")).toBe(lightColors["interactive-on-primary"]);
+  expect(colorOf("npm test")).toBe(lightColors["text-primary"]);
+});
+
+test("links keep the brand colour on a regular surface", async () => {
+  await show("[docs](https://example.com)", "markdown");
+  expect(colorOf("docs")).toBe(lightColors["text-brand"]);
 });
