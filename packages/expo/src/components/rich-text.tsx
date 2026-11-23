@@ -346,6 +346,8 @@ function renderInlines(inlines: RichInline[], context: Context, key: string): Re
               fontFamily: theme.fonts.mono,
               fontSize: theme.text(context.body).fontSize * 0.9,
               backgroundColor: theme.color("bg-inset"),
+              // The chip is always light: keep its text dark even inside an ink bubble.
+              color: theme.color("text-primary"),
             }}
           >
             {`\u2009${inline.text}\u2009`}
@@ -358,7 +360,8 @@ function renderInlines(inlines: RichInline[], context: Context, key: string): Re
             accessibilityRole="link"
             accessibilityHint={inline.href}
             onPress={() => context.openLink(inline.href)}
-            style={[styles.u, { color: theme.color("text-brand") }]}
+            // The brand blue is unreadable on an ink bubble; follow the light text there (the underline keeps it a link).
+            style={[styles.u, { color: context.tone === "interactive-on-primary" ? theme.color(context.tone) : theme.color("text-brand") }]}
           >
             {renderInlines(inline.children, context, id)}
           </Text>
