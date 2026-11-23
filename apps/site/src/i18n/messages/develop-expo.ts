@@ -223,8 +223,8 @@ export const expoGlassMessages = defineMessages({
     en: "iOS 26 or later, Reduce Transparency off",
   },
   rowNativeDraws: {
-    ko: "GlassView. 모든 단계가 regular 효과이고 thick에는 glass-thick 색조(다크는 glass-fill-strong)가 더해집니다. 유리 층은 glass.nativeFillOpacity(0.75)로 옅게 깔리고 그 위의 내용은 흐려지지 않습니다. glass 재료는 가장자리를 잘라 내지 않아 시스템 굴절 테두리가 보이고, veil은 내용을 모서리에서 잘라 냅니다. 앱 화면 모드는 colorScheme으로 넘어갑니다.",
-    en: "A GlassView in the regular effect for every tier; thick adds the glass-thick tint (glass-fill-strong in dark). The glass layer sits at glass.nativeFillOpacity (0.75) behind the content, which stays opaque. The glass material is not clipped, so the system refraction rim at the edge shows; veil clips its content to the corner. The app scheme goes in as colorScheme.",
+    ko: "GlassView. 모든 단계가 regular 효과이고 thick에는 glass-thick(다크는 glass-fill-strong) 색조가 더해집니다. 유리 층 불투명도는 glass.native[scheme].fillOpacity(라이트 0.75, 다크 0.92)를 따르며 그 위의 내용은 흐려지지 않습니다. glass 재료는 가장자리를 잘라 내지 않아 시스템 굴절 테두리가 보이고, veil은 내용을 모서리에서 잘라 냅니다. 앱 화면 모드는 colorScheme으로 넘어갑니다.",
+    en: "A GlassView in the regular effect for every tier; thick adds the glass-thick tint (glass-fill-strong in dark). The glass layer sits at glass.native[scheme].fillOpacity (0.75 in light, 0.92 in dark) behind opaque content. The glass material is not clipped, so the system refraction rim at the edge shows; veil clips its content to the corner. The app scheme goes in as colorScheme.",
   },
   rowFrostEnvironment: {
     ko: 'Android, iOS 26 미만, 투명도 줄이기 켜짐, glass="frost"',

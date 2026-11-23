@@ -5,6 +5,7 @@ import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
 import { GlassSurface } from "../lib/glass-surface";
+import { ACTIVE_ICON_WEIGHT } from "../lib/icon";
 import { useInsets } from "../lib/insets";
 import { duration, easing } from "../lib/motion";
 import { HoronText } from "../lib/text";
@@ -107,7 +108,7 @@ export function TopBar({
           )
         ) : null}
       </Fade>
-      {onMore ? <IconButton icon={<DotsThree weight="bold" />} label={moreLabel} onClick={onMore} /> : null}
+      {onMore ? <IconButton icon={<DotsThree weight={ACTIVE_ICON_WEIGHT} />} label={moreLabel} onClick={onMore} /> : null}
     </>
   );
 
@@ -121,6 +122,7 @@ export function TopBar({
         <View
           style={[
             styles.pill,
+            styles.clip,
             { backgroundColor: theme.color("bg-surface"), borderColor: theme.color("border-default"), borderWidth: 1 },
           ]}
         >
@@ -165,7 +167,7 @@ const styles = StyleSheet.create({
     padding: spacing["2"],
     borderRadius: radius.full,
     borderCurve: "continuous",
-    overflow: "hidden",
   },
+  clip: { overflow: "hidden" },
   title: { flex: 1, minWidth: 0, flexDirection: "column" },
 });

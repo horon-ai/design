@@ -1,10 +1,11 @@
-import { useMemo, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { IconContext } from "phosphor-react-native";
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
 import { usePlatform } from "../hooks/use-platform";
+import { useIconContext } from "../lib/icon";
 import { formatShortcut } from "../lib/platform";
 import type { ControlSize } from "../lib/size";
 import { HoronText } from "../lib/text";
@@ -61,7 +62,7 @@ export function Kbd({ size = "md", keys, style, children }: KbdProps) {
   const { os } = usePlatform();
   const rung = RUNGS[size];
   const ink = theme.color("text-secondary");
-  const iconContext = useMemo(() => ({ color: ink, size: rung.icon, weight: "regular" as const }), [ink, rung.icon]);
+  const iconContext = useIconContext({ color: ink, size: rung.icon });
   return (
     <View
       style={[

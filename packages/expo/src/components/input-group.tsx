@@ -14,6 +14,7 @@ import { radius, spacing } from "@horon-ai/tokens";
 import { useHoronTheme, type ColorToken, type TextStyleName } from "../provider";
 import { FIELD_MAX_FONT_SCALE, useFieldText } from "../lib/field-text";
 import { GlassSurface } from "../lib/glass-surface";
+import { useIconContext } from "../lib/icon";
 import { controlHeight, type ControlSize } from "../lib/size";
 import { HoronText } from "../lib/text";
 import { fieldBoxClass, fieldTextClass, type InputSurface } from "./input";
@@ -364,7 +365,7 @@ function SegmentContent({
   children: ReactNode;
 }) {
   const text = typeof children === "string" || typeof children === "number";
-  const [iconContext] = useState(() => ({ size: SEGMENT_ICON[size], color: undefined }));
+  const iconContext = useIconContext({ size: SEGMENT_ICON[size], color: undefined });
   return (
     <IconContext.Provider value={iconContext}>
       {text ? (

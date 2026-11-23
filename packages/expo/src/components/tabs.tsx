@@ -16,6 +16,7 @@ import { radius, spacing } from "@horon-ai/tokens";
 import { useHoronTheme, type ColorToken, type TextStyleName } from "../provider";
 import { useActiveIndicator, type IndicatorRect } from "../hooks/use-active-indicator";
 import { GlassSurface } from "../lib/glass-surface";
+import { ACTIVE_ICON_WEIGHT, useIconWeight } from "../lib/icon";
 import { duration, easing } from "../lib/motion";
 import { HoronPressable } from "../lib/press";
 import { DISABLED_OPACITY, type ControlSize } from "../lib/size";
@@ -358,9 +359,10 @@ export function TabsTab({ value, icon, count, disabled = false, style, children 
   const hub = TAB_HUB[set.size];
   const height = theme.touch && !underline ? Math.max(hub.height, 44) : hub.height;
   const label: ColorToken = active ? "text-primary" : "text-secondary";
+  const iconWeight = useIconWeight();
   const glyph = useMemo(
-    () => ({ color: theme.color(label), size: TAB_ICON[set.size] }),
-    [theme, label, set.size],
+    () => ({ color: theme.color(label), size: TAB_ICON[set.size], weight: active ? ACTIVE_ICON_WEIGHT : iconWeight }),
+    [theme, label, set.size, active, iconWeight],
   );
 
   return (

@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { Check, IconContext, WarningCircle } from "phosphor-react-native";
 import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
 import { useMediaQuery } from "../hooks/use-media-query";
+import { useIconContext } from "../lib/icon";
 import { easing } from "../lib/motion";
 import { HoronPressable } from "../lib/press";
 import { TOUCH_TARGET, touchSlop } from "../lib/size";
@@ -144,7 +145,7 @@ export function SourceRow({
   stages = defaultStages[status],
 }: SourceRowProps) {
   const theme = useHoronTheme();
-  const tileIcon = useMemo(() => ({ size: 16, color: theme.color("text-primary") }), [theme]);
+  const tileIcon = useIconContext({ size: 16, color: theme.color("text-primary") });
   return (
     <View
       style={[

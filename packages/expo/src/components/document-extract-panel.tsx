@@ -12,6 +12,7 @@ import {
 import { CaretDown, Check, FilePdf, Minus, Plus, Scan } from "phosphor-react-native";
 import { primitives, radius, spacing } from "@horon-ai/tokens";
 
+import { ACTIVE_ICON_WEIGHT } from "../lib/icon";
 import { duration, easing } from "../lib/motion";
 import { HoronPressable } from "../lib/press";
 import { DISABLED_OPACITY, TOUCH_TARGET, touchSlop } from "../lib/size";
@@ -517,7 +518,7 @@ export function DocumentExtractPanel({
                                 Check
                               </HoronText>
                             ) : (
-                              <Check size={14} weight="bold" color={theme.color("text-secondary")} />
+                              <Check size={14} weight={ACTIVE_ICON_WEIGHT} color={theme.color("text-secondary")} />
                             )}
                           </HoronPressable>
                           {field.type ? (

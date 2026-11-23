@@ -6,6 +6,7 @@ import { primitives, radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
 import { GlassSurface } from "../lib/glass-surface";
+import { DEFAULT_ICON_STROKE_WIDTH } from "../lib/icon";
 import { useInsets } from "../lib/insets";
 import { duration, easing } from "../lib/motion";
 import { HoronPressable } from "../lib/press";
@@ -640,7 +641,7 @@ export function SidebarTree({ children }: SidebarTreeProps) {
         <Svg width={16} height={height} viewBox={`0 0 16 ${height}`} fill="none">
           <Path
             d={branchesPath(count, row)}
-            strokeWidth={1.5}
+            strokeWidth={DEFAULT_ICON_STROKE_WIDTH}
             stroke={theme.color("overlay-ink-16")}
           />
         </Svg>

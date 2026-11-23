@@ -1,5 +1,6 @@
 import { darkColors, lightColors, primitives } from "./color";
 import { glass, veil } from "./glass";
+import { icon } from "./icon";
 import { radius, shadow } from "./scale";
 import { fontFamily, fontWeight, textStyles, type Platform } from "./typography";
 
@@ -77,6 +78,8 @@ function rootBlock(): string[] {
     `  --veil-saturate: ${veil.saturate};`,
     `  --veil-ring-width: ${px(veil.ringWidth)};`,
     ...veilLines("light"),
+    `  --icon-stroke-width: ${icon.strokeWidth.default};`,
+    `  --icon-stroke-width-active: ${icon.strokeWidth.active};`,
   ];
   for (const [name, style] of Object.entries(textStyles)) {
     if ("paragraph" in style) lines.push(`  --paragraph-${name}: ${style.paragraph}em;`);

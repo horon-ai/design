@@ -5,6 +5,7 @@ import { radius, spacing } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
 import { GlassSurface } from "../lib/glass-surface";
+import { ACTIVE_ICON_WEIGHT } from "../lib/icon";
 import { BreadcrumbItem } from "./breadcrumb";
 import { IconButton } from "./icon-button";
 
@@ -70,7 +71,7 @@ export function BreadcrumbHeader({
 }: BreadcrumbHeaderProps) {
   const theme = useHoronTheme();
   return (
-    <View role="banner" style={[styles.root, style]}>
+    <View role="banner" style={[styles.root, surface !== "glass" && styles.clip, style]}>
       {surface === "glass" ? (
         <GlassSurface tier="regular" radius={radius.full} style={StyleSheet.absoluteFill} />
       ) : (
@@ -119,7 +120,7 @@ export function BreadcrumbHeader({
       {onSearch ? (
         <IconButton icon={<MagnifyingGlass />} label={searchLabel} onClick={onSearch} size="sm" />
       ) : null}
-      {onMore ? <IconButton icon={<DotsThree weight="bold" />} label={moreLabel} onClick={onMore} size="sm" /> : null}
+      {onMore ? <IconButton icon={<DotsThree weight={ACTIVE_ICON_WEIGHT} />} label={moreLabel} onClick={onMore} size="sm" /> : null}
     </View>
   );
 }
@@ -133,8 +134,8 @@ const styles = StyleSheet.create({
     padding: spacing["2"],
     borderRadius: radius.full,
     borderCurve: "continuous",
-    overflow: "hidden",
   },
+  clip: { overflow: "hidden" },
   trail: { flex: 1, minWidth: 0 },
   // React Native's ScrollView ships `flexGrow: 1`; inside the 52pt pill it must hug its row.
   scroller: { flexGrow: 0, flexShrink: 0 },

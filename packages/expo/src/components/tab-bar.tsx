@@ -6,6 +6,7 @@ import { radius, spacing } from "@horon-ai/tokens";
 import { useHoronTheme } from "../provider";
 import { useActiveIndicator, type IndicatorRect } from "../hooks/use-active-indicator";
 import { GlassSurface } from "../lib/glass-surface";
+import { ACTIVE_ICON_WEIGHT, useIconWeight } from "../lib/icon";
 import { useInsets } from "../lib/insets";
 import { duration, easing } from "../lib/motion";
 import { HoronPressable } from "../lib/press";
@@ -102,12 +103,13 @@ export function TabBar({
   const { rect, animate, bindItem } = useActiveIndicator(index);
   const place = useIndicatorPlacement(rect, animate, theme.reducedMotion);
   const tap = TAB_SIZE[size];
+  const iconWeight = useIconWeight();
   const icons = useMemo(
     () => ({
-      current: { color: theme.color("text-primary"), size: ICON_SIZE[size] },
-      rest: { color: theme.color("text-secondary"), size: ICON_SIZE[size] },
+      current: { color: theme.color("text-primary"), size: ICON_SIZE[size], weight: ACTIVE_ICON_WEIGHT },
+      rest: { color: theme.color("text-secondary"), size: ICON_SIZE[size], weight: iconWeight },
     }),
-    [theme, size],
+    [theme, size, iconWeight],
   );
 
   return (
@@ -115,6 +117,8 @@ export function TabBar({
       <View
         style={[
           styles.pill,
+          // Glass stays unclipped so the native refraction rim at its edge stays visible.
+          surface !== "glass" && styles.clip,
           {
             borderRadius: radius.full,
             // An explicit height, so the pill cannot be stretched by a flex ancestor: it is the rung's
@@ -246,7 +250,8 @@ const styles = StyleSheet.create({
   // React Native's ScrollView ships `flexGrow: 1`, which inside an auto-height column makes the
   // glass pill grow to the viewport. The scroller has to hug its row instead.
   scroller: { flexGrow: 0, flexShrink: 0 },
-  pill: { borderCurve: "continuous", overflow: "hidden" },
+  pill: { borderCurve: "continuous" },
+  clip: { overflow: "hidden" },
   track: { position: "relative", flexDirection: "row", alignItems: "center" },
   indicator: { position: "absolute", borderRadius: radius.full },
   tab: { alignItems: "center", justifyContent: "center", borderRadius: radius.full },

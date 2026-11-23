@@ -115,6 +115,12 @@ export {
 } from "./provider";
 export { GlassSurface, type GlassSurfaceProps, type GlassTier } from "./lib/glass-surface";
 export { nativeGlassAvailable } from "./lib/glass-support";
+export {
+  ACTIVE_ICON_STROKE_WIDTH,
+  ACTIVE_ICON_WEIGHT,
+  DEFAULT_ICON_STROKE_WIDTH,
+  DEFAULT_ICON_WEIGHT,
+} from "./lib/icon";
 export { useInsets } from "./lib/insets";
 export { duration, easing } from "./lib/motion";
 export {

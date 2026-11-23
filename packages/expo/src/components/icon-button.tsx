@@ -6,6 +6,7 @@ import { radius } from "@horon-ai/tokens";
 import { useHoronTheme, type ColorToken } from "../provider";
 import { HoronPressable } from "../lib/press";
 import { GlassSurface } from "../lib/glass-surface";
+import { useIconWeight } from "../lib/icon";
 import { controlHeight, DISABLED_OPACITY, type ControlSize, touchSlop } from "../lib/size";
 
 /**
@@ -93,10 +94,14 @@ export function IconButton({
   const paint = variant === "glass" ? undefined : PAINT[variant];
   const restInk = theme.color(disabled ? "text-disabled" : (paint?.ink ?? "text-primary"));
   const downInk = theme.color(disabled ? "text-disabled" : variant === "quiet" ? "text-primary" : (paint?.ink ?? "text-primary"));
+  const iconWeight = useIconWeight();
   // Two prepared values instead of one object per press, so the provider never re-mounts its consumers.
   const iconContext = useMemo(
-    () => ({ rest: { color: restInk, size: ICON[size] }, down: { color: downInk, size: ICON[size] } }),
-    [downInk, restInk, size],
+    () => ({
+      rest: { color: restInk, size: ICON[size], weight: iconWeight },
+      down: { color: downInk, size: ICON[size], weight: iconWeight },
+    }),
+    [downInk, restInk, size, iconWeight],
   );
 
   return (

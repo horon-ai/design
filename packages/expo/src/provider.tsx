@@ -4,6 +4,7 @@ import { IconContext } from "phosphor-react-native";
 import { darkColors, fontFamily, fontWeight, lightColors, textStyles, type ColorToken } from "@horon-ai/tokens";
 
 import { nativeGlassAvailable } from "./lib/glass-support";
+import { DEFAULT_ICON_WEIGHT } from "./lib/icon";
 
 export type { ColorToken };
 
@@ -232,7 +233,10 @@ export function HoronProvider({
     () => buildTheme(resolved, platform, motionOff, reduceTransparency, touch, haptics, glassMode, { sans, mono }),
     [resolved, platform, motionOff, reduceTransparency, touch, haptics, glassMode, sans, mono],
   );
-  const iconDefaults = useMemo(() => ({ color: theme.color("text-primary"), size: 16 }), [theme]);
+  const iconDefaults = useMemo(
+    () => ({ color: theme.color("text-primary"), size: 16, weight: DEFAULT_ICON_WEIGHT }),
+    [theme],
+  );
 
   return (
     <ThemeContext.Provider value={theme}>
