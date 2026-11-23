@@ -57,14 +57,22 @@ Expo Router를 쓰면 `SafeAreaProvider`는 라우터가 이미 넣으므로 `Ho
 
 | 환경 | 그리는 것 |
 |---|---|
-| iOS 26 이상, 투명도 줄이기 꺼짐 | `GlassView`. `clear` 단계는 `clear` 효과, `regular`·`thick`은 `regular` 효과이고 `thick`에는 `glass-thick` 색조를 더합니다. 앱 화면 모드를 `colorScheme`으로 넘깁니다. |
+| iOS 26 이상, 투명도 줄이기 꺼짐 | `GlassView`. 떠 있는 크롬(`material="glass"`, `clear`·`regular` 단계)은 `glass.native[scheme]`을 따릅니다. 라이트는 `regular` 효과에 불투명도 `0.75`, 다크는 `clear` 효과에 불투명도 `0.85`로 곡면 굴절과 투명도를 맞춥니다. `thick`과 `veil`은 가독성을 위해 `regular` 효과를 유지하고 `thick`에는 `glass-thick`(다크는 `glass-fill-strong`) 색조를 더합니다. `glass` 재료는 가장자리를 잘라 내지 않아 시스템 굴절 테두리가 그대로 보이고, `veil`은 모서리에서 잘라 냅니다. 앱 화면 모드를 `colorScheme`으로 넘깁니다. |
 | Android, iOS 26 미만, 투명도 줄이기 켜짐, `glass="frost"` | 뒤 배경을 흐리게 할 수 없으므로 `glass-fill-frost` 채움에 토큰 테두리(위 밝음, 옆 옅음, 아래 중간)를 둡니다. `@horon-ai/tokens` `glass.ts`가 정한 대체 규칙과 같습니다. |
 
 - 판정은 `isLiquidGlassAvailable()`과 `isGlassEffectAPIAvailable()`(일부 iOS 26 베타의 API 누락 대비)이 모두 참이고 `AccessibilityInfo`의 투명도 줄이기가 꺼져 있을 때만 네이티브입니다. 함수가 예외를 던지면 대체 모양으로 갑니다.
 - 메뉴·팝업·대화상자 같은 오버레이는 `material="veil"`로 그립니다. 대체 모양에서는 링과 그림자가 붙습니다.
 - 눌림 반응: 네이티브 유리는 `isInteractive`로 iOS가 직접 반응합니다. 대체 모양에는 시스템 효과가 없으므로 `pressed`가 참인 동안 `overlay-ink-8`(밝은 화면에서는 어두운 잉크, 어두운 화면에서는 밝은 잉크)을 채움 위에 한 겹 더 칠합니다.
-- Apple 권고대로 유리와 그 부모에 1보다 작은 `opacity`를 주지 않습니다.
+- Apple 권고대로 유리와 그 부모의 `opacity`는 1로 둡니다(`GlassSurface` 내부 유리 층만 `glass.native[scheme].fillOpacity`로 옅게 깔고 그 위 자식은 흐리지 않습니다).
 - `LiquidGlass`는 react처럼 호스트 안에 까는 레이어이고, 표면 전체를 소유하는 컴포넌트는 `GlassSurface`를 직접 씁니다.
+
+## 아이콘 선 굵기
+
+`@horon-ai/tokens`의 `icon` 토큰(`strokeWidth.default: 1.3`, `strokeWidth.active: 1.8`, `phosphorWeight.default: "light"`, `phosphorWeight.active: "regular"`)을 기본값으로 씁니다.
+
+- `HoronProvider`가 `IconContext`에 기본 무게(`DEFAULT_ICON_WEIGHT = "light"`)를 내려 주고, `IconButton`·`Button`·`TabBar`·`Tabs`·`Input`·`Menu` 등 내부 `IconContext.Provider`가 이 무게를 덮어쓰지 않고 이어받습니다.
+- 선택·강조 아이콘(`TabBar`·`Tabs` 활성 탭, 체크 표시, 더보기 아이콘 등)은 `ACTIVE_ICON_WEIGHT("regular")`를 쓰고, 직접 그리는 SVG 선은 `DEFAULT_ICON_STROKE_WIDTH(1.3)`를 씁니다.
+- 16·20·24px 크기에서 라이트·다크 모두 비텍스트 대비 3:1 이상을 유지합니다.
 
 ## 안전 영역
 
@@ -250,7 +258,7 @@ import { RichText } from "@horon-ai/expo";
 | usage-meter | 구현 | Base UI Meter를 `Animated` 채움과 `progressbar` 값으로 |
 | workspace-menu | 구현 | `render` 트리거를 측정 래퍼 안에서 복제 |
 
-배럴에서 빠진 이름은 `mountCursorGhost`·`CursorGhostOptions`(DOM 전용 데스크톱 커서 꼬리)와 `cn`·`ClassValue`(클래스 이름 병합 도구)입니다. 대신 `GlassSurface`, `HoronPressable`, `useHaptic`, `HoronText`, `useFieldText`, `useInsets`, `HoronProvider`, `useHoronTheme`과 Expo 전용 컴포넌트 `RichText`를 더 내보냅니다.
+배럴에서 빠진 이름은 `mountCursorGhost`·`CursorGhostOptions`(DOM 전용 데스크톱 커서 꼬리)와 `cn`·`ClassValue`(클래스 이름 병합 도구)입니다. 대신 `GlassSurface`, `HoronPressable`, `useHaptic`, `HoronText`, `useFieldText`, `useInsets`, `HoronProvider`, `useHoronTheme`, 아이콘 기본 상수(`DEFAULT_ICON_STROKE_WIDTH`, `ACTIVE_ICON_STROKE_WIDTH`, `DEFAULT_ICON_WEIGHT`, `ACTIVE_ICON_WEIGHT`)와 Expo 전용 컴포넌트 `RichText`를 더 내보냅니다.
 
 ## 명령
 
