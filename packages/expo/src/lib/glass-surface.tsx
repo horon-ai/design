@@ -67,7 +67,9 @@ export function GlassSurface({
   ...rest
 }: GlassSurfaceProps) {
   const theme = useHoronTheme();
-  const shape = { borderRadius: radius, borderCurve: "continuous" } as const;
+  const shape: ViewStyle = radius
+    ? { borderRadius: radius, borderCurve: "continuous" }
+    : { borderCurve: "continuous" };
 
   if (theme.glass === "native") {
     return (

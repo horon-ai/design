@@ -6,17 +6,24 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
+  type ComponentRef,
   type ReactElement,
   type ReactNode,
 } from "react";
 import {
   Animated,
+  Keyboard,
   Modal,
   PanResponder,
+  Platform,
   ScrollView,
   StyleSheet,
+  useWindowDimensions,
   View,
+  type KeyboardEvent,
+  type LayoutChangeEvent,
   type PressableProps,
   type StyleProp,
   type ViewStyle,
@@ -34,7 +41,7 @@ function withPress(element: ReactElement<PressableProps>, press: PressableProps,
 }
 
 import { CaretRight } from "phosphor-react-native";
-import { radius, spacing } from "@horon-ai/tokens";
+import { radius, spacing, veil } from "@horon-ai/tokens";
 
 import { useHoronTheme } from "../provider";
 import { GlassSurface } from "../lib/glass-surface";
@@ -43,6 +50,9 @@ import { duration, easing } from "../lib/motion";
 import { HoronPressable } from "../lib/press";
 import { DISABLED_OPACITY } from "../lib/size";
 import { HoronText } from "../lib/text";
+
+/** Default maximum width on wider screens, matching {@link Modal}'s `md` reading width while staying wider than every portrait phone. */
+const DEFAULT_MAX_WIDTH = 560;
 
 /** The open state {@link BottomSheet} publishes to the parts below it. */
 type SheetSet = {
@@ -80,7 +90,7 @@ type BottomSheetProps = {
  * ```tsx
  * <BottomSheet>
  *   <BottomSheetTrigger render={<Button variant="solid" />}>Open sheet</BottomSheetTrigger>
- *   <BottomSheetContent title="Reminder" floating>
+ *   <BottomSheetContent title="Reminder">
  *     <HoronText tone="text-secondary">Every weekday at 9:00</HoronText>
  *     <BottomSheetActions>
  *       <BottomSheetAction>Cancel</BottomSheetAction>
@@ -178,28 +188,31 @@ export type BottomSheetContentProps = {
   /** Sheet title, rendered in the sheet's title slot above the children. */
   title: ReactNode;
   /**
-   * `panel` is the Figma panel sheet (374pt max, `label-lg` title). `detail` is the Paper detail sheet:
-   * full width, 18pt rhythm, a caller-built header (tile, title, description) set flush left.
+   * `panel` is the docked panel sheet (`label-lg` title, 4pt rhythm). `detail` is the detail sheet:
+   * 18pt rhythm with a caller-built header (tile, title, description) set flush left.
    * @default "panel"
    */
   variant?: "panel" | "detail";
   /**
-   * `glass` places the sheet on the veil; `solid` is the Paper workspace sheet: the opaque surface fill,
-   * 20pt top corners, 8/24/16 padding.
+   * `glass` places the sheet on the veil; `solid` is the opaque surface fill. Both dock flush to the
+   * bottom edge (and left/right edges when the screen is narrower than `maxWidth`) with 20pt top
+   * corners and pad their bottom content by the safe-area inset.
    * @default "solid"
    */
   surface?: "glass" | "solid";
   /**
-   * Draws the dimmed scrim behind the sheet. Paper's floating panel sheet has none.
+   * Draws the dimmed scrim behind the sheet. Pressing outside still dismisses the sheet when `false`.
    * @default true
    */
   backdrop?: boolean;
   /**
-   * Insets the sheet 16pt from the sides and bottom edge (Paper's 358pt panel sheet) instead of docking
-   * it full width. The safe-area inset of the bottom edge is added on top either way.
-   * @default false
+   * Maximum sheet width on wider screens (tablets, landscape phones, desktop web). When the viewport is
+   * wider than `maxWidth`, the sheet stays horizontally centred and docked to the bottom edge; when
+   * narrower, it fills 100% width flush to the left and right edges. Pass `"none"` to span full width
+   * at every screen size.
+   * @default 560
    */
-  floating?: boolean;
+  maxWidth?: number | "none";
   /** Layout of the sheet, merged after its own. */
   style?: StyleProp<ViewStyle>;
   /** The sheet body under the title. */
@@ -209,54 +222,155 @@ export type BottomSheetContentProps = {
 /** How far the grabber must travel down before the sheet dismisses, in points. */
 const DRAG_DISMISS_THRESHOLD = 72;
 
+/** True for text a slot can set in its own type token; a node keeps its own layout. */
+const isPlainText = (value: ReactNode): value is string | number =>
+  typeof value === "string" || typeof value === "number";
+
+/** Reads the live keyboard frame when a sheet mounts while the keyboard is already open. */
+function readCurrentKeyboard(): { height: number; screenY: number | null } {
+  if (!Keyboard.isVisible?.()) return { height: 0, screenY: null };
+  const metrics = Keyboard.metrics?.();
+  if (!metrics || metrics.height <= 0) return { height: 0, screenY: null };
+  return {
+    height: metrics.height,
+    screenY: typeof metrics.screenY === "number" ? metrics.screenY : null,
+  };
+}
+
 /**
- * Figma `Bottom sheet` (Panels 88:808): the veil with 32pt top corners, a 36x5 grabber and a `label-lg`
- * title. There is no close button: the sheet closes on the scrim, on a downward drag of the grabber, on
- * the Android back button, or through the caller's own bottom action row.
- *
- * React portals it above the page and lets Base UI slide it and own the drag. Here an RN `Modal`
- * (transparent) holds the scrim and the bottom-docked sheet, so it paints above the app, the back button
- * closes it through `onRequestClose`, and a scrim press dismisses it like an outside press. The grabber
- * drags with a `PanResponder`: a downward pull past 72pt closes the sheet and a shorter one springs back.
- * The sheet is capped at the window height minus 32pt, pads its own bottom by the safe-area inset, and
- * scrolls its body.
+ * Tracks the software keyboard while the sheet modal is mounted so the scrollable body clears the
+ * keyboard while the sheet frame stays docked to bottom 0, without double-padding the bottom
+ * safe-area inset or double-offsetting when Android `adjustResize` already shrinks the modal host.
  */
-export function BottomSheetContent({
+function useKeyboardInset(reducedMotion: boolean) {
+  const [keyboard, setKeyboard] = useState(readCurrentKeyboard);
+  const [hostBottom, setHostBottom] = useState<number | null>(null);
+  const hostRef = useRef<ComponentRef<typeof View>>(null);
+
+  useEffect(() => {
+    const handleShow = (event: KeyboardEvent) => {
+      if (!reducedMotion && Platform.OS === "ios") {
+        Keyboard.scheduleLayoutAnimation?.(event);
+      }
+      const height = Math.max(0, event.endCoordinates?.height ?? 0);
+      const screenY = typeof event.endCoordinates?.screenY === "number" ? event.endCoordinates.screenY : null;
+      setKeyboard({ height, screenY });
+    };
+    const handleHide = (event: KeyboardEvent) => {
+      if (!reducedMotion && Platform.OS === "ios") {
+        Keyboard.scheduleLayoutAnimation?.(event);
+      }
+      setKeyboard({ height: 0, screenY: null });
+    };
+
+    const showEvents =
+      Platform.OS === "ios"
+        ? (["keyboardWillShow", "keyboardDidShow"] as const)
+        : (["keyboardDidShow"] as const);
+    const hideEvents =
+      Platform.OS === "ios"
+        ? (["keyboardWillHide", "keyboardDidHide"] as const)
+        : (["keyboardDidHide"] as const);
+
+    const subscriptions = [
+      ...showEvents.map((name) => Keyboard.addListener(name, handleShow)),
+      ...hideEvents.map((name) => Keyboard.addListener(name, handleHide)),
+    ];
+    return () => {
+      for (const subscription of subscriptions) subscription.remove();
+    };
+  }, [reducedMotion]);
+
+  const onHostLayout = useCallback((event: LayoutChangeEvent) => {
+    const { y, height } = event.nativeEvent.layout;
+    if (height <= 0) return;
+    if (typeof hostRef.current?.measureInWindow === "function") {
+      hostRef.current.measureInWindow((_wx, wy, _ww, wh) => {
+        if (wh > 0) setHostBottom(wy + wh);
+        else setHostBottom(y + height);
+      });
+      return;
+    }
+    setHostBottom(y + height);
+  }, []);
+
+  const keyboardHeight = keyboard.height;
+  const keyboardOffset =
+    keyboardHeight <= 0
+      ? 0
+      : hostBottom !== null && keyboard.screenY !== null && keyboard.screenY > 0
+        ? Math.max(0, hostBottom - keyboard.screenY)
+        : keyboardHeight;
+
+  return { hostRef, keyboardHeight, keyboardOffset, onHostLayout };
+}
+
+/**
+ * Bottom-docked sheet: on screens narrower than `maxWidth` (default 560pt) it docks flush to the
+ * left, right and bottom edges; on wider screens (tablets, landscape phones, desktop web) it centres
+ * horizontally at `maxWidth` while staying anchored to the bottom edge. Top corners are 20pt
+ * continuous, bottom corners are square, and the sheet closes on an outside tap, on a downward drag
+ * of the grabber, on the Android back / Escape / VoiceOver escape action, or through the caller's
+ * own action row.
+ *
+ * The sheet background extends to the physical bottom edge while the scrollable content pads its
+ * bottom by the safe-area inset (yielding to the keyboard when open so no double padding appears),
+ * and the sheet stops below the top safe-area inset.
+ */
+export function BottomSheetContent(props: BottomSheetContentProps) {
+  const { open, setOpen } = useContext(SheetContext);
+  const close = useCallback(() => setOpen(false), [setOpen]);
+  if (!open) return null;
+  return <BottomSheetModal {...props} close={close} />;
+}
+
+/** Mounted only while open so slide, drag and keyboard state start clean on every presentation. */
+function BottomSheetModal({
   title,
   variant = "panel",
   surface = "solid",
   backdrop = true,
-  floating = false,
+  maxWidth = DEFAULT_MAX_WIDTH,
   style,
   children,
-}: BottomSheetContentProps) {
+  close,
+}: BottomSheetContentProps & { close: () => void }) {
   const theme = useHoronTheme();
   const insets = useInsets();
-  const { open, setOpen } = useContext(SheetContext);
-  const close = useCallback(() => setOpen(false), [setOpen]);
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const [slide] = useState(() => new Animated.Value(0));
   const [drag] = useState(() => new Animated.Value(0));
   const [dragging, setDragging] = useState(false);
+  const { hostRef, keyboardHeight, keyboardOffset, onHostLayout } = useKeyboardInset(theme.reducedMotion);
 
   useEffect(() => {
-    if (!open) {
-      slide.setValue(0);
-      drag.setValue(0);
-      return undefined;
-    }
     if (theme.reducedMotion) {
       slide.setValue(1);
       return undefined;
     }
     const animation = Animated.timing(slide, {
       toValue: 1,
-      duration: duration.slide + 120,
+      duration: duration.popIn,
       easing: easing.outQuint,
       useNativeDriver: true,
     });
     animation.start();
     return () => animation.stop();
-  }, [open, theme.reducedMotion, slide, drag]);
+  }, [theme.reducedMotion, slide]);
+
+  const snapDragBack = useCallback(() => {
+    setDragging(false);
+    if (theme.reducedMotion) {
+      drag.setValue(0);
+      return;
+    }
+    Animated.timing(drag, {
+      toValue: 0,
+      duration: duration.slide,
+      easing: easing.outQuint,
+      useNativeDriver: true,
+    }).start();
+  }, [drag, theme.reducedMotion]);
 
   const pan = useMemo(
     () =>
@@ -265,31 +379,44 @@ export function BottomSheetContent({
         onPanResponderGrant: () => setDragging(true),
         onPanResponderMove: (_event, gesture) => drag.setValue(Math.max(0, gesture.dy)),
         onPanResponderRelease: (_event, gesture) => {
-          setDragging(false);
           if (gesture.dy >= DRAG_DISMISS_THRESHOLD) {
+            setDragging(false);
             close();
             return;
           }
-          Animated.timing(drag, {
-            toValue: 0,
-            duration: duration.slide,
-            easing: easing.outQuint,
-            useNativeDriver: true,
-          }).start();
+          snapDragBack();
         },
+        onPanResponderTerminate: snapDragBack,
       }),
-    [close, drag],
+    [close, drag, snapDragBack],
   );
-
-  if (!open) return null;
 
   const detail = variant === "detail";
   const glass = surface === "glass";
+  const slideDistance = Math.min(Math.max(Math.round(windowHeight * 0.5), 360), 560);
   const translateY = Animated.add(
-    slide.interpolate({ inputRange: [0, 1], outputRange: [360, 0] }),
+    slide.interpolate({ inputRange: [0, 1], outputRange: [slideDistance, 0] }),
     drag,
   );
-  const cornerRadius = floating || detail ? radius.xl : radius["2xl"] * 2;
+  const resolvedMaxWidth = maxWidth === "none" ? undefined : Math.max(0, maxWidth);
+  const sideGap =
+    resolvedMaxWidth !== undefined && windowWidth > resolvedMaxWidth
+      ? (windowWidth - resolvedMaxWidth) / 2
+      : 0;
+  // Side safe-area insets only apply where the sheet actually reaches the screen's side notch zone;
+  // when centred inside a wider viewport, the outer gap already clears the notch.
+  const leftSafeInset = Math.max(0, insets.left - sideGap);
+  const rightSafeInset = Math.max(0, insets.right - sideGap);
+  // Keep the sheet frame anchored at bottom 0 even while the keyboard is open; clear the keyboard
+  // inside the scrollable content container without stacking `insets.bottom` on top of the keyboard.
+  const bottomInset =
+    keyboardHeight > 0
+      ? Math.max(keyboardOffset, Math.max(0, insets.bottom - keyboardHeight))
+      : insets.bottom;
+  const baseBottomPadding = glass ? spacing["5"] : spacing["6"];
+  const accessibleTitle = isPlainText(title) ? String(title) : undefined;
+  const ringColor = glass ? veil.scheme[theme.scheme].ring : theme.color("border-default");
+  const shadowColor = veil.scheme[theme.scheme].overlayShadow;
 
   return (
     <Modal
@@ -300,59 +427,87 @@ export function BottomSheetContent({
       onRequestClose={close}
       supportedOrientations={["portrait", "landscape"]}
     >
-      <View style={styles.host} accessibilityViewIsModal>
+      <View
+        ref={hostRef}
+        onLayout={onHostLayout}
+        onAccessibilityEscape={close}
+        style={[
+          styles.host,
+          {
+            paddingTop: Math.max(insets.top + spacing["4"], spacing["8"]),
+          },
+        ]}
+        accessibilityViewIsModal
+      >
         <HoronPressable
           haptic="none"
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
-          onPress={backdrop ? close : undefined}
+          onPress={close}
           style={[styles.scrim, backdrop ? { backgroundColor: theme.color("bg-scrim"), opacity: 0.32 } : undefined]}
         />
-        <View
-          pointerEvents="box-none"
-          style={[
-            styles.viewport,
-            floating ? { paddingHorizontal: spacing["4"], paddingBottom: spacing["4"] } : undefined,
-          ]}
-        >
+        <View pointerEvents="box-none" style={styles.viewport}>
           <Animated.View
+            role="dialog"
+            accessibilityLabel={accessibleTitle}
             style={[
               styles.frame,
-              {
-                borderRadius: cornerRadius,
-                transform: [{ translateY }],
-                maxWidth: floating || detail ? "100%" : 374,
-                paddingBottom: insets.bottom + (detail ? 24 : floating ? spacing["3"] : spacing["6"]),
-              },
+              resolvedMaxWidth !== undefined ? { maxWidth: resolvedMaxWidth } : undefined,
+              { transform: [{ translateY }] },
               glass
-                ? undefined
-                : { backgroundColor: theme.color("bg-surface"), boxShadow: `0 -8px 32px 0 ${theme.color("overlay-ink-8")}` },
+                ? theme.glass === "native"
+                  ? undefined
+                  : { boxShadow: `0 -8px 32px 0 ${shadowColor}` }
+                : {
+                    backgroundColor: theme.color("bg-surface"),
+                    boxShadow: `0 0 0 ${veil.ringWidth}px ${ringColor}, 0 -8px 32px 0 ${shadowColor}`,
+                  },
               style,
             ]}
           >
             {glass ? (
               <GlassSurface
                 material="veil"
-                radius={cornerRadius}
-                style={StyleSheet.absoluteFill}
+                style={[
+                  theme.glass === "native" ? StyleSheet.absoluteFill : styles.frostFill,
+                  styles.glassCorners,
+                ]}
                 pointerEvents="none"
               />
             ) : null}
-            <View style={styles.grabberZone} {...pan.panHandlers} accessibilityElementsHidden>
+            <View
+              style={styles.grabberZone}
+              hitSlop={GRABBER_HIT_SLOP}
+              {...pan.panHandlers}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
               <View style={[styles.grabber, { backgroundColor: theme.color("overlay-ink-20") }]} />
             </View>
             <ScrollView
               style={styles.body}
-              contentContainerStyle={[styles.bodyContent, { gap: detail ? 18 : floating ? spacing["3"] : spacing["1"] }]}
+              contentContainerStyle={[
+                styles.bodyContent,
+                {
+                  gap: detail ? 18 : spacing["1"],
+                  paddingLeft: spacing["4"] + leftSafeInset,
+                  paddingRight: spacing["4"] + rightSafeInset,
+                  paddingBottom: bottomInset + baseBottomPadding,
+                },
+              ]}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
               scrollEnabled={!dragging}
             >
               <View style={[styles.titleRow, detail ? styles.titleRowDetail : null]}>
                 <View style={styles.titleText}>
-                  <HoronText variant={detail ? "body-md" : "label-lg"} role="heading">
-                    {title}
-                  </HoronText>
+                  {isPlainText(title) ? (
+                    <HoronText variant={detail ? "body-md" : "label-lg"} role="heading">
+                      {title}
+                    </HoronText>
+                  ) : (
+                    title
+                  )}
                 </View>
               </View>
               {children}
@@ -501,24 +656,71 @@ export function BottomSheetAction({
   );
 }
 
+/** Widens the visual 5pt grabber strip to a 45pt vertical touch target without inflating header height. */
+const GRABBER_HIT_SLOP = { top: spacing["4"], bottom: spacing["4"] } as const;
+
 const styles = StyleSheet.create({
-  host: { flex: 1, justifyContent: "flex-end" },
+  host: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "flex-end",
+    marginBottom: 0,
+    paddingBottom: 0,
+  },
   scrim: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
-  viewport: { width: "100%", alignItems: "center" },
+  viewport: {
+    width: "100%",
+    maxHeight: "100%",
+    flexShrink: 1,
+    alignItems: "center",
+    marginBottom: 0,
+    paddingBottom: 0,
+  },
   frame: {
     width: "100%",
+    alignSelf: "center",
     maxHeight: "100%",
     flexDirection: "column",
     overflow: "hidden",
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     borderCurve: "continuous",
+    marginBottom: 0,
     paddingTop: spacing["2"],
-    paddingHorizontal: spacing["4"],
+    paddingBottom: 0,
   },
-  body: { flexShrink: 1 },
+  // In frost fallback mode `GlassSurface` draws a 1pt ring on every side; nudging only the bottom
+  // edge below the frame clip keeps top and side curves flush while removing the bottom seam.
+  frostFill: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: -veil.ringWidth,
+  },
+  glassCorners: {
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  body: { flexShrink: 1, minHeight: 0 },
   bodyContent: { paddingTop: spacing["2"] },
   grabberZone: { alignSelf: "stretch", alignItems: "center", paddingVertical: spacing["1"] },
-  grabber: { height: 5, width: 36, borderRadius: 3 },
-  titleRow: { flexDirection: "row", gap: spacing["2"], alignItems: "center", paddingTop: spacing["2.5"], paddingBottom: spacing["2"], paddingLeft: spacing["2"] },
+  grabber: { height: 5, width: 36, borderRadius: radius.full },
+  titleRow: {
+    flexDirection: "row",
+    gap: spacing["2"],
+    alignItems: "center",
+    paddingTop: spacing["2.5"],
+    paddingBottom: spacing["2"],
+    paddingLeft: spacing["2"],
+  },
   titleRowDetail: { alignItems: "flex-start", paddingLeft: 0 },
   titleText: { flex: 1, minWidth: 0 },
   row: {
