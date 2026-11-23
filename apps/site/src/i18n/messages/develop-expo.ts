@@ -223,8 +223,8 @@ export const expoGlassMessages = defineMessages({
     en: "iOS 26 or later, Reduce Transparency off",
   },
   rowNativeDraws: {
-    ko: "GlassView. clear 단계는 clear 효과, regular와 thick은 regular 효과이고 thick에는 glass-thick 색조가 더해집니다. 앱 화면 모드는 colorScheme으로 넘어갑니다.",
-    en: "A GlassView. The clear tier takes the clear effect, regular and thick take regular, and thick adds the glass-thick tint. The app scheme goes in as colorScheme.",
+    ko: "GlassView. 모든 단계가 regular 효과이고 thick에는 glass-thick 색조(다크는 glass-fill-strong)가 더해집니다. 유리 층은 glass.nativeFillOpacity(0.75)로 옅게 깔리고 그 위의 내용은 흐려지지 않습니다. glass 재료는 가장자리를 잘라 내지 않아 시스템 굴절 테두리가 보이고, veil은 내용을 모서리에서 잘라 냅니다. 앱 화면 모드는 colorScheme으로 넘어갑니다.",
+    en: "A GlassView in the regular effect for every tier; thick adds the glass-thick tint (glass-fill-strong in dark). The glass layer sits at glass.nativeFillOpacity (0.75) behind the content, which stays opaque. The glass material is not clipped, so the system refraction rim at the edge shows; veil clips its content to the corner. The app scheme goes in as colorScheme.",
   },
   rowFrostEnvironment: {
     ko: 'Android, iOS 26 미만, 투명도 줄이기 켜짐, glass="frost"',
@@ -237,8 +237,8 @@ export const expoGlassMessages = defineMessages({
 
   tierHeading: { ko: "티어와 반경", en: "Tier and radius" },
   tierBody: {
-    ko: "tier는 clear, regular, thick 세 단계이고 기본값은 regular입니다. radius는 네이티브 효과가 그 반경으로 잘라 내는 값이고 기본값은 0입니다. 높이와 그림자는 재료에 들지 않으므로, 떠 있는 표면은 @horon-ai/tokens의 shadow에서 직접 더합니다.",
-    en: "tier is clear, regular or thick and defaults to regular. radius is the corner the native effect clips to and defaults to 0. Elevation is not part of the material, so a floating surface adds its own boxShadow from @horon-ai/tokens shadow.",
+    ko: "tier는 clear, regular, thick 세 단계이고 기본값은 regular입니다. radius는 네이티브 효과의 모서리 반경이고 기본값은 0입니다. style에 준 모서리 반경도 유리 층이 따라갑니다. 높이와 그림자는 재료에 들지 않으므로, 떠 있는 표면은 @horon-ai/tokens의 shadow에서 직접 더합니다.",
+    en: "tier is clear, regular or thick and defaults to regular. radius is the corner of the native effect and defaults to 0; a corner radius set through style is followed too. Elevation is not part of the material, so a floating surface adds its own boxShadow from @horon-ai/tokens shadow.",
   },
 
   pressedHeading: { ko: "누름 상태", en: "Press state" },

@@ -17,8 +17,8 @@ export const foundationsGlassMessages = defineMessages({
     en: "Backdrop: blurs what is behind by {blur}px and raises saturation to {saturate}%. On GlassView the native Liquid Glass draws it instead.",
   },
   fillItem: {
-    ko: "채움: glass-clear, glass-regular, glass-thick 중 하나입니다. React는 호스트가 칠하고, Expo의 GlassSurface가 같은 단계를 GlassView의 효과와 glass-thick 색조로 옮깁니다. GlassView를 쓸 수 없으면 glass-fill-frost를 유지합니다.",
-    en: "Fill: one of glass-clear, glass-regular, or glass-thick. React lets the host paint it; Expo's GlassSurface maps the same tiers to GlassView's effect and the glass-thick tint, and keeps glass-fill-frost where GlassView is unavailable.",
+    ko: "채움: glass-clear, glass-regular, glass-thick 중 하나입니다. React는 호스트가 칠하고, Expo의 GlassSurface는 GlassView의 regular 효과에 glass-thick 색조를 더해 단계를 나누고, 유리 층을 glass.nativeFillOpacity로 옅게 깝니다. GlassView를 쓸 수 없으면 glass-fill-frost를 유지합니다.",
+    en: "Fill: one of glass-clear, glass-regular, or glass-thick. React lets the host paint it; Expo's GlassSurface draws GlassView's regular effect, separates the tiers with the glass-thick tint and lays the layer at glass.nativeFillOpacity, and keeps glass-fill-frost where GlassView is unavailable.",
   },
   borderItem: {
     ko: "테두리: 가장자리 안쪽 {width}px 링입니다. 위가 가장 밝고({top}), 가운데에서 옅어졌다가({mid}) 아래에서 조금 다시 밝아집니다({bottom}). 다크 모드는 더 옅습니다.",

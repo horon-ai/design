@@ -20,6 +20,11 @@
  * `shadow` from `scale.ts`. Where the backdrop cannot be filtered (no
  * backdrop-filter support, reduced transparency, Android and iOS before 26 in
  * Expo), the fill becomes `glass-fill-frost` and the rim stays.
+ *
+ * `nativeFillOpacity` is the opacity of the system material layer where a
+ * native host draws it (iOS Liquid Glass): 0.75 lets the content behind show
+ * through while icons over the moving content keep 3:1 non-text contrast in
+ * light and dark. It fades only the material, never the content on it.
  */
 
 export const glass = {
@@ -27,6 +32,7 @@ export const glass = {
   saturate: 1.8,
   rimWidth: 1,
   rimMidStop: 0.5,
+  nativeFillOpacity: 0.75,
   rim: {
     light: { top: "rgba(255, 255, 255, 0.7)", mid: "rgba(255, 255, 255, 0.12)", bottom: "rgba(255, 255, 255, 0.3)" },
     dark: { top: "rgba(255, 255, 255, 0.22)", mid: "rgba(255, 255, 255, 0.04)", bottom: "rgba(255, 255, 255, 0.1)" },

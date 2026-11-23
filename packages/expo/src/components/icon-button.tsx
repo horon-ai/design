@@ -114,6 +114,8 @@ export function IconButton({
       }}
       style={({ pressed }) => [
         styles.root,
+        // Glass is left unclipped so the native refraction rim at its edge stays visible.
+        variant !== "glass" && styles.clip,
         { width: disc, height: disc },
         paint?.fill ? { backgroundColor: theme.color(paint.fill) } : null,
         paint?.border ? { borderWidth: 1, borderColor: theme.color(paint.border) } : null,
@@ -150,9 +152,9 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     alignItems: "center",
     justifyContent: "center",
-    overflow: "hidden",
     borderRadius: radius.full,
     borderCurve: "continuous",
   },
+  clip: { overflow: "hidden" },
   icon: { alignItems: "center", justifyContent: "center" },
 });
