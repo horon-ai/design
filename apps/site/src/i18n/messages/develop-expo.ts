@@ -150,6 +150,10 @@ export const expoThemingMessages = defineMessages({
     ko: "expo-font에 등록한 글꼴 이름을 sans와 mono로 넘깁니다. 비우면 토큰의 첫 글꼴입니다.",
     en: "The family names registered with expo-font, as sans and mono. Unset reads the token first families.",
   },
+  rowTextScaleMeaning: {
+    ko: "앱 글자 크기 배율. 글자 토큰의 크기와 줄 높이에 곱하고, OS 글자 확대보다 먼저 적용됩니다.",
+    en: "The app text-size multiplier. It scales every type token's size and line height before OS font scaling.",
+  },
 
   schemeHeading: { ko: "scheme", en: "scheme" },
   schemeBody: {
@@ -185,6 +189,12 @@ export const expoThemingMessages = defineMessages({
   fontsBody: {
     ko: "기본값은 토큰 첫 글꼴인 Pretendard Variable과 Geist Mono Variable입니다. expo-font에 다른 이름으로 올렸다면 fonts={{ sans, mono }}로 알려 줍니다.",
     en: "It defaults to the token first families, Pretendard Variable and Geist Mono Variable. If expo-font registered other names, pass them as fonts={{ sans, mono }}.",
+  },
+
+  textScaleHeading: { ko: "textScale", en: "textScale" },
+  textScaleBody: {
+    ko: "앱 자체의 글자 크기 배율이고 기본값은 1입니다. 글자 토큰 13개의 크기와 줄 높이에 곱하며 OS 글자 확대보다 먼저 적용되므로, 사용자가 앱 설정에서 고른 값에 1.2를 넘기면 body-md가 16px에서 19.2px로 커집니다. 줄 높이도 같은 비율로 늘어 줄 간격이 유지됩니다.",
+    en: "The app's own text-size multiplier, 1 by default. It scales the size and line height of all 13 type tokens before OS font scaling, so passing 1.2 for a user's in-app preference takes body-md from 16px to 19.2px. Line height grows by the same factor, so spacing stays proportional.",
   },
 
   hapticsHeading: { ko: "haptics", en: "haptics" },

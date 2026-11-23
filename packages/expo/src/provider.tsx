@@ -101,6 +101,13 @@ export type HoronProviderProps = {
    * first family of each `@horon-ai/tokens` stack.
    */
   fonts?: { sans?: string; mono?: string };
+  /**
+   * App text-size preference, applied before OS font scaling. Every type token
+   * multiplies its size and line height by this value, so `1.2` draws the app
+   * 20% larger and `1` (the default) keeps the tokens as published.
+   * @default 1
+   */
+  textScale?: number;
   /** The tree to paint inside the theme root. */
   children?: ReactNode;
 };
@@ -117,6 +124,7 @@ function buildTheme(
   haptics: boolean,
   glass: GlassMode,
   fonts: { sans: string; mono: string },
+  textScale = 1,
 ): HoronTheme {
   const colors = scheme === "dark" ? darkColors : lightColors;
   const cache = new Map<TextStyleName, ThemeTextStyle>();
@@ -135,12 +143,12 @@ function buildTheme(
       const hit = cache.get(name);
       if (hit) return hit;
       const style = textStyles[name];
-      const size = style.size[platform];
+      const size = style.size[platform] * textScale;
       const resolved: ThemeTextStyle = {
         fontFamily: fonts[style.family],
         fontWeight: fontWeight[style.weight],
         fontSize: size,
-        lineHeight: style.lineHeight[platform],
+        lineHeight: style.lineHeight[platform] * textScale,
         // Tracking is em in the token file; React Native takes points.
         letterSpacing: Math.round(style.tracking * size * 100) / 100,
       };
@@ -218,6 +226,7 @@ export function HoronProvider({
   haptics = true,
   glass = "auto",
   fonts,
+  textScale = 1,
   children,
 }: HoronProviderProps) {
   const system = useSystemColorScheme();
@@ -230,8 +239,19 @@ export function HoronProvider({
   const mono = fonts?.mono ?? DEFAULT_FONTS.mono;
 
   const theme = useMemo(
-    () => buildTheme(resolved, platform, motionOff, reduceTransparency, touch, haptics, glassMode, { sans, mono }),
-    [resolved, platform, motionOff, reduceTransparency, touch, haptics, glassMode, sans, mono],
+    () =>
+      buildTheme(
+        resolved,
+        platform,
+        motionOff,
+        reduceTransparency,
+        touch,
+        haptics,
+        glassMode,
+        { sans, mono },
+        textScale,
+      ),
+    [resolved, platform, motionOff, reduceTransparency, touch, haptics, glassMode, sans, mono, textScale],
   );
   const iconDefaults = useMemo(
     () => ({ color: theme.color("text-primary"), size: 16, weight: DEFAULT_ICON_WEIGHT }),
