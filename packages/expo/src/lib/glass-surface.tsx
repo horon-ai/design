@@ -32,7 +32,10 @@ export type GlassSurfaceProps = Omit<ViewProps, "style"> & {
    * on light, light ink on dark).
    */
   pressed?: boolean;
-  /** Layout of the surface. Keep `opacity` at 1: Apple's glass does not render under a faded parent. */
+  /**
+   * Layout of the surface. Keep `opacity` at 1: the native material is already
+   * faded to `glass.nativeFillOpacity`, and a faded parent fades it again.
+   */
   style?: StyleProp<ViewStyle>;
   children?: ReactNode;
 };
@@ -41,11 +44,15 @@ export type GlassSurfaceProps = Omit<ViewProps, "style"> & {
  * The one glass material of `@horon-ai/tokens` `glass.ts`, drawn by
  * `expo-glass-effect`.
  *
- * - **native** (iOS 26+, Reduce Transparency off): a `GlassView`. `clear` maps
- *   to the `clear` effect, `regular` and `thick` to `regular`; `thick` adds the
- *   `glass-thick` tint so the denser tier still reads denser. The view follows
- *   the theme scheme through `colorScheme`, so an in-app dark toggle wins over
- *   the system appearance.
+ * - **native** (iOS 26+, Reduce Transparency off): a `GlassView` in the
+ *   `regular` effect for every tier, laid behind the children at
+ *   `glass.nativeFillOpacity` so the content behind shows through while the
+ *   children stay opaque. `thick` adds the `glass-thick` tint (`glass-fill-strong`
+ *   in dark) so the denser tier still reads denser. The `glass` material is not
+ *   clipped, so the system refraction rim at the edge stays visible; `veil`
+ *   clips its children to the corner. The view follows the theme scheme
+ *   through `colorScheme`, so an in-app dark toggle wins over the system
+ *   appearance.
  * - **frost** (Android, iOS before 26, Reduce Transparency, or
  *   `HoronProvider glass="frost"`): the backdrop cannot be filtered, so the
  *   fill becomes `glass-fill-frost` and the rim stays — a `rimWidth` ring
@@ -72,17 +79,24 @@ export function GlassSurface({
     : { borderCurve: "continuous" };
 
   if (theme.glass === "native") {
+    const corners = cornerStyle(style);
     return (
-      <GlassView
-        {...rest}
-        glassEffectStyle={tier === "clear" && material === "glass" ? "clear" : "regular"}
-        tintColor={tier === "thick" ? theme.color("glass-thick") : undefined}
-        colorScheme={theme.scheme}
-        isInteractive={interactive}
-        style={[shape, styles.clip, style]}
-      >
+      <View {...rest} style={[shape, material === "veil" && styles.clip, style]}>
+        <View pointerEvents="box-none" style={[StyleSheet.absoluteFill, styles.nativeFill]}>
+          <GlassView
+            glassEffectStyle="regular"
+            tintColor={
+              tier === "thick"
+                ? theme.color(theme.scheme === "dark" ? "glass-fill-strong" : "glass-thick")
+                : undefined
+            }
+            colorScheme={theme.scheme}
+            isInteractive={interactive}
+            style={[StyleSheet.absoluteFill, shape, corners]}
+          />
+        </View>
         {children}
-      </GlassView>
+      </View>
     );
   }
 
@@ -115,4 +129,34 @@ export function GlassSurface({
   );
 }
 
-const styles = StyleSheet.create({ clip: { overflow: "hidden" } });
+const CORNER_KEYS = [
+  "borderRadius",
+  "borderTopLeftRadius",
+  "borderTopRightRadius",
+  "borderBottomLeftRadius",
+  "borderBottomRightRadius",
+  "borderTopStartRadius",
+  "borderTopEndRadius",
+  "borderBottomStartRadius",
+  "borderBottomEndRadius",
+  "borderCurve",
+] as const;
+
+/** The corner keys of the caller's style, so the glass layer follows a radius set through `style`. */
+function cornerStyle(style: StyleProp<ViewStyle>): ViewStyle | undefined {
+  const flat = StyleSheet.flatten(style);
+  if (!flat) return undefined;
+  const corners: ViewStyle = {};
+  let found = false;
+  for (const key of CORNER_KEYS) {
+    if (flat[key] === undefined) continue;
+    Object.assign(corners, { [key]: flat[key] });
+    found = true;
+  }
+  return found ? corners : undefined;
+}
+
+const styles = StyleSheet.create({
+  clip: { overflow: "hidden" },
+  nativeFill: { opacity: glass.nativeFillOpacity },
+});
