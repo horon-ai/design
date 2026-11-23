@@ -48,6 +48,7 @@ Expo Router를 쓰면 `SafeAreaProvider`는 라우터가 이미 넣으므로 `Ho
 | `haptics` | `true` | 누를 때마다 `expo-haptics` 진동을 줍니다. 끄면 앱 전체에서 진동이 멈춥니다. |
 | `glass` | `"auto"` | `auto`는 가능한 곳에서 네이티브 Liquid Glass, `frost`는 어디서나 대체 모양을 씁니다. |
 | `fonts` | 토큰 첫 글꼴 | `expo-font`에 등록한 글꼴 이름(`sans`, `mono`). |
+| `textScale` | `1` | 앱 글자 크기 배율. 글자 토큰의 크기와 줄 높이에 곱하고, OS 글자 확대보다 먼저 적용됩니다. |
 
 `useHoronTheme()`은 현재 색(`color(token)`), 글자 스타일(`text(style)`), 화면 모드, 유리 방식, 접근성 상태를 돌려줍니다. 컴포넌트는 이 값만 읽고 색·간격을 직접 적지 않습니다.
 

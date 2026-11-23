@@ -16,6 +16,7 @@ const props: { name: string; fallback: string | Localized; meaning: Localized }[
   { name: "glass", fallback: '"auto"', meaning: m.rowGlassMeaning },
   { name: "haptics", fallback: "true", meaning: m.rowHapticsMeaning },
   { name: "fonts", fallback: m.rowFontsDefault, meaning: m.rowFontsMeaning },
+  { name: "textScale", fallback: "1", meaning: m.rowTextScaleMeaning },
 ];
 ---
 
@@ -76,6 +77,9 @@ const props: { name: string; fallback: string | Localized; meaning: Localized }[
 
   <h2><T m={m.fontsHeading} /></h2>
   <p><T m={m.fontsBody} /></p>
+
+  <h2><T m={m.textScaleHeading} /></h2>
+  <p><T m={m.textScaleBody} /></p>
 
   <h2><T m={m.hapticsHeading} /></h2>
   <p><T m={m.hapticsBody} /></p>
