@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { View, type StyleProp, type ViewStyle } from "react-native";
+import { Platform, View, type StyleProp, type ViewStyle } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import {
   Archive,
@@ -143,17 +143,20 @@ export function HoronIcon({ size = "1em", color, style, accessibilityLabel }: Ho
   const icons = useContext(IconContext);
   const paint = color ?? icons.color ?? theme.color("text-primary");
   const side = points(size, icons.size === undefined ? 16 : points(icons.size, 16));
+  // react-native-svg forwards `accessible` to DOM <svg> on web, triggering a React warning.
+  const accessibilityProps =
+    Platform.OS === "web"
+      ? accessibilityLabel === undefined
+        ? ({ "aria-hidden": true } as const)
+        : ({ role: "img", "aria-label": accessibilityLabel } as const)
+      : ({
+          accessible: accessibilityLabel !== undefined,
+          accessibilityRole: accessibilityLabel === undefined ? undefined : "image",
+          accessibilityLabel,
+        } as const);
 
   return (
-    <Svg
-      width={side}
-      height={side}
-      viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
-      style={style}
-      accessible={accessibilityLabel !== undefined}
-      accessibilityRole={accessibilityLabel === undefined ? undefined : "image"}
-      accessibilityLabel={accessibilityLabel}
-    >
+    <Svg width={side} height={side} viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`} style={style} {...accessibilityProps}>
       <Path d={HORON_PATH} fill={paint} />
     </Svg>
   );

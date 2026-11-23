@@ -170,17 +170,18 @@ function useAccessibilityFlag(
         return enabled;
       })
       .catch(() => undefined);
-    const subscription = AccessibilityInfo.addEventListener(event, (enabled: boolean) => setValue(enabled));
+    const subscription = AccessibilityInfo.addEventListener?.(event, (enabled: boolean) => setValue(enabled));
     return () => {
       live = false;
-      subscription.remove();
+      subscription?.remove();
     };
   }, [read, event]);
   return value;
 }
 
-const readReduceMotion = () => AccessibilityInfo.isReduceMotionEnabled();
-const readReduceTransparency = () => AccessibilityInfo.isReduceTransparencyEnabled();
+const readReduceMotion = () => AccessibilityInfo.isReduceMotionEnabled?.() ?? Promise.resolve(false);
+// React Native Web does not implement `isReduceTransparencyEnabled`.
+const readReduceTransparency = () => AccessibilityInfo.isReduceTransparencyEnabled?.() ?? Promise.resolve(false);
 
 /**
  * The root of every Horon Expo tree: it paints the palette background, selects
