@@ -298,7 +298,11 @@ export function createBasicCatalogFunctions(
   const resolved = resolveLocale(locale);
   let names: DateNames | undefined;
   const lazyNames = () => (names ??= dateNames(resolved));
-  const plural = new Intl.PluralRules(resolved);
+  // Hermes has no `Intl.PluralRules`; there the CLDR `one`/`other` split of English applies.
+  const plural =
+    typeof Intl.PluralRules === "function"
+      ? new Intl.PluralRules(resolved)
+      : { select: (count: number) => (count === 1 ? "one" : "other") };
 
   const executors: Record<string, Executor> = {
     required: ({ value }) =>

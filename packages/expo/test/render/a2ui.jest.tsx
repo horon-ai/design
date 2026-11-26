@@ -8,6 +8,7 @@ import {
   HORON_CATALOG_ID,
   basicCatalog,
   createA2uiProcessor,
+  createBasicCatalog,
   horonCatalog,
   type ActionPayload,
   type NativeMessageProcessor,
@@ -189,4 +190,32 @@ test("openUrl opens web links and refuses other schemes", async () => {
   await fireEvent.press(screen.getByRole("button", { name: "Script" }));
   expect(openURL.mock.calls).toEqual([["https://horon.ai/docs"]]);
   openURL.mockRestore();
+});
+
+test("the basic catalog builds and pluralizes on Hermes, which has no Intl.PluralRules", async () => {
+  const pluralRules = Intl.PluralRules;
+  Reflect.deleteProperty(Intl, "PluralRules");
+  try {
+    const processor = createA2uiProcessor([createBasicCatalog({ locale: "ko-KR" })]);
+    processor.processMessages(
+      surface(BASIC_CATALOG_ID, [
+        { id: "root", component: "Column", children: ["one", "many"] },
+        {
+          id: "one",
+          component: "Text",
+          text: { "@call": "pluralize", args: { value: 1, one: "1 file", other: "files" } },
+        },
+        {
+          id: "many",
+          component: "Text",
+          text: { "@call": "pluralize", args: { value: 3, one: "1 file", other: "3 files" } },
+        },
+      ]),
+    );
+    await show(processor);
+    expect(screen.getByText("1 file")).toBeTruthy();
+    expect(screen.getByText("3 files")).toBeTruthy();
+  } finally {
+    Object.defineProperty(Intl, "PluralRules", { value: pluralRules, writable: true, configurable: true });
+  }
 });
