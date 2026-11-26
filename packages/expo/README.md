@@ -261,6 +261,37 @@ import { RichText } from "@horon-ai/expo";
 
 배럴에서 빠진 이름은 `mountCursorGhost`·`CursorGhostOptions`(DOM 전용 데스크톱 커서 꼬리)와 `cn`·`ClassValue`(클래스 이름 병합 도구)입니다. 대신 `GlassSurface`, `HoronPressable`, `useHaptic`, `HoronText`, `useFieldText`, `useInsets`, `HoronProvider`, `useHoronTheme`, 아이콘 기본 상수(`DEFAULT_ICON_STROKE_WIDTH`, `ACTIVE_ICON_STROKE_WIDTH`, `DEFAULT_ICON_WEIGHT`, `ACTIVE_ICON_WEIGHT`)와 Expo 전용 컴포넌트 `RichText`를 더 내보냅니다.
 
+## A2UI (`@horon-ai/expo/a2ui`)
+
+에이전트가 보내는 [A2UI](https://a2ui.org) v1.0 메시지를 Horon 컴포넌트로 그리는 React Native 렌더러입니다. 웹용 `@a2ui/react`와 같은 구조이고, 메시지 처리기는 같은 `@a2ui/web_core`의 `MessageProcessor`를 씁니다. `@a2ui/react`는 웹 컴포넌트와 `react-dom`에 묶여 있어 React Native에서 쓸 수 없으므로 그 자리를 이 진입점이 맡습니다.
+
+```tsx
+import { A2uiSurfaces, createA2uiProcessor, horonCatalog } from "@horon-ai/expo/a2ui";
+
+const processor = createA2uiProcessor([horonCatalog], {
+  onAction: (action) => sendToAgent({ version: "1.0", action }),
+});
+
+// 전송 계층에서 받은 JSON을 그대로 넘깁니다.
+processor.processMessages(JSON.parse(chunk));
+
+<A2uiSurfaces processor={processor} />;
+```
+
+- **흐름**: `createSurface`가 오면 서피스가 생기고, `updateComponents`·`updateDataModel`은 그려진 화면을 제자리에서 갱신하며, `deleteSurface`가 오면 사라집니다. 서피스 하나만 그리려면 `<A2uiSurface surface={...} />`, 목록만 필요하면 `useA2uiSurfaces(processor)`를 씁니다.
+- **카탈로그 두 개**:
+  - `basicCatalog`: A2UI 공식 기본 카탈로그(`https://a2ui.org/specification/v1_0/catalogs/basic/catalog.json`)입니다. 카탈로그 문서는 공식 문서를 그대로 쓰고 18개 컴포넌트(Row, Column, List, Card, Tabs, Modal, Divider, Text, Image, Icon, Video, AudioPlayer, Button, TextField, CheckBox, ChoicePicker, Slider, DateTimeInput)를 Horon 컴포넌트로 그립니다. 기본 카탈로그를 겨냥한 에이전트는 고치지 않고 그대로 씁니다.
+  - `horonCatalog`(`https://horon.ai/a2ui/catalogs/horon-expo/v1`): 기본 카탈로그 전체에 Badge, Banner, Chip, EmptyState, IntegrationRow, Progress를 더한 카탈로그입니다. `horonCatalog.toJson()`이 에이전트에 줄 합친 문서입니다.
+- **함수**: 기본 카탈로그 함수 14개(`required`, `regex`, `length`, `numeric`, `email`, `formatString`, `formatNumber`, `formatCurrency`, `formatDate`, `pluralize`, `openUrl`, `and`, `or`, `not`)를 구현합니다. 날짜·숫자 형식의 로캘은 `createBasicCatalog({ locale: "ko-KR" })`, `createHoronCatalog({ locale: "ko-KR" })`로 정합니다(기본값 `en-US`).
+- **자체 컴포넌트**: `createComponentImplementation(api, View)`로 만듭니다. `View`는 값이 풀린 `props`(바인딩된 속성에는 `setValue` 같은 setter, 액션은 호출하면 에이전트로 가는 함수, 검사 결과는 `isValid`·`validationErrors`)와 자식 참조를 그리는 `buildChild`를 받습니다. API는 카탈로그 문서에서 `Catalog.fromJson(doc).components.get("Name")`로 가져오고, `basicCatalogParts()`와 합쳐 새 `Catalog`를 만듭니다.
+- **보안**: 에이전트 메시지는 신뢰하지 않는 입력으로 다룹니다. `createA2uiProcessor`는 기본으로 `STRICT_VALIDATION`(스키마, ID, 참조, 순환 검사)을 켭니다. `openUrl`은 `http(s)`·`mailto`·`tel`만 열고, 이미지·영상 주소는 `http(s)`만 받습니다.
+- **React Native 차이**:
+  - Video와 AudioPlayer는 앱 안에서 재생하지 않습니다. 패키지가 재생기 의존성을 갖지 않으므로 포스터와 재생 행을 그리고, 누르면 시스템 재생기로 주소를 엽니다.
+  - Modal은 Horon 하단 시트로 열립니다. 카탈로그에 제목 속성이 없어 시트 제목은 `accessibility.label`을 씁니다.
+  - DateTimeInput의 날짜는 Horon `DateField`, 시간은 24시간 `HH:mm` 입력칸입니다. 값은 ISO 8601(`yyyy-MM-dd`, `HH:mm`, 둘 다면 `yyyy-MM-ddTHH:mm`)입니다.
+  - 입력 컴포넌트의 검사 메시지는 사용자가 값을 바꾼 뒤부터 보입니다. 빈 양식이 처음부터 빨갛게 열리지 않게 하려는 것입니다.
+  - 기본 카탈로그의 `theme`(`primaryColor` 등)은 쓰지 않고 Horon 토큰을 따릅니다.
+
 ## 명령
 
 ```sh

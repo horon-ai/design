@@ -60,12 +60,24 @@ third-party stock photography. If it is, the PolyForm Strict license in
 `LICENSE` does not apply to that file; the question stays open until the source
 and its terms are confirmed.
 
+## A2UI
+
+`packages/expo/src/a2ui/catalogs/basic/catalog.json` is the A2UI v1.0 basic
+catalog document, copied unchanged from `@a2ui/web_core` 0.16.1
+(`specification/v1_0/catalogs/basic/catalog.json`), and
+`packages/expo/src/a2ui/catalogs/basic/functions.ts` ports that package's basic
+catalog functions (`src/common/basic_functions.js`) to React Native.
+Apache License 2.0, Copyright 2024 Google LLC. The license text is at
+<https://www.apache.org/licenses/LICENSE-2.0> and in the published
+`@a2ui/web_core` package.
+
 ## Runtime dependencies
 
 Everything else the packages import arrives as npm dependencies rather than
 vendored source, and each carries its own license in its published package:
 `@base-ui/react` (MIT), `@tanstack/react-table` (MIT), `tailwind-merge` (MIT),
-`shiki` (MIT), `expo`, `expo-glass-effect`, `expo-clipboard` (MIT),
+`shiki` (MIT), `@a2ui/web_core` (Apache-2.0), `expo`, `expo-glass-effect`,
+`expo-clipboard` (MIT),
 `react-native` (MIT), `react-native-safe-area-context` (MIT), `react-native-svg`
 (MIT), `marked` (MIT), `htmlparser2` (MIT) with `entities`, `domhandler`,
 `domutils` and `domelementtype` (BSD-2-Clause), and the React, Astro and Expo
