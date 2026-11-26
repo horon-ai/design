@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://horon.ai/a2ui/catalogs/horon-expo/v1/catalog.json",
+  "catalogId": "https://horon.ai/a2ui/catalogs/horon-expo/v1",
+  "protocolVersion": "1.0",
+  "title": "Horon Expo Catalog",
+  "description": "Horon design system components for A2UI v1.0 surfaces, drawn by @horon-ai/expo. Surfaces on this catalog also get every component and function of the A2UI basic catalog.",
+  "instructions": "Use the basic catalog components (Row, Column, Card, Text, Button, ...) for layout and forms. Use Badge for a short status label, Banner for a one-line notice, Chip for a toggleable filter or quick reply, EmptyState when there is nothing to show, IntegrationRow for a connected service, and Progress for completion.",
+  "$defs": {
+    "Weight": {
+      "type": "number",
+      "description": "The relative weight of this component within a Row or Column, like CSS 'flex-grow'. Only set it on a direct child of a Row or Column."
+    }
+  },
+  "components": {
+    "Badge": {
+      "type": "object",
+      "description": "A short status label.",
+      "properties": {
+        "component": { "const": "Badge" },
+        "label": { "$ref": "common_types.json#/$defs/DynamicString", "description": "The label text." },
+        "tone": {
+          "type": "string",
+          "enum": ["neutral", "brand", "danger", "solid", "surface"],
+          "default": "neutral",
+          "description": "The colour treatment."
+        },
+        "size": { "type": "string", "enum": ["sm", "md", "lg"], "default": "md" },
+        "dot": { "$ref": "common_types.json#/$defs/DynamicBoolean", "description": "Shows a leading status dot." },
+        "weight": { "$ref": "#/$defs/Weight" }
+      },
+      "required": ["component", "label"]
+    },
+    "Banner": {
+      "type": "object",
+      "description": "A one-line notice strip, optionally with an action link.",
+      "properties": {
+        "component": { "const": "Banner" },
+        "message": { "$ref": "common_types.json#/$defs/DynamicString", "description": "The notice text." },
+        "tone": { "type": "string", "enum": ["info", "danger"], "default": "info" },
+        "surface": { "type": "string", "enum": ["solid", "glass"], "default": "solid" },
+        "actionLabel": {
+          "$ref": "common_types.json#/$defs/DynamicString",
+          "description": "Label of the action link. The link shows only when both actionLabel and action are set."
+        },
+        "action": { "$ref": "common_types.json#/$defs/Action" },
+        "weight": { "$ref": "#/$defs/Weight" }
+      },
+      "required": ["component", "message"]
+    },
+    "Chip": {
+      "type": "object",
+      "description": "A toggleable pill, for filters and quick replies. Bind 'pressed' to a data path to keep its state in the data model.",
+      "properties": {
+        "component": { "const": "Chip" },
+        "label": { "$ref": "common_types.json#/$defs/DynamicString" },
+        "pressed": { "$ref": "common_types.json#/$defs/DynamicBoolean", "description": "Whether the chip is on." },
+        "disabled": { "$ref": "common_types.json#/$defs/DynamicBoolean" },
+        "size": { "type": "string", "enum": ["sm", "md", "lg"], "default": "md" },
+        "action": { "$ref": "common_types.json#/$defs/Action", "description": "Dispatched on every press." },
+        "weight": { "$ref": "#/$defs/Weight" }
+      },
+      "required": ["component", "label"]
+    },
+    "EmptyState": {
+      "type": "object",
+      "description": "A centred message for an empty, failed or signed-out area, optionally with one action button.",
+      "properties": {
+        "component": { "const": "EmptyState" },
+        "title": { "$ref": "common_types.json#/$defs/DynamicString" },
+        "description": { "$ref": "common_types.json#/$defs/DynamicString" },
+        "actionLabel": {
+          "$ref": "common_types.json#/$defs/DynamicString",
+          "description": "Label of the action button. The button shows only when both actionLabel and action are set."
+        },
+        "action": { "$ref": "common_types.json#/$defs/Action" },
+        "weight": { "$ref": "#/$defs/Weight" }
+      },
+      "required": ["component", "title"]
+    },
+    "IntegrationRow": {
+      "type": "object",
+      "description": "A connected service row with its status and a connect or reconnect button.",
+      "properties": {
+        "component": { "const": "IntegrationRow" },
+        "name": { "$ref": "common_types.json#/$defs/DynamicString", "description": "The service name." },
+        "detail": { "$ref": "common_types.json#/$defs/DynamicString", "description": "A line under the name, such as the account." },
+        "status": { "type": "string", "enum": ["connected", "reconnect", "not-connected"], "default": "not-connected" },
+        "connectedLabel": { "$ref": "common_types.json#/$defs/DynamicString" },
+        "reconnectLabel": { "$ref": "common_types.json#/$defs/DynamicString" },
+        "connectLabel": { "$ref": "common_types.json#/$defs/DynamicString" },
+        "action": { "$ref": "common_types.json#/$defs/Action", "description": "Dispatched by the connect or reconnect button." },
+        "weight": { "$ref": "#/$defs/Weight" }
+      },
+      "required": ["component", "name"]
+    },
+    "Progress": {
+      "type": "object",
+      "description": "A progress bar. Omit value for an indeterminate bar.",
+      "properties": {
+        "component": { "const": "Progress" },
+        "value": { "$ref": "common_types.json#/$defs/DynamicNumber" },
+        "min": { "type": "number", "default": 0 },
+        "max": { "type": "number", "default": 100 },
+        "weight": { "$ref": "#/$defs/Weight" }
+      },
+      "required": ["component"]
+    }
+  }
+}

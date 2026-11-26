@@ -28,6 +28,9 @@ const transpiled = [
   "domutils",
   "domelementtype",
   "dom-serializer",
+  // `@a2ui/web_core` and its signals ship as ES modules only.
+  "@a2ui\\+web_core",
+  "@preact\\+signals-core",
 ].join("|");
 
 module.exports = {
