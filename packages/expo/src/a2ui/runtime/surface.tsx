@@ -50,7 +50,7 @@ export function useSignalValue<T>(signal: Signal<T>): T {
     [signal],
   );
   const getSnapshot = useCallback(() => peekValue(signal), [signal]);
-  return useSyncExternalStore(subscribe, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -199,15 +199,21 @@ type ResolverBox = { resolver: NodeResolver<NativeCatalogComponent> | undefined 
  * It owns a `NodeResolver` for the surface, subscribes to the resolved root and renders each node
  * through its catalog entry's `view`. Components, data model and actions update in place as
  * `updateComponents` and `updateDataModel` arrive. Wrap the tree in `HoronProvider`.
+ *
+ * The resolver is created on the first render, so the first frame (and a server render, such as
+ * Expo web static rendering) already holds the surface's content.
  */
 export function A2uiSurface({ surface }: { surface: NativeSurfaceModel }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- one box per surface
   const box = useMemo<ResolverBox>(() => ({ resolver: undefined }), [surface]);
 
+  const resolverOf = useCallback(
+    () => (box.resolver ??= new NodeResolver(surface, surface.defaultCatalog)),
+    [surface, box],
+  );
   const subscribe = useCallback(
     (onChange: () => void) => {
-      const resolver = new NodeResolver(surface, surface.defaultCatalog);
-      box.resolver = resolver;
+      const resolver = resolverOf();
       const stop = effect(() => {
         getValue(resolver.rootNode);
         onChange();
@@ -218,10 +224,10 @@ export function A2uiSurface({ surface }: { surface: NativeSurfaceModel }) {
         if (box.resolver === resolver) box.resolver = undefined;
       };
     },
-    [surface, box],
+    [resolverOf, box],
   );
-  const getSnapshot = useCallback(() => (box.resolver ? peekValue(box.resolver.rootNode) : undefined), [box]);
-  const root = useSyncExternalStore(subscribe, getSnapshot);
+  const getSnapshot = useCallback(() => peekValue(resolverOf().rootNode), [resolverOf]);
+  const root = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   if (!root) return null;
   return (
